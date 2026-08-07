@@ -35,6 +35,10 @@
   background:#1B2733;border:1px solid #2A3B4C;color:#C6D3DF}
 .minib.grn{border-color:#2E6B4A;color:#6FD9A0}
 .minib.blu{border-color:#2A5A8A;color:#8ab4d8}
+/* 배 목록에서 지금 보고 있는 배 */
+.mr.cur{border-color:#2E6B4A;background:#101C16}
+.mr.cur .cn{color:#6FD9A0}
+
 /* 비어 있는 목록 — 무엇을 하는 곳인지 알려 준다 */
 .emptybox{border:1px dashed #2A3B4C;border-radius:12px;padding:22px 16px;margin:6px 0;
   text-align:center;background:#0E1620;line-height:1.85}
@@ -418,7 +422,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <header>
   <div class="hrow">
     <div>
-      <div class="sub" id="boatSub">뱃일</div>
+      <div class="sub" id="boatSub" onclick="openFleet()" style="cursor:pointer">뱃일</div>
       <h1><span id="hTitle">적재표</span> <span id="syncState"></span></h1>
     </div>
     <div class="btns">
@@ -698,6 +702,11 @@ const HELP = {
   seed: ['초안 표시',
     '앱이 기본으로 넣어 둔 항목입니다. 일반적인 정비 주기를 참고용으로 담았을 뿐, 배마다 실제 주기는 다릅니다.<br><br>' +
     '설명서를 확인하고 주기와 내용을 배에 맞게 고쳐 주세요. 한 번이라도 수정하면 초안 표시가 사라집니다.'],
+  model: ['제조사 · 모델 · 연식',
+    '배의 제조사와 모델, 건조 연도입니다. 예를 들어 <b>Beneteau · First 45f5 · 1991</b> 처럼 적습니다.<br><br>' +
+    '나중에 정비 문제로 도움을 구할 때, 상대가 배를 알아야 답이 정확해집니다. ' +
+    '같은 모델을 쓰는 사람의 경험도 그만큼 잘 맞습니다.<br><br>' +
+    '모르면 비워 두어도 됩니다. 선체나 엔진룸에 붙은 명판, 선박검사증에서 확인할 수 있습니다.'],
   status: ['수리 상태',
     '<b>고장</b>은 발견했지만 아직 손대지 않은 상태입니다.<br>' +
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>' +
@@ -879,6 +888,13 @@ function openBoatSetup(){
         Object.entries(BOAT_TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
     <div class="mrrow"><span class="mrlbl">홈포트</span>
       <input id="nbPort" style="flex:1" placeholder="예: 여수 원형마리나" autocomplete="off"></div>
+    <div class="mrrow"><span class="mrlbl">제조사</span>
+      <input id="nbMaker" style="flex:1" placeholder="예: Beneteau" autocomplete="off"></div>
+    <div class="mrrow"><span class="mrlbl">모델</span>
+      <input id="nbModel" style="flex:1" placeholder="예: First 45f5" autocomplete="off">
+      <input id="nbYear" type="number" min="1900" max="2100" style="width:86px" placeholder="연식" autocomplete="off"></div>
+    <div class="mrnone" style="text-align:left">제조사·모델·연식은 나중에 도움을 구할 때 상대가 배를 파악하는 데 쓰입니다.
+      지금 몰라도 되고, 나중에 채워도 됩니다.</div>
     <div class="mrrow" style="justify-content:flex-end">
       <button class="mrbtn" onclick="createBoat()">등록</button></div>`;
   P.classList.add('open');
@@ -889,11 +905,23 @@ function createBoat(){
   if(!name){ alert('배 이름을 입력해 주세요.'); return; }
   const type = document.getElementById('nbType').value || 'sail';
   const port = (document.getElementById('nbPort').value||'').trim();
-  const nb = { id:newId(), name, type, port,
+  const val = id => { const el = document.getElementById(id); return el ? (el.value||'').trim() : ''; };
+  const maker = val('nbMaker'), model = val('nbModel'), year = val('nbYear');
+  const nb = { id:newId(), name, type, port, maker, model,
+               year: (year && +year > 1800) ? +year : null,
                code: makeBoatCode(name), createdAt:new Date().toISOString(), members:{} };
   if(me) nb.members[me.uid] = 'owner';    // 로그인 상태면 선주로 등록
+  const first = boats.length === 0;
   boats.push(nb);
   if(window.__saveBoat) window.__saveBoat(nb);
+  if(!first){
+    // 두 번째 이후의 배는 빈 기록으로 시작한다
+    currentBoatId = nb.id; window.currentBoatId = currentBoatId;
+    items=[]; trash=[]; repair=[]; voyage=[]; fuel=[]; runs=[]; vdocs=[]; mrTrash=[];
+    maint = deepCopy(MAINT_DEFAULTS);
+    contacts = deepCopy(CONTACT_DEFAULTS);
+    checkt = deepCopy(CHECK_DEFAULTS);
+  }
   currentBoatId = boats[boats.length-1].id;
   window.currentBoatId = currentBoatId;
   sysSave();
@@ -908,6 +936,43 @@ function applyBoatName(){
   const dh = document.querySelector('#drawer .dhead');
   if(dh && dh.firstChild && dh.firstChild.nodeType === 3) dh.firstChild.textContent = b.name + ' ';
   document.title = b.name + ' 운용';
+}
+
+// 배가 여러 척이면 여기서 바꾼다. 한 척이면 곧바로 배 정보로 간다.
+function openFleet(){
+  if(boats.length <= 1){ openBoat('info'); return; }
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>내 배 목록</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+    + boats.map(b=>{
+        const on = String(b.id) === String(currentBoatId);
+        return `<div class="mr${on?' cur':''}" onclick="switchBoat('${b.id}')">
+          <div class="ct"><div class="cn">${on?'✓ ':''}${esc(b.name)}</div>
+            <span class="chip">${esc(BOAT_TYPES[b.type]||'')}</span></div>
+          <div class="mrm">${esc(b.port||'홈포트 미입력')}${
+            b.model ? ' · '+esc(b.model) : ''}${b.year ? ' · '+b.year+'년' : ''}</div>
+        </div>`;
+      }).join('')
+    + `<div class="mrrow" style="justify-content:flex-end">
+        ${unlocked ? `<button class="mrbtn" onclick="addBoat()">+ 배 추가</button>` : ''}
+        <button class="mrbtn" onclick="openBoat('info')">현재 배 정보</button></div>`;
+  P.classList.add('open');
+}
+async function switchBoat(id){
+  if(String(id) === String(currentBoatId)){ openBoat('info'); return; }
+  currentBoatId = String(id);
+  window.currentBoatId = currentBoatId;
+  idbSet('curboat', currentBoatId).catch(e=>{});
+  applyBoatName();
+  closeBoat();
+  await loadBoatData();          // 그 배의 기록으로 바꾼다
+  updateTrashTab();
+  if(typeof cloudSeedCheck === 'function') cloudSeedCheck();
+  switchTab(curTab || 'stow');
+}
+function addBoat(){
+  if(!unlocked) return;
+  openBoatSetup();
 }
 
 // 배 정보 보기·고치기
@@ -940,6 +1005,13 @@ function openBoat(tab){
       <div class="mrrow"><span class="mrlbl">홈포트</span>${unlocked
         ? `<input value="${esc(b.port||'')}" style="flex:1" placeholder="예: 여수 원형마리나" onchange="boatField('port',this.value)">`
         : ro(b.port)}</div>
+      <div class="mrrow"><span class="mrlbl">제조사</span>${unlocked
+        ? `<input value="${esc(b.maker||'')}" style="flex:1" placeholder="예: Beneteau" onchange="boatField('maker',this.value)">`
+        : ro(b.maker)}</div>
+      <div class="mrrow"><span class="mrlbl">모델${helpBtn('model')}</span>${unlocked
+        ? `<input value="${esc(b.model||'')}" style="flex:1" placeholder="예: First 45f5" onchange="boatField('model',this.value)">
+           <input type="number" min="1900" max="2100" value="${b.year||''}" style="width:86px" placeholder="연식" onchange="boatYear(this.value)">`
+        : `<b class="mrv">${esc(b.model||'—')}${b.year?' · '+b.year+'년':''}</b>`}</div>
       <div class="mrrow"><span class="mrlbl">초대 코드</span><b class="mrv" style="letter-spacing:1px">${esc(b.code)}</b></div>
       <div class="mrnone" style="text-align:left">이 코드는 함께 배를 관리할 사람을 초대할 때 사용합니다.<br>
         현재는 코드만 표시되며, 공동 관리 기능은 준비 중입니다.</div>
@@ -969,6 +1041,11 @@ function setBoatSpecUI(k, v){
   if(typeof renderFuel === 'function') renderFuel();
 }
 function closeBoat(){ document.getElementById('mrPanel').classList.remove('open'); }
+function boatYear(v){
+  const t = String(v||'').trim();
+  const n = parseInt(t, 10);
+  boatField('year', (t && n >= 1800 && n <= 2100) ? n : null);
+}
 function boatField(k, v){
   const b = curBoat(); if(!b || !unlocked) return;
   b[k] = v; saveMR(); applyBoatName();
@@ -1031,32 +1108,56 @@ function openDB(){
     q.onerror = ()=>rej(q.error);
   });
 }
+// 배별 저장 키. 배를 바꾸면 그 배의 기록을 읽고 쓴다.
+// 배가 정해지기 전(첫 실행)에는 예전 방식 그대로 둔다 — 기존 데이터를 잃지 않기 위해서다.
+function bkey(name){
+  const id = currentBoatId;
+  return id ? (name + '@' + id) : name;
+}
 function idbGet(key){ return new Promise((res,rej)=>{ const t=db.transaction('kv','readonly').objectStore('kv').get(key); t.onsuccess=()=>res(t.result); t.onerror=()=>rej(t.error); }); }
 function idbSet(key,val){ return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite').objectStore('kv').put(val,key); t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+
+// 현재 배의 기록을 불러온다. 배를 바꿀 때도 이 함수를 다시 부른다.
+async function loadBoatData(){
+  const get = async (name, fallback) => {
+    try{
+      let v = await idbGet(bkey(name));
+      // 배별 키에 없으면, 배가 하나뿐이던 시절의 키에서 가져와 옮긴다
+      if(v === undefined || v === null){
+        const old = await idbGet(name);
+        if(old !== undefined && old !== null){ v = old; await idbSet(bkey(name), v); }
+      }
+      return (v === undefined || v === null) ? fallback : v;
+    }catch(e){ return fallback; }
+  };
+  let data = await get('all', null);
+  if(!data || !data.length){
+    try{
+      const old = JSON.parse(localStorage.getItem('bt_items')||'[]');
+      if(old.length){ data = old; await idbSet(bkey('all'), data); }
+    }catch(e){}
+  }
+  items   = migrate(data);
+  trash   = migrate(await get('trash', []));
+  const m = await get('maint', null);   maint  = (m && m.length) ? m : deepCopy(MAINT_DEFAULTS);
+  repair  = await get('repair', []);
+  voyage  = await get('voyage', []);
+  fuel    = await get('fuel', []);
+  runs    = await get('runs', []);
+  const c = await get('contacts', null); contacts = (c && c.length) ? c : deepCopy(CONTACT_DEFAULTS);
+  vdocs   = await get('vdocs', []);
+  const k = await get('checkt', null);  checkt = (k && k.length) ? k : deepCopy(CHECK_DEFAULTS);
+  mrTrash = await get('mrtrash', []);
+}
 
 async function initStorage(){
   try{
     db = await openDB();
-    let data = await idbGet('all');
-    if(!data || !data.length){
-      try{
-        const old = JSON.parse(localStorage.getItem('bt_items')||'[]');
-        if(old.length){ data = old; await idbSet('all', data); }
-      }catch(e){}
-    }
-    items = migrate(data);
-    try{ trash = migrate(await idbGet('trash')); }catch(e){ trash = []; }
-    try{ const m = await idbGet('maint'); maint = (m&&m.length)? m : deepCopy(MAINT_DEFAULTS); }catch(e){ maint = deepCopy(MAINT_DEFAULTS); }
-    try{ const r = await idbGet('repair'); repair = r||[]; }catch(e){ repair = []; }
-    try{ voyage = (await idbGet('voyage'))||[]; }catch(e){ voyage = []; }
-    try{ fuel = (await idbGet('fuel'))||[]; }catch(e){ fuel = []; }
-    try{ runs = (await idbGet('runs'))||[]; }catch(e){ runs = []; }
+    // 배 목록을 먼저 읽어야 어느 배의 기록을 불러올지 알 수 있다
     try{ boats = (await idbGet('boats'))||[]; }catch(e){ boats = []; }
     try{ currentBoatId = (await idbGet('curboat'))||null; }catch(e){ currentBoatId = null; }
-    try{ const c = await idbGet('contacts'); contacts = (c&&c.length)? c : deepCopy(CONTACT_DEFAULTS); }catch(e){ contacts = deepCopy(CONTACT_DEFAULTS); }
-    try{ vdocs = (await idbGet('vdocs'))||[]; }catch(e){ vdocs = []; }
-    try{ const k = await idbGet('checkt'); checkt = (k&&k.length)? k : deepCopy(CHECK_DEFAULTS); }catch(e){ checkt = deepCopy(CHECK_DEFAULTS); }
-    try{ mrTrash = (await idbGet('mrtrash'))||[]; }catch(e){ mrTrash = []; }
+    if(!currentBoatId && boats.length) currentBoatId = boats[0].id;
+    await loadBoatData();
     updateTrashTab();
   }catch(e){
     db = null;
@@ -1079,28 +1180,30 @@ async function initStorage(){
 
 function saveLocal(){
   if(db){
-    idbSet('all', items).catch(e=>alert('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.'));
-    idbSet('trash', trash).catch(e=>{});
-    idbSet('maint', maint).catch(e=>{});
-    idbSet('repair', repair).catch(e=>{});
-    idbSet('voyage', voyage).catch(e=>{});
-    idbSet('fuel', fuel).catch(e=>{});
-    idbSet('runs', runs).catch(e=>{});
+    // 기록은 배별로 나눠 저장한다. 배 목록과 현재 배는 공통이다.
+    idbSet(bkey('all'), items).catch(e=>alert('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.'));
+    idbSet(bkey('trash'), trash).catch(e=>{});
+    idbSet(bkey('maint'), maint).catch(e=>{});
+    idbSet(bkey('repair'), repair).catch(e=>{});
+    idbSet(bkey('voyage'), voyage).catch(e=>{});
+    idbSet(bkey('fuel'), fuel).catch(e=>{});
+    idbSet(bkey('runs'), runs).catch(e=>{});
+    idbSet(bkey('contacts'), contacts).catch(e=>{});
+    idbSet(bkey('vdocs'), vdocs).catch(e=>{});
+    idbSet(bkey('checkt'), checkt).catch(e=>{});
+    idbSet(bkey('mrtrash'), mrTrash).catch(e=>{});
     idbSet('boats', boats).catch(e=>{});
     idbSet('curboat', currentBoatId).catch(e=>{});
-    idbSet('contacts', contacts).catch(e=>{});
-    idbSet('vdocs', vdocs).catch(e=>{});
-    idbSet('checkt', checkt).catch(e=>{});
-    idbSet('mrtrash', mrTrash).catch(e=>{});
   } else {
     try{
-      localStorage.setItem('bt_items', JSON.stringify(items));
-      localStorage.setItem('bt_trash', JSON.stringify(trash));
-      localStorage.setItem('bt_maint', JSON.stringify(maint));
-      localStorage.setItem('bt_repair', JSON.stringify(repair));
-      localStorage.setItem('bt_voyage', JSON.stringify(voyage));
-      localStorage.setItem('bt_fuel', JSON.stringify(fuel));
-      localStorage.setItem('bt_runs', JSON.stringify(runs));
+      const lk = n => 'bt_' + bkey(n);
+      localStorage.setItem(lk('items'), JSON.stringify(items));
+      localStorage.setItem(lk('trash'), JSON.stringify(trash));
+      localStorage.setItem(lk('maint'), JSON.stringify(maint));
+      localStorage.setItem(lk('repair'), JSON.stringify(repair));
+      localStorage.setItem(lk('voyage'), JSON.stringify(voyage));
+      localStorage.setItem(lk('fuel'), JSON.stringify(fuel));
+      localStorage.setItem(lk('runs'), JSON.stringify(runs));
       localStorage.setItem('bt_boats', JSON.stringify(boats));
       if(currentBoatId) localStorage.setItem('bt_curboat', String(currentBoatId));
       localStorage.setItem('bt_contacts', JSON.stringify(contacts));
@@ -4137,6 +4240,7 @@ document.addEventListener('visibilitychange', ()=>{
       try{
         await setDoc(doc(fdb, 'boats', String(boat.id)), {
           name: boat.name || '', type: boat.type || 'other', port: boat.port || '',
+          maker: boat.maker || '', model: boat.model || '', year: boat.year || null,
           code: boat.code || '', spec: boat.spec || {},
           members: boat.members || {}, createdAt: boat.createdAt || ''
         }, { merge:true });

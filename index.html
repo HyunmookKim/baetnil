@@ -803,7 +803,13 @@ function authMsg(e){
   if(c.includes('too-many-requests'))      return '시도가 많아 잠시 제한되었습니다. 잠시 후 다시 시도해 주세요.';
   if(c.includes('network'))                return '인터넷 연결을 확인해 주세요.';
   if(c.includes('popup-closed'))           return '로그인 창이 닫혔습니다.';
-  return '로그인하지 못했습니다. 잠시 후 다시 시도해 주세요.';
+  if(c.includes('popup-blocked'))          return '팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해 주세요.';
+  if(c.includes('unauthorized-domain'))    return '이 주소에서는 로그인할 수 없도록 설정되어 있습니다.';
+  if(c.includes('operation-not-allowed'))  return '해당 로그인 방식이 꺼져 있습니다.';
+  if(c.includes('user-disabled'))          return '사용이 중지된 계정입니다.';
+  // 알 수 없는 오류는 원인을 알 수 있게 코드를 함께 보여 준다.
+  // 문의를 받을 때도 이 코드가 있어야 원인을 찾을 수 있다.
+  return '로그인하지 못했습니다.' + (c ? ` (${esc(c)})` : '');
 }
 async function doGoogle(){
   if(!window.__auth){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }

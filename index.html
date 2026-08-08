@@ -196,7 +196,8 @@ body{padding-bottom:62px}
 .seedb{font-size:9px;color:#b58a3a;border:1px solid #7a5a20;border-radius:4px;padding:0 4px;vertical-align:1px}
 .mrnone{color:#2a4a6a;font-size:12px;text-align:center;margin-top:22px}
 #mrMap{position:relative;width:min(500px,100%);margin:0 auto;overflow:hidden;
-  touch-action:none;user-select:none;-webkit-user-select:none}
+  touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#mrMap.zoomed{touch-action:none}
 #mrPan{position:absolute;left:0;top:0;width:100%;will-change:transform}
 #mrPan img{width:100%;height:auto;display:block}
 .mrzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px;z-index:5}
@@ -2379,16 +2380,14 @@ function dgFit(){
     const r = (img.naturalHeight && img.naturalWidth)
       ? img.naturalHeight / img.naturalWidth : 1.56;
     dgRatio = r;
-    // 도면이 길면 틀 높이를 화면 안으로 제한한다.
-    // (평면도는 비율이 3배라 그대로 두면 페이지가 하염없이 길어진다)
-    const cap = Math.round(Math.min(window.innerHeight * 0.62, 560));
-    const H = Math.round(Math.min(w * r, cap));
-    box.style.height = H + 'px';
-    // 처음에는 도면 전체가 보이도록 맞춘다. 폭에만 맞추면 세로가 잘린다.
-    if(!dgTouched){
-      DG_MIN = Math.min(1, H / (w * r));    // 전체가 들어가는 배율
-      dgV.s = DG_MIN;
-    }
+    DG_MIN = 1;                        // 기본은 폭에 꽉 채운 크기
+    // 확대 전에는 도면 전체 높이만큼 자리를 준다 — 크게 보이고 페이지 스크롤로 내려 본다.
+    // 확대하면 틀을 화면 안으로 줄여, 그 안에서 끌어 이동하게 한다.
+    const cap = Math.round(Math.min(window.innerHeight * 0.72, 720));
+    const full = Math.round(w * r);
+    box.style.height = (dgTouched ? Math.min(full, cap) : full) + 'px';
+    box.classList.toggle('zoomed', dgTouched);
+    if(!dgTouched) dgV = { s:1, x:0, y:0 };
     dgClamp(); dgApply();
   };
   if(img.complete && img.naturalWidth) set();
@@ -2433,13 +2432,15 @@ function dgZoom(mul, cx, cy){
   dgV.x = cx - (cx - dgV.x)*k;
   dgV.y = cy - (cy - dgV.y)*k;
   dgV.s = ns;
-  dgTouched = true;
+  const was = dgTouched;
+  dgTouched = (ns > 1);          // 원래 크기면 스크롤 방식, 확대하면 이동 방식
+  if(was !== dgTouched){ dgFit(); return; }   // 틀 높이를 다시 잡는다
   dgClamp(); dgApply(true);
 }
 function dgReset(anim){
   dgTouched = false;
-  dgV = { s:DG_MIN, x:0, y:0 };
-  dgClamp();
+  dgV = { s:1, x:0, y:0 };
+  dgFit();                       // 틀을 도면 전체 높이로 되돌린다
   dgApply(anim !== false);
 }
 // 특정 핀(이미지 기준 %)을 화면 가운데에 놓고 확대한다
@@ -2467,12 +2468,12 @@ function dgBind(){
   });
   box.addEventListener('pointermove', e=>{
     if(!drag || pinch) return;           // 두 손가락 중에는 끌지 않는다
+    if(!dgTouched) return;               // 확대 전에는 페이지 스크롤에 맡긴다
     const sz = dgSize();
     if(sz.pw <= sz.W && sz.ph <= sz.H) return;   // 다 보이면 끌 것이 없다
     const q = pt(e), dx = q.x-drag.x, dy = q.y-drag.y;
     moved += Math.abs(dx)+Math.abs(dy);
     dgV.x += dx; dgV.y += dy; drag = q;
-    dgTouched = true;
     dgClamp(); dgApply();
   });
   box.addEventListener('pointerup', ()=>{ drag=null; });
@@ -2498,7 +2499,9 @@ function dgBind(){
       dgV.x = pinch.cx - (pinch.cx - dgV.x)*k;
       dgV.y = pinch.cy - (pinch.cy - dgV.y)*k;
       dgV.s = want;
-      dgTouched = true;
+      const was = dgTouched;
+      dgTouched = (want > 1);
+      if(was !== dgTouched){ dgFit(); return; }
       dgClamp(); dgApply(false);   // 전환 효과가 있으면 손가락보다 늦게 따라와 끊겨 보인다
     }
   }, {passive:false});

@@ -927,9 +927,9 @@ function createBoat(){
   currentBoatId = boats[boats.length-1].id;
   window.currentBoatId = currentBoatId;
   sysSave();
-  document.getElementById('mrPanel').classList.remove('open');
   applyBoatName();
   switchTab('stow');   // 등록이 끝났으니 적재표부터 보여준다
+  openPortPick();      // 이어서 홈포트 위치를 잡는다 (날씨 지점으로도 쓰인다)
 }
 function applyBoatName(){
   const el = document.getElementById('boatSub');
@@ -943,6 +943,75 @@ function applyBoatName(){
   const dh = document.querySelector('#drawer .dhead');
   if(dh && dh.firstChild && dh.firstChild.nodeType === 3) dh.firstChild.textContent = b.name + ' ';
   document.title = b.name + ' 운용';
+}
+
+// ── 홈포트 위치
+// 이름만으로는 어디인지 알기 어렵고, 부르는 이름도 사람마다 다릅니다.
+// 지도에서 찍어 두면 날씨·물때 지점으로도 바로 쓸 수 있습니다.
+let portPickCtx = null;
+function openPortPick(){
+  if(!unlocked) return;
+  const b = curBoat(); if(!b) return;
+  portPickCtx = { id: b.id };
+  const cur = (b.lat != null && b.lon != null) ? { lat:b.lat, lon:b.lon } : null;
+  const box = document.getElementById('mrPanel');
+  box.innerHTML = `<div class="mrhead"><b>홈포트 위치</b><span style="flex:1"></span>
+      <button class="tab" onclick="portPickCancel()">취소</button>
+      <button class="tab on" id="portSave" onclick="portPickSave()" ${cur?'':'disabled'}>저장</button></div>
+    ${mapBox('portMap','52vh')}
+    <div class="mrnone" style="text-align:left">지도를 탭하면 위치가 지정됩니다 · 끌어서 이동 · 두 손가락으로 확대<br>
+      정박지나 계류장 자리를 찍어 두시면 됩니다.</div>
+    <div class="mrrow" style="justify-content:center">
+      <button class="mrbtn" onclick="portUseGPS()">현재 위치로</button></div>`;
+  box.classList.add('open');
+  mapInit('portMap', [], { mode:'pick', pick: cur });
+  if(!cur) portUseGPS(true);        // 위치가 없으면 현재 자리부터 보여 준다
+}
+function portUseGPS(quiet){
+  if(!navigator.geolocation){ if(!quiet) alert('이 기기에서는 위치 기능을 사용할 수 없습니다.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      if(!mapS) return;
+      mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
+      const v = fitView([mapS.pick], 360, 300);
+      mapS.z = Math.max(v.z, 13); mapS.cx = MERC.x(mapS.pick.lon, mapS.z); mapS.cy = MERC.y(mapS.pick.lat, mapS.z);
+      mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
+      mapPaint(true);
+      const btn = document.getElementById('portSave'); if(btn) btn.disabled = false;
+    },
+    ()=>{ if(!quiet) alert('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'); }
+  );
+}
+function portPickCancel(){
+  portPickCtx = null; mapS = null;
+  openBoat('info');
+}
+function portPickSave(){
+  if(!portPickCtx || !mapS || !mapS.pick) return;
+  const b = boats.find(x=>String(x.id)===String(portPickCtx.id));
+  if(b){
+    b.lat = mapS.pick.lat; b.lon = mapS.pick.lon;
+    saveMR();
+    if(window.__saveBoat) window.__saveBoat(b);
+    syncPortSpot(b);        // 날씨 지점으로도 등록한다
+  }
+  portPickCtx = null; mapS = null;
+  openBoat('info');
+}
+
+// 홈포트를 날씨·물때 지점으로 맞춰 둔다.
+// 배를 등록하면 날씨 지점도 따로 만들어야 했던 번거로움을 없앤다.
+function syncPortSpot(b){
+  if(!b || b.lat == null || b.lon == null) return;
+  if(!Array.isArray(wxSpots)) wxSpots = [];
+  const sid = 'port@' + b.id;
+  const name = b.port || (b.name ? b.name + ' 홈포트' : '홈포트');
+  const idx = wxSpots.findIndex(s=>s.id === sid);
+  const spot = { id:sid, name, lat:b.lat, lon:b.lon, region: wxNearestRegion(b.lat, b.lon) };
+  if(idx >= 0) wxSpots[idx] = spot; else wxSpots.unshift(spot);
+  wxSet('bt_spots', wxSpots);
+  if(!wxCur || wxCur.id === sid){ wxCur = spot; wxSet('bt_wxcur', wxCur); wxData = null; }
+  if(typeof curTab !== 'undefined' && curTab === 'weather') renderWeather();
 }
 
 // 배가 여러 척이면 여기서 바꾼다. 한 척이면 곧바로 배 정보로 간다.
@@ -975,6 +1044,7 @@ async function switchBoat(id){
   closeBoat();
   await loadBoatData();          // 그 배의 기록으로 바꾼다
   updateTrashTab();
+  syncPortSpot(curBoat());       // 날씨 지점도 그 배 기준으로
   if(typeof cloudSeedCheck === 'function') cloudSeedCheck();
   switchTab(curTab || 'stow');
 }
@@ -1014,6 +1084,11 @@ function openBoat(tab){
       <div class="mrrow"><span class="mrlbl">홈포트</span>${unlocked
         ? `<input value="${esc(b.port||'')}" style="flex:1" placeholder="예: 여수 원형마리나" onchange="boatField('port',this.value)">`
         : ro(b.port)}</div>
+      <div class="posrow">${(b.lat != null && b.lon != null)
+        ? `📍 ${fmtDeg(b.lat,['N','S'])} ${fmtDeg(b.lon,['E','W'])}`
+        : `<span style="color:#7b8794">위치 미지정 — 날씨·물때가 이 자리를 기준으로 표시됩니다</span>`}${
+        unlocked ? `<button class="minib blu" onclick="openPortPick()">${
+          (b.lat != null) ? '지도에서 변경' : '지도에서 지정'}</button>` : ''}</div>
       <div class="mrrow"><span class="mrlbl">제조사</span>${unlocked
         ? `<input value="${esc(b.maker||'')}" style="flex:1" placeholder="예: Beneteau" onchange="boatField('maker',this.value)">`
         : ro(b.maker)}</div>
@@ -4279,6 +4354,7 @@ document.addEventListener('visibilitychange', ()=>{
         await setDoc(doc(fdb, 'boats', String(boat.id)), {
           name: boat.name || '', type: boat.type || 'other', port: boat.port || '',
           maker: boat.maker || '', model: boat.model || '', year: boat.year || null,
+          lat: (boat.lat != null ? boat.lat : null), lon: (boat.lon != null ? boat.lon : null),
           code: boat.code || '', spec: boat.spec || {},
           members: boat.members || {}, createdAt: boat.createdAt || ''
         }, { merge:true });

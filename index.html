@@ -1221,6 +1221,16 @@ function boatLabel(){
 // 항목 id — Date.now()만 쓰면 같은 밀리초에 두 번 만들 때 겹친다.
 // 겹치면 하나를 지울 때 둘 다 지워지므로 뒤에 일련번호를 붙인다.
 let _idSeq = 0;
+// 기본값·기록을 복사할 때 쓴다. 원본과 사본이 값을 공유하면
+// 한쪽을 고칠 때 다른 쪽까지 바뀌므로 깊은 복사가 필요하다.
+// JSON 방식을 쓰는 이유: undefined 를 자동으로 걷어내기 때문이다.
+// (undefined 가 섞이면 Firestore 배치 저장이 통째로 실패한다)
+function deepCopy(o){
+  if(o === null || typeof o !== 'object') return o;
+  try{ return JSON.parse(JSON.stringify(o)); }
+  catch(e){ return o; }
+}
+
 function newId(){
   return String(Date.now()) + '-' + (++_idSeq).toString(36);
 }

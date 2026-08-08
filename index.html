@@ -952,7 +952,7 @@ function createBoat(){
     // 두 번째 이후의 배는 빈 기록으로 시작한다
     currentBoatId = nb.id; window.currentBoatId = currentBoatId;
     items=[]; trash=[]; repair=[]; voyage=[]; fuel=[]; runs=[]; vdocs=[]; mrTrash=[];
-    maint = deepCopy(MAINT_DEFAULTS);
+    maint = maintDefaults();      // 선종에 맞는 기본 정비 항목
     contacts = deepCopy(CONTACT_DEFAULTS);
     checkt = deepCopy(CHECK_DEFAULTS);
   }
@@ -1166,9 +1166,18 @@ function boatYear(v){
 }
 function boatField(k, v){
   const b = curBoat(); if(!b || !unlocked) return;
+  const before = b.type;
   b[k] = v; saveMR(); applyBoatName();
   if(window.__saveBoat) window.__saveBoat(b);
-  if(k === 'name') openBoat();
+  if(k === 'type' && before !== v){
+    // 선종이 바뀌면 없는 계통이 남을 수 있다. 지우지는 않고 알리기만 한다.
+    const grps = MAINT_GRPS_BY_TYPE[v] || MAINT_GRPS_BY_TYPE.other;
+    const extra = [...new Set(maint.filter(m=>m.grp && !grps.includes(m.grp)).map(m=>m.grp))];
+    if(extra.length)
+      alert(`선종을 바꾸셨습니다.\n\n정기점검에 「${extra.join(', ')}」 항목이 남아 있습니다.\n`
+          + '이 배에 없는 설비라면 정비 탭에서 삭제하시면 됩니다.');
+  }
+  if(k === 'name' || k === 'type') openBoat();
 }
 
 // 배별 설정값. 배마다 다르므로 배 객체 안에 담는다.
@@ -1257,7 +1266,7 @@ async function loadBoatData(){
   }
   items   = migrate(data);
   trash   = migrate(await get('trash', []));
-  const m = await get('maint', null);   maint  = (m && m.length) ? m : deepCopy(MAINT_DEFAULTS);
+  const m = await get('maint', null);   maint  = (m && m.length) ? m : maintDefaults();
   repair  = await get('repair', []);
   voyage  = await get('voyage', []);
   fuel    = await get('fuel', []);
@@ -1281,7 +1290,7 @@ async function initStorage(){
     db = null;
     try{ items = migrate(JSON.parse(localStorage.getItem('bt_items')||'[]')); }catch(_){ items=[]; }
     try{ trash = migrate(JSON.parse(localStorage.getItem('bt_trash')||'[]')); }catch(_){ trash=[]; }
-    try{ const m = JSON.parse(localStorage.getItem('bt_maint')||'[]'); maint = m.length? m : deepCopy(MAINT_DEFAULTS); }catch(_){ maint = deepCopy(MAINT_DEFAULTS); }
+    try{ const m = JSON.parse(localStorage.getItem('bt_maint')||'[]'); maint = m.length? m : maintDefaults(); }catch(_){ maint = deepCopy(MAINT_DEFAULTS); }
     try{ repair = JSON.parse(localStorage.getItem('bt_repair')||'[]'); }catch(_){ repair=[]; }
     try{ voyage = JSON.parse(localStorage.getItem('bt_voyage')||'[]'); }catch(_){ voyage=[]; }
     try{ fuel = JSON.parse(localStorage.getItem('bt_fuel')||'[]'); }catch(_){ fuel=[]; }
@@ -1996,26 +2005,72 @@ let mrOpenType = null, mrOpenId = null, pinTarget = null;
 
 // 정기점검 초안 (얀마 디젤 + First 45f5 기준, 날짜 주기)
 // ※ 전부 [초안] — 주기·항목은 사용자가 확인 후 수정
-const MAINT_DEFAULTS = [
+// 선종별 기본값
+// 배마다 있는 것과 없는 것이 다릅니다. 세일링 요트에는 리깅·세일이 있지만
+// 모터보트에는 없고, 낚시배에는 어구·어창이 따로 있습니다.
+// 여기 값은 참고용 초안이며, 등록 후 배에 맞게 고쳐 쓰시면 됩니다.
+
+// 어느 배에나 공통인 항목
+const MAINT_COMMON = [
   {id:'m01', grp:'엔진', name:'엔진오일 + 오일필터 교체', months:6,  note:'[초안] 주기·내용 확인 필요'},
-  {id:'m02', grp:'엔진', name:'기어박스(세일드라이브) 오일 교체', months:12, note:'[초안] 주기·내용 확인 필요'},
   {id:'m03', grp:'엔진', name:'연료필터 교체 (1차 세퍼레이터+2차)', months:12, note:'[초안] 주기·내용 확인 필요'},
   {id:'m04', grp:'엔진', name:'해수펌프 임펠러 교체', months:12, note:'[초안] 주기·내용 확인 필요'},
-  {id:'m05', grp:'선체·수중', name:'아연 아노드 점검·교체', months:12, note:'[초안] 엔진/샤프트/러더 각 위치'},
   {id:'m06', grp:'엔진', name:'V벨트 장력 점검·교체', months:12, note:'[초안] 주기·내용 확인 필요'},
   {id:'m07', grp:'엔진', name:'냉각수(부동액) 교체', months:24, note:'[초안] 주기·내용 확인 필요'},
-  {id:'m08', grp:'선체·수중', name:'시콕·해수 스트레이너 점검', months:6,  note:'[초안] 마린토일렛 인렛 포함'},
-  {id:'m09', grp:'선체·수중', name:'빌지펌프 작동 점검', months:3,  note:'[초안] 전동·수동 둘 다'},
-  {id:'m10', grp:'전기', name:'배터리 단자·상태 점검', months:6,  note:'[초안] 주기·내용 확인 필요'},
-  {id:'m11', grp:'리깅·세일', name:'스탠딩 리깅 점검', months:12, note:'[초안] 로드리깅 단자·턴버클'},
-  {id:'m12', grp:'리깅·세일', name:'러닝 리깅·세일 점검', months:12, note:'[초안] 주기·내용 확인 필요'},
-  {id:'m13', grp:'선체·수중', name:'하부 방오도장(안티파울링)', months:12, note:'[초안] 킬 선단부 터치업 포함'},
-  {id:'m14', grp:'안전장비', name:'소화기·안전장비 점검', months:12, note:'[초안] 유효기한 확인'},
-  {id:'m15', grp:'선체·수중', name:'스티어링·러더 베어링 점검', months:12, note:'[초안] 주기·내용 확인 필요'},
-].map(x=>({...x, lastDate:'', photos:[], pin:null, history:[], seed:true}));
+  {id:'m05', grp:'선체·수중', name:'아연 아노드 점검·교체', months:12, note:'[초안] 엔진/샤프트/러더 각 위치'},
+  {id:'m08', grp:'선체·수중', name:'시콕·해수 스트레이너 점검', months:6,  note:'[초안] 확인 필요'},
+  {id:'m09', grp:'선체·수중', name:'빌지펌프 작동 점검', months:3,  note:'[초안] 자동/수동 모두'},
+  {id:'m13', grp:'선체·수중', name:'하부 방오도장(안티파울링)', months:12, note:'[초안] 상가 시 함께'},
+  {id:'m15', grp:'선체·수중', name:'스티어링·러더 베어링 점검', months:12, note:'[초안] 유격·누유 확인'},
+  {id:'m10', grp:'전기', name:'배터리 단자·상태 점검', months:3,  note:'[초안] 확인 필요'},
+  {id:'m14', grp:'안전장비', name:'소화기·안전장비 점검', months:12, note:'[초안] 구명조끼·조명탄 유효기간'},
+];
+const MAINT_BY_TYPE = {
+  sail: [
+    {id:'m02', grp:'엔진', name:'세일드라이브 오일 교체', months:12, note:'[초안] 샤프트 방식이면 삭제하세요'},
+    {id:'m11', grp:'리깅·세일', name:'스탠딩 리깅 점검', months:12, note:'[초안] 터미널·스웨이지 균열 확인'},
+    {id:'m12', grp:'리깅·세일', name:'러닝 리깅·세일 점검', months:6,  note:'[초안] 마모·봉제 확인'},
+  ],
+  power: [
+    {id:'p01', grp:'엔진', name:'기어박스 오일 교체', months:12, note:'[초안] 주기·내용 확인 필요'},
+    {id:'p02', grp:'선체·수중', name:'프로펠러·샤프트 점검', months:12, note:'[초안] 휨·부착물 확인'},
+  ],
+  fishing: [
+    {id:'f01', grp:'엔진', name:'기어박스 오일 교체', months:12, note:'[초안] 주기·내용 확인 필요'},
+    {id:'f02', grp:'어로장비', name:'양망기·윈치 점검', months:6,  note:'[초안] 유압·와이어 확인'},
+    {id:'f03', grp:'어로장비', name:'어창·냉동설비 점검', months:6,  note:'[초안] 온도·배수 확인'},
+    {id:'f04', grp:'안전장비', name:'승선자 구명장비 점검', months:6, note:'[초안] 정원수만큼 있는지'},
+  ],
+  other: [],
+};
+const MAINT_GRPS_BY_TYPE = {
+  sail:    ['엔진','전기','선체·수중','리깅·세일','안전장비'],
+  power:   ['엔진','전기','선체·수중','안전장비'],
+  fishing: ['엔진','전기','선체·수중','어로장비','안전장비'],
+  other:   ['엔진','전기','선체·수중','안전장비'],
+};
+// 항해 중 남기는 기록의 종류도 배에 따라 다릅니다
+const LOG_KINDS_COMMON = ['엔진ON','엔진OFF','기항','묘박','급유','고장','관측','기타'];
+const LOG_KINDS_BY_TYPE = {
+  sail:    ['세일'],
+  power:   [],
+  fishing: ['투망','양망','어군탐지'],
+  other:   [],
+};
+function logKinds(){
+  const t = boatType();
+  return [...(LOG_KINDS_BY_TYPE[t] || []), ...LOG_KINDS_COMMON];
+}
+function boatType(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  return (b && MAINT_BY_TYPE[b.type]) ? b.type : 'other';
+}
+function maintDefaults(){
+  const t = boatType();
+  return deepCopy([...MAINT_COMMON, ...(MAINT_BY_TYPE[t] || [])]);
+}
+const MAINT_DEFAULTS = [...MAINT_COMMON, ...MAINT_BY_TYPE.sail];   // 예전 코드 호환용
 
-const deepCopy = o => JSON.parse(JSON.stringify(o));
-const MAINT_GRPS = ['엔진','전기','선체·수중','리깅·세일','안전장비'];
 const GRP_MAP = {m01:'엔진',m02:'엔진',m03:'엔진',m04:'엔진',m06:'엔진',m07:'엔진',
   m10:'전기', m05:'선체·수중',m08:'선체·수중',m09:'선체·수중',m13:'선체·수중',m15:'선체·수중',
   m11:'리깅·세일',m12:'리깅·세일', m14:'안전장비'};
@@ -2023,7 +2078,7 @@ function normalizeMaint(){
   maint.forEach(it=>{ if(!it.grp) it.grp = GRP_MAP[it.id] || '기타'; });
 }
 function allGrps(){
-  const s = [...MAINT_GRPS];
+  const s = [...(MAINT_GRPS_BY_TYPE[boatType()] || MAINT_GRPS_BY_TYPE.other)];
   maint.forEach(it=>{ if(it.grp && !s.includes(it.grp)) s.push(it.grp); });
   if(!s.includes('기타')) s.push('기타');
   return s;
@@ -2921,7 +2976,7 @@ function logRows(it){
       ? `<div class="mrrow" style="gap:6px">
            <input type="time" value="${esc(String(g.time||''))}" style="width:100px" onchange="logField('${g.id}','time',this.value)">
            <select onchange="logField('${g.id}','kind',this.value)" style="width:88px">${
-             LOG_KINDS.map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${x}</option>`).join('')}</select>
+             logKinds().map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${x}</option>`).join('')}</select>
            <input value="${esc(String(g.text||''))}" placeholder="내용" style="flex:1;min-width:60px" onchange="logField('${g.id}','text',this.value)">
            <button class="mrbtn" onclick="logDel('${g.id}')">삭제</button>
          </div>`

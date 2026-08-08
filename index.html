@@ -865,7 +865,7 @@ function makeBoatCode(name){
 // 이미 쌓인 데이터는 이 배의 것으로 본다 — 그동안 배가 하나뿐이었으므로 맞는 해석이다.
 function ensureBoat(){
   if(!Array.isArray(boats)) boats = [];
-  if(!boats.length){ openBoatSetup(); return false; }   // 등록부터 해야 한다
+  if(!boats.length){ applyBoatName(); openBoatSetup(); return false; }   // 등록부터 해야 한다
   if(!currentBoatId || !boats.some(b=>String(b.id)===String(currentBoatId))){
     currentBoatId = boats[0].id;
     sysSave();
@@ -878,7 +878,8 @@ function ensureBoat(){
 // 처음 켰을 때 — 배 등록
 function openBoatSetup(){
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>배 등록</b></div>
+  P.innerHTML = `<div class="mrhead"><b>배 등록</b><span style="flex:1"></span>${
+      boats.length ? `<button class="tab" onclick="closeBoat()">닫기</button>` : ''}</div>
     <div class="mrnone" style="text-align:left">이 앱은 배 한 척을 기준으로 기록을 관리합니다.<br>
       먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.</div>
     <div class="mrrow"><span class="mrlbl">이름</span>
@@ -930,9 +931,14 @@ function createBoat(){
   switchTab('stow');   // 등록이 끝났으니 적재표부터 보여준다
 }
 function applyBoatName(){
-  const b = curBoat(); if(!b) return;
   const el = document.getElementById('boatSub');
-  if(el) el.textContent = b.name + (b.port ? ' · ' + b.port : '');
+  const b = curBoat();
+  if(!b){
+    if(el) el.textContent = '배 등록하기 ▸';    // 눌러서 등록할 수 있음을 알린다
+    return;
+  }
+  if(el) el.textContent = b.name + (b.port ? ' · ' + b.port : '')
+        + (boats.length > 1 ? ' ▾' : '');
   const dh = document.querySelector('#drawer .dhead');
   if(dh && dh.firstChild && dh.firstChild.nodeType === 3) dh.firstChild.textContent = b.name + ' ';
   document.title = b.name + ' 운용';
@@ -940,7 +946,8 @@ function applyBoatName(){
 
 // 배가 여러 척이면 여기서 바꾼다. 한 척이면 곧바로 배 정보로 간다.
 function openFleet(){
-  if(boats.length <= 1){ openBoat('info'); return; }
+  if(!boats.length){ openBoatSetup(); return; }
+  if(boats.length === 1){ openBoat('info'); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>내 배 목록</b><span style="flex:1"></span>
       <button class="tab" onclick="closeBoat()">닫기</button></div>`
@@ -979,7 +986,8 @@ function addBoat(){
 // 내 배 — 기본 정보와 제원을 한곳에서 관리한다
 let boatTab = 'info';
 function openBoat(tab){
-  const b = curBoat(); if(!b) return;
+  const b = curBoat();
+  if(!b){ openBoatSetup(); return; }   // 아직 배가 없다 — 등록부터
   if(tab) boatTab = tab;
   const P = document.getElementById('mrPanel');
   const ro = v => `<b class="mrv">${esc(v||'—')}</b>`;
@@ -2341,7 +2349,7 @@ function mrPickPhoto(ev){
 
 // ===== 도면 + 핀 =====
 function setMapKind(k, keepView){
-  if(!keepView) dgV = { s:1, x:0, y:0 };
+  if(!keepView){ dgTouched = false; dgV = { s:1, x:0, y:0 }; }
   mrMapKind = k;
   document.getElementById('kindSide').classList.toggle('on', k==='side');
   document.getElementById('kindPlan').classList.toggle('on', k==='plan');
@@ -2371,10 +2379,16 @@ function dgFit(){
     const r = (img.naturalHeight && img.naturalWidth)
       ? img.naturalHeight / img.naturalWidth : 1.56;
     dgRatio = r;
-    // 도면 전체 높이가 화면을 넘으면 틀을 화면 크기로 제한하고 안에서 끌어 본다.
+    // 도면이 길면 틀 높이를 화면 안으로 제한한다.
     // (평면도는 비율이 3배라 그대로 두면 페이지가 하염없이 길어진다)
     const cap = Math.round(Math.min(window.innerHeight * 0.62, 560));
-    box.style.height = Math.round(Math.min(w * r, cap)) + 'px';
+    const H = Math.round(Math.min(w * r, cap));
+    box.style.height = H + 'px';
+    // 처음에는 도면 전체가 보이도록 맞춘다. 폭에만 맞추면 세로가 잘린다.
+    if(!dgTouched){
+      DG_MIN = Math.min(1, H / (w * r));    // 전체가 들어가는 배율
+      dgV.s = DG_MIN;
+    }
     dgClamp(); dgApply();
   };
   if(img.complete && img.naturalWidth) set();
@@ -2385,7 +2399,8 @@ function dgFit(){
 // 핀이 몰린 곳을 손으로 넓혀 볼 수 있게 한다. 좌표는 이미지 기준 %라
 // 확대해도 핀 위치는 그대로 따라간다.
 let dgV = { s:1, x:0, y:0 };   // 배율, 이동(px)
-const DG_MIN = 1, DG_MAX = 6;
+let DG_MIN = 1;
+const DG_MAX = 6;
 
 function dgApply(anim){
   const pan = document.getElementById('mrPan'); if(!pan) return;
@@ -2395,6 +2410,7 @@ function dgApply(anim){
 }
 // 판(도면)의 실제 크기. 틀 높이와 다르다 — 도면이 더 길 수 있다.
 let dgRatio = 1.56;
+let dgTouched = false;   // 사용자가 확대·이동을 했는지
 function dgSize(){
   const box = document.getElementById('mrMap');
   const W = box ? box.clientWidth : 1, H = box ? box.clientHeight : 1;
@@ -2417,16 +2433,20 @@ function dgZoom(mul, cx, cy){
   dgV.x = cx - (cx - dgV.x)*k;
   dgV.y = cy - (cy - dgV.y)*k;
   dgV.s = ns;
+  dgTouched = true;
   dgClamp(); dgApply(true);
 }
 function dgReset(anim){
-  dgV = { s:1, x:0, y:0 };
+  dgTouched = false;
+  dgV = { s:DG_MIN, x:0, y:0 };
+  dgClamp();
   dgApply(anim !== false);
 }
 // 특정 핀(이미지 기준 %)을 화면 가운데에 놓고 확대한다
 function dgFocus(px, py, scale){
   const box = document.getElementById('mrMap'); if(!box) return;
   const W = box.clientWidth, H = box.clientHeight;
+  dgTouched = true;
   dgV.s = Math.max(DG_MIN, Math.min(DG_MAX, scale || 2.6));
   // 핀 좌표는 도면 기준 % — 판 크기(폭×비율)로 환산해야 맞는다
   dgV.x = W/2 - (px/100)*W*dgV.s;
@@ -2452,6 +2472,7 @@ function dgBind(){
     const q = pt(e), dx = q.x-drag.x, dy = q.y-drag.y;
     moved += Math.abs(dx)+Math.abs(dy);
     dgV.x += dx; dgV.y += dy; drag = q;
+    dgTouched = true;
     dgClamp(); dgApply();
   });
   box.addEventListener('pointerup', ()=>{ drag=null; });
@@ -2477,6 +2498,7 @@ function dgBind(){
       dgV.x = pinch.cx - (pinch.cx - dgV.x)*k;
       dgV.y = pinch.cy - (pinch.cy - dgV.y)*k;
       dgV.s = want;
+      dgTouched = true;
       dgClamp(); dgApply(false);   // 전환 효과가 있으면 손가락보다 늦게 따라와 끊겨 보인다
     }
   }, {passive:false});
@@ -4018,7 +4040,20 @@ async function renderWeather(){
   if(!wxCur){ wxInit(); }
   await loadTide();
   await loadKr();
-  if(!wxCur){ L.innerHTML = '<div class="mrnone">등록된 지점이 없습니다. [+ 지점]으로 추가해 주세요.</div>'; return; }
+  if(!wxCur){
+    const b = curBoat();
+    L.innerHTML = `<div class="emptybox">
+      <b>날씨 · 물때</b>
+      <div>바람·파고·조위를 볼 지점을 먼저 정해 주세요.<br>
+        마리나나 자주 가는 해역을 등록해 두면 그때그때 바꿔 볼 수 있습니다.</div>
+      <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="mrbtn" onclick="wxUseGPS()">현재 위치로 시작</button>
+        ${unlocked ? `<button class="mrbtn" onclick="wxAddSpot()">지점 직접 추가</button>` : ''}
+      </div>
+      ${b && b.port ? `<div class="emptysub">홈포트: ${esc(b.port)}</div>` : ''}
+    </div>`;
+    return;
+  }
 
   const head = `<div class="wxbar"><div class="wxspots">
       <button class="tab${wxCur.id==='gps'?' on':''}" onclick="wxUseGPS()">현재 위치</button>

@@ -890,6 +890,8 @@ function openBoatSetup(){
         Object.entries(BOAT_TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
     <div class="mrrow"><span class="mrlbl">홈포트</span>
       <input id="nbPort" style="flex:1" placeholder="예: 여수 원형마리나" autocomplete="off"></div>
+    ${mapBox('setupMap','40vh')}
+    <div class="mrnone" style="text-align:left" id="setupHint">현재 위치를 확인하는 중입니다…</div>
     <div class="mrrow"><span class="mrlbl">제조사</span>
       <input id="nbMaker" style="flex:1" placeholder="예: Beneteau" autocomplete="off"></div>
     <div class="mrrow"><span class="mrlbl">모델</span>
@@ -901,6 +903,34 @@ function openBoatSetup(){
       <button class="mrbtn" onclick="createBoat()">등록</button></div>`;
   P.classList.add('open');
   setTimeout(()=>{ const el=document.getElementById('nbName'); if(el) el.focus(); }, 100);
+  // 지도를 켜고 현재 위치를 기본값으로 잡는다 — 대부분 지금 있는 곳이 홈포트다
+  requestAnimationFrame(()=>{
+    mapInit('setupMap', [], { mode:'pick', pick:null });
+    setupUseGPS();
+  });
+}
+// 등록 화면의 지도에서 현재 위치를 잡는다
+function setupUseGPS(){
+  const hint = () => document.getElementById('setupHint');
+  const say = t => { const el = hint(); if(el) el.innerHTML = t; };
+  if(!navigator.geolocation){
+    say('지도를 탭해 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      if(!mapS) return;
+      mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
+      const v = fitView([mapS.pick], 360, 300);
+      mapS.z = Math.max(v.z, 14);
+      mapS.cx = MERC.x(mapS.pick.lon, mapS.z); mapS.cy = MERC.y(mapS.pick.lat, mapS.z);
+      mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
+      mapPaint(true);
+      say('현재 위치를 홈포트로 잡았습니다. 다르면 지도를 탭해 옮겨 주세요.');
+    },
+    ()=>{ say('위치를 가져오지 못했습니다. 지도를 탭해 홈포트 위치를 지정해 주세요.'); },
+    { enableHighAccuracy:false, timeout:10000, maximumAge:300000 }
+  );
 }
 function createBoat(){
   const name = (document.getElementById('nbName').value||'').trim();
@@ -909,8 +939,10 @@ function createBoat(){
   const port = (document.getElementById('nbPort').value||'').trim();
   const val = id => { const el = document.getElementById(id); return el ? (el.value||'').trim() : ''; };
   const maker = val('nbMaker'), model = val('nbModel'), year = val('nbYear');
+  const pick = (mapS && mapS.pick) ? mapS.pick : null;
   const nb = { id:newId(), name, type, port, maker, model,
                year: (year && +year > 1800) ? +year : null,
+               lat: pick ? pick.lat : null, lon: pick ? pick.lon : null,
                code: makeBoatCode(name), createdAt:new Date().toISOString(), members:{} };
   if(me) nb.members[me.uid] = 'owner';    // 로그인 상태면 선주로 등록
   const first = boats.length === 0;
@@ -927,9 +959,11 @@ function createBoat(){
   currentBoatId = boats[boats.length-1].id;
   window.currentBoatId = currentBoatId;
   sysSave();
+  mapS = null;
+  document.getElementById('mrPanel').classList.remove('open');
   applyBoatName();
+  syncPortSpot(nb);    // 홈포트를 날씨·물때 지점으로
   switchTab('stow');   // 등록이 끝났으니 적재표부터 보여준다
-  openPortPick();      // 이어서 홈포트 위치를 잡는다 (날씨 지점으로도 쓰인다)
 }
 function applyBoatName(){
   const el = document.getElementById('boatSub');
@@ -3874,6 +3908,7 @@ function tideInput(){
 }
 
 // ---------- 위치 ----------
+function wxRetryGPS(){ wxGeoTried = false; wxUseGPS(); }
 function wxUseGPS(){
   if(!navigator.geolocation){ alert('이 기기에서는 위치 기능을 사용할 수 없습니다.'); return; }
   const st = document.getElementById('wxStatus');
@@ -3883,7 +3918,7 @@ function wxUseGPS(){
       wxCur = { id:'gps', name:'현재 위치', lat:p.coords.latitude, lon:p.coords.longitude, region: wxNearestRegion(p.coords.latitude, p.coords.longitude) };
       wxSet('bt_wxcur', wxCur); wxData=null; renderWeather();
     },
-    e=>{ alert('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'); renderWeather(); },
+    e=>{ renderWeather(); },   // 안내는 화면에 표시한다
     { enableHighAccuracy:false, timeout:10000, maximumAge:300000 }
   );
 }
@@ -4119,16 +4154,22 @@ async function renderWeather(){
   await loadTide();
   await loadKr();
   if(!wxCur){
-    const b = curBoat();
+    // 지점이 없으면 곧바로 현재 위치로 시작한다. 묻지 않는다.
+    if(!wxGeoTried){
+      wxGeoTried = true;
+      L.innerHTML = '<div class="mrnone">현재 위치를 확인하는 중입니다…</div>';
+      wxUseGPS();
+      return;
+    }
+    // 위치를 못 받은 경우에만 대안을 보여 준다
     L.innerHTML = `<div class="emptybox">
       <b>날씨 · 물때</b>
-      <div>바람·파고·조위를 볼 지점을 먼저 정해 주세요.<br>
-        마리나나 자주 가는 해역을 등록해 두면 그때그때 바꿔 볼 수 있습니다.</div>
+      <div>현재 위치를 가져오지 못했습니다.<br>
+        설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.</div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="mrbtn" onclick="wxUseGPS()">현재 위치로 시작</button>
+        <button class="mrbtn" onclick="wxRetryGPS()">현재 위치 다시 시도</button>
         ${unlocked ? `<button class="mrbtn" onclick="wxAddSpot()">지점 직접 추가</button>` : ''}
       </div>
-      ${b && b.port ? `<div class="emptysub">홈포트: ${esc(b.port)}</div>` : ''}
     </div>`;
     return;
   }

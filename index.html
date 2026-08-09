@@ -35,6 +35,16 @@
   background:#1B2733;border:1px solid #2A3B4C;color:#C6D3DF}
 .minib.grn{border-color:#2E6B4A;color:#6FD9A0}
 .minib.blu{border-color:#2A5A8A;color:#8ab4d8}
+.minib.red{border-color:#7A3A30;color:#FF9A8A}
+/* 내 배 목록 — 한 줄에 배 하나, 오른쪽에 정보·삭제 */
+.fleet{display:flex;align-items:center;gap:8px;padding:11px 12px;border-bottom:1px solid #12283e}
+.fleet.cur{background:#0d1f31}
+.fleet .fmain{flex:1;min-width:0;cursor:pointer}
+.fleet .fname{color:#dfe8f2;font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fleet .fdot{color:#2faa6a;font-size:11px}
+.fleet .fsub{color:#8a97a8;font-size:12px;margin-top:3px}
+.fleet .fbtns{display:flex;gap:6px;flex:0 0 auto}
+.mrbtn.big{padding:11px 20px;font-size:14px;border-radius:9px}
 /* 배 목록에서 지금 보고 있는 배 */
 .mr.cur{border-color:#2E6B4A;background:#101C16}
 .mr.cur .cn{color:#6FD9A0}
@@ -1522,23 +1532,93 @@ function syncPortSpot(b){
 // 배가 여러 척이면 여기서 바꾼다. 한 척이면 곧바로 배 정보로 간다.
 function openFleet(){
   if(!boats.length){ openBoatSetup(); return; }
-  if(boats.length === 1){ openBoat('info'); return; }
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>내 배 목록</b><span style="flex:1"></span>
+  P.innerHTML = `<div class="mrhead"><b>내 배</b><span style="flex:1"></span>
       <button class="tab" onclick="closeBoat()">닫기</button></div>`
     + boats.map(b=>{
         const on = String(b.id) === String(currentBoatId);
-        return `<div class="mr${on?' cur':''}" onclick="switchBoat('${b.id}')">
-          <div class="ct"><div class="cn">${on?'✓ ':''}${esc(b.name)}</div>
-            <span class="chip">${esc(BOAT_TYPES[b.type]||'')}</span></div>
-          <div class="mrm">${esc(b.port||'홈포트 미입력')}${
-            b.model ? ' · '+esc(b.model) : ''}${b.year ? ' · '+b.year+'년' : ''}</div>
+        const del = unlocked && canDelBoat(b);
+        return `<div class="fleet${on?' cur':''}">
+          <div class="fmain" onclick="switchBoat('${b.id}')">
+            <div class="fname">${on?'<span class="fdot">●</span> ':''}${esc(b.name)}
+              <span class="chip">${esc(BOAT_TYPES[b.type]||'')}</span></div>
+            <div class="fsub">${esc(b.port||'홈포트 미입력')}${
+              b.model ? ' · '+esc(b.model) : ''}${b.year ? ' · '+b.year+'년' : ''}</div>
+          </div>
+          <div class="fbtns">
+            <button class="minib blu" onclick="openBoatInfo('${b.id}')">정보</button>
+            ${del ? `<button class="minib red" onclick="askDelBoat('${b.id}')">삭제</button>` : ''}
+          </div>
         </div>`;
       }).join('')
-    + `<div class="mrrow" style="justify-content:flex-end">
-        ${unlocked ? `<button class="mrbtn" onclick="addBoat()">+ 배 추가</button>` : ''}
-        <button class="mrbtn" onclick="openBoat('info')">현재 배 정보</button></div>`;
+    + (unlocked ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
+        <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button></div>` : '');
   P.classList.add('open');
+}
+// 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
+async function openBoatInfo(id){
+  if(String(id) !== String(currentBoatId)) await switchBoat(id);
+  openBoat('info');
+}
+// 배 지우기 — 되돌릴 수 없으므로 무엇이 사라지는지 정확히 알린다
+async function askDelBoat(id){
+  const b = boats.find(x=>String(x.id)===String(id));
+  if(!b) return;
+  if(!canDelBoat(b)){ alert('선주만 배를 지울 수 있습니다'); return; }
+  const mine = String(id) === String(currentBoatId);
+  let n = 0;
+  try{ n = mine ? items.length : 0; }catch(_){}
+  const what = mine ? `물품 ${n}개와 정비·수리·항해일지·도면` : '물품과 정비·수리·항해일지·도면';
+  if(!confirm(`'${b.name}' 을(를) 지울까요?\n\n`
+    + `이 배의 ${what} 기록이 모두 사라집니다.\n`
+    + `되돌릴 수 없습니다.\n\n`
+    + `먼저 백업을 받아 두시길 권합니다.`)) return;
+  const typed = prompt(`정말 지우시려면 배 이름을 그대로 적어 주세요.\n\n${b.name}`, '');
+  if(typed === null) return;
+  if(String(typed).trim() !== String(b.name).trim()){
+    alert('이름이 달라서 지우지 않았습니다');
+    return;
+  }
+  await delBoatData(id);
+  boats = boats.filter(x=>String(x.id)!==String(id));
+  if(window.__delBoat){ try{ await window.__delBoat(id); }catch(_){} }
+  if(mine){
+    currentBoatId = boats.length ? boats[0].id : null;
+    window.currentBoatId = currentBoatId;
+    try{ await idbSet('curboat', currentBoatId); }catch(_){}
+    await loadBoatData();
+    refreshBoxes(); drawShapes(); renderList(); updateTrashTab();
+  }
+  saveLocal();
+  applyBoatName();
+  if(boats.length) openFleet(); else { closeBoat(); openBoatSetup(); }
+}
+
+// ===== 배 지우기 =====
+// 한 척의 기록이 어느 저장 칸에 흩어져 있는지 한곳에 적어 둔다.
+// 여기서 빠지면 지운 배의 기록이 기기에 남는다.
+const BOAT_DATA = ['all','trash','maint','repair','voyage','fuel','runs',
+                   'contacts','vdocs','checkt','mrtrash','lockers','shapes','dgimgs'];
+function boatKeys(id){
+  return BOAT_DATA.map(n => n + '@' + id);
+}
+// 선주만 지울 수 있다. 남이 만든 배에 초대받아 들어간 것은 못 지운다.
+// 로그인하지 않고 이 기기에서만 쓰는 배는 그냥 지울 수 있다.
+function canDelBoat(b){
+  if(!b) return false;
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  const mem = b.members || {};
+  if(!me) return true;                       // 로컬 전용
+  if(!Object.keys(mem).length) return true;  // 아직 클라우드에 안 올라간 배
+  return mem[me] === 'owner';
+}
+async function delBoatData(id){
+  for(const k of boatKeys(id)){
+    try{ await idbDel(k); }catch(_){}
+    try{ localStorage.removeItem('bt_' + k); }catch(_){}
+  }
+  try{ await idbDel('bt_check2_' + id); }catch(_){}
+  try{ localStorage.removeItem('bt_check2_' + id); }catch(_){}
 }
 async function switchBoat(id){
   if(String(id) === String(currentBoatId)){ openBoat('info'); return; }
@@ -1724,6 +1804,7 @@ function bkey(name){
 }
 function idbGet(key){ return new Promise((res,rej)=>{ const t=db.transaction('kv','readonly').objectStore('kv').get(key); t.onsuccess=()=>res(t.result); t.onerror=()=>rej(t.error); }); }
 function idbSet(key,val){ return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite').objectStore('kv').put(val,key); t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
+function idbDel(key){ return new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite').objectStore('kv').delete(key); t.onsuccess=()=>res(); t.onerror=()=>rej(t.error); }); }
 
 // 현재 배의 기록을 불러온다. 배를 바꿀 때도 이 함수를 다시 부른다.
 async function loadBoatData(){
@@ -5762,6 +5843,26 @@ document.addEventListener('visibilitychange', ()=>{
           await b.commit();
         }
       }
+    };
+    // 배 지우기 — 딸린 기록까지 지운다.
+    // 규칙상 선주만 지울 수 있고, 실패해도 기기에서는 이미 지워진 상태다.
+    window.__delBoat = async (boatId) => {
+      if(!fauth.currentUser || !boatId) return false;
+      const id = String(boatId);
+      const colls = ['all','items','trash','maint','repair','voyage','fuel','runs',
+                     'contacts','vdocs','checkt','mrtrash','lockers','shapes','dgimgs','meta'];
+      for(const name of colls){
+        try{
+          const snap = await getDocs(collection(fdb, 'boats', id, name));
+          for(let off=0; off<snap.docs.length; off+=200){
+            const b = writeBatch(fdb);
+            snap.docs.slice(off, off+200).forEach(d=>b.delete(d.ref));
+            await b.commit();
+          }
+        }catch(e){ /* 없는 컬렉션은 넘어간다 */ }
+      }
+      try{ await deleteDoc(doc(fdb, 'boats', id)); }catch(e){ return false; }
+      return true;
     };
     // ── 공개 도면 라이브러리
     // dglib      : 목록에 뜨는 정보만 (그림 없음) — 목록을 가볍게 읽으려고 나눴다

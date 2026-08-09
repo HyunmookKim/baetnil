@@ -109,7 +109,9 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .b-w{border:1.5px dashed #b58a3a99;background:#3a2a0a33}.b-w span{color:#d8b878}
 .b-d{border:1.5px solid #6a4a9a99;background:#2a1a4a33}.b-d span{color:#b89ae0}
 /* 사용자가 그린 도형 — 도면 위, 수납칸 아래에 깔린다 */
-#shLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+#shLayer,#mrShLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
+#mrShLayer line,#mrShLayer rect,#mrShLayer polygon{fill:none;stroke:#9fb3c8;stroke-width:1.6;vector-effect:non-scaling-stroke}
+#mrShLayer rect,#mrShLayer polygon{fill:#9fb3c810}
 #shLayer line,#shLayer rect,#shLayer polygon{fill:none;stroke:#9fb3c8;stroke-width:1.6;vector-effect:non-scaling-stroke}
 #shLayer rect,#shLayer polygon{fill:#9fb3c810}
 #map.lkedit #shLayer{pointer-events:auto}
@@ -2328,10 +2330,20 @@ function shNewId(){
   while(used.has('sh'+n)) n++;
   return 'sh'+n;
 }
+// 이 도형이 어느 도면 것인가. 표시가 없는 옛 도형은 평면도로 본다
+// (도면 구분이 생기기 전에 그린 것을 잃지 않기 위해서다).
+function shMapOf(sh){
+  return (sh && sh.map === 'side') ? 'side' : 'plan';
+}
+// 특정 도면의 도형만 골라낸다
+function shOf(kind){
+  const k = (kind === 'side') ? 'side' : 'plan';
+  return shapes.filter(sh => shMapOf(sh) === k);
+}
 function shGet(id){
   return shapes.find(s => String(s.id) === String(id)) || null;
 }
-function shAdd(type, rect){
+function shAdd(type, rect, mapKind){
   if(!shCanEdit()) return null;
   if(SHAPE_TYPES.indexOf(type) < 0) return null;
   if(!rect) return null;
@@ -2340,7 +2352,7 @@ function shAdd(type, rect){
   if(type === 'line'){ if(Math.abs(w) < 1 && Math.abs(h) < 1) return null; }
   else { if(Math.abs(w) < 1 || Math.abs(h) < 1) return null; }
   undoPush();
-  const sh = { id: shNewId(), t: type,
+  const sh = { id: shNewId(), t: type, map: (mapKind === 'side' ? 'side' : 'plan'),
                x: lkRound(rect.x), y: lkRound(rect.y), w: lkRound(w), h: lkRound(h) };
   shapes.push(sh);
   saveLocal();
@@ -2612,8 +2624,10 @@ function lkMenu(id){
 // 도형들을 화면에 그린다
 function drawShapes(){
   const el = document.getElementById('shLayer');
-  if(!el) return;
-  el.innerHTML = shSvg(shapes);
+  if(el) el.innerHTML = shSvg(shOf('plan'));   // 적재표는 평면도
+  // 정비 화면에도 같은 도면이 떠 있으면 거기도 함께 갱신한다
+  const m = document.getElementById('mrShLayer');
+  if(m) m.innerHTML = shSvg(shOf(typeof mrMapKind!=='undefined' ? mrMapKind : 'plan'));
 }
 // 휴대폰 뒤로가기 버튼으로도 되돌린다.
 // 편집 중에 뒤로가기를 누르면 앱이 꺼지는 것이 아니라 한 걸음 물린다.
@@ -2801,7 +2815,7 @@ map.addEventListener('pointerup', e=>{
   if(lkDrag.mode==='shape'){
     const ds = lkDrag; lkDrag = null;
     const g2 = document.getElementById('lkGhost'); if(g2) g2.remove();
-    shAdd(lkTool, { x:ds.x0, y:ds.y0, w:p.x - ds.x0, h:p.y - ds.y0 });
+    shAdd(lkTool, { x:ds.x0, y:ds.y0, w:p.x - ds.x0, h:p.y - ds.y0 }, 'plan');
     return;
   }
   if(lkDrag.mode==='move' || lkDrag.mode==='size'){
@@ -3923,6 +3937,7 @@ function setMapKind(k, keepView){
   }
   document.getElementById('mrMap').innerHTML =
     `<div id="mrPan"><img src="${src}" style="width:100%;display:block;opacity:.92" draggable="false">`
+    + `<svg id="mrShLayer" viewBox="0 0 100 100" preserveAspectRatio="none">${shSvg(shOf(k))}</svg>`
     + pinLayer(pins, t) + `</div>`
     + `<div class="mrzoom"><button onclick="dgZoom(1.5)">+</button>`
     + `<button onclick="dgZoom(1/1.5)">−</button>`

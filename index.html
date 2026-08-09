@@ -110,10 +110,9 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .b-d{border:1.5px solid #6a4a9a99;background:#2a1a4a33}.b-d span{color:#b89ae0}
 /* 사용자가 그린 도형 — 도면 위, 수납칸 아래에 깔린다 */
 #shLayer,#mrShLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
-#mrShLayer line,#mrShLayer rect,#mrShLayer polygon{fill:none;stroke:#9fb3c8;stroke-width:1.6;vector-effect:non-scaling-stroke}
-#mrShLayer rect,#mrShLayer polygon{fill:#9fb3c810}
-#shLayer line,#shLayer rect,#shLayer polygon{fill:none;stroke:#9fb3c8;stroke-width:1.6;vector-effect:non-scaling-stroke}
-#shLayer rect,#shLayer polygon{fill:#9fb3c810}
+#shLayer line,#shLayer rect,#shLayer polygon,
+#mrShLayer line,#mrShLayer rect,#mrShLayer polygon{fill:none;vector-effect:non-scaling-stroke}
+#shLayer rect,#shLayer polygon,#mrShLayer rect,#mrShLayer polygon{fill:#9fb3c810}
 #map.lkedit #shLayer{pointer-events:auto}
 #map.lkedit #shLayer line{stroke-width:3}
 #map.lkedit line,#map.lkedit rect,#map.lkedit polygon{cursor:pointer}
@@ -129,7 +128,12 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .lkt.on{background:#2a5a8a;color:#dff2ff}
 .lkt:disabled{opacity:.35;cursor:not-allowed}
 .lkt.lock{margin-left:4px}
+.lkt.st{font-size:12px;padding:5px 10px}
 .lkt.undo{font-size:16px;padding:3px 12px;line-height:1}
+#mrMap.drawing{cursor:crosshair;touch-action:none}
+#mrMap.drawing #mrShLayer{pointer-events:auto}
+#mrMap.drawing #mrShLayer line{stroke-width:3}
+#mrGhost{position:absolute;border:2px dashed #4ad9ff;background:#4ad9ff22;border-radius:2px;pointer-events:none;z-index:4}
 .lkt.lock.on{background:#3a2a14;border-color:#7a5a2a;color:#f0c98a}
 .has{border-color:#2faa6a!important;background:#1a6a3a44!important}.has span{color:#7aefaa!important}
 .sel{border-color:#5ab0e8!important;background:#2a6aa055!important}.sel span{color:#bfe6ff!important}
@@ -524,6 +528,13 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
       <button class="tab lkt" id="lkt_line" onclick="setLkTool('line')">선</button>
       <button class="tab lkt" id="lkt_rect" onclick="setLkTool('rect')">네모</button>
       <button class="tab lkt" id="lkt_tri" onclick="setLkTool('tri')">세모</button>
+      <span id="shStyles" style="display:none">
+        <button class="tab lkt st" id="st_wall" onclick="setShStyle('wall')">벽</button>
+        <button class="tab lkt st" id="st_part" onclick="setShStyle('part')">칸막이</button>
+        <button class="tab lkt st" id="st_dash" onclick="setShStyle('dash')">점선</button>
+        <button class="tab lkt st" id="st_warn" onclick="setShStyle('warn')">주의</button>
+        <button class="tab lkt st" id="st_note" onclick="setShStyle('note')">표시</button>
+      </span>
       <button class="tab lkt lock" id="lkLockBtn" onclick="toggleLkLock()">칸 🔓</button>
       <button class="tab lkt lock" id="dgLockBtn" onclick="toggleDgLock()">도면 🔓</button>
     </span>
@@ -595,6 +606,20 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px">
     <button class="tab" id="kindSide" onclick="setMapKind('side')">측면도</button>
     <button class="tab" id="kindPlan" onclick="setMapKind('plan')">평면도</button>
+    <button class="tab" id="mrDrawTab" onclick="toggleMrDraw()">도면 그리기</button>
+  </div>
+  <div id="mrDrawTools" style="display:none;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap">
+    <button class="tab lkt undo" id="mrUndoBtn" onclick="undoRun()" title="되돌리기">↶</button>
+    <button class="tab lkt undo" id="mrRedoBtn" onclick="redoRun()" title="다시하기">↷</button>
+    <button class="tab lkt on" id="mrt_line" onclick="setMrTool('line')">선</button>
+    <button class="tab lkt" id="mrt_rect" onclick="setMrTool('rect')">네모</button>
+    <button class="tab lkt" id="mrt_tri" onclick="setMrTool('tri')">세모</button>
+    <button class="tab lkt st" id="mst_wall" onclick="setShStyle('wall')">벽</button>
+    <button class="tab lkt st" id="mst_part" onclick="setShStyle('part')">칸막이</button>
+    <button class="tab lkt st" id="mst_dash" onclick="setShStyle('dash')">점선</button>
+    <button class="tab lkt st" id="mst_warn" onclick="setShStyle('warn')">주의</button>
+    <button class="tab lkt st" id="mst_note" onclick="setShStyle('note')">표시</button>
+    <button class="tab lkt lock" id="mrLockBtn" onclick="toggleDgLock()">도면 🔓</button>
   </div>
   <div id="pinBanner">도면을 탭하면 핀 위치가 지정됩니다
     <button class="mrbtn" style="margin-left:8px" onclick="pinCancel()">취소</button></div>
@@ -2310,6 +2335,7 @@ function lkAdd(rect, zone, label){
   zone = String(zone||'').trim();
   label = String(label||'').trim();
   if(!zone || !label) return null;
+  if(!lkOverlapOk(rect, null)) return null;
   undoPush();
   const l = { id: lkNewId(), zone, label, x:rect.x, y:rect.y, w:rect.w, h:rect.h };
   lockers.push(l);
@@ -2324,6 +2350,32 @@ function lkAdd(rect, zone, label){
 // 물품이 들어가는 '수납칸'과는 완전히 별개로 저장한다 —
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 const SHAPE_TYPES = ['line','rect','tri'];
+// 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
+const SHAPE_STYLES = [
+  { id:'wall',  name:'벽',     color:'#dfe8f2', w:2.4 },
+  { id:'part',  name:'칸막이', color:'#9fb3c8', w:1.6 },
+  { id:'dash',  name:'점선',   color:'#8fa3b8', w:1.4, dash:'5 4' },
+  { id:'warn',  name:'주의',   color:'#e0a94a', w:2.0 },
+  { id:'note',  name:'표시',   color:'#4ad9ff', w:1.8 }
+];
+// 이 도형이 어떤 모양인가. 표시가 없거나 모르는 값이면 첫 번째(벽)로 본다.
+function shStyleOf(sh){
+  const id = sh && sh.s;
+  return SHAPE_STYLES.find(x => x.id === id) || SHAPE_STYLES[0];
+}
+// 이미 그린 도형의 모양을 바꾼다
+function shSetStyle(id, styleId){
+  if(!shCanEdit()) return null;
+  const sh = shGet(id);
+  if(!sh) return null;
+  if(!SHAPE_STYLES.some(x => x.id === styleId)) return null;
+  undoPush();
+  sh.s = styleId;
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof drawShapes==='function') drawShapes();
+  return sh;
+}
 function shNewId(){
   const used = new Set(shapes.map(s=>String(s.id)));
   let n = 1;
@@ -2343,7 +2395,7 @@ function shOf(kind){
 function shGet(id){
   return shapes.find(s => String(s.id) === String(id)) || null;
 }
-function shAdd(type, rect, mapKind){
+function shAdd(type, rect, mapKind, styleId){
   if(!shCanEdit()) return null;
   if(SHAPE_TYPES.indexOf(type) < 0) return null;
   if(!rect) return null;
@@ -2352,7 +2404,8 @@ function shAdd(type, rect, mapKind){
   if(type === 'line'){ if(Math.abs(w) < 1 && Math.abs(h) < 1) return null; }
   else { if(Math.abs(w) < 1 || Math.abs(h) < 1) return null; }
   undoPush();
-  const sh = { id: shNewId(), t: type, map: (mapKind === 'side' ? 'side' : 'plan'),
+  const st = SHAPE_STYLES.find(x => x.id === styleId) || SHAPE_STYLES[0];
+  const sh = { id: shNewId(), t: type, map: (mapKind === 'side' ? 'side' : 'plan'), s: st.id,
                x: lkRound(rect.x), y: lkRound(rect.y), w: lkRound(w), h: lkRound(h) };
   shapes.push(sh);
   saveLocal();
@@ -2498,14 +2551,17 @@ function shSvg(list){
   const p = v => lkRound(v);
   const body = (Array.isArray(list)?list:[]).map(s=>{
     const x = Number(s.x)||0, y = Number(s.y)||0, w = Number(s.w)||0, h = Number(s.h)||0;
+    const st = shStyleOf(s);
+    const a = `data-id="${s.id}" stroke="${st.color}" stroke-width="${st.w}"`
+            + (st.dash ? ` stroke-dasharray="${st.dash}"` : '');
     if(s.t === 'line')
-      return `<line data-id="${s.id}" x1="${p(x)}" y1="${p(y)}" x2="${p(x+w)}" y2="${p(y+h)}"/>`;
+      return `<line ${a} x1="${p(x)}" y1="${p(y)}" x2="${p(x+w)}" y2="${p(y+h)}"/>`;
     const ax = Math.min(x, x+w), ay = Math.min(y, y+h);
     const aw = Math.abs(w), ah = Math.abs(h);
     if(s.t === 'rect')
-      return `<rect data-id="${s.id}" x="${p(ax)}" y="${p(ay)}" width="${p(aw)}" height="${p(ah)}"/>`;
+      return `<rect ${a} x="${p(ax)}" y="${p(ay)}" width="${p(aw)}" height="${p(ah)}"/>`;
     if(s.t === 'tri')
-      return `<polygon data-id="${s.id}" points="${p(ax+aw/2)},${p(ay)} ${p(ax+aw)},${p(ay+ah)} ${p(ax)},${p(ay+ah)}"/>`;
+      return `<polygon ${a} points="${p(ax+aw/2)},${p(ay)} ${p(ax+aw)},${p(ay+ah)} ${p(ax)},${p(ay+ah)}"/>`;
     return '';
   }).join('');
   return body;
@@ -2520,9 +2576,12 @@ function lkMove(id, nx, ny){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
+  const px = lkRound(Math.max(0, Math.min(100 - l.w, nx)));
+  const py = lkRound(Math.max(0, Math.min(100 - l.h, ny)));
+  if(!lkOverlapOk({ x:px, y:py, w:l.w, h:l.h }, l.id)) return null;
   undoPush();
-  l.x = lkRound(Math.max(0, Math.min(100 - l.w, nx)));
-  l.y = lkRound(Math.max(0, Math.min(100 - l.h, ny)));
+  l.x = px;
+  l.y = py;
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
   if(typeof refreshBoxes==='function') refreshBoxes();
@@ -2534,13 +2593,36 @@ function lkResize(id, nw, nh){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
+  const pw = lkRound(Math.max(1, Math.min(100 - l.x, nw)));
+  const ph = lkRound(Math.max(1, Math.min(100 - l.y, nh)));
+  if(!lkOverlapOk({ x:l.x, y:l.y, w:pw, h:ph }, l.id)) return null;
   undoPush();
-  l.w = lkRound(Math.max(1, Math.min(100 - l.x, nw)));
-  l.h = lkRound(Math.max(1, Math.min(100 - l.y, nh)));
+  l.w = pw;
+  l.h = ph;
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
   if(typeof refreshBoxes==='function') refreshBoxes();
   return l;
+}
+// 이 자리에 이미 있는 칸을 찾는다. 겹치면 어느 칸을 누른 건지 알 수 없다.
+// 모서리만 맞닿는 것은 겹침으로 보지 않는다 — 칸을 나란히 붙여 그리는 것이 정상이다.
+function lkOverlap(rect, skipId){
+  if(!rect) return [];
+  const ax = Math.min(rect.x, rect.x + rect.w), aw = Math.abs(rect.w);
+  const ay = Math.min(rect.y, rect.y + rect.h), ah = Math.abs(rect.h);
+  return lockers.filter(l=>{
+    if(skipId != null && String(l.id) === String(skipId)) return false;
+    return ax < l.x + l.w && l.x < ax + aw && ay < l.y + l.h && l.y < ay + ah;
+  });
+}
+// 겹치면 물어본다. 일부러 겹쳐 두는 경우(2층 등)도 있어서 막지는 않는다.
+function lkOverlapOk(rect, skipId){
+  const hit = lkOverlap(rect, skipId);
+  if(!hit.length) return true;
+  const names = hit.slice(0, 3).map(l=>l.label).join(', ')
+              + (hit.length > 3 ? ` 외 ${hit.length-3}개` : '');
+  return confirm(`이 자리에 이미 '${names}' 칸이 있습니다.\n\n`
+    + '칸이 겹치면 도면에서 누를 때 어느 칸인지 헷갈립니다.\n그래도 이대로 둘까요?');
 }
 // 칸 이름 바꾸기 — 빈 이름은 받지 않는다
 function lkRename(id, label){
@@ -2639,10 +2721,33 @@ window.addEventListener('popstate', ()=>{
 });
 // 되돌리기 버튼 표시 갱신
 function paintUndoBtns(){
-  const u = document.getElementById('undoBtn');
-  if(u) u.disabled = !canUndo();
-  const r = document.getElementById('redoBtn');
-  if(r) r.disabled = !canRedo();
+  ['undoBtn','mrUndoBtn'].forEach(id=>{
+    const b = document.getElementById(id); if(b) b.disabled = !canUndo();
+  });
+  ['redoBtn','mrRedoBtn'].forEach(id=>{
+    const b = document.getElementById(id); if(b) b.disabled = !canRedo();
+  });
+}
+// 지금 고른 도형 모양
+let shStyle = 'wall';
+function setShStyle(id){
+  if(!SHAPE_STYLES.some(x => x.id === id)) return;
+  shStyle = id;
+  paintShStyles();
+}
+function paintShStyles(){
+  SHAPE_STYLES.forEach(x=>{
+    ['st_','mst_'].forEach(pre=>{
+      const b = document.getElementById(pre + x.id);
+      if(b){
+        b.classList.toggle('on', x.id === shStyle);
+        b.style.borderColor = (x.id === shStyle) ? x.color : '';
+      }
+    });
+  });
+  // 도형 도구를 쓰고 있을 때만 모양 칩을 보여준다
+  const wrap = document.getElementById('shStyles');
+  if(wrap) wrap.style.display = (typeof lkTool!=='undefined' && lkTool !== 'locker') ? '' : 'none';
 }
 // 자물쇠 버튼 표시 갱신
 function paintLockBtns(){
@@ -2666,6 +2771,7 @@ function toggleLkLock(){
 }
 function toggleDgLock(){
   setDgLock(!dgLocked);
+  if(typeof mrDraw!=='undefined' && mrDraw) setMrTool(mrTool);
   if(dgLocked && lkTool !== 'locker' && !lkLocked) setLkTool('locker');
   else setLkTool(lkTool);
 }
@@ -2677,6 +2783,7 @@ function setLkTool(t){
   else if(t !== 'locker' && dgLocked) t = lkLocked ? t : 'locker';
   lkTool = t;
   paintLockBtns();
+  paintShStyles();
   ['locker','line','rect','tri'].forEach(x=>{
     const b = document.getElementById('lkt_'+x);
     if(b) b.classList.toggle('on', x===t);
@@ -2815,7 +2922,7 @@ map.addEventListener('pointerup', e=>{
   if(lkDrag.mode==='shape'){
     const ds = lkDrag; lkDrag = null;
     const g2 = document.getElementById('lkGhost'); if(g2) g2.remove();
-    shAdd(lkTool, { x:ds.x0, y:ds.y0, w:p.x - ds.x0, h:p.y - ds.y0 }, 'plan');
+    shAdd(lkTool, { x:ds.x0, y:ds.y0, w:p.x - ds.x0, h:p.y - ds.y0 }, 'plan', shStyle);
     return;
   }
   if(lkDrag.mode==='move' || lkDrag.mode==='size'){
@@ -4172,7 +4279,122 @@ function pinShow(){
   // 화면이 그려진 뒤에 그 자리로 확대한다
   requestAnimationFrame(()=>{ dgBind(); dgFocus(px, py); });
 }
+// ===== 정비 화면에서 도면 그리기 =====
+// 측면도는 여기에만 있으므로, 측면도 도형은 이 화면에서 그린다.
+// 평면도도 여기서 그릴 수 있다 — 어느 쪽이 떠 있든 그 도면에 저장된다.
+let mrDraw = false;
+let mrTool = 'line';
+let mrDrag = null;
+function setMrTool(t){
+  mrTool = (['line','rect','tri'].indexOf(t) >= 0) ? t : 'line';
+  ['line','rect','tri'].forEach(x=>{
+    const b = document.getElementById('mrt_'+x);
+    if(b){ b.classList.toggle('on', x===mrTool); b.disabled = dgLocked; }
+  });
+  const lb = document.getElementById('mrLockBtn');
+  if(lb){ lb.textContent = '도면 ' + (dgLocked ? '🔒' : '🔓'); lb.classList.toggle('on', dgLocked); }
+  paintUndoBtns();
+  paintShStyles();
+}
+function toggleMrDraw(){
+  if(!mrDraw && !dgSrc(mrMapKind)){
+    alert('먼저 도면을 고르거나 올려 주세요'); return;
+  }
+  mrDraw = !mrDraw;
+  const t = document.getElementById('mrDrawTools');
+  if(t) t.style.display = mrDraw ? 'flex' : 'none';
+  const b = document.getElementById('mrDrawTab');
+  if(b){ b.classList.toggle('on', mrDraw); b.textContent = mrDraw ? '그리기 끝' : '도면 그리기'; }
+  const box = document.getElementById('mrMap');
+  if(box) box.classList.toggle('drawing', mrDraw);
+  if(mrDraw){ setMrTool(mrTool); mrDrawBind(); }
+  else { undoClear(); mrDrag = null; }
+}
+// 도면 위 좌표를 % 로 바꾼다 (확대·이동 중에도 그림 기준으로 잡는다)
+function mrPct(e){
+  const img = document.querySelector('#mrMap img');
+  if(!img) return null;
+  const r = img.getBoundingClientRect();
+  if(!r.width || !r.height) return null;
+  return { x:(e.clientX-r.left)/r.width*100, y:(e.clientY-r.top)/r.height*100 };
+}
+function mrDrawBind(){
+  const box = document.getElementById('mrMap');
+  if(!box || box.__shdraw) return;
+  box.__shdraw = true;
+  box.addEventListener('pointerdown', e=>{
+    if(!mrDraw) return;
+    if(e.target.closest && e.target.closest('.mrzoom')) return;
+    const p = mrPct(e); if(!p) return;
+    e.preventDefault(); e.stopPropagation();
+    // 이미 그린 도형을 잡았는가?
+    if(e.target && e.target.dataset && e.target.dataset.id
+       && e.target.closest && e.target.closest('#mrShLayer')){
+      const sh = shGet(e.target.dataset.id);
+      if(sh){
+        const b = shBox(sh);
+        const near = (p.x > b.x + b.w - 4) && (p.y > b.y + b.h - 4);
+        mrDrag = { mode: near ? 'size' : 'move', id: sh.id, x0:p.x, y0:p.y,
+                   ow:Number(sh.w)||0, oh:Number(sh.h)||0 };
+        return;
+      }
+    }
+    mrDrag = { mode:'new', x0:p.x, y0:p.y };
+    const pan = document.getElementById('mrPan');
+    if(pan){
+      const g = document.createElement('div');
+      g.id = 'mrGhost';
+      g.style.cssText = `left:${p.x}%;top:${p.y}%;width:0;height:0`;
+      pan.appendChild(g);
+    }
+  }, true);
+  box.addEventListener('pointermove', e=>{
+    if(!mrDraw || !mrDrag) return;
+    const p = mrPct(e); if(!p) return;
+    e.preventDefault(); e.stopPropagation();
+    if(mrDrag.mode === 'new'){
+      const r = lkRect(mrDrag.x0, mrDrag.y0, p.x, p.y);
+      const g = document.getElementById('mrGhost');
+      if(g) g.style.cssText = `left:${r.x}%;top:${r.y}%;width:${r.w}%;height:${r.h}%`;
+      return;
+    }
+    const sh = shGet(mrDrag.id); if(!sh) return;
+    const keep = { x:sh.x, y:sh.y, w:sh.w, h:sh.h };
+    if(mrDrag.mode === 'move') shPreview(sh, p.x - mrDrag.x0, p.y - mrDrag.y0, null);
+    else shPreview(sh, 0, 0, { w:mrDrag.ow + (p.x - mrDrag.x0), h:mrDrag.oh + (p.y - mrDrag.y0) });
+    drawShapes();
+    Object.assign(sh, keep);
+  }, true);
+  const finish = e => {
+    if(!mrDraw || !mrDrag) return;
+    const p = mrPct(e);
+    const d = mrDrag; mrDrag = null;
+    const g = document.getElementById('mrGhost'); if(g) g.remove();
+    if(!p) return;
+    e.preventDefault(); e.stopPropagation();
+    if(d.mode === 'new'){
+      shAdd(mrTool, { x:d.x0, y:d.y0, w:p.x - d.x0, h:p.y - d.y0 }, mrMapKind, shStyle);
+      return;
+    }
+    const moved = Math.abs(p.x - d.x0) > 0.7 || Math.abs(p.y - d.y0) > 0.7;
+    if(!moved){
+      drawShapes();
+      if(shGet(d.id)
+         && confirm('이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.'))
+        shDelete(d.id);
+      return;
+    }
+    if(d.mode === 'move') shMove(d.id, p.x - d.x0, p.y - d.y0);
+    else shResize(d.id, d.ow + (p.x - d.x0), d.oh + (p.y - d.y0));
+  };
+  box.addEventListener('pointerup', finish, true);
+  box.addEventListener('pointercancel', ()=>{
+    mrDrag = null;
+    const g = document.getElementById('mrGhost'); if(g) g.remove();
+  }, true);
+}
 function mrMapClick(e){
+  if(mrDraw) return;        // 그리는 중에는 핀을 찍지 않는다
   if(!pinTarget) return;
   const img = document.querySelector('#mrMap img'); if(!img) return;
   const r = img.getBoundingClientRect();

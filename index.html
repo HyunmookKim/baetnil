@@ -172,6 +172,22 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .tq{text-align:center;color:#7aefaa;width:44px}.tm{color:#7a98b0;font-size:11px}
 .to{width:96px;white-space:nowrap;text-align:right}.to button{background:none;border:none;cursor:pointer;font-size:12px;margin-left:11px}
 #trashView{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center;z-index:55;padding:16px}
+/* 도면 고르기 — 그림을 보고 눌러서 고른다 */
+#dgPick{position:fixed;inset:0;background:#050a10;display:none;flex-direction:column;z-index:70}
+#dgPickHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;
+  align-items:center;font-size:15px;font-weight:700;color:#c8dff0;flex:0 0 auto}
+#dgPickSub{padding:8px 16px 0;color:#8a97a8;font-size:12.5px;flex:0 0 auto}
+#dgPickBody{flex:1 1 auto;overflow:auto;padding:12px;display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));align-content:start}
+.dgCard{background:#0a1828;border:1px solid #22496f;border-radius:12px;overflow:hidden;
+  cursor:pointer;display:flex;flex-direction:column;text-align:left;padding:0}
+.dgCard:hover,.dgCard:focus{border-color:#4ad9ff;outline:none}
+.dgCard .pv{height:250px;background:#060c12;display:flex;align-items:center;justify-content:center;padding:6px}
+.dgCard .pv img{max-width:100%;max-height:100%;object-fit:contain}
+.dgCard .nm{padding:9px 11px;color:#dfe8f2;font-size:13.5px;font-weight:600;line-height:1.35}
+.dgCard .sub{padding:0 11px 10px;color:#8a97a8;font-size:11.5px}
+.dgCard .mine{color:#7aefaa}
+#dgPickEmpty{padding:40px 20px;text-align:center;color:#8a97a8;font-size:13.5px}
 .trashBox{background:#0a1828;border:1px solid #2a5a8a;border-radius:12px;width:min(560px,100%);max-height:84vh;display:flex;flex-direction:column}
 .trashHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:#c8dff0}
 #trashBody{padding:10px 14px;overflow:auto}
@@ -565,6 +581,11 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   <div class="pf" id="pf"></div>
 </div>
 
+<div id="dgPick">
+  <div id="dgPickHead"><span id="dgPickTitle">도면 고르기</span><button class="x" onclick="closeDgPick()">×</button></div>
+  <div id="dgPickSub"></div>
+  <div id="dgPickBody"></div>
+</div>
 <div id="trashView">
   <div class="trashBox">
     <div class="trashHead"><span>삭제된 물품</span><button class="x" onclick="closeTrash()">×</button></div>
@@ -883,27 +904,59 @@ async function dgResolve(){
     }catch(_){}
   }
 }
-// 앱에 들어 있는 기본 도면 고르기.
-// 내 배 선종에 맞는 것을 맨 위에 놓는다.
-function dgPickBuiltin(k){
-  if(!lkCanEdit()) return;
-  const kind = (k==='side' ? 'side' : 'plan');
-  const b = (typeof curBoat==='function') ? curBoat() : null;
-  const myType = (b && b.type) || '';
-  const keys = Object.keys(DG_BUILTIN)
-    .filter(x => dgSeedUrl(kind, x))
-    .sort((x,y) => (DG_BUILTIN[y].type===myType) - (DG_BUILTIN[x].type===myType));
-  if(!keys.length){ alert('기본 도면이 없습니다'); return; }
-  const lines = keys.map((x,i) => (i+1) + '. ' + DG_BUILTIN[x].name
-    + (DG_BUILTIN[x].type===myType ? ' ← 내 배 선종' : ''));
-  const pick = prompt('기본 도면 고르기 — 번호를 넣어 주세요\n\n' + lines.join('\n')
-    + '\n\n고른 뒤 "칸 그리기"로 내 배에 맞게 칸을 그리시면 됩니다.', '1');
-  if(pick === null) return;
-  const n = parseInt(pick, 10);
-  if(!(n >= 1 && n <= keys.length)){ alert('목록에 없는 번호입니다'); return; }
-  const url = dgSeedUrl(kind, keys[n-1]);
+// ===== 도면 고르기 화면 =====
+// 이름만 보고 번호를 찍게 하면 안 된다. 도면을 눈으로 보고 골라야 한다.
+let dgPickKind = 'plan';
+let dgPickItems = [];
+function closeDgPick(){
+  const el = document.getElementById('dgPick');
+  if(el) el.style.display = 'none';
+  dgPickItems = [];
+}
+// items: [{ key, name, sub, mine, url, get }]  — url 이 없으면 get() 으로 나중에 받아온다
+function openDgPick(kind, title, sub, list){
+  dgPickKind = (kind==='side' ? 'side' : 'plan');
+  dgPickItems = list || [];
+  const el = document.getElementById('dgPick');
+  const body = document.getElementById('dgPickBody');
+  document.getElementById('dgPickTitle').textContent = title;
+  document.getElementById('dgPickSub').textContent = sub || '';
+  if(!dgPickItems.length){
+    body.innerHTML = '<div id="dgPickEmpty">보여드릴 도면이 없습니다</div>';
+  }else{
+    body.innerHTML = dgPickItems.map((d,i)=>
+      `<button class="dgCard" onclick="chooseDgPick(${i})">`
+      + `<div class="pv">${d.url ? `<img src="${d.url}" alt="">` : '<span style="color:#5d7488;font-size:12px">불러오는 중…</span>'}</div>`
+      + `<div class="nm">${esc(d.name||'이름 없음')}</div>`
+      + (d.sub ? `<div class="sub${d.mine?' mine':''}">${esc(d.sub)}</div>` : '')
+      + `</button>`).join('');
+    // 그림을 아직 안 받은 것은 화면에 띄운 뒤 하나씩 채운다
+    dgPickItems.forEach((d,i)=>{
+      if(d.url || typeof d.get !== 'function') return;
+      d.get().then(u=>{
+        if(!u) return;
+        d.url = u;
+        const card = body.children[i];
+        if(card) card.querySelector('.pv').innerHTML = `<img src="${u}" alt="">`;
+      }).catch(()=>{});
+    });
+  }
+  el.style.display = 'flex';
+}
+async function chooseDgPick(i){
+  const d = dgPickItems[i];
+  if(!d) return;
+  let url = d.url;
+  if(!url && typeof d.get === 'function'){
+    try{ url = await d.get(); }catch(e){ alert('도면을 불러오지 못했습니다'); return; }
+  }
+  if(!url){ alert('이 도면의 그림이 없습니다'); return; }
+  const kind = dgPickKind;
+  if(d.libId){
+    try{ await dgCacheSet(d.libId, url); }catch(_){}
+  }
   dgImgs = { ...dgImgs, [kind]: url };
-  dgRef  = { ...dgRef,  [kind]: null };
+  dgRef  = { ...dgRef,  [kind]: d.libId || null };
   dgPub  = { ...dgPub,  [kind]: false };
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
@@ -912,10 +965,27 @@ function dgPickBuiltin(k){
     if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
        && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
   }catch(_){}
+  closeDgPick();
 }
-// 공개 목록에서 도면 고르기
+// 앱에 들어 있는 기본 도면 고르기 — 내 배 선종을 맨 앞에 놓는다
+function dgPickBuiltin(k){
+  if(!lkCanEdit()) return;
+  const kind = (k==='side' ? 'side' : 'plan');
+  const b = (typeof curBoat==='function') ? curBoat() : null;
+  const myType = (b && b.type) || '';
+  const list = Object.keys(DG_BUILTIN)
+    .filter(x => dgSeedUrl(kind, x))
+    .sort((x,y) => (DG_BUILTIN[y].type===myType) - (DG_BUILTIN[x].type===myType))
+    .map(x => ({ key:x, name:DG_BUILTIN[x].name, url:dgSeedUrl(kind, x),
+                 mine: DG_BUILTIN[x].type===myType,
+                 sub: DG_BUILTIN[x].type===myType ? '내 배 선종' : (BOAT_TYPES[DG_BUILTIN[x].type]||'') }));
+  openDgPick(kind, (kind==='side' ? '기본 측면도 고르기' : '기본 평면도 고르기'),
+    '고른 뒤 "칸 그리기"로 내 배에 맞게 칸을 그리시면 됩니다', list);
+}
+// 공개 도면 고르기 — 남들이 올린 도면을 그림으로 보고 고른다
 async function dgPickLib(k){
   if(!lkCanEdit()) return;
+  const kind = (k==='side' ? 'side' : 'plan');
   if(!(typeof window!=='undefined' && window.__dglib)){
     alert('공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다'); return;
   }
@@ -923,33 +993,23 @@ async function dgPickLib(k){
     alert('공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.'); return;
   }
   let list;
-  try{ list = await window.__dglib.list(k==='side'?'side':'plan'); }
+  try{ list = await window.__dglib.list(kind); }
   catch(e){ alert('공개 도면 목록을 불러오지 못했습니다: ' + ((e && e.message) || e)); return; }
-  if(!list || !list.length){ alert('아직 공개된 도면이 없습니다'); return; }
-  const lines = list.map((d,i)=> (i+1) + '. ' + (d.title||'이름 없음')
-    + (d.maker||d.model ? ' — ' + [d.maker,d.model].filter(Boolean).join(' ') : ''));
-  const pick = prompt('공개 도면 고르기 — 번호를 넣어 주세요\n\n' + lines.join('\n'), '1');
-  if(pick === null) return;
-  const n = parseInt(pick, 10);
-  if(!(n >= 1 && n <= list.length)){ alert('목록에 없는 번호입니다'); return; }
-  const chosen = list[n-1];
-  let url;
-  try{ url = await window.__dglib.image(chosen.id); }
-  catch(e){ alert('도면 그림을 불러오지 못했습니다: ' + ((e && e.message) || e)); return; }
-  if(!url){ alert('이 도면의 그림이 없습니다'); return; }
-  const key = (k==='side' ? 'side' : 'plan');
-  await dgCacheSet(chosen.id, url);
-  dgImgs = { ...dgImgs, [key]: url };
-  dgRef  = { ...dgRef,  [key]: chosen.id };   // 창고에 이미 있는 도면 — 번호만 갖는다
-  dgPub  = { ...dgPub,  [key]: false };       // 남이 공개한 것이지 내가 공개한 것이 아니다
-  saveLocal();
-  if(typeof schedulePush==='function') schedulePush();
-  if(typeof applyStowDg==='function') applyStowDg();
-  try{
-    if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
-       && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
-  }catch(_){}
-  alert('도면을 가져왔습니다.\n칸은 함께 오지 않습니다 — "칸 그리기"로 직접 그려 주세요.');
+  const cards = (list||[]).map(d => ({
+    key: d.id, libId: d.id,
+    name: d.name || d.title || '이름 없음',
+    sub: [d.maker, d.model].filter(Boolean).join(' '),
+    // 그림은 무거우니 화면을 먼저 띄우고 하나씩 받아온다
+    get: async () => {
+      const c = await dgCacheGet(d.id);
+      if(c) return c;
+      const u = await window.__dglib.image(d.id);
+      if(u) await dgCacheSet(d.id, u);
+      return u;
+    }
+  }));
+  openDgPick(kind, (kind==='side' ? '공개 측면도 고르기' : '공개 평면도 고르기'),
+    '다른 사용자가 공개한 도면입니다 · 칸은 함께 오지 않습니다', cards);
 }
 
 function uploadDg(k){

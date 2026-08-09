@@ -219,6 +219,13 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .fchip{background:#12283e;border:1px solid #24486c;border-radius:14px;color:#9ed0f5;
   font-size:12px;padding:5px 11px;cursor:pointer}
 .fchip:hover{border-color:#4ad9ff}
+.fpick{display:flex;flex-direction:column;gap:7px}
+.fopt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
+  background:#0c1e30;border:1px solid #24486c;border-radius:9px;padding:11px 13px;cursor:pointer}
+.fopt b{color:#dfe8f2;font-size:14.5px;font-weight:700}
+.fopt span{color:#8a97a8;font-size:12px}
+.fopt.on{border-color:#4ad9ff;background:#12314a}
+.fopt.on b{color:#cfefff}
 .formFoot{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #1e3a5a;
   display:flex;gap:9px;align-items:center}
 .fbtn{flex:1;border-radius:9px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;
@@ -320,7 +327,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .tab.on{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 #lockBtn.unlocked{background:#12241B;border-color:var(--grn);color:#6FD9A0}
 .iconb{padding:8px 10px;display:flex;align-items:center}
-#stowTools,#mrSub{display:flex;gap:8px;padding:10px 16px 0}
+#stowTools,#mrSub,.subrow{display:flex;gap:8px;padding:10px 16px 0}
 #searchWrap input{background:var(--sf);border:1px solid var(--bd);border-radius:13px;color:var(--tx)}
 #panel,#mrPanel{background:#15171B;border-top:1px solid var(--bd);border-radius:18px 18px 0 0}
 #panel input,#panel select,#panel textarea,#mrPanel input,#mrPanel select,#mrPanel textarea{background:var(--sf);border:1px solid var(--bd);border-radius:10px;color:var(--tx)}
@@ -667,7 +674,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 </div>
 
 <div id="formOv"><div class="formBox">
-  <div class="formHead"><span id="formTitle"></span><button class="x" onclick="closeForm()">×</button></div>
+  <div class="formHead"><span id="lkFormTitle"></span><button class="x" onclick="closeForm()">×</button></div>
   <div id="formSub"></div>
   <div id="formBody"></div>
   <div class="formFoot" id="formFoot"></div>
@@ -1001,6 +1008,7 @@ async function dgResolve(){
 // 브라우저 기본 prompt 창은 배 위에서 쓰기 나쁘다.
 // 여러 칸을 한 화면에서 채우고, 자주 쓰는 값은 눌러서 넣을 수 있게 한다.
 let formCtx = null;
+let formPick = {};   // '고르기' 항목에서 지금 고른 값
 function closeForm(){
   const el = document.getElementById('formOv');
   if(el) el.style.display = 'none';
@@ -1009,25 +1017,42 @@ function closeForm(){
 // o = { title, sub, fields:[{key,label,value,placeholder,chips:[]}], okText, onOk(vals), del:{text,run} }
 function openForm(o){
   formCtx = o;
-  document.getElementById('formTitle').textContent = o.title || '';
+  document.getElementById('lkFormTitle').textContent = o.title || '';
   const sub = document.getElementById('formSub');
   sub.textContent = o.sub || '';
   sub.style.display = o.sub ? '' : 'none';
-  document.getElementById('formBody').innerHTML = (o.fields||[]).map((f,i)=>
-    `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
-    + `<input id="ff${i}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}"`
-    + ` autocomplete="off" enterkeyhint="done">`
-    + ((f.chips && f.chips.length)
-        ? `<div class="fchips">${f.chips.map(c=>
-            `<button class="fchip" onclick="formChip(${i},'${esc(String(c)).replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('')}</div>`
-        : '')
-    + `</div>`).join('');
+  formPick = {};
+  document.getElementById('formBody').innerHTML = (o.fields||[]).map((f,i)=>{
+    if(f.type === 'pick'){
+      formPick[f.key] = f.value;
+      return `<div class="frow"><label>${esc(f.label||'')}</label><div class="fpick" id="fp${i}">`
+        + (f.options||[]).map(op=>
+            `<button class="fopt${String(op.v)===String(f.value)?' on':''}" data-v="${esc(String(op.v))}"`
+            + ` onclick="formPickSet('${esc(f.key)}',${i},'${esc(String(op.v))}')">`
+            + `<b>${esc(op.name)}</b>${op.sub ? `<span>${esc(op.sub)}</span>` : ''}</button>`).join('')
+        + `</div></div>`;
+    }
+    return `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
+      + `<input id="ff${i}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}"`
+      + ` autocomplete="off" enterkeyhint="done">`
+      + ((f.chips && f.chips.length)
+          ? `<div class="fchips">${f.chips.map(c=>
+              `<button class="fchip" onclick="formChip(${i},'${esc(String(c)).replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('')}</div>`
+          : '')
+      + `</div>`;
+  }).join('');
   document.getElementById('formFoot').innerHTML =
     (o.del ? `<button class="fbtn del" onclick="formDel()">${esc(o.del.text||'지우기')}</button>` : '')
     + `<button class="fbtn" onclick="closeForm()">취소</button>`
     + `<button class="fbtn go" onclick="formOk()">${esc(o.okText||'확인')}</button>`;
   document.getElementById('formOv').style.display = 'flex';
   setTimeout(()=>{ const el = document.getElementById('ff0'); if(el){ el.focus(); el.select(); } }, 60);
+}
+function formPickSet(key, i, v){
+  formPick[key] = v;
+  const box = document.getElementById('fp' + i);
+  if(!box) return;
+  [...box.children].forEach(b => b.classList.toggle('on', b.dataset.v === String(v)));
 }
 function formChip(i, v){
   const el = document.getElementById('ff' + i);
@@ -1037,6 +1062,7 @@ function formVals(){
   const o = formCtx; if(!o) return null;
   const out = {};
   (o.fields||[]).forEach((f,i)=>{
+    if(f.type === 'pick'){ out[f.key] = formPick[f.key]; return; }
     const el = document.getElementById('ff' + i);
     out[f.key] = el ? String(el.value||'').trim() : '';
   });
@@ -1774,7 +1800,7 @@ function openBoat(tab){
 
   const head = `<div class="mrhead"><b>내 배</b><span style="flex:1"></span>
       <button class="tab" onclick="closeBoat()">닫기</button></div>
-    <div id="mrSub" style="display:flex">
+    <div class="subrow" style="display:flex">
       <button class="tab${boatTab==='info'?' on':''}" onclick="openBoat('info')">기본 정보</button>
       <button class="tab${boatTab==='spec'?' on':''}" onclick="openBoat('spec')">제원</button>
     </div>`;
@@ -5503,37 +5529,54 @@ function resetCheck(){
 
 // ----- 목록 관리 -----
 function ckAskCycle(cur){
-  const a = prompt('초기화 주기를 골라 주세요.\n\n1. 날마다 — 출항 전 점검처럼 나갈 때마다 하는 것\n2. 주마다 — 정박 중 점검처럼 주 단위로 하는 것\n3. 직접 초기화할 때까지 그대로 두기',
-                   cur==='w'?'2':cur==='n'?'3':'1');
-  if(a===null) return null;
-  const t = String(a).trim();
-  if(t==='2') return 'w';
-  if(t==='3') return 'n';
-  return 'd';
+  // 예전 방식은 없앴다. 주기는 목록 고치기 화면에서 고른다.
+  return cur || 'd';
 }
 function addCheckList(){
   if(!unlocked) return;
-  const nm = prompt('새 목록 이름:'); if(nm===null) return;
-  if(!nm.trim()) return;
-  const cy = ckAskCycle('d'); if(cy===null) return;
-  const id = newId();
-  checkt.push({id, typ:'list', name:nm.trim(), cycle:cy});
-  saveMR(); selectCheckList(id);
+  openForm({
+    title: '새 점검 목록',
+    sub: '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다',
+    okText: '만들기',
+    fields: [
+      { key:'name',  label:'목록 이름', value:'', placeholder:'예: 출항 전 점검' },
+      { key:'cycle', label:'초기화 주기', type:'pick', value:'d',
+        options: [{v:'d', name:'날마다', sub:'출항 전 점검처럼 나갈 때마다 하는 것'},
+       {v:'w', name:'주마다', sub:'정박 중 점검처럼 주 단위로 하는 것'},
+       {v:'n', name:'직접 초기화', sub:'내가 누를 때까지 그대로 둔다'}] }
+    ],
+    onOk: v => {
+      if(!v.name){ alert('목록 이름을 넣어 주세요'); return false; }
+      const id = newId();
+      checkt.push({ id, typ:'list', name:v.name, cycle:v.cycle });
+      saveMR(); selectCheckList(id);
+    }
+  });
 }
 function renameCheckList(id){
   if(!unlocked) return;
   const l = ckLists().find(x=>String(x.id)===String(id)); if(!l) return;
-  const nm = prompt('목록 이름:', l.name); if(nm===null) return;
-  if(!nm.trim()) return;
-  l.name = nm.trim();
-  saveMR(); renderCheck();
+  openForm({
+    title: '점검 목록 고치기',
+    okText: '저장',
+    fields: [
+      { key:'name',  label:'목록 이름', value:l.name, placeholder:'예: 출항 전 점검' },
+      { key:'cycle', label:'초기화 주기', type:'pick', value:l.cycle || 'd',
+        options: [{v:'d', name:'날마다', sub:'출항 전 점검처럼 나갈 때마다 하는 것'},
+       {v:'w', name:'주마다', sub:'정박 중 점검처럼 주 단위로 하는 것'},
+       {v:'n', name:'직접 초기화', sub:'내가 누를 때까지 그대로 둔다'}] }
+    ],
+    del: { text:'목록 지우기', run: ()=>delCheckList(id) },
+    onOk: v => {
+      if(!v.name){ alert('목록 이름을 넣어 주세요'); return false; }
+      l.name = v.name;
+      l.cycle = v.cycle;
+      saveMR(); renderCheck();
+    }
+  });
 }
 function cycleCheckList(id){
-  if(!unlocked) return;
-  const l = ckLists().find(x=>String(x.id)===String(id)); if(!l) return;
-  const cy = ckAskCycle(l.cycle); if(cy===null) return;
-  l.cycle = cy;
-  saveMR(); renderCheck();
+  renameCheckList(id);   // 이름과 주기를 한 화면에서 같이 고친다
 }
 function delCheckList(id){
   if(!unlocked) return;
@@ -5553,33 +5596,62 @@ function delCheckList(id){
 
 // ----- 항목 관리 -----
 function addCheckItem(){
-  if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
+  if(!unlocked) return;
   const cur = ckCurId(); if(!cur || cur==='__orphan') return;
-  const l = prompt('점검 항목:'); if(!l||!l.trim()) return;
-  const u = prompt('연결할 링크 주소 (없으면 비워두고 확인):','') || '';
-  checkt.push({id:newId(), label:l.trim(), url:u.trim(), list:String(cur)});
-  saveMR(); renderCheck();
+  openForm({
+    title: '점검 항목 추가',
+    sub: '링크를 넣어 두면 항목에서 바로 열 수 있습니다',
+    okText: '추가',
+    fields: [
+      { key:'label', label:'점검 항목', value:'', placeholder:'예: 연료 잔량 확인' },
+      { key:'url',   label:'링크 (없으면 비워 두세요)', value:'', placeholder:'https://' }
+    ],
+    onOk: v => {
+      if(!v.label){ alert('점검 항목을 넣어 주세요'); return false; }
+      checkt.push({ id:newId(), label:v.label, url:v.url, list:String(cur) });
+      saveMR(); renderCheck();
+    }
+  });
 }
 function editCheckItem(id){
   if(!unlocked) return;
   const it = checkt.find(c=>c && c.typ!=='list' && String(c.id)===String(id)); if(!it) return;
-  const l = prompt('항목 이름:', it.label); if(l===null) return;
-  const u = prompt('링크 주소 (없으면 비워둠):', it.url||''); if(u===null) return;
-  if(l.trim()) it.label = l.trim();
-  it.url = u.trim();
-  saveMR(); renderCheck();
+  openForm({
+    title: '점검 항목 고치기',
+    okText: '저장',
+    fields: [
+      { key:'label', label:'점검 항목', value:it.label, placeholder:'예: 연료 잔량 확인' },
+      { key:'url',   label:'링크 (없으면 비워 두세요)', value:it.url||'', placeholder:'https://' }
+    ],
+    del: { text:'항목 지우기', run: ()=>delCheckItem(id) },
+    onOk: v => {
+      if(!v.label){ alert('점검 항목을 넣어 주세요'); return false; }
+      it.label = v.label;
+      it.url = v.url;
+      saveMR(); renderCheck();
+    }
+  });
 }
 function moveCheckItem(id){
   if(!unlocked) return;
   const it = checkt.find(c=>c && c.typ!=='list' && String(c.id)===String(id)); if(!it) return;
   const ls = ckLists();
   if(ls.length < 2){ alert('목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.'); return; }
-  const msg = ls.map((l,i)=>`${i+1}. ${l.name}`).join('\n');
-  const a = prompt('어느 목록으로 옮길까요?\n\n'+msg, '1'); if(a===null) return;
-  const n = parseInt(String(a).trim(), 10);
-  if(!(n>=1 && n<=ls.length)){ alert('1 부터 '+ls.length+' 사이 번호를 넣어 주세요.'); return; }
-  it.list = String(ls[n-1].id);
-  saveMR(); renderCheck();
+  openForm({
+    title: '다른 목록으로 옮기기',
+    sub: it.label,
+    okText: '옮기기',
+    fields: [
+      { key:'list', label:'옮길 목록', type:'pick', value:String(it.list),
+        options: ls.map(l=>({ v:String(l.id), name:l.name,
+          sub: l.cycle==='w' ? '주마다 초기화' : l.cycle==='n' ? '직접 초기화' : '날마다 초기화' })) }
+    ],
+    onOk: v => {
+      if(!v.list) return false;
+      it.list = String(v.list);
+      saveMR(); renderCheck();
+    }
+  });
 }
 function delCheckItem(id){
   if(!unlocked) return;

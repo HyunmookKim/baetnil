@@ -1974,6 +1974,64 @@ function lkResize(id, nw, nh){
   if(typeof refreshBoxes==='function') refreshBoxes();
   return l;
 }
+// 칸 안에 든 물품 수 (휴지통은 빼고 센다)
+function lkCount(id){
+  return items.filter(i => String(i.lockerId) === String(id)).length;
+}
+// 칸을 지운다. 안에 든 물품은 절대 지우지 않는다 —
+// 칸만 사라지고 물품은 '미배치'로 목록 아래에 남는다.
+function lkDelete(id){
+  if(!lkCanEdit()) return null;
+  const l = lkGet(id);
+  if(!l) return null;
+  const n = lkCount(id);
+  const msg = n > 0
+    ? `'${l.label}' 칸을 지울까요?\n\n안에 든 물품 ${n}개는 지워지지 않고 '미배치'로 남습니다.\n나중에 '이동'으로 다른 칸에 옮기시면 됩니다.`
+    : `'${l.label}' 칸을 지울까요?`;
+  if(!confirm(msg)) return null;
+  lockers = lockers.filter(x => String(x.id) !== String(id));
+  if(typeof selected!=='undefined' && selected === id){
+    selected = null;
+    if(typeof closePanel==='function') closePanel();
+  }
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  if(typeof renderList==='function') renderList();
+  return l;
+}
+// 편집 모드에서 칸을 누르면 나오는 메뉴
+function lkMenu(id){
+  const l = lkGet(id);
+  if(!l) return;
+  const n = lkCount(id);
+  const pick = prompt(`'${l.label}' (${l.zone})` + (n ? ` · 물품 ${n}개` : ' · 비어 있음')
+    + '\n\n1. 이름 바꾸기\n2. 구역 바꾸기\n3. 칸 지우기\n\n번호를 넣어 주세요', '1');
+  if(pick === null) return;
+  const c = String(pick).trim();
+  if(c === '1'){
+    const v = prompt('칸 이름', l.label);
+    if(v === null) return;
+    if(!String(v).trim()){ alert('이름은 비울 수 없습니다'); return; }
+    l.label = String(v).trim();
+    saveLocal();
+    if(typeof schedulePush==='function') schedulePush();
+    if(typeof refreshBoxes==='function') refreshBoxes();
+    if(typeof renderList==='function') renderList();
+  }else if(c === '2'){
+    const zones = zoneOrder();
+    const v = prompt('구역 이름' + (zones.length ? '\n(이미 있는 구역: ' + zones.join(', ') + ')' : ''), l.zone);
+    if(v === null) return;
+    if(!String(v).trim()){ alert('구역은 비울 수 없습니다'); return; }
+    l.zone = String(v).trim();
+    saveLocal();
+    if(typeof schedulePush==='function') schedulePush();
+    if(typeof refreshBoxes==='function') refreshBoxes();
+    if(typeof renderList==='function') renderList();
+  }else if(c === '3'){
+    lkDelete(id);
+  }
+}
 function toggleLkEdit(){
   if(!lkEdit && !lkCanEdit()) return;
   lkEdit = !lkEdit;
@@ -1981,7 +2039,7 @@ function toggleLkEdit(){
   const b = document.getElementById('lkEditTab');
   if(b){ b.classList.toggle('on', lkEdit); b.textContent = lkEdit ? '그리기 끝' : '칸 그리기'; }
   const h = document.getElementById('hint');
-  if(h) h.innerHTML = lkEdit ? '빈 곳을 끌면 새 칸 · 칸을 끌면 이동 · 오른쪽 아래 파란 모서리를 끌면 크기' : lkHintOrig;
+  if(h) h.innerHTML = lkEdit ? '빈 곳을 끌면 새 칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 칸을 톡 누르면 이름·지우기' : lkHintOrig;
   if(!lkEdit && lkDrag){ lkDrag = null; const g=document.getElementById('lkGhost'); if(g) g.remove(); }
 }
 function lkPct(e){
@@ -2042,6 +2100,14 @@ map.addEventListener('pointerup', e=>{
   if(lkDrag.mode==='move' || lkDrag.mode==='size'){
     const d = lkDrag; lkDrag = null;
     if(d.el) d.el.classList.remove('lkon');
+    // 거의 안 움직였으면 끈 것이 아니라 누른 것 — 칸 메뉴를 연다
+    const moved = Math.abs(p.x - d.x0) > 0.7 || Math.abs(p.y - d.y0) > 0.7;
+    if(!moved){
+      if(d.el){ d.el.style.left=d.ox+'%'; d.el.style.top=d.oy+'%';
+                d.el.style.width=d.ow+'%'; d.el.style.height=d.oh+'%'; }
+      lkMenu(d.id);
+      return;
+    }
     if(d.mode==='move') lkMove(d.id, d.ox + (p.x - d.x0), d.oy + (p.y - d.y0));
     else                lkResize(d.id, d.ow + (p.x - d.x0), d.oh + (p.y - d.y0));
     return;

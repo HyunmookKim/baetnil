@@ -214,7 +214,9 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .frow label{display:block;color:#8ab4d8;font-size:12.5px;margin-bottom:5px}
 .frow input{width:100%;box-sizing:border-box;background:#0c1e30;border:1px solid #24486c;
   border-radius:8px;color:#dfe8f2;font-size:16px;padding:11px 12px}
-.frow input:focus{outline:none;border-color:#4ad9ff}
+.frow textarea{width:100%;box-sizing:border-box;background:#0c1e30;border:1px solid #24486c;
+  border-radius:8px;color:#dfe8f2;font-size:16px;padding:11px 12px;font-family:inherit;line-height:1.5;resize:vertical}
+.frow input:focus,.frow textarea:focus{outline:none;border-color:#4ad9ff}
 .fchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
 .fchip{background:#12283e;border:1px solid #24486c;border-radius:14px;color:#9ed0f5;
   font-size:12px;padding:5px 11px;cursor:pointer}
@@ -1032,9 +1034,14 @@ function openForm(o){
             + `<b>${esc(op.name)}</b>${op.sub ? `<span>${esc(op.sub)}</span>` : ''}</button>`).join('')
         + `</div></div>`;
     }
+    if(f.type === 'multi'){
+      return `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
+        + `<textarea id="ff${i}" rows="${f.rows||5}" placeholder="${esc(f.placeholder||'')}">`
+        + `${esc(f.value||'')}</textarea></div>`;
+    }
     return `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
       + `<input id="ff${i}" value="${esc(f.value||'')}" placeholder="${esc(f.placeholder||'')}"`
-      + ` autocomplete="off" enterkeyhint="done">`
+      + ` inputmode="${esc(f.mode||'text')}" autocomplete="off" enterkeyhint="done">`
       + ((f.chips && f.chips.length)
           ? `<div class="fchips">${f.chips.map(c=>
               `<button class="fchip" onclick="formChip(${i},'${esc(String(c)).replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('')}</div>`
@@ -1064,7 +1071,7 @@ function formVals(){
   (o.fields||[]).forEach((f,i)=>{
     if(f.type === 'pick'){ out[f.key] = formPick[f.key]; return; }
     const el = document.getElementById('ff' + i);
-    out[f.key] = el ? String(el.value||'').trim() : '';
+    out[f.key] = el ? String(el.value||'').trim() : '';   // 줄바꿈은 안쪽에 그대로 남는다
   });
   return out;
 }
@@ -1723,12 +1730,22 @@ async function askDelBoat(id){
     + `이 배의 ${what} 기록이 모두 사라집니다.\n`
     + `되돌릴 수 없습니다.\n\n`
     + `먼저 백업을 받아 두시길 권합니다.`)) return;
-  const typed = prompt(`정말 지우시려면 배 이름을 그대로 적어 주세요.\n\n${b.name}`, '');
-  if(typed === null) return;
-  if(String(typed).trim() !== String(b.name).trim()){
-    alert('이름이 달라서 지우지 않았습니다');
-    return;
-  }
+  openForm({
+    title: '배 지우기 확인',
+    sub: `되돌릴 수 없습니다. 지우려면 '${b.name}' 을 그대로 적어 주세요.`,
+    okText: '지우기',
+    fields: [ { key:'name', label:'배 이름', value:'', placeholder:b.name } ],
+    onOk: v => {
+      if(String(v.name).trim() !== String(b.name).trim()){
+        alert('이름이 달라서 지우지 않았습니다');
+        return false;
+      }
+      doDelBoat(id, mine);
+    }
+  });
+}
+// 확인이 끝난 뒤 실제로 지운다
+async function doDelBoat(id, mine){
   await delBoatData(id);
   boats = boats.filter(x=>String(x.id)!==String(id));
   if(window.__delBoat){ try{ await window.__delBoat(id); }catch(_){} }
@@ -5887,20 +5904,25 @@ function tidePoints(){
 
 function tideInput(){
   const cur = wxLS('bt_tide', {date:today(), rows:[]});
-  const txt = prompt(
-    '오늘의 만조·간조 시각과 높이를 입력해 주세요.\n' +
-    '형식: 시각,높이cm  —  줄바꿈 또는 / 로 구분\n\n' +
-    '예)\n04:08,88\n10:01,291\n15:59,56\n22:35,335',
-    (cur.date===today() ? (cur.rows||[]).map(r=>r.time+','+r.cm).join('\n') : '')
-  );
-  if(txt===null) return;
-  const rows = txt.split(/[\n\/]+/).map(s=>s.trim()).filter(Boolean).map(s=>{
-    const m = s.match(/(\d{1,2})\s*[:시]\s*(\d{1,2}).*?(-?\d{2,4})/);
-    return m ? { time: String(m[1]).padStart(2,'0')+':'+String(m[2]).padStart(2,'0'), cm: Number(m[3]) } : null;
-  }).filter(Boolean);
-  if(rows.length < 2){ alert('만조와 간조를 각각 하나 이상 입력해 주세요.'); return; }
-  wxSet('bt_tide', { date: today(), rows });
-  renderWeather();
+  openForm({
+    title: '오늘 물때 입력',
+    sub: '한 줄에 하나씩 · 시각,높이cm',
+    okText: '저장',
+    fields: [
+      { key:'txt', type:'multi', rows:6, label:'만조·간조 시각과 높이',
+        value: (cur.date===today() ? (cur.rows||[]).map(r=>r.time+','+r.cm).join('\n') : ''),
+        placeholder: '04:08,88\n10:01,291\n15:59,56\n22:35,335' }
+    ],
+    onOk: v => {
+      const rows = String(v.txt||'').split(/[\n\/]+/).map(x=>x.trim()).filter(Boolean).map(x=>{
+        const m = x.match(/(\d{1,2})\s*[:시]\s*(\d{1,2}).*?(-?\d{2,4})/);
+        return m ? { time: String(m[1]).padStart(2,'0')+':'+String(m[2]).padStart(2,'0'), cm: Number(m[3]) } : null;
+      }).filter(Boolean);
+      if(rows.length < 2){ alert('만조와 간조를 각각 하나 이상 넣어 주세요.'); return false; }
+      wxSet('bt_tide', { date: today(), rows });
+      renderWeather();
+    }
+  });
 }
 
 // ---------- 위치 ----------
@@ -5932,20 +5954,34 @@ function wxPick(id){
 }
 function wxAddSpot(){
   if(!unlocked){ alert('편집 모드에서 추가할 수 있습니다.'); return; }
-  const name = prompt('지점 이름 (예: 안도항):'); if(!name||!name.trim()) return;
-  const c = prompt('위도,경도 (예: 34.5330,127.7690)\n비워 두면 현재 위치로 저장됩니다.','');
-  const add = (lat,lon)=>{
-    wxSpots.push({ id:'s'+Date.now(), name:name.trim(), lat, lon, region: wxNearestRegion(lat,lon) });
-    wxSet('bt_spots', wxSpots); renderWeather();
-  };
-  if(c && c.trim()){
-    const m = c.split(',').map(x=>parseFloat(x.trim()));
-    if(m.length!==2 || isNaN(m[0]) || isNaN(m[1])){ alert('위도, 경도 형식을 확인해 주세요. (예: 34.5330, 127.7690)'); return; }
-    add(m[0], m[1]);
-  } else {
-    if(!navigator.geolocation){ alert('위치 기능을 사용할 수 없습니다.'); return; }
-    navigator.geolocation.getCurrentPosition(p=>add(p.coords.latitude, p.coords.longitude), ()=>alert('위치를 가져오지 못했습니다'));
-  }
+  openForm({
+    title: '날씨 지점 추가',
+    sub: '위도·경도를 비워 두면 지금 있는 자리로 저장합니다',
+    okText: '추가',
+    fields: [
+      { key:'name', label:'지점 이름', value:'', placeholder:'예: 안도항' },
+      { key:'lat',  label:'위도 (비워도 됩니다)',  value:'', placeholder:'34.5330', mode:'decimal' },
+      { key:'lon',  label:'경도 (비워도 됩니다)',  value:'', placeholder:'127.7690', mode:'decimal' }
+    ],
+    onOk: v => {
+      if(!v.name){ alert('지점 이름을 넣어 주세요'); return false; }
+      const add = (lat,lon)=>{
+        wxSpots.push({ id:'s'+Date.now(), name:v.name, lat, lon, region: wxNearestRegion(lat,lon) });
+        wxSet('bt_spots', wxSpots); renderWeather();
+      };
+      if(v.lat || v.lon){
+        const la = parseFloat(v.lat), lo = parseFloat(v.lon);
+        if(isNaN(la) || isNaN(lo)){ alert('위도와 경도를 모두 숫자로 넣어 주세요'); return false; }
+        if(la < -90 || la > 90 || lo < -180 || lo > 180){ alert('위도·경도 범위를 확인해 주세요'); return false; }
+        add(la, lo);
+        return;
+      }
+      if(!navigator.geolocation){ alert('위치 기능을 쓸 수 없습니다. 위도·경도를 넣어 주세요.'); return false; }
+      navigator.geolocation.getCurrentPosition(
+        p => add(p.coords.latitude, p.coords.longitude),
+        () => alert('위치를 가져오지 못했습니다. 위도·경도를 직접 넣어 주세요.'));
+    }
+  });
 }
 function wxDelSpot(){
   if(!unlocked || !wxCur || wxCur.id==='gps') return;
@@ -6027,21 +6063,44 @@ function hatPick(name){
 }
 function hatAddOne(){
   if(!unlocked){ alert('편집 모드에서 추가할 수 있습니다.'); return; }
-  const name = prompt('지역 이름 (예: 사키토마리):'); if(!name||!name.trim()) return;
-  const v = parseFloat(prompt(`${name.trim()} 의 약최고고조위 (m):`)); if(!(v>0)) return;
-  const custom = wxLS('bt_hatlist', []);
-  if(hatList().some(x=>x.name===name.trim())){ alert('이미 등록된 이름입니다.'); return; }
-  custom.push({ name:name.trim(), hat:v, lat: wxCur?wxCur.lat:null, lon: wxCur?wxCur.lon:null });
-  wxSet('bt_hatlist', custom);
-  hatPanel(); renderWeather();
+  openForm({
+    title: '약최고고조위 추가',
+    sub: '다리 통과 높이를 계산할 때 쓰는 기준값입니다',
+    okText: '추가',
+    fields: [
+      { key:'name', label:'지역 이름', value:'', placeholder:'예: 사키토마리' },
+      { key:'hat',  label:'약최고고조위 (m)', value:'', placeholder:'3.62', mode:'decimal' }
+    ],
+    onOk: v => {
+      if(!v.name){ alert('지역 이름을 넣어 주세요'); return false; }
+      const n = parseFloat(v.hat);
+      if(!(n > 0)){ alert('약최고고조위를 미터 단위 숫자로 넣어 주세요'); return false; }
+      if(hatList().some(x=>x.name===v.name)){ alert('이미 등록된 이름입니다.'); return false; }
+      const custom = wxLS('bt_hatlist', []);
+      custom.push({ name:v.name, hat:n, lat: wxCur?wxCur.lat:null, lon: wxCur?wxCur.lon:null });
+      wxSet('bt_hatlist', custom);
+      hatPanel(); renderWeather();
+    }
+  });
 }
 function hatEditOne(name){
   if(!unlocked){ alert('편집 모드에서 수정할 수 있습니다.'); return; }
   const x = hatList().find(i=>i.name===name); if(!x) return;
-  const v = parseFloat(prompt(`${name} 기준값 (m):`, String(x.hat))); if(!(v>0)) return;
-  if(x.builtin){ const ov = wxLS('bt_hat', {}); ov[name]=v; wxSet('bt_hat', ov); }
-  else { const c = wxLS('bt_hatlist', []); const f=c.find(i=>i.name===name); if(f){ f.hat=v; wxSet('bt_hatlist', c); } }
-  hatPanel(); renderWeather();
+  openForm({
+    title: name,
+    sub: '약최고고조위 (m)',
+    okText: '저장',
+    fields: [
+      { key:'hat', label:'약최고고조위 (m)', value:String(x.hat), placeholder:'3.62', mode:'decimal' }
+    ],
+    onOk: v => {
+      const n = parseFloat(v.hat);
+      if(!(n > 0)){ alert('미터 단위 숫자로 넣어 주세요'); return false; }
+      if(x.builtin){ const ov = wxLS('bt_hat', {}); ov[name]=n; wxSet('bt_hat', ov); }
+      else { const c = wxLS('bt_hatlist', []); const f=c.find(i=>i.name===name); if(f){ f.hat=n; wxSet('bt_hatlist', c); } }
+      hatPanel(); renderWeather();
+    }
+  });
 }
 function hatDelOne(name){
   if(!unlocked) return;

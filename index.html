@@ -1393,8 +1393,11 @@ window.__onAuth = u => {
     // 로그인 전에 만든 배는 주인이 없다. 처음 로그인한 사람을 선주로 잡는다.
     let changed = false;
     boats.forEach(b=>{
+      b.memberNames = b.memberNames || {};
+      if(b.members && b.members[u.uid]) b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
       if(!b.members || !Object.keys(b.members).length){
         b.members = { [u.uid]: 'owner' };
+        b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
         changed = true;
       }
     });
@@ -1710,8 +1713,9 @@ function openFleet(){
           </div>
         </div>`;
       }).join('')
-    + (unlocked ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
-        <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button></div>` : '');
+    + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
+        <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button>
+        <button class="mrbtn big" onclick="joinBoat()">참여 신청</button></div>` : '');
   P.classList.add('open');
 }
 // 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
@@ -1763,6 +1767,188 @@ async function doDelBoat(id, mine){
   if(boats.length) openFleet(); else { closeBoat(); openBoatSetup(); }
 }
 
+// ===== 함께 관리 (구성원) =====
+// 배 하나를 여러 사람이 같이 본다. 권한은 배 문서 안 members 에 적힌다.
+const ROLES = [
+  { v:'owner',  name:'선주',      sub:'모든 권한 · 구성원 관리 · 배 삭제' },
+  { v:'admin',  name:'공동 관리자', sub:'기록을 넣고 고칠 수 있음' },
+  { v:'viewer', name:'보기 전용',  sub:'보기만 가능 · 정비소나 지인에게' }
+];
+function ownerCount(b){
+  const m = (b && b.members) || {};
+  return Object.values(m).filter(r => r === 'owner').length;
+}
+// 화면에 뿌릴 구성원 목록. 선주 → 공동 관리자 → 보기 전용 순.
+function memberRows(b){
+  const m = (b && b.members) || {};
+  const names = (b && b.memberNames) || {};
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  const rank = { owner:0, admin:1, viewer:2 };
+  return Object.keys(m).map(uid => ({
+    uid,
+    role: m[uid],
+    name: names[uid] || '이름 미등록',
+    me: uid === me
+  })).sort((a,b2) => (rank[a.role] ?? 9) - (rank[b2.role] ?? 9));
+}
+function myRole(b){
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  if(!me) return null;
+  const m = (b && b.members) || {};
+  return m[me] || null;
+}
+// 구성원을 바꾸는 것은 선주만 할 수 있다.
+// 공동 관리자까지 허용하면 스스로를 선주로 올릴 수 있다.
+function canManage(b){
+  return myRole(b) === 'owner';
+}
+function setMemberRole(b, uid, role){
+  if(!b || !b.members || !b.members[uid]) return null;
+  if(!ROLES.some(r => r.v === role)) return null;
+  // 선주가 하나뿐인데 그 사람을 내리면 아무도 관리할 수 없게 된다
+  if(b.members[uid] === 'owner' && role !== 'owner' && ownerCount(b) <= 1){
+    alert('선주가 한 명뿐입니다.\n다른 사람을 먼저 선주로 올린 뒤에 바꿔 주세요.');
+    return null;
+  }
+  b.members[uid] = role;
+  return b;
+}
+function removeMember(b, uid){
+  if(!b || !b.members || !b.members[uid]) return null;
+  if(b.members[uid] === 'owner' && ownerCount(b) <= 1){
+    alert('마지막 선주는 내보낼 수 없습니다.\n배를 지우시려면 배 지우기를 쓰세요.');
+    return null;
+  }
+  delete b.members[uid];
+  if(b.memberNames) delete b.memberNames[uid];
+  return b;
+}
+// 배 정보 화면에 들어가는 구성원 목록
+function memberBlock(b){
+  const rows = memberRows(b);
+  const manage = canManage(b);
+  if(!(typeof window!=='undefined' && window.__user)){
+    return `<div class="mrnone" style="text-align:left">로그인하면 다른 사람과 함께 관리할 수 있습니다.</div>`;
+  }
+  const list = rows.map(r=>{
+    const rn = (ROLES.find(x=>x.v===r.role)||{}).name || r.role;
+    return `<div class="fleet">
+      <div class="fmain"><div class="fname">${esc(r.name)}${r.me?' <span class="chip">나</span>':''}
+        <span class="chip">${esc(rn)}</span></div></div>
+      ${manage && !(r.role==='owner' && ownerCount(b)<=1)
+        ? `<div class="fbtns"><button class="minib blu" onclick="editMember('${esc(r.uid)}')">권한</button></div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="mrrow" style="margin-top:6px"><span class="mrlbl">함께 관리</span>
+      <span class="mrm" style="flex:1">${rows.length}명</span>
+      ${manage ? `<button class="minib blu" onclick="openJoinReqs()">참여 신청 보기</button>` : ''}</div>`
+    + list;
+}
+function copyJoinCode(){
+  const b = curBoat(); if(!b) return;
+  try{
+    navigator.clipboard.writeText(b.id);
+    alert('참여 코드를 복사했습니다.\n\n' + b.id);
+  }catch(e){ alert('참여 코드\n\n' + b.id); }
+}
+// 권한 바꾸기 · 내보내기
+function editMember(uid){
+  const b = curBoat(); if(!b) return;
+  if(!canManage(b)){ alert('선주만 구성원을 바꿀 수 있습니다'); return; }
+  const r = memberRows(b).find(x=>x.uid===uid); if(!r) return;
+  openForm({
+    title: r.name,
+    sub: '이 사람이 이 배에서 할 수 있는 일',
+    okText: '저장',
+    fields: [
+      { key:'role', label:'권한', type:'pick', value:r.role,
+        options: ROLES.map(x=>({ v:x.v, name:x.name, sub:x.sub })) }
+    ],
+    del: { text:'내보내기', run: ()=>{
+      if(!confirm(`'${r.name}' 을(를) 이 배에서 내보낼까요?\n\n그 사람은 더 이상 이 배의 기록을 볼 수 없습니다.`)) return;
+      if(!removeMember(b, uid)) return;
+      saveBoatMembers(b);
+    }},
+    onOk: v => {
+      if(!setMemberRole(b, uid, v.role)) return false;
+      saveBoatMembers(b);
+    }
+  });
+}
+function saveBoatMembers(b){
+  saveLocal();
+  if(window.__saveBoat) window.__saveBoat(b);
+  openBoat('info');
+}
+// 다른 배에 참여 신청하기
+function joinBoat(){
+  if(!(typeof window!=='undefined' && window.__user)){
+    alert('참여하려면 먼저 로그인해 주세요'); return;
+  }
+  if(!window.__invites){ alert('인터넷에 연결된 상태에서만 신청할 수 있습니다'); return; }
+  openForm({
+    title: '다른 배에 참여 신청',
+    sub: '선주에게 받은 참여 코드를 넣어 주세요',
+    okText: '신청',
+    fields: [ { key:'code', label:'참여 코드', value:'', placeholder:'예: b1723…' } ],
+    onOk: v => {
+      if(!v.code){ alert('참여 코드를 넣어 주세요'); return false; }
+      if(boats.some(x=>String(x.id)===String(v.code))){ alert('이미 이 배의 구성원입니다'); return false; }
+      window.__invites.request(String(v.code), window.__user)
+        .then(()=>alert('신청했습니다.\n선주가 승인하면 배 목록에 나타납니다.'))
+        .catch(e=>alert('신청하지 못했습니다: ' + ((e && e.message) || e)));
+    }
+  });
+}
+// 들어온 참여 신청 보기 (선주만)
+async function openJoinReqs(){
+  const b = curBoat(); if(!b) return;
+  if(!canManage(b)){ alert('선주만 볼 수 있습니다'); return; }
+  if(!window.__invites){ alert('인터넷에 연결된 상태에서만 볼 수 있습니다'); return; }
+  let list;
+  try{ list = await window.__invites.pending(b.id); }
+  catch(e){ alert('신청을 불러오지 못했습니다: ' + ((e && e.message) || e)); return; }
+  if(!list || !list.length){ alert('들어온 참여 신청이 없습니다'); return; }
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>참여 신청</b><span style="flex:1"></span>
+      <button class="tab" onclick="openBoat('info')">닫기</button></div>`
+    + list.map(v=>`<div class="fleet">
+        <div class="fmain"><div class="fname">${esc(v.name||'이름 미등록')}</div>
+          <div class="fsub">${esc(v.email||'')}</div></div>
+        <div class="fbtns">
+          <button class="minib blu" onclick="approveJoin('${esc(v.id)}','${esc(v.uid)}','${esc(v.name||'')}')">받기</button>
+          <button class="minib red" onclick="rejectJoin('${esc(v.id)}')">거절</button>
+        </div></div>`).join('');
+  P.classList.add('open');
+}
+function approveJoin(inviteId, uid, name){
+  const b = curBoat(); if(!b || !canManage(b)) return;
+  openForm({
+    title: name || '참여 신청',
+    sub: '어떤 권한으로 받을까요?',
+    okText: '받기',
+    fields: [
+      { key:'role', label:'권한', type:'pick', value:'viewer',
+        options: ROLES.filter(x=>x.v!=='owner').map(x=>({ v:x.v, name:x.name, sub:x.sub })) }
+    ],
+    onOk: v => {
+      b.members = b.members || {};
+      b.members[uid] = v.role;
+      b.memberNames = b.memberNames || {};
+      b.memberNames[uid] = name || '이름 미등록';
+      saveLocal();
+      if(window.__saveBoat) window.__saveBoat(b);
+      if(window.__invites) window.__invites.close(inviteId).catch(()=>{});
+      alert('구성원으로 받았습니다');
+      openBoat('info');
+    }
+  });
+}
+function rejectJoin(inviteId){
+  if(!confirm('이 신청을 거절할까요?')) return;
+  if(window.__invites) window.__invites.close(inviteId, 'rejected').catch(()=>{});
+  openJoinReqs();
+}
 // ===== 배 지우기 =====
 // 한 척의 기록이 어느 저장 칸에 흩어져 있는지 한곳에 적어 둔다.
 // 여기서 빠지면 지운 배의 기록이 기기에 남는다.
@@ -1850,9 +2036,12 @@ function openBoat(tab){
         ? `<input value="${esc(b.model||'')}" style="flex:1" placeholder="예: First 45f5" onchange="boatField('model',this.value)">
            <input type="number" min="1900" max="2100" value="${b.year||''}" style="width:86px" placeholder="연식" onchange="boatYear(this.value)">`
         : `<b class="mrv">${esc(b.model||'—')}${b.year?' · '+b.year+'년':''}</b>`}</div>
-      <div class="mrrow"><span class="mrlbl">초대 코드</span><b class="mrv" style="letter-spacing:1px">${esc(b.code)}</b></div>
-      <div class="mrnone" style="text-align:left">이 코드는 함께 배를 관리할 사람을 초대할 때 사용합니다.<br>
-        현재는 코드만 표시되며, 공동 관리 기능은 준비 중입니다.</div>
+      <div class="mrrow"><span class="mrlbl">참여 코드</span>
+        <b class="mrv" id="joinCode" style="letter-spacing:1px;flex:1">${esc(b.id)}</b>
+        <button class="minib blu" onclick="copyJoinCode()">복사</button></div>
+      <div class="mrnone" style="text-align:left">함께 관리할 사람에게 이 코드를 알려 주세요.<br>
+        그 사람이 <b>내 배 › 참여 신청</b>에서 코드를 넣으면 아래에 신청이 뜹니다.</div>
+      ${memberBlock(b)}
       <div class="mrrow"><span class="mrlbl">기록</span><span class="mrm" style="flex:1">
         물품 ${items.length} · 정기점검 ${maint.length} · 수리 ${repair.length} · 항해 ${voyage.length} · 주유 ${fuel.length}</span></div>`;
   } else {
@@ -2396,7 +2585,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.3';
+const APP_VER = '1.4';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -6476,7 +6665,8 @@ document.addEventListener('visibilitychange', ()=>{
           maker: boat.maker || '', model: boat.model || '', year: boat.year || null,
           lat: (boat.lat != null ? boat.lat : null), lon: (boat.lon != null ? boat.lon : null),
           code: boat.code || '', spec: boat.spec || {},
-          members: boat.members || {}, createdAt: boat.createdAt || ''
+          members: boat.members || {}, memberNames: boat.memberNames || {},
+          createdAt: boat.createdAt || ''
         }, { merge:true });
         return true;
       }catch(e){ console.warn('배 저장 실패', e.code || e.message); return false; }
@@ -6602,6 +6792,29 @@ document.addEventListener('visibilitychange', ()=>{
       }
       try{ await deleteDoc(doc(fdb, 'boats', id)); }catch(e){ return false; }
       return true;
+    };
+    // ── 참여 신청
+    // 신청서에는 어느 배인지(boatId)가 반드시 들어가야 한다.
+    // 규칙이 그 배의 선주인지 확인해서 읽기를 허용하기 때문이다.
+    window.__invites = {
+      async request(boatId, me){
+        const id = 'iv' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        await setDoc(doc(fdb, 'invites', id), {
+          id, boatId: String(boatId), uid: me.uid,
+          name: me.name || '', email: me.email || '',
+          status: 'pending', ts: new Date().toISOString()
+        });
+        return id;
+      },
+      async pending(boatId){
+        const snap = await getDocs(query(collection(fdb, 'invites'),
+          where('boatId','==', String(boatId)), where('status','==','pending')));
+        return snap.docs.map(d=>d.data());
+      },
+      async close(id, status){
+        await setDoc(doc(fdb, 'invites', String(id)),
+          { status: status || 'done' }, { merge:true });
+      }
     };
     // ── 공개 도면 라이브러리
     // dglib      : 목록에 뜨는 정보만 (그림 없음) — 목록을 가볍게 읽으려고 나눴다

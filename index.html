@@ -462,6 +462,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
     <div id="fpNone" style="display:none;padding:60px 20px;text-align:center;color:#8a97a8">
       이 배의 평면도가 아직 없습니다.<br>
       <button class="btn" style="margin-top:12px" onclick="uploadDg('plan')">도면 사진 올리기</button>
+      <button class="btn" style="margin-top:8px" onclick="dgPickLib('plan')">공개 도면에서 고르기</button>
     </div>
     <div class="mark" style="top:-2px;left:50%;transform:translateX(-50%)">▲ 선수</div>
     <div class="mark" style="bottom:-15px;left:50%;transform:translateX(-50%)">선미 ▼</div>
@@ -685,18 +686,59 @@ let lockers = [];
 // FLOORPLAN / SIDEVIEW 는 First 45f5 기본값일 뿐이고,
 // 실제로는 배마다 dgImgs 에 따로 저장한다. null 이면 아직 도면이 없는 배.
 let dgImgs = { plan: null, side: null };
+// 앱 도면 창고에 올라간 도면이면 그 번호. 백업에는 이 번호만 들어간다.
+let dgRef = { plan: null, side: null };
+// 공개 목록에 띄울지 여부. 창고 저장과는 별개다 — 안 띄워도 창고에는 남는다.
+let dgPub = { plan: false, side: false };
 function dgSrc(k){ return dgImgs[k==='side' ? 'side' : 'plan']; }
 // 저장·동기화용: id 붙은 문서 배열 <-> 객체 변환
+// 기본 도면(앱에 내장)은 base64 를 다시 넣지 않고 ref:'seed' 로만 적는다.
+// 백업·클라우드 문서가 도면당 약 100~200KB 가벼워진다.
+// 사용자가 올린 도면은 백업이 자급자족해야 하므로 그대로 인라인으로 넣는다.
+const DG_SEEDS = { plan: () => FLOORPLAN, side: () => SIDEVIEW };
 function dgArr(){
   const a = [];
-  if(dgImgs.plan) a.push({ id:'plan', img:dgImgs.plan });
-  if(dgImgs.side) a.push({ id:'side', img:dgImgs.side });
+  for(const k of ['plan','side']){
+    const v = dgImgs[k];
+    if(!v) continue;
+    let d;
+    if(v === DG_SEEDS[k]())      d = { id:k, ref:'seed' };          // 앱에 내장된 기본 도면
+    else if(dgRef[k])            d = { id:k, ref:'lib:'+dgRef[k] }; // 앱 창고에 있는 도면
+    else                         d = { id:k, img:v };               // 아직 창고에 못 올린 것 — 그림째 보관
+    if(dgPub[k] === true) d.pub = true;
+    a.push(d);
+  }
   return a;
 }
+// 그림을 되살린다. 창고 번호만 있는 것은 여기서 null 이고, 나중에 따로 받아온다.
 function dgFromArr(a){
   const o = { plan:null, side:null };
   (Array.isArray(a)?a:[]).forEach(d=>{
-    if(d && (d.id==='plan'||d.id==='side') && typeof d.img==='string' && d.img) o[d.id]=d.img;
+    if(!d || (d.id!=='plan' && d.id!=='side')) return;
+    if(typeof d.img==='string' && d.img) o[d.id] = d.img;   // 인라인 (창고에 못 올린 것·옛 백업)
+    else if(d.ref==='seed') o[d.id] = DG_SEEDS[d.id]();     // 내장 기본 도면
+    // 'lib:...' 은 그림이 여기 없다 — dgResolve() 가 창고에서 받아온다
+    // 모르는 ref 는 버린다. 죽는 것보다 도면 없는 편이 낫다.
+  });
+  return o;
+}
+// 창고 번호만 따로 읽는다
+function dgRefFromArr(a){
+  const o = { plan:null, side:null };
+  (Array.isArray(a)?a:[]).forEach(d=>{
+    if(!d || (d.id!=='plan' && d.id!=='side')) return;
+    if(typeof d.ref==='string' && d.ref.startsWith('lib:')){
+      const id = d.ref.slice(4).trim();
+      if(id) o[d.id] = id;
+    }
+  });
+  return o;
+}
+// 공개 여부만 따로 읽는다
+function dgPubFromArr(a){
+  const o = { plan:false, side:false };
+  (Array.isArray(a)?a:[]).forEach(d=>{
+    if(d && (d.id==='plan'||d.id==='side') && d.pub===true) o[d.id]=true;
   });
   return o;
 }
@@ -710,8 +752,126 @@ function seedDgIfNeeded(){
     dgImgs = { plan: FLOORPLAN, side: SIDEVIEW };
   }
 }
-// 도면 사진 올리기: 휴대폰 사진은 수 MB 라 그대로 저장하면
-// Firestore 문서 한도(1MB)를 넘는다. 캔버스로 줄여서 저장한다.
+// ===== 공개 도면 라이브러리 =====
+// 사용자가 올린 도면을 다른 사람도 쓸 수 있게 공개한다.
+// 공개되는 것은 도면 그림과 배 종류뿐이다 — 물품·정비·항해 기록은 절대 올리지 않는다.
+function dgCanPublish(){
+  return !!(typeof window!=='undefined' && window.__user && window.__dglib);
+}
+function dgLibId(){
+  return 'dg' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+// 공개 목록에 올라가는 정보. 배 이름은 넣지 않는다 (남에게 알릴 이유가 없다).
+function dgLibRec(k, b, title){
+  return {
+    id: dgLibId(),
+    kind: (k==='side' ? 'side' : 'plan'),
+    title: String(title||'').trim(),
+    maker: String((b && b.maker) || ''),
+    model: String((b && b.model) || ''),
+    owner: (typeof window!=='undefined' && window.__user && window.__user.uid) || '',
+    ownerName: (typeof window!=='undefined' && window.__user && window.__user.name) || '',
+    ts: new Date().toISOString()
+  };
+}
+// 도면 그림 기기 복사본. 배별이 아니라 도면 번호별로 둔다 —
+// 인터넷 없는 바다에서도 도면이 보여야 한다.
+async function dgCacheGet(id){
+  if(!id) return '';
+  try{ const v = await idbGet('dgimg:' + id); if(typeof v==='string' && v) return v; }catch(_){}
+  try{ return localStorage.getItem('bt_dgimg_' + id) || ''; }catch(_){ return ''; }
+}
+async function dgCacheSet(id, url){
+  if(!id || !url) return;
+  try{ await idbSet('dgimg:' + id, url); return; }catch(_){}
+  try{ localStorage.setItem('bt_dgimg_' + id, url); }catch(_){}
+}
+// 도면을 앱 창고에 올린다. 창고 도면은 지운 계정과 상관없이 앱에 남는다.
+// 그래서 백업에는 그림 대신 번호만 들어가도 안전하다.
+async function dgStore(k, url, title, pub){
+  if(!dgCanPublish()) return null;
+  const b = (typeof curBoat==='function') ? curBoat() : null;
+  const rec = dgLibRec(k, b, title);
+  rec.pub = (pub === true);
+  await window.__dglib.publish(rec, url);
+  await dgCacheSet(rec.id, url);        // 오프라인에서도 보이게 기기에 복사해 둔다
+  return rec.id;
+}
+// 공개 목록에 띄울지 여부만 바꾼다 (창고에서 빼는 것이 아니다)
+async function dgSetPublic(k, on){
+  const key = (k==='side' ? 'side' : 'plan');
+  const id = dgRef[key];
+  if(!id){ alert('아직 앱 창고에 올라가지 않은 도면입니다'); return; }
+  if(!dgCanPublish()){ alert('로그인한 상태에서만 바꿀 수 있습니다'); return; }
+  try{
+    await window.__dglib.setPublic(id, on === true);
+    dgPub = { ...dgPub, [key]: (on === true) };
+    saveLocal();
+    if(typeof schedulePush==='function') schedulePush();
+    alert(on ? '공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.'
+             : '공개를 내렸습니다.\n이미 가져간 사람의 도면은 그대로 남습니다.');
+    if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
+       && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
+  }catch(e){ alert('바꾸지 못했습니다: ' + ((e && e.message) || e)); }
+}
+// 창고 번호만 있고 그림이 없는 도면을 받아온다. 기기 복사본이 있으면 그것부터 쓴다.
+async function dgResolve(){
+  let changed = false;
+  for(const k of ['plan','side']){
+    if(dgImgs[k] || !dgRef[k]) continue;
+    let url = await dgCacheGet(dgRef[k]);
+    if(!url && typeof window!=='undefined' && window.__dglib){
+      try{
+        url = await window.__dglib.image(dgRef[k]);
+        if(url) await dgCacheSet(dgRef[k], url);
+      }catch(e){ /* 인터넷이 없으면 다음에 다시 받는다 */ }
+    }
+    if(url){ dgImgs = { ...dgImgs, [k]: url }; changed = true; }
+  }
+  if(changed){
+    if(typeof applyStowDg==='function') applyStowDg();
+    try{
+      if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
+         && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
+    }catch(_){}
+  }
+}
+// 공개 목록에서 도면 고르기
+async function dgPickLib(k){
+  if(!lkCanEdit()) return;
+  if(!(typeof window!=='undefined' && window.__dglib)){
+    alert('공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다'); return;
+  }
+  let list;
+  try{ list = await window.__dglib.list(k==='side'?'side':'plan'); }
+  catch(e){ alert('공개 도면 목록을 불러오지 못했습니다: ' + ((e && e.message) || e)); return; }
+  if(!list || !list.length){ alert('아직 공개된 도면이 없습니다'); return; }
+  const lines = list.map((d,i)=> (i+1) + '. ' + (d.title||'이름 없음')
+    + (d.maker||d.model ? ' — ' + [d.maker,d.model].filter(Boolean).join(' ') : ''));
+  const pick = prompt('공개 도면 고르기 — 번호를 넣어 주세요\n\n' + lines.join('\n'), '1');
+  if(pick === null) return;
+  const n = parseInt(pick, 10);
+  if(!(n >= 1 && n <= list.length)){ alert('목록에 없는 번호입니다'); return; }
+  const chosen = list[n-1];
+  let url;
+  try{ url = await window.__dglib.image(chosen.id); }
+  catch(e){ alert('도면 그림을 불러오지 못했습니다: ' + ((e && e.message) || e)); return; }
+  if(!url){ alert('이 도면의 그림이 없습니다'); return; }
+  const key = (k==='side' ? 'side' : 'plan');
+  await dgCacheSet(chosen.id, url);
+  dgImgs = { ...dgImgs, [key]: url };
+  dgRef  = { ...dgRef,  [key]: chosen.id };   // 창고에 이미 있는 도면 — 번호만 갖는다
+  dgPub  = { ...dgPub,  [key]: false };       // 남이 공개한 것이지 내가 공개한 것이 아니다
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof applyStowDg==='function') applyStowDg();
+  try{
+    if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
+       && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
+  }catch(_){}
+  alert('도면을 가져왔습니다.\n칸은 함께 오지 않습니다 — "칸 그리기"로 직접 그려 주세요.');
+}
+
 function uploadDg(k){
   if(typeof unlocked!=='undefined' && !unlocked){ alert('잠금 상태에서는 도면을 바꿀 수 없습니다'); return; }
   const inp = document.createElement('input');
@@ -719,8 +879,11 @@ function uploadDg(k){
   inp.onchange = ()=>{
     const f = inp.files && inp.files[0];
     if(!f) return;
-    resizeDg(f, url=>{
-      dgImgs = { ...dgImgs, [k==='side'?'side':'plan']: url };
+    resizeDg(f, async url=>{
+      const key = (k==='side' ? 'side' : 'plan');
+      dgImgs = { ...dgImgs, [key]: url };
+      dgRef  = { ...dgRef,  [key]: null };   // 창고에 올리기 전 — 아직 번호가 없다
+      dgPub  = { ...dgPub,  [key]: false };
       saveLocal();
       if(typeof schedulePush==='function') schedulePush();
       // 보이는 화면 갱신
@@ -731,6 +894,30 @@ function uploadDg(k){
           setMapKind(mrMapKind, false);
         }
       }catch(_){}
+      // 도면은 앱 창고에 올린다. 그래야 백업이 번호만 갖고도 되살아난다.
+      // 공개(남에게 보이기)는 따로 묻는다 — 기본은 '공개 안 함'이다.
+      if(dgCanPublish()){
+        const pub = confirm('이 도면을 다른 사람도 쓸 수 있게 공개할까요?\n\n'
+          + '공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n'
+          + '공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n'
+          + '"취소"를 눌러도 도면은 내 배에 그대로 쓰입니다.\n'
+          + '나중에 언제든 공개하거나 내릴 수 있습니다.');
+        const b = (typeof curBoat==='function') ? curBoat() : null;
+        const def = [ (b&&b.maker)||'', (b&&b.model)||'' ].filter(Boolean).join(' ');
+        try{
+          const id = await dgStore(k, url, (def || '도면'), pub);
+          if(id){
+            dgRef = { ...dgRef, [key]: id };
+            dgPub = { ...dgPub, [key]: pub };
+            saveLocal();
+            if(typeof schedulePush==='function') schedulePush();
+          }
+        }catch(e){
+          // 못 올려도 그림은 이미 기기에 있다 — 다음에 다시 시도한다
+          alert('도면은 이 기기에 저장했습니다.\n앱 창고에 올리지 못했습니다: '
+                + ((e && e.message) || e));
+        }
+      }
     });
   };
   inp.click();
@@ -1413,7 +1600,8 @@ async function loadBoatData(){
   mrTrash = await get('mrtrash', []);
   lockers = await get('lockers', []);
   seedLockersIfNeeded();
-  dgImgs = dgFromArr(await get('dgimgs', []));
+  { const _dg = await get('dgimgs', []); dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
+  dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
   seedDgIfNeeded();
 }
 
@@ -1443,7 +1631,9 @@ async function initStorage(){
     try{ mrTrash = JSON.parse(localStorage.getItem('bt_mrtrash')||'[]'); }catch(_){ mrTrash=[]; }
     try{ lockers = JSON.parse(localStorage.getItem('bt_lockers')||'[]'); }catch(_){ lockers=[]; }
     seedLockersIfNeeded();
-    try{ dgImgs = dgFromArr(JSON.parse(localStorage.getItem('bt_dgimgs')||'[]')); }catch(_){ dgImgs={plan:null,side:null}; }
+    try{ const _dg = JSON.parse(localStorage.getItem('bt_dgimgs')||'[]');
+      dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
+    catch(_){ dgImgs={plan:null,side:null}; dgRef={plan:null,side:null}; dgPub={plan:false,side:false}; }
     seedDgIfNeeded();
   }
   refreshBoxes(); renderList();
@@ -1554,7 +1744,10 @@ async function cloudPull(){
   if(Array.isArray(r.checkt) && r.checkt.length) checkt = r.checkt;
   if(Array.isArray(r.mrtrash)) mrTrash = r.mrtrash;
   if(Array.isArray(r.lockers) && r.lockers.length) lockers = r.lockers;
-  if(Array.isArray(r.dgimgs) && r.dgimgs.length) dgImgs = dgFromArr(r.dgimgs);
+  if(Array.isArray(r.dgimgs) && r.dgimgs.length){
+    dgImgs = dgFromArr(r.dgimgs); dgRef = dgRefFromArr(r.dgimgs); dgPub = dgPubFromArr(r.dgimgs);
+    dgResolve();   // 번호만 온 도면은 창고에서 받아온다
+  }
   lastCloudMaint = snapOf(Array.isArray(r.maint)? r.maint : []);
   lastCloudRepair = snapOf(Array.isArray(r.repair)? r.repair : []);
   lastCloudV = snapOf(Array.isArray(r.voyage)? r.voyage : []);
@@ -2288,8 +2481,13 @@ function restoreData(ev){
       // 도면 이미지: 백업에 있으면 그것을, 없으면 칸이 기본 71칸일 때만 기본 도면을 쓴다.
       if(Array.isArray(data.dgimgs) && data.dgimgs.length){
         dgImgs = dgFromArr(data.dgimgs);
+        dgRef  = dgRefFromArr(data.dgimgs);
+        dgPub  = dgPubFromArr(data.dgimgs);
+        dgResolve();
       } else {
         dgImgs = { plan:null, side:null };
+        dgRef  = { plan:null, side:null };
+        dgPub  = { plan:false, side:false };
         seedDgIfNeeded();
       }
       const ids = new Set(valid.map(i=>i.id));
@@ -2857,7 +3055,8 @@ function setMapKind(k, keepView){
     document.getElementById('mrMap').innerHTML =
       `<div style="padding:60px 20px;text-align:center;color:#8a97a8">`
       + `이 배의 ${k==='side'?'측면도':'평면도'}가 아직 없습니다.<br>`
-      + `<button class="btn" style="margin-top:12px" onclick="uploadDg('${k}')">도면 사진 올리기</button></div>`;
+      + `<button class="btn" style="margin-top:12px" onclick="uploadDg('${k}')">도면 사진 올리기</button>`
+      + `<button class="btn" style="margin-top:8px" onclick="dgPickLib('${k}')">공개 도면에서 고르기</button></div>`;
     return;
   }
   document.getElementById('mrMap').innerHTML =
@@ -2866,7 +3065,13 @@ function setMapKind(k, keepView){
     + `<div class="mrzoom"><button onclick="dgZoom(1.5)">+</button>`
     + `<button onclick="dgZoom(1/1.5)">−</button>`
     + `<button onclick="dgReset()" title="전체 보기">⤢</button>`
-    + `<button onclick="uploadDg('${k}')" title="도면 사진 바꾸기">🖼</button></div>`;
+    + `<button onclick="uploadDg('${k}')" title="도면 사진 바꾸기">🖼</button>`
+    + `<button onclick="dgPickLib('${k}')" title="공개 도면에서 고르기">📚</button>`
+    + (dgPub[k==='side'?'side':'plan']
+        ? `<button onclick="dgSetPublic('${k}',false)" title="공개 내리기 (지금 공개 중)">🌐</button>`
+        : (dgRef[k==='side'?'side':'plan']
+            ? `<button onclick="dgSetPublic('${k}',true)" title="이 도면 공개하기">🔒</button>` : ''))
+    + `</div>`;
   dgFit();      // 이미지 비율에 맞춰 틀 높이를 잡는다
   dgApply();
   dgBind();
@@ -4986,7 +5191,7 @@ document.addEventListener('visibilitychange', ()=>{
 (async ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, writeBatch } =
+    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where, writeBatch } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -5117,6 +5322,33 @@ document.addEventListener('visibilitychange', ()=>{
           });
           await b.commit();
         }
+      }
+    };
+    // ── 공개 도면 라이브러리
+    // dglib      : 목록에 뜨는 정보만 (그림 없음) — 목록을 가볍게 읽으려고 나눴다
+    // dglibimg   : 도면 그림 본체 (고를 때만 한 장 읽는다)
+    window.__dglib = {
+      async publish(rec, url){
+        await setDoc(doc(fdb, 'dglibimg', String(rec.id)), { img: String(url||'') });
+        await setDoc(doc(fdb, 'dglib', String(rec.id)), rec);
+        return rec.id;
+      },
+      async list(kind){
+        // 공개로 표시한 것만 목록에 뜬다. 창고에는 있어도 공개 안 한 도면은 안 보인다.
+        const snap = await getDocs(query(collection(fdb, 'dglib'),
+          where('kind','==', kind==='side'?'side':'plan'), where('pub','==', true)));
+        return snap.docs.map(d=>d.data()).sort((a,b)=> String(b.ts||'').localeCompare(String(a.ts||'')));
+      },
+      async setPublic(id, on){
+        await setDoc(doc(fdb, 'dglib', String(id)), { pub: on===true }, { merge:true });
+      },
+      async image(id){
+        const d = await getDoc(doc(fdb, 'dglibimg', String(id)));
+        return d.exists() ? (d.data().img || '') : '';
+      },
+      async remove(id){
+        await deleteDoc(doc(fdb, 'dglib', String(id)));
+        try{ await deleteDoc(doc(fdb, 'dglibimg', String(id))); }catch(_){}
       }
     };
     window.__initCloud(api);

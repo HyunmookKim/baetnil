@@ -1854,21 +1854,29 @@ function locPath(it){
 
 const map = document.getElementById('map');
 // 적재표 평면도는 배마다 다르므로, 배 기록을 불러온 뒤·바꿀 때마다 적용한다.
-let fpShown = null; // 마지막으로 적용한 이미지 (같은 참조면 다시 그리지 않는다)
+// 마지막으로 적용한 이미지 (같은 참조면 다시 그리지 않는다).
+// 처음에는 '아직 아무것도 안 그림' 상태여야 한다 —
+// null 로 두면 도면 없는 첫 화면에서 null===null 이라 안내가 안 떴다.
+const FP_UNSET = Symbol('unset');
+let fpShown = FP_UNSET;
 function applyStowDg(){
   const fp = document.getElementById('fp');
   const none = document.getElementById('fpNone');
   const src = dgImgs.plan;
   if(src === fpShown) return;
   fpShown = src;
+  // 도면이 없으면 도면 보는 법 설명도 숨긴다 (설명할 도면이 없다)
+  const hint = document.getElementById('hint');
   if(src){
     fp.src = src; fp.style.display = '';
     none.style.display = 'none';
     map.classList.remove('nodg');
+    if(hint) hint.style.display = '';
   } else {
     fp.removeAttribute('src'); fp.style.display = 'none';
     none.style.display = '';
     map.classList.add('nodg');
+    if(hint) hint.style.display = 'none';
   }
 }
 

@@ -465,7 +465,8 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
     <img id="fp" alt="평면도">
     <div id="fpNone" style="display:none;padding:60px 20px;text-align:center;color:#8a97a8">
       이 배의 평면도가 아직 없습니다.<br>
-      <button class="btn" style="margin-top:12px" onclick="uploadDg('plan')">도면 사진 올리기</button>
+      <button class="btn" style="margin-top:12px" onclick="dgPickBuiltin('plan')">기본 도면에서 고르기</button>
+      <button class="btn" style="margin-top:8px" onclick="uploadDg('plan')">도면 사진 올리기</button>
       <button class="btn" style="margin-top:8px" onclick="dgPickLib('plan')">공개 도면에서 고르기</button>
     </div>
     <div class="mark" style="top:-2px;left:50%;transform:translateX(-50%)">▲ 선수</div>
@@ -696,19 +697,59 @@ let dgRef = { plan: null, side: null };
 let dgPub = { plan: false, side: false };
 function dgSrc(k){ return dgImgs[k==='side' ? 'side' : 'plan']; }
 // 저장·동기화용: id 붙은 문서 배열 <-> 객체 변환
+
+// ===== 선종별 기본 도면 =====
+// 선으로 그린 개략도다. 사진이 아니라 SVG 라 몇 KB 밖에 안 되고 확대해도 안 깨진다.
+// 사용자는 이 위에 자기 배의 칸을 그려 넣으면 된다.
+function svgUrl(t){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t); }
+const DG_BUILTIN = {
+  first45: { name:'베네토 퍼스트 45f5', type:'sail' },   // 그림은 아래에서 붙인다
+  sail: { name:"세일링 요트 (일반)", type:"sail",
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"><path d=\"M200 22 C154 120 82 302 68 470 C60 624 76 802 98 950 L302 950 C324 802 340 624 332 470 C318 302 246 120 200 22 Z\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\"><path d=\"M108 214 L292 214\"/><path d=\"M84 352 L316 352\"/><path d=\"M74 452 L326 452\"/><path d=\"M70 712 L330 712\"/><path d=\"M82 828 L318 828\"/></g><g fill=\"none\" stroke=\"#5d7488\" stroke-width=\"1.3\" stroke-dasharray=\"5 4\"><path d=\"M200 214 L200 352\"/><path d=\"M200 452 L200 712\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"1.5\"><path d=\"M126 232 L196 232 L196 340 L150 340 Z\"/><path d=\"M274 232 L204 232 L204 340 L250 340 Z\"/><path d=\"M86 366 L150 366 L150 440 L82 440 Z\"/><path d=\"M314 366 L250 366 L250 440 L318 440 Z\"/><path d=\"M78 470 L146 470 L146 620 L74 620 Z\"/><path d=\"M322 470 L254 470 L254 620 L326 620 Z\"/><path d=\"M162 520 L238 520 L238 640 L162 640 Z\"/><path d=\"M78 636 L146 636 L146 700 L76 700 Z\"/><path d=\"M322 636 L254 636 L254 700 L324 700 Z\"/><path d=\"M90 726 L192 726 L192 816 L92 816 Z\"/><path d=\"M310 726 L208 726 L208 816 L308 816 Z\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.5\"><path d=\"M104 844 L296 844 L288 938 L112 938 Z\"/><path d=\"M118 862 L172 862 L172 924 L124 924 Z\"/><path d=\"M282 862 L228 862 L228 924 L276 924 Z\"/><circle cx=\"200\" cy=\"890\" r=\"22\"/></g><g fill=\"none\" stroke=\"#e0a94a\" stroke-width=\"2\"><circle cx=\"200\" cy=\"470\" r=\"11\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"15\" text-anchor=\"middle\"><text x=\"200\" y=\"130\">선수 창고</text><text x=\"200\" y=\"290\">앞 선실</text><text x=\"116\" y=\"410\">화장실</text><text x=\"284\" y=\"410\">창고</text><text x=\"200\" y=\"490\">살롱</text><text x=\"110\" y=\"672\">갤리</text><text x=\"290\" y=\"672\">차트</text><text x=\"141\" y=\"775\">선미 좌현</text><text x=\"259\" y=\"775\">선미 우현</text><text x=\"200\" y=\"806\">침실</text><text x=\"200\" y=\"978\">코크핏</text></g></svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M60 238 C200 216 620 206 900 200 C934 198 946 214 940 236 L936 258 C700 316 300 324 120 296 C86 290 60 264 60 238 Z\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\"><path d=\"M300 232 L300 186 L660 178 L700 232\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\"><path d=\"M470 300 L470 392 L560 396 L580 300\"/><path d=\"M700 296 L700 356 L716 356 L716 292\"/></g><g fill=\"none\" stroke=\"#e0a94a\" stroke-width=\"2.5\"><path d=\"M470 182 L470 14\"/><path d=\"M470 40 L636 178\"/></g><g fill=\"none\" stroke=\"#5d7488\" stroke-width=\"1.4\" stroke-dasharray=\"7 6\"><path d=\"M40 268 L960 268\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"17\"><text x=\"150\" y=\"262\">선미</text><text x=\"880\" y=\"262\">선수</text><text x=\"452\" y=\"248\">선실 지붕</text><text x=\"770\" y=\"242\">앞 갑판</text><text x=\"486\" y=\"376\">용골</text><text x=\"642\" y=\"284\">흘수선</text></g></svg>" },
+  power: { name:"모터보트·요트 (일반)", type:"power",
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M200 40 C168 44 116 150 88 330 C68 520 70 796 78 952 L322 952 C330 796 332 520 312 330 C284 150 232 44 200 40 Z\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\"><path d=\"M96 250 L304 250\"/><path d=\"M80 470 L320 470\"/><path d=\"M74 600 L326 600\"/><path d=\"M74 700 L326 700\"/><path d=\"M76 852 L324 852\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"1.5\"><path d=\"M118 272 L196 272 L196 452 L102 452 Z\"/><path d=\"M282 272 L204 272 L204 452 L298 452 Z\"/><path d=\"M86 488 L190 488 L190 584 L80 584 Z\"/><path d=\"M314 488 L210 488 L210 584 L320 584 Z\"/><path d=\"M80 616 L316 616 L316 684 L80 684 Z\"/><path d=\"M96 716 L188 716 L188 836 L88 836 Z\"/><path d=\"M304 716 L212 716 L212 836 L312 836 Z\"/><path d=\"M92 868 L308 868 L308 938 L92 938 Z\"/></g><g fill=\"none\" stroke=\"#5d7488\" stroke-width=\"1.3\" stroke-dasharray=\"5 4\"><path d=\"M200 250 L200 470\"/><path d=\"M200 700 L200 852\"/></g><g fill=\"none\" stroke=\"#e0a94a\" stroke-width=\"2\"><circle cx=\"118\" cy=\"650\" r=\"16\"/><path d=\"M118 634 L118 666\"/><path d=\"M102 650 L134 650\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"15\" text-anchor=\"middle\"><text x=\"200\" y=\"170\">선수 창고</text><text x=\"149\" y=\"368\">앞 침실</text><text x=\"251\" y=\"368\">앞 침실</text><text x=\"135\" y=\"540\">화장실</text><text x=\"265\" y=\"540\">갤리</text><text x=\"180\" y=\"656\">조타석</text><text x=\"272\" y=\"656\">살롱</text><text x=\"142\" y=\"782\">엔진실</text><text x=\"258\" y=\"782\">창고</text><text x=\"200\" y=\"908\">뒷 갑판</text></g></svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M70 220 L900 196 C940 200 950 226 940 250 L120 306 C88 300 68 262 70 220 Z\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\"><path d=\"M330 214 L346 140 L700 128 L742 206\"/><path d=\"M420 140 L420 210\"/><path d=\"M560 134 L560 206\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\"><path d=\"M250 288 L268 340 L316 340\"/><path d=\"M300 292 L300 330\"/></g><g fill=\"none\" stroke=\"#5d7488\" stroke-width=\"1.4\" stroke-dasharray=\"7 6\"><path d=\"M40 272 L960 272\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"17\"><text x=\"150\" y=\"262\">선미</text><text x=\"856\" y=\"248\">선수</text><text x=\"470\" y=\"184\">조타실</text><text x=\"200\" y=\"252\">뒷 갑판</text><text x=\"262\" y=\"332\">추진기</text><text x=\"640\" y=\"292\">흘수선</text></g></svg>" },
+  fishing: { name:"낚시·유어선 (일반)", type:"fishing",
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M200 34 C170 40 124 168 100 348 C80 528 80 800 88 950 L312 950 C320 800 320 528 300 348 C276 168 230 40 200 34 Z\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\"><path d=\"M100 250 L300 250\"/><path d=\"M96 402 L304 402\"/><path d=\"M86 596 L314 596\"/><path d=\"M88 790 L312 790\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"1.5\"><path d=\"M120 272 L280 272 L280 386 L120 386 Z\"/><path d=\"M96 420 L304 420 L304 580 L96 580 Z\"/><path d=\"M130 444 L270 444 L270 556 L130 556 Z\"/><path d=\"M92 614 L192 614 L192 772 L88 772 Z\"/><path d=\"M308 614 L208 614 L208 772 L312 772 Z\"/><path d=\"M92 806 L308 806 L308 936 L92 936 Z\"/><path d=\"M124 828 L188 828 L188 916 L124 916 Z\"/><path d=\"M276 828 L212 828 L212 916 L276 916 Z\"/></g><g fill=\"none\" stroke=\"#e0a94a\" stroke-width=\"2\"><circle cx=\"200\" cy=\"500\" r=\"17\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"15\" text-anchor=\"middle\"><text x=\"200\" y=\"160\">선수 창고</text><text x=\"200\" y=\"336\">앞 갑판</text><text x=\"200\" y=\"436\">조타실</text><text x=\"200\" y=\"530\">타</text><text x=\"140\" y=\"700\">어창</text><text x=\"260\" y=\"700\">어창</text><text x=\"200\" y=\"824\">작업 갑판</text><text x=\"156\" y=\"884\">보관</text><text x=\"244\" y=\"884\">보관</text></g></svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><g fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\"><path d=\"M80 216 L840 176 C900 172 934 190 936 222 L130 300 C96 292 78 254 80 216 Z\"/></g><g fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\"><path d=\"M540 200 L548 112 L716 104 L730 192\"/><path d=\"M600 112 L600 196\"/></g><g fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\"><path d=\"M180 250 L470 232\"/><path d=\"M240 288 L256 336 L300 336\"/></g><g fill=\"none\" stroke=\"#e0a94a\" stroke-width=\"2.5\"><path d=\"M628 104 L628 34\"/><path d=\"M596 60 L660 60\"/></g><g fill=\"none\" stroke=\"#5d7488\" stroke-width=\"1.4\" stroke-dasharray=\"7 6\"><path d=\"M40 268 L960 268\"/></g><g fill=\"#8fa3b8\" font-family=\"sans-serif\" font-size=\"17\"><text x=\"140\" y=\"256\">선미</text><text x=\"866\" y=\"222\">선수</text><text x=\"596\" y=\"158\">조타실</text><text x=\"300\" y=\"228\">작업 갑판</text><text x=\"252\" y=\"330\">추진기</text><text x=\"780\" y=\"266\">흘수선</text></g></svg>" },
+};
+DG_BUILTIN.first45.plan = FLOORPLAN;
+DG_BUILTIN.first45.side = SIDEVIEW;
+for(const k in DG_BUILTIN){
+  const b = DG_BUILTIN[k];
+  if(b.planSvg){ b.plan = svgUrl(b.planSvg); delete b.planSvg; }
+  if(b.sideSvg){ b.side = svgUrl(b.sideSvg); delete b.sideSvg; }
+}
+// 이름으로 기본 도면 그림 찾기
+function dgSeedUrl(kind, key){
+  const b = DG_BUILTIN[key];
+  if(!b) return null;
+  return b[kind==='side' ? 'side' : 'plan'] || null;
+}
+// 그림으로 기본 도면 이름 되찾기
+function dgSeedKeyOf(kind, url){
+  if(!url) return null;
+  const f = (kind==='side' ? 'side' : 'plan');
+  for(const k in DG_BUILTIN){ if(DG_BUILTIN[k][f] === url) return k; }
+  return null;
+}
+
 // 기본 도면(앱에 내장)은 base64 를 다시 넣지 않고 ref:'seed' 로만 적는다.
 // 백업·클라우드 문서가 도면당 약 100~200KB 가벼워진다.
 // 사용자가 올린 도면은 백업이 자급자족해야 하므로 그대로 인라인으로 넣는다.
-const DG_SEEDS = { plan: () => FLOORPLAN, side: () => SIDEVIEW };
 function dgArr(){
   const a = [];
   for(const k of ['plan','side']){
     const v = dgImgs[k];
     if(!v) continue;
     let d;
-    if(v === DG_SEEDS[k]())      d = { id:k, ref:'seed' };          // 앱에 내장된 기본 도면
-    else if(dgRef[k])            d = { id:k, ref:'lib:'+dgRef[k] }; // 앱 창고에 있는 도면
-    else                         d = { id:k, img:v };               // 아직 창고에 못 올린 것 — 그림째 보관
+    const seed = dgSeedKeyOf(k, v);
+    // 'seed' 는 퍼스트45 를 뜻한다 — 옛 백업이 그렇게 적혀 있어 그대로 둔다
+    if(seed === 'first45')  d = { id:k, ref:'seed' };
+    else if(seed)           d = { id:k, ref:'seed:'+seed };         // 선종별 기본 도면
+    else if(dgRef[k])       d = { id:k, ref:'lib:'+dgRef[k] };      // 앱 창고에 있는 도면
+    else                    d = { id:k, img:v };                    // 아직 창고에 못 올린 것 — 그림째 보관
     if(dgPub[k] === true) d.pub = true;
     a.push(d);
   }
@@ -720,7 +761,9 @@ function dgFromArr(a){
   (Array.isArray(a)?a:[]).forEach(d=>{
     if(!d || (d.id!=='plan' && d.id!=='side')) return;
     if(typeof d.img==='string' && d.img) o[d.id] = d.img;   // 인라인 (창고에 못 올린 것·옛 백업)
-    else if(d.ref==='seed') o[d.id] = DG_SEEDS[d.id]();     // 내장 기본 도면
+    else if(d.ref==='seed') o[d.id] = dgSeedUrl(d.id, 'first45');
+    else if(typeof d.ref==='string' && d.ref.startsWith('seed:'))
+      o[d.id] = dgSeedUrl(d.id, d.ref.slice(5));            // 선종별 기본 도면
     // 'lib:...' 은 그림이 여기 없다 — dgResolve() 가 창고에서 받아온다
     // 모르는 ref 는 버린다. 죽는 것보다 도면 없는 편이 낫다.
   });
@@ -839,6 +882,36 @@ async function dgResolve(){
          && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
     }catch(_){}
   }
+}
+// 앱에 들어 있는 기본 도면 고르기.
+// 내 배 선종에 맞는 것을 맨 위에 놓는다.
+function dgPickBuiltin(k){
+  if(!lkCanEdit()) return;
+  const kind = (k==='side' ? 'side' : 'plan');
+  const b = (typeof curBoat==='function') ? curBoat() : null;
+  const myType = (b && b.type) || '';
+  const keys = Object.keys(DG_BUILTIN)
+    .filter(x => dgSeedUrl(kind, x))
+    .sort((x,y) => (DG_BUILTIN[y].type===myType) - (DG_BUILTIN[x].type===myType));
+  if(!keys.length){ alert('기본 도면이 없습니다'); return; }
+  const lines = keys.map((x,i) => (i+1) + '. ' + DG_BUILTIN[x].name
+    + (DG_BUILTIN[x].type===myType ? ' ← 내 배 선종' : ''));
+  const pick = prompt('기본 도면 고르기 — 번호를 넣어 주세요\n\n' + lines.join('\n')
+    + '\n\n고른 뒤 "칸 그리기"로 내 배에 맞게 칸을 그리시면 됩니다.', '1');
+  if(pick === null) return;
+  const n = parseInt(pick, 10);
+  if(!(n >= 1 && n <= keys.length)){ alert('목록에 없는 번호입니다'); return; }
+  const url = dgSeedUrl(kind, keys[n-1]);
+  dgImgs = { ...dgImgs, [kind]: url };
+  dgRef  = { ...dgRef,  [kind]: null };
+  dgPub  = { ...dgPub,  [kind]: false };
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof applyStowDg==='function') applyStowDg();
+  try{
+    if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
+       && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
+  }catch(_){}
 }
 // 공개 목록에서 도면 고르기
 async function dgPickLib(k){
@@ -3204,7 +3277,8 @@ function setMapKind(k, keepView){
     document.getElementById('mrMap').innerHTML =
       `<div style="padding:60px 20px;text-align:center;color:#8a97a8">`
       + `이 배의 ${k==='side'?'측면도':'평면도'}가 아직 없습니다.<br>`
-      + `<button class="btn" style="margin-top:12px" onclick="uploadDg('${k}')">도면 사진 올리기</button>`
+      + `<button class="btn" style="margin-top:12px" onclick="dgPickBuiltin('${k}')">기본 도면에서 고르기</button>`
+      + `<button class="btn" style="margin-top:8px" onclick="uploadDg('${k}')">도면 사진 올리기</button>`
       + `<button class="btn" style="margin-top:8px" onclick="dgPickLib('${k}')">공개 도면에서 고르기</button></div>`;
     return;
   }
@@ -3215,6 +3289,7 @@ function setMapKind(k, keepView){
     + `<button onclick="dgZoom(1/1.5)">−</button>`
     + `<button onclick="dgReset()" title="전체 보기">⤢</button>`
     + `<button onclick="uploadDg('${k}')" title="도면 사진 바꾸기">🖼</button>`
+    + `<button onclick="dgPickBuiltin('${k}')" title="기본 도면에서 고르기">⛵</button>`
     + `<button onclick="dgPickLib('${k}')" title="공개 도면에서 고르기">📚</button>`
     + (dgPub[k==='side'?'side':'plan']
         ? `<button onclick="dgSetPublic('${k}',false)" title="공개 내리기 (지금 공개 중)">🌐</button>`

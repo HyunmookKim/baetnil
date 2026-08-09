@@ -127,6 +127,7 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .lkt.on{background:#2a5a8a;color:#dff2ff}
 .lkt:disabled{opacity:.35;cursor:not-allowed}
 .lkt.lock{margin-left:4px}
+.lkt.undo{font-size:16px;padding:3px 12px;line-height:1}
 .lkt.lock.on{background:#3a2a14;border-color:#7a5a2a;color:#f0c98a}
 .has{border-color:#2faa6a!important;background:#1a6a3a44!important}.has span{color:#7aefaa!important}
 .sel{border-color:#5ab0e8!important;background:#2a6aa055!important}.sel span{color:#bfe6ff!important}
@@ -515,6 +516,8 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
     <button class="tab" id="sortTab" onclick="cycleSort()">가나다순</button>
     <button class="tab" id="lkEditTab" onclick="toggleLkEdit()">칸 그리기</button>
     <span id="lkTools" style="display:none">
+      <button class="tab lkt undo" id="undoBtn" onclick="undoRun()" title="되돌리기">↶</button>
+      <button class="tab lkt undo" id="redoBtn" onclick="redoRun()" title="다시하기">↷</button>
       <button class="tab lkt on" id="lkt_locker" onclick="setLkTool('locker')">수납칸</button>
       <button class="tab lkt" id="lkt_line" onclick="setLkTool('line')">선</button>
       <button class="tab lkt" id="lkt_rect" onclick="setLkTool('rect')">네모</button>
@@ -2305,6 +2308,7 @@ function lkAdd(rect, zone, label){
   zone = String(zone||'').trim();
   label = String(label||'').trim();
   if(!zone || !label) return null;
+  undoPush();
   const l = { id: lkNewId(), zone, label, x:rect.x, y:rect.y, w:rect.w, h:rect.h };
   lockers.push(l);
   saveLocal();
@@ -2335,6 +2339,7 @@ function shAdd(type, rect){
   // 선은 한쪽만 길어도 된다. 네모·세모는 양쪽 다 있어야 한다.
   if(type === 'line'){ if(Math.abs(w) < 1 && Math.abs(h) < 1) return null; }
   else { if(Math.abs(w) < 1 || Math.abs(h) < 1) return null; }
+  undoPush();
   const sh = { id: shNewId(), t: type,
                x: lkRound(rect.x), y: lkRound(rect.y), w: lkRound(w), h: lkRound(h) };
   shapes.push(sh);
@@ -2342,6 +2347,60 @@ function shAdd(type, rect){
   if(typeof schedulePush==='function') schedulePush();
   if(typeof drawShapes==='function') drawShapes();
   return sh;
+}
+// ===== 되돌리기 =====
+// 그림 그리는 앱처럼, 방금 한 일을 한 걸음씩 물린다.
+// 칸과 도형을 통째로 찍어 두는 방식이라 어떤 작업이든 되돌릴 수 있다.
+// (칸 71개 + 도형 수십 개라도 한 장에 수십 KB라 40장까지는 부담이 없다)
+const UNDO_MAX = 40;
+let undoStack = [];
+let redoStack = [];
+function undoSnap(){
+  return { lockers: deepCopy(lockers), shapes: deepCopy(shapes) };
+}
+function undoApply(sn){
+  lockers = deepCopy(sn.lockers);
+  shapes  = deepCopy(sn.shapes);
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  if(typeof drawShapes==='function') drawShapes();
+  if(typeof renderList==='function') renderList();
+  if(typeof paintUndoBtns==='function') paintUndoBtns();
+}
+// 무언가 바꾸기 "직전"에 부른다
+function undoPush(){
+  undoStack.push(undoSnap());
+  if(undoStack.length > UNDO_MAX) undoStack.shift();
+  redoStack = [];          // 새로 그리면 앞으로 가기는 사라진다 (그림 앱과 같은 규칙)
+  if(typeof paintUndoBtns==='function') paintUndoBtns();
+}
+function undoClear(){
+  undoStack = []; redoStack = [];
+  if(typeof paintUndoBtns==='function') paintUndoBtns();
+}
+function canUndo(){ return undoStack.length > 0; }
+function canRedo(){ return redoStack.length > 0; }
+function undoRun(){
+  if(!undoStack.length) return false;
+  // 잠근 것을 되돌리기로 우회할 수 없게 한다
+  if(lkLocked && dgLocked){
+    alert('수납칸과 도면이 모두 잠겨 있습니다.\n자물쇠를 눌러 여시면 됩니다.');
+    return false;
+  }
+  redoStack.push(undoSnap());
+  undoApply(undoStack.pop());
+  return true;
+}
+function redoRun(){
+  if(!redoStack.length) return false;
+  if(lkLocked && dgLocked){
+    alert('수납칸과 도면이 모두 잠겨 있습니다.\n자물쇠를 눌러 여시면 됩니다.');
+    return false;
+  }
+  undoStack.push(undoSnap());
+  undoApply(redoStack.pop());
+  return true;
 }
 // 도형을 감싸는 사각형. 선을 거꾸로 그어도(음수 w·h) 제자리 상자를 돌려준다.
 // 어느 도형을 눌렀는지 판정하고 옮길 때 쓴다.
@@ -2357,6 +2416,7 @@ function shMove(id, dx, dy){
   if(!shCanEdit()) return null;
   const sh = shGet(id);
   if(!sh) return null;
+  undoPush();
   const b = shBox(sh);
   const nbx = Math.max(0, Math.min(100 - b.w, b.x + dx));
   const nby = Math.max(0, Math.min(100 - b.h, b.y + dy));
@@ -2372,6 +2432,7 @@ function shResize(id, nw, nh){
   if(!shCanEdit()) return null;
   const sh = shGet(id);
   if(!sh) return null;
+  undoPush();
   const sx = (Number(sh.w)||0) < 0 ? -1 : 1;
   const sy = (Number(sh.h)||0) < 0 ? -1 : 1;
   // 선은 한쪽만 길어도 되고, 네모·세모는 양쪽 다 있어야 한다
@@ -2410,6 +2471,7 @@ function shDelete(id){
   if(!shCanEdit()) return null;
   const sh = shGet(id);
   if(!sh) return null;
+  undoPush();
   shapes = shapes.filter(x => String(x.id) !== String(id));
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
@@ -2446,6 +2508,7 @@ function lkMove(id, nx, ny){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
+  undoPush();
   l.x = lkRound(Math.max(0, Math.min(100 - l.w, nx)));
   l.y = lkRound(Math.max(0, Math.min(100 - l.h, ny)));
   saveLocal();
@@ -2459,6 +2522,7 @@ function lkResize(id, nw, nh){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
+  undoPush();
   l.w = lkRound(Math.max(1, Math.min(100 - l.x, nw)));
   l.h = lkRound(Math.max(1, Math.min(100 - l.y, nh)));
   saveLocal();
@@ -2473,6 +2537,7 @@ function lkRename(id, label){
   if(!l) return null;
   const v = String(label||'').trim();
   if(!v) return null;
+  undoPush();
   l.label = v;
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
@@ -2487,6 +2552,7 @@ function lkRezone(id, zone){
   if(!l) return null;
   const v = String(zone||'').trim();
   if(!v) return null;
+  undoPush();
   l.zone = v;
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
@@ -2509,6 +2575,7 @@ function lkDelete(id){
     ? `'${l.label}' 칸을 지울까요?\n\n안에 든 물품 ${n}개는 지워지지 않고 '미배치'로 남습니다.\n나중에 '이동'으로 다른 칸에 옮기시면 됩니다.`
     : `'${l.label}' 칸을 지울까요?`;
   if(!confirm(msg)) return null;
+  undoPush();
   lockers = lockers.filter(x => String(x.id) !== String(id));
   if(typeof selected!=='undefined' && selected === id){
     selected = null;
@@ -2547,6 +2614,21 @@ function drawShapes(){
   const el = document.getElementById('shLayer');
   if(!el) return;
   el.innerHTML = shSvg(shapes);
+}
+// 휴대폰 뒤로가기 버튼으로도 되돌린다.
+// 편집 중에 뒤로가기를 누르면 앱이 꺼지는 것이 아니라 한 걸음 물린다.
+window.addEventListener('popstate', ()=>{
+  if(lkEdit && canUndo()){
+    undoRun();
+    history.pushState({ lkEdit:true }, '');   // 다음 뒤로가기도 받도록 다시 쌓는다
+  }
+});
+// 되돌리기 버튼 표시 갱신
+function paintUndoBtns(){
+  const u = document.getElementById('undoBtn');
+  if(u) u.disabled = !canUndo();
+  const r = document.getElementById('redoBtn');
+  if(r) r.disabled = !canRedo();
 }
 // 자물쇠 버튼 표시 갱신
 function paintLockBtns(){
@@ -2600,7 +2682,9 @@ function toggleLkEdit(){
   if(b){ b.classList.toggle('on', lkEdit); b.textContent = lkEdit ? '그리기 끝' : '도면 그리기'; }
   const tl = document.getElementById('lkTools');
   if(tl) tl.style.display = lkEdit ? '' : 'none';
-  if(lkEdit) setLkTool(lkTool);
+  if(lkEdit){ try{ history.pushState({ lkEdit:true }, ''); }catch(_){} }
+  if(lkEdit){ setLkTool(lkTool); paintUndoBtns(); }
+  else undoClear();   // 편집을 끝내면 되돌리기 기록도 비운다
   const h = document.getElementById('hint');
   if(h) h.innerHTML = lkEdit ? '빈 곳을 끌면 새 칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 칸을 톡 누르면 이름·지우기' : lkHintOrig;
   if(!lkEdit && lkDrag){ lkDrag = null; const g=document.getElementById('lkGhost'); if(g) g.remove(); }

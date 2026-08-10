@@ -55,6 +55,17 @@
 .rosteral{background:#3a2a14;border-bottom:1px solid #7a5a2a;color:#f0c98a;
   font-size:12.5px;padding:10px 14px;line-height:1.6}
 .fleet .due{color:#FF9A8A}
+.chip.whochip{background:#14304a;color:#9ed0f5}
+.chip.late{background:#7A3A30;color:#FF9A8A}
+.chip.notice{background:#7a5a2a;color:#f0c98a}
+.postmeta{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#8a97a8;
+  font-size:12.5px;border-bottom:1px solid #12283e}
+.postbody{padding:14px;color:#dfe8f2;font-size:14.5px;line-height:1.7;white-space:pre-wrap}
+.cmt{padding:10px 14px;border-bottom:1px solid #12283e}
+.cmthead{display:flex;align-items:center;gap:8px;color:#8ab4d8;font-size:12.5px;font-weight:600}
+.cmthead span{color:#5d7488;font-weight:400}
+.cmthead .ckdel{margin-left:auto}
+.cmtbody{color:#dfe8f2;font-size:14px;line-height:1.6;margin-top:4px}
 /* 배 목록에서 지금 보고 있는 배 */
 .mr.cur{border-color:#2E6B4A;background:#101C16}
 .mr.cur .cn{color:#6FD9A0}
@@ -651,7 +662,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabStow" class="on" onclick="switchTab('stow')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></svg>적재표</button><button id="tabMaint" onclick="switchTab('maint')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>정비</button><button id="tabWeather" onclick="switchTab('weather')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.3A7 7 0 1 0 5 17.7"/><path d="M2 20.5c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1"/></svg>날씨</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button></nav>
 
 
@@ -821,6 +832,8 @@ const SIDEVIEW = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA+gAAAYYCAYAAAAK
 let lockers = [];
 // 사용자가 도면 위에 그린 선·네모·세모. 물품이 들어가는 수납칸과는 별개다.
 let shapes = [];
+// 이 배의 게시판 글 (댓글은 글 안에 들어 있다)
+let posts = [];
 
 // ===== 배별 도면 이미지 =====
 // FLOORPLAN / SIDEVIEW 는 First 45f5 기본값일 뿐이고,
@@ -1964,6 +1977,298 @@ function assignRank(b, uid, rankId){
   b.members[uid] = r.id;
   return r;
 }
+// ===== 배별 게시판 =====
+// 배마다 게시판 하나. 공지·인수인계·일반 글과 댓글.
+const POST_KINDS = [
+  { v:'notice', name:'공지',     sub:'맨 위에 고정됩니다' },
+  { v:'hand',   name:'인수인계', sub:'교대할 때 남기는 것' },
+  { v:'free',   name:'일반',     sub:'그 밖의 이야기' }
+];
+function meUid(){
+  return (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+}
+function meName(){
+  const u = (typeof window!=='undefined') ? window.__user : null;
+  return (u && (u.name || u.email)) || '이름 미등록';
+}
+// 공지는 게시판 전체 권한이 있어야 쓴다
+function canNotice(b){ return can(b, 'board', 'full'); }
+// 내 글이거나 게시판 전체 권한이면 고치고 지울 수 있다
+function canEditPost(b, p){
+  if(!p) return false;
+  const me = meUid();
+  if(!me) return false;
+  if(String(p.by) === String(me)) return can(b, 'board', 'write');
+  return can(b, 'board', 'full');
+}
+function addPost(title, body, kind, photos){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!can(b, 'board', 'write')){ alert('글을 쓸 권한이 없습니다'); return null; }
+  const t = String(title||'').trim();
+  if(!t) return null;
+  let k = POST_KINDS.some(x=>x.v===kind) ? kind : 'free';
+  if(k === 'notice' && !canNotice(b)){
+    alert('공지는 게시판 관리 권한이 있어야 쓸 수 있습니다.\n일반 글로 올립니다.');
+    k = 'free';
+  }
+  const p = { id:newId(), kind:k, title:t, body:String(body||''),
+              by: meUid() || '', byName: meName(),
+              ts: new Date().toISOString(), photos: photos || [], comments: [] };
+  posts.push(p);
+  save();
+  return p;
+}
+function postOf(id){ return posts.find(x => String(x.id) === String(id)) || null; }
+function editPost(id, patch){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const p = postOf(id);
+  if(!p || !canEditPost(b, p)){ if(p) alert('이 글은 고칠 수 없습니다'); return null; }
+  if('title' in patch){ const t = String(patch.title||'').trim(); if(!t) return null; p.title = t; }
+  if('body'  in patch) p.body = String(patch.body||'');
+  if('kind'  in patch && POST_KINDS.some(x=>x.v===patch.kind)){
+    if(patch.kind !== 'notice' || canNotice(b)) p.kind = patch.kind;
+  }
+  p.edited = new Date().toISOString();
+  save();
+  return p;
+}
+function delPost(id){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const p = postOf(id);
+  if(!p || !canEditPost(b, p)){ if(p) alert('이 글은 지울 수 없습니다'); return null; }
+  posts = posts.filter(x => String(x.id) !== String(id));
+  save();
+  return p;
+}
+// 공지가 맨 위, 나머지는 최신순
+function postList(){
+  return posts.slice().sort((a,c)=>{
+    const an = a.kind === 'notice' ? 0 : 1, cn = c.kind === 'notice' ? 0 : 1;
+    if(an !== cn) return an - cn;
+    return String(c.ts||'').localeCompare(String(a.ts||''));
+  });
+}
+function addComment(postId, text){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!can(b, 'board', 'write')){ alert('댓글을 쓸 권한이 없습니다'); return null; }
+  const p = postOf(postId);
+  if(!p) return null;
+  const t = String(text||'').trim();
+  if(!t) return null;
+  p.comments = p.comments || [];
+  p.comments.push({ id:newId(), text:t, by: meUid() || '', byName: meName(),
+                    ts: new Date().toISOString() });
+  save();
+  return p;
+}
+function delComment(postId, cid){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const p = postOf(postId);
+  if(!p) return null;
+  const c = (p.comments || []).find(x => String(x.id) === String(cid));
+  if(!c) return null;
+  const me = meUid();
+  const mine = String(c.by) === String(me);
+  if(!(mine ? can(b,'board','write') : can(b,'board','full'))){
+    alert('이 댓글은 지울 수 없습니다'); return null;
+  }
+  p.comments = p.comments.filter(x => String(x.id) !== String(cid));
+  save();
+  return c;
+}
+// 게시판 화면
+let boardOpenId = null;
+function openBoard(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'board','view')){ alert('게시판을 볼 권한이 없습니다'); return; }
+  boardOpenId = null;
+  const write = can(b,'board','write');
+  const rows = postList().map(p=>{
+    const kn = (POST_KINDS.find(k=>k.v===p.kind)||{}).name || '일반';
+    const nc = (p.comments||[]).length;
+    return `<div class="fleet" onclick="openPost('${esc(p.id)}')">
+      <div class="fmain"><div class="fname">
+        <span class="chip${p.kind==='notice'?' notice':''}">${esc(kn)}</span>
+        ${esc(p.title)}${nc?` <span class="chip">댓 ${nc}</span>`:''}</div>
+        <div class="fsub">${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}</div></div></div>`;
+  }).join('');
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>게시판</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+    + (rows || '<div class="mrnone">아직 글이 없습니다</div>')
+    + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
+        <button class="mrbtn big" onclick="writePost()">+ 글쓰기</button></div>` : '');
+  P.classList.add('open');
+}
+function writePost(id){
+  const b = curBoat(); if(!b) return;
+  const p = id ? postOf(id) : null;
+  if(id && !canEditPost(b, p)) return;
+  const kinds = POST_KINDS.filter(k => k.v !== 'notice' || canNotice(b));
+  openForm({
+    title: p ? '글 고치기' : '새 글',
+    okText: p ? '저장' : '올리기',
+    fields: [
+      { key:'kind',  label:'말머리', type:'pick', value: p ? p.kind : 'free',
+        options: kinds.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
+      { key:'title', label:'제목', value: p ? p.title : '', placeholder:'제목' },
+      { key:'body',  type:'multi', rows:6, label:'내용', value: p ? p.body : '',
+        placeholder:'내용을 적어 주세요' }
+    ],
+    del: p ? { text:'글 지우기', run: ()=>{
+      if(!confirm('이 글을 지울까요?')) return;
+      if(delPost(p.id)) openBoard();
+    }} : null,
+    onOk: v => {
+      if(!v.title){ alert('제목을 넣어 주세요'); return false; }
+      if(p){ if(!editPost(p.id, v)) return false; openPost(p.id); }
+      else { const np = addPost(v.title, v.body, v.kind); if(!np) return false; openPost(np.id); }
+    }
+  });
+}
+function openPost(id){
+  const b = curBoat(); if(!b) return;
+  const p = postOf(id); if(!p) return;
+  boardOpenId = id;
+  const kn = (POST_KINDS.find(k=>k.v===p.kind)||{}).name || '일반';
+  const me = meUid();
+  const cs = (p.comments||[]).map(c=>{
+    const mine = String(c.by) === String(me);
+    const canDel = mine ? can(b,'board','write') : can(b,'board','full');
+    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+        <span>${esc(String(c.ts||'').slice(0,10))}</span>
+        ${canDel?`<button class="ckdel" onclick="delCommentUI('${esc(p.id)}','${esc(c.id)}')">&#10005;</button>`:''}</div>
+      <div class="cmtbody">${esc(c.text).replace(/\n/g,'<br>')}</div></div>`;
+  }).join('');
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>${esc(p.title)}</b><span style="flex:1"></span>
+      <button class="tab" onclick="openBoard()">목록</button></div>
+    <div class="postmeta"><span class="chip${p.kind==='notice'?' notice':''}">${esc(kn)}</span>
+      ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
+      ${canEditPost(b,p)?`<button class="minib blu" style="margin-left:auto" onclick="writePost('${esc(p.id)}')">고치기</button>`:''}</div>
+    <div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>
+    <div class="ghead"><b>댓글</b><span class="gcnt">${(p.comments||[]).length}</span></div>
+    ${cs}
+    ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
+      <button class="mrbtn big" style="width:100%" onclick="writeComment('${esc(p.id)}')">댓글 쓰기</button></div>`:''}`;
+  P.classList.add('open');
+}
+function writeComment(pid){
+  openForm({
+    title: '댓글',
+    okText: '올리기',
+    fields: [ { key:'text', type:'multi', rows:3, label:'내용', value:'', placeholder:'댓글을 적어 주세요' } ],
+    onOk: v => {
+      if(!v.text){ alert('내용을 넣어 주세요'); return false; }
+      if(!addComment(pid, v.text)) return false;
+      openPost(pid);
+    }
+  });
+}
+function delCommentUI(pid, cid){
+  if(!confirm('이 댓글을 지울까요?')) return;
+  if(delComment(pid, cid)) openPost(pid);
+}
+// ===== 할 일 배정 =====
+// 정기점검과 체크리스트 항목에 담당자를 붙인다.
+// 기한과 주기는 이미 정기점검에 있으니 그대로 쓴다 — 따로 만들면 두 벌이 된다.
+function taskItem(kind, id){
+  if(kind === 'maint') return maint.find(x => String(x.id) === String(id)) || null;
+  if(kind === 'check') return checkt.find(x => x && x.typ !== 'list' && String(x.id) === String(id)) || null;
+  return null;
+}
+function assignTask(kind, id, uid){
+  const it = taskItem(kind, id);
+  if(!it) return null;
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  // 이 배의 구성원에게만 맡길 수 있다
+  if(uid && !(b && b.members && (uid in b.members))){
+    alert('이 배의 구성원에게만 맡길 수 있습니다');
+    return null;
+  }
+  it.who = uid || '';
+  saveMR();
+  return it;
+}
+function taskOwnerName(b, uid){
+  if(!uid) return '';
+  const names = (b && b.memberNames) || {};
+  if(names[uid]) return names[uid];
+  return (b && b.members && (uid in b.members)) ? '이름 미등록' : '나간 사람';
+}
+// 한 사람이 맡은 것들. 정기점검은 기한이 지났는지도 함께 준다.
+function openTasksOf(b, uid){
+  const out = [];
+  maint.forEach(m=>{
+    if(String(m.who || '') !== String(uid)) return;
+    const st = mStatus(m);
+    out.push({ kind:'maint', id:m.id, who:m.who || '',
+               name:m.name, grp:m.grp || '',
+               late: st.days !== null && st.days < 0,
+               days: st.days, next: st.next });
+  });
+  checkt.forEach(c=>{
+    if(!c || c.typ === 'list') return;
+    if(String(c.who || '') !== String(uid)) return;
+    out.push({ kind:'check', id:c.id, who:c.who || '', name:c.label, grp:'', late:false });
+  });
+  // 기한 지난 것을 앞으로
+  return out.sort((a,c)=> (c.late?1:0) - (a.late?1:0) || (a.days ?? 9999) - (c.days ?? 9999));
+}
+function myTasks(b){
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  if(!me) return [];
+  return openTasksOf(b, me);
+}
+// 아무도 안 맡은 것을 세려면 uid 를 빈 문자열로 준다
+function taskCount(b, uid){
+  return openTasksOf(b, uid || '');
+}
+// 담당자 고르기
+function pickAssignee(kind, id){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'task','write')){ alert('할 일을 맡길 권한이 없습니다'); return; }
+  const it = taskItem(kind, id); if(!it) return;
+  const opts = [{ v:'', name:'없음', sub:'아무에게도 맡기지 않음' }]
+    .concat(memberRows(b).map(m=>({ v:m.uid, name:m.name, sub:m.rankName })));
+  openForm({
+    title: kind === 'maint' ? (it.name || '정기점검') : (it.label || '점검 항목'),
+    sub: '누가 맡을까요?',
+    okText: '맡기기',
+    fields: [ { key:'who', label:'담당', type:'pick', value: it.who || '', options: opts } ],
+    onOk: v => {
+      if(!assignTask(kind, id, v.who)) return false;
+      if(typeof rerender === 'function') rerender(kind === 'maint' ? 'maint' : 'check');
+      if(kind === 'maint' && typeof openMR === 'function') openMR('maint', id);
+      else if(typeof renderCheck === 'function') renderCheck();
+    }
+  });
+}
+// 내 할 일 화면
+function openMyTasks(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'task','view')){ alert('할 일을 볼 권한이 없습니다'); return; }
+  const seeAll = can(b,'task','write');
+  const mine = myTasks(b);
+  const free = seeAll ? taskCount(b, '') : [];
+  const row = t => `<div class="fleet" onclick="${t.kind==='maint'
+      ? `openMR('maint','${esc(t.id)}')` : `switchTab('check')`}">
+    <div class="fmain"><div class="fname">${esc(t.name || '(이름 없음)')}
+      ${t.late ? '<span class="chip late">기한 지남</span>' : ''}
+      <span class="chip">${t.kind==='maint' ? '정기점검' : '체크리스트'}</span></div>
+      <div class="fsub">${t.kind==='maint'
+        ? (t.next ? '다음 ' + fmtDate(t.next) + (t.days!==null ? ' · ' + (t.days<0 ? (-t.days)+'일 지남' : t.days+'일 남음') : '') : '기록 없음')
+        : (t.grp || '')}</div></div></div>`;
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>내 할 일</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+    + (mine.length ? mine.map(row).join('')
+        : '<div class="mrnone">맡은 일이 없습니다</div>')
+    + (seeAll && free.length
+        ? `<div class="ghead"><b>아무도 안 맡은 일</b><span class="gcnt">${free.length}</span></div>`
+          + free.map(row).join('') : '');
+  P.classList.add('open');
+}
 // ===== 회원 명부 =====
 // 사람마다 회비·오는 주기·부재·메모를 적어 둔다.
 // 회비 계산까지는 하지 않는다 — 적어 두고 날짜가 되면 알려주는 정도다.
@@ -2428,7 +2733,7 @@ function rejectJoin(inviteId){
 // 한 척의 기록이 어느 저장 칸에 흩어져 있는지 한곳에 적어 둔다.
 // 여기서 빠지면 지운 배의 기록이 기기에 남는다.
 const BOAT_DATA = ['all','trash','maint','repair','voyage','fuel','runs',
-                   'contacts','vdocs','checkt','mrtrash','lockers','shapes','dgimgs'];
+                   'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs'];
 function boatKeys(id){
   return BOAT_DATA.map(n => n + '@' + id);
 }
@@ -2677,6 +2982,7 @@ async function loadBoatData(){
   mrTrash = await get('mrtrash', []);
   lockers = await get('lockers', []);
   shapes  = await get('shapes', []);
+  posts   = await get('posts', []);
   seedLockersIfNeeded();
   { const _dg = await get('dgimgs', []); dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
   dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
@@ -2709,6 +3015,7 @@ async function initStorage(){
     try{ mrTrash = JSON.parse(localStorage.getItem('bt_mrtrash')||'[]'); }catch(_){ mrTrash=[]; }
     try{ lockers = JSON.parse(localStorage.getItem('bt_lockers')||'[]'); }catch(_){ lockers=[]; }
     try{ shapes = JSON.parse(localStorage.getItem('bt_shapes')||'[]'); }catch(_){ shapes=[]; }
+    try{ posts = JSON.parse(localStorage.getItem('bt_posts')||'[]'); }catch(_){ posts=[]; }
     seedLockersIfNeeded();
     try{ const _dg = JSON.parse(localStorage.getItem('bt_dgimgs')||'[]');
       dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
@@ -2735,6 +3042,7 @@ function saveLocal(){
     idbSet(bkey('mrtrash'), mrTrash).catch(e=>{});
     idbSet(bkey('lockers'), lockers).catch(e=>{});
     idbSet(bkey('shapes'), shapes).catch(e=>{});
+    idbSet(bkey('posts'), posts).catch(e=>{});
     idbSet(bkey('dgimgs'), dgArr()).catch(e=>{});
     idbSet('boats', boats).catch(e=>{});
     idbSet('curboat', currentBoatId).catch(e=>{});
@@ -2797,6 +3105,7 @@ function toggleLock(){
 let cloud = null, lastCloud = {}, lastCloudTrash = {}, lastCloudMaint = {}, lastCloudRepair = {}, lastCloudV = {}, lastCloudF = {}, lastCloudC = {}, lastCloudD = {}, lastCloudK = {}, lastCloudMT = {}, lastCloudRN = {}, lastCloudL = {}, pushTimer = null;
 let lastCloudDG = {};
 let lastCloudSH = {};
+let lastCloudPO = {};
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 function setSync(t){ const el=document.getElementById('syncState'); if(el) el.textContent = t; }
 const snapOf = arr => { const m={}; arr.forEach(i=>{ m[String(i.id)] = JSON.stringify(i); }); return m; };
@@ -2827,6 +3136,7 @@ async function cloudPull(){
   if(Array.isArray(r.mrtrash)) mrTrash = r.mrtrash;
   if(Array.isArray(r.lockers) && r.lockers.length) lockers = r.lockers;
   if(Array.isArray(r.shapes) && r.shapes.length) shapes = r.shapes;
+  if(Array.isArray(r.posts) && r.posts.length) posts = r.posts;
   if(Array.isArray(r.dgimgs) && r.dgimgs.length){
     dgImgs = dgFromArr(r.dgimgs); dgRef = dgRefFromArr(r.dgimgs); dgPub = dgPubFromArr(r.dgimgs);
     dgResolve();   // 번호만 온 도면은 창고에서 받아온다
@@ -2842,6 +3152,7 @@ async function cloudPull(){
   lastCloudMT = snapOf(Array.isArray(r.mrtrash)? r.mrtrash : []);
   lastCloudL  = snapOf(Array.isArray(r.lockers)? r.lockers : []);
   lastCloudSH = snapOf(Array.isArray(r.shapes)? r.shapes : []);
+  lastCloudPO = snapOf(Array.isArray(r.posts)? r.posts : []);
   lastCloudDG = snapOf(Array.isArray(r.dgimgs)? r.dgimgs : []);
   if(r.seeded){
     items = migrate(r.items); trash = migrate(r.trash);
@@ -2899,19 +3210,21 @@ async function pushNow(){
     const [setL,delL] = diff(curL, lastCloudL);
     const curSH = snapOf(shapes);
     const [setSH,delSH] = diff(curSH, lastCloudSH);
+    const curPO = snapOf(posts);
+    const [setPO,delPO] = diff(curPO, lastCloudPO);
     const curDG = snapOf(dgArr());
     const [setDG,delDG] = diff(curDG, lastCloudDG);
     if(setI.length||delI.length||setT.length||delT.length||setM.length||delM.length||setR.length||delR.length
        ||setV.length||delV.length||setF.length||delF.length||setC.length||delC.length||setD.length||delD.length||setK.length||delK.length||setMT.length||delMT.length||setRN.length||delRN.length||setL.length||delL.length||setDG.length||delDG.length){
       await cloud.push({setI, delI, setT, delT, setM, delM, setR, delR,
                         setV, delV, setF, delF, setC, delC, setD, delD, setK, delK, setMT, delMT,
-                        setRN, delRN, setL, delL, setDG, delDG, setSH, delSH,
+                        setRN, delRN, setL, delL, setDG, delDG, setSH, delSH, setPO, delPO,
                         itemCount:items.length, trashCount:trash.length,
                         maintCount:maint.length, repairCount:repair.length});
     }
     lastCloud = curI; lastCloudTrash = curT; lastCloudMaint = curM; lastCloudRepair = curR;
     lastCloudV = curV; lastCloudF = curF; lastCloudC = curC; lastCloudD = curD; lastCloudK = curK; lastCloudMT = curMT;
-    lastCloudRN = curRN; lastCloudL = curL; lastCloudDG = curDG; lastCloudSH = curSH;
+    lastCloudRN = curRN; lastCloudL = curL; lastCloudDG = curDG; lastCloudSH = curSH; lastCloudPO = curPO;
     setSync('동기화됨');
   }catch(e){
     console.error(e);
@@ -3066,7 +3379,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.6';
+const APP_VER = '1.7';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -4134,7 +4447,7 @@ function backupData(){
     boat: curBoat(), boats: boats,
     items:items, trash:trash, maint:maint, repair:repair, voyage:voyage,
     fuel:fuel, runs:runs, contacts:contacts, vdocs:vdocs, checkt:checkt, mrtrash:mrTrash,
-    lockers:lockers, shapes:shapes, dgimgs:dgArr()};
+    lockers:lockers, shapes:shapes, posts:posts, dgimgs:dgArr()};
   const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
   const a = document.createElement("a");
   const d = new Date(), pad = n=>String(n).padStart(2,'0');
@@ -4178,6 +4491,7 @@ function restoreData(ev){
       // 사용자가 그린 도형(선·네모·세모). 백업에 있으면 그대로 되살린다.
       // 비어 있으면 지금 것을 건드리지 않는다 — 빈 배열로 덮어쓰면 그림이 사라진다.
       if(Array.isArray(data.shapes) && data.shapes.length) shapes = deepCopy(data.shapes);
+      if(Array.isArray(data.posts) && data.posts.length) posts = deepCopy(data.posts);
       // 도면 이미지: 백업에 있으면 그것을, 없으면 칸이 기본 71칸일 때만 기본 도면을 쓴다.
       if(Array.isArray(data.dgimgs) && data.dgimgs.length){
         dgImgs = dgFromArr(data.dgimgs);
@@ -4459,6 +4773,7 @@ function renderMaintList(){
       const s=mStatus(it);
       return `<div class="mr gitem" onclick="openMR('maint','${it.id}')">
         <div class="ct"><div class="cn">${esc(it.name || '(이름 없음)')}${it.seed?' <span class="seedb">초안</span>':''}</div>
+          ${it.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), it.who))}</span>`:''}
           <span class="chip" style="background:${s.c}">${s.t}</span></div>
         <div class="mrm">주기 ${it.months}${UNIT_LABEL[it.unit||'m']} · 마지막 ${it.lastDate||'—'}${s.next?' · 다음 '+fmtDate(s.next):''}${it.pin?' · 핀':''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}</div>
       </div>`;
@@ -4555,6 +4870,10 @@ function openMR(t, id){
         ?`<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
         :`<b class="mrv">${it.lastDate||'—'}</b>`}
         <span class="chip" style="background:${s.c}">${s.t}</span>${s.next?`<span class="mrv2">다음 ${fmtDate(s.next)}</span>`:''}</div>
+      <div class="mrrow"><span class="mrlbl">담당</span>
+        <b class="mrv" style="flex:1">${it.who ? esc(taskOwnerName(curBoat(), it.who)) : '없음'}</b>
+        ${can(curBoat(),'task','write')
+          ? `<button class="minib blu" onclick="pickAssignee('maint','${it.id}')">맡기기</button>` : ''}</div>
       <div class="mrrow edt"><button class="mrbtn ok" onclick="mrComplete()">완료 처리</button></div>
       ${(it.history&&it.history.length)?`<div class="mhist">이력: ${it.history.map(x=>x.date).join(' · ')}</div>`:''}`;
   } else if(t==='repair'){
@@ -6199,7 +6518,9 @@ function renderCheck(){
     return `<div class="ckrow${on?' on':''}" onclick="toggleCheck('${c.id}')">
       <span class="ckbox">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>':''}</span>
       <span class="cklbl">${esc(c.label)}</span>
+      ${c.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), c.who))}</span>`:''}
       ${c.url?`<a class="mrbtn cklink" href="${esc(c.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">바로가기</a>`:''}
+      <button class="ckdel edt" title="맡기기" onclick="event.stopPropagation();pickAssignee('check','${c.id}')">&#128100;</button>
       <button class="ckdel edt" title="옮기기" onclick="event.stopPropagation();moveCheckItem('${c.id}')">&#8677;</button>
       <button class="ckdel edt" title="고치기" onclick="event.stopPropagation();editCheckItem('${c.id}')">&#9998;</button>
       <button class="ckdel edt" title="삭제" onclick="event.stopPropagation();delCheckItem('${c.id}')">&#10005;</button>
@@ -7194,6 +7515,7 @@ document.addEventListener('visibilitychange', ()=>{
         const mtsnap = await getDocs(col('mrtrash'));
         const lsnap = await getDocs(col('lockers'));
         const shsnap = await getDocs(col('shapes'));
+        const posnap = await getDocs(col('posts'));
         const dgsnap = await getDocs(col('dgimgs'));
         return {
           seeded: meta.exists(),
@@ -7210,6 +7532,7 @@ document.addEventListener('visibilitychange', ()=>{
           mrtrash: mtsnap.docs.map(d=>d.data()),
           lockers: lsnap.docs.map(d=>d.data()),
           shapes: shsnap.docs.map(d=>d.data()),
+          posts: posnap.docs.map(d=>d.data()),
           dgimgs: dgsnap.docs.map(d=>d.data())
         };
       },
@@ -7237,6 +7560,8 @@ document.addEventListener('visibilitychange', ()=>{
         (p.delK||[]).forEach(k=>ops.push(['del','checkt',k]));
         (p.setMT||[]).forEach(i=>ops.push(['set','mrtrash',String(i.id),i]));
         (p.delMT||[]).forEach(k=>ops.push(['del','mrtrash',k]));
+        (p.setPO||[]).forEach(i=>ops.push(['set','posts',String(i.id),i]));
+        (p.delPO||[]).forEach(k=>ops.push(['del','posts',k]));
         (p.setSH||[]).forEach(i=>ops.push(['set','shapes',String(i.id),i]));
         (p.delSH||[]).forEach(k=>ops.push(['del','shapes',k]));
         (p.setL||[]).forEach(i=>ops.push(['set','lockers',String(i.id),i]));
@@ -7262,7 +7587,7 @@ document.addEventListener('visibilitychange', ()=>{
       if(!fauth.currentUser || !boatId) return false;
       const id = String(boatId);
       const colls = ['all','items','trash','maint','repair','voyage','fuel','runs',
-                     'contacts','vdocs','checkt','mrtrash','lockers','shapes','dgimgs','meta'];
+                     'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','meta'];
       for(const name of colls){
         try{
           const snap = await getDocs(collection(fdb, 'boats', id, name));

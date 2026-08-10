@@ -52,6 +52,9 @@
   font-size:11.5px;padding:6px 9px;cursor:pointer}
 .permb.on{background:#2a5a8a;border-color:#4ad9ff;color:#dff2ff}
 .permb:disabled{opacity:.4;cursor:not-allowed}
+.rosteral{background:#3a2a14;border-bottom:1px solid #7a5a2a;color:#f0c98a;
+  font-size:12.5px;padding:10px 14px;line-height:1.6}
+.fleet .due{color:#FF9A8A}
 /* 배 목록에서 지금 보고 있는 배 */
 .mr.cur{border-color:#2E6B4A;background:#101C16}
 .mr.cur .cn{color:#6FD9A0}
@@ -1404,7 +1407,7 @@ window.__onAuth = u => {
       b.memberNames = b.memberNames || {};
       if(b.members && b.members[u.uid]) b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
       if(!b.members || !Object.keys(b.members).length){
-        b.members = { [u.uid]: b.ranks.find(r=>r.owner).id };
+        b.members = { [u.uid]: ownerRank(b).id };
         b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
         changed = true;
       }
@@ -1597,7 +1600,7 @@ function createBoat(){
                code: makeBoatCode(name), createdAt:new Date().toISOString(), members:{} };
   seedRanks(nb);                          // 기본 등급 다섯을 깐다
   if(me){
-    nb.members[me.uid] = nb.ranks.find(r=>r.owner).id;   // 만든 사람이 선주
+    nb.members[me.uid] = ownerRank(nb).id;   // 만든 사람이 선주
     nb.memberNames = { [me.uid]: me.name || me.email || '이름 미등록' };
   }
   const first = boats.length === 0;
@@ -1826,20 +1829,29 @@ function mkPerms(seed){
   return p;
 }
 // 배에 등급이 없으면 기본 다섯을 깐다. 이미 있으면 건드리지 않는다.
+// 등급은 배열이 아니라 지도(id → 등급)로 저장한다.
+// 파이어스토어 규칙에는 목록을 걸러내는 기능이 없어서,
+// 배열이면 규칙에서 내 등급을 찾아낼 수 없다.
 function seedRanks(b){
   if(!b) return null;
-  if(Array.isArray(b.ranks) && b.ranks.length) return b.ranks;
-  b.ranks = RANK_SEED.map(seed => ({
-    id: newId(), pos: seed.pos, name: seed.name,
-    owner: seed.owner === true, perms: mkPerms(seed)
-  }));
+  if(b.ranks && Object.keys(b.ranks).length) return b.ranks;
+  b.ranks = {};
+  RANK_SEED.forEach(seed => {
+    const id = newId();
+    b.ranks[id] = { id, pos: seed.pos, name: seed.name,
+                    owner: seed.owner === true, perms: mkPerms(seed) };
+  });
   return b.ranks;
 }
+// 순위대로 늘어놓은 등급 목록 (화면에서 쓴다)
+function rankList(b){
+  return Object.values((b && b.ranks) || {}).sort((a,c) => a.pos - c.pos);
+}
 function rankOf(b, id){
-  return ((b && b.ranks) || []).find(r => String(r.id) === String(id)) || null;
+  return ((b && b.ranks) || {})[id] || null;
 }
 function ownerRank(b){
-  return ((b && b.ranks) || []).find(r => r.owner === true) || null;
+  return rankList(b).find(r => r.owner === true) || null;
 }
 // 지금 나의 등급
 function myRank(b){
@@ -1887,10 +1899,11 @@ function addRank(b, name){
   if(!can(b, 'ranks', 'write')){ alert('등급을 만들 권한이 없습니다'); return null; }
   const nm = String(name||'').trim();
   if(!nm) return null;
-  const pos = Math.max(...b.ranks.map(r=>r.pos)) + 1;
-  const r = { id:newId(), pos, name:nm, owner:false,
+  const pos = Math.max(...rankList(b).map(r=>r.pos)) + 1;
+  const id = newId();
+  const r = { id, pos, name:nm, owner:false,
               perms: mkPerms({ all:'view', over:{ members:'none', ranks:'none', backup:'none', publish:'none', dues:'none' } }) };
-  b.ranks.push(r);
+  b.ranks[id] = r;
   return r;
 }
 function editRank(b, id, patch){
@@ -1912,10 +1925,11 @@ function delRank(b, id){
   if(!r) return null;
   if(r.owner){ alert('선주 등급은 지울 수 없습니다'); return null; }
   if(!canTouchRank(b, id)){ alert('이 등급은 지울 수 없습니다'); return null; }
-  if(b.ranks.length <= 2){ alert('등급이 너무 적습니다. 하나는 남겨 두세요.'); return null; }
-  b.ranks = b.ranks.filter(x => String(x.id) !== String(id));
+  if(rankList(b).length <= 2){ alert('등급이 너무 적습니다. 하나는 남겨 두세요.'); return null; }
+  delete b.ranks[id];
   // 이 등급이던 사람은 맨 아래 등급으로 내린다 — 아무 등급도 없으면 앱이 막힌다
-  const last = b.ranks.reduce((a,x) => (x.pos > a.pos ? x : a), b.ranks[0]);
+  const ls = rankList(b);
+  const last = ls[ls.length - 1];
   Object.keys(b.members || {}).forEach(uid=>{
     if(String(b.members[uid]) === String(id)) b.members[uid] = last.id;
   });
@@ -1950,15 +1964,110 @@ function assignRank(b, uid, rankId){
   b.members[uid] = r.id;
   return r;
 }
+// ===== 회원 명부 =====
+// 사람마다 회비·오는 주기·부재·메모를 적어 둔다.
+// 회비 계산까지는 하지 않는다 — 적어 두고 날짜가 되면 알려주는 정도다.
+const DUES_CYCLES = [
+  { v:'',  name:'없음',   sub:'회비를 안 받는 사람' },
+  { v:'m', name:'매달',   sub:'한 달에 한 번' },
+  { v:'q', name:'분기',   sub:'석 달에 한 번' },
+  { v:'y', name:'해마다', sub:'일 년에 한 번' }
+];
+const CYCLE_MONTHS = { m:1, q:3, y:12 };
+function rosterOf(b, uid){
+  if(!b) return {};
+  b.roster = b.roster || {};
+  return b.roster[uid] || {};
+}
+function setRoster(b, uid, patch){
+  if(!b || !b.members || !(uid in b.members)) return null;
+  b.roster = b.roster || {};
+  b.roster[uid] = Object.assign({}, b.roster[uid] || {}, patch || {});
+  return b.roster[uid];
+}
+// 날짜 도우미 — 'YYYY-MM-DD' 문자열만 다룬다 (시간대 때문에 Date 로 오가면 하루가 밀린다)
+function dParts(s){
+  const m = String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? { y:+m[1], m:+m[2], d:+m[3] } : null;
+}
+function dStr(y, m, d){
+  const last = new Date(Date.UTC(y, m, 0)).getUTCDate();   // 그 달의 마지막 날
+  const dd = Math.min(d, last);
+  return y + '-' + String(m).padStart(2,'0') + '-' + String(dd).padStart(2,'0');
+}
+// 시작일부터 주기를 더해 가며, 기준일 이후로 처음 오는 납부일을 찾는다
+function nextDueDate(from, cycle, ref){
+  const step = CYCLE_MONTHS[cycle];
+  const f = dParts(from);
+  if(!step || !f) return null;
+  const r = dParts(ref) || dParts(today());
+  if(!r) return null;
+  let y = f.y, m = f.m;
+  for(let i = 0; i < 600; i++){
+    const cand = dStr(y, m, f.d);
+    if(cand >= (r.y + '-' + String(r.m).padStart(2,'0') + '-' + String(r.d).padStart(2,'0'))) return cand;
+    m += step;
+    while(m > 12){ m -= 12; y++; }
+  }
+  return null;
+}
+// 마지막으로 낸 뒤 다음 납부일이 이미 지났는가
+function duesDue(b, uid, ref){
+  const r = rosterOf(b, uid);
+  if(!r.duesCycle || !CYCLE_MONTHS[r.duesCycle] || !r.duesFrom) return false;
+  const now = ref || today();
+  const pays = r.pays || [];
+  const last = pays.length ? pays[pays.length-1].date : null;
+  // 마지막 납부일 다음 주기가 왔으면 밀린 것이다
+  const base = last || r.duesFrom;
+  const due = last ? nextDueDate(r.duesFrom, r.duesCycle, addDay(last)) : nextDueDate(r.duesFrom, r.duesCycle, r.duesFrom);
+  if(!due) return false;
+  return due <= now;
+}
+function addDay(s){
+  const p = dParts(s);
+  if(!p) return s;
+  const d = new Date(Date.UTC(p.y, p.m-1, p.d + 1));
+  return d.toISOString().slice(0,10);
+}
+function payDues(b, uid, amount, date){
+  const r = setRoster(b, uid, {});
+  if(!r) return null;
+  r.pays = r.pays || [];
+  r.pays.push({ id:newId(), date: date || today(), amount: Number(amount) || 0 });
+  r.pays.sort((a,c)=> String(a.date).localeCompare(String(c.date)));
+  return r;
+}
+function isAway(b, uid, ref){
+  const r = rosterOf(b, uid);
+  if(!r.awayTo) return false;
+  return (ref || today()) <= r.awayTo;
+}
+// 명부 위에 띄울 알림 — 밀린 회비와 부재 중인 사람
+function rosterAlerts(b, ref){
+  const now = ref || today();
+  const names = (b && b.memberNames) || {};
+  const out = [];
+  Object.keys((b && b.members) || {}).forEach(uid=>{
+    const nm = names[uid] || '이름 미등록';
+    if(duesDue(b, uid, now)) out.push({ uid, name:nm, kind:'dues' });
+    if(isAway(b, uid, now)){
+      const r = rosterOf(b, uid);
+      out.push({ uid, name:nm, kind:'away', until:r.awayTo, note:r.awayNote || '' });
+    }
+  });
+  return out;
+}
 // ===== 함께 관리 (구성원) =====
 // 등급 체계로 바뀌었다. 옛 3역할(owner/admin/viewer)로 저장된 배도
 // 앱을 열 때 등급으로 옮겨 준다 — 기존 사용자가 잠기면 안 된다.
 function migrateRanks(b){
   if(!b) return;
   seedRanks(b);
-  const own  = b.ranks.find(r=>r.owner);
-  const adm  = b.ranks.find(r=>r.pos===1) || own;
-  const view = b.ranks.reduce((a,x)=>(x.pos>a.pos?x:a), b.ranks[0]);
+  const ls   = rankList(b);
+  const own  = ls.find(r=>r.owner);
+  const adm  = ls.find(r=>r.pos===1) || own;
+  const view = ls[ls.length - 1];
   const map = { owner:own, admin:adm, viewer:view };
   b.members = b.members || {};
   Object.keys(b.members).forEach(uid=>{
@@ -1998,6 +2107,97 @@ function removeMember(b, uid){
   if(b.memberNames) delete b.memberNames[uid];
   return b;
 }
+// 가입 신청을 받을지 말지
+function toggleOpenJoin(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'members','write')){ alert('권한이 없습니다'); return; }
+  b.openJoin = (b.openJoin === false);
+  saveBoatMembers(b);
+}
+// 회원 명부 화면
+function openRoster(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'roster','view')){ alert('명부를 볼 권한이 없습니다'); return; }
+  const seeDues = can(b,'dues','view');
+  const editD  = can(b,'dues','write');
+  const al = seeDues ? rosterAlerts(b) : [];
+  const P = document.getElementById('mrPanel');
+  const rows = memberRows(b).map(m=>{
+    const r = rosterOf(b, m.uid);
+    const bits = [];
+    if(seeDues && r.duesAmount) bits.push('회비 ' + Number(r.duesAmount).toLocaleString() + '원 '
+      + ((DUES_CYCLES.find(c=>c.v===r.duesCycle)||{}).name || ''));
+    if(r.visitNote) bits.push(r.visitNote);
+    if(isAway(b, m.uid)) bits.push('~' + r.awayTo + ' 부재' + (r.awayNote ? ' (' + r.awayNote + ')' : ''));
+    if(seeDues && duesDue(b, m.uid)) bits.push('<span class="due">회비 밀림</span>');
+    return `<div class="fleet">
+      <div class="fmain"><div class="fname">${esc(m.name)}${m.me?' <span class="chip">나</span>':''}
+        <span class="chip">${esc(m.rankName)}</span></div>
+        <div class="fsub">${bits.join(' · ') || '적어 둔 것 없음'}</div></div>
+      ${editD ? `<div class="fbtns"><button class="minib blu" onclick="editRoster('${esc(m.uid)}')">기록</button></div>` : ''}
+    </div>`;
+  }).join('');
+  P.innerHTML = `<div class="mrhead"><b>회원 명부</b><span style="flex:1"></span>
+      <button class="tab" onclick="openBoat('info')">닫기</button></div>`
+    + (al.length ? `<div class="rosteral">${al.map(a=>
+        a.kind==='dues' ? `${esc(a.name)} · 회비 납부일이 지났습니다`
+                        : `${esc(a.name)} · ${esc(a.until)}까지 부재${a.note?' ('+esc(a.note)+')':''}`
+      ).join('<br>')}</div>` : '')
+    + rows;
+  P.classList.add('open');
+}
+// 한 사람의 명부 기록 고치기
+function editRoster(uid){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'dues','write')){ alert('기록할 권한이 없습니다'); return; }
+  const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
+  const r = rosterOf(b, uid);
+  const nd = r.duesFrom && r.duesCycle ? nextDueDate(r.duesFrom, r.duesCycle) : null;
+  const paid = (r.pays||[]).length;
+  openForm({
+    title: m.name,
+    sub: (nd ? '다음 납부일 ' + nd : '회비 없음') + (paid ? ' · 납부 ' + paid + '회' : ''),
+    okText: '저장',
+    fields: [
+      { key:'duesAmount', label:'회비 (원)', value: r.duesAmount ? String(r.duesAmount) : '',
+        placeholder:'50000', mode:'numeric' },
+      { key:'duesCycle', label:'회비 주기', type:'pick', value: r.duesCycle || '',
+        options: DUES_CYCLES.map(c=>({ v:c.v, name:c.name, sub:c.sub })) },
+      { key:'duesFrom', label:'회비 시작일', value: r.duesFrom || '',
+        placeholder:'2026-01-15' },
+      { key:'visitNote', label:'오는 주기', value: r.visitNote || '',
+        placeholder:'예: 한 달에 한 번, 격주 토요일' },
+      { key:'awayTo', label:'언제까지 못 오는지', value: r.awayTo || '',
+        placeholder:'2026-08-20' },
+      { key:'awayNote', label:'부재 사유', value: r.awayNote || '', placeholder:'예: 출장' },
+      { key:'memo', type:'multi', rows:3, label:'메모', value: r.memo || '',
+        placeholder:'기억해 둘 것' }
+    ],
+    onOk: v => {
+      const bad = k => v[k] && !/^\d{4}-\d{2}-\d{2}$/.test(v[k]);
+      if(bad('duesFrom') || bad('awayTo')){
+        alert('날짜는 2026-08-20 처럼 적어 주세요'); return false;
+      }
+      setRoster(b, uid, {
+        duesAmount: v.duesAmount ? Number(String(v.duesAmount).replace(/[^0-9]/g,'')) : 0,
+        duesCycle: v.duesCycle, duesFrom: v.duesFrom,
+        visitNote: v.visitNote, awayTo: v.awayTo, awayNote: v.awayNote, memo: v.memo
+      });
+      saveBoatMembers(b, 'roster');
+      setTimeout(()=>askPay(uid), 60);
+    }
+  });
+}
+// 회비를 냈는지 바로 물어본다 — 따로 들어가게 하면 아무도 안 적는다
+function askPay(uid){
+  const b = curBoat(); if(!b) return;
+  const r = rosterOf(b, uid);
+  if(!r.duesAmount || !duesDue(b, uid)) return;
+  const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
+  if(!confirm(`${m.name} 님의 회비 납부일이 지났습니다.\n\n지금 납부로 기록할까요?`)) return;
+  payDues(b, uid, r.duesAmount);
+  saveBoatMembers(b, 'roster');
+}
 // 등급을 한 줄로 요약한다 (전체 3 · 쓰기 5 · 보기 4 · 없음 5)
 function rankSummary(r){
   if(!r) return '';
@@ -2011,7 +2211,7 @@ function openRanks(){
   const b = curBoat(); if(!b) return;
   if(!can(b,'ranks','write')){ alert('등급을 설정할 권한이 없습니다'); return; }
   const P = document.getElementById('mrPanel');
-  const list = b.ranks.slice().sort((a,c)=>a.pos-c.pos).map(r=>{
+  const list = rankList(b).map(r=>{
     const n = Object.values(b.members||{}).filter(x=>String(x)===String(r.id)).length;
     const locked = r.owner || !canTouchRank(b, r.id);
     return `<div class="fleet">
@@ -2106,6 +2306,7 @@ function memberBlock(b){
     </div>`).join('');
   return `<div class="mrrow" style="margin-top:6px"><span class="mrlbl">함께 관리</span>
       <span class="mrm" style="flex:1">${rows.length}명</span>
+      ${can(b,'roster','view') ? `<button class="minib blu" onclick="openRoster()">명부</button>` : ''}
       ${can(b,'ranks','write') ? `<button class="minib blu" onclick="openRanks()">등급 설정</button>` : ''}
       ${manage ? `<button class="minib blu" onclick="openJoinReqs()">참여 신청</button>` : ''}</div>`
     + list;
@@ -2123,8 +2324,7 @@ function editMember(uid){
   if(!canTouchMember(b, uid)){ alert('이 사람의 등급은 바꿀 수 없습니다'); return; }
   const r = memberRows(b).find(x=>x.uid===uid); if(!r) return;
   // 나보다 낮은 등급만 줄 수 있다
-  const opts = b.ranks.filter(x => x.pos > myPos(b))
-    .sort((a,c)=>a.pos-c.pos)
+  const opts = rankList(b).filter(x => x.pos > myPos(b))
     .map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) }));
   if(!opts.length){ alert('줄 수 있는 등급이 없습니다'); return; }
   openForm({
@@ -2148,7 +2348,8 @@ function editMember(uid){
 function saveBoatMembers(b, back, id){
   saveLocal();
   if(window.__saveBoat) window.__saveBoat(b);
-  if(back === 'ranks') openRanks();
+  if(back === 'roster') openRoster();
+  else if(back === 'ranks') openRanks();
   else if(back === 'rank') editRankUI(id);
   else openBoat('info');
 }
@@ -2201,8 +2402,8 @@ function approveJoin(inviteId, uid, name){
     okText: '받기',
     fields: [
       { key:'role', label:'등급', type:'pick',
-        value: (b.ranks.filter(x=>x.pos>myPos(b)).sort((a,c)=>c.pos-a.pos)[0]||{}).id,
-        options: b.ranks.filter(x=>x.pos>myPos(b)).sort((a,c)=>a.pos-c.pos)
+        value: (rankList(b).filter(x=>x.pos>myPos(b)).slice(-1)[0]||{}).id,
+        options: rankList(b).filter(x=>x.pos>myPos(b))
           .map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) })) }
     ],
     onOk: v => {
@@ -2313,8 +2514,13 @@ function openBoat(tab){
       <div class="mrrow"><span class="mrlbl">참여 코드</span>
         <b class="mrv" id="joinCode" style="letter-spacing:1px;flex:1">${esc(b.id)}</b>
         <button class="minib blu" onclick="copyJoinCode()">복사</button></div>
-      <div class="mrnone" style="text-align:left">함께 관리할 사람에게 이 코드를 알려 주세요.<br>
-        그 사람이 <b>내 배 › 참여 신청</b>에서 코드를 넣으면 아래에 신청이 뜹니다.</div>
+      <div class="mrrow"><span class="mrlbl">신청 받기</span>
+        <span class="mrm" style="flex:1">${b.openJoin === false ? '받지 않음' : '받는 중'}</span>
+        ${can(b,'members','write')
+          ? `<button class="minib ${b.openJoin === false ? 'blu' : 'grn'}" onclick="toggleOpenJoin()">${b.openJoin === false ? '열기' : '닫기'}</button>` : ''}</div>
+      <div class="mrnone" style="text-align:left">함께 관리할 사람에게 참여 코드를 알려 주세요.<br>
+        그 사람이 <b>내 배 › 참여 신청</b>에서 코드를 넣으면 신청이 들어옵니다.<br>
+        신청을 안 받으려면 위에서 닫아 두세요.</div>
       ${memberBlock(b)}
       <div class="mrrow"><span class="mrlbl">기록</span><span class="mrm" style="flex:1">
         물품 ${items.length} · 정기점검 ${maint.length} · 수리 ${repair.length} · 항해 ${voyage.length} · 주유 ${fuel.length}</span></div>`;
@@ -2860,7 +3066,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.5';
+const APP_VER = '1.6';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -6941,7 +7147,8 @@ document.addEventListener('visibilitychange', ()=>{
           lat: (boat.lat != null ? boat.lat : null), lon: (boat.lon != null ? boat.lon : null),
           code: boat.code || '', spec: boat.spec || {},
           members: boat.members || {}, memberNames: boat.memberNames || {},
-          ranks: boat.ranks || [],
+          ranks: boat.ranks || {}, roster: boat.roster || {},
+          openJoin: boat.openJoin !== false,
           createdAt: boat.createdAt || ''
         }, { merge:true });
         return true;

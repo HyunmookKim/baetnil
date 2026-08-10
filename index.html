@@ -45,6 +45,13 @@
 .fleet .fsub{color:#8a97a8;font-size:12px;margin-top:3px}
 .fleet .fbtns{display:flex;gap:6px;flex:0 0 auto}
 .mrbtn.big{padding:11px 20px;font-size:14px;border-radius:9px}
+.permrow{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid #12283e}
+.permname{flex:1;color:#dfe8f2;font-size:13.5px}
+.permbtns{display:flex;gap:4px;flex:0 0 auto}
+.permb{background:#0c1e30;border:1px solid #24486c;border-radius:7px;color:#8ab4d8;
+  font-size:11.5px;padding:6px 9px;cursor:pointer}
+.permb.on{background:#2a5a8a;border-color:#4ad9ff;color:#dff2ff}
+.permb:disabled{opacity:.4;cursor:not-allowed}
 /* 배 목록에서 지금 보고 있는 배 */
 .mr.cur{border-color:#2E6B4A;background:#101C16}
 .mr.cur .cn{color:#6FD9A0}
@@ -1393,10 +1400,11 @@ window.__onAuth = u => {
     // 로그인 전에 만든 배는 주인이 없다. 처음 로그인한 사람을 선주로 잡는다.
     let changed = false;
     boats.forEach(b=>{
+      migrateRanks(b);                    // 옛 역할로 저장된 배를 등급으로 옮긴다
       b.memberNames = b.memberNames || {};
       if(b.members && b.members[u.uid]) b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
       if(!b.members || !Object.keys(b.members).length){
-        b.members = { [u.uid]: 'owner' };
+        b.members = { [u.uid]: b.ranks.find(r=>r.owner).id };
         b.memberNames[u.uid] = u.name || u.email || '이름 미등록';
         changed = true;
       }
@@ -1587,7 +1595,11 @@ function createBoat(){
                year: (year && +year > 1800) ? +year : null,
                lat: pick ? pick.lat : null, lon: pick ? pick.lon : null,
                code: makeBoatCode(name), createdAt:new Date().toISOString(), members:{} };
-  if(me) nb.members[me.uid] = 'owner';    // 로그인 상태면 선주로 등록
+  seedRanks(nb);                          // 기본 등급 다섯을 깐다
+  if(me){
+    nb.members[me.uid] = nb.ranks.find(r=>r.owner).id;   // 만든 사람이 선주
+    nb.memberNames = { [me.uid]: me.name || me.email || '이름 미등록' };
+  }
   const first = boats.length === 0;
   boats.push(nb);
   if(window.__saveBoat) window.__saveBoat(nb);
@@ -1767,81 +1779,335 @@ async function doDelBoat(id, mine){
   if(boats.length) openFleet(); else { closeBoat(); openBoatSetup(); }
 }
 
-// ===== 함께 관리 (구성원) =====
-// 배 하나를 여러 사람이 같이 본다. 권한은 배 문서 안 members 에 적힌다.
-const ROLES = [
-  { v:'owner',  name:'선주',      sub:'모든 권한 · 구성원 관리 · 배 삭제' },
-  { v:'admin',  name:'공동 관리자', sub:'기록을 넣고 고칠 수 있음' },
-  { v:'viewer', name:'보기 전용',  sub:'보기만 가능 · 정비소나 지인에게' }
+// ===== 등급 체계 =====
+// 배마다 등급을 직접 만들고 이름도 자유롭게 짓는다 (선주/선장/캡틴…).
+// 등급에는 순위(pos)가 있고, 자기보다 낮은 순위만 건드릴 수 있다.
+// 0순위(선주)는 이름만 바꿀 수 있고 권한은 못 깎으며 지울 수도 없다.
+const PERM_LEVELS = [
+  { v:'none',  name:'없음',   sub:'화면이 보이지 않음' },
+  { v:'view',  name:'보기',   sub:'보기만 가능' },
+  { v:'write', name:'쓰기',   sub:'넣고 고칠 수 있음' },
+  { v:'full',  name:'전체',   sub:'지우기까지 가능' }
 ];
+const PERM_ORDER = { none:0, view:1, write:2, full:3 };
+const PERMS = [
+  { k:'stow',    name:'적재표 (물품)' },
+  { k:'diagram', name:'도면·수납칸 편집' },
+  { k:'maint',   name:'정비·수리' },
+  { k:'voyage',  name:'항해일지' },
+  { k:'fuel',    name:'연료·엔진 기록' },
+  { k:'contact', name:'연락처·문서' },
+  { k:'check',   name:'체크리스트' },
+  { k:'task',    name:'할 일 배정' },
+  { k:'board',   name:'게시판' },
+  { k:'roster',  name:'회원 명부 보기' },
+  { k:'dues',    name:'회비·개인 메모' },
+  { k:'boat',    name:'배 정보·제원' },
+  { k:'members', name:'구성원 관리' },
+  { k:'ranks',   name:'등급 관리' },
+  { k:'backup',  name:'백업·복원' },
+  { k:'publish', name:'배 공개 설정' },
+  { k:'report',  name:'신고·차단' }
+];
+// 기본 등급 다섯. 이름과 권한은 배마다 고쳐 쓰면 된다.
+const RANK_SEED = [
+  { pos:0, owner:true, name:'선주',        all:'full' },
+  { pos:1, name:'공동 관리자', all:'write', over:{ ranks:'none', backup:'full', members:'write', dues:'write' } },
+  { pos:2, name:'정비 담당',   all:'view',  over:{ maint:'full', check:'full', task:'write', diagram:'write',
+                                                  members:'none', ranks:'none', backup:'none', publish:'none', dues:'none' } },
+  { pos:3, name:'크루',        all:'view',  over:{ check:'write', task:'view', board:'write',
+                                                  members:'none', ranks:'none', backup:'none', publish:'none', dues:'none', roster:'view' } },
+  { pos:4, name:'손님',        all:'none',  over:{ stow:'view', board:'view' } }
+];
+function mkPerms(seed){
+  const p = {};
+  PERMS.forEach(x => { p[x.k] = seed.all; });
+  if(seed.over) Object.keys(seed.over).forEach(k => { if(k in p) p[k] = seed.over[k]; });
+  return p;
+}
+// 배에 등급이 없으면 기본 다섯을 깐다. 이미 있으면 건드리지 않는다.
+function seedRanks(b){
+  if(!b) return null;
+  if(Array.isArray(b.ranks) && b.ranks.length) return b.ranks;
+  b.ranks = RANK_SEED.map(seed => ({
+    id: newId(), pos: seed.pos, name: seed.name,
+    owner: seed.owner === true, perms: mkPerms(seed)
+  }));
+  return b.ranks;
+}
+function rankOf(b, id){
+  return ((b && b.ranks) || []).find(r => String(r.id) === String(id)) || null;
+}
+function ownerRank(b){
+  return ((b && b.ranks) || []).find(r => r.owner === true) || null;
+}
+// 지금 나의 등급
+function myRank(b){
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  if(!me || !b || !b.members) return null;
+  return rankOf(b, b.members[me]);
+}
+// 어떤 등급이 이 항목에 대해 가진 권한
+function permOf(rank, key){
+  if(!rank) return 'none';
+  if(rank.owner) return 'full';           // 선주는 언제나 전체
+  const v = (rank.perms || {})[key];
+  return (v in PERM_ORDER) ? v : 'none';
+}
+// 내가 이 일을 할 수 있는가. need 는 view / write / full
+function can(b, key, need){
+  const r = myRank(b);
+  if(!r) return false;
+  return PERM_ORDER[permOf(r, key)] >= PERM_ORDER[need || 'view'];
+}
+// 내 순위. 낮을수록 높은 자리다 (0 = 선주)
+function myPos(b){
+  const r = myRank(b);
+  return r ? r.pos : Infinity;
+}
+// 이 등급을 건드릴 수 있는가 — 나보다 낮은 순위만 된다
+function canTouchRank(b, rankId){
+  const r = rankOf(b, rankId);
+  if(!r) return false;
+  if(r.owner) return false;               // 선주 등급은 누구도 못 건드린다
+  if(!can(b, 'ranks', 'write')) return false;
+  return r.pos > myPos(b);
+}
+// 이 사람을 건드릴 수 있는가 — 나보다 낮은 등급인 사람만, 나 자신은 안 된다
+function canTouchMember(b, uid){
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  if(!me || String(uid) === String(me)) return false;   // 자기 등급은 스스로 못 바꾼다
+  if(!can(b, 'members', 'write')) return false;
+  const r = rankOf(b, (b.members||{})[uid]);
+  if(!r) return false;
+  return r.pos > myPos(b);
+}
+function addRank(b, name){
+  if(!b) return null;
+  if(!can(b, 'ranks', 'write')){ alert('등급을 만들 권한이 없습니다'); return null; }
+  const nm = String(name||'').trim();
+  if(!nm) return null;
+  const pos = Math.max(...b.ranks.map(r=>r.pos)) + 1;
+  const r = { id:newId(), pos, name:nm, owner:false,
+              perms: mkPerms({ all:'view', over:{ members:'none', ranks:'none', backup:'none', publish:'none', dues:'none' } }) };
+  b.ranks.push(r);
+  return r;
+}
+function editRank(b, id, patch){
+  const r = rankOf(b, id);
+  if(!r || !patch) return null;
+  // 선주 등급은 이름만 바꿀 수 있다
+  if(r.owner){
+    if(!can(b, 'ranks', 'write')){ alert('등급을 바꿀 권한이 없습니다'); return null; }
+    if(myPos(b) !== 0){ alert('선주 등급은 선주만 바꿀 수 있습니다'); return null; }
+    if('name' in patch){ const nm = String(patch.name||'').trim(); if(nm) r.name = nm; }
+    return r;
+  }
+  if(!canTouchRank(b, id)){ alert('이 등급은 바꿀 수 없습니다'); return null; }
+  if('name' in patch){ const nm = String(patch.name||'').trim(); if(nm) r.name = nm; }
+  return r;
+}
+function delRank(b, id){
+  const r = rankOf(b, id);
+  if(!r) return null;
+  if(r.owner){ alert('선주 등급은 지울 수 없습니다'); return null; }
+  if(!canTouchRank(b, id)){ alert('이 등급은 지울 수 없습니다'); return null; }
+  if(b.ranks.length <= 2){ alert('등급이 너무 적습니다. 하나는 남겨 두세요.'); return null; }
+  b.ranks = b.ranks.filter(x => String(x.id) !== String(id));
+  // 이 등급이던 사람은 맨 아래 등급으로 내린다 — 아무 등급도 없으면 앱이 막힌다
+  const last = b.ranks.reduce((a,x) => (x.pos > a.pos ? x : a), b.ranks[0]);
+  Object.keys(b.members || {}).forEach(uid=>{
+    if(String(b.members[uid]) === String(id)) b.members[uid] = last.id;
+  });
+  return r;
+}
+function setPerm(b, rankId, key, level){
+  const r = rankOf(b, rankId);
+  if(!r) return null;
+  if(!PERMS.some(p => p.k === key)) return null;
+  if(!(level in PERM_ORDER)) return null;
+  if(r.owner){ alert('선주 권한은 낮출 수 없습니다'); return null; }
+  if(!canTouchRank(b, rankId)){ alert('이 등급은 바꿀 수 없습니다'); return null; }
+  r.perms = r.perms || {};
+  r.perms[key] = level;
+  return r;
+}
+// 사람에게 등급 매기기
+function assignRank(b, uid, rankId){
+  const r = rankOf(b, rankId);
+  if(!r || !b.members || !(uid in b.members)) return null;
+  if(!canTouchMember(b, uid)){ alert('이 사람의 등급은 바꿀 수 없습니다'); return null; }
+  // 나보다 높거나 같은 자리를 남에게 줄 수 없다
+  if(r.pos <= myPos(b)){ alert('내 등급보다 높은 자리는 줄 수 없습니다'); return null; }
+  const cur = rankOf(b, b.members[uid]);
+  // 선주가 한 명뿐인데 그 사람을 내리면 아무도 관리할 수 없게 된다
+  if(cur && cur.owner){
+    const owners = Object.values(b.members).filter(x => {
+      const rr = rankOf(b, x); return rr && rr.owner;
+    }).length;
+    if(owners <= 1){ alert('선주가 한 명뿐입니다.\n선주 넘기기를 먼저 해 주세요.'); return null; }
+  }
+  b.members[uid] = r.id;
+  return r;
+}
+// ===== 함께 관리 (구성원) =====
+// 등급 체계로 바뀌었다. 옛 3역할(owner/admin/viewer)로 저장된 배도
+// 앱을 열 때 등급으로 옮겨 준다 — 기존 사용자가 잠기면 안 된다.
+function migrateRanks(b){
+  if(!b) return;
+  seedRanks(b);
+  const own  = b.ranks.find(r=>r.owner);
+  const adm  = b.ranks.find(r=>r.pos===1) || own;
+  const view = b.ranks.reduce((a,x)=>(x.pos>a.pos?x:a), b.ranks[0]);
+  const map = { owner:own, admin:adm, viewer:view };
+  b.members = b.members || {};
+  Object.keys(b.members).forEach(uid=>{
+    const v = b.members[uid];
+    if(map[v]) b.members[uid] = map[v].id;         // 옛 역할 이름 → 등급 id
+    else if(!rankOf(b, v)) b.members[uid] = view.id;  // 모르는 값이면 맨 아래로
+  });
+}
+// 선주 수 (마지막 선주 보호에 쓴다)
 function ownerCount(b){
   const m = (b && b.members) || {};
-  return Object.values(m).filter(r => r === 'owner').length;
+  return Object.values(m).filter(id => { const r = rankOf(b, id); return r && r.owner; }).length;
 }
-// 화면에 뿌릴 구성원 목록. 선주 → 공동 관리자 → 보기 전용 순.
+// 화면에 뿌릴 구성원 목록. 등급 순위대로 정렬한다.
 function memberRows(b){
   const m = (b && b.members) || {};
   const names = (b && b.memberNames) || {};
   const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
-  const rank = { owner:0, admin:1, viewer:2 };
-  return Object.keys(m).map(uid => ({
-    uid,
-    role: m[uid],
-    name: names[uid] || '이름 미등록',
-    me: uid === me
-  })).sort((a,b2) => (rank[a.role] ?? 9) - (rank[b2.role] ?? 9));
-}
-function myRole(b){
-  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
-  if(!me) return null;
-  const m = (b && b.members) || {};
-  return m[me] || null;
-}
-// 구성원을 바꾸는 것은 선주만 할 수 있다.
-// 공동 관리자까지 허용하면 스스로를 선주로 올릴 수 있다.
-function canManage(b){
-  return myRole(b) === 'owner';
-}
-function setMemberRole(b, uid, role){
-  if(!b || !b.members || !b.members[uid]) return null;
-  if(!ROLES.some(r => r.v === role)) return null;
-  // 선주가 하나뿐인데 그 사람을 내리면 아무도 관리할 수 없게 된다
-  if(b.members[uid] === 'owner' && role !== 'owner' && ownerCount(b) <= 1){
-    alert('선주가 한 명뿐입니다.\n다른 사람을 먼저 선주로 올린 뒤에 바꿔 주세요.');
-    return null;
-  }
-  b.members[uid] = role;
-  return b;
+  return Object.keys(m).map(uid => {
+    const r = rankOf(b, m[uid]);
+    return { uid, rankId: m[uid], rank: r,
+             rankName: r ? r.name : '등급 없음',
+             pos: r ? r.pos : 999,
+             name: names[uid] || '이름 미등록',
+             me: uid === me };
+  }).sort((a,b2) => a.pos - b2.pos);
 }
 function removeMember(b, uid){
-  if(!b || !b.members || !b.members[uid]) return null;
-  if(b.members[uid] === 'owner' && ownerCount(b) <= 1){
-    alert('마지막 선주는 내보낼 수 없습니다.\n배를 지우시려면 배 지우기를 쓰세요.');
+  if(!b || !b.members || !(uid in b.members)) return null;
+  if(!canTouchMember(b, uid)){ alert('이 사람은 내보낼 수 없습니다'); return null; }
+  const r = rankOf(b, b.members[uid]);
+  if(r && r.owner && ownerCount(b) <= 1){
+    alert('마지막 선주는 내보낼 수 없습니다.');
     return null;
   }
   delete b.members[uid];
   if(b.memberNames) delete b.memberNames[uid];
   return b;
 }
+// 등급을 한 줄로 요약한다 (전체 3 · 쓰기 5 · 보기 4 · 없음 5)
+function rankSummary(r){
+  if(!r) return '';
+  if(r.owner) return '모든 권한 · 고정';
+  const c = { full:0, write:0, view:0, none:0 };
+  PERMS.forEach(p => c[permOf(r, p.k)]++);
+  return PERM_LEVELS.filter(l=>c[l.v]).map(l=>l.name + ' ' + c[l.v]).join(' · ');
+}
+// 등급 설정 화면
+function openRanks(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'ranks','write')){ alert('등급을 설정할 권한이 없습니다'); return; }
+  const P = document.getElementById('mrPanel');
+  const list = b.ranks.slice().sort((a,c)=>a.pos-c.pos).map(r=>{
+    const n = Object.values(b.members||{}).filter(x=>String(x)===String(r.id)).length;
+    const locked = r.owner || !canTouchRank(b, r.id);
+    return `<div class="fleet">
+      <div class="fmain"><div class="fname">${esc(r.name)}
+        ${r.owner?'<span class="chip">고정</span>':''}
+        <span class="chip">${n}명</span></div>
+        <div class="fsub">${esc(rankSummary(r))}</div></div>
+      <div class="fbtns">
+        ${(r.owner && myPos(b)===0) || !locked
+          ? `<button class="minib blu" onclick="editRankUI('${esc(r.id)}')">고치기</button>` : ''}
+      </div></div>`;
+  }).join('');
+  P.innerHTML = `<div class="mrhead"><b>등급 설정</b><span style="flex:1"></span>
+      <button class="tab" onclick="openBoat('info')">닫기</button></div>
+    <div class="mrnone" style="text-align:left">위에 있을수록 높은 등급입니다.
+      자기보다 낮은 등급만 고칠 수 있습니다.</div>`
+    + list
+    + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
+        <button class="mrbtn big" onclick="addRankUI()">+ 등급 만들기</button></div>`;
+  P.classList.add('open');
+}
+function addRankUI(){
+  const b = curBoat(); if(!b) return;
+  openForm({
+    title: '새 등급',
+    sub: '이름은 배에 맞게 지으세요 (예: 기관장, 갑판원, 낚시꾼)',
+    okText: '만들기',
+    fields: [ { key:'name', label:'등급 이름', value:'', placeholder:'예: 기관장' } ],
+    onOk: v => {
+      if(!v.name){ alert('등급 이름을 넣어 주세요'); return false; }
+      if(!addRank(b, v.name)) return false;
+      saveBoatMembers(b, 'ranks');
+    }
+  });
+}
+// 등급 이름과 권한 스위치
+function editRankUI(id){
+  const b = curBoat(); if(!b) return;
+  const r = rankOf(b, id); if(!r) return;
+  const P = document.getElementById('mrPanel');
+  const rows = PERMS.map(p=>{
+    const cur = permOf(r, p.k);
+    return `<div class="permrow"><div class="permname">${esc(p.name)}</div>
+      <div class="permbtns">${PERM_LEVELS.map(l=>
+        `<button class="permb${l.v===cur?' on':''}"${r.owner?' disabled':''}
+           onclick="setPermUI('${esc(id)}','${p.k}','${l.v}')">${l.name}</button>`).join('')}</div></div>`;
+  }).join('');
+  P.innerHTML = `<div class="mrhead"><b>${esc(r.name)}</b><span style="flex:1"></span>
+      <button class="tab" onclick="openRanks()">닫기</button></div>
+    <div class="mrrow"><span class="mrlbl">등급 이름</span>
+      <input value="${esc(r.name)}" style="flex:1" onchange="renameRankUI('${esc(id)}',this.value)"></div>`
+    + (r.owner
+        ? `<div class="mrnone" style="text-align:left">선주 등급입니다. 이름만 바꿀 수 있고
+             권한은 낮출 수 없습니다.</div>`
+        : `<div class="mrnone" style="text-align:left">이 등급인 사람이 각 화면에서 할 수 있는 일입니다.</div>`)
+    + rows
+    + (r.owner ? '' : `<div class="mrrow" style="justify-content:center;padding:14px 12px">
+        <button class="mrbtn" onclick="delRankUI('${esc(id)}')">이 등급 지우기</button></div>`);
+  P.classList.add('open');
+}
+function renameRankUI(id, v){
+  const b = curBoat(); if(!b) return;
+  if(!editRank(b, id, { name:v })) return;
+  saveBoatMembers(b, 'rank', id);
+}
+function setPermUI(id, key, level){
+  const b = curBoat(); if(!b) return;
+  if(!setPerm(b, id, key, level)) return;
+  saveBoatMembers(b, 'rank', id);
+}
+function delRankUI(id){
+  const b = curBoat(); if(!b) return;
+  const r = rankOf(b, id); if(!r) return;
+  const n = Object.values(b.members||{}).filter(x=>String(x)===String(id)).length;
+  if(!confirm(`'${r.name}' 등급을 지울까요?`
+    + (n ? `\n\n이 등급인 ${n}명은 맨 아래 등급으로 내려갑니다.` : ''))) return;
+  if(!delRank(b, id)) return;
+  saveBoatMembers(b, 'ranks');
+}
 // 배 정보 화면에 들어가는 구성원 목록
 function memberBlock(b){
   const rows = memberRows(b);
-  const manage = canManage(b);
+  const manage = can(b, 'members', 'write');
   if(!(typeof window!=='undefined' && window.__user)){
     return `<div class="mrnone" style="text-align:left">로그인하면 다른 사람과 함께 관리할 수 있습니다.</div>`;
   }
-  const list = rows.map(r=>{
-    const rn = (ROLES.find(x=>x.v===r.role)||{}).name || r.role;
-    return `<div class="fleet">
+  const list = rows.map(r=>`<div class="fleet">
       <div class="fmain"><div class="fname">${esc(r.name)}${r.me?' <span class="chip">나</span>':''}
-        <span class="chip">${esc(rn)}</span></div></div>
-      ${manage && !(r.role==='owner' && ownerCount(b)<=1)
-        ? `<div class="fbtns"><button class="minib blu" onclick="editMember('${esc(r.uid)}')">권한</button></div>` : ''}
-    </div>`;
-  }).join('');
+        <span class="chip">${esc(r.rankName)}</span></div></div>
+      ${canTouchMember(b, r.uid)
+        ? `<div class="fbtns"><button class="minib blu" onclick="editMember('${esc(r.uid)}')">등급</button></div>` : ''}
+    </div>`).join('');
   return `<div class="mrrow" style="margin-top:6px"><span class="mrlbl">함께 관리</span>
       <span class="mrm" style="flex:1">${rows.length}명</span>
-      ${manage ? `<button class="minib blu" onclick="openJoinReqs()">참여 신청 보기</button>` : ''}</div>`
+      ${can(b,'ranks','write') ? `<button class="minib blu" onclick="openRanks()">등급 설정</button>` : ''}
+      ${manage ? `<button class="minib blu" onclick="openJoinReqs()">참여 신청</button>` : ''}</div>`
     + list;
 }
 function copyJoinCode(){
@@ -1854,15 +2120,19 @@ function copyJoinCode(){
 // 권한 바꾸기 · 내보내기
 function editMember(uid){
   const b = curBoat(); if(!b) return;
-  if(!canManage(b)){ alert('선주만 구성원을 바꿀 수 있습니다'); return; }
+  if(!canTouchMember(b, uid)){ alert('이 사람의 등급은 바꿀 수 없습니다'); return; }
   const r = memberRows(b).find(x=>x.uid===uid); if(!r) return;
+  // 나보다 낮은 등급만 줄 수 있다
+  const opts = b.ranks.filter(x => x.pos > myPos(b))
+    .sort((a,c)=>a.pos-c.pos)
+    .map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) }));
+  if(!opts.length){ alert('줄 수 있는 등급이 없습니다'); return; }
   openForm({
     title: r.name,
-    sub: '이 사람이 이 배에서 할 수 있는 일',
+    sub: '이 사람의 등급',
     okText: '저장',
     fields: [
-      { key:'role', label:'권한', type:'pick', value:r.role,
-        options: ROLES.map(x=>({ v:x.v, name:x.name, sub:x.sub })) }
+      { key:'role', label:'등급', type:'pick', value:r.rankId, options: opts }
     ],
     del: { text:'내보내기', run: ()=>{
       if(!confirm(`'${r.name}' 을(를) 이 배에서 내보낼까요?\n\n그 사람은 더 이상 이 배의 기록을 볼 수 없습니다.`)) return;
@@ -1870,15 +2140,17 @@ function editMember(uid){
       saveBoatMembers(b);
     }},
     onOk: v => {
-      if(!setMemberRole(b, uid, v.role)) return false;
+      if(!assignRank(b, uid, v.role)) return false;
       saveBoatMembers(b);
     }
   });
 }
-function saveBoatMembers(b){
+function saveBoatMembers(b, back, id){
   saveLocal();
   if(window.__saveBoat) window.__saveBoat(b);
-  openBoat('info');
+  if(back === 'ranks') openRanks();
+  else if(back === 'rank') editRankUI(id);
+  else openBoat('info');
 }
 // 다른 배에 참여 신청하기
 function joinBoat(){
@@ -1903,7 +2175,7 @@ function joinBoat(){
 // 들어온 참여 신청 보기 (선주만)
 async function openJoinReqs(){
   const b = curBoat(); if(!b) return;
-  if(!canManage(b)){ alert('선주만 볼 수 있습니다'); return; }
+  if(!can(b,'members','write')){ alert('구성원을 관리할 권한이 없습니다'); return; }
   if(!window.__invites){ alert('인터넷에 연결된 상태에서만 볼 수 있습니다'); return; }
   let list;
   try{ list = await window.__invites.pending(b.id); }
@@ -1922,14 +2194,16 @@ async function openJoinReqs(){
   P.classList.add('open');
 }
 function approveJoin(inviteId, uid, name){
-  const b = curBoat(); if(!b || !canManage(b)) return;
+  const b = curBoat(); if(!b || !can(b,'members','write')) return;
   openForm({
     title: name || '참여 신청',
     sub: '어떤 권한으로 받을까요?',
     okText: '받기',
     fields: [
-      { key:'role', label:'권한', type:'pick', value:'viewer',
-        options: ROLES.filter(x=>x.v!=='owner').map(x=>({ v:x.v, name:x.name, sub:x.sub })) }
+      { key:'role', label:'등급', type:'pick',
+        value: (b.ranks.filter(x=>x.pos>myPos(b)).sort((a,c)=>c.pos-a.pos)[0]||{}).id,
+        options: b.ranks.filter(x=>x.pos>myPos(b)).sort((a,c)=>a.pos-c.pos)
+          .map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) })) }
     ],
     onOk: v => {
       b.members = b.members || {};
@@ -2235,6 +2509,7 @@ async function initStorage(){
     catch(_){ dgImgs={plan:null,side:null}; dgRef={plan:null,side:null}; dgPub={plan:false,side:false}; }
     seedDgIfNeeded();
   }
+  boats.forEach(b => migrateRanks(b));   // 옛 역할로 저장된 배를 등급으로 옮긴다
   refreshBoxes(); drawShapes(); renderList();
 }
 
@@ -2585,7 +2860,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.4';
+const APP_VER = '1.5';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -6666,6 +6941,7 @@ document.addEventListener('visibilitychange', ()=>{
           lat: (boat.lat != null ? boat.lat : null), lon: (boat.lon != null ? boat.lon : null),
           code: boat.code || '', spec: boat.spec || {},
           members: boat.members || {}, memberNames: boat.memberNames || {},
+          ranks: boat.ranks || [],
           createdAt: boat.createdAt || ''
         }, { merge:true });
         return true;

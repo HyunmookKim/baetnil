@@ -665,7 +665,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();openExplore(false)">배 둘러보기</button><button class="ditem" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();openExplore(false)">배 둘러보기</button><button class="ditem" id="dBoard" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" id="dTasks" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabStow" class="on" onclick="switchTab('stow')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></svg>적재표</button><button id="tabMaint" onclick="switchTab('maint')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>정비</button><button id="tabWeather" onclick="switchTab('weather')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.3A7 7 0 1 0 5 17.7"/><path d="M2 20.5c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1"/></svg>날씨</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button></nav>
 
 
@@ -2056,6 +2056,110 @@ function buildPublic(b){
   }
   return o;
 }
+// ===== 신고·차단 =====
+// 차단은 이 기기에만 저장한다 — 내가 안 보고 싶은 것이지 남에게 강요할 일이 아니다.
+// 신고는 클라우드로 보내 나중에 살펴본다.
+const REPORT_REASONS = [
+  { v:'spam',   name:'광고·도배',       sub:'같은 내용을 반복해서 올림' },
+  { v:'abuse',  name:'욕설·비방',       sub:'남을 헐뜯거나 괴롭힘' },
+  { v:'adult',  name:'선정적인 내용',    sub:'보기 불편한 사진이나 글' },
+  { v:'fake',   name:'거짓 정보',       sub:'사실과 다른 영업 정보' },
+  { v:'etc',    name:'그 밖의 이유',     sub:'아래에 적어 주세요' }
+];
+function hiddenBoats(){
+  try{ const v = JSON.parse(localStorage.getItem('bt_hidden') || '[]');
+       return Array.isArray(v) ? v : []; }catch(_){ return []; }
+}
+function saveHidden(list){
+  try{ localStorage.setItem('bt_hidden', JSON.stringify(list)); }catch(_){}
+}
+function isHidden(id){
+  return hiddenBoats().includes(String(id));
+}
+function hideBoat(id){
+  const l = hiddenBoats();
+  if(!l.includes(String(id))) l.push(String(id));
+  saveHidden(l);
+  return l;
+}
+function unhideBoat(id){
+  const l = hiddenBoats().filter(x => x !== String(id));
+  saveHidden(l);
+  return l;
+}
+function filterHidden(list){
+  const h = hiddenBoats();
+  return (Array.isArray(list) ? list : []).filter(x => x && !h.includes(String(x.id)));
+}
+// 신고 내용을 만든다 (보내는 것은 따로)
+function reportBody(kind, target, reason, note){
+  const me = (typeof window!=='undefined' && window.__user) ? window.__user : null;
+  if(!me) return null;
+  if(!target) return null;
+  if(!REPORT_REASONS.some(r => r.v === reason)) return null;
+  return { id:newId(), kind:String(kind||'boat'), target:String(target),
+           reason, note:String(note||''),
+           by:me.uid, byName:me.name || '', ts:new Date().toISOString(), status:'new' };
+}
+// 신고하기
+function reportBoat(id){
+  if(!window.__user){ alert('신고하려면 로그인이 필요합니다'); return; }
+  openForm({
+    title: '신고하기',
+    sub: '무엇이 문제인지 알려 주세요',
+    okText: '보내기',
+    fields: [
+      { key:'reason', label:'사유', type:'pick', value:'spam',
+        options: REPORT_REASONS.map(r=>({ v:r.v, name:r.name, sub:r.sub })) },
+      { key:'note', type:'multi', rows:3, label:'설명 (없어도 됩니다)', value:'',
+        placeholder:'무슨 일이 있었는지' }
+    ],
+    onOk: v => {
+      const body = reportBody('boat', id, v.reason, v.note);
+      if(!body){ alert('신고를 만들지 못했습니다'); return false; }
+      if(window.__report){
+        window.__report.send(body)
+          .then(()=>alert('신고했습니다.\n살펴본 뒤 조치하겠습니다.'))
+          .catch(e=>alert('보내지 못했습니다: ' + ((e && e.message) || e)));
+      } else {
+        alert('인터넷에 연결된 상태에서만 신고할 수 있습니다');
+        return false;
+      }
+    }
+  });
+}
+// 이 기기에서 안 보이게 하기
+function hideBoatUI(id){
+  if(!confirm('이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.')) return;
+  hideBoat(id);
+  openExplore(exploreBiz);
+}
+// 숨긴 배 목록
+async function openHidden(){
+  const ids = hiddenBoats();
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>숨긴 배</b><span style="flex:1"></span>
+      <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>`
+    + (ids.length ? '<div class="mrnone">불러오는 중…</div>'
+                  : '<div class="mrnone">숨긴 배가 없습니다</div>');
+  P.classList.add('open');
+  if(!ids.length || !window.__pub) return;
+  const rows = [];
+  for(const id of ids){
+    let x = null;
+    try{ x = await window.__pub.one(id); }catch(_){}
+    rows.push(`<div class="fleet">
+      <div class="fmain"><div class="fname">${esc((x && x.name) || '(사라진 배)')}</div>
+        <div class="fsub">${esc((x && x.typeName) || '')}</div></div>
+      <div class="fbtns"><button class="minib blu" onclick="unhideBoatUI('${esc(id)}')">다시 보기</button></div>
+    </div>`);
+  }
+  P.innerHTML = P.innerHTML.replace('<div class="mrnone">불러오는 중…</div>', rows.join(''));
+}
+function unhideBoatUI(id){
+  unhideBoat(id);
+  openHidden();
+}
 // ===== 배 둘러보기 =====
 let exploreBiz = false;
 async function openExplore(biz){
@@ -2073,14 +2177,17 @@ async function openExplore(biz){
   let list;
   try{ list = await window.__pub.list(exploreBiz); }
   catch(e){ P.innerHTML += `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
-  const rows = (list||[]).map(x=>`<div class="fleet" onclick="openBoatPage('${esc(x.id)}')">
+  const hid = hiddenBoats().length;
+  const rows = filterHidden(list).map(x=>`<div class="fleet" onclick="openBoatPage('${esc(x.id)}')">
       <div class="fmain"><div class="fname">${esc(x.name||'이름 없음')}
         <span class="chip">${esc(x.typeName||'')}</span>
         ${x.biz?'<span class="chip notice">영업</span>':''}</div>
         <div class="fsub">${esc([x.port, x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
       </div></div>`).join('');
   P.innerHTML = P.innerHTML.replace('<div class="mrnone">불러오는 중…</div>',
-    rows || `<div class="mrnone">${exploreBiz?'영업 배가 아직 없습니다':'공개된 배가 아직 없습니다'}</div>`);
+    (rows || `<div class="mrnone">${exploreBiz?'영업 배가 아직 없습니다':'공개된 배가 아직 없습니다'}</div>`)
+    + (hid ? `<div class="mrrow" style="justify-content:center;padding:12px">
+        <button class="minib" onclick="openHidden()">숨긴 배 ${hid}척 보기</button></div>` : ''));
 }
 // 남의 배 소개 페이지
 async function openBoatPage(id){
@@ -2101,7 +2208,9 @@ async function openBoatPage(id){
   P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
       <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
-      ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>`
+      ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}
+      <button class="minib" style="margin-left:auto" onclick="reportBoat('${esc(x.id)}')">신고</button>
+      <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`
     + intro
     + sec('제원', spec ? `<div class="postbody">${esc(spec)}</div>` : '')
     + sec('연락처', x.phone ? `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>` : '')
@@ -3660,7 +3769,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.8';
+const APP_VER = '2.0';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -5775,10 +5884,18 @@ const CHECK_DEFAULTS = [
 
 // ----- 서랍 -----
 function openDrawer(){ document.getElementById('drawerOv').classList.add('open');   paintVer();
+  paintMenuPerms();
 }
 // 서랍 아래에 버전을 적는다.
 // 서비스워커가 실제로 어떤 캐시를 쓰고 있는지도 함께 보여준다 —
 // 파일을 제대로 올렸는지 앱에서 바로 확인할 수 있다.
+// 권한이 없는 메뉴는 감춘다 — 눌러서 거절당하는 것보다 안 보이는 편이 낫다
+function paintMenuPerms(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const set = (id, on) => { const el = document.getElementById(id); if(el) el.style.display = on ? '' : 'none'; };
+  set('dBoard', !!b && can(b,'board','view'));
+  set('dTasks', !!b && can(b,'task','view'));
+}
 function paintVer(){
   const el = document.getElementById('dVer');
   if(!el) return;
@@ -7882,6 +7999,14 @@ document.addEventListener('visibilitychange', ()=>{
       }
       try{ await deleteDoc(doc(fdb, 'boats', id)); }catch(e){ return false; }
       return true;
+    };
+    // ── 신고
+    // 보내기만 가능하고 남의 신고는 못 본다.
+    window.__report = {
+      async send(body){
+        await setDoc(doc(fdb, 'reports', String(body.id)), body);
+        return body.id;
+      }
     };
     // ── 배 공개 자료
     // 배 문서와 따로 둔다. boats 안에는 정비·물품 기록이 있어서

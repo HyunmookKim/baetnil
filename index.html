@@ -66,6 +66,9 @@
 .cmthead span{color:#5d7488;font-weight:400}
 .cmthead .ckdel{margin-left:auto}
 .cmtbody{color:#dfe8f2;font-size:14px;line-height:1.6;margin-top:4px}
+.permsub{color:#5d7488;font-size:11.5px;margin-top:2px}
+.introrow{padding:12px 14px;border-bottom:1px solid #12283e}
+.introbtns{display:flex;gap:6px;margin-top:8px}
 /* 배 목록에서 지금 보고 있는 배 */
 .mr.cur{border-color:#2E6B4A;background:#101C16}
 .mr.cur .cn{color:#6FD9A0}
@@ -662,7 +665,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();openExplore(false)">배 둘러보기</button><button class="ditem" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabStow" class="on" onclick="switchTab('stow')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></svg>적재표</button><button id="tabMaint" onclick="switchTab('maint')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>정비</button><button id="tabWeather" onclick="switchTab('weather')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.3A7 7 0 1 0 5 17.7"/><path d="M2 20.5c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1"/></svg>날씨</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button></nav>
 
 
@@ -1977,6 +1980,268 @@ function assignRank(b, uid, rankId){
   b.members[uid] = r.id;
   return r;
 }
+// ===== 배 공개 설정 =====
+// 선주가 항목별로 켜고 끈다. 다만 위험한 부분은 켜도 나가지 않는다 —
+// 좌표·회비·물품 위치는 스위치 자체가 없고, 걸러내는 코드로 막는다.
+const PUB_KEYS = [
+  { k:'port',   name:'홈포트',        sub:'어느 항에 있는지' },
+  { k:'spec',   name:'제원',          sub:'제조사·모델·연식·길이·폭' },
+  { k:'intro',  name:'소개 페이지',    sub:'글과 사진, 유튜브 링크' },
+  { k:'phone',  name:'연락처',        sub:'전화번호' },
+  { k:'board',  name:'게시판 공개 글', sub:'공개로 표시한 글만' },
+  { k:'voyage', name:'항해일지',      sub:'날짜와 항로만 · 좌표는 나가지 않음' },
+  { k:'maint',  name:'정비 기록',      sub:'항목과 날짜만 · 메모는 나가지 않음' },
+  { k:'gear',   name:'보유 장비',      sub:'물품 이름만 · 어느 칸인지는 나가지 않음' },
+  { k:'roster', name:'회원 명부',      sub:'이름과 등급만 · 회비·부재는 나가지 않음' },
+  { k:'biz',    name:'영업 배',        sub:'영업 탭에 실립니다' }
+];
+function pubOn(b, key){
+  return !!((b && b.pub) || {})[key];
+}
+// 하나라도 켜져 있으면 공개 상태다
+function isPublic(b){
+  const p = (b && b.pub) || {};
+  return PUB_KEYS.some(x => !!p[x.k]);
+}
+function setPub(b, key, on){
+  if(!b) return null;
+  if(!PUB_KEYS.some(x => x.k === key)) return null;
+  b.pub = b.pub || {};
+  b.pub[key] = !!on;
+  return b.pub;
+}
+// 밖으로 내보낼 자료를 만든다. 여기서 걸러진 것은 어떤 경우에도 나가지 않는다.
+function buildPublic(b){
+  if(!b || !isPublic(b)) return null;
+  // 배 이름과 선종은 공개하면 항상 함께 나간다 — 무슨 배인지 모르면 볼 이유가 없다
+  const o = { id:b.id, name:b.name || '', type:b.type || '',
+              typeName: (typeof BOAT_TYPES!=='undefined' ? (BOAT_TYPES[b.type]||'') : ''),
+              biz: pubOn(b,'biz'), ts: new Date().toISOString() };
+  if(pubOn(b,'port')) o.port = b.port || '';
+  if(pubOn(b,'spec')){
+    o.maker = b.maker || ''; o.model = b.model || '';
+    o.year = b.year || ''; o.loa = b.loa || ''; o.beam = b.beam || '';
+  }
+  if(pubOn(b,'phone')) o.phone = b.phone || '';
+  if(pubOn(b,'intro')) o.intro = b.intro || [];   // 소개 페이지 (글·사진·링크 묶음)
+  if(pubOn(b,'board')){
+    o.posts = (typeof posts!=='undefined' ? posts : [])
+      .filter(p => p && p.pub === true)
+      .map(p => ({ id:p.id, kind:p.kind, title:p.title, body:p.body,
+                   byName:p.byName || '', ts:p.ts || '' }));
+  }
+  // 항해일지 — 좌표와 정박지는 뺀다. 빈 배가 어디 있는지 알려주는 셈이 된다.
+  if(pubOn(b,'voyage')){
+    o.voyage = (typeof voyage!=='undefined' ? voyage : [])
+      .map(v => ({ id:v.id, date:v.date || '', title:v.title || '', note:v.note || '' }));
+  }
+  // 정비 — 항목과 날짜만. 메모에 연락처나 개인정보가 섞여 있을 수 있다.
+  if(pubOn(b,'maint')){
+    o.maint = (typeof maint!=='undefined' ? maint : [])
+      .map(m => ({ id:m.id, grp:m.grp || '', name:m.name || '', lastDate:m.lastDate || '' }));
+  }
+  // 장비 — 이름과 수량만. 어느 칸에 있는지는 배에 뭐가 어디 있는지 알려주는 지도가 된다.
+  if(pubOn(b,'gear')){
+    o.gear = (typeof items!=='undefined' ? items : [])
+      .filter(i => i && !i.parentId)
+      .map(i => ({ id:i.id, name:i.name || '', qty:i.qty || 1 }));
+  }
+  // 명부 — 이름과 등급만. 회비·부재·메모·uid 는 뺀다.
+  if(pubOn(b,'roster')){
+    const names = b.memberNames || {};
+    o.roster = Object.keys(b.members || {}).map(uid=>{
+      const r = rankOf(b, b.members[uid]);
+      return { name: names[uid] || '이름 미등록', rank: r ? r.name : '' };
+    });
+  }
+  return o;
+}
+// ===== 배 둘러보기 =====
+let exploreBiz = false;
+async function openExplore(biz){
+  exploreBiz = (biz === true);
+  if(!window.__pub){ alert('인터넷에 연결된 상태에서만 볼 수 있습니다'); return; }
+  if(!window.__user){ alert('둘러보려면 로그인이 필요합니다'); return; }
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>배 둘러보기</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat()">닫기</button></div>
+    <div class="subrow">
+      <button class="tab${exploreBiz?'':' on'}" onclick="openExplore(false)">모아보기</button>
+      <button class="tab${exploreBiz?' on':''}" onclick="openExplore(true)">영업</button>
+    </div><div class="mrnone">불러오는 중…</div>`;
+  P.classList.add('open');
+  let list;
+  try{ list = await window.__pub.list(exploreBiz); }
+  catch(e){ P.innerHTML += `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  const rows = (list||[]).map(x=>`<div class="fleet" onclick="openBoatPage('${esc(x.id)}')">
+      <div class="fmain"><div class="fname">${esc(x.name||'이름 없음')}
+        <span class="chip">${esc(x.typeName||'')}</span>
+        ${x.biz?'<span class="chip notice">영업</span>':''}</div>
+        <div class="fsub">${esc([x.port, x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
+      </div></div>`).join('');
+  P.innerHTML = P.innerHTML.replace('<div class="mrnone">불러오는 중…</div>',
+    rows || `<div class="mrnone">${exploreBiz?'영업 배가 아직 없습니다':'공개된 배가 아직 없습니다'}</div>`);
+}
+// 남의 배 소개 페이지
+async function openBoatPage(id){
+  if(!window.__pub) return;
+  let x;
+  try{ x = await window.__pub.one(id); }
+  catch(e){ alert('불러오지 못했습니다'); return; }
+  if(!x){ alert('공개된 자료가 없습니다'); return; }
+  const sec = (title, body) => body ? `<div class="ghead"><b>${esc(title)}</b></div>${body}` : '';
+  const intro = (x.intro||[]).map(p=>
+    p.t === 'photo' ? `<div class="introrow"><img src="${esc(p.v)}" style="max-width:100%;border-radius:8px;display:block"></div>`
+    : p.t === 'video' ? `<div class="introrow"><a class="mrbtn" href="${esc(p.v)}" target="_blank" rel="noopener">유튜브 열기</a></div>`
+    : `<div class="postbody">${esc(p.v).replace(/\n/g,'<br>')}</div>`).join('');
+  const spec = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
+                 x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
+                 .filter(Boolean).join(' · ');
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
+      <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>
+    <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
+      ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>`
+    + intro
+    + sec('제원', spec ? `<div class="postbody">${esc(spec)}</div>` : '')
+    + sec('연락처', x.phone ? `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>` : '')
+    + sec('보유 장비', (x.gear||[]).length
+        ? `<div class="postbody">${x.gear.map(g=>esc(g.name)).join(' · ')}</div>` : '')
+    + sec('항해일지', (x.voyage||[]).length
+        ? x.voyage.map(v=>`<div class="cmt"><div class="cmthead">${esc(v.title||'')}<span>${esc(v.date||'')}</span></div>
+            <div class="cmtbody">${esc(v.note||'')}</div></div>`).join('') : '')
+    + sec('정비 기록', (x.maint||[]).length
+        ? x.maint.map(m=>`<div class="cmt"><div class="cmthead">${esc(m.name||'')}<span>${esc(m.lastDate||'')}</span></div></div>`).join('') : '')
+    + sec('구성원', (x.roster||[]).length
+        ? `<div class="postbody">${x.roster.map(r=>esc(r.name)+' ('+esc(r.rank)+')').join(' · ')}</div>` : '')
+    + sec('게시판', (x.posts||[]).length
+        ? x.posts.map(p=>`<div class="cmt"><div class="cmthead">${esc(p.title||'')}<span>${esc(String(p.ts||'').slice(0,10))}</span></div>
+            <div class="cmtbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div></div>`).join('') : '');
+  P.classList.add('open');
+}
+// 공개 설정 화면
+function openPublish(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'publish','write')){ alert('공개 설정을 바꿀 권한이 없습니다'); return; }
+  const rows = PUB_KEYS.map(k=>`<div class="permrow">
+      <div class="permname">${esc(k.name)}<div class="permsub">${esc(k.sub)}</div></div>
+      <div class="permbtns">
+        <button class="permb${pubOn(b,k.k)?'':' on'}" onclick="setPubUI('${k.k}',false)">끔</button>
+        <button class="permb${pubOn(b,k.k)?' on':''}" onclick="setPubUI('${k.k}',true)">켬</button>
+      </div></div>`).join('');
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>배 공개 설정</b><span style="flex:1"></span>
+      <button class="tab" onclick="openBoat('info')">닫기</button></div>
+    <div class="mrnone" style="text-align:left">
+      ${isPublic(b) ? '<b>지금 공개 중입니다.</b> 배 이름과 선종은 항상 함께 보입니다.'
+                    : '<b>지금은 비공개입니다.</b> 하나라도 켜면 배 둘러보기에 실립니다.'}<br>
+      물품 위치, 좌표, 회비, 개인 메모는 <b>켜도 나가지 않습니다.</b></div>`
+    + rows
+    + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
+        <button class="mrbtn big" onclick="openIntro()">소개 페이지 쓰기</button></div>`;
+  P.classList.add('open');
+}
+function setPubUI(key, on){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
+  if(!setPub(b, key, on)) return;
+  saveLocal();
+  if(window.__saveBoat) window.__saveBoat(b);
+  pushPublic(b);
+  openPublish();
+}
+// 공개 자료를 밖에 내보낸다 (비공개면 지운다)
+function pushPublic(b){
+  if(!window.__pub) return;
+  const data = buildPublic(b);
+  if(data) window.__pub.put(b.id, data).catch(()=>{});
+  else window.__pub.remove(b.id).catch(()=>{});
+}
+// ===== 소개 페이지 =====
+// 글·사진·유튜브 링크를 섞어서 쓰는 자유 지면. 게시판과 같은 구조다.
+const INTRO_KINDS = [
+  { v:'text',  name:'글',        sub:'문단 하나' },
+  { v:'photo', name:'사진',      sub:'사진 한 장' },
+  { v:'video', name:'유튜브 링크', sub:'주소를 넣으면 눌러서 봅니다' }
+];
+function openIntro(){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
+  b.intro = b.intro || [];
+  const rows = b.intro.map((x,i)=>{
+    const body = x.t === 'photo'
+      ? `<img src="${esc(x.v)}" style="max-width:100%;border-radius:8px;display:block">`
+      : x.t === 'video'
+        ? `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`
+        : `<div class="postbody" style="padding:0">${esc(x.v).replace(/\n/g,'<br>')}</div>`;
+    return `<div class="introrow">${body}
+      <div class="introbtns">
+        <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
+        <button class="minib" onclick="moveIntro(${i},1)">↓</button>
+        <button class="minib red" onclick="delIntro(${i})">지우기</button>
+      </div></div>`;
+  }).join('');
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>소개 페이지</b><span style="flex:1"></span>
+      <button class="tab" onclick="openPublish()">닫기</button></div>
+    <div class="mrnone" style="text-align:left">글과 사진을 섞어서 쓰시면 됩니다.
+      ${pubOn(b,'intro') ? '' : '<br><b>지금은 소개 페이지가 꺼져 있어 밖에 보이지 않습니다.</b>'}</div>`
+    + (rows || '<div class="mrnone">아직 아무것도 없습니다</div>')
+    + `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
+        <button class="mrbtn" onclick="addIntro('text')">+ 글</button>
+        <button class="mrbtn" onclick="addIntro('photo')">+ 사진</button>
+        <button class="mrbtn" onclick="addIntro('video')">+ 유튜브</button></div>`;
+  P.classList.add('open');
+}
+function saveIntro(b){
+  saveLocal();
+  if(window.__saveBoat) window.__saveBoat(b);
+  pushPublic(b);
+  openIntro();
+}
+function addIntro(kind){
+  const b = curBoat(); if(!b) return;
+  b.intro = b.intro || [];
+  if(kind === 'photo'){
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = ()=>{
+      const f = inp.files && inp.files[0];
+      if(!f) return;
+      // 도면과 같은 방식으로 줄여서 넣는다 — 원본은 너무 커서 저장이 안 된다
+      resizeDg(f, url=>{ b.intro.push({ t:'photo', v:url }); saveIntro(b); });
+    };
+    inp.click();
+    return;
+  }
+  const isV = (kind === 'video');
+  openForm({
+    title: isV ? '유튜브 링크' : '글',
+    okText: '넣기',
+    fields: [ isV
+      ? { key:'v', label:'유튜브 주소', value:'', placeholder:'https://youtu.be/...' }
+      : { key:'v', type:'multi', rows:5, label:'내용', value:'', placeholder:'배 소개, 연혁, 자랑거리' } ],
+    onOk: v => {
+      if(!v.v){ alert('내용을 넣어 주세요'); return false; }
+      if(isV && !/^https?:\/\//.test(v.v)){ alert('주소는 https:// 로 시작해야 합니다'); return false; }
+      b.intro.push({ t: isV ? 'video' : 'text', v: v.v });
+      saveIntro(b);
+    }
+  });
+}
+function moveIntro(i, d){
+  const b = curBoat(); if(!b || !b.intro) return;
+  const j = i + d;
+  if(j < 0 || j >= b.intro.length) return;
+  const t = b.intro[i]; b.intro[i] = b.intro[j]; b.intro[j] = t;
+  saveIntro(b);
+}
+function delIntro(i){
+  const b = curBoat(); if(!b || !b.intro) return;
+  if(!confirm('이 부분을 지울까요?')) return;
+  b.intro.splice(i, 1);
+  saveIntro(b);
+}
 // ===== 배별 게시판 =====
 // 배마다 게시판 하나. 공지·인수인계·일반 글과 댓글.
 const POST_KINDS = [
@@ -2113,7 +2378,10 @@ function writePost(id){
         options: kinds.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
       { key:'title', label:'제목', value: p ? p.title : '', placeholder:'제목' },
       { key:'body',  type:'multi', rows:6, label:'내용', value: p ? p.body : '',
-        placeholder:'내용을 적어 주세요' }
+        placeholder:'내용을 적어 주세요' },
+      { key:'pub', label:'밖에도 보이게', type:'pick', value: (p && p.pub) ? '1' : '0',
+        options:[ { v:'0', name:'배 안에서만', sub:'구성원만 봅니다' },
+                  { v:'1', name:'공개', sub:'배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)' } ] }
     ],
     del: p ? { text:'글 지우기', run: ()=>{
       if(!confirm('이 글을 지울까요?')) return;
@@ -2121,8 +2389,19 @@ function writePost(id){
     }} : null,
     onOk: v => {
       if(!v.title){ alert('제목을 넣어 주세요'); return false; }
-      if(p){ if(!editPost(p.id, v)) return false; openPost(p.id); }
-      else { const np = addPost(v.title, v.body, v.kind); if(!np) return false; openPost(np.id); }
+      const wantPub = (v.pub === '1');
+      if(p){
+        if(!editPost(p.id, v)) return false;
+        p.pub = wantPub; save();
+        pushPublic(curBoat());
+        openPost(p.id);
+      } else {
+        const np = addPost(v.title, v.body, v.kind);
+        if(!np) return false;
+        np.pub = wantPub; save();
+        pushPublic(curBoat());
+        openPost(np.id);
+      }
     }
   });
 }
@@ -2144,6 +2423,7 @@ function openPost(id){
   P.innerHTML = `<div class="mrhead"><b>${esc(p.title)}</b><span style="flex:1"></span>
       <button class="tab" onclick="openBoard()">목록</button></div>
     <div class="postmeta"><span class="chip${p.kind==='notice'?' notice':''}">${esc(kn)}</span>
+      ${p.pub?'<span class="chip">공개</span>':''}
       ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
       ${canEditPost(b,p)?`<button class="minib blu" style="margin-left:auto" onclick="writePost('${esc(p.id)}')">고치기</button>`:''}</div>
     <div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>
@@ -2611,6 +2891,7 @@ function memberBlock(b){
     </div>`).join('');
   return `<div class="mrrow" style="margin-top:6px"><span class="mrlbl">함께 관리</span>
       <span class="mrm" style="flex:1">${rows.length}명</span>
+      ${can(b,'publish','write') ? `<button class="minib ${isPublic(b)?'grn':'blu'}" onclick="openPublish()">공개 설정</button>` : ''}
       ${can(b,'roster','view') ? `<button class="minib blu" onclick="openRoster()">명부</button>` : ''}
       ${can(b,'ranks','write') ? `<button class="minib blu" onclick="openRanks()">등급 설정</button>` : ''}
       ${manage ? `<button class="minib blu" onclick="openJoinReqs()">참여 신청</button>` : ''}</div>`
@@ -3379,7 +3660,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '1.7';
+const APP_VER = '1.8';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -7470,6 +7751,7 @@ document.addEventListener('visibilitychange', ()=>{
           members: boat.members || {}, memberNames: boat.memberNames || {},
           ranks: boat.ranks || {}, roster: boat.roster || {},
           openJoin: boat.openJoin !== false,
+          pub: boat.pub || {}, intro: boat.intro || [],
           createdAt: boat.createdAt || ''
         }, { merge:true });
         return true;
@@ -7600,6 +7882,28 @@ document.addEventListener('visibilitychange', ()=>{
       }
       try{ await deleteDoc(doc(fdb, 'boats', id)); }catch(e){ return false; }
       return true;
+    };
+    // ── 배 공개 자료
+    // 배 문서와 따로 둔다. boats 안에는 정비·물품 기록이 있어서
+    // 거기를 공개로 열면 전부 새어 나간다.
+    window.__pub = {
+      async put(boatId, data){
+        await setDoc(doc(fdb, 'boatPublic', String(boatId)),
+          Object.assign({}, data, { owner: fauth.currentUser ? fauth.currentUser.uid : '' }));
+      },
+      async remove(boatId){
+        try{ await deleteDoc(doc(fdb, 'boatPublic', String(boatId))); }catch(_){}
+      },
+      async list(biz){
+        const snap = await getDocs(query(collection(fdb, 'boatPublic'),
+          where('biz','==', biz === true)));
+        return snap.docs.map(d=>d.data())
+          .sort((a,b)=> String(b.ts||'').localeCompare(String(a.ts||'')));
+      },
+      async one(boatId){
+        const d = await getDoc(doc(fdb, 'boatPublic', String(boatId)));
+        return d.exists() ? d.data() : null;
+      }
     };
     // ── 참여 신청
     // 신청서에는 어느 배인지(boatId)가 반드시 들어가야 한다.

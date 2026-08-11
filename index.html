@@ -178,7 +178,8 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 #map.lkedit #shLayer line{stroke-width:3}
 #map.lkedit line,#map.lkedit rect,#map.lkedit polygon{cursor:pointer}
 #map.lkedit{cursor:crosshair;touch-action:none}
-#map.lkedit .box{pointer-events:auto;cursor:move;outline:1px dashed #4ad9ff88}
+/* 도형 레이어(z-index:1)보다 위에 둔다. 아래 깔리면 눌러도 도형이 먼저 잡힌다. */
+#map.lkedit .box{pointer-events:auto;cursor:move;outline:1px dashed #4ad9ff88;z-index:3}
 /* 오른쪽 아래 모서리를 잡으면 크기가 바뀐다 */
 #map.lkedit .box::after{content:'';position:absolute;right:-6px;bottom:-6px;
   width:16px;height:16px;background:#4ad9ff;border:2px solid #08131c;border-radius:4px}
@@ -2542,8 +2543,12 @@ function openIntro(){
 function saveIntro(b){
   saveLocal();
   if(window.__saveBoat) window.__saveBoat(b);
+  if(typeof schedulePush === 'function') schedulePush();
   pushPublic(b);
-  openIntro();
+  // 소개는 두 곳에서 고칠 수 있다 — 내 배 > 배 소개, 공개 설정 > 소개 페이지.
+  // 보고 있던 화면으로 돌아온다.
+  if(boatTab === 'intro') openBoat('intro');
+  else openIntro();
 }
 function addIntro(kind){
   const b = curBoat(); if(!b) return;
@@ -3447,10 +3452,45 @@ function openBoat(tab){
     <div class="subrow" style="display:flex">
       <button class="tab${boatTab==='info'?' on':''}" onclick="openBoat('info')">기본 정보</button>
       <button class="tab${boatTab==='spec'?' on':''}" onclick="openBoat('spec')">제원</button>
+      <button class="tab${boatTab==='intro'?' on':''}" onclick="openBoat('intro')">배 소개</button>
     </div>`;
 
   let body = '';
-  if(boatTab === 'info'){
+  if(boatTab === 'intro'){
+    // 배 소개 — 글과 사진을 섞어 쓴다.
+    // 사진째 복사해 붙여넣으면 사진도 함께 들어간다 (addIntro 의 붙여넣기).
+    b.intro = b.intro || [];
+    const canEd = can(b, 'publish', 'write') && unlocked;
+    const rows = b.intro.map((x,i)=>{
+      const inner = x.t === 'photo'
+        ? `<img src="${esc(x.v)}" style="max-width:100%;border-radius:8px;display:block">`
+        : x.t === 'video'
+          ? `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`
+          : `<div class="postbody" style="padding:0">${esc(x.v).replace(/\n/g,'<br>')}</div>`;
+      return `<div class="introrow">${inner}${canEd ? `
+        <div class="introbtns">
+          <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
+          <button class="minib" onclick="moveIntro(${i},1)">↓</button>
+          <button class="minib red" onclick="delIntro(${i})">지우기</button>
+        </div>` : ''}</div>`;
+    }).join('');
+    body = `<div class="mrnone" style="text-align:left">
+        배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진도 함께</b> 들어갑니다.<br>
+        ${pubOn(b,'intro')
+          ? '지금은 <b>공개</b> 상태라 배 소개 페이지에 실립니다.'
+          : '지금은 <b>꺼져 있어</b> 밖에 보이지 않습니다. 공개 설정에서 켤 수 있습니다.'}</div>`
+      + (rows || '<div class="mrnone">아직 아무것도 없습니다</div>')
+      + (canEd ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
+          <button class="mrbtn big ok" onclick="addIntro('text')">+ 글·사진</button>
+          <button class="mrbtn" onclick="addIntro('photo')">+ 사진만</button>
+          <button class="mrbtn" onclick="addIntro('video')">+ 유튜브</button></div>
+        <div class="mrrow" style="justify-content:center;padding:0 12px 14px">
+          <button class="mrbtn" onclick="openPublish()">공개 설정 열기</button></div>`
+        : `<div class="mrnone">고치려면 <b>공개(publish)</b> 권한이 있어야 합니다.${
+            (typeof me!=='undefined' && me) ? '<br>등급 설정에서 권한을 켜 주세요.'
+                                            : '<br>먼저 로그인해 주세요 — 서랍 > 로그인.'}</div>`);
+  }
+  else if(boatTab === 'info'){
     body = `
       <div class="mrrow"><span class="mrlbl">이름</span>${unlocked
         ? `<input value="${esc(b.name)}" style="flex:1" placeholder="예: 여수 Sunshine" onchange="boatField('name',this.value)">`
@@ -4441,7 +4481,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.12';
+const APP_VER = '2.13';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -4984,6 +5024,25 @@ map.addEventListener('pointerdown', e=>{
       return;
     }
   }
+  // ★ 수납칸을 먼저 본다. 도구가 선·네모·세모여도 마찬가지다.
+  // 2.11 까지는 도구가 수납칸일 때만 확인해서, 선 도구를 고른 채로
+  // 수납칸을 누르면 도형 그리기로 넘어가 버렸다. '눌러도 안 바뀐다' 가 이것이다.
+  // 수납칸 위에 도형을 그리려면 빈 곳에서 끌기 시작하면 된다.
+  {
+    const bx = e.target && e.target.closest ? e.target.closest('.box') : null;
+    if(bx && bx.dataset && bx.dataset.id){
+      const lb = lkGet(bx.dataset.id);
+      if(lb){
+        const br = bx.getBoundingClientRect();
+        const nc = (e.clientX > br.right - 22) && (e.clientY > br.bottom - 22);
+        lkDrag = { mode: nc ? 'size' : 'move', id: lb.id, el: bx,
+                   x0: p.x, y0: p.y, ox: lb.x, oy: lb.y, ow: lb.w, oh: lb.h };
+        bx.classList.add('lkon');
+        try{ map.setPointerCapture(e.pointerId); }catch(_){}
+        return;
+      }
+    }
+  }
   if(lkTool !== 'locker'){
     lkDrag = { mode:'shape', x0:p.x, y0:p.y };
     const g0 = document.createElement('div');
@@ -4993,21 +5052,7 @@ map.addEventListener('pointerdown', e=>{
     try{ map.setPointerCapture(e.pointerId); }catch(_){}
     return;
   }
-  // 이미 있는 칸을 잡았는가?
-  const boxEl = e.target && e.target.closest ? e.target.closest('.box') : null;
-  if(boxEl && boxEl.dataset && boxEl.dataset.id){
-    const l = lkGet(boxEl.dataset.id);
-    if(l){
-      const r = map.getBoundingClientRect(), br = boxEl.getBoundingClientRect();
-      // 오른쪽 아래 모서리 근처면 크기 조절, 아니면 옮기기
-      const nearCorner = (e.clientX > br.right - 22) && (e.clientY > br.bottom - 22);
-      lkDrag = { mode: nearCorner ? 'size' : 'move', id: l.id, el: boxEl,
-                 x0: p.x, y0: p.y, ox: l.x, oy: l.y, ow: l.w, oh: l.h };
-      boxEl.classList.add('lkon');
-      try{ map.setPointerCapture(e.pointerId); }catch(_){}
-      return;
-    }
-  }
+  // 수납칸은 위에서 이미 확인했다 — 여기까지 왔으면 빈 곳이다
   lkDrag = { mode:'new', x0:p.x, y0:p.y };
   const g = document.createElement('div');
   g.id = 'lkGhost';
@@ -5053,6 +5098,15 @@ map.addEventListener('pointermove', e=>{
   const r = lkRect(lkDrag.x0, lkDrag.y0, p.x, p.y);
   const g = document.getElementById('lkGhost');
   if(g) g.style.cssText = `left:${r.x}%;top:${r.y}%;width:${r.w}%;height:${r.h}%`;
+});
+// 손가락이 미끄러져 취소되면 끌기 상태가 남아 다음 동작이 엉킨다. 정리한다.
+map.addEventListener('pointercancel', ()=>{
+  if(!lkDrag) return;
+  const d = lkDrag; lkDrag = null;
+  if(d.el){ d.el.classList.remove('lkon');
+            d.el.style.left=d.ox+'%'; d.el.style.top=d.oy+'%';
+            d.el.style.width=d.ow+'%'; d.el.style.height=d.oh+'%'; }
+  const g = document.getElementById('lkGhost'); if(g) g.remove();
 });
 map.addEventListener('pointerup', e=>{
   if(!lkEdit || !lkDrag) return;

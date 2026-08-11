@@ -2227,7 +2227,7 @@ function syncPortSpot(b){
   if(idx >= 0) wxSpots[idx] = spot; else wxSpots.unshift(spot);
   wxSet('bt_spots', wxSpots);
   if(!wxCur || wxCur.id === sid){ wxCur = spot; wxSet('bt_wxcur', wxCur); wxData = null; }
-  if(typeof curTab !== 'undefined' && curTab === 'weather') renderWeather();
+  if(typeof curScreen === 'function' && curScreen() === 'weather') renderWeather();
 }
 
 // 배가 여러 척이면 여기서 바꾼다. 한 척이면 곧바로 배 정보로 간다.
@@ -3959,7 +3959,7 @@ function saveSpecNow(){
   saveLocal();
   if(window.__saveBoat) window.__saveBoat(b);
   if(typeof schedulePush === 'function') schedulePush();
-  if(typeof renderWeather === 'function' && curTab === 'weather') renderWeather();
+  if(typeof renderWeather === 'function' && curScreen() === 'weather') renderWeather();
   alert('제원 ' + n + '칸을 저장했습니다.');
 }
 function setBoatSpecUI(k, v){
@@ -3967,7 +3967,7 @@ function setBoatSpecUI(k, v){
   // 길이를 처음 넣으면 아직 비어 있는 날씨 한계값을 채워 준다
   if(k === 'loa'){ const b = curBoat(); if(b && applyWxLimits(b)) { saveLocal(); openBoat('spec'); return; } }
   openBoat();
-  if(typeof renderWeather === 'function' && curTab === 'weather') renderWeather();
+  if(typeof renderWeather === 'function' && curScreen() === 'weather') renderWeather();
   if(typeof renderFuel === 'function') renderFuel();
 }
 function closeBoat(){
@@ -4491,7 +4491,7 @@ async function cloudPull(){
     setSync('클라우드 비어있음');
     cloudSeedCheck();
   }
-  if(curTab==='maint' || curTab==='repair') renderMR();
+  if(curScreen()==='maint' || curScreen()==='repair') renderMR();
 }
 // 클라우드에 있는 내 배를 기기 목록에 합친다.
 // 2.5 까지 앱은 배를 올리기만 하고 받아오지는 않았다. 그래서 컴퓨터에서 켜면
@@ -4849,7 +4849,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.4';
+const APP_VER = '3.5';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -6065,11 +6065,9 @@ document.getElementById('fNote').addEventListener('keydown', e=>{ if(e.key==='En
 let maint = [], repair = [];
 // 켤 때 어디를 보여줄지. 아무것도 안 그리면 화면과 아래 탭이 어긋난다 —
 // 실제로 새로고침하면 '오늘' 에 불이 켜져 있는데 내용은 적재표가 나왔다.
-let curTab = (function(){
-  try{ const v = localStorage.getItem('bt_tab');
-       return ['home','boat','voyage','community'].includes(v) ? v : 'home'; }
-  catch(_){ return 'home'; }
-})();
+// 켤 때는 언제나 '오늘'. 배를 하는 사람이 앱을 켜는 첫 이유는
+// '오늘 나갈 수 있나' 이지, 마지막에 보던 화면이 아니다.
+let curTab = 'home';
 let maintView = 'list', repairView = 'list';
 let mrMapKind = 'side';
 let mrOpenType = null, mrOpenId = null, pinTarget = null;
@@ -6299,7 +6297,6 @@ function switchTab(t){
     t = g;
   }
   curTab = t;
-  try{ localStorage.setItem('bt_tab', curTab); }catch(_){}
 
   const show = (id,on)=>{ const el=document.getElementById(id); if(el) el.style.display = on?'':'none'; };
   const paint = (pairs, cur)=> pairs.forEach(([id,k])=>{
@@ -6463,8 +6460,17 @@ function mrToggleView(t){
   else            repairView = repairView==='list'?'map':'list';
   renderMR();
 }
+// 지금 실제로 보고 있는 화면 이름.
+// curTab 은 위 단계(home·boat·voyage·community)만 담는다.
+// 옛 이름(stow·maint·weather…)으로 비교해야 하는 곳은 반드시 이 함수를 쓴다.
+function curScreen(){
+  if(curTab === 'boat')      return boatSubTab === 'docs' ? 'contacts' : boatSubTab;
+  if(curTab === 'home')      return homeSub === 'today' ? 'home' : homeSub;
+  if(curTab === 'community') return comSub;
+  return curTab;
+}
 function renderMR(){
-  const t = (curTab==='maint') ? mrSub : curTab;
+  const t = curScreen();
   if(t!=='maint' && t!=='repair') return;
   const isMap = (t==='maint'?maintView:repairView)==='map';
   document.getElementById('mrMapWrap').style.display = isMap?'':'none';
@@ -6866,7 +6872,7 @@ function setMapKind(k, keepView){
   mrMapKind = k;
   document.getElementById('kindSide').classList.toggle('on', k==='side');
   document.getElementById('kindPlan').classList.toggle('on', k==='plan');
-  const t = (((curTab==='maint') ? mrSub : curTab)==='repair') ? 'repair' : 'maint';
+  const t = (curScreen()==='repair') ? 'repair' : 'maint';
   const items = t==='maint' ? maint : repair;
   const pins = items.filter(i=>i.pin && i.pin.map===k);
   const src = dgSrc(k);
@@ -7111,7 +7117,7 @@ function pinShow(){
   closeMR();
   pinSel = String(id);          // 어느 핀인지 이름표로 알려준다
   pinOpenClu = null;
-  if(curTab==='maint' && mrSub!==ty) setMrSub(ty);
+  if((curScreen()==='maint' || curScreen()==='repair') && boatSubTab!==ty) setBoatSubTab(ty);
   else renderMR();
   // 화면이 그려진 뒤에 그 자리로 확대한다
   requestAnimationFrame(()=>{ dgBind(); dgFocus(px, py); });
@@ -9406,7 +9412,7 @@ setTimeout(checkNewsBadge, 2500);
 setInterval(checkNewsBadge, 30*60*1000);
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState !== 'visible') return;
-  if(curTab === 'news'){ renderNews(true); }
+  if(curScreen() === 'news'){ renderNews(true); }
   else { checkNewsBadge(); }
 });
 </script>

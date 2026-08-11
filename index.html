@@ -1454,7 +1454,11 @@ window.__onAuth = u => {
     });
     if(changed && typeof sysSave === 'function') sysSave();
     boats.forEach(b=>{ if(window.__saveBoat) window.__saveBoat(b); });
-    if(typeof cloudSeedCheck === 'function') cloudSeedCheck();
+    // 첫 pull 은 로그인 전에 지나가 권한이 없어 실패한다.
+    // 로그인이 확정된 지금 배 목록을 받아 합치고, 그 배의 기록을 다시 받아온다.
+    const after = () => { if(typeof cloudSeedCheck === 'function') cloudSeedCheck(); };
+    if(typeof mergeCloudBoats === 'function') mergeCloudBoats().then(after, after);
+    else after();
   }
 };
 function applyAccount(){
@@ -3163,11 +3167,16 @@ function boatKeys(id){
 // 로그인하지 않고 이 기기에서만 쓰는 배는 그냥 지울 수 있다.
 function canDelBoat(b){
   if(!b) return false;
-  const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
+  const uid = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
   const mem = b.members || {};
-  if(!me) return true;                       // 로컬 전용
-  if(!Object.keys(mem).length) return true;  // 아직 클라우드에 안 올라간 배
-  return mem[me] === 'owner';
+  if(!uid) return true;                       // 로컬 전용
+  if(!Object.keys(mem).length) return true;   // 아직 클라우드에 안 올라간 배
+  const rid = mem[uid];
+  // members 는 uid → 등급id 지도다. 등급의 owner 표시로 선주를 가린다.
+  // 옛 배는 등급이 없고 members 에 역할 문자열이 들어 있다 — 그때만 문자열로 본다.
+  const rk = (b.ranks && b.ranks[rid]) ? b.ranks[rid] : null;
+  if(rk) return rk.owner === true;
+  return rid === 'owner';
 }
 async function delBoatData(id){
   for(const k of boatKeys(id)){
@@ -3732,6 +3741,7 @@ let lastCloudSH = {};
 let lastCloudPO = {};
 let lastPushErr = null;
 let pushErrShown = false;
+let cloudSeeded = false;   // 클라우드에 이 배의 자료가 있는가 (meta/info 존재)
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 function setSync(t){ const el=document.getElementById('syncState'); if(el) el.textContent = t; }
 const snapOf = arr => { const m={}; arr.forEach(i=>{ m[String(i.id)] = JSON.stringify(i); }); return m; };
@@ -3780,6 +3790,7 @@ async function cloudPull(){
   lastCloudSH = snapOf(Array.isArray(r.shapes)? r.shapes : []);
   lastCloudPO = snapOf(Array.isArray(r.posts)? r.posts : []);
   lastCloudDG = snapOf(Array.isArray(r.dgimgs)? r.dgimgs : []);
+  cloudSeeded = !!r.seeded;
   if(r.seeded){
     items = migrate(r.items); trash = migrate(r.trash);
     lastCloud = snapOf(items); lastCloudTrash = snapOf(trash);
@@ -3797,18 +3808,81 @@ async function cloudPull(){
   }
   if(curTab==='maint' || curTab==='repair') renderMR();
 }
+// 클라우드에 있는 내 배를 기기 목록에 합친다.
+// 2.5 까지 앱은 배를 올리기만 하고 받아오지는 않았다. 그래서 컴퓨터에서 켜면
+// 배 등록 화면이 뜨고, 거기서 만든 배는 폰의 배와 id 가 달라서
+// 같은 계정인데도 기록이 하나도 안 보였다.
+async function mergeCloudBoats(){
+  if(!window.__myBoats) return false;
+  let list = [];
+  try{ list = await window.__myBoats(); }
+  catch(e){
+    lastPushErr = (e && (e.code ? e.code + ' \u2014 ' : '') + (e.message || String(e))) || '알 수 없는 오류';
+    setSync('배 목록을 받지 못함 · 눌러서 확인');
+    return false;
+  }
+  if(!Array.isArray(list) || !list.length) return false;
+  const have = {};
+  boats.forEach(b => { have[String(b.id)] = b; });
+  let added = 0;
+  list.forEach(cb => {
+    const old = have[String(cb.id)];
+    if(old){
+      // 이미 있는 배는 두 번 넣지 않는다. 사람·등급은 클라우드 것이 최신이다.
+      if(cb.name) old.name = cb.name;
+      if(cb.members) old.members = cb.members;
+      if(cb.memberNames) old.memberNames = cb.memberNames;
+      if(cb.ranks) old.ranks = cb.ranks;
+      return;
+    }
+    migrateRanks(cb);
+    boats.push(cb);
+    added++;
+  });
+  // 지금 보고 있는 배가 클라우드에 없으면 클라우드 배로 옮긴다.
+  // 이 기기에서 방금 만든 빈 배를 보고 있는 상황이다.
+  // 배를 지우지는 않는다 — 기록이 들어 있을 수도 있으므로 사람이 판단한다.
+  const curInCloud = list.some(cb => String(cb.id) === String(currentBoatId));
+  if(!curInCloud){
+    currentBoatId = String(list[0].id);
+    window.currentBoatId = currentBoatId;
+    applyBoatName();
+    await loadBoatData();
+    updateTrashTab();
+    syncPortSpot(curBoat());
+  }
+  sysSave();
+  try{ await cloudPull(); }catch(e){}
+  return added > 0;
+}
+
 // 클라우드가 비어 있을 때 한 번만 물어본다.
 // 켤 때마다 같은 질문을 하면 고문이다 — 특히 올리기가 실패하고 있을 때 그렇다.
 function cloudSeedAsked(){
   try{ return localStorage.getItem('bt_seedask') === String(currentBoatId); }catch(_){ return false; }
 }
+// 표시는 올리기가 성공한 뒤에만 찍는다.
+// 2.5 까지는 확인을 누르기도 전에 찍어서, 올리기가 실패해도 두 번 다시 묻지 않았다.
+function seedAskMark(on){
+  try{
+    if(on) localStorage.setItem('bt_seedask', String(currentBoatId));
+    else localStorage.removeItem('bt_seedask');
+  }catch(_){}
+}
 function cloudSeedCheck(){
-  if(!(cloud && unlocked && items.length && Object.keys(lastCloud).length===0)) return;
+  if(!(cloud && unlocked)) return;
+  if(cloudSeeded) return;                 // 클라우드에 이미 자료가 있다
   if(cloudSeedAsked()) return;
-  try{ localStorage.setItem('bt_seedask', String(currentBoatId)); }catch(_){}
-  if(confirm(`클라우드에 이 배의 자료가 없습니다.\n\n`
-    + `이 기기의 물품 ${items.length}개를 올릴까요?\n`
-    + `다시 묻지 않습니다 — 메뉴의 '지금 동기화'로 언제든 올릴 수 있습니다.`)) schedulePush();
+  // 물품만 보면 안 된다. 정비·항해일지·체크리스트만 있는 배도 올려야 한다.
+  const n = items.length + trash.length + maint.length + repair.length + voyage.length
+          + fuel.length + runs.length + contacts.length + vdocs.length + checkt.length
+          + lockers.length + shapes.length + posts.length;
+  if(!n) return;
+  if(!confirm(`클라우드에 이 배의 자료가 없습니다.\n\n`
+    + `이 기기의 기록 ${n}건을 올릴까요?\n`
+    + `올리고 나면 다시 묻지 않습니다 — 메뉴의 '지금 동기화'로 언제든 올릴 수 있습니다.`)) return;
+  lastPushErr = null;
+  pushNow().then(()=>{ seedAskMark(!lastPushErr); });
 }
 // 동기화 글자를 누르면 실패 이유를 보여주고 다시 시도한다
 function syncTap(){
@@ -3868,17 +3942,25 @@ async function pushNow(){
     const [setPO,delPO] = diff(curPO, lastCloudPO);
     const curDG = snapOf(dgArr());
     const [setDG,delDG] = diff(curDG, lastCloudDG);
-    if(setI.length||delI.length||setT.length||delT.length||setM.length||delM.length||setR.length||delR.length
-       ||setV.length||delV.length||setF.length||delF.length||setC.length||delC.length||setD.length||delD.length||setK.length||delK.length||setMT.length||delMT.length||setRN.length||delRN.length||setL.length||delL.length||setDG.length||delDG.length){
-      await cloud.push({setI, delI, setT, delT, setM, delM, setR, delR,
-                        setV, delV, setF, delF, setC, delC, setD, delD, setK, delK, setMT, delMT,
-                        setRN, delRN, setL, delL, setDG, delDG, setSH, delSH, setPO, delPO,
-                        itemCount:items.length, trashCount:trash.length,
-                        maintCount:maint.length, repairCount:repair.length});
+    // 보낼 것을 한곳에 모은다.
+    // 조건을 손으로 나열하면 새 컬렉션을 빠뜨린다 — 실제로 도형(setSH)과
+    // 게시판(setPO)이 조건에서 빠져 있어서, 그것만 바뀌면 올리지 않은 채
+    // '올렸다'고 기준값만 갱신되어 영영 안 올라갔다.
+    const payload = {setI, delI, setT, delT, setM, delM, setR, delR,
+                     setV, delV, setF, delF, setC, delC, setD, delD, setK, delK, setMT, delMT,
+                     setRN, delRN, setL, delL, setDG, delDG, setSH, delSH, setPO, delPO};
+    let pushed = false;
+    for(const k in payload){ if(payload[k] && payload[k].length){ pushed = true; break; } }
+    if(pushed){
+      await cloud.push(Object.assign({}, payload, {
+        itemCount:items.length, trashCount:trash.length,
+        maintCount:maint.length, repairCount:repair.length}));
+      // 올린 뒤에만 기준값을 갱신한다
+      lastCloud = curI; lastCloudTrash = curT; lastCloudMaint = curM; lastCloudRepair = curR;
+      lastCloudV = curV; lastCloudF = curF; lastCloudC = curC; lastCloudD = curD; lastCloudK = curK; lastCloudMT = curMT;
+      lastCloudRN = curRN; lastCloudL = curL; lastCloudDG = curDG; lastCloudSH = curSH; lastCloudPO = curPO;
+      cloudSeeded = true;
     }
-    lastCloud = curI; lastCloudTrash = curT; lastCloudMaint = curM; lastCloudRepair = curR;
-    lastCloudV = curV; lastCloudF = curF; lastCloudC = curC; lastCloudD = curD; lastCloudK = curK; lastCloudMT = curMT;
-    lastCloudRN = curRN; lastCloudL = curL; lastCloudDG = curDG; lastCloudSH = curSH; lastCloudPO = curPO;
     setSync('동기화됨');
   }catch(e){
     console.error(e);
@@ -4041,7 +4123,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.5';
+const APP_VER = '2.6';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -8262,7 +8344,7 @@ document.addEventListener('visibilitychange', ()=>{
 (async ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where, writeBatch } =
+    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where, writeBatch, FieldPath } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -8300,6 +8382,18 @@ document.addEventListener('visibilitychange', ()=>{
         }, { merge:true });
         return true;
       }catch(e){ console.warn('배 저장 실패', e.code || e.message); return false; }
+    };
+
+    // 내가 구성원으로 들어 있는 배를 클라우드에서 받아온다.
+    // 이것이 없으면 다른 기기에서 켤 때 기기에 배가 없어 새로 만들게 되고,
+    // 서로 다른 boats/{id} 를 보게 되어 동기화가 통째로 안 된 것처럼 보인다.
+    // members 는 uid → 등급id 지도라서, 그 칸이 있는지로 거를 수 있다.
+    window.__myBoats = async () => {
+      if(!fauth.currentUser) return [];
+      const uid = fauth.currentUser.uid;
+      const snap = await getDocs(query(collection(fdb, 'boats'),
+        where(new FieldPath('members', uid), '>', '')));
+      return snap.docs.map(d => Object.assign({}, d.data(), { id: d.id }));
     };
 
     window.__auth = {

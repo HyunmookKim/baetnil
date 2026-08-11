@@ -437,6 +437,19 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .iconb{padding:8px 10px;display:flex;align-items:center}
 /* 버튼이 많아 좁은 화면에서 줄바꿈되면 글자가 세로로 쪼개진다.
    줄을 바꾸지 않고 옆으로 밀리게 한다. */
+/* 제목 자리의 하위 탭 — 고른 것이 곧 제목이다 */
+.hrow .hleft{flex:1;min-width:0;padding-right:8px}
+#hNav{margin-top:1px}
+.hsubs{display:flex;gap:0;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-right:14px;
+  /* 오른쪽 끝을 흐리게 — 더 있다는 것이 보여야 한다 */
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 18px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 18px),transparent)}
+.hsubs::-webkit-scrollbar{display:none}
+.hsub{flex:none;border:0;background:none;padding:1px 0 3px;margin-right:14px;cursor:pointer;
+  font-family:inherit;font-size:17px;font-weight:800;color:#6f7d8c;line-height:1.3;
+  border-bottom:2px solid transparent}
+.hsub.on{color:var(--tx,#eaf2f8);border-bottom-color:var(--ac,#e8663c)}
 #stowTools,#mrSub,.subrow{display:flex;gap:8px;padding:10px 16px 0;
   flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -631,9 +644,10 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <body>
 <header>
   <div class="hrow">
-    <div>
-      <div class="sub" id="boatSub" onclick="openFleet()" style="cursor:pointer">뱃일</div>
-      <h1><span id="hTitle">적재표</span> <span id="syncState" onclick="syncTap()" style="cursor:pointer"></span></h1>
+    <div class="hleft">
+      <div class="sub"><span id="boatSub" onclick="openFleet()" style="cursor:pointer">뱃일</span>
+        <span id="syncState" onclick="syncTap()" style="cursor:pointer"></span></div>
+      <div id="hNav"></div>
     </div>
     <div class="btns">
       <button class="tab" id="lockBtn" onclick="toggleLock()">편집 중</button>
@@ -690,18 +704,8 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <div id="hint">칸 클릭 · 초록=물품있음 · <span class="w">점선=벽면/선반</span> · <span class="d">보라=2층</span> · 상자 · 이동 · 합치기 · 사진</div>
 
 <div id="listView"></div>
-<div id="homeSubBar" class="subrow" style="display:none">
-  <button class="tab on" id="hsToday" onclick="setHomeSub('today')">오늘 한눈에</button>
-  <button class="tab" id="hsWeather" onclick="setHomeSub('weather')">날씨 · 물때</button>
-  <button class="tab" id="hsCheck" onclick="setHomeSub('check')">출항 전 점검</button>
-</div>
-<div id="boatSubBar" class="subrow" style="display:none">
-  <button class="tab on" id="bsStow" onclick="setBoatSubTab('stow')">적재표</button>
-  <button class="tab" id="bsMaint" onclick="setBoatSubTab('maint')">정기점검</button>
-  <button class="tab" id="bsRepair" onclick="setBoatSubTab('repair')">수리목록</button>
-  <button class="tab" id="bsFuel" onclick="setBoatSubTab('fuel')">연료</button>
-  <button class="tab" id="bsDocs" onclick="setBoatSubTab('docs')">문서 · 연락처</button>
-</div>
+
+
 <div id="mrSub" style="display:none">
   <button class="tab on" id="subMaint" onclick="setMrSub('maint')">정기점검</button>
   <button class="tab" id="subRepair" onclick="setMrSub('repair')">수리목록</button>
@@ -765,11 +769,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <datalist id="grpList"></datalist>
 <div id="homeWrap" style="display:none"><div id="homeList"></div></div>
 <div id="communityWrap" style="display:none">
-  <div class="subrow" id="comSubBar">
-    <button class="tab" id="csExplore" onclick="setComSub('explore')">배 둘러보기</button>
-    <button class="tab" id="csBiz" onclick="setComSub('biz')">영업</button>
-    <button class="tab" id="csNews" onclick="setComSub('news')">뉴스</button>
-  </div>
+  
   <div id="exploreWrap"></div>
 </div>
 <div id="mrPanel"></div>
@@ -3788,8 +3788,8 @@ const BOAT_TABS2 = [
   ['publish', '공개 설정',  'openPublish']
 ];
 function setHeadTitle(t){
-  const h = document.getElementById('hTitle');
-  if(h) h.textContent = t || '뱃일';
+  const N = document.getElementById('hNav');
+  if(N) N.innerHTML = `<h1 class="htit">${esc(t || '뱃일')}</h1>`;
 }
 function boatHead(cur){
   return `<div class="mrhead"><b>내 배</b><span style="flex:1"></span></div>
@@ -4849,7 +4849,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.3';
+const APP_VER = '3.4';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -6205,7 +6205,7 @@ function mStatus(it){
 const DS = {maint:()=>maint, repair:()=>repair, voyage:()=>voyage, fuel:()=>fuel, run:()=>runs, contact:()=>contacts, vdoc:()=>vdocs};
 const getMR = (t,id) => (DS[t]?DS[t]():[]).find(x=>String(x.id)===String(id));
 function rerender(t){
-  if(t==='maint'){ document.getElementById('hTitle').textContent = mrSub==='maint'?'정기점검':'수리목록'; renderMR(); }
+  if(t==='maint'){ setHeadTitle(mrSub==='maint'?'정기점검':'수리목록'); renderMR(); }
   else if(t==='weather') renderWeather();
   else if(t==='voyage') renderVoyage();
   else if(t==='fuel'||t==='run') renderFuel();
@@ -6236,6 +6236,31 @@ const BOATSUB_TITLES = {stow:'적재표', maint:'정기점검', repair:'수리�
                         fuel:'연료 기록', docs:'문서 · 연락처'};
 let homeSub = (function(){ try{ return localStorage.getItem('bt_homesub') || 'today'; }catch(_){ return 'today'; } })();
 let boatSubTab = (function(){ try{ return localStorage.getItem('bt_boatsub') || 'stow'; }catch(_){ return 'stow'; } })();
+// 제목 자리에 그 탭의 하위 화면들을 그린다.
+// 제목에 '적재표', 그 아래 줄에 또 '적재표' 를 쓰면 줄만 잡아먹고 헷갈린다.
+// 지금 고른 하위 탭이 곧 제목이다.
+const SUBS = {
+  home:      { get: () => homeSub,    set: 'setHomeSub',    list: () => HOMESUB_TITLES },
+  boat:      { get: () => boatSubTab, set: 'setBoatSubTab', list: () => BOATSUB_TITLES },
+  community: { get: () => comSub,     set: 'setComSub',     list: () => COMSUB_TITLES }
+};
+function paintHNav(){
+  const N = document.getElementById('hNav');
+  if(!N) return;
+  const S = SUBS[curTab];
+  if(!S){
+    // 하위가 없는 탭(항해일지)은 이름만 적는다
+    N.innerHTML = `<h1 class="htit">${esc(TAB_TITLES[curTab] || '뱃일')}</h1>`;
+    return;
+  }
+  const cur = S.get(), L = S.list();
+  N.innerHTML = `<div class="hsubs">` + Object.keys(L).map(k =>
+      `<button class="hsub${k === cur ? ' on' : ''}" onclick="${S.set}('${k}')">${esc(L[k])}</button>`
+    ).join('') + `</div>`;
+  // 고른 것이 화면 밖에 있으면 밀어서 보여 준다
+  const on = N.querySelector('.hsub.on');
+  if(on && on.scrollIntoView) try{ on.scrollIntoView({ inline:'nearest', block:'nearest' }); }catch(_){}
+}
 function setHomeSub(k){
   homeSub = HOMESUB_TITLES[k] ? k : 'today';
   try{ localStorage.setItem('bt_homesub', homeSub); }catch(_){}
@@ -6280,10 +6305,6 @@ function switchTab(t){
   const paint = (pairs, cur)=> pairs.forEach(([id,k])=>{
     const el=document.getElementById(id); if(el) el.classList.toggle('on', k===cur); });
 
-  // ── 하위 줄
-  show('homeSubBar', t==='home');
-  show('boatSubBar', t==='boat');
-  show('comSubBar',  t==='community');
   show('mrSub', false);
 
   // ── 적재표는 배 탭 안에 있다
@@ -6315,29 +6336,23 @@ function switchTab(t){
 
   paint([['tabHome','home'],['tabBoat','boat'],['tabVoyage','voyage'],['tabCommunity','community']], t);
 
-  const H = document.getElementById('hTitle');
+  paintHNav();
+  measureHeader();
   if(t==='home'){
-    paint([['hsToday','today'],['hsWeather','weather'],['hsCheck','check']], homeSub);
-    H.textContent = HOMESUB_TITLES[homeSub] || '오늘';
     if(homeSub==='today') renderHome();
     else if(homeSub==='weather') renderWeather();
     else renderCheck();
   }
   else if(t==='boat'){
-    paint([['bsStow','stow'],['bsMaint','maint'],['bsRepair','repair'],
-           ['bsFuel','fuel'],['bsDocs','docs']], boatSubTab);
-    H.textContent = BOATSUB_TITLES[boatSubTab] || '배';
     if(boatSubTab==='maint' || boatSubTab==='repair'){ mrSub = boatSubTab; renderMR(); }
     else if(boatSubTab==='fuel') renderFuel();
     else if(boatSubTab==='docs') renderContacts();
   }
   else if(t==='community'){
-    paint([['csExplore','explore'],['csBiz','biz'],['csNews','news']], comSub);
-    H.textContent = COMSUB_TITLES[comSub] || '커뮤니티';
     if(comSub==='news') renderNews();
     else openExplore(comSub==='biz');
   }
-  else if(t==='voyage'){ H.textContent = '항해일지'; renderVoyage(); }
+  else if(t==='voyage') renderVoyage();
 }
 
 // ===== 오늘 =====
@@ -7301,19 +7316,14 @@ function showPanel(P){
   measureHeader();
   P.classList.add('open', 'full');
   const t = P.querySelector('.mrhead > b, .mrtop > b');
-  const h = document.getElementById('hTitle');
-  if(h && t) h.textContent = String(t.textContent || '').trim() || h.textContent;
+  if(t) setHeadTitle(String(t.textContent || '').trim());
   ['tabHome','tabBoat','tabVoyage','tabCommunity'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.classList.remove('on');
   });
 }
 // 화면을 닫으면 원래 탭으로 되돌린다
 function restorePanel(){
-  const h = document.getElementById('hTitle');
-  if(h) h.textContent = (curTab === 'home')  ? (HOMESUB_TITLES[homeSub] || '오늘')
-                      : (curTab === 'boat')  ? (BOATSUB_TITLES[boatSubTab] || '배')
-                      : (curTab === 'community') ? (COMSUB_TITLES[comSub] || '커뮤니티')
-                      : (TAB_TITLES[curTab] || '뱃일');
+  paintHNav();
   [['tabHome','home'],['tabBoat','boat'],['tabVoyage','voyage'],['tabCommunity','community']]
     .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.classList.toggle('on', curTab===k); });
 }

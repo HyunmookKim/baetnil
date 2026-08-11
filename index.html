@@ -357,7 +357,9 @@ body{padding-bottom:62px}
 #mrPanel.open{display:block}
 /* 화면을 덮되 위 머리줄은 남긴다.
    머리줄까지 덮으면 삼선 메뉴가 사라져서 다른 데로 갈 방법이 없어진다. */
-#mrPanel.full{top:var(--hdrH,56px);bottom:0;max-height:none;border-radius:0;border-top:none;
+/* 아래 탭줄은 덮지 않는다. 덮으면 다른 데로 갈 방법이 없어진다 (2.4 의 교훈).
+   머리줄의 삼선과 아래 탭줄, 두 갈래로 항상 나갈 수 있다. */
+#mrPanel.full{top:var(--hdrH,56px);bottom:62px;max-height:none;border-radius:0;border-top:none;
   padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 #mrPanel input,#mrPanel textarea,#mrPanel select{background:#0c1e30;border:1px solid #1e4060;border-radius:7px;color:#c8dff0;padding:7px 10px;font-size:13px;outline:none}
 .mrrow{display:flex;gap:8px;margin:7px 0;align-items:center;flex-wrap:wrap}
@@ -1474,14 +1476,14 @@ function openAccount(){
   const P = document.getElementById('mrPanel');
   if(me){
     P.innerHTML = `<div class="mrhead"><b>계정</b><span style="flex:1"></span>
-        <button class="tab" onclick="closeBoat()">닫기</button></div>
+        </div>
       <div class="mrrow"><span class="mrlbl">로그인</span><b class="mrv">${esc(me.email||me.name||'—')}</b></div>
       <div class="mrnone" style="text-align:left">이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.</div>
       <div class="mrrow" style="justify-content:flex-end">
         <button class="mrbtn warn" onclick="doSignOut()">로그아웃</button></div>`;
   } else {
     P.innerHTML = `<div class="mrhead"><b>로그인</b><span style="flex:1"></span>
-        <button class="tab" onclick="closeBoat()">닫기</button></div>
+        </div>
       <div class="mrnone" style="text-align:left">
         로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.<br>
         여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.</div>
@@ -1582,7 +1584,7 @@ function ensureBoat(){
 function openBoatSetup(){
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>배 등록</b><span style="flex:1"></span>${
-      boats.length ? `<button class="tab" onclick="closeBoat()">닫기</button>` : ''}</div>
+      boats.length ? `` : ''}</div>
     <div class="mrnone" style="text-align:left">이 앱은 배 한 척을 기준으로 기록을 관리합니다.<br>
       먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.</div>
     <div class="mrrow"><span class="mrlbl">이름</span>
@@ -1760,7 +1762,7 @@ function openFleet(){
   if(!boats.length){ openBoatSetup(); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>내 배</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+      </div>`
     + boats.map(b=>{
         const on = String(b.id) === String(currentBoatId);
         const del = unlocked && canDelBoat(b);
@@ -2201,7 +2203,7 @@ async function openExplore(biz){
   if(!window.__user){ alert('둘러보려면 로그인이 필요합니다'); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>배 둘러보기</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">닫기</button></div>
+      </div>
     <div class="subrow">
       <button class="tab${exploreBiz?'':' on'}" onclick="openExplore(false)">모아보기</button>
       <button class="tab${exploreBiz?' on':''}" onclick="openExplore(true)">영업</button>
@@ -2508,7 +2510,7 @@ function openBoard(){
   }).join('');
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>게시판</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+      </div>`
     + (rows || '<div class="mrnone">아직 글이 없습니다</div>')
     + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="writePost()">+ 글쓰기</button></div>` : '');
@@ -2690,7 +2692,7 @@ function openMyTasks(){
         : (t.grp || '')}</div></div></div>`;
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>내 할 일</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">닫기</button></div>`
+      </div>`
     + (mine.length ? mine.map(row).join('')
         : '<div class="mrnone">맡은 일이 없습니다</div>')
     + (seeAll && free.length
@@ -3223,7 +3225,7 @@ function openBoat(tab){
   const ro = v => `<b class="mrv">${esc(v||'—')}</b>`;
 
   const head = `<div class="mrhead"><b>내 배</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">닫기</button></div>
+      </div>
     <div class="subrow" style="display:flex">
       <button class="tab${boatTab==='info'?' on':''}" onclick="openBoat('info')">기본 정보</button>
       <button class="tab${boatTab==='spec'?' on':''}" onclick="openBoat('spec')">제원</button>
@@ -4163,7 +4165,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.7';
+const APP_VER = '2.8';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -5510,6 +5512,11 @@ function setMrSub(k){
 }
 const TAB_TITLES = {stow:'적재표', maint:'정기점검', repair:'수리목록', weather:'날씨 · 물때', voyage:'항해일지', fuel:'연료 기록', news:'뉴스', contacts:'연락처 · 문서', check:'체크리스트'};
 function switchTab(t){
+  // 열려 있던 화면(내 배·게시판·둘러보기 등)을 닫고 그 탭으로 간다.
+  // 패널에 '닫기' 버튼을 두지 않으므로 여기가 나가는 길이다.
+  if(typeof closeBoat === 'function') closeBoat();
+  // 배가 하나도 없으면 등록부터 해야 한다 — 빈 화면으로 빠지지 않게 되돌린다
+  if(Array.isArray(boats) && !boats.length){ openBoatSetup(); return; }
   curTab = t;
   document.getElementById('hTitle').textContent = TAB_TITLES[t]||'뱃일';
   const stow = t==='stow';
@@ -5839,7 +5846,7 @@ function openMR(t, id){
     ${pinBtns}
     <div class="mrrow edt" style="justify-content:flex-end">
       <button class="mrbtn warn" onclick="mrDelete()">삭제</button></div>`;
-  P.classList.add('open');
+  measureHeader(); P.classList.add('open', 'full');
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
   if(t === 'voyage'){
     const pts = trkPoints(it);
@@ -6370,8 +6377,12 @@ function openDrawer(){ document.getElementById('drawerOv').classList.add('open')
 // 권한이 없는 메뉴는 감춘다 — 눌러서 거절당하는 것보다 안 보이는 편이 낫다
 // 머리줄 높이를 재 둔다. 전체 화면이 그 아래에서 시작해야
 // 삼선 메뉴가 가려지지 않는다.
+// ★ header 전체가 아니라 머리줄 한 줄(.hrow)만 잰다.
+// header 안에는 적재표 도구줄(목록·가나다순·칸 그리기)과 검색창도 들어 있어서,
+// 전체 높이로 재면 '전체 화면' 이 그 아래에서 시작해 도구줄이 뒤에 그대로 남는다.
+// 사용자가 여러 번 지적한 '뒤에 다른 탭이 보인다' 가 이것이다.
 function measureHeader(){
-  const h = document.querySelector('header');
+  const h = document.querySelector('header .hrow') || document.querySelector('header');
   if(!h) return;
   document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px');
 }

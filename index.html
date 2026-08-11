@@ -76,6 +76,11 @@
 .bwrow.high b{color:#FF9A8A}
 .bwrow.mid b{color:#f0c98a}
 .bwrow.ok b{color:#7aefaa}
+.bwwhen{padding:8px 13px 0;color:#5d7488;font-size:11.5px}
+.mflt{font-size:12.5px;padding:6px 11px}
+.mflt.red{border-color:#7A3A30;color:#FF9A8A}
+.mflt.yel{border-color:#7a5a2a;color:#f0c98a}
+.mflt.on{background:#2a5a8a;color:#dff2ff;border-color:#4ad9ff}
 .introrow{padding:12px 14px;border-bottom:1px solid #12283e}
 .introbtns{display:flex;gap:6px;margin-top:8px}
 /* 배 목록에서 지금 보고 있는 배 */
@@ -3325,10 +3330,53 @@ const BOAT_SPEC = {
   waterTank:{ label:'청수 탱크',       unit:'L',  help:'식수·생활용수 탱크의 총 용량입니다. 며칠 나가는 항해를 준비할 때 참고가 됩니다.' },
   engine:   { label:'엔진',            unit:'',   help:'제조사와 모델을 적어 두면 부품을 찾을 때 편합니다.', text:true },
 };
+// 조류 세기(kt). 수집 자료에 있으면 쓰고, 없으면 판단하지 않는다.
+// 없는 값을 어림잡아 넣으면 잘못된 안심을 준다.
+function krCurrentKt(ts){
+  if(!ts || !krCache) return null;
+  const sp = (typeof nearestTideSpot === 'function') ? nearestTideSpot() : null;
+  const rows = (sp && sp.cur) ? sp.cur : (krCache.cur || null);
+  if(!Array.isArray(rows) || !rows.length) return null;
+  // { d:'2026-08-11', t:'13:00', v:2.4 } 형태를 찾는다
+  const d = new Date(ts);
+  const day = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0')
+            + '-' + String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0');
+  let best = null, bestGap = 1e9;
+  rows.forEach(r=>{
+    if(r.d && r.d !== day) return;
+    const rt = hm(r.t || '');
+    const gap = Math.abs(parseInt(rt,10) - parseInt(hh,10));
+    if(gap < bestGap){ bestGap = gap; best = r; }
+  });
+  return (best && bestGap <= 1 && isFinite(Number(best.v))) ? Number(best.v) : null;
+}
+// 고른 시각의 날씨 값을 뽑는다. 지금이 아니라 내가 나갈 시각으로 판단해야 한다.
+function wxAt(idx){
+  if(!wxData || idx < 0) return null;
+  const H = wxData.w.hourly, M = wxData.m;
+  return {
+    wind:   H.wind_speed_10m[idx],
+    gust:   H.wind_gusts_10m[idx],
+    wave:   (M && M.hourly && M.hourly.wave_height) ? M.hourly.wave_height[idx] : null,
+    period: (M && M.hourly && M.hourly.wave_period) ? M.hourly.wave_period[idx] : null,
+    vis:    (H.visibility ? H.visibility[idx]/1000 : null),
+    current: krCurrentKt(wxData._t0 ? wxData._t0 + idx*3600e3 : null)
+  };
+}
+// 선택 시각 기준으로 배 경고 카드를 다시 그린다
+function paintBoatWx(idx){
+  const el = document.getElementById('boatWx');
+  if(!el) return;
+  const now = wxAt(idx);
+  el.innerHTML = now ? boatWxCard(now, idx) : '';
+}
 // 배 기준 경고 카드. 기준을 하나도 안 넣었으면 넣으라고 한 번 알려 준다.
-function boatWxCard(now){
+function boatWxCard(now, idx){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   if(!b) return '';
+  const when = (wxData && wxData._t0 != null && idx != null)
+    ? `<div class="bwwhen">${fmtMD(wxData._t0 + idx*3600e3)} ${fmtHM(wxData._t0 + idx*3600e3)} 기준</div>` : '';
   const ws = wxWarnings(now);
   const rf = reefStage(now && now.wind);
   const anyLimit = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCurrent']
@@ -3340,16 +3388,16 @@ function boatWxCard(now){
   }
   const rows = ws.map(w=>`<div class="bwrow ${w.level}">
       <b>${esc(w.text)}</b>
-      <span>지금 ${w.value}${w.key==='maxWave'?'m':w.key==='maxPeriod'?'초':w.key==='minVis'?'km':'kt'}
+      <span>${w.value}${w.key==='maxWave'?'m':w.key==='maxPeriod'?'초':w.key==='minVis'?'km':'kt'}
         · 기준 ${w.limit}${w.key==='maxWave'?'m':w.key==='maxPeriod'?'초':w.key==='minVis'?'km':'kt'}</span>
     </div>`).join('');
   const reef = (rf === null) ? ''
     : `<div class="bwrow ${rf >= 2 ? 'mid' : 'ok'}">
         <b>${rf === 0 ? '리프 없이 갈 수 있는 바람입니다' : '메인세일 ' + rf + '단 리프'}</b>
-        <span>지금 ${Math.round(now.wind)}kt 기준</span></div>`;
-  if(!rows && !reef) return `<div class="bwcard ok"><div class="bwrow ok">
-      <b>정해 둔 기준 안에 있습니다</b><span>지금 바람 ${Math.round(now.wind||0)}kt</span></div></div>`;
-  return `<div class="bwcard${ws.some(w=>w.level==='high') ? ' bad' : ''}">${reef}${rows}</div>`;
+        <span>바람 ${Math.round(now.wind)}kt</span></div>`;
+  if(!rows && !reef) return `<div class="bwcard ok">${when}<div class="bwrow ok">
+      <b>정해 둔 기준 안에 있습니다</b><span>바람 ${Math.round(now.wind||0)}kt</span></div></div>`;
+  return `<div class="bwcard${ws.some(w=>w.level==='high') ? ' bad' : ''}">${when}${reef}${rows}</div>`;
 }
 // ===== 날씨 기준 판정 =====
 // 배마다 정해 둔 한계와 지금 날씨를 견준다.
@@ -3878,7 +3926,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.2';
+const APP_VER = '2.3';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -5241,6 +5289,29 @@ function renderMR(){
 }
 
 // ===== 정기점검 목록 =====
+// 정기점검 요약과 거르기.
+// 배에서 제일 먼저 봐야 할 것은 '지금 밀린 게 뭔가' 인데,
+// 그룹이 접혀 있으면 찾아 들어가야 해서 눈에 안 띈다.
+function maintCounts(){
+  let late=0, soon=0, none=0, seed=0;
+  maint.forEach(it=>{
+    const d = mStatus(it).days;
+    if(d === null) none++;
+    else if(d < 0) late++;
+    else if(d <= 30) soon++;
+    if(it.seed) seed++;
+  });
+  return { late, soon, none, seed, all: maint.length };
+}
+function maintFilter(mode){
+  if(mode === 'real') return maint.filter(it => !it.seed);
+  if(mode === 'late') return maint.filter(it => { const d = mStatus(it).days; return d !== null && d < 0; });
+  if(mode === 'soon') return maint.filter(it => { const d = mStatus(it).days; return d !== null && d >= 0 && d <= 30; });
+  if(mode === 'none') return maint.filter(it => mStatus(it).days === null);
+  return maint.slice();
+}
+let maintMode = 'all';
+function setMaintMode(m){ maintMode = m; renderMaintList(); }
 function renderMaintList(){
   const L = document.getElementById('maintList');
   normalizeMaint();
@@ -5255,9 +5326,20 @@ function renderMaintList(){
     return;
   }
   const fold = grpFold();
-  const order = allGrps().filter(g=>maint.some(it=>it.grp===g));
-  L.innerHTML = order.map(g=>{
-    const arr = maint.filter(it=>it.grp===g).sort((a,b)=>{
+  const cnt = maintCounts();
+  const view = maintFilter(maintMode);
+  const chip = (m, label, n, cls) =>
+    `<button class="tab mflt${maintMode===m?' on':''}${cls?' '+cls:''}" onclick="setMaintMode('${m}')">${label}${n!=null?' '+n:''}</button>`;
+  const bar = `<div class="subrow" style="flex-wrap:wrap">
+      ${chip('all','전체',cnt.all)}
+      ${cnt.late?chip('late','밀림',cnt.late,'red'):''}
+      ${cnt.soon?chip('soon','곧',cnt.soon,'yel'):''}
+      ${cnt.none?chip('none','미기록',cnt.none):''}
+      ${cnt.seed?chip('real','초안 빼고',cnt.all-cnt.seed):''}
+    </div>`;
+  const order = allGrps().filter(g=>view.some(it=>it.grp===g));
+  L.innerHTML = bar + (order.length ? '' : '<div class="mrnone">해당하는 항목이 없습니다</div>') + order.map(g=>{
+    const arr = view.filter(it=>it.grp===g).sort((a,b)=>{
       const da=mStatus(a).days, db=mStatus(b).days;
       if(da===null && db===null) return String(a.name).localeCompare(String(b.name),'ko');
       if(da===null) return 1; if(db===null) return -1;
@@ -5265,7 +5347,7 @@ function renderMaintList(){
     });
     const red = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d<0;}).length;
     const yel = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d>=0&&d<=30;}).length;
-    const closed = !!fold[g];
+    const closed = (maintMode === 'all') ? !!fold[g] : false;
     const head = `<div class="ghead" onclick="toggleGrp('${esc(g)}')">
       <span class="garr">${closed?'&#9656;':'&#9662;'}</span><b>${esc(g)}</b>
       <span class="gsum">${red?`<span class="gdot" style="background:#F05B52"></span>${red}`:''}${yel?` <span class="gdot" style="background:#E8B33C"></span>${yel}`:''}</span>
@@ -6133,8 +6215,8 @@ function legRow(label, placeKey, timeKey, wxKey, it){
     ? `<input value="${esc(String(it[placeKey]||''))}" placeholder="지명" style="flex:1;min-width:60px" onchange="mrField('${placeKey}',this.value)">`
     : `<b class="mrv" style="flex:1">${esc(it[placeKey]||'—')}</b>`;
   const time = unlocked
-    ? `<input type="time" value="${esc(String(it[timeKey]||''))}" style="width:110px" onchange="voyTime('${timeKey}','${wxKey}',this.value)">`
-    : `<b class="mrv">${esc(it[timeKey]||'—')}</b>`;
+    ? `<input type="time" value="${esc(hm(it[timeKey]||''))}" style="width:110px" onchange="voyTime('${timeKey}','${wxKey}',this.value)">`
+    : `<b class="mrv">${esc(it[timeKey] ? hm(it[timeKey]) : '—')}</b>`;
   return `<div class="mrrow"><span class="mrlbl">${label}</span>${place}${time}</div>`
        + wxLine(it[wxKey], it[timeKey] ? `wxCapture('${wxKey}')` : '')
        + posLine(it, wxKey);
@@ -6153,7 +6235,10 @@ function wxLine(w, refetch){
 // 시각을 고치면 그 시각 날씨를 다시 받는다
 function voyTime(timeKey, wxKey, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
-  it[timeKey] = v; it.seed = false;
+  it[timeKey] = hm(v); it.seed = false;
+  // 출발·도착 시각이 정해지면 항해 시간과 엔진 시간을 다시 잡는다
+  const sh = sailHours(it); if(sh !== null) it.hours = sh;
+  const eh = engineHoursFromLogs(it); if(eh !== null) it.engineH = eh;
   saveMR();
   if(v) wxCapture(wxKey);
   else { it[wxKey] = null; saveMR(); renderVoyage(); openMR('voyage', mrOpenId); }
@@ -6173,11 +6258,19 @@ function arriveNow(){
   renderVoyage(); openMR('voyage', it.id);
 }
 
+// 시각 문자열을 항상 HH:MM 으로 맞춘다.
+// 어디서 들어왔든 '13:1' 같은 모양이 화면에 나오면 안 된다.
+function hm(v){
+  const m = String(v||'').trim().match(/^(\d{1,2})\s*[:시]?\s*(\d{1,2})$/);
+  if(!m) return String(v||'');
+  const h = Math.min(23, +m[1]), mi = Math.min(59, +m[2]);
+  return String(h).padStart(2,'0') + ':' + String(mi).padStart(2,'0');
+}
 // ── 항해 시간 / 엔진 시간
 // 항해 시간은 출발부터 도착까지 전체다.
 // 엔진 시간은 그 안에 들어 있는 일부다 — 따로 세는 값이 아니다.
 function hhmmToH(v){
-  const m = String(v||'').match(/^(\d{1,2}):(\d{2})$/);
+  const m = hm(v).match(/^(\d{1,2}):(\d{2})$/);
   if(!m) return null;
   const h = +m[1], mi = +m[2];
   if(h > 23 || mi > 59) return null;
@@ -6245,7 +6338,8 @@ function logAdd(){
 function logField(lid, k, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
   const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
-  g[k] = v; it.seed = false;
+  g[k] = (k === 'time') ? hm(v) : v;
+  it.seed = false;
   // 세일을 올리고 내린 기록이 바뀌면 엔진 시간도 따라 바뀐다.
   // 사람이 두 번 계산하게 두면 반드시 어긋난다.
   if(k === 'kind' || k === 'time'){
@@ -6281,13 +6375,13 @@ function logRows(it){
   return head + arr.map(g=>{
     const row = unlocked
       ? `<div class="mrrow" style="gap:6px">
-           <input type="time" value="${esc(String(g.time||''))}" style="width:100px" onchange="logField('${g.id}','time',this.value)">
+           <input type="time" value="${esc(hm(g.time||''))}" style="width:100px" onchange="logField('${g.id}','time',this.value)">
            <select onchange="logField('${g.id}','kind',this.value)" style="width:88px">${
              logKinds().map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${x}</option>`).join('')}</select>
            <input value="${esc(String(g.text||''))}" placeholder="내용" style="flex:1;min-width:60px" onchange="logField('${g.id}','text',this.value)">
            <button class="mrbtn" onclick="logDel('${g.id}')">삭제</button>
          </div>`
-      : `<div class="mrrow"><span class="mrlbl">${esc(g.time||'—')}</span>
+      : `<div class="mrrow"><span class="mrlbl">${esc(g.time ? hm(g.time) : '—')}</span>
            <span class="chip">${esc(g.kind||'')}</span>
            <b class="mrv" style="flex:1">${esc(g.text||'')}</b></div>`;
     return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id);
@@ -7514,7 +7608,7 @@ function tideInput(){
     okText: '저장',
     fields: [
       { key:'txt', type:'multi', rows:6, label:'만조·간조 시각과 높이',
-        value: (cur.date===today() ? (cur.rows||[]).map(r=>r.time+','+r.cm).join('\n') : ''),
+        value: (cur.date===today() ? (cur.rows||[]).map(r=>hm(r.time)+','+r.cm).join('\n') : ''),
         placeholder: '04:08,88\n10:01,291\n15:59,56\n22:35,335' }
     ],
     onOk: v => {
@@ -7779,6 +7873,7 @@ function renderWxSel(){
   if(!bar || wxSel==null || !wxData) return;
   const H = wxData.w.hourly, times = H.time;
   const idx = times.findIndex(t => new Date(t+'+09:00').getTime() === wxSel);
+  paintBoatWx(idx);          // 고른 시각 기준으로 배 경고를 다시 그린다
   const TA = tideSource();
   const tide = TA ? tideAt(wxSel, TA.pts) : null;
   const cur = hatCurrent(), ad = airDraft(), mg = clearanceMargin();
@@ -7980,15 +8075,8 @@ async function renderWeather(){
           :(TA.manual?`<div class="mrm">직접 입력한 만조·간조 사용 중 <button class="mrbtn edt" onclick="tideInput()">수정</button></div>`:'')}
       </div>`;
 
-    // 배마다 정해 둔 한계와 지금 날씨를 견준다
-    const _now = {
-      wind:   H.wind_speed_10m[nowIdx],
-      gust:   H.wind_gusts_10m[nowIdx],
-      wave:   (M && M.hourly && M.hourly.wave_height) ? M.hourly.wave_height[nowIdx] : null,
-      period: (M && M.hourly && M.hourly.wave_period) ? M.hourly.wave_period[nowIdx] : null,
-      vis:    (H.visibility ? H.visibility[nowIdx]/1000 : null)
-    };
-    L.innerHTML = head + wxAlertBox() + boatWxCard(_now)
+    L.innerHTML = head + wxAlertBox()
+      + `<div id="boatWx"></div>`
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline
       + bridgeCard

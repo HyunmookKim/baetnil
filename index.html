@@ -4041,7 +4041,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.4';
+const APP_VER = '2.5';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -8322,7 +8322,14 @@ document.addEventListener('visibilitychange', ()=>{
     });
     // 배 밑에 데이터를 둔다 — /boats/{배id}/items/{id}
     // 배가 여럿이 되거나 남과 함께 관리할 때 서로 섞이지 않게 하는 것이 목적이다.
-    const boatPath = () => 'boats/' + String(window.currentBoatId || 'default');
+    // 배가 정해지지 않았으면 클라우드에 손대지 않는다.
+    // 예전에는 'boats/default' 로 썼는데, 그 배에는 구성원이 없어서
+    // 규칙이 전부 거부했고 원인도 알기 어려웠다.
+    const boatPath = () => {
+      const id = window.currentBoatId;
+      if(!id) throw new Error('배가 아직 정해지지 않았습니다 (배를 먼저 등록하거나 골라 주세요)');
+      return 'boats/' + String(id);
+    };
     const col = name => collection(fdb, boatPath(), name);
     const dc  = (name, id) => doc(fdb, boatPath(), name, String(id));
     const api = {

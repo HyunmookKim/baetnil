@@ -157,6 +157,14 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .fphotox{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
   border:0;background:#a33;color:#fff;font-size:12px;line-height:1;cursor:pointer}
 .fhint{font-size:12px;opacity:.7;margin-top:6px}
+.fphotn{position:absolute;left:-4px;bottom:-4px;min-width:18px;height:18px;border-radius:9px;
+  background:#1e4060;color:#c8dff0;font-size:11px;line-height:18px;text-align:center;padding:0 4px}
+/* 옛 앱 파일 경고 띠 */
+#verbar{position:fixed;left:0;right:0;top:0;z-index:900;background:#8a3a1a;color:#ffe9dc;
+  font-size:13px;padding:9px 12px;display:flex;gap:10px;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px #0008}
+#verbar button{background:#ffe9dc;color:#8a3a1a;border:0;border-radius:7px;
+  padding:6px 12px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex:none}
 /* 다시 계산하면 덮어써지는 제원 칸 */
 .mrrow.wxauto input{border-color:#b8862f !important;background:#2a1f0a !important;color:#f0d79a !important}
 .mrrow.wxauto .mrlbl{color:#d8b878}
@@ -1100,6 +1108,58 @@ const PHOTO_MAX_PX = 1280;
 const PHOTO_MAX_KB = 180;     // 한 장
 const PHOTO_BUDGET_KB = 700;  // 한 글·한 소개 페이지에 들어가는 사진 전부 (문서 1MB 한계 대비 여유)
 
+// 글 안에서 사진이 있던 자리를 나타내는 표시.
+// 글은 글대로, 사진은 뒤에 몰아 붙이면 원래 글의 짜임새가 무너진다.
+// 사람이 눈으로 보고 옮기거나 지울 수 있게 글자로 남긴다.
+const PHOTO_MARK = /\[사진(\d+)\]/g;
+
+// 조각들을 '표시가 박힌 글' 로 만든다 (입력 칸에 보여줄 것)
+function partsToText(parts){
+  let n = 0;
+  return (parts||[]).map(x => x.t === 'photo' ? '[사진' + (++n) + ']' : x.v)
+    .filter(v => String(v||'').trim() !== '')
+    .join('\n\n');
+}
+
+// 표시가 박힌 글 + 사진 목록 → 순서대로 엮은 블록
+// 표시가 없으면 글 뒤에 사진을 붙인다. 표시만 있고 사진이 없으면 표시를 지운다.
+function blocksFromText(text, photos){
+  const ph = Array.isArray(photos) ? photos : [];
+  const used = new Set();
+  const out = [];
+  const pushText = v => {
+    const t = String(v||'').replace(/\n{3,}/g, '\n\n').trim();
+    if(!t) return;
+    // 사진 없는 표시를 지우고 나면 앞뒤 글이 갈라진다. 다시 한 덩이로 붙인다.
+    const last = out[out.length-1];
+    if(last && last.t === 'text'){ last.v += ' ' + t; return; }
+    out.push({ t:'text', v:t });
+  };
+  let at = 0, m;
+  const re = new RegExp(PHOTO_MARK.source, 'g');
+  const src = String(text||'');
+  while((m = re.exec(src))){
+    pushText(src.slice(at, m.index));
+    const i = parseInt(m[1], 10) - 1;
+    if(i >= 0 && i < ph.length && !used.has(i)){
+      used.add(i);
+      out.push({ t:'photo', v: ph[i] });
+    }
+    at = m.index + m[0].length;
+  }
+  pushText(src.slice(at));
+  // 표시가 없던 사진은 뒤에 붙인다 — 사라지면 안 된다
+  ph.forEach((u,i)=>{ if(!used.has(i)) out.push({ t:'photo', v:u }); });
+  return out;
+}
+
+// 블록을 화면에 그린다 (글·사진이 섞인 순서 그대로)
+function renderBlocks(blocks, tag){
+  return (blocks||[]).map((x,i)=> x.t === 'photo'
+    ? `<img class="postimg" src="${esc(x.v)}"${tag ? ` onclick="pvOpen(${tag},${i})"` : ''}>`
+    : `<div class="postbody">${esc(x.v||'').replace(/\n/g,'<br>')}</div>`).join('');
+}
+
 // 붙여넣은 내용을 글·사진 조각으로 순서대로 나눈다.
 // 인터넷 주소(http) 사진은 가져오지 않는다 — 나중에 안 보이는 사진이 되고,
 // 남의 서버를 계속 부르게 된다.
@@ -1222,7 +1282,8 @@ function openForm(o){
       return `<div class="frow"><label>${esc(f.label||'사진')}</label>`
         + `<div id="formPhotos"></div>`
         + `<div class="fchips"><button class="fchip" onclick="formPhotoPick()">+ 사진 넣기</button></div>`
-        + `<div class="fhint">글을 사진째 복사해 내용 칸에 붙여넣으면 사진도 함께 들어갑니다.</div></div>`;
+        + `<div class="fhint">글을 사진째 복사해 내용 칸에 붙여넣으면 사진도 함께 들어갑니다.<br>`
+        + `내용 속의 <b>[사진1]</b> 표시 자리에 그 번호의 사진이 들어갑니다 — 옮기거나 지우셔도 됩니다.</div></div>`;
     }
     if(f.type === 'multi'){
       // 붙여넣기를 받아 사진을 뽑아낸다
@@ -1255,6 +1316,7 @@ function renderFormPhotos(){
   box.innerHTML = formPhotoList.length
     ? formPhotoList.map((p,i)=>
         `<span class="fphoto"><img src="${esc(p)}">`
+        + `<b class="fphotn">${i+1}</b>`
         + `<button class="fphotox" onclick="formPhotoDel(${i})">✕</button></span>`).join('')
     : `<div class="fhint">아직 사진이 없습니다</div>`;
 }
@@ -1295,12 +1357,18 @@ function onFormPaste(e, i){
   const photos = parts.filter(x => x.t === 'photo').map(x => x.v);
   if(!photos.length && !files.length) return;   // 글자만이면 브라우저 기본 동작에 맡긴다
   e.preventDefault();
-  const text = parts.filter(x => x.t === 'text').map(x => x.v).join('\n\n');
+  // 사진이 있던 자리에 [사진N] 표시를 남긴다. 그 자리에 사진이 들어간다.
+  // 이미 붙어 있던 사진이 있으면 번호를 이어서 매긴다.
+  const base = formPhotoList.length;
+  let cnt = base;
+  const text = (parts||[]).map(x => x.t === 'photo' ? '[사진' + (++cnt) + ']' : x.v)
+    .filter(v => String(v||'').trim() !== '').join('\n\n');
   const el = document.getElementById('ff' + i);
   if(el && text){
     const a = el.selectionStart, b = el.selectionEnd;
-    el.value = el.value.slice(0, a) + text + el.value.slice(b);
-    el.selectionStart = el.selectionEnd = a + text.length;
+    const pad = (a > 0 && el.value[a-1] !== '\n') ? '\n' : '';
+    el.value = el.value.slice(0, a) + pad + text + el.value.slice(b);
+    el.selectionStart = el.selectionEnd = a + pad.length + text.length;
   }
   const box = document.getElementById('formPhotos');
   if(box) box.innerHTML = '<div class="fhint">사진을 넣는 중…</div>';
@@ -2256,10 +2324,17 @@ function buildPublic(b){
   if(pubOn(b,'board')){
     o.posts = (typeof posts!=='undefined' ? posts : [])
       .filter(p => p && p.pub === true)
-      .map(p => ({ id:p.id, kind:p.kind, title:p.title, body:p.body,
-                   photos: (typeof photoBudget==='function'
-                             ? photoBudget(p.photos||[], 500).kept : []),
-                   byName:p.byName || '', ts:p.ts || '' }));
+      .map(p => {
+        const kept = (typeof photoBudget==='function')
+          ? photoBudget(p.photos||[], 500).kept : [];
+        const okSet = new Set(kept);
+        return { id:p.id, kind:p.kind, title:p.title, body:p.body,
+                 photos: kept,
+                 // 글·사진이 섞인 순서를 그대로 가져간다 (용량을 넘긴 사진만 뺀다)
+                 blocks: (Array.isArray(p.blocks) ? p.blocks : [])
+                           .filter(x => x.t !== 'photo' || okSet.has(x.v)),
+                 byName:p.byName || '', ts:p.ts || '' };
+      });
   }
   // 항해일지 — 좌표와 정박지는 뺀다. 빈 배가 어디 있는지 알려주는 셈이 된다.
   if(pubOn(b,'voyage')){
@@ -2592,9 +2667,9 @@ function addIntro(kind){
           + `소개 페이지에 들어가는 사진 용량을 넘었습니다.\n`
           + `기존 사진을 지우거나 장수를 줄여 주세요.`);
       }
+      // 글 속 [사진N] 표시 자리에 그 사진이 들어간다 — 섞인 순서 그대로
       const add = r.kept.slice(already.length);
-      if(v.v) b.intro.push({ t:'text', v:v.v });
-      add.forEach(u => b.intro.push({ t:'photo', v:u }));
+      blocksFromText(String(v.v||''), add).forEach(x => b.intro.push(x));
       saveIntro(b);
     }
   });
@@ -2648,12 +2723,21 @@ function addPost(title, body, kind, photos){
   }
   const p = { id:newId(), kind:k, title:t, body:String(body||''),
               by: meUid() || '', byName: meName(),
-              ts: new Date().toISOString(), photos: photos || [], comments: [] };
+              ts: new Date().toISOString(), photos: photos || [],
+              blocks: blocksFromText(String(body||''), photos || []), comments: [] };
   posts.push(p);
   save();
   return p;
 }
 function postOf(id){ return posts.find(x => String(x.id) === String(id)) || null; }
+// 크게 보기용 — 블록에서 사진만 뽑는다 (섞인 순서 그대로)
+function postPhotos(id){
+  const p = postOf(id);
+  if(!p) return [];
+  if(Array.isArray(p.blocks) && p.blocks.length)
+    return p.blocks.filter(x=>x.t==='photo').map(x=>x.v);
+  return p.photos || [];
+}
 function editPost(id, patch){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const p = postOf(id);
@@ -2764,11 +2848,14 @@ function writePost(id){
       if(p){
         if(!editPost(p.id, v)) return false;
         p.photos = Array.isArray(v.photos) ? v.photos : [];
+        p.blocks = blocksFromText(String(v.body||''), p.photos);
         p.pub = wantPub; save();
         pushPublic(curBoat());
         openPost(p.id);
       } else {
-        const np = addPost(v.title, v.body, v.kind);
+        // ★ 사진을 넘겨야 한다. 2.14 까지 새 글에서만 이걸 빠뜨려
+        //   붙여넣은 사진이 통째로 사라졌다 (고칠 때는 들어갔다).
+        const np = addPost(v.title, v.body, v.kind, Array.isArray(v.photos) ? v.photos : []);
         if(!np) return false;
         np.pub = wantPub; save();
         pushPublic(curBoat());
@@ -2798,9 +2885,11 @@ function openPost(id){
       ${p.pub?'<span class="chip">공개</span>':''}
       ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
       ${canEditPost(b,p)?`<button class="minib blu" style="margin-left:auto" onclick="writePost('${esc(p.id)}')">고치기</button>`:''}</div>
-    <div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>
-    ${(p.photos||[]).map((u,i)=>
-       `<img class="postimg" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
+    ${(Array.isArray(p.blocks) && p.blocks.length)
+      ? renderBlocks(p.blocks, `postPhotos('${esc(p.id)}')`)
+      : `<div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>`
+        + (p.photos||[]).map((u,i)=>
+            `<img class="postimg" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
     <div class="ghead"><b>댓글</b><span class="gcnt">${(p.comments||[]).length}</span></div>
     ${cs}
     ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
@@ -4481,7 +4570,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.13';
+const APP_VER = '2.15';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -6780,6 +6869,20 @@ function paintMenuPerms(){
   set('dBoard', !!b && can(b,'board','view'));
   set('dTasks', !!b && can(b,'task','view'));
 }
+// 저장된 파일이 지금 앱과 어긋나면 화면 맨 위에 띠를 띄운다.
+// 서랍을 열어봐야만 알 수 있으면 아무도 모른다 —
+// 실제로 2.11 이 돌고 있는 줄 모르고 여러 판을 헛되이 보냈다.
+function verBanner(got){
+  let d = document.getElementById('verbar');
+  if(got === APP_VER || !got){ if(d) d.remove(); return; }
+  if(!d){
+    d = document.createElement('div');
+    d.id = 'verbar';
+    document.body.appendChild(d);
+  }
+  d.innerHTML = `옛 앱 파일이 남아 있습니다 — 지금 ${esc(got)} 가 돌고 있습니다 (새 파일 ${APP_VER})`
+    + `<button onclick="forceReload()">지금 새로 받기</button>`;
+}
 function paintVer(){
   const el = document.getElementById('dVer');
   if(!el) return;
@@ -6793,6 +6896,7 @@ function paintVer(){
       ? '뱃일 ' + APP_VER
       : '뱃일 ' + APP_VER + ' · 저장된 파일 ' + got + ' (새로고침 필요)';
     el.classList.toggle('warn', got !== APP_VER);
+    verBanner(got);
   }).catch(()=>{});
 }
 // 저장된 옛 파일 때문에 고친 것이 안 보이는 일이 있다.
@@ -8814,6 +8918,7 @@ window.addEventListener('unhandledrejection', e=>showErr((e.reason&&e.reason.mes
 wxInit();
 applyLock();
 initStorage().then(()=>{ ensureBoat(); applyAccount(); storageReadyResolve(); });
+setTimeout(paintVer, 1500);      // 옛 파일이 물려 있는지 켜자마자 확인한다
 setTimeout(checkNewsBadge, 2500);
 setInterval(checkNewsBadge, 30*60*1000);
 document.addEventListener('visibilitychange', ()=>{

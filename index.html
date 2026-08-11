@@ -393,7 +393,13 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .tab.on{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 #lockBtn.unlocked{background:#12241B;border-color:var(--grn);color:#6FD9A0}
 .iconb{padding:8px 10px;display:flex;align-items:center}
-#stowTools,#mrSub,.subrow{display:flex;gap:8px;padding:10px 16px 0}
+/* 버튼이 많아 좁은 화면에서 줄바꿈되면 글자가 세로로 쪼개진다.
+   줄을 바꾸지 않고 옆으로 밀리게 한다. */
+#stowTools,#mrSub,.subrow{display:flex;gap:8px;padding:10px 16px 0;
+  flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#stowTools::-webkit-scrollbar,#mrSub::-webkit-scrollbar,.subrow::-webkit-scrollbar{display:none}
+#stowTools button,#stowTools span,#mrSub button,.subrow button{flex:none}
 #searchWrap input{background:var(--sf);border:1px solid var(--bd);border-radius:13px;color:var(--tx)}
 #panel,#mrPanel{background:#15171B;border-top:1px solid var(--bd);border-radius:18px 18px 0 0}
 #panel input,#panel select,#panel textarea,#mrPanel input,#mrPanel select,#mrPanel textarea{background:var(--sf);border:1px solid var(--bd);border-radius:10px;color:var(--tx)}
@@ -610,8 +616,8 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
         <button class="tab lkt st" id="st_warn" onclick="setShStyle('warn')">주의</button>
         <button class="tab lkt st" id="st_note" onclick="setShStyle('note')">표시</button>
       </span>
-      <button class="tab lkt lock" id="lkLockBtn" onclick="toggleLkLock()">칸 🔓</button>
-      <button class="tab lkt lock" id="dgLockBtn" onclick="toggleDgLock()">도면 🔓</button>
+      <button class="tab lkt lock" id="lkLockBtn" onclick="toggleLkLock()">수납칸 🔓</button>
+      <button class="tab lkt lock" id="dgLockBtn" onclick="toggleDgLock()">도형 🔓</button>
     </span>
   </div>
   <div id="searchWrap">
@@ -4353,7 +4359,7 @@ function shCanEdit(){
     return false;
   }
   if(dgLocked){
-    if(confirm('도면이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)')) setDgLock(false);
+    if(confirm('도면 도형이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)')) setDgLock(false);
     return false;
   }
   return true;
@@ -4395,7 +4401,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.10';
+const APP_VER = '2.11';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -4406,6 +4412,29 @@ const LK_SHAPES = [
 function lkShapeOf(l){
   const v = l && l.shape;
   return LK_SHAPES.some(x => x.id === v) ? v : 'rect';
+}
+// 가운데를 그대로 두고 제자리에서 키우거나 줄인다.
+// 배 위에서 손가락으로 모서리를 끄는 건 어렵다 — 눌러서 바꿀 수 있게 한다.
+function lkScale(id, f){
+  if(!lkCanEdit()) return false;
+  const k = Number(f);
+  if(!(k > 0) || k === 1) return false;
+  const l = lockers.find(x => String(x.id) === String(id));
+  if(!l) return false;
+  const r = v => Math.round(v*10)/10;
+  const cx = l.x + l.w/2, cy = l.y + l.h/2;
+  let w = r(Math.max(1.5, Math.min(100, l.w * k)));
+  let h = r(Math.max(1.5, Math.min(100, l.h * k)));
+  let x = r(Math.max(0, Math.min(100 - w, cx - w/2)));
+  let y = r(Math.max(0, Math.min(100 - h, cy - h/2)));
+  if(w === l.w && h === l.h) return false;
+  if(typeof lkOverlapOk === 'function' && !lkOverlapOk({x,y,w,h}, id)) return false;
+  undoPush();
+  l.x = x; l.y = y; l.w = w; l.h = h;
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  return true;
 }
 function lkSetShape(id, shape){
   if(!lkCanEdit()) return false;
@@ -4521,7 +4550,7 @@ function undoRun(){
   if(!undoStack.length) return false;
   // 잠근 것을 되돌리기로 우회할 수 없게 한다
   if(lkLocked && dgLocked){
-    if(confirm('수납칸과 도면이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
+    if(confirm('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
     return false;
   }
   redoStack.push(undoSnap());
@@ -4531,7 +4560,7 @@ function undoRun(){
 function redoRun(){
   if(!redoStack.length) return false;
   if(lkLocked && dgLocked){
-    if(confirm('수납칸과 도면이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
+    if(confirm('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
     return false;
   }
   undoStack.push(undoSnap());
@@ -4766,14 +4795,20 @@ function lkMenu(id){
       { key:'label', label:'칸 이름', value:l.label, placeholder:'예: 싱크대 아래' },
       { key:'zone',  label:'구역',   value:l.zone,  placeholder:'예: 갤리', chips: zones },
       { key:'shape', label:'모양', type:'pick', value: lkShapeOf(l),
-        options: LK_SHAPES.map(x => ({ v:x.id, name:x.name, sub:x.sub })) }
+        options: LK_SHAPES.map(x => ({ v:x.id, name:x.name, sub:x.sub })) },
+      { key:'size', label:'크기', type:'pick', value:'1',
+        options:[ { v:'0.8', name:'작게',   sub:'20% 줄임' },
+                  { v:'1',   name:'그대로', sub:'지금 크기' },
+                  { v:'1.2', name:'크게',   sub:'20% 키움' } ] }
     ],
-    del: { text:'칸 지우기', run: ()=>lkDelete(id) },
+    del: { text:'수납칸 지우기', run: ()=>lkDelete(id) },
     onOk: v => {
       if(!v.label || !v.zone){ alert('칸 이름과 구역을 모두 넣어 주세요'); return false; }
       lkRename(id, v.label);
       lkRezone(id, v.zone);
       if(v.shape) lkSetShape(id, v.shape);
+      if(v.size && v.size !== '1' && !lkScale(id, parseFloat(v.size)))
+        alert('크기를 바꾸지 못했습니다.\n\n옆 칸과 겹치거나 도면 밖으로 나갑니다.');
     }
   });
 }
@@ -4826,9 +4861,9 @@ function paintShStyles(){
 // 자물쇠 버튼 표시 갱신
 function paintLockBtns(){
   const a = document.getElementById('lkLockBtn');
-  if(a){ a.textContent = '칸 ' + (lkLocked ? '🔒' : '🔓'); a.classList.toggle('on', lkLocked); }
+  if(a){ a.textContent = '수납칸 ' + (lkLocked ? '🔒' : '🔓'); a.classList.toggle('on', lkLocked); }
   const b = document.getElementById('dgLockBtn');
-  if(b){ b.textContent = '도면 ' + (dgLocked ? '🔒' : '🔓'); b.classList.toggle('on', dgLocked); }
+  if(b){ b.textContent = '도형 ' + (dgLocked ? '🔒' : '🔓'); b.classList.toggle('on', dgLocked); }
   // 잠긴 쪽 도구는 고를 수 없게 한다
   ['line','rect','tri'].forEach(x=>{
     const t = document.getElementById('lkt_'+x);
@@ -4864,7 +4899,7 @@ function setLkTool(t){
   });
   const h = document.getElementById('hint');
   if(h && lkEdit){
-    if(lkLocked && dgLocked) h.innerHTML = '수납칸과 도면이 모두 잠겨 있습니다 · 자물쇠를 눌러 여세요';
+    if(lkLocked && dgLocked) h.innerHTML = '수납칸과 도형이 모두 잠겨 있습니다 · 자물쇠를 눌러 여세요';
     else if(t==='locker') h.innerHTML = '빈 곳을 끌면 새 수납칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 톡 누르면 이름·지우기';
     else h.innerHTML = '빈 곳을 끌면 새 도형 · 도형을 끌면 이동 · 오른쪽 아래 모서리는 크기 · 톡 누르면 지우기';
   }
@@ -4881,7 +4916,10 @@ function toggleLkEdit(){
   if(lkEdit){ setLkTool(lkTool); paintUndoBtns(); }
   else undoClear();   // 편집을 끝내면 되돌리기 기록도 비운다
   const h = document.getElementById('hint');
-  if(h) h.innerHTML = lkEdit ? '빈 곳을 끌면 새 칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 칸을 톡 누르면 이름·지우기' : lkHintOrig;
+  if(h) h.innerHTML = lkEdit
+    ? '빈 곳을 끌면 <b>새 수납칸</b> · 수납칸을 끌면 <b>이동</b> · 파란 모서리는 <b>크기</b><br>'
+      + '<b>수납칸을 톡 누르면</b> 이름 · 구역 · <b>모양(네모·동그라미·세모)</b> · 크기 · 지우기'
+    : lkHintOrig;
   if(!lkEdit && lkDrag){ lkDrag = null; const g=document.getElementById('lkGhost'); if(g) g.remove(); }
 }
 function lkPct(e){

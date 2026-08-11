@@ -157,6 +157,11 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .fphotox{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
   border:0;background:#a33;color:#fff;font-size:12px;line-height:1;cursor:pointer}
 .fhint{font-size:12px;opacity:.7;margin-top:6px}
+/* 다시 계산하면 덮어써지는 제원 칸 */
+.mrrow.wxauto input{border-color:#b8862f !important;background:#2a1f0a !important;color:#f0d79a !important}
+.mrrow.wxauto .mrlbl{color:#d8b878}
+.wxdot{display:inline-block;width:10px;height:10px;border-radius:3px;
+  border:1px solid #b8862f;background:#2a1f0a;vertical-align:-1px;margin-right:4px}
 .postimg{display:block;width:100%;border-radius:10px;margin:10px 0;cursor:zoom-in}
 #formPhotos{display:flex;flex-wrap:wrap}
 .box{position:absolute;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .12s}
@@ -365,6 +370,9 @@ body{padding-bottom:62px}
 #pinBanner{display:none;background:#3a2a08;border:1px solid #b58a3a;color:#e8c87a;font-size:12px;padding:8px 12px;text-align:center;border-radius:8px;margin:0 0 8px}
 #mrPanel{position:fixed;left:0;right:0;bottom:62px;max-height:66vh;overflow:auto;background:#081828;border-top:2px solid #2a5a8a;border-radius:14px 14px 0 0;display:none;z-index:55;padding:14px 16px;box-shadow:0 -8px 30px #000b}
 #mrPanel.open{display:block}
+/* 전체 화면일 때 화면 안 제목은 감춘다. 머리줄에 같은 이름이 이미 떠 있다. */
+#mrPanel.full .mrhead > b, #mrPanel.full .mrtop > b{display:none}
+#mrPanel.full .mrhead:empty, #mrPanel.full .mrtop:empty{display:none}
 /* 화면을 덮되 위 머리줄은 남긴다.
    머리줄까지 덮으면 삼선 메뉴가 사라져서 다른 데로 갈 방법이 없어진다. */
 /* 아래 탭줄은 덮지 않는다. 덮으면 다른 데로 갈 방법이 없어진다 (2.4 의 교훈).
@@ -1683,7 +1691,7 @@ function openAccount(){
         <button class="mrbtn" style="flex:1" onclick="doEmail(true)">회원가입</button></div>
       <div id="acMsg" class="mrnone" style="text-align:left;display:none"></div>`;
   }
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function acMsg(t){
   const el = document.getElementById('acMsg');
@@ -1790,7 +1798,7 @@ function openBoatSetup(){
       지금 몰라도 되고, 나중에 채워도 됩니다.</div>
     <div class="mrrow" style="justify-content:flex-end">
       <button class="mrbtn" onclick="createBoat()">등록</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
   setTimeout(()=>{ const el=document.getElementById('nbName'); if(el) el.focus(); }, 100);
   // 지도를 켜고 현재 위치를 기본값으로 잡는다 — 대부분 지금 있는 곳이 홈포트다
   requestAnimationFrame(()=>{
@@ -1967,7 +1975,7 @@ function openFleet(){
     + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
         <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button>
         <button class="mrbtn big" onclick="joinBoat()">참여 신청</button></div>` : '');
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 // 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
 async function openBoatInfo(id){
@@ -2364,7 +2372,7 @@ async function openHidden(){
       <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>`
     + (ids.length ? '<div class="mrnone">불러오는 중…</div>'
                   : '<div class="mrnone">숨긴 배가 없습니다</div>');
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
   if(!ids.length || !window.__pub) return;
   const rows = [];
   for(const id of ids){
@@ -2395,7 +2403,7 @@ async function openExplore(biz){
       <button class="tab${exploreBiz?'':' on'}" onclick="openExplore(false)">모아보기</button>
       <button class="tab${exploreBiz?' on':''}" onclick="openExplore(true)">영업</button>
     </div><div class="mrnone">불러오는 중…</div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
   let list;
   try{ list = await window.__pub.list(exploreBiz); }
   catch(e){ P.innerHTML += `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
@@ -2455,7 +2463,7 @@ async function openBoatPage(id){
          border-top:1px solid #12283e;margin-top:12px">
         <button class="minib" onclick="reportBoat('${esc(x.id)}')">신고</button>
         <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 // 공개 설정 화면
 function openPublish(){
@@ -2477,7 +2485,7 @@ function openPublish(){
     + rows
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="openIntro()">소개 페이지 쓰기</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function setPubUI(key, on){
   const b = curBoat(); if(!b) return;
@@ -2529,7 +2537,7 @@ function openIntro(){
         <button class="mrbtn" onclick="addIntro('text')">+ 글</button>
         <button class="mrbtn" onclick="addIntro('photo')">+ 사진</button>
         <button class="mrbtn" onclick="addIntro('video')">+ 유튜브</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function saveIntro(b){
   saveLocal();
@@ -2720,7 +2728,7 @@ function openBoard(){
     + (rows || '<div class="mrnone">아직 글이 없습니다</div>')
     + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="writePost()">+ 글쓰기</button></div>` : '');
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function writePost(id){
   const b = curBoat(); if(!b) return;
@@ -2792,7 +2800,7 @@ function openPost(id){
     ${cs}
     ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
       <button class="mrbtn big" style="width:100%" onclick="writeComment('${esc(p.id)}')">댓글 쓰기</button></div>`:''}`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function writeComment(pid){
   openForm({
@@ -2908,7 +2916,7 @@ function openMyTasks(){
     + (seeAll && free.length
         ? `<div class="ghead"><b>아무도 안 맡은 일</b><span class="gcnt">${free.length}</span></div>`
           + free.map(row).join('') : '');
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 // ===== 회원 명부 =====
 // 사람마다 회비·오는 주기·부재·메모를 적어 둔다.
@@ -3090,7 +3098,7 @@ function openRoster(){
                         : `${esc(a.name)} · ${esc(a.until)}까지 부재${a.note?' ('+esc(a.note)+')':''}`
       ).join('<br>')}</div>` : '')
     + rows;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 // 한 사람의 명부 기록 고치기
 function editRoster(uid){
@@ -3177,7 +3185,7 @@ function openRanks(){
     + list
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="addRankUI()">+ 등급 만들기</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function addRankUI(){
   const b = curBoat(); if(!b) return;
@@ -3216,7 +3224,7 @@ function editRankUI(id){
     + rows
     + (r.owner ? '' : `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn" onclick="delRankUI('${esc(id)}')">이 등급 지우기</button></div>`);
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function renameRankUI(id, v){
   const b = curBoat(); if(!b) return;
@@ -3339,7 +3347,7 @@ async function openJoinReqs(){
           <button class="minib blu" onclick="approveJoin('${esc(v.id)}','${esc(v.uid)}','${esc(v.name||'')}')">받기</button>
           <button class="minib red" onclick="rejectJoin('${esc(v.id)}')">거절</button>
         </div></div>`).join('');
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 function approveJoin(inviteId, uid, name){
   const b = curBoat(); if(!b || !can(b,'members','write')) return;
@@ -3488,15 +3496,21 @@ function openBoat(tab){
     const rows = Object.entries(BOAT_SPEC).filter(([k,d]) => !d.only || d.only === bt).map(([k,d])=>{
       const cur = (b.spec && b.spec[k] != null) ? b.spec[k] : '';
       const ph = d.def != null ? String(d.def) : '';
-      return `<div class="mrrow"><span class="mrlbl">${d.label}${helpBtn('spec_'+k)}</span>${unlocked
+      // 다시 계산하면 덮어써지는 칸은 색을 달리해 미리 알려 준다
+      const auto = WX_AUTO_KEYS.includes(k) ? ' wxauto' : '';
+      return `<div class="mrrow${auto}"><span class="mrlbl">${d.label}${helpBtn('spec_'+k)}</span>${unlocked
         ? (d.text
-            ? `<input value="${esc(String(cur))}" style="flex:1" placeholder="예: Yanmar 4JH4E" onchange="setBoatSpecUI('${k}',this.value)">`
-            : `<input type="number" step="0.01" min="0" value="${esc(String(cur))}" style="width:110px" placeholder="${ph}" onchange="setBoatSpecUI('${k}',this.value)"> ${d.unit}`)
+            ? `<input id="sp_${k}" value="${esc(String(cur))}" style="flex:1" placeholder="예: Yanmar 4JH4E" onchange="setBoatSpecUI('${k}',this.value)">`
+            : `<input id="sp_${k}" type="number" step="0.01" min="0" value="${esc(String(cur))}" style="width:110px" placeholder="${ph}" onchange="setBoatSpecUI('${k}',this.value)"> ${d.unit}`)
         : `<b class="mrv">${cur !== '' ? esc(String(cur))+' '+d.unit : '—'}</b>`}</div>`;
     }).join('');
     body = rows
-      + (unlocked ? `<div class="mrrow" style="justify-content:center;padding:12px">
-          <button class="mrbtn big" onclick="refillWxLimits()">날씨 한계값 다시 계산</button></div>` : '')
+      + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:12px">
+          <button class="mrbtn big ok" onclick="saveSpecNow()">저장</button>
+          <button class="mrbtn big" onclick="refillWxLimits()">날씨 한계값 다시 계산</button></div>
+        <div class="mrnone" style="text-align:left">
+          <span class="wxdot"></span> 표시된 칸은 <b>[날씨 한계값 다시 계산]</b> 을 누르면
+          배 길이·선종으로 <b>덮어써지는</b> 값입니다. 직접 넣으신 값도 바뀝니다.</div>` : '')
       + `<div class="mrnone" style="text-align:left">
       풍속·파고 한계와 ${isSail ? '리프 풍속은 ' : ''}배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.
       실제 배와 다를 수 있으니 겪어 보시고 고쳐 주세요.<br>
@@ -3504,7 +3518,7 @@ function openBoat(tab){
       <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.</div>`;
   }
   P.innerHTML = head + body;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
 }
 // 길이나 선종이 바뀐 뒤 날씨 한계값을 다시 잡는다
 function refillWxLimits(){
@@ -3520,6 +3534,26 @@ function refillWxLimits(){
   if(window.__saveBoat) window.__saveBoat(b);
   openBoat('spec');
 }
+// 제원 화면의 모든 칸을 읽어 한 번에 저장한다.
+// 칸마다 onchange 로도 저장되지만, 값을 넣고 바로 화면을 넘기면 안 걸린다.
+// 사람마다 자기 배에 맞는 값이 있으므로 '저장' 을 눌러 확실히 남길 수 있어야 한다.
+function saveSpecNow(){
+  const b = curBoat();
+  if(!b){ alert('배가 없습니다'); return; }
+  if(!unlocked){ alert('지금은 보기 전용입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.'); return; }
+  let n = 0;
+  Object.keys(BOAT_SPEC).forEach(k=>{
+    const el = document.getElementById('sp_' + k);
+    if(!el) return;
+    setBoatSpec(k, el.value);
+    n++;
+  });
+  saveLocal();
+  if(window.__saveBoat) window.__saveBoat(b);
+  if(typeof schedulePush === 'function') schedulePush();
+  if(typeof renderWeather === 'function' && curTab === 'weather') renderWeather();
+  alert('제원 ' + n + '칸을 저장했습니다.');
+}
 function setBoatSpecUI(k, v){
   setBoatSpec(k, v);
   // 길이를 처음 넣으면 아직 비어 있는 날씨 한계값을 채워 준다
@@ -3530,7 +3564,9 @@ function setBoatSpecUI(k, v){
 }
 function closeBoat(){
   const _p = document.getElementById('mrPanel');
-  if(_p) _p.classList.remove('full'); document.getElementById('mrPanel').classList.remove('open'); }
+  if(_p) _p.classList.remove('open', 'full');
+  restorePanel();
+}
 function boatYear(v){
   const t = String(v||'').trim();
   const n = parseInt(t, 10);
@@ -3760,6 +3796,10 @@ function setBoatSpec(key, v){
 // 클라우드 배 문서에 들어가는 칸. 올리는 쪽(__saveBoat)과 받는 쪽(mergeCloudBoats)이
 // 반드시 같은 목록을 봐야 한다. 2.6 에서 받는 쪽이 넷만 받아 제원·홈포트·명부가
 // 전부 버려졌다. 목록을 따로 적으면 또 어긋난다.
+// '날씨 한계값 다시 계산' 을 누르면 덮어써지는 항목.
+// suggestWxLimits 가 내놓는 것과 같아야 한다 — 어긋나면 색 표시가 거짓말이 된다.
+const WX_AUTO_KEYS = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCurrent',
+                      'reef1','reef2','reef3','jibDown'];
 const BOAT_FIELDS = ['name','type','port','maker','model','year','lat','lon','code',
                      'spec','members','memberNames','ranks','roster','openJoin',
                      'pub','intro','createdAt'];
@@ -4401,7 +4441,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.11';
+const APP_VER = '2.12';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -6093,7 +6133,7 @@ function openMR(t, id){
     ${pinBtns}
     <div class="mrrow edt" style="justify-content:flex-end">
       <button class="mrbtn warn" onclick="mrDelete()">삭제</button></div>`;
-  measureHeader(); P.classList.add('open', 'full');
+  showPanel(P);
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
   if(t === 'voyage'){
     const pts = trkPoints(it);
@@ -6106,6 +6146,7 @@ function closeMR(){
   // 'full' 도 같이 걷어낸다. 남겨 두면 다음에 다른 화면이 엉뚱한 크기로 뜬다.
   if(P) P.classList.remove('open', 'full');
   mrOpenType=null; mrOpenId=null;
+  restorePanel();
 }
 // 기록 화면은 칸을 고치는 중이다. 닫기 전에 확실히 저장하고 클라우드로도 올린다.
 // 입력 칸은 onchange 로 저장되는데, 글자를 넣고 바로 닫으면 onchange 가 안 걸린다.
@@ -6648,6 +6689,31 @@ function openDrawer(){ document.getElementById('drawerOv').classList.add('open')
 // header 안에는 적재표 도구줄(목록·가나다순·칸 그리기)과 검색창도 들어 있어서,
 // 전체 높이로 재면 '전체 화면' 이 그 아래에서 시작해 도구줄이 뒤에 그대로 남는다.
 // 사용자가 여러 번 지적한 '뒤에 다른 탭이 보인다' 가 이것이다.
+// 화면(내 배·명부·등급·기록…)을 연다.
+// 머리줄 이름을 그 화면 이름으로 바꾸고 아래 탭 불을 끈다.
+// 그렇게 하지 않으면 머리줄에 '적재표' 가 남고 아래 탭도 적재표가 켜져 있어서,
+// 다른 탭 위에 얹힌 것처럼 보인다. 사용자가 여러 번 지적한 것이 이것이다.
+function showPanel(P){
+  P = P || document.getElementById('mrPanel');
+  if(!P) return;
+  measureHeader();
+  P.classList.add('open', 'full');
+  const t = P.querySelector('.mrhead > b, .mrtop > b');
+  const h = document.getElementById('hTitle');
+  if(h && t) h.textContent = String(t.textContent || '').trim() || h.textContent;
+  ['tabStow','tabMaint','tabWeather','tabVoyage'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.classList.remove('on');
+  });
+}
+// 화면을 닫으면 원래 탭으로 되돌린다
+function restorePanel(){
+  const h = document.getElementById('hTitle');
+  if(h) h.textContent = (curTab === 'maint')
+    ? (mrSub === 'maint' ? '정기점검' : '수리목록')
+    : (TAB_TITLES[curTab] || '뱃일');
+  [['tabStow','stow'],['tabMaint','maint'],['tabWeather','weather'],['tabVoyage','voyage']]
+    .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.classList.toggle('on', curTab===k); });
+}
 function measureHeader(){
   const h = document.querySelector('header .hrow') || document.querySelector('header');
   if(!h) return;

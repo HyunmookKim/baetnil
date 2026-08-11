@@ -1936,7 +1936,7 @@ window.__onAuth = u => {
   me = u;
   applyAccount();
   // 로그아웃하면 운영자 표시를 즉시 지운다
-  if(!u){ adminMe = null; myBan = null; personCur = null;
+  if(!u){ adminMe = null; myBan = null; personCur = null; adminClaimTried = false;
           if(typeof paintAdminMenu==='function') paintAdminMenu(); }
   if(u){
     // 로그인 전에 만든 배는 주인이 없다. 처음 로그인한 사람을 선주로 잡는다.
@@ -2776,7 +2776,27 @@ async function loadAdmin(){
   adminMe = null;
   if(!window.__admin || !window.__user) return null;
   try{ adminMe = await window.__admin.me(); }catch(e){ adminMe = null; }
+  if(!adminMe) adminMe = await claimOwner();
   return adminMe;
+}
+// ★ 첫 운영자 세우기.
+//   운영자 문서를 만들려면 임명 권한이 있어야 하는데, 맨 처음에는 아무도 운영자가 아니다.
+//   그래서 규칙이 딱 한 사람 — 이 앱의 주인 — 만 자기 문서를 스스로 세우도록 열어 뒀다.
+//   앱은 누가 주인인지 모른다. 알 필요도 없다. 그냥 한 번 해 보고 안 되면 조용히 넘어간다.
+//   막는 것은 규칙이다. 여기서 통과시켜도 서버가 거절한다.
+let adminClaimTried = false;
+async function claimOwner(){
+  if(adminClaimTried) return null;
+  adminClaimTried = true;
+  if(!window.__admin || !window.__user || !meUid()) return null;
+  try{
+    await window.__admin.set(meUid(), {
+      name: (typeof meName === 'function' ? meName() : '') || '',
+      owner: true,
+      perms: { postDel:true, boatMod:true, userBan:true, admin:true }
+    });
+    return await window.__admin.me();
+  }catch(e){ return null; }   // 주인이 아니면 규칙이 거절한다 — 정상이다
 }
 function isAdmin(perm){
   if(!adminMe) return false;
@@ -5607,7 +5627,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.10';
+const APP_VER = '3.11';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7149,21 +7169,25 @@ function renderHome(){
   // ── 날씨와 출항 판단
   let wxBody = '<div class="hmute">날씨 자료를 아직 받지 못했습니다</div>';
   try{
-    const idx = (typeof wxNowIdx === 'function') ? wxNowIdx() : 0;
-    const now = (typeof wxAt === 'function') ? wxAt(idx) : null;
+    const idx = wxNowIdx();
+    const now = (idx >= 0 && typeof wxAt === 'function') ? wxAt(idx) : null;
     if(now){
       const warn = wxWarnings(now);
       const bad = warn.filter(w => w.level === 'high');
       const state = bad.length ? ['나가지 마세요', '#F05B52']
                   : warn.length ? ['조심하세요', '#E8B33C']
                                 : ['나갈 만합니다', '#46B87C'];
+      // ★ 바람은 이미 노트(kt)로 받아 온다. 여기서 또 곱하면 두 배가 된다.
+      //   실제로 10kt 가 24kt 로, 돌풍 18kt 가 44kt 로 나왔다.
       const rf = (typeof reefStage === 'function' && now.wind != null)
-        ? reefStage(Number(now.wind) * 1.94384) : null;
+        ? reefStage(now.wind) : null;
+      const kt = v => v != null && isFinite(Number(v)) ? Number(v).toFixed(0) + 'kt' : '—';
       wxBody = `<div class="hbig" style="color:${state[1]}">${state[0]}</div>`
-        + `<div class="hrow2">바람 <b>${now.wind!=null?(Number(now.wind)*1.94384).toFixed(0)+'kt':'—'}</b>`
-        + ` · 돌풍 <b>${now.gust!=null?(Number(now.gust)*1.94384).toFixed(0)+'kt':'—'}</b>`
+        + `<div class="hrow2">바람 <b>${kt(now.wind)}</b>`
+        + ` · 돌풍 <b>${kt(now.gust)}</b>`
         + ` · 파고 <b>${now.wave!=null?Number(now.wave).toFixed(1)+'m':'—'}</b></div>`
-        + (rf ? `<div class="hmute">${esc(rf)}</div>` : '')
+        + `<div class="hmute">${wxWhenText(idx)}</div>`
+        + (reefText(rf) ? `<div class="hmute">${esc(reefText(rf))}</div>` : '')
         + (warn.length ? '<div class="hwarn">' + warn.map(w=>esc(w.text)).join('<br>') + '</div>' : '');
     }
   }catch(e){ wxBody = '<div class="hmute">날씨를 읽지 못했습니다</div>'; }
@@ -9836,6 +9860,66 @@ function wxInit(){
 
   wxCur = wxLS('bt_wxcur', null) || wxSpots[0];
 }
+// ★ 지금이 예보의 몇 번째 칸인가.
+//   이 함수가 없어서 늘 0번 칸 — 예보 첫 시각(새벽·아침) 값을
+//   '지금' 인 것처럼 보여 줬다. 밤 9시에 아침 바람이 나오던 원인이다.
+function wxNowIdx(){
+  if(!wxData || wxData._t0 == null) return -1;
+  const n = wxData._n || 0;
+  if(!n) return -1;
+  const i = Math.floor((Date.now() - wxData._t0) / 3600e3);
+  return Math.max(0, Math.min(n - 1, i));
+}
+// 예보 시작 시각과 칸 수를 잡아 둔다.
+// ★ 예전에는 날씨 탭을 그릴 때만 잡았다. 그래서 오늘 탭을 먼저 열면
+//   _t0 가 없어 지금 시각을 찾을 수 없었다. 받아올 때 함께 잡는다.
+function wxStamp(){
+  try{
+    const H = wxData && wxData.w && wxData.w.hourly;
+    if(!H || !H.time || !H.time.length) return;
+    wxData._t0 = new Date(H.time[0] + '+09:00').getTime();
+    wxData._n  = H.time.length;
+  }catch(e){}
+}
+// 앱을 열면 날씨를 한 번 받아 둔다.
+// ★ 예전에는 날씨·물때 탭을 눌러야 받아왔다. 그래서 오늘 탭이 비어 있었다.
+let wxEnsuring = false;
+async function ensureWx(){
+  if(wxEnsuring) return null;                       // 한 번에 하나만
+  if(!wxCur) wxInit();
+  if(!wxCur) return null;
+  const key = wxCur.lat + ',' + wxCur.lon;
+  if(wxData && wxData.key === key){ wxStamp(); return wxData; }
+  wxEnsuring = true;
+  try{
+    const d = await wxFetch(wxCur.lat, wxCur.lon);
+    wxData = { key, ...d };
+    wxStamp();
+  }catch(e){ /* 인터넷이 없으면 조용히 넘어간다 */ }
+  wxEnsuring = false;
+  try{ if(typeof renderHome === 'function') renderHome(); }catch(e){}
+  return wxData;
+}
+// 리프 단수는 숫자(0·1·2·3)다. 그대로 찍으면 화면에 '2' 만 덩그러니 나온다.
+// 어느 시각 자료인지. 이것이 없어서 아침 값이 '지금' 인 줄 알았다.
+// ★ 기기 시계가 아니라 자료에 적힌 시각을 그대로 쓴다.
+//   날씨는 한국 시각(Asia/Seoul)으로 받아 오는데, 기기가 다른 표준시면
+//   다시 계산하다가 엉뚱한 시각이 찍힌다.
+function wxWhenText(idx){
+  const H = wxData && wxData.w && wxData.w.hourly;
+  if(!H || !H.time || idx == null || idx < 0 || idx >= H.time.length) return '';
+  const s = String(H.time[idx]);              // 예: 2026-08-11T21:00
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2})/);
+  if(!m) return '';
+  const wd = '일월화수목금토'[ new Date(Date.UTC(+m[1], +m[2]-1, +m[3])).getUTCDay() ];
+  return (+m[2]) + '/' + (+m[3]) + '(' + wd + ') ' + m[4] + '시 기준';
+}
+function reefText(n){
+  if(n === null || n === undefined || n === '') return '';
+  const v = Number(n);
+  if(!isFinite(v)) return '';
+  return v === 0 ? '리프 없이 갈 수 있는 바람입니다' : '메인세일 ' + v + '단 리프';
+}
 
 const DIRS = ['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
 const dirName = d => DIRS[Math.round(((d%360)/22.5))%16];
@@ -10284,7 +10368,7 @@ async function renderWeather(){
     const H = W.hourly, times = H.time;
     const N = times.length;
     const t0 = new Date(times[0]+'+09:00').getTime();
-    wxData._t0 = t0; wxData._n = N;
+    wxStamp();
     const nowTs = Date.now();
     const nowIdx = Math.max(0, Math.min(N-1, Math.floor((nowTs - t0)/3600e3)));
     if(wxSel==null || wxSel < t0 || wxSel > t0+(N-1)*3600e3) wxSel = t0 + nowIdx*3600e3;
@@ -10441,6 +10525,8 @@ function showErr(msg){
 window.addEventListener('error', e=>showErr(e.message||'알 수 없는 오류'));
 window.addEventListener('unhandledrejection', e=>showErr((e.reason&&e.reason.message)||String(e.reason||'비동기 오류')));
 wxInit();
+// 앱을 열면 날씨를 미리 받아 둔다 — 오늘 탭이 비어 있지 않게
+try{ ensureWx(); }catch(e){}
 applyLock();
 initStorage().then(()=>{
   ensureBoat(); applyAccount();

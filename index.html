@@ -147,6 +147,10 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 #mapWrap{padding:14px;display:flex;justify-content:center}
 #map{position:relative;width:min(420px,100%)}
 #map img{display:block;width:100%;height:auto;filter:brightness(1.1);opacity:.82;pointer-events:none}
+/* 수납칸 모양 — 배 안의 칸이 전부 네모는 아니다 */
+.box.s-circ{border-radius:50% !important}
+.box.s-tri{clip-path:polygon(50% 0%,100% 100%,0% 100%);border-radius:0 !important}
+.box.s-tri span{padding-top:40%}
 .box{position:absolute;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .12s}
 .box span{font-size:6.4px;text-align:center;line-height:1;padding:1px;text-shadow:0 1px 3px #000;white-space:nowrap}
 .b-n{border:1.5px solid #2a5a8a88;background:#0a204033}.b-n span{color:#7ab5d8}
@@ -3190,10 +3194,14 @@ async function switchBoat(id){
   if(String(id) === String(currentBoatId)){ openBoat('info'); return; }
   currentBoatId = String(id);
   window.currentBoatId = currentBoatId;
+  // 새 배의 자료를 받기 전에는 올리지 않는다 (기본값으로 덮어쓰는 것을 막는다)
+  pullDone = false; pushWanted = false;
   idbSet('curboat', currentBoatId).catch(e=>{});
   applyBoatName();
   closeBoat();
   await loadBoatData();          // 그 배의 기록으로 바꾼다
+  // 배를 바꿨으면 그 배의 클라우드 자료도 받아온다. 2.6 까지는 안 받아왔다.
+  if(typeof cloud !== 'undefined' && cloud){ try{ await cloudPull(); }catch(e){} }
   updateTrashTab();
   syncPortSpot(curBoat());       // 날씨 지점도 그 배 기준으로
   if(typeof cloudSeedCheck === 'function') cloudSeedCheck();
@@ -3742,6 +3750,12 @@ let lastCloudPO = {};
 let lastPushErr = null;
 let pushErrShown = false;
 let cloudSeeded = false;   // 클라우드에 이 배의 자료가 있는가 (meta/info 존재)
+// ★ 이 배의 첫 받아오기가 끝나기 전에는 절대 올리지 않는다.
+// 앱은 켜질 때 기본 도면·기본 칸을 스스로 깐다(seed). 받아오기보다 올리기가
+// 먼저 나가면 그 기본값이 다른 기기가 올려 둔 진짜 자료를 덮어쓴다.
+// 컴퓨터에서 처음 켤 때 실제로 이 순서가 된다.
+let pullDone = false;
+let pushWanted = false;
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 function setSync(t){ const el=document.getElementById('syncState'); if(el) el.textContent = t; }
 const snapOf = arr => { const m={}; arr.forEach(i=>{ m[String(i.id)] = JSON.stringify(i); }); return m; };
@@ -3790,7 +3804,10 @@ async function cloudPull(){
   lastCloudSH = snapOf(Array.isArray(r.shapes)? r.shapes : []);
   lastCloudPO = snapOf(Array.isArray(r.posts)? r.posts : []);
   lastCloudDG = snapOf(Array.isArray(r.dgimgs)? r.dgimgs : []);
+  // 여기까지 왔으면 이 배의 클라우드 자료를 다 받았다. 이제 올려도 된다.
+  pullDone = true;
   cloudSeeded = !!r.seeded;
+  if(pushWanted){ pushWanted = false; schedulePush(); }
   if(r.seeded){
     items = migrate(r.items); trash = migrate(r.trash);
     lastCloud = snapOf(items); lastCloudTrash = snapOf(trash);
@@ -3851,8 +3868,11 @@ async function mergeCloudBoats(){
     updateTrashTab();
     syncPortSpot(curBoat());
   }
-  sysSave();
+  // ★ 받아오기를 먼저 한다. 저장(sysSave)은 올리기를 예약하므로,
+  //   순서가 뒤집히면 이 기기의 기본값이 클라우드를 덮어쓴다.
+  pullDone = false; pushWanted = false;
   try{ await cloudPull(); }catch(e){}
+  sysSave();
   return added > 0;
 }
 
@@ -3906,12 +3926,15 @@ function syncNow(){
 }
 function schedulePush(){
   if(!cloud || !unlocked) return;
+  // 받아오기가 끝나기 전이면 미뤄 둔다. 끝나면 이어서 올린다.
+  if(!pullDone){ pushWanted = true; setSync('받아오는 중…'); return; }
   setSync('저장 중…');
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushNow, 1200);
 }
 async function pushNow(){
   if(!cloud || !unlocked) return;
+  if(!pullDone){ pushWanted = true; return; }   // 받아오기 전에는 나가지 않는다
   try{
     const curI = snapOf(items), curT = snapOf(trash), curM = snapOf(maint), curR = snapOf(repair);
     const diff = (cur, last)=>{
@@ -4027,7 +4050,7 @@ function buildBoxes(){
     const d = document.createElement('div');
     d.id = 'bx_'+l.id;
     d.dataset.id = l.id;     // 칸 편집에서 어느 칸인지 알아야 한다
-    d.className = 'box ' + (l.wall?'b-w':l.deck2?'b-d':'b-n');
+    d.className = 'box ' + (l.wall?'b-w':l.deck2?'b-d':'b-n') + ' s-' + lkShapeOf(l);
     d.style.cssText = `left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`;
     d.innerHTML = '<span></span>';
     d.onclick = ()=>{ if(typeof lkEdit!=='undefined' && lkEdit) return; openLocker(l.id); };
@@ -4037,7 +4060,7 @@ function buildBoxes(){
 }
 // 칸 목록이 바뀌었는지 알아보는 값. 위치·이름까지 바뀌면 다시 그려야 한다.
 function lockerKey(){
-  return lockers.map(l=>[l.id,l.x,l.y,l.w,l.h,l.label,l.wall?1:0,l.deck2?1:0].join(',')).join('|');
+  return lockers.map(l=>[l.id,l.x,l.y,l.w,l.h,l.label,l.wall?1:0,l.deck2?1:0,lkShapeOf(l)].join(',')).join('|');
 }
 
 function refreshBoxes(){
@@ -4076,14 +4099,31 @@ function setLkLock(on){
 }
 // 수납칸을 바꿀 수 있는가
 function lkCanEdit(){
-  if(typeof unlocked!=='undefined' && !unlocked){ alert('잠금 상태에서는 칸을 바꿀 수 없습니다'); return false; }
-  if(lkLocked){ alert('수납칸이 잠겨 있습니다.\n도구 막대의 자물쇠를 눌러 여시면 됩니다.'); return false; }
+  // '잠겨 있습니다' 만 띄우고 여는 방법을 안 알려주면 갇힌다.
+  // 어디를 눌러야 하는지 적고, 그 자리에서 열 수 있게 물어본다.
+  if(typeof unlocked!=='undefined' && !unlocked){
+    alert('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.');
+    return false;
+  }
+  if(lkLocked){
+    // 열어만 주고 이번 동작은 하지 않는다.
+    // 잠금은 흔들리는 배에서 화면을 스쳐 잘못 건드리는 것을 막는 장치다.
+    // 한 번 물어보고 바로 실행하면 그 장치가 없는 것과 같다.
+    if(confirm('수납칸이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)')) setLkLock(false);
+    return false;
+  }
   return true;
 }
 // 도면 도형을 바꿀 수 있는가
 function shCanEdit(){
-  if(typeof unlocked!=='undefined' && !unlocked){ alert('잠금 상태에서는 도면을 바꿀 수 없습니다'); return false; }
-  if(dgLocked){ alert('도면이 잠겨 있습니다.\n도구 막대의 자물쇠를 눌러 여시면 됩니다.'); return false; }
+  if(typeof unlocked!=='undefined' && !unlocked){
+    alert('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.');
+    return false;
+  }
+  if(dgLocked){
+    if(confirm('도면이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)')) setDgLock(false);
+    return false;
+  }
   return true;
 }
 // 어느 방향으로 끌어도 같은 사각형이 되게 정리하고, 도면 밖은 잘라낸다.
@@ -4123,7 +4163,31 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.6';
+const APP_VER = '2.7';
+// 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
+// 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
+const LK_SHAPES = [
+  { id:'rect', name:'네모',     sub:'기본' },
+  { id:'circ', name:'동그라미', sub:'둥근 칸' },
+  { id:'tri',  name:'세모',     sub:'선수·구석' }
+];
+function lkShapeOf(l){
+  const v = l && l.shape;
+  return LK_SHAPES.some(x => x.id === v) ? v : 'rect';
+}
+function lkSetShape(id, shape){
+  if(!lkCanEdit()) return false;
+  if(!LK_SHAPES.some(x => x.id === shape)) return false;
+  const l = lockers.find(x => String(x.id) === String(id));
+  if(!l) return false;
+  if(lkShapeOf(l) === shape) return true;
+  undoPush();
+  l.shape = shape;
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  return true;
+}
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -4225,7 +4289,7 @@ function undoRun(){
   if(!undoStack.length) return false;
   // 잠근 것을 되돌리기로 우회할 수 없게 한다
   if(lkLocked && dgLocked){
-    alert('수납칸과 도면이 모두 잠겨 있습니다.\n자물쇠를 눌러 여시면 됩니다.');
+    if(confirm('수납칸과 도면이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
     return false;
   }
   redoStack.push(undoSnap());
@@ -4235,7 +4299,7 @@ function undoRun(){
 function redoRun(){
   if(!redoStack.length) return false;
   if(lkLocked && dgLocked){
-    alert('수납칸과 도면이 모두 잠겨 있습니다.\n자물쇠를 눌러 여시면 됩니다.');
+    if(confirm('수납칸과 도면이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?')){ setLkLock(false); setDgLock(false); }
     return false;
   }
   undoStack.push(undoSnap());
@@ -4468,13 +4532,16 @@ function lkMenu(id){
     okText: '저장',
     fields: [
       { key:'label', label:'칸 이름', value:l.label, placeholder:'예: 싱크대 아래' },
-      { key:'zone',  label:'구역',   value:l.zone,  placeholder:'예: 갤리', chips: zones }
+      { key:'zone',  label:'구역',   value:l.zone,  placeholder:'예: 갤리', chips: zones },
+      { key:'shape', label:'모양', type:'pick', value: lkShapeOf(l),
+        options: LK_SHAPES.map(x => ({ v:x.id, name:x.name, sub:x.sub })) }
     ],
     del: { text:'칸 지우기', run: ()=>lkDelete(id) },
     onOk: v => {
       if(!v.label || !v.zone){ alert('칸 이름과 구역을 모두 넣어 주세요'); return false; }
       lkRename(id, v.label);
       lkRezone(id, v.zone);
+      if(v.shape) lkSetShape(id, v.shape);
     }
   });
 }

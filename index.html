@@ -56,6 +56,13 @@
   font-size:12.5px;padding:10px 14px;line-height:1.6}
 .fleet .due{color:#FF9A8A}
 .chip.whochip{background:#14304a;color:#9ed0f5}
+.fishbox{margin:2px 12px 10px;border:1px solid #12283e;border-radius:10px;background:#0b1a29;padding:4px 0}
+.catchrow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;padding:5px 12px}
+.catchrow .cname{flex:1;min-width:0;color:#dfe8f2;font-size:14px;font-weight:700;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catchrow .cnum{flex:0 0 34px;text-align:center;color:#dfe8f2;font-size:16px;font-weight:800}
+.catchrow .minib{flex:0 0 auto;min-width:38px;padding:5px 8px}
+.catchrow input{flex:0 0 58px;width:58px;min-width:0}
 .whoa{color:#8ab4d8;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .chip.late{background:#7A3A30;color:#FF9A8A}
 .chip.notice{background:#7a5a2a;color:#f0c98a}
@@ -4961,7 +4968,7 @@ const WX_AUTO_KEYS = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCur
                       'reef1','reef2','reef3','jibDown'];
 const BOAT_FIELDS = ['name','type','port','maker','model','year','lat','lon','code',
                      'spec','members','memberNames','ranks','roster','openJoin',
-                     'pub','intro','createdAt'];
+                     'pub','intro','createdAt','tideStyle'];
 if(typeof window !== 'undefined') window.__boatFields = BOAT_FIELDS;
 
 function curBoat(){
@@ -5600,7 +5607,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.9';
+const APP_VER = '3.10';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -6895,7 +6902,7 @@ const LOG_KINDS_COMMON = ['엔진ON','엔진OFF','기항','묘박','급유','고
 const LOG_KINDS_BY_TYPE = {
   sail:    ['세일 올림','세일 내림','리프'],
   power:   [],
-  fishing: ['투망','양망','어군탐지'],
+  fishing: ['포인트','투망','양망','어군탐지'],
   other:   [],
 };
 // 세일을 올리면 엔진을 끈 것으로, 내리면 켠 것으로 본다.
@@ -7444,6 +7451,8 @@ function openMR(t, id){
         :`<b class="mrv">${esc(it.grp||'—')}</b>`}</div>`;
   } else if(t==='voyage'){
     body = tf('날짜','date',it.date,'date','')
+      // 낚시배일 때만 물때와 조과가 붙는다. 요트·보트 항해일지는 그대로다.
+      + (isFishing() ? tideRow(it) + catchBox(it) : '')
       + legRow('출발','from','timeOut','wxOut', it)
       + logRows(it)                       // 출발 → 중간 기록 → 도착 순서로 읽힌다
       + legRow('도착','to','timeIn','wxIn', it)
@@ -7463,7 +7472,7 @@ function openMR(t, id){
              <button class="minib blu" onclick="fillEngineHours()">중간 기록에서 계산</button>`
           :`<b class="mrv">${it.engineH||'—'} h</b>`}</div>`
       + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">
-           엔진 시간은 항해 시간 안에 들어 있습니다. 세일로 간 시간은
+           엔진 시간은 항해 시간 안에 들어 있습니다. ${isFishing() ? '엔진을 끄고 있던 시간은' : '세일로 간 시간은'}
            ${(() => { const a=Number(it.hours)||0, b=Number(it.engineH)||0;
                       return (a>0 && b>=0 && a>=b) ? (a-b).toFixed(1)+'h' : '—'; })()} 입니다.</div>`
       + suggestRow(it, 'engineH')
@@ -8210,7 +8219,7 @@ function renderVoyage(){
   L.innerHTML = head + (arr.map(v=>`<div class="mr" onclick="openMR('voyage','${v.id}')">
       <div class="ct"><div class="cn">${esc(v.from || v.timeOut || '—')} → ${esc(v.to || v.timeIn || '—')}</div>
       <span class="chip nchip">${v.nm?fmtNum(parseFloat(v.nm))+' NM':'—'}</span></div>
-      <div class="mrm">${v.date||'—'}${(v.timeOut&&v.from)?' · '+v.timeOut:''}${(()=>{const n=trkPoints(v).length; return n?' · 📍'+n:'';})()}${v.logs&&v.logs.length?' · 기록 '+v.logs.length:''}${v.engineH?' · 엔진 '+v.engineH+'h':''}${v.crew?' · '+esc(v.crew):''}${v.photos&&v.photos.length?' · 사진 '+v.photos.length:''}</div>
+      <div class="mrm">${v.date||'—'}${(v.timeOut&&v.from)?' · '+v.timeOut:''}${(()=>{const n=trkPoints(v).length; return n?' · 📍'+n:'';})()}${v.logs&&v.logs.length?' · 기록 '+v.logs.length:''}${(isFishing()&&catchCount(v))?' · 조과 '+catchCount(v)+'마리':''}${v.engineH?' · 엔진 '+v.engineH+'h':''}${v.crew?' · '+esc(v.crew):''}${v.photos&&v.photos.length?' · 사진 '+v.photos.length:''}</div>
     </div>`).join('') || '<div class="mrnone">기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.</div>');
 }
 function addVoyage(){
@@ -8224,6 +8233,259 @@ function addVoyage(){
   voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
   wxCapture('wxOut', v.id);          // 출항 시각 기준 날씨 자동 기록
   posHere('wxOut', v.id, true);      // 출발 위치도 지금 자리로 잡는다 (실패해도 조용히)
+}
+
+// ===== 물때 =====
+// ★ 지어내면 안 되는 곳이다. 낚시하는 사람은 물때로 날을 잡는다.
+//   삭(신월) 시각을 계산해 음력일을 구하고, 표로 물때 이름을 정한다.
+//   삭 계산은 Meeus 의 천문 알고리즘(49장)이고, 2026년 열두 번의 삭을
+//   미국 해군천문대(USNO) 발표값과 대조해 1분 이내로 맞는 것을 확인했다.
+//
+//   부르는 법은 지역마다 다르다.
+//    · 서해식(7물때식) — 음력 1일 7물, 8일 조금, 9일 무시, 10일 1물, 15일 6물
+//    · 남해식(8물때식) — 음력 1일 8물, 8일 조금, 9일 1물,  15일 7물
+//   음력 8일·23일이 조금, 15일·30일이 사리인 것은 두 방식이 같다.
+const MOON_A = [
+  [299.77, 0.107408, 0.000325], [251.88, 0.016321, 0.000165],
+  [251.83, 26.651886, 0.000164], [349.42, 36.412478, 0.000126],
+  [ 84.66, 18.206239, 0.000110], [141.74, 53.303771, 0.000062],
+  [207.14,  2.453732, 0.000060], [154.84,  7.306860, 0.000056],
+  [ 34.52, 27.261239, 0.000047], [207.19,  0.121824, 0.000042],
+  [291.34,  1.844379, 0.000040], [161.72, 24.198154, 0.000037],
+  [239.56, 25.513099, 0.000035], [331.55,  3.592518, 0.000023]
+];
+// k 번째 삭의 율리우스일(UT). k 는 2000년 1월 삭부터 센 번호다.
+function newMoonJD(k){
+  const S = d => Math.sin(d * Math.PI / 180);
+  const T = k / 1236.85;
+  let J = 2451550.09766 + 29.530588861 * k
+        + 0.00015437 * T * T - 0.000000150 * T * T * T + 0.00000000073 * T * T * T * T;
+  const E  = 1 - 0.002516 * T - 0.0000074 * T * T;
+  const M  = 2.5534 + 29.10535670 * k - 0.0000014 * T * T - 0.00000011 * T * T * T;
+  const Mp = 201.5643 + 385.81693528 * k + 0.0107582 * T * T
+           + 0.00001238 * T * T * T - 0.000000058 * T * T * T * T;
+  const F  = 160.7108 + 390.67050284 * k - 0.0016118 * T * T
+           - 0.00000227 * T * T * T + 0.000000011 * T * T * T * T;
+  const O  = 124.7746 - 1.56375588 * k + 0.0020672 * T * T + 0.00000215 * T * T * T;
+  J += -0.40720 * S(Mp)      + 0.17241 * E * S(M)      + 0.01608 * S(2*Mp)
+     +  0.01039 * S(2*F)     + 0.00739 * E * S(Mp-M)   - 0.00514 * E * S(Mp+M)
+     +  0.00208 * E*E*S(2*M) - 0.00111 * S(Mp-2*F)     - 0.00057 * S(Mp+2*F)
+     +  0.00056 * E * S(2*Mp+M) - 0.00042 * S(3*Mp)    + 0.00042 * E * S(M+2*F)
+     +  0.00038 * E * S(M-2*F)  - 0.00024 * E * S(2*Mp-M) - 0.00017 * S(O)
+     -  0.00007 * S(Mp+2*M)  + 0.00004 * S(2*Mp-2*F)   + 0.00004 * S(3*M)
+     +  0.00003 * S(Mp+M-2*F) + 0.00003 * S(2*Mp+2*F)  - 0.00003 * S(Mp+M+2*F)
+     +  0.00003 * S(Mp-M+2*F) - 0.00002 * S(Mp-M-2*F)  - 0.00002 * S(3*Mp+M)
+     +  0.00002 * S(4*Mp);
+  for(let i = 0; i < MOON_A.length; i++){
+    const a = MOON_A[i];
+    J += a[2] * S(a[0] + a[1] * k - (i === 0 ? 0.009173 * T * T : 0));
+  }
+  return J - 69 / 86400;   // 역학시 → 세계시 (2026년 ΔT ≈ 69초)
+}
+// 그 날짜(한국 시각) 이전의 마지막 삭이 든 날. 그 날이 음력 1일이다.
+// 한국 음력은 삭이 든 날을 초하루로 삼는다 — 그래서 시각이 아니라 '한국 날짜' 로 본다.
+function lastNewMoonKST(dateStr){
+  const day = d => Math.floor((d.getTime() + 9 * 3600000) / 86400000);   // KST 기준 날짜 번호
+  const want = day(new Date(String(dateStr) + 'T12:00:00Z'));
+  const jdToDate = jd => new Date((jd - 2440587.5) * 86400000);
+  // 대강의 k 에서 시작해 앞뒤로 훑는다 (달마다 하나씩이라 몇 번이면 닿는다)
+  let k = Math.floor((new Date(String(dateStr) + 'T12:00:00Z').getFullYear() - 2000) * 12.3685);
+  for(let i = 0; i < 40 && day(jdToDate(newMoonJD(k))) > want; i++) k--;
+  for(let i = 0; i < 40 && day(jdToDate(newMoonJD(k + 1))) <= want; i++) k++;
+  return { k, day: day(jdToDate(newMoonJD(k))), want };
+}
+// 음력 며칠인가 (1~30)
+function lunarDay(dateStr){
+  const r = lastNewMoonKST(dateStr);
+  return r.want - r.day + 1;
+}
+// 물때 이름표. 음력 1일이 첫 칸이고 15일마다 되풀이된다.
+const TIDE_WEST  = ['7물','8물','9물','10물','11물','12물','13물','조금','무시',
+                    '1물','2물','3물','4물','5물','6물'];
+const TIDE_SOUTH = ['8물','9물','10물','11물','12물','13물','14물','조금',
+                    '1물','2물','3물','4물','5물','6물','7물'];
+function tideIdx(ld){
+  const n = Number(ld);
+  if(!n || n < 1) return -1;
+  return (n - 1) % 15;
+}
+function tideName(dateStr, style){
+  const i = tideIdx(lunarDay(dateStr));
+  if(i < 0) return '';
+  return (style === 'south' ? TIDE_SOUTH : TIDE_WEST)[i];
+}
+// 사리(음력 15·30일)인가 조금(음력 8·23일)인가. 두 방식이 같다.
+function tideMark(dateStr){
+  const i = tideIdx(lunarDay(dateStr));
+  if(i === 14) return '사리';
+  if(i === 7)  return '조금';
+  return '';
+}
+function tideStyle(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  return (b && b.tideStyle === 'south') ? 'south' : 'west';
+}
+function setTideStyle(v){
+  const b = curBoat(); if(!b) return;
+  b.tideStyle = (v === 'south') ? 'south' : 'west';
+  save(); schedulePush(); openMR('voyage', mrOpenId);
+}
+function tideRow(it){
+  if(!it || !it.date) return '';
+  const st = tideStyle();
+  const nm = tideName(it.date, st), mk = tideMark(it.date);
+  return `<div class="mrrow"><span class="mrlbl">물때</span>
+      <b class="mrv">${esc(nm || '—')}</b>
+      ${mk?`<span class="chip notice">${esc(mk)}</span>`:''}
+      <span class="mrv2">음력 ${lunarDay(it.date)}일</span></div>`
+    + (unlocked
+        ? `<div class="mrrow"><span class="mrlbl"></span>
+             <button class="tchip${st==='west'?' on':''}" onclick="setTideStyle('west')">서해식</button>
+             <button class="tchip${st==='south'?' on':''}" onclick="setTideStyle('south')">남해식</button></div>
+           <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">
+             지역마다 부르는 법이 다릅니다. 서해는 조금 다음이 무시, 남해는 바로 1물입니다.<br>
+             달의 삭 시각으로 음력일을 구해 정합니다.</div>`
+        : '');
+}
+
+// ===== 조행기 =====
+// 낚시배일 때만 붙는다. 요트·보트 항해일지는 그대로다.
+function isFishing(){
+  return boatType() === 'fishing';
+}
+const FISH_SPECIES = ['광어','우럭','참돔','감성돔','농어','갈치','고등어','삼치',
+                      '부시리','방어','한치','오징어','갑오징어','주꾸미','문어','아나고','기타'];
+const FISH_BAITS   = ['미꾸라지','오징어살','새우','갯지렁이','크릴','메탈지그',
+                      '인치쿠','타이라바','에기','웜'];
+const FISH_RIGS    = ['다운샷','외줄','편대','카드채비','지깅','타이라바',
+                      '에깅','텐야','흘림','원투'];
+
+function fishOf(g){
+  if(!g.fish) g.fish = { depth:'', temp:'', bait:'', rig:'', catches:[] };
+  if(!Array.isArray(g.fish.catches)) g.fish.catches = [];
+  return g.fish;
+}
+function fishField(lid, k, v){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
+  const f = fishOf(g);
+  f[k] = (k === 'bait' || k === 'rig') ? (f[k] === v ? '' : v) : v;   // 같은 것을 다시 누르면 해제
+  it.seed = false; saveMR(); renderVoyage(); openMR('voyage', mrOpenId);
+}
+function catchAdd(lid, sp){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
+  const f = fishOf(g);
+  const put = name => {
+    const nm = String(name||'').trim();
+    if(!nm) return;
+    const had = f.catches.find(c => c.sp === nm);
+    if(had) had.n = (Number(had.n)||0) + 1;
+    else f.catches.push({ id:newId(), sp:nm, n:1, cm:'' });
+    it.seed = false; saveMR(); renderVoyage(); openMR('voyage', mrOpenId);
+  };
+  if(sp === '기타'){
+    // 목록에 없는 어종 — 직접 넣는다 (prompt 는 배 위에서 못 쓴다)
+    openForm({ title:'어종 직접 넣기', sub:'목록에 없는 것을 적어 주세요', okText:'넣기',
+      fields:[ { key:'sp', label:'어종', value:'', placeholder:'예: 열기' } ],
+      onOk: v => { if(!String(v.sp||'').trim()){ alert('어종을 적어 주세요'); return false; } put(v.sp); } });
+    return;
+  }
+  put(sp);
+}
+// 마릿수는 눌러서 센다. 배 위에서 장갑 끼고 숫자를 타이핑할 수는 없다.
+function catchN(lid, cid, d){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
+  const c = fishOf(g).catches.find(x=>x.id===cid); if(!c) return;
+  c.n = Math.max(0, (Number(c.n)||0) + Number(d));
+  it.seed = false; saveMR(); renderVoyage(); openMR('voyage', mrOpenId);
+}
+function catchCm(lid, cid, v){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
+  const c = fishOf(g).catches.find(x=>x.id===cid); if(!c) return;
+  c.cm = v;
+  it.seed = false; saveMR(); openMR('voyage', mrOpenId);
+}
+function catchDel(lid, cid){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
+  const f = fishOf(g);
+  f.catches = f.catches.filter(x=>x.id!==cid);
+  it.seed = false; saveMR(); renderVoyage(); openMR('voyage', mrOpenId);
+}
+// 출조 전체의 어종별 합계 — 포인트 여러 곳을 모은다
+function catchTotal(it){
+  const sum = {};
+  ((it && it.logs) || []).forEach(g=>{
+    (((g.fish||{}).catches) || []).forEach(c=>{
+      const sp = String(c.sp||'').trim(); if(!sp) return;
+      if(!sum[sp]) sum[sp] = { sp, n:0, cm:0 };
+      sum[sp].n += Number(c.n) || 0;
+      const cm = Number(c.cm) || 0;
+      if(cm > sum[sp].cm) sum[sp].cm = cm;
+    });
+  });
+  return Object.values(sum).filter(x=>x.n > 0).sort((a,b)=> b.n - a.n);
+}
+function catchCount(it){
+  return catchTotal(it).reduce((a,x)=> a + x.n, 0);
+}
+// 포인트 한 곳 — 수심·수온·미끼·채비·잡은 것
+function fishRows(g){
+  const f = fishOf(g);
+  const chips = (list, key) => list.map(x=>
+    `<button class="tchip${f[key]===x?' on':''}" onclick="fishField('${g.id}','${key}','${esc(x)}')">${esc(x)}</button>`).join('');
+  if(!unlocked){
+    const cs = f.catches.filter(c=>Number(c.n)>0);
+    const info = [f.depth?f.depth+'m':'', f.temp?f.temp+'℃':'', f.bait, f.rig].filter(Boolean).join(' · ');
+    if(!info && !cs.length) return '';
+    return `<div class="mrrow"><span class="mrlbl"></span>
+        <span class="mrm" style="flex:1;color:#7b8794">${esc(info || '—')}</span></div>`
+      + (cs.length ? `<div class="fchips" style="padding:0 12px 8px">`
+          + cs.map(c=>`<span class="chip">${esc(c.sp)} ${c.n}마리${c.cm?' · 최대 '+esc(String(c.cm))+'cm':''}</span>`).join('')
+          + `</div>` : '');
+  }
+  return `<div class="fishbox">
+      <div class="mrrow"><span class="mrlbl">수심</span>
+        <input type="number" inputmode="decimal" value="${esc(String(f.depth||''))}" style="width:80px"
+          onchange="fishField('${g.id}','depth',this.value)"> m
+        <span class="mrlbl" style="width:auto;margin-left:10px">수온</span>
+        <input type="number" inputmode="decimal" value="${esc(String(f.temp||''))}" style="width:80px"
+          onchange="fishField('${g.id}','temp',this.value)"> ℃</div>
+      <div class="mrrow"><span class="mrlbl">미끼</span></div>
+      <div class="fchips" style="padding:0 12px 6px">${chips(FISH_BAITS,'bait')}</div>
+      <div class="mrrow"><span class="mrlbl">채비</span></div>
+      <div class="fchips" style="padding:0 12px 6px">${chips(FISH_RIGS,'rig')}</div>
+      <div class="mrrow"><span class="mrlbl">잡은 것</span>
+        <span class="mrm" style="flex:1;color:#7b8794">어종을 누르면 한 마리씩 · 오른쪽 칸은 가장 큰 것 cm</span></div>
+      <div class="fchips" style="padding:0 12px 6px">${
+        FISH_SPECIES.map(x=>`<button class="tchip" onclick="catchAdd('${g.id}','${esc(x)}')">${esc(x)}${x==='기타'?' 직접':''}</button>`).join('')}</div>
+      ${f.catches.map(c=>`<div class="catchrow">
+          <b class="cname">${esc(c.sp)}</b>
+          <button class="minib" onclick="catchN('${g.id}','${c.id}',-1)">−</button>
+          <b class="cnum">${Number(c.n)||0}</b>
+          <button class="minib grn" onclick="catchN('${g.id}','${c.id}',1)">+</button>
+          <input type="number" inputmode="decimal" value="${esc(String(c.cm||''))}" placeholder="cm"
+            onchange="catchCm('${g.id}','${c.id}',this.value)">
+          <button class="minib red" onclick="catchDel('${g.id}','${c.id}')">×</button>
+        </div>`).join('')}
+    </div>`;
+}
+// 출조 전체 조과
+function catchBox(it){
+  const tot = catchTotal(it);
+  if(!tot.length)
+    return `<div class="mrrow"><span class="mrlbl">조과</span>
+      <span class="mrm" style="flex:1;color:#7b8794">${
+        unlocked ? '포인트에서 어종을 누르면 여기에 모입니다' : '기록 없음'}</span></div>`;
+  return `<div class="mrrow"><span class="mrlbl">조과</span>
+      <b class="mrv">모두 ${catchCount(it)}마리</b>
+      <span class="mrv2">${tot.length}종</span></div>`
+    + `<div class="fchips" style="padding:0 12px 10px">`
+    + tot.map(x=>`<span class="chip">${esc(x.sp)} ${x.n}마리${x.cm?' · 최대 '+x.cm+'cm':''}</span>`).join('')
+    + `</div>`;
 }
 
 // ===== 항해일지 날씨 기록 =====
@@ -8388,7 +8650,7 @@ function logAdd(){
   const p = n => String(n).padStart(2,'0');
   const now = new Date();
   it.logs.push({ id:newId(), time:p(now.getHours())+':'+p(now.getMinutes()),
-                 kind:'세일', text:'', wx:null, pos:null });
+                 kind: isFishing() ? '포인트' : '세일', text:'', wx:null, pos:null });
   it.seed = false; saveMR(); openMR('voyage', mrOpenId);
   wxCapture('log:' + it.logs[it.logs.length-1].id);
 }
@@ -8446,7 +8708,9 @@ function logRows(it){
            <span class="chip">${esc(g.kind||'')}</span>
            ${logEngine(g)!=='keep'?`<span class="chip ${logEngine(g)==='on'?'engon':'engoff'}">엔진 ${logEngine(g)==='on'?'켬':'끔'}</span>`:''}
            <b class="mrv" style="flex:1">${esc(g.text||'')}</b></div>`;
-    return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id);
+    // 낚시배의 포인트에는 수심·수온·미끼·채비·잡은 것이 따라붙는다
+    return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id)
+      + ((isFishing() && g.kind === '포인트') ? fishRows(g) : '');
   }).join('') + foot;
 }
 

@@ -151,6 +151,14 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .box.s-circ{border-radius:50% !important}
 .box.s-tri{clip-path:polygon(50% 0%,100% 100%,0% 100%);border-radius:0 !important}
 .box.s-tri span{padding-top:40%}
+/* 입력 화면에 붙은 사진 */
+.fphoto{position:relative;display:inline-block;margin:4px 6px 0 0}
+.fphoto img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid #2a5a8a;display:block}
+.fphotox{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;
+  border:0;background:#a33;color:#fff;font-size:12px;line-height:1;cursor:pointer}
+.fhint{font-size:12px;opacity:.7;margin-top:6px}
+.postimg{display:block;width:100%;border-radius:10px;margin:10px 0;cursor:zoom-in}
+#formPhotos{display:flex;flex-wrap:wrap}
 .box{position:absolute;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .12s}
 .box span{font-size:6.4px;text-align:center;line-height:1;padding:1px;text-shadow:0 1px 3px #000;white-space:nowrap}
 .b-n{border:1.5px solid #2a5a8a88;background:#0a204033}.b-n span{color:#7ab5d8}
@@ -695,7 +703,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();exportCSV()">CSV 내보내기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><button class="ditem" onclick="closeDrawer();syncNow()">지금 동기화</button><button class="ditem" onclick="closeDrawer();openExplore(false)">배 둘러보기</button><button class="ditem" id="dBoard" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" id="dTasks" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" onclick="drawerGo('news')">뉴스 <span class="dbadge" id="newsBadge">새 소식</span></button><button class="ditem" onclick="drawerGo('fuel')">연료 기록</button><button class="ditem" onclick="drawerGo('contacts')">연락처 · 문서</button><button class="ditem" onclick="drawerGo('check')">체크리스트</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();openExplore(false)">배 둘러보기</button><button class="ditem" id="dBoard" onclick="closeDrawer();openBoard()">게시판</button><button class="ditem" id="dTasks" onclick="closeDrawer();openMyTasks()">내 할 일</button><button class="ditem" id="trashTab" onclick="drawerTrash()">휴지통</button><div class="ddiv"></div><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabStow" class="on" onclick="switchTab('stow')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></svg>적재표</button><button id="tabMaint" onclick="switchTab('maint')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>정비</button><button id="tabWeather" onclick="switchTab('weather')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9h-1.3A7 7 0 1 0 5 17.7"/><path d="M2 20.5c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1"/></svg>날씨</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button></nav>
 
 
@@ -1064,11 +1072,111 @@ async function dgResolve(){
     }catch(_){}
   }
 }
+// ===== 사진째 붙여넣기 =====
+// 글과 사진이 섞인 내용을 통째로 복사해 붙여넣으면 사진까지 들어가야 한다.
+// 붙여넣기 자료에는 두 가지가 온다 — text/html (사진이 data: 로 박혀 있다) 과
+// text/plain (글자만). html 이 있으면 그쪽을 쓴다.
+
+// 파이어스토어 문서 한 개는 1MB 가 한계다. 사진을 그대로 넣으면 넘는다.
+// 사진 한 장이 이 크기를 넘지 않게 줄인다.
+const PHOTO_MAX_PX = 1280;
+const PHOTO_MAX_KB = 180;     // 한 장
+const PHOTO_BUDGET_KB = 700;  // 한 글·한 소개 페이지에 들어가는 사진 전부 (문서 1MB 한계 대비 여유)
+
+// 붙여넣은 내용을 글·사진 조각으로 순서대로 나눈다.
+// 인터넷 주소(http) 사진은 가져오지 않는다 — 나중에 안 보이는 사진이 되고,
+// 남의 서버를 계속 부르게 된다.
+function pasteParts(html, plain){
+  const out = [];
+  const push = (t, v) => {
+    if(t === 'text'){
+      const s = String(v||'').replace(/\u00a0/g,' ').replace(/[ \t]+\n/g,'\n').trim();
+      if(!s) return;
+      const last = out[out.length-1];
+      if(last && last.t === 'text'){ last.v += '\n' + s; return; }
+      out.push({ t:'text', v:s });
+    } else {
+      if(v) out.push({ t:'photo', v:v });
+    }
+  };
+  const unesc = t => String(t||'')
+    .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"')
+    .replace(/&#39;/g,"'").replace(/&nbsp;/g,' ').replace(/&amp;/g,'&');
+
+  if(html && /<[a-z!/]/i.test(html)){
+    // 사진 태그를 기준으로 자르고, 사이의 글자는 태그를 벗겨서 담는다
+    let rest = html
+      .replace(/<(script|style)[\s\S]*?<\/\1>/gi, '')
+      .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/tr)\s*\/?>/gi, '\n');
+    const re = /<img\b[^>]*>/gi;
+    let m, at = 0;
+    while((m = re.exec(rest))){
+      push('text', unesc(rest.slice(at, m.index).replace(/<[^>]*>/g, '')));
+      const sm = m[0].match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+      const url = sm ? sm[1].trim() : '';
+      if(/^data:image\//i.test(url)) push('photo', url);
+      at = m.index + m[0].length;
+    }
+    push('text', unesc(rest.slice(at).replace(/<[^>]*>/g, '')));
+    if(out.length) return out;
+  }
+  push('text', plain);
+  return out;
+}
+
+// 사진 여러 장이 한계를 넘으면 뒤엣것부터 뺀다. 조용히 자르지 않고 몇 장인지 돌려준다.
+function photoBudget(list, kb){
+  const cap = (kb || PHOTO_BUDGET_KB) * 1024;
+  const kept = [];
+  let used = 0;
+  (list||[]).forEach(p=>{
+    const n = String(p||'').length;
+    if(used + n <= cap){ kept.push(p); used += n; }
+  });
+  return { ok: kept.length === (list||[]).length, kept,
+           dropped: (list||[]).length - kept.length, used };
+}
+
+// 사진 한 장을 줄인다. 파일(File)도 그림 자료(data:)도 받는다.
+function resizePhoto(srcOrFile, cb){
+  const img = new Image();
+  const isFile = (typeof File !== 'undefined') && (srcOrFile instanceof Blob);
+  img.onload = ()=>{
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if(!w || !h){ cb(null); return; }
+    const sc = Math.min(1, PHOTO_MAX_PX / Math.max(w, h));
+    w = Math.round(w*sc); h = Math.round(h*sc);
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    let q = 0.82, out = c.toDataURL('image/jpeg', q);
+    while(out.length > PHOTO_MAX_KB*1024 && q > 0.35){
+      q -= 0.08;
+      out = c.toDataURL('image/jpeg', q);
+    }
+    if(isFile) URL.revokeObjectURL(img.src);
+    cb(out.length > PHOTO_MAX_KB*1024*1.6 ? null : out);
+  };
+  img.onerror = ()=>{ cb(null); };
+  img.src = isFile ? URL.createObjectURL(srcOrFile) : String(srcOrFile);
+}
+
+// 여러 장을 차례로 줄인다
+function resizePhotos(list, cb){
+  const out = [];
+  const step = i => {
+    if(i >= list.length){ cb(out); return; }
+    resizePhoto(list[i], r=>{ if(r) out.push(r); step(i+1); });
+  };
+  step(0);
+}
+
 // ===== 입력 화면 =====
 // 브라우저 기본 prompt 창은 배 위에서 쓰기 나쁘다.
 // 여러 칸을 한 화면에서 채우고, 자주 쓰는 값은 눌러서 넣을 수 있게 한다.
 let formCtx = null;
 let formPick = {};   // '고르기' 항목에서 지금 고른 값
+let formPhotoList = [];   // 이 화면에 붙은 사진들
 function closeForm(){
   const el = document.getElementById('formOv');
   if(el) el.style.display = 'none';
@@ -1092,9 +1200,18 @@ function openForm(o){
             + `<b>${esc(op.name)}</b>${op.sub ? `<span>${esc(op.sub)}</span>` : ''}</button>`).join('')
         + `</div></div>`;
     }
+    if(f.type === 'photos'){
+      formPhotoList = Array.isArray(f.value) ? f.value.slice() : [];
+      return `<div class="frow"><label>${esc(f.label||'사진')}</label>`
+        + `<div id="formPhotos"></div>`
+        + `<div class="fchips"><button class="fchip" onclick="formPhotoPick()">+ 사진 넣기</button></div>`
+        + `<div class="fhint">글을 사진째 복사해 내용 칸에 붙여넣으면 사진도 함께 들어갑니다.</div></div>`;
+    }
     if(f.type === 'multi'){
+      // 붙여넣기를 받아 사진을 뽑아낸다
       return `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
-        + `<textarea id="ff${i}" rows="${f.rows||5}" placeholder="${esc(f.placeholder||'')}">`
+        + `<textarea id="ff${i}" rows="${f.rows||5}" placeholder="${esc(f.placeholder||'')}"`
+        + ` onpaste="onFormPaste(event, ${i})">`
         + `${esc(f.value||'')}</textarea></div>`;
     }
     return `<div class="frow"><label for="ff${i}">${esc(f.label||'')}</label>`
@@ -1111,7 +1228,66 @@ function openForm(o){
     + `<button class="fbtn" onclick="closeForm()">취소</button>`
     + `<button class="fbtn go" onclick="formOk()">${esc(o.okText||'확인')}</button>`;
   document.getElementById('formOv').style.display = 'flex';
+  renderFormPhotos();
   setTimeout(()=>{ const el = document.getElementById('ff0'); if(el){ el.focus(); el.select(); } }, 60);
+}
+// 붙은 사진 목록을 그린다
+function renderFormPhotos(){
+  const box = document.getElementById('formPhotos');
+  if(!box) return;
+  box.innerHTML = formPhotoList.length
+    ? formPhotoList.map((p,i)=>
+        `<span class="fphoto"><img src="${esc(p)}">`
+        + `<button class="fphotox" onclick="formPhotoDel(${i})">✕</button></span>`).join('')
+    : `<div class="fhint">아직 사진이 없습니다</div>`;
+}
+function formPhotoAdd(list, quiet){
+  const merged = formPhotoList.concat(list||[]);
+  const r = photoBudget(merged);
+  formPhotoList = r.kept;
+  renderFormPhotos();
+  if(!r.ok && !quiet){
+    alert(`사진 ${r.dropped}장은 넣지 못했습니다.\n\n`
+      + `한 글에 넣을 수 있는 사진 용량을 넘었습니다.\n`
+      + `사진 수를 줄이거나 나눠서 올려 주세요.`);
+  }
+  return r;
+}
+function formPhotoDel(i){
+  formPhotoList.splice(i, 1);
+  renderFormPhotos();
+}
+function formPhotoPick(){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = ()=>{
+    const fs = [...(inp.files||[])];
+    if(!fs.length) return;
+    resizePhotos(fs, out=>formPhotoAdd(out));
+  };
+  inp.click();
+}
+// 여러 줄 칸에 붙여넣을 때 — 글자는 칸에 넣고 사진은 따로 모은다
+function onFormPaste(e, i){
+  const cd = e.clipboardData || (typeof window!=='undefined' && window.clipboardData);
+  if(!cd) return;
+  const html = cd.getData('text/html') || '';
+  const plain = cd.getData('text/plain') || '';
+  const files = [...(cd.files || [])].filter(f => /^image\//.test(f.type||''));
+  const parts = pasteParts(html, plain);
+  const photos = parts.filter(x => x.t === 'photo').map(x => x.v);
+  if(!photos.length && !files.length) return;   // 글자만이면 브라우저 기본 동작에 맡긴다
+  e.preventDefault();
+  const text = parts.filter(x => x.t === 'text').map(x => x.v).join('\n\n');
+  const el = document.getElementById('ff' + i);
+  if(el && text){
+    const a = el.selectionStart, b = el.selectionEnd;
+    el.value = el.value.slice(0, a) + text + el.value.slice(b);
+    el.selectionStart = el.selectionEnd = a + text.length;
+  }
+  const box = document.getElementById('formPhotos');
+  if(box) box.innerHTML = '<div class="fhint">사진을 넣는 중…</div>';
+  resizePhotos(photos.concat(files), out=>formPhotoAdd(out));
 }
 function formPickSet(key, i, v){
   formPick[key] = v;
@@ -1128,6 +1304,7 @@ function formVals(){
   const out = {};
   (o.fields||[]).forEach((f,i)=>{
     if(f.type === 'pick'){ out[f.key] = formPick[f.key]; return; }
+    if(f.type === 'photos'){ out[f.key] = formPhotoList.slice(); return; }
     const el = document.getElementById('ff' + i);
     out[f.key] = el ? String(el.value||'').trim() : '';   // 줄바꿈은 안쪽에 그대로 남는다
   });
@@ -2063,6 +2240,8 @@ function buildPublic(b){
     o.posts = (typeof posts!=='undefined' ? posts : [])
       .filter(p => p && p.pub === true)
       .map(p => ({ id:p.id, kind:p.kind, title:p.title, body:p.body,
+                   photos: (typeof photoBudget==='function'
+                             ? photoBudget(p.photos||[], 500).kept : []),
                    byName:p.byName || '', ts:p.ts || '' }));
   }
   // 항해일지 — 좌표와 정박지는 뺀다. 빈 배가 어디 있는지 알려주는 셈이 된다.
@@ -2369,13 +2548,32 @@ function addIntro(kind){
   openForm({
     title: isV ? '유튜브 링크' : '글',
     okText: '넣기',
-    fields: [ isV
-      ? { key:'v', label:'유튜브 주소', value:'', placeholder:'https://youtu.be/...' }
-      : { key:'v', type:'multi', rows:5, label:'내용', value:'', placeholder:'배 소개, 연혁, 자랑거리' } ],
+    fields: isV
+      ? [ { key:'v', label:'유튜브 주소', value:'', placeholder:'https://youtu.be/...' } ]
+      : [ { key:'v', type:'multi', rows:5, label:'내용', value:'',
+            placeholder:'배 소개, 연혁, 자랑거리 (사진째 복사해 붙여넣어도 됩니다)' },
+          { key:'photos', type:'photos', label:'사진', value:[] } ],
     onOk: v => {
-      if(!v.v){ alert('내용을 넣어 주세요'); return false; }
-      if(isV && !/^https?:\/\//.test(v.v)){ alert('주소는 https:// 로 시작해야 합니다'); return false; }
-      b.intro.push({ t: isV ? 'video' : 'text', v: v.v });
+      if(isV){
+        if(!v.v){ alert('내용을 넣어 주세요'); return false; }
+        if(!/^https?:\/\//.test(v.v)){ alert('주소는 https:// 로 시작해야 합니다'); return false; }
+        b.intro.push({ t:'video', v:v.v });
+        saveIntro(b);
+        return;
+      }
+      const photos = Array.isArray(v.photos) ? v.photos : [];
+      if(!v.v && !photos.length){ alert('내용을 넣어 주세요'); return false; }
+      // 소개 페이지는 배 문서 안에 들어간다. 문서 1MB 한계를 지켜야 한다.
+      const already = (b.intro||[]).filter(x=>x.t==='photo').map(x=>x.v);
+      const r = photoBudget(already.concat(photos));
+      if(!r.ok){
+        alert(`사진 ${r.dropped}장은 넣지 못했습니다.\n\n`
+          + `소개 페이지에 들어가는 사진 용량을 넘었습니다.\n`
+          + `기존 사진을 지우거나 장수를 줄여 주세요.`);
+      }
+      const add = r.kept.slice(already.length);
+      if(v.v) b.intro.push({ t:'text', v:v.v });
+      add.forEach(u => b.intro.push({ t:'photo', v:u }));
       saveIntro(b);
     }
   });
@@ -2529,7 +2727,8 @@ function writePost(id){
         options: kinds.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
       { key:'title', label:'제목', value: p ? p.title : '', placeholder:'제목' },
       { key:'body',  type:'multi', rows:6, label:'내용', value: p ? p.body : '',
-        placeholder:'내용을 적어 주세요' },
+        placeholder:'내용을 적어 주세요 (사진째 복사해 붙여넣어도 됩니다)' },
+      { key:'photos', type:'photos', label:'사진', value: p ? (p.photos||[]) : [] },
       { key:'pub', label:'밖에도 보이게', type:'pick', value: (p && p.pub) ? '1' : '0',
         options:[ { v:'0', name:'배 안에서만', sub:'구성원만 봅니다' },
                   { v:'1', name:'공개', sub:'배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)' } ] }
@@ -2543,6 +2742,7 @@ function writePost(id){
       const wantPub = (v.pub === '1');
       if(p){
         if(!editPost(p.id, v)) return false;
+        p.photos = Array.isArray(v.photos) ? v.photos : [];
         p.pub = wantPub; save();
         pushPublic(curBoat());
         openPost(p.id);
@@ -2578,6 +2778,8 @@ function openPost(id){
       ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
       ${canEditPost(b,p)?`<button class="minib blu" style="margin-left:auto" onclick="writePost('${esc(p.id)}')">고치기</button>`:''}</div>
     <div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>
+    ${(p.photos||[]).map((u,i)=>
+       `<img class="postimg" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
     <div class="ghead"><b>댓글</b><span class="gcnt">${(p.comments||[]).length}</span></div>
     ${cs}
     ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
@@ -3547,6 +3749,14 @@ function setBoatSpec(key, v){
   if(window.__saveBoat) window.__saveBoat(b);
 }
 
+// 클라우드 배 문서에 들어가는 칸. 올리는 쪽(__saveBoat)과 받는 쪽(mergeCloudBoats)이
+// 반드시 같은 목록을 봐야 한다. 2.6 에서 받는 쪽이 넷만 받아 제원·홈포트·명부가
+// 전부 버려졌다. 목록을 따로 적으면 또 어긋난다.
+const BOAT_FIELDS = ['name','type','port','maker','model','year','lat','lon','code',
+                     'spec','members','memberNames','ranks','roster','openJoin',
+                     'pub','intro','createdAt'];
+if(typeof window !== 'undefined') window.__boatFields = BOAT_FIELDS;
+
 function curBoat(){
   return boats.find(b=>String(b.id)===String(currentBoatId)) || boats[0] || null;
 }
@@ -3847,11 +4057,10 @@ async function mergeCloudBoats(){
   list.forEach(cb => {
     const old = have[String(cb.id)];
     if(old){
-      // 이미 있는 배는 두 번 넣지 않는다. 사람·등급은 클라우드 것이 최신이다.
-      if(cb.name) old.name = cb.name;
-      if(cb.members) old.members = cb.members;
-      if(cb.memberNames) old.memberNames = cb.memberNames;
-      if(cb.ranks) old.ranks = cb.ranks;
+      // 이미 있는 배는 두 번 넣지 않는다. 칸은 목록대로 전부 받는다.
+      // 골라 받으면 빠뜨린 칸이 영영 안 내려온다 (2.6 의 제원 동기화 사고).
+      BOAT_FIELDS.forEach(k => { if(cb[k] !== undefined && cb[k] !== null) old[k] = cb[k]; });
+      migrateRanks(old);
       return;
     }
     migrateRanks(cb);
@@ -3916,16 +4125,35 @@ function syncTap(){
   }
   syncNow();
 }
+// '동기화' 한 단어로는 올리는 건지 받는 건지 알 수 없다. 둘로 나눈다.
 // 손으로 올리기 (실패하면 이유를 그대로 보여준다)
-function syncNow(){
-  if(!cloud){ alert('로그인한 상태에서만 동기화합니다'); return; }
+function syncUp(){
+  if(!cloud){ alert('로그인한 상태에서만 클라우드를 씁니다'); return; }
   lastPushErr = null;
   pushNow().then(()=>{
     if(lastPushErr) alert('올리지 못했습니다.\n\n' + lastPushErr
       + '\n\n권한 오류라면 파이어스토어 규칙을 최신으로 올렸는지 확인해 주세요.');
-    else alert('클라우드에 올렸습니다.');
+    else alert('이 기기의 기록을 클라우드에 올렸습니다.');
   });
 }
+// 손으로 받아오기 — 이 기기 기록이 클라우드 것으로 바뀐다. 먼저 알린다.
+function syncDown(){
+  if(!cloud){ alert('로그인한 상태에서만 클라우드를 씁니다'); return; }
+  if(!confirm('클라우드에서 받아옵니다.\n\n'
+    + '이 기기에만 있고 아직 올리지 않은 기록은\n클라우드 것으로 덮어씌워질 수 있습니다.\n\n'
+    + '계속할까요?')) return;
+  setSync('받아오는 중…');
+  cloudPull().then(()=>{
+    alert('클라우드에서 받아왔습니다.');
+  }).catch(e=>{
+    const m = (e && (e.code ? e.code + ' \u2014 ' : '') + (e.message || String(e))) || '알 수 없는 오류';
+    lastPushErr = m;
+    setSync('받아오지 못함 · 눌러서 확인');
+    alert('받아오지 못했습니다.\n\n' + m);
+  });
+}
+// 옛 이름 — 다른 곳에서 부르던 것이 있으면 올리기로 이어준다
+function syncNow(){ syncUp(); }
 function schedulePush(){
   if(!cloud || !unlocked) return;
   // 받아오기가 끝나기 전이면 미뤄 둔다. 끝나면 이어서 올린다.
@@ -4165,7 +4393,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.8';
+const APP_VER = '2.9';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -5232,27 +5460,6 @@ function toggleView(force){
   document.getElementById('listView').style.display = isMap?'none':'block';
   document.getElementById('tabToggle').textContent = isMap?'목록':'도면';
   if(!isMap){ if(typeof lkEdit!=='undefined' && lkEdit) toggleLkEdit(); closePanel(); renderList(); }
-}
-
-function exportCSV(){
-  const rows = [["층","구역","수납칸","상자","물품명","수량","단위","비고"]];
-  zoneOrder().forEach(zone=>{
-    lockers.filter(l=>l.zone===zone).forEach(l=>{
-      const top = items.filter(i=>i.lockerId===l.id && !i.parentId);
-      if(top.length===0){ rows.push([l.deck2?"2층":"1층", zone, l.label, "", "", "", "", ""]); return; }
-      top.forEach(it=>{
-        rows.push([l.deck2?"2층":"1층", zone, l.label, it.box?"(상자)":"", it.name, it.qty, it.unit||"", it.note]);
-        if(it.box) children(it.id).forEach(c=>{
-          rows.push([l.deck2?"2층":"1층", zone, l.label, it.name, c.name, c.qty, c.unit||"", c.note]);
-        });
-      });
-    });
-  });
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob(["\uFEFF"+csv], {type:"text/csv;charset=utf-8;"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = "뱃일_적재표.csv"; a.click();
-  URL.revokeObjectURL(a.href);
 }
 
 function backupData(){
@@ -8444,20 +8651,23 @@ document.addEventListener('visibilitychange', ()=>{
     // 계정 없이도 앱을 쓸 수 있다. 계정은 여러 기기에서 함께 보거나
     // 다른 사람과 같이 관리할 때 필요하다.
     // 배 문서 저장 — 규칙이 members 를 읽어 접근을 판단한다
+    // 올릴 칸은 앱이 가진 목록(window.__boatFields)을 그대로 쓴다.
+    // 여기에 손으로 다시 적으면 앱과 어긋나 어떤 칸은 영영 안 올라간다.
+    const BOAT_DEFAULTS = { name:'', type:'other', port:'', maker:'', model:'', year:null,
+      lat:null, lon:null, code:'', spec:{}, members:{}, memberNames:{}, ranks:{},
+      roster:{}, openJoin:true, pub:{}, intro:[], createdAt:'' };
     window.__saveBoat = async (boat) => {
       if(!fauth.currentUser || !boat || !boat.id) return false;
+      const keys = (window.__boatFields && window.__boatFields.length)
+        ? window.__boatFields : Object.keys(BOAT_DEFAULTS);
+      const body = {};
+      keys.forEach(k => {
+        const v = boat[k];
+        body[k] = (v === undefined || v === null)
+          ? (k in BOAT_DEFAULTS ? BOAT_DEFAULTS[k] : null) : v;
+      });
       try{
-        await setDoc(doc(fdb, 'boats', String(boat.id)), {
-          name: boat.name || '', type: boat.type || 'other', port: boat.port || '',
-          maker: boat.maker || '', model: boat.model || '', year: boat.year || null,
-          lat: (boat.lat != null ? boat.lat : null), lon: (boat.lon != null ? boat.lon : null),
-          code: boat.code || '', spec: boat.spec || {},
-          members: boat.members || {}, memberNames: boat.memberNames || {},
-          ranks: boat.ranks || {}, roster: boat.roster || {},
-          openJoin: boat.openJoin !== false,
-          pub: boat.pub || {}, intro: boat.intro || [],
-          createdAt: boat.createdAt || ''
-        }, { merge:true });
+        await setDoc(doc(fdb, 'boats', String(boat.id)), body, { merge:true });
         return true;
       }catch(e){ console.warn('배 저장 실패', e.code || e.message); return false; }
     };

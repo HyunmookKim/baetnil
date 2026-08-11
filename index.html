@@ -1513,6 +1513,7 @@ function openForm(o){
     + `<button class="fbtn" onclick="closeForm()">취소</button>`
     + `<button class="fbtn go" onclick="formOk()">${esc(o.okText||'확인')}</button>`;
   document.getElementById('formOv').style.display = 'flex';
+  navPush('form');
   renderFormPhotos();
   // 편집기(contenteditable)에는 select() 가 없다 — 있는 것만 부른다
   setTimeout(()=>{ const el = document.getElementById('ff0');
@@ -2656,7 +2657,7 @@ async function openHidden(){
   const ids = hiddenBoats();
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>숨긴 배</b><span style="flex:1"></span>
-      <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>`
+      <button class="tab" onclick="backToExplore()">목록</button></div>`
     + (ids.length ? '<div class="mrnone">불러오는 중…</div>'
                   : '<div class="mrnone">숨긴 배가 없습니다</div>');
   showPanel(P);
@@ -2679,6 +2680,14 @@ function unhideBoatUI(id){
 }
 // ===== 배 둘러보기 =====
 let exploreBiz = false;
+// 배 페이지·신고 화면에서 목록으로 돌아온다.
+// 덮개를 먼저 닫지 않으면 뒤에 그려도 안 보인다 — 눌러도 아무 일도 안 일어난다.
+function backToExplore(){
+  comSub = (exploreBiz ? 'biz' : 'explore');
+  try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
+  closeBoat();
+  switchTab('community');
+}
 // 커뮤니티 탭 안에 그린다. 덮개(mrPanel)로 띄우면 다른 탭 위에 얹힌 것처럼 보인다.
 async function openExplore(biz){
   exploreBiz = (biz === true);
@@ -2723,7 +2732,7 @@ async function openBoatPage(id){
   const mine = boats.some(b=>String(b.id)===String(id));
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>
+      <button class="tab" onclick="backToExplore()">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
       ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>
     ${mine ? `<div class="mrnone">이미 이 배의 구성원입니다</div>`
@@ -4849,7 +4858,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.5';
+const APP_VER = '3.6';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -5270,11 +5279,32 @@ function drawShapes(){
 }
 // 휴대폰 뒤로가기 버튼으로도 되돌린다.
 // 편집 중에 뒤로가기를 누르면 앱이 꺼지는 것이 아니라 한 걸음 물린다.
+// 화면을 열 때 뒤로가기 한 칸을 쌓는다.
+// 안드로이드에서 화면 왼쪽을 밀면 뒤로가기가 오는데, 쌓아 둔 것이 없으면
+// 브라우저가 앱을 통째로 닫는다. 정식 앱이 아니라서가 아니라 이걸 안 쌓아서였다.
+let navDepth = 0;
+function navPush(kind){
+  try{ history.pushState({ bt:kind || 1 }, ''); navDepth++; }catch(_){}
+}
 window.addEventListener('popstate', ()=>{
+  if(navDepth > 0) navDepth--;
+  // 1) 그리기 중이면 한 걸음 물린다
   if(lkEdit && canUndo()){
     undoRun();
-    history.pushState({ lkEdit:true }, '');   // 다음 뒤로가기도 받도록 다시 쌓는다
+    navPush('lkEdit');
+    return;
   }
+  // 2) 입력 화면이 떠 있으면 그것부터 닫는다
+  const fo = document.getElementById('formOv');
+  if(fo && fo.style.display === 'flex'){ closeForm(); return; }
+  // 3) 열려 있는 화면(내 배·기록·배 페이지)을 닫는다
+  const P = document.getElementById('mrPanel');
+  if(P && P.classList.contains('open')){ closeBoat(); return; }
+  // 4) 물품 목록이 열려 있으면 닫는다
+  const pn = document.getElementById('panel');
+  if(pn && pn.classList.contains('open')){ closePanel(); return; }
+  // 5) 오늘이 아니면 오늘로 — 여기서 한 번 더 뒤로 밀면 앱이 닫힌다
+  if(curTab !== 'home'){ switchTab('home'); navPush('home'); return; }
 });
 // 되돌리기 버튼 표시 갱신
 function paintUndoBtns(){
@@ -6744,7 +6774,10 @@ function openMR(t, id){
   }
   P.innerHTML = `
     <div class="mrtop"><b>${TITLES[t]||''}</b>
-      <button class="mrbtn ok" onclick="mrSaveClose()">저장 후 닫기</button></div>
+      ${unlocked
+        ? `<button class="mrbtn ok" onclick="mrSaveClose()">저장 후 닫기</button>
+           <button class="mrbtn" onclick="closeMR()">목록</button>`
+        : `<button class="mrbtn" onclick="closeMR()">목록</button>`}</div>
     ${body}
     <div class="mrrow"><span class="mrlbl">메모</span>${unlocked
       ?`<textarea rows="2" style="flex:1" onchange="mrField('note',this.value)">${esc(it.note||'')}</textarea>`
@@ -7320,6 +7353,7 @@ function showPanel(P){
   P = P || document.getElementById('mrPanel');
   if(!P) return;
   measureHeader();
+  if(!P.classList.contains('open')) navPush('panel');   // 뒤로가기로 닫을 수 있게
   P.classList.add('open', 'full');
   const t = P.querySelector('.mrhead > b, .mrtop > b');
   if(t) setHeadTitle(String(t.textContent || '').trim());

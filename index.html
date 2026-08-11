@@ -331,6 +331,9 @@ body{padding-bottom:62px}
 #pinBanner{display:none;background:#3a2a08;border:1px solid #b58a3a;color:#e8c87a;font-size:12px;padding:8px 12px;text-align:center;border-radius:8px;margin:0 0 8px}
 #mrPanel{position:fixed;left:0;right:0;bottom:62px;max-height:66vh;overflow:auto;background:#081828;border-top:2px solid #2a5a8a;border-radius:14px 14px 0 0;display:none;z-index:55;padding:14px 16px;box-shadow:0 -8px 30px #000b}
 #mrPanel.open{display:block}
+/* 화면을 통째로 덮는다. 아래에 작게 뜨면 뒤 화면이 비쳐서 무슨 화면인지 헷갈린다. */
+#mrPanel.full{top:0;bottom:0;max-height:none;border-radius:0;border-top:none;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom))}
 #mrPanel input,#mrPanel textarea,#mrPanel select{background:#0c1e30;border:1px solid #1e4060;border-radius:7px;color:#c8dff0;padding:7px 10px;font-size:13px;outline:none}
 .mrrow{display:flex;gap:8px;margin:7px 0;align-items:center;flex-wrap:wrap}
 .mrlbl{font-size:11px;color:#4a789e;width:58px;flex-shrink:0}
@@ -1464,7 +1467,7 @@ function openAccount(){
         <button class="mrbtn" style="flex:1" onclick="doEmail(true)">회원가입</button></div>
       <div id="acMsg" class="mrnone" style="text-align:left;display:none"></div>`;
   }
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function acMsg(t){
   const el = document.getElementById('acMsg');
@@ -1571,7 +1574,7 @@ function openBoatSetup(){
       지금 몰라도 되고, 나중에 채워도 됩니다.</div>
     <div class="mrrow" style="justify-content:flex-end">
       <button class="mrbtn" onclick="createBoat()">등록</button></div>`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
   setTimeout(()=>{ const el=document.getElementById('nbName'); if(el) el.focus(); }, 100);
   // 지도를 켜고 현재 위치를 기본값으로 잡는다 — 대부분 지금 있는 곳이 홈포트다
   requestAnimationFrame(()=>{
@@ -1747,7 +1750,7 @@ function openFleet(){
     + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
         <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button>
         <button class="mrbtn big" onclick="joinBoat()">참여 신청</button></div>` : '');
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 // 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
 async function openBoatInfo(id){
@@ -2142,7 +2145,7 @@ async function openHidden(){
       <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>`
     + (ids.length ? '<div class="mrnone">불러오는 중…</div>'
                   : '<div class="mrnone">숨긴 배가 없습니다</div>');
-  P.classList.add('open');
+  P.classList.add('open', 'full');
   if(!ids.length || !window.__pub) return;
   const rows = [];
   for(const id of ids){
@@ -2173,7 +2176,7 @@ async function openExplore(biz){
       <button class="tab${exploreBiz?'':' on'}" onclick="openExplore(false)">모아보기</button>
       <button class="tab${exploreBiz?' on':''}" onclick="openExplore(true)">영업</button>
     </div><div class="mrnone">불러오는 중…</div>`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
   let list;
   try{ list = await window.__pub.list(exploreBiz); }
   catch(e){ P.innerHTML += `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
@@ -2204,13 +2207,15 @@ async function openBoatPage(id){
   const spec = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
                  x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
                  .filter(Boolean).join(' · ');
+  const mine = boats.some(b=>String(b.id)===String(id));
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
       <button class="tab" onclick="openExplore(${exploreBiz})">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
-      ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}
-      <button class="minib" style="margin-left:auto" onclick="reportBoat('${esc(x.id)}')">신고</button>
-      <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`
+      ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>
+    ${mine ? `<div class="mrnone">이미 이 배의 구성원입니다</div>`
+      : `<div class="mrrow" style="padding:12px">
+          <button class="mrbtn big" style="width:100%" onclick="joinBoat('${esc(x.id)}')">이 배에 가입 신청</button></div>`}`
     + intro
     + sec('제원', spec ? `<div class="postbody">${esc(spec)}</div>` : '')
     + sec('연락처', x.phone ? `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>` : '')
@@ -2225,8 +2230,13 @@ async function openBoatPage(id){
         ? `<div class="postbody">${x.roster.map(r=>esc(r.name)+' ('+esc(r.rank)+')').join(' · ')}</div>` : '')
     + sec('게시판', (x.posts||[]).length
         ? x.posts.map(p=>`<div class="cmt"><div class="cmthead">${esc(p.title||'')}<span>${esc(String(p.ts||'').slice(0,10))}</span></div>
-            <div class="cmtbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div></div>`).join('') : '');
-  P.classList.add('open');
+            <div class="cmtbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div></div>`).join('') : '')
+    // 신고·차단은 맨 아래. 위에 두면 이 화면이 신고하는 곳처럼 보인다.
+    + `<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 12px 24px;
+         border-top:1px solid #12283e;margin-top:12px">
+        <button class="minib" onclick="reportBoat('${esc(x.id)}')">신고</button>
+        <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`;
+  P.classList.add('open', 'full');
 }
 // 공개 설정 화면
 function openPublish(){
@@ -2248,7 +2258,7 @@ function openPublish(){
     + rows
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="openIntro()">소개 페이지 쓰기</button></div>`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function setPubUI(key, on){
   const b = curBoat(); if(!b) return;
@@ -2300,7 +2310,7 @@ function openIntro(){
         <button class="mrbtn" onclick="addIntro('text')">+ 글</button>
         <button class="mrbtn" onclick="addIntro('photo')">+ 사진</button>
         <button class="mrbtn" onclick="addIntro('video')">+ 유튜브</button></div>`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function saveIntro(b){
   saveLocal();
@@ -2472,7 +2482,7 @@ function openBoard(){
     + (rows || '<div class="mrnone">아직 글이 없습니다</div>')
     + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="writePost()">+ 글쓰기</button></div>` : '');
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function writePost(id){
   const b = curBoat(); if(!b) return;
@@ -2540,7 +2550,7 @@ function openPost(id){
     ${cs}
     ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
       <button class="mrbtn big" style="width:100%" onclick="writeComment('${esc(p.id)}')">댓글 쓰기</button></div>`:''}`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function writeComment(pid){
   openForm({
@@ -2656,7 +2666,7 @@ function openMyTasks(){
     + (seeAll && free.length
         ? `<div class="ghead"><b>아무도 안 맡은 일</b><span class="gcnt">${free.length}</span></div>`
           + free.map(row).join('') : '');
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 // ===== 회원 명부 =====
 // 사람마다 회비·오는 주기·부재·메모를 적어 둔다.
@@ -2838,7 +2848,7 @@ function openRoster(){
                         : `${esc(a.name)} · ${esc(a.until)}까지 부재${a.note?' ('+esc(a.note)+')':''}`
       ).join('<br>')}</div>` : '')
     + rows;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 // 한 사람의 명부 기록 고치기
 function editRoster(uid){
@@ -2925,7 +2935,7 @@ function openRanks(){
     + list
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="addRankUI()">+ 등급 만들기</button></div>`;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function addRankUI(){
   const b = curBoat(); if(!b) return;
@@ -2964,7 +2974,7 @@ function editRankUI(id){
     + rows
     + (r.owner ? '' : `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn" onclick="delRankUI('${esc(id)}')">이 등급 지우기</button></div>`);
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function renameRankUI(id, v){
   const b = curBoat(); if(!b) return;
@@ -3087,7 +3097,7 @@ async function openJoinReqs(){
           <button class="minib blu" onclick="approveJoin('${esc(v.id)}','${esc(v.uid)}','${esc(v.name||'')}')">받기</button>
           <button class="minib red" onclick="rejectJoin('${esc(v.id)}')">거절</button>
         </div></div>`).join('');
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function approveJoin(inviteId, uid, name){
   const b = curBoat(); if(!b || !can(b,'members','write')) return;
@@ -3220,7 +3230,9 @@ function openBoat(tab){
       <div class="mrrow"><span class="mrlbl">기록</span><span class="mrm" style="flex:1">
         물품 ${items.length} · 정기점검 ${maint.length} · 수리 ${repair.length} · 항해 ${voyage.length} · 주유 ${fuel.length}</span></div>`;
   } else {
-    const rows = Object.entries(BOAT_SPEC).map(([k,d])=>{
+    // 세일 관련 항목은 세일링 요트에만 보여준다
+    const isSail = (typeof boatType === 'function') ? boatType() === 'sail' : true;
+    const rows = Object.entries(BOAT_SPEC).filter(([k,d]) => !d.sailOnly || isSail).map(([k,d])=>{
       const cur = (b.spec && b.spec[k] != null) ? b.spec[k] : '';
       const ph = d.def != null ? String(d.def) : '';
       return `<div class="mrrow"><span class="mrlbl">${d.label}${helpBtn('spec_'+k)}</span>${unlocked
@@ -3231,10 +3243,11 @@ function openBoat(tab){
     }).join('');
     body = rows + `<div class="mrnone" style="text-align:left">
       제원은 계산에 쓰입니다. 입력하지 않은 항목은 관련 계산을 건너뜁니다.<br>
-      <b>공기흘수</b>가 없으면 교량 통과 여부를, <b>연료 탱크</b>가 없으면 잔량 추정을 계산하지 않습니다.</div>`;
+      <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.${
+      isSail ? '<br><b>리프 풍속</b>을 넣어 두면 날씨 화면에서 지금 바람에 몇 단을 줄여야 하는지 알려 줍니다.' : ''}</div>`;
   }
   P.innerHTML = head + body;
-  P.classList.add('open');
+  P.classList.add('open', 'full');
 }
 function setBoatSpecUI(k, v){
   setBoatSpec(k, v);
@@ -3242,7 +3255,9 @@ function setBoatSpecUI(k, v){
   if(typeof renderWeather === 'function' && curTab === 'weather') renderWeather();
   if(typeof renderFuel === 'function') renderFuel();
 }
-function closeBoat(){ document.getElementById('mrPanel').classList.remove('open'); }
+function closeBoat(){
+  const _p = document.getElementById('mrPanel');
+  if(_p) _p.classList.remove('full'); document.getElementById('mrPanel').classList.remove('open'); }
 function boatYear(v){
   const t = String(v||'').trim();
   const n = parseInt(t, 10);
@@ -3273,6 +3288,12 @@ const BOAT_SPEC = {
   airDraft: { label:'공기흘수',        unit:'m',  help:'수면부터 배의 가장 높은 곳까지의 높이입니다. 안테나를 포함한 실측값을 넣어 주세요. 교량 통과 판단에 쓰입니다.' },
   margin:   { label:'교량 안전여유',   unit:'m',  help:'교량 아래를 지날 때 최소한 남겨 둘 여유입니다. 이 값보다 적게 남으면 통과 불가로 표시됩니다.', def:1.0 },
   fuelTank: { label:'연료 탱크',       unit:'L',  help:'연료 탱크의 총 용량입니다. 잔량 추정의 기준이 됩니다.' },
+  reef1:    { label:'1단 리프 풍속',   unit:'kt', help:'이 풍속부터 메인세일을 1단 줄입니다. 핸드북이나 세일메이커 기준을 적어 주세요.', sailOnly:true },
+  reef2:    { label:'2단 리프 풍속',   unit:'kt', help:'이 풍속부터 2단으로 줄입니다.', sailOnly:true },
+  reef3:    { label:'3단 리프 풍속',   unit:'kt', help:'이 풍속부터 3단으로 줄입니다. 없으면 비워 두세요.', sailOnly:true },
+  jibDown:  { label:'헤드세일 교체 풍속', unit:'kt', help:'제노아를 접거나 작은 집으로 바꾸는 기준 풍속입니다.', sailOnly:true },
+  maxWind:  { label:'출항 한계 풍속',  unit:'kt', help:'이 풍속을 넘으면 나가지 않는다고 정해 둔 값입니다. 날씨 화면에서 경고합니다.' },
+  maxWave:  { label:'출항 한계 파고',  unit:'m',  help:'이 파고를 넘으면 나가지 않는다고 정해 둔 값입니다.' },
   waterTank:{ label:'청수 탱크',       unit:'L',  help:'식수·생활용수 탱크의 총 용량입니다. 며칠 나가는 항해를 준비할 때 참고가 됩니다.' },
   engine:   { label:'엔진',            unit:'',   help:'제조사와 모델을 적어 두면 부품을 찾을 때 편합니다.', text:true },
 };
@@ -3769,7 +3790,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '2.0';
+const APP_VER = '2.1';
 const SHAPE_TYPES = ['line','rect','tri'];
 // 도형 모양. 벽과 통로를 눈으로 구분할 수 있게 몇 가지를 준다.
 const SHAPE_STYLES = [
@@ -4985,11 +5006,14 @@ const MAINT_GRPS_BY_TYPE = {
 // 항해 중 남기는 기록의 종류도 배에 따라 다릅니다
 const LOG_KINDS_COMMON = ['엔진ON','엔진OFF','기항','묘박','급유','고장','관측','기타'];
 const LOG_KINDS_BY_TYPE = {
-  sail:    ['세일'],
+  sail:    ['세일 올림','세일 내림','리프'],
   power:   [],
   fishing: ['투망','양망','어군탐지'],
   other:   [],
 };
+// 세일을 올리면 엔진을 끈 것으로, 내리면 켠 것으로 본다.
+// 요트에서 당연한 순서라 매번 따로 적게 하면 번거롭고 빠뜨린다.
+const SAIL_ENGINE = { '세일 올림':'엔진OFF', '세일 내림':'엔진ON' };
 function logKinds(){
   const t = boatType();
   return [...(LOG_KINDS_BY_TYPE[t] || []), ...LOG_KINDS_COMMON];
@@ -5284,6 +5308,7 @@ function openMR(t, id){
   } else if(t==='voyage'){
     body = tf('날짜','date',it.date,'date','')
       + legRow('출발','from','timeOut','wxOut', it)
+      + logRows(it)                       // 출발 → 중간 기록 → 도착 순서로 읽힌다
       + legRow('도착','to','timeIn','wxIn', it)
       + (unlocked && !String(it.timeIn||'').trim()
           ? `<div class="posrow"><span style="color:#7b8794">입항하면 한 번에 —</span>`
@@ -5292,12 +5317,19 @@ function openMR(t, id){
           ?`<input type="number" step="0.1" value="${esc(String(it.nm||''))}" style="width:90px" onchange="mrField('nm',this.value)"> NM`
           :`<b class="mrv">${it.nm?it.nm+' NM':'—'}</b>`}</div>`
       + suggestRow(it, 'nm')
-      + `<div class="mrrow"><span class="mrlbl">시간</span>${unlocked
-          ?`<input type="number" step="0.5" value="${esc(String(it.hours||''))}" style="width:70px" onchange="mrField('hours',this.value)"> 항해h
-             <input type="number" step="0.5" value="${esc(String(it.engineH||''))}" style="width:70px" onchange="mrField('engineH',this.value)"> 엔진h`
-          :`<b class="mrv">항해 ${it.hours||'—'}h · 엔진 ${it.engineH||'—'}h</b>`}</div>`
+      + `<div class="mrrow"><span class="mrlbl">항해 시간</span>${unlocked
+          ?`<input type="number" step="0.1" value="${esc(String(it.hours||''))}" style="width:80px" onchange="mrField('hours',this.value)"> h
+             <button class="minib blu" onclick="fillSailHours()">출발·도착에서 계산</button>`
+          :`<b class="mrv">${it.hours||'—'} h</b>`}</div>`
+      + `<div class="mrrow"><span class="mrlbl">엔진 시간</span>${unlocked
+          ?`<input type="number" step="0.1" value="${esc(String(it.engineH||''))}" style="width:80px" onchange="mrField('engineH',this.value)"> h
+             <button class="minib blu" onclick="fillEngineHours()">중간 기록에서 계산</button>`
+          :`<b class="mrv">${it.engineH||'—'} h</b>`}</div>`
+      + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">
+           엔진 시간은 항해 시간 안에 들어 있습니다. 세일로 간 시간은
+           ${(() => { const a=Number(it.hours)||0, b=Number(it.engineH)||0;
+                      return (a>0 && b>=0 && a>=b) ? (a-b).toFixed(1)+'h' : '—'; })()} 입니다.</div>`
       + suggestRow(it, 'engineH')
-      + logRows(it)
       + tf('동승','crew',it.crew)
       + (trkPoints(it).length
           ? `<div class="mrrow"><span class="mrlbl">항적</span>
@@ -6053,6 +6085,63 @@ function arriveNow(){
   renderVoyage(); openMR('voyage', it.id);
 }
 
+// ── 항해 시간 / 엔진 시간
+// 항해 시간은 출발부터 도착까지 전체다.
+// 엔진 시간은 그 안에 들어 있는 일부다 — 따로 세는 값이 아니다.
+function hhmmToH(v){
+  const m = String(v||'').match(/^(\d{1,2}):(\d{2})$/);
+  if(!m) return null;
+  const h = +m[1], mi = +m[2];
+  if(h > 23 || mi > 59) return null;
+  return h + mi/60;
+}
+const round1 = v => Math.round(v*10)/10;
+function sailHours(it){
+  const a = hhmmToH(it && it.timeOut), b = hhmmToH(it && it.timeIn);
+  if(a === null || b === null) return null;
+  let d = b - a;
+  if(d < 0) d += 24;            // 자정을 넘긴 항해
+  return round1(d);
+}
+// 중간 기록의 엔진ON/OFF(세일 올림·내림 포함)로 엔진을 켠 시간을 더한다.
+// 아무 기록도 없으면 항해 내내 켠 것으로 본다 — 모터보트가 그렇다.
+function engineHoursFromLogs(it){
+  const a = hhmmToH(it && it.timeOut), b0 = hhmmToH(it && it.timeIn);
+  if(a === null || b0 === null) return null;
+  const end = (b0 < a) ? b0 + 24 : b0;
+  const evs = (it.logs || []).map(g=>{
+    const k = SAIL_ENGINE[g.kind] || g.kind;
+    if(k !== '엔진ON' && k !== '엔진OFF') return null;
+    let t = hhmmToH(g.time);
+    if(t === null) return null;
+    if(t < a) t += 24;                     // 자정 넘김
+    return { t: Math.max(a, Math.min(end, t)), on: (k === '엔진ON') };
+  }).filter(Boolean).sort((x,y)=> x.t - y.t);
+  let on = true, last = a, total = 0;      // 출발 시점에는 켜 놓고 나간다
+  evs.forEach(e=>{
+    if(on) total += e.t - last;
+    on = e.on; last = e.t;
+  });
+  if(on) total += end - last;
+  return round1(Math.max(0, Math.min(end - a, total)));
+}
+// 계산 버튼
+function fillSailHours(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const h = sailHours(it);
+  if(h === null){ alert('출발 시각과 도착 시각을 먼저 넣어 주세요'); return; }
+  mrField('hours', h);
+}
+function fillEngineHours(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const h = engineHoursFromLogs(it);
+  if(h === null){ alert('출발 시각과 도착 시각을 먼저 넣어 주세요'); return; }
+  const n = (it.logs||[]).filter(g => SAIL_ENGINE[g.kind] || g.kind==='엔진ON' || g.kind==='엔진OFF').length;
+  if(!n && !confirm('중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n'
+    + '항해 내내 엔진을 켠 것으로 보고 ' + h + '시간으로 넣을까요?\n'
+    + '세일로 가셨다면 중간 기록에 "세일 올림"을 먼저 넣어 주세요.')) return;
+  mrField('engineH', h);
+}
 // ── 중간 기록
 function logAdd(){
   if(!unlocked) return;
@@ -6068,7 +6157,16 @@ function logAdd(){
 function logField(lid, k, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
   const g = (it.logs||[]).find(x=>x.id===lid); if(!g) return;
-  g[k] = v; it.seed = false; saveMR();
+  g[k] = v; it.seed = false;
+  // 세일을 올리고 내린 기록이 바뀌면 엔진 시간도 따라 바뀐다.
+  // 사람이 두 번 계산하게 두면 반드시 어긋난다.
+  if(k === 'kind' || k === 'time'){
+    const eh = engineHoursFromLogs(it);
+    if(eh !== null) it.engineH = eh;
+    const sh = sailHours(it);
+    if(sh !== null && !it.hours) it.hours = sh;
+  }
+  saveMR();
   if(k === 'time'){
     if(v) return wxCapture('log:'+lid);
     g.wx = null; saveMR();
@@ -6082,12 +6180,16 @@ function logDel(lid){
 }
 function logRows(it){
   const arr = (it.logs||[]).slice().sort((a,b)=> String(a.time||'').localeCompare(String(b.time||'')));
-  const head = `<div class="mrrow"><span class="mrlbl">중간 기록</span>${
-    unlocked ? `<button class="mrbtn" onclick="logAdd()">+ 추가</button>` : ''}
-    <span style="flex:1"></span></div>`;
+  const head = `<div class="mrrow"><span class="mrlbl">중간 기록</span>
+    <span class="mrm" style="flex:1;color:#7b8794">출발과 도착 사이에 있었던 일</span></div>`;
+  // 추가 버튼은 목록 아래에 둔다 — 위에 있으면 누를 때마다 화면을 위로 올려야 한다
+  const foot = unlocked
+    ? `<div class="mrrow" style="justify-content:center;padding:6px 12px 12px">
+         <button class="mrbtn big" onclick="logAdd()">+ 중간 기록 추가</button></div>`
+    : '';
   if(!arr.length)
     return head + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${
-      unlocked ? '항해 중 있었던 일을 시각과 함께 남겨라' : '기록 없음'}</div>`;
+      unlocked ? '항해 중 있었던 일을 시각과 함께 남겨 주세요' : '기록 없음'}</div>` + foot;
   return head + arr.map(g=>{
     const row = unlocked
       ? `<div class="mrrow" style="gap:6px">
@@ -6101,7 +6203,7 @@ function logRows(it){
            <span class="chip">${esc(g.kind||'')}</span>
            <b class="mrv" style="flex:1">${esc(g.text||'')}</b></div>`;
     return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id);
-  }).join('');
+  }).join('') + foot;
 }
 
 // ── 지도 (OpenSeaMap)
@@ -6712,7 +6814,8 @@ function renderFuel(){
   else
     notes.push(boatSpec('fuelTank') > 0
       ? '잔량 추정은 주유 기록에서 "만탱크"를 켜면 계산됩니다.'
-      : '잔량을 추정하려면 <b>내 배 → 제원</b>에서 연료 탱크 용량을 먼저 입력해 주세요.');
+      : '연료 탱크 용량을 넣으면 잔량을 추정합니다. '
+        + '<button class="minib blu" style="vertical-align:middle" onclick="openBoat(\'spec\')">연료 탱크 넣기</button>');
   const sub = `<div class="mrnone" style="text-align:left">${notes.join('<br>')}</div>`;
 
   // 주유·가동 기록을 한 목록에 날짜순으로 섞어 보여준다

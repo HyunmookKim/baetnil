@@ -1965,7 +1965,9 @@ window.__onAuth = u => {
     if(typeof retryDirtyBoats === 'function') retryDirtyBoats();
     const after = () => { if(typeof cloudSeedCheck === 'function') cloudSeedCheck(); };
     // 받아온 배가 화면에 나타나야 한다. 안 그리면 로그인해도 빈 화면이다.
-    const redraw = () => { try{ ensureBoat(); applyBoatName(); switchTab(curTab); }catch(_){} };
+    // ★ 화면을 옮기지 않는다. 사람이 이미 다른 탭에 가 있거나
+    //   무언가를 열어 보고 있을 수 있다. 내용만 새로 그린다.
+    const redraw = () => { try{ ensureBoat(); applyBoatName(); paintHNav(); renderCurrent(); }catch(_){} };
     if(typeof mergeCloudBoats === 'function')
       mergeCloudBoats().then(()=>{ redraw(); after(); }, ()=>{ redraw(); after(); });
     else { redraw(); after(); }
@@ -6004,7 +6006,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.16';
+const APP_VER = '3.17';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7519,9 +7521,18 @@ function switchTab(t){
   paintHNav();
   measureHeader();
 
-  // ★ 배가 없으면 배가 필요한 화면은 안내만 보여 준다.
-  //   막지는 않는다 — 오늘·커뮤니티는 그대로 쓸 수 있고, 탭도 다 열린다.
-  //   (배 없이 물품을 넣으면 어느 배의 것도 아닌 자리에 쌓여 나중에 사라진다)
+  renderCurrent();
+}
+// ★ 지금 보고 있는 화면의 '내용만' 다시 그린다.
+//   화면을 옮기지도, 열어 둔 것을 닫지도 않는다.
+//   늦게 끝나는 일(로그인 확정·클라우드 받아오기)이 화면을 새로 그려야 할 때
+//   switchTab 을 부르면 사람이 보고 있던 화면이 닫히고 탭이 되돌아간다.
+//   실제로 켠 직후 다른 탭으로 옮기면 잠시 뒤 되돌아가는 일이 있었다.
+function renderCurrent(){
+  const t = curTab;
+  // 배가 없으면 배가 필요한 화면은 안내만 보여 준다.
+  // 막지는 않는다 — 오늘·커뮤니티는 그대로 쓸 수 있고, 탭도 다 열린다.
+  // (배 없이 물품을 넣으면 어느 배의 것도 아닌 자리에 쌓여 나중에 사라진다)
   if(!curBoat() && boatNeedGuard(t)) return;
 
   if(t==='home'){

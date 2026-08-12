@@ -1,0 +1,30 @@
+name: collect-news
+on:
+  schedule:
+    - cron: '0 21 * * 0,3'   # 월·목 06:00 KST (UTC 일·수 21:00)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install rss-parser@3
+      - run: node scripts/collect_news.js
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - name: commit news.json
+        run: |
+          git config user.name "news-bot"
+          git config user.email "bot@users.noreply.github.com"
+          # news_seen.json 은 이미 내보낸 기사 목록이다.
+          # 이것도 함께 커밋해야 다음 회차에서 읽어 같은 기사를 거를 수 있다.
+          git add news.json news_seen.json
+          git diff --cached --quiet && exit 0
+          git commit -m "요트 뉴스 자동 수집"
+          git pull --rebase origin main
+          git push

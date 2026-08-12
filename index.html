@@ -808,7 +808,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()">고객센터 · 건의하기</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg>오늘</button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg>배</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>커뮤니티</button></nav>
 
 
@@ -3412,6 +3412,7 @@ function boatModGuard(){
 }
 
 const ADMIN_TABS = [
+  { k:'support', name:'들어온 이야기', need:null },
   { k:'reports', name:'신고된 글', need:'postDel' },
   { k:'boats',   name:'배',        need:'boatMod' },
   { k:'people',  name:'사람',      need:null      },
@@ -3432,7 +3433,8 @@ async function openAdmin(){
 
   let body = '';
   try{
-    if(adminTab === 'admins')      body = await adminAdmins();
+    if(adminTab === 'support')     body = await adminSupport();
+    else if(adminTab === 'admins') body = await adminAdmins();
     else if(adminTab === 'people') body = await adminPeople();
     else if(adminTab === 'boats')  body = await adminBoats();
     else                           body = await adminReports();
@@ -3894,14 +3896,27 @@ function openPublish(){
         <button class="mrbtn big" onclick="openIntro()">소개 페이지 쓰기</button></div>`;
   showPanel(P); boatKeepTabs('publish');
 }
-function setPubUI(key, on){
+function setPubUI(key, on, back){
   const b = curBoat(); if(!b) return;
   if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
   if(!setPub(b, key, on)) return;
   saveLocal();
   saveBoatCloud(b);
   pushPublic(b);
-  openPublish();
+  // 어디서 눌렀든 그 화면으로 돌아간다. 공개 설정으로 튕기면 길을 잃는다.
+  if(back === 'info') openBoat('info'); else openPublish();
+}
+// ★ 영업 배 여부는 등록할 때 정하고 끝나는 것이 아니다.
+//   개인 배로 타다 손님을 받기도 하고, 영업을 접기도 한다.
+//   공개 설정 안쪽에만 두면 나중에 어디서 바꾸는지 못 찾는다 —
+//   가장 먼저 보이는 기본 정보에도 둔다. 값은 pub.biz 한 곳만 쓴다.
+function setBizUI(on){
+  const b = curBoat(); if(!b) return;
+  if(!can(b, 'publish', 'write')){ alert('공개 설정을 바꿀 권한이 없습니다'); return; }
+  if(on && !confirm('영업 배로 켜면 배 이름과 선종이 밖으로 나갑니다.\n\n'
+      + '커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n'
+      + '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?')) return;
+  setPubUI('biz', !!on, 'info');
 }
 // 공개 자료를 밖에 내보낸다 (비공개면 지운다)
 function pushPublic(b){
@@ -5133,6 +5148,14 @@ function openBoat(tab){
       <div class="mrrow"><span class="mrlbl">참여 코드</span>
         <b class="mrv" id="joinCode" style="letter-spacing:1px;flex:1">${esc(b.id)}</b>
         <button class="minib blu" onclick="copyJoinCode()">복사</button></div>
+      <div class="mrrow"><span class="mrlbl">영업 배</span>
+        <span class="mrm" style="flex:1">${pubOn(b,'biz') ? '영업용 배입니다' : '개인 배입니다'}</span>
+        ${can(b,'publish','write')
+          ? `<button class="minib ${pubOn(b,'biz') ? 'grn' : 'blu'}" onclick="setBizUI(${pubOn(b,'biz')?'false':'true'})">${pubOn(b,'biz') ? '개인 배로' : '영업 배로'}</button>` : ''}</div>
+      <div class="mrnone" style="text-align:left">${pubOn(b,'biz')
+        ? '커뮤니티 <b>배 둘러보기 › 영업</b> 에 실려 있습니다. 손님이 찾아볼 수 있습니다.'
+        : '낚싯배·유어선·체험처럼 손님을 받는 배라면 켜 주세요. <b>배 둘러보기 › 영업</b> 에 실립니다.'}<br>
+        나중에 사정이 바뀌면 여기서 언제든 되돌릴 수 있습니다.</div>
       <div class="mrrow"><span class="mrlbl">신청 받기</span>
         <span class="mrm" style="flex:1">${b.openJoin === false ? '받지 않음' : '받는 중'}</span>
         ${can(b,'members','write')
@@ -6180,7 +6203,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.23';
+const APP_VER = '3.24';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8847,6 +8870,124 @@ function addVoyage(){
   posHere('wxOut', v.id, true);      // 출발 위치도 지금 자리로 잡는다 (실패해도 조용히)
 }
 
+// ===== 고객센터 =====
+// ★ 오류 신고에 기기 정보가 없으면 고칠 수가 없다.
+//   "무슨 폰 쓰세요?" 를 물으면 답이 안 온다. 앱이 알아서 붙인다.
+//   그리고 접수한 것은 클라우드에 남긴다 — 메일이 안 가도 사라지지 않는다.
+const SUPPORT_MAIL = 'jaha814@gmail.com';
+const SUPPORT_KINDS = [
+  { v:'bug',  name:'오류 신고',   sub:'앱이 이상하게 동작합니다' },
+  { v:'idea', name:'건의',       sub:'이런 것이 있으면 좋겠습니다' },
+  { v:'ask',  name:'물어보기',    sub:'쓰는 법을 모르겠습니다' },
+  { v:'etc',  name:'그 밖',      sub:'위에 없는 이야기' }
+];
+let supportRows = [];
+
+// 기기 정보 — 사람이 적게 하지 않고 앱이 붙인다
+function supportInfo(){
+  const L = [];
+  try{ L.push('앱 ' + APP_VER); }catch(_){}
+  try{ L.push('화면 ' + window.innerWidth + '×' + window.innerHeight); }catch(_){}
+  try{
+    const t = (typeof curTab !== 'undefined') ? curTab : '';
+    const s = t === 'home' ? homeSub : t === 'boat' ? boatSubTab : t === 'community' ? comSub : '';
+    L.push('보던 곳 ' + t + (s ? '/' + s : ''));
+  }catch(_){}
+  try{ L.push(navigator.onLine ? '온라인' : '오프라인'); }catch(_){}
+  try{ L.push(String(navigator.userAgent || '').slice(0, 140)); }catch(_){}
+  return L.join(' · ');
+}
+function openSupport(){
+  openForm({
+    title: '고객센터',
+    sub: '불편한 것·이상한 것·있었으면 하는 것을 알려 주세요',
+    okText: '보내기',
+    fields: [
+      { key:'kind', label:'무엇인가요', type:'pick', value:'bug',
+        options: SUPPORT_KINDS.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
+      { key:'text', type:'multi', rows:6, label:'내용',
+        placeholder:'어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다' }
+    ],
+    onOk: v => {
+      const t = String(v.text || '').trim();
+      if(!t){ alert('내용을 적어 주세요'); return false; }
+      sendSupport(v.kind, t);
+    }
+  });
+}
+async function sendSupport(kind, text){
+  const body = {
+    id: 'sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    kind: kind || 'etc', text: String(text || '').trim(),
+    info: supportInfo(),
+    by: meUid() || '', byName: (typeof meName === 'function' ? meName() : '') || '',
+    email: (window.__user && window.__user.email) || '',
+    ts: new Date().toISOString(), done: false
+  };
+  if(!body.text){ alert('내용을 적어 주세요'); return; }
+  if(!window.__support || !window.__user){
+    // 로그인 전이거나 인터넷이 없을 때 — 메일 길을 알려 준다
+    if(confirm('지금은 앱으로 보낼 수 없습니다.\n\n메일로 보내시겠습니까?')) supportMail(kind, text);
+    return;
+  }
+  try{
+    await window.__support.add(body);
+    alert('보내 주셔서 고맙습니다.\n\n확인하고 고치겠습니다.');
+  }catch(e){
+    if(confirm('보내지 못했습니다.\n\n' + ((e && e.message) || e) + '\n\n메일로 보내시겠습니까?'))
+      supportMail(kind, text);
+  }
+}
+// 메일로 보내기 — 제목에 [뱃일] 을 붙여 받는 쪽에서 자동으로 걸러 담을 수 있게 한다
+function supportMail(kind, text){
+  const k = (SUPPORT_KINDS.find(x=>x.v===kind) || {}).name || '문의';
+  const subject = '[뱃일] ' + k;
+  const lines = [
+    String(text || ''),
+    '',
+    '─────────────',
+    supportInfo(),
+    (window.__user && window.__user.email) ? ('계정 ' + window.__user.email) : '로그인 안 함'
+  ];
+  const url = 'mailto:' + SUPPORT_MAIL
+    + '?subject=' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent(lines.join('\n'));
+  try{ location.href = url; }
+  catch(e){ alert('메일 앱을 열지 못했습니다.\n\n' + SUPPORT_MAIL + ' 으로 보내 주세요.'); }
+}
+
+// ── 운영자 접수함
+async function adminSupport(){
+  try{ supportRows = await window.__support.list(); }catch(e){ supportRows = []; }
+  if(!supportRows.length) return '<div class="mrnone">들어온 이야기가 없습니다</div>';
+  // 안 읽은 것이 먼저, 그 다음 최근 순
+  const rows = supportRows.slice().sort((a,b)=>{
+    const da = a.done ? 1 : 0, db = b.done ? 1 : 0;
+    if(da !== db) return da - db;
+    return String(b.ts||'').localeCompare(String(a.ts||''));
+  });
+  return rows.map(s=>{
+    const kn = (SUPPORT_KINDS.find(x=>x.v===s.kind) || {}).name || '문의';
+    return `<div class="fleet"><div class="fmain">
+      <div class="fname">${s.done?'<span class="chip">확인함</span> ':'<span class="chip notice">새 글</span> '}
+        <span class="chip">${esc(kn)}</span> ${esc(String(s.text||'').slice(0, 40))}</div>
+      <div class="fsub">${esc(s.byName||'')}${s.email?' · '+esc(s.email):''} · ${esc(String(s.ts||'').slice(0,16).replace('T',' '))}</div>
+      <div class="fsub" style="color:#5a7a9a;word-break:break-all">${esc(s.info||'')}</div>
+      <div class="postbody" style="padding:6px 0">${esc(s.text||'').replace(/\n/g,'<br>')}</div>
+      <div class="fchips" style="margin-top:6px">
+        ${s.by?`<button class="tchip" onclick="openPerson('${esc(s.by)}')">보낸 사람</button>`:''}
+        <button class="tchip${s.done?' on':''}" onclick="supportDone('${esc(s.id)}',${s.done?'false':'true'})">${s.done?'다시 새 글로':'확인함'}</button>
+      </div></div></div>`;
+  }).join('');
+}
+function supportDone(id, on){
+  if(!isAdmin()){ alert('운영자만 할 수 있습니다'); return; }
+  const val = (on === true || on === 'true');
+  window.__support.edit(id, { done: val })
+    .then(()=>openAdmin())
+    .catch(e=>alert('바꾸지 못했습니다.\n\n' + ((e&&e.message)||e)));
+}
+
 // ===== 중고 장터 =====
 // ★ 여기는 돈이 오간다. 사기가 가장 많이 생기는 자리다.
 //   그래서 기능보다 먼저 세 가지를 챙긴다.
@@ -9216,6 +9357,7 @@ const SPOT_FAC = [
 const SPOT_HIDE_AT = 3;      // 신고가 이만큼 쌓이면 목록에서 내린다
 
 let spotList = [], spotQ = '', spotKind = '', spotOpenId = null, spotPickCtx = null;
+let spotDepthCtx = null;   // 수심 환산 화면 — { raw:잰 값(m), ts:잰 시각 }
 
 function spotOf(id){ return spotList.find(x=>String(x.id)===String(id)) || null; }
 function spotKindName(v){ return (SPOT_KINDS.find(k=>k.v===v)||{}).name || '정박지'; }
@@ -9238,6 +9380,10 @@ function spotShelterText(s){
 }
 function spotDepthText(s){
   if(!s || !s.depth) return '';
+  const f = s && s.depthFrom;
+  // ★ 환산한 값은 근거를 달고 다녀야 한다. 어디서 나온 숫자인지 모르면 못 믿는다.
+  if(f && f.raw != null && f.tide != null)
+    return s.depth + 'm (저조위 기준 · 잰 값 ' + f.raw + 'm − 그때 조위 ' + f.tide + 'm)';
   return s.depth + 'm' + (s.lowTide ? ' (저조위 기준)' : ' (기준 미상 — 물때를 확인하세요)');
 }
 
@@ -9414,7 +9560,9 @@ function spotForm(){
     <div class="mrrow"><span class="mrlbl">수심</span>
       <input id="spDepth" type="number" inputmode="decimal" style="width:90px" value="${esc(String(d.depth||''))}"> m
       <button class="tchip${d.lowTide?' on':''}" style="margin-left:8px" onclick="spotSet('lowTide',${d.lowTide?'false':'true'})">저조위 기준</button></div>
-    <div class="mrnone" style="text-align:left">우리 바다는 물때 차가 큽니다. 저조위(가장 낮을 때) 수심을 아시면 그걸 적고 칩을 켜 주세요.</div>
+    <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="spotDepthCalc()">수심계로 잰 값 넣기 — 저조위 기준으로 바꿔 드립니다</button></div>
+    ${ d.depthFrom ? `<div class="mrnone" style="text-align:left;color:#46B87C">잰 값 ${d.depthFrom.raw}m 에서 그때 조위 ${d.depthFrom.tide}m 를 뺐습니다 · ${esc(String(d.depthFrom.spot||''))} 조위 기준</div>`
+      : `<div class="mrnone" style="text-align:left">우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.<br>해도를 보고 저조위 수심을 이미 아시면 그 값을 적고 칩을 켜 주세요.</div>` }
     <div class="mrrow"><span class="mrlbl">바닥</span></div>
     <div class="fchips" style="padding:0 12px 8px">${
       SPOT_BOTTOM.map(x=>`<button class="tchip${d.bottom===x?' on':''}" onclick="spotSet('bottom','${x}')">${x}</button>`).join('')}</div>
@@ -9436,6 +9584,105 @@ function spotForm(){
   showPanel(P);
   setHeadTitle('정박지');
 }
+// ── ★ 수심 환산 화면
+//   배 위에서 숫자를 타이핑하게 하지 않는다. 눌러서 맞춘다.
+async function spotDepthCalc(){
+  spotKeep();
+  const d = (spotPickCtx && spotPickCtx.draft) || null;
+  if(!d || d.lat == null){ alert('자리를 먼저 찍어 주세요'); return; }
+  if(!spotDepthCtx){
+    const cur = Number(String(d.depth||'').trim());
+    spotDepthCtx = { raw: (isFinite(cur) && cur > 0) ? cur : 3, ts: Date.now() };
+  }
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  if(!tideCache){
+    P.innerHTML = '<div class="mrhead"><b>수심 환산</b></div><div class="mrnone">물때 자료를 받는 중…</div>';
+    showPanel(P);
+    try{ await loadTide(); }catch(e){}
+  }
+  const c = spotDepthCtx;
+  const TA = tideAtPlace(d.lat, d.lon, c.ts);
+  const low = TA ? lowTideDepth(c.raw, TA.v) : null;
+  const w = new Date(c.ts);
+  const wtxt = (w.getMonth()+1) + '/' + w.getDate() + ' '
+    + String(w.getHours()).padStart(2,'0') + ':' + String(w.getMinutes()).padStart(2,'0');
+  // 좁은 폰(360px)에서도 한 줄에 들어가야 한다 — 줄이 넘어가면 누르다 헷갈린다
+  const B = (t, f) => `<button class="mrbtn" style="min-width:44px;padding:8px 6px" onclick="${f}">${t}</button>`;
+  const col = low == null ? '#7b8794' : low < 1 ? '#F05B52' : low < 2 ? '#E8B33C' : '#46B87C';
+  P.innerHTML = `<div class="mrhead"><b>수심 환산</b><span style="flex:1"></span>
+      <button class="tab" onclick="spotDepthCancel()">취소</button>
+      <button class="tab${low == null ? '' : ' on'}" onclick="spotDepthApply()">넣기</button></div>
+    <div class="mrnone" style="text-align:left">수심계 값은 <b>잰 그때 물 높이 기준</b>입니다.
+      만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.<br>
+      잰 값과 잰 시각을 넣으면 그 시각 <b>조위를 빼서</b> 저조위 기준으로 바꿔 드립니다.</div>
+
+    <div class="ghead"><b>수심계에 나온 값</b></div>
+    <div class="mrrow" style="justify-content:center;gap:6px">
+      ${B('−1', 'spotDepthAdj(-1)')}${B('−0.1', 'spotDepthAdj(-0.1)')}
+      <b style="min-width:88px;text-align:center;font-size:26px">${c.raw.toFixed(1)}m</b>
+      ${B('+0.1', 'spotDepthAdj(0.1)')}${B('+1', 'spotDepthAdj(1)')}</div>
+
+    <div class="ghead"><b>잰 시각</b></div>
+    <div class="mrrow" style="justify-content:center;gap:6px">
+      ${B('−1시간', 'spotDepthTime(-60)')}${B('−10분', 'spotDepthTime(-10)')}
+      <b style="min-width:88px;text-align:center;white-space:nowrap">${wtxt}</b>
+      ${B('+10분', 'spotDepthTime(10)')}${B('+1시간', 'spotDepthTime(60)')}</div>
+    <div class="mrrow" style="justify-content:center">
+      <button class="mrbtn" onclick="spotDepthNow()">지금으로</button></div>
+
+    <div class="ghead"><b>환산</b></div>
+    ${ TA ? `<div class="mrnone" style="text-align:left">
+        가까운 조위 관측소 <b>${esc(String(TA.spot.name||''))}</b> · ${TA.dist.toFixed(0)}km<br>
+        그 시각 조위 <b>${TA.v.toFixed(2)}m</b> 를 잰 값 ${c.raw.toFixed(1)}m 에서 뺍니다.</div>
+      ${ TA.dist > 50 ? `<div class="mrnone" style="text-align:left;color:#E8B33C">관측소가 ${TA.dist.toFixed(0)}km 나 떨어져 있습니다. 그만큼 어긋날 수 있으니 여유를 두세요.</div>` : '' }
+      <div class="mrrow" style="justify-content:center">
+        <b style="font-size:30px;color:${col}">저조위 기준 ${low == null ? '—' : low.toFixed(1) + 'm'}</b></div>
+      ${ (low != null && low < 0) ? `<div class="mrnone" style="color:#F05B52">계산이 0보다 작습니다. 잰 값이나 잰 시각을 다시 봐 주세요.</div>` : '' }`
+      : `<div class="mrnone" style="text-align:left;color:#F05B52">
+        이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.<br>
+        관측소 자료가 닿지 않는 바다이거나, 잰 시각이 자료 기간 밖입니다.
+        없는 숫자를 지어내면 배가 얹히므로 그냥 두겠습니다.<br>
+        수심을 손으로 적고, 기준을 아시면 '저조위 기준' 을 눌러 주세요.</div>` }
+    <div style="height:24px"></div>`;
+  showPanel(P);
+  setHeadTitle('정박지');
+}
+function spotDepthAdj(v){
+  if(!spotDepthCtx) return;
+  spotDepthCtx.raw = Math.round(Math.max(0, spotDepthCtx.raw + v) * 10) / 10;
+  spotDepthCalc();
+}
+function spotDepthTime(min){
+  if(!spotDepthCtx) return;
+  // 앞날 물때를 미리 재 놓을 수는 없다 — 잰 시각은 지금보다 뒤로 못 간다
+  const now = Date.now();
+  spotDepthCtx.ts = Math.min(now, spotDepthCtx.ts + min * 60000);
+  spotDepthCalc();
+}
+function spotDepthNow(){
+  if(!spotDepthCtx) return;
+  spotDepthCtx.ts = Date.now();
+  spotDepthCalc();
+}
+function spotDepthCancel(){ spotDepthCtx = null; spotForm(); }
+function spotDepthApply(){
+  const d = (spotPickCtx && spotPickCtx.draft) || null;
+  const c = spotDepthCtx;
+  if(!d || !c) return;
+  const TA = tideAtPlace(d.lat, d.lon, c.ts);
+  const low = TA ? lowTideDepth(c.raw, TA.v) : null;
+  if(low == null){ alert('조위 자료가 없어 환산할 수 없습니다.\n\n수심을 손으로 적어 주세요.'); return; }
+  if(low < 0){ alert('환산값이 0보다 작습니다.\n\n잰 값이나 잰 시각을 다시 봐 주세요.'); return; }
+  d.depth = String(low);
+  d.lowTide = true;
+  d.depthFrom = { raw: c.raw, tide: Math.round(TA.v * 100) / 100,
+                  spot: String(TA.spot.name || ''), out: String(low),
+                  ts: new Date(c.ts).toISOString() };
+  spotDepthCtx = null;
+  spotForm();
+}
+
 function spotSet(k, v){
   const d = spotPickCtx.draft = spotPickCtx.draft || {};
   d[k] = (v === 'true') ? true : (v === 'false') ? false : (d[k] === v ? '' : v);
@@ -9461,6 +9708,9 @@ function spotKeep(){
   const put = (k, id) => { const v = g(id); if(v !== undefined) d[k] = v; };
   put('name','spName'); put('depth','spDepth'); put('tideNote','spTide');
   put('fee','spFee'); put('tel','spTel'); put('note','spNote');
+  // ★ 손으로 수심을 고치면 환산 근거는 더 이상 그 숫자의 근거가 아니다.
+  //   남겨 두면 '4.2m 에서 뺐다' 는 거짓말이 붙어 다닌다.
+  if(d.depthFrom && String(d.depth||'').trim() !== String(d.depthFrom.out||'')) d.depthFrom = null;
 }
 function spotPhoto(){
   spotKeep();
@@ -9492,6 +9742,7 @@ async function spotSave(){
     region: (typeof boatRegion === 'function' ? boatRegion() : '') || regionOfPoint(d.lat, d.lon),
     open: Array.isArray(d.open) ? d.open : [],
     depth: String(d.depth||'').trim(), lowTide: !!d.lowTide,
+    depthFrom: d.depthFrom || null,
     bottom: d.bottom || '', tideNote: String(d.tideNote||'').trim(),
     fac: d.fac || {}, fee: String(d.fee||'').trim(), tel: String(d.tel||'').trim(),
     note: String(d.note||'').trim(), photos: (d.photos||[]).slice(0,4),
@@ -11260,7 +11511,9 @@ async function wxFetch(lat, lon){
 function tideAt(ts, pts){
   if(!pts || pts.length < 2) return null;
   const P = [...pts].sort((a,b)=>a.t-b.t);
-  if(ts <= P[0].t || ts >= P[P.length-1].t) return null;
+  // ★ 딱 만조·간조 그 시각은 값을 아는 시각이다. 빈손으로 돌려주면 안 된다.
+  //   (자료 기간 '밖' 만 빈손이다 — 그건 지어내면 안 되는 값이다)
+  if(ts < P[0].t || ts > P[P.length-1].t) return null;
   for(let i=0;i<P.length-1;i++){
     if(ts >= P[i].t && ts <= P[i+1].t){
       const f = (ts - P[i].t) / (P[i+1].t - P[i].t);
@@ -11286,15 +11539,21 @@ function hav(a,b,c,d){
   const q=Math.sin(dLat/2)**2 + Math.cos(t(a))*Math.cos(t(c))*Math.sin(dLon/2)**2;
   return 2*R*Math.asin(Math.sqrt(q));
 }
-// 현재 지점에서 가장 가까운 물때 관측지점
-function nearestTideSpot(){
-  if(!tideCache || !tideCache.spots || !wxCur) return null;
+// ★ 어느 자리에서든 가장 가까운 물때 관측지점을 잡는다.
+//   전에는 '지금 보는 날씨 위치' 로만 찾을 수 있어서
+//   정박지에 찍은 핀 자리의 조위를 물을 길이 아예 없었다.
+//   고르는 셈은 여기 한 곳에만 둔다.
+function nearestTideSpotAt(lat, lon){
+  if(!tideCache || !tideCache.spots || lat == null || lon == null) return null;
   let best=null, bd=1e9;
   tideCache.spots.forEach(s=>{
-    const d = hav(wxCur.lat, wxCur.lon, s.lat, s.lon);
+    const d = hav(lat, lon, s.lat, s.lon);
     if(d<bd){ bd=d; best=s; }
   });
   return best ? { ...best, dist: bd } : null;
+}
+function nearestTideSpot(){
+  return wxCur ? nearestTideSpotAt(wxCur.lat, wxCur.lon) : null;
 }
 
 function tidePoints(){
@@ -11630,19 +11889,57 @@ function wxSelHour(ts){ wxSel = ts; bridgeT = ts; renderWxSel(); syncBridgeCard(
 function wxSelMove(d){ if(wxSel!=null){ wxSel += d*3600e3; renderWxSel(); } }
 
 // 전체 조위 포인트 (관측지점의 보유 일수 전부 — 15일 탐색용)
-function allTidePts(){
-  const sp = nearestTideSpot(); if(!sp) return null;
+// 관측지점 하나의 만조·간조를 시각·높이(m) 점으로 편다.
+function tidePtsOf(sp){
+  if(!sp || !sp.days) return [];
   const pts = [];
   sp.days.forEach(day=>{
-    const mk = r => { const [hh,mm]=r.t.split(':').map(Number);
+    const mk = r => { const [hh,mm]=String(r.t).split(':').map(Number);
       const d=new Date(day.d+'T00:00:00+09:00'); d.setHours(hh,mm,0,0);
       return {t:d.getTime(), v:r.v/100}; };
     (day.h||[]).forEach(r=>pts.push(mk(r)));
     (day.l||[]).forEach(r=>pts.push(mk(r)));
   });
   pts.sort((a,b)=>a.t-b.t);
+  return pts;
+}
+function allTidePts(){
+  const sp = nearestTideSpot(); if(!sp) return null;
+  const pts = tidePtsOf(sp);
   if(pts.length>=2) return { pts, spot:sp };
   return null;
+}
+
+// ── ★ 잰 수심을 저조위 기준으로 바꾼다
+//
+//   먼저 못 박을 것 — 지도에 핀을 찍었다고 수심이 나오지는 않는다.
+//   앱에는 해도 수심·측심 자료가 없다. 좌표에서 바닥 깊이를 알 방법이 없다.
+//   여기서 숫자를 지어내면 그 값을 믿고 들어간 배가 얹힌다.
+//
+//   대신 되는 것이 있다. 수심계가 보여 주는 값은 '지금 물 높이 기준' 이다.
+//   만조에 4.2m 나왔다고 대 놓으면 저조에 1.1m 가 된다.
+//   우리 조위(국립해양조사원)는 약최저저조위 — 곧 해도 기준면에서 잰 높이다.
+//   그러니 잰 값에서 그 시각 조위를 빼면 저조위 기준 수심이 된다.
+//
+//        저조위 기준 = 잰 수심 − 그 시각 조위
+//
+//   핀을 찍었으니 앱이 대신 해 줄 수 있는 일이 이것이다 —
+//   그 자리에서 가장 가까운 관측소를 알아서 잡고, 잰 시각 조위를 빼 준다.
+//   사람이 넣을 것은 '잰 값' 하나뿐이다.
+function tideAtPlace(lat, lon, ts){
+  const sp = nearestTideSpotAt(lat, lon);
+  if(!sp) return null;
+  const pts = tidePtsOf(sp);
+  if(pts.length < 2) return null;
+  const v = tideAt(ts, pts);
+  if(v == null) return null;            // 자료 기간 밖 — 지어내지 않는다
+  return { v, spot: sp, dist: sp.dist };
+}
+function lowTideDepth(raw, tide){
+  const r = Number(raw), t = Number(tide);
+  if(raw === '' || raw == null || tide == null) return null;
+  if(!isFinite(r) || !isFinite(t)) return null;
+  return Math.round((r - t) * 10) / 10;
 }
 function tideSource(){
   const A = allTidePts();
@@ -12338,6 +12635,15 @@ document.addEventListener('visibilitychange', ()=>{
       async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); return body.id; },
       async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); },
       async del(id){ await deleteDoc(doc(fdb,'market',String(id))); }
+    };
+    // ── 고객센터
+    window.__support = {
+      async add(body){ await setDoc(doc(fdb,'support',String(body.id)), body); return body.id; },
+      async list(){
+        const snap = await getDocs(query(collection(fdb,'support'), orderBy('ts','desc'), limit(300)));
+        return snap.docs.map(d=>d.data());
+      },
+      async edit(id, patch){ await setDoc(doc(fdb,'support',String(id)), patch, { merge:true }); }
     };
     window.__initCloud(api);
   }catch(e){

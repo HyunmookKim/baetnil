@@ -1960,8 +1960,11 @@ window.__onAuth = u => {
     // 내가 막혔는지도 확인한다 (막히면 글·댓글을 못 쓴다)
     if(typeof loadMyBan === 'function') loadMyBan();
     const after = () => { if(typeof cloudSeedCheck === 'function') cloudSeedCheck(); };
-    if(typeof mergeCloudBoats === 'function') mergeCloudBoats().then(after, after);
-    else after();
+    // 받아온 배가 화면에 나타나야 한다. 안 그리면 로그인해도 빈 화면이다.
+    const redraw = () => { try{ ensureBoat(); applyBoatName(); switchTab(curTab); }catch(_){} };
+    if(typeof mergeCloudBoats === 'function')
+      mergeCloudBoats().then(()=>{ redraw(); after(); }, ()=>{ redraw(); after(); });
+    else { redraw(); after(); }
   }
 };
 function applyAccount(){
@@ -2069,9 +2072,48 @@ function makeBoatCode(name){
 }
 // 처음 켰거나 배가 없으면 하나 만든다.
 // 이미 쌓인 데이터는 이 배의 것으로 본다 — 그동안 배가 하나뿐이었으므로 맞는 해석이다.
+// ===== 처음 켰을 때 =====
+// ★ 예전에는 로그인도 없이 '배 등록' 부터 나왔다.
+//   로그인하면 클라우드에서 자기 배를 받아오므로, 이미 배가 있는 사람은
+//   등록할 필요가 없다. 그래서 로그인이 먼저다.
+//   다만 배 위에서는 인터넷이 없을 수 있다. 막다른 골목을 만들지 않으려고
+//   '나중에 하기' 로 빠져나갈 수 있게 둔다.
+function welcomeSkipped(){
+  try{ return localStorage.getItem('bt_welcome') === 'done'; }catch(_){ return false; }
+}
+function needWelcome(){
+  if(welcomeSkipped()) return false;
+  if(window.__user) return false;                       // 이미 로그인했다
+  if(Array.isArray(boats) && boats.length) return false; // 이미 쓰던 사람이다
+  return true;
+}
+function skipWelcome(){
+  try{ localStorage.setItem('bt_welcome', 'done'); }catch(_){}
+  closeBoat();
+  switchTab('home');
+}
+function openWelcome(){
+  try{ localStorage.setItem('bt_welcome', 'done'); }catch(_){}
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>뱃일</b><span style="flex:1"></span></div>
+    <div class="mrnone" style="text-align:left">
+      배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.<br><br>
+      <b>먼저 로그인해 주세요.</b> 로그인하면 쓰던 배와 기록을 그대로 불러오고,
+      휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.</div>
+    <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="doGoogle()">Google 계정으로 시작하기</button></div>
+    <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="openAccount()">이메일로 로그인 · 회원가입</button></div>
+    <div class="mrnone" style="text-align:left">
+      바다에서는 인터넷이 안 될 때가 있습니다. 그럴 때는 로그인 없이 이 기기에서만 쓰다가
+      나중에 로그인하셔도 됩니다.</div>
+    <div class="mrrow" style="justify-content:center;padding:4px 12px 16px">
+      <button class="minib" onclick="skipWelcome()">나중에 하기</button></div>`;
+  showPanel(P);
+  setHeadTitle('뱃일');
+}
 function ensureBoat(){
   if(!Array.isArray(boats)) boats = [];
-  if(!boats.length){ applyBoatName(); openBoatSetup(); return false; }   // 등록부터 해야 한다
+  // 배가 없어도 앱은 돌아간다. 억지로 등록 화면을 띄우지 않는다.
+  if(!boats.length){ applyBoatName(); return false; }
   if(!currentBoatId || !boats.some(b=>String(b.id)===String(currentBoatId))){
     currentBoatId = boats[0].id;
     sysSave();
@@ -2081,11 +2123,52 @@ function ensureBoat(){
   return true;
 }
 
+// 배 등록 화면을 닫는다. 배가 있든 없든 언제나 닫을 수 있다.
+function closeBoatSetup(){
+  closeBoat();
+  switchTab('home');
+}
+// 배가 필요한 화면인가. 그렇다면 안내를 그리고 true 를 돌려준다.
+// 어디에 그릴지를 한 곳에 모은다 — 흩어 놓으면 새 화면을 더할 때 빠뜨린다.
+const NEED_BOAT_WRAP = {
+  'boat:stow':   ['listView',     '적재표'],
+  'boat:maint':  ['maintWrap',    '정기점검'],
+  'boat:repair': ['repairWrap',   '수리목록'],
+  'boat:fuel':   ['fuelWrap',     '연료 기록'],
+  'boat:docs':   ['contactsWrap', '문서 · 연락처'],
+  'voyage:':     ['voyageWrap',   '항해일지'],
+  'home:check':  ['checkWrap',    '출항 전 점검']
+};
+function boatNeedGuard(t){
+  const key = t + ':' + (t === 'boat' ? boatSubTab : t === 'home' ? homeSub : '');
+  const hit = NEED_BOAT_WRAP[key];
+  if(!hit) return false;
+  const el = document.getElementById(hit[0]);
+  if(!el) return false;
+  if(t === 'boat' && boatSubTab === 'stow'){
+    // 적재표는 지도와 도구줄이 따로 있다. 함께 감춘다.
+    ['mapWrap','searchWrap','stowTools','hint','trashPanel'].forEach(id=>{
+      const x = document.getElementById(id); if(x) x.style.display = 'none'; });
+    el.style.display = 'block';
+  }
+  el.style.display = 'block';
+  el.innerHTML = needBoatCard(hit[1]);
+  return true;
+}
+// 배가 없을 때 그 화면에 대신 보여 주는 안내.
+// 막지 않고 알려만 준다 — 다른 탭은 그대로 쓸 수 있다.
+function needBoatCard(what){
+  return `<div class="mrnone" style="text-align:left">
+      <b>${esc(what || '이 화면')}</b><br>
+      배를 등록해야 쓸 수 있습니다. 등록하면 이 화면이 바로 열립니다.<br><br>
+      <button class="mrbtn ok" onclick="openBoatSetup()">배 등록하기</button></div>`;
+}
 // 처음 켰을 때 — 배 등록
 function openBoatSetup(){
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>배 등록</b><span style="flex:1"></span>${
-      boats.length ? `` : ''}</div>
+  // ★ 닫는 길이 반드시 있어야 한다. 없으면 막다른 골목이 된다. 실제로 그랬다.
+  P.innerHTML = `<div class="mrhead"><b>배 등록</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoatSetup()">← 오늘</button></div>
     <div class="mrnone" style="text-align:left">이 앱은 배 한 척을 기준으로 기록을 관리합니다.<br>
       먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.</div>
     <div class="mrrow"><span class="mrlbl">이름</span>
@@ -5627,7 +5710,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.11';
+const APP_VER = '3.12';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7081,7 +7164,9 @@ function setComSub(k){
 function switchTab(t){
   // 열려 있던 화면(내 배·게시판 등)을 닫고 그 자리로 간다.
   if(typeof closeBoat === 'function') closeBoat();
-  if(Array.isArray(boats) && !boats.length){ openBoatSetup(); return; }
+  // ★ 예전에는 배가 없으면 여기서 배 등록을 띄우고 돌아섰다.
+  //   그래서 어느 탭을 눌러도 등록 화면만 나오고 앱 전체가 잠겼다.
+  //   배가 없어도 탭은 다 열린다. 배가 필요한 화면만 안내를 보여 준다.
 
   // 옛 이름으로 불러도 제자리를 찾아간다 (서랍·안내문·되돌아가기에서 쓴다)
   const OLD = { stow:['boat','stow'], maint:['boat','maint'], repair:['boat','repair'],
@@ -7135,6 +7220,12 @@ function switchTab(t){
 
   paintHNav();
   measureHeader();
+
+  // ★ 배가 없으면 배가 필요한 화면은 안내만 보여 준다.
+  //   막지는 않는다 — 오늘·커뮤니티는 그대로 쓸 수 있고, 탭도 다 열린다.
+  //   (배 없이 물품을 넣으면 어느 배의 것도 아닌 자리에 쌓여 나중에 사라진다)
+  if(!curBoat() && boatNeedGuard(t)) return;
+
   if(t==='home'){
     if(homeSub==='today') renderHome();
     else if(homeSub==='weather') renderWeather();
@@ -7165,6 +7256,12 @@ function renderHome(){
   if(!L) return;
   const b = curBoat();
   let out = '';
+
+  // 배가 없어도 오늘 탭은 열린다. 다만 등록하러 갈 길을 맨 위에 둔다.
+  if(!b){
+    out += homeCard('배 등록', '<div class="hmute">배를 등록하면 물품·정비·항해 기록을 쓸 수 있습니다.</div>',
+                    'openBoatSetup()', '등록하기');
+  }
 
   // ── 날씨와 출항 판단
   let wxBody = '<div class="hmute">날씨 자료를 아직 받지 못했습니다</div>';
@@ -10532,7 +10629,10 @@ initStorage().then(()=>{
   ensureBoat(); applyAccount();
   // ★ 켤 때 반드시 한 번 그린다. 안 그리면 아래 탭은 '오늘' 인데
   //   화면은 적재표가 그대로 남아 서로 어긋난다.
-  if(Array.isArray(boats) && boats.length) switchTab(curTab);
+  switchTab(curTab);
+  // 처음 켠 사람에게는 로그인부터 보여 준다 (배 등록이 아니라).
+  // 로그인 상태는 조금 뒤에 확정되므로 잠깐 기다렸다 판단한다.
+  setTimeout(()=>{ if(needWelcome()) openWelcome(); }, 1200);
   storageReadyResolve();
 });
 setTimeout(paintVer, 1500);      // 옛 파일이 물려 있는지 켜자마자 확인한다

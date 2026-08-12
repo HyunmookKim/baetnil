@@ -5851,7 +5851,12 @@ window.__cloudFailed = async function(){
 //    2) 백업 복원처럼 로컬이 통째로 바뀌면 지난 셈이 거짓이 된다 → id 지문으로 확인한다.
 //    3) 옛 판 앱이 _u 없이 올릴 수 있다 → 반나절에 한 번은 무조건 통째로 받아 맞춘다.
 const SYNC_BASE_KEY = 'bt_sbase_';
-const SYNC_FULL_MS = 432e5;    // 12시간
+// 옛 판 앱이 _u 없이 올릴 때를 대비한 안전장치다.
+// ★ 이게 짧으면 그 자체가 비용이 된다 — 배 하나가 한 번에 500번 읽으므로
+//   12시간마다면 사용자 100명에 하루 10만 번이다. 안전장치가 본 작업보다 비싸진다.
+//   손으로 '클라우드에서 받아오기' 를 누르면 언제든 전부 다시 받으므로,
+//   자동으로 도는 주기는 길게 잡는다.
+const SYNC_FULL_MS = 6048e5;   // 7일
 const SYNC_COLLS = ['items','trash','maint','repair','voyage','fuel','runs','contacts',
                     'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs'];
 function localColl(k){
@@ -6126,6 +6131,10 @@ function syncDown(){
   if(!confirm('클라우드에서 받아옵니다.\n\n'
     + '이 기기에만 있고 아직 올리지 않은 기록은\n클라우드 것으로 덮어씌워질 수 있습니다.\n\n'
     + '계속할까요?')) return;
+  // ★ 손으로 누른 것은 '전부 다시' 라는 뜻이다.
+  //   평소에는 바뀐 것만 받지만, 여기서는 지난 셈을 버리고 통째로 받는다.
+  //   무언가 어긋났을 때 사람이 스스로 바로잡을 수 있는 유일한 길이다.
+  clearSyncBase();
   setSync('받아오는 중…');
   cloudPull().then(()=>{
     alert('클라우드에서 받아왔습니다.');
@@ -6445,7 +6454,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.32';
+const APP_VER = '3.33';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

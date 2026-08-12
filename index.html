@@ -5584,17 +5584,25 @@ async function mergeCloudBoats(){
   list.forEach(cb => {
     const old = have[String(cb.id)];
     if(old){
-      // ★ 아직 클라우드에 못 올린 배는 덮지 않는다.
-      //   덮으면 방금 한 일(구성원 받기·등급 바꾸기)이 통째로 사라진다.
-      //   실제로 어머니를 크루로 받았는데 다음 받아오기에서 사라졌다.
-      if(boatDirty.has(String(cb.id))){
-        saveBoatCloud(old, true);        // 대신 다시 올린다
-        return;
-      }
+      // ★ 구성원은 덮지 않고 합친다.
+      //   폰에서 어머니를 받고 컴퓨터에서 아버지를 받으면, 덮어쓰기로는
+      //   나중에 켠 기기의 것만 남고 한 사람이 사라진다.
+      //   내보내기는 따로 있으니, 합쳐도 원하지 않는 사람이 남지 않는다.
+      const mergedMembers = Object.assign({}, cb.members || {}, old.members || {});
+      const mergedNames   = Object.assign({}, cb.memberNames || {}, old.memberNames || {});
+      // 아직 클라우드에 못 올린 배는 먼저 올려 보고, 올라간 뒤에 받는다.
+      // 그냥 안 받으면 다른 기기가 올린 것이 영영 안 내려온다.
+      const dirty = boatDirty.has(String(cb.id));
       // 이미 있는 배는 두 번 넣지 않는다. 칸은 목록대로 전부 받는다.
       // 골라 받으면 빠뜨린 칸이 영영 안 내려온다 (2.6 의 제원 동기화 사고).
-      BOAT_FIELDS.forEach(k => { if(cb[k] !== undefined && cb[k] !== null) old[k] = cb[k]; });
+      BOAT_FIELDS.forEach(k => {
+        if(k === 'members' || k === 'memberNames') return;   // 위에서 합쳤다
+        if(cb[k] !== undefined && cb[k] !== null) old[k] = cb[k];
+      });
+      old.members = mergedMembers;
+      old.memberNames = mergedNames;
       migrateRanks(old);
+      if(dirty) saveBoatCloud(old, true);   // 합친 것을 다시 올린다
       return;
     }
     migrateRanks(cb);
@@ -5996,7 +6004,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.15';
+const APP_VER = '3.16';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7400,7 +7408,11 @@ const TAB_TITLES = {home:'오늘', boat:'배', voyage:'항해일지', community:
 const HOMESUB_TITLES = {today:'오늘', weather:'날씨 · 물때', check:'출항 전 점검'};
 const BOATSUB_TITLES = {stow:'적재표', maint:'정기점검', repair:'수리목록',
                         fuel:'연료 기록', docs:'문서 · 연락처'};
-let homeSub = (function(){ try{ return localStorage.getItem('bt_homesub') || 'today'; }catch(_){ return 'today'; } })();
+// ★ 앱을 켜면 언제나 '오늘' 부터 나온다.
+//   마지막에 본 하위 화면을 기억해 두면, 날씨를 보고 껐을 때 다음에 켜도
+//   날씨가 먼저 나온다. 앱을 켜는 첫 이유는 '오늘 나갈 수 있나' 이므로
+//   그 화면이 먼저여야 한다.
+let homeSub = 'today';
 let boatSubTab = (function(){ try{ return localStorage.getItem('bt_boatsub') || 'stow'; }catch(_){ return 'stow'; } })();
 // 제목 자리에 그 탭의 하위 화면들을 그린다.
 // 제목에 '적재표', 그 아래 줄에 또 '적재표' 를 쓰면 줄만 잡아먹고 헷갈린다.

@@ -1,132 +1,141 @@
 {
- "updated": "2026-08-12T02:47:32.828Z",
- "candidates": 81,
+ "updated": "2026-08-12T21:32:02.303Z",
+ "candidates": 83,
  "items": [
   {
-   "title": "How to check keel bolts + why it matters",
-   "t_ko": "킬 볼트 점검 방법과 중요성",
-   "s_ko": "킬이 선체에 고정된 킬 볼트는 착지 후 특히 마모되기 쉬우나 손상이 겉으로 드러나지 않을 수 있다.\n킬 플랜지를 밝은 금속으로 갈아낸 후 실카플렉스를 도포하고 재설치해야 한다.\n선주는 정기적으로 킬 볼트 상태를 점검해야 하며, 특히 최근 착지 경험이 있다면 우선적으로 확인할 필요가 있다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/how-to-check-keel-bolts-28039",
-   "source": "PBO",
-   "date": "2026-08-11T10:28:42.000Z"
+   "title": "Important milestone for Catalina Yachts",
+   "t_ko": "카탈리나 요트, 파산 위기에서 생산 재개",
+   "s_ko": "미국 최대 범선 제조사 카탈리나 요트가 CT Composites LLC에 인수되어 플로리다 라고 시설에서 생산을 재개했다.\n경험 많은 조선인 중심의 핵심 팀으로 구성되어 현재 생산 라인에서 배를 건조 중이다.\nCEO는 \"우리는 더 작은 팀이지만 배를 짓고 있다\"며 \"생산 재개는 중요한 이정표\"라고 밝혔다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/11/important-milestone-for-catalina-yachts/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-11T18:48:18.000Z"
   },
   {
-   "title": "Video Introduction to Using a Marine VHF Radio",
-   "t_ko": "해상 VHF 무선기 안전 운용 가이드 동영상 공개",
-   "s_ko": "아이콤 UK가 유튜브 채널에서 해상 VHF 무선기 운용에 관한 동영상 가이드를 공개했다.\n안전하고 합법적인 운용 방법에 대한 실용적 조언과 팁을 담고 있다.\n요트 선주는 무선 운용 규정을 숙지하고 통신 장비를 올바르게 관리해야 한다.",
-   "cat": "안전",
-   "link": "https://www.sail-world.com/news/298776/?source=rss",
+   "title": "Ancasta strengthens European presence",
+   "t_ko": "앙카스타, 네덜란드·몬테네그로에 유럽 사무소 개설",
+   "s_ko": "요트 판매 회사 앙카스타 인터내셔널이 네덜란드와 몬테네그로에 새로운 사무소를 열었다.\n요트 소유자, 구매자, 판매자를 지원하기 위한 유럽 내 장기 확장 전략의 일환이다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/298785/?source=rss",
    "source": "Sail-World",
-   "date": "2026-08-11T16:00:00.000Z"
+   "date": "2026-08-12T08:00:00.000Z"
   },
   {
-   "title": "Why attention to detail beats gut instinct on the offshore circuit",
-   "t_ko": "50피트 외양항 레이서 준비: 직관보다 데이터",
-   "s_ko": "50피트 다중선체 DMS 비닐이 AZAB 레이스 준비 중 고정식 범장 운용에서 고급 데이터 기반 접근으로 전환했다.\n해수시운전 중 밸러스트 배치 실험을 포함한 세부 사항 점검이 경기력 향상의 핵심이었다.\n외양항 참가 선주는 경험만이 아닌 측정 데이터를 바탕으로 선박 튜닝을 최적화해야 한다.",
-   "cat": "항해술",
-   "link": "https://www.yachtingmonthly.com/blogs/why-attention-to-detail-beats-gut-instinct-on-the-offshore-circuit-106008",
-   "source": "Yachting Monthly",
-   "date": "2026-08-11T05:27:48.000Z"
-  },
-  {
-   "title": "Offshore racing is now two sports",
-   "t_ko": "외양항 레이싱의 분화: 풀크루vs 단축승무원",
-   "s_ko": "2016~2021년 재즈 트로피 우승 요트는 모두 풀크루 방식이었으나, 이후는 단축승무원(도우핸드) 요트만 우승했다.\n패스넷, RORC 트랜스애틀란틱, 브릿틀 레이스 등 주요 외양항 레이스에서 도우핸드 방식이 우위를 점하고 있다.\n소수 인원으로 운영하는 선주는 단축승무원 외양항 레이싱의 성장 추세와 전술적 이점을 고려해야 한다.",
+   "title": "3 next-generation trimarans shaking up the market",
+   "t_ko": "3세대 트리마란, 시장 판도 바꾼다",
+   "s_ko": "스마트 글래스 선실, 모듈식 평판 조립, 쌍발 엔진 등을 갖춘 신형 성능 트리마란 3종이 출시된다.\n기존 경주용·금욕적 크루징용 삼동선을 벗어나 속도, 안전, 럭셔리 거주 공간을 통합하는 설계다.",
    "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/07/offshore-racing-is-now-two-sports/",
+   "link": "https://www.yachtingworld.com/yachts-and-gear/3-next-generation-trimarans-shaking-ip-the-market-163681",
+   "source": "Yachting World",
+   "date": "2026-08-11T05:22:45.000Z"
+  },
+  {
+   "title": "Women moving in the right direction",
+   "t_ko": "세일GP·미국컵 여성 의무화 규정, 학습 격차 과제 남겨",
+   "s_ko": "윙·포일 도입으로 남성들이 선행 교육을 독점해온 가운데 세일GP와 미국컵이 여성 선수 의무 참가 규정을 시행 중이다.\n세일GP는 영국 본부에서 18명 여성을 대상으로 시뮬레이터 훈련 세션을 개최해 기술 격차를 좁히려고 노력 중이다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/12/women-moving-in-the-right-direction/",
    "source": "Scuttlebutt",
-   "date": "2026-08-07T18:30:19.000Z"
+   "date": "2026-08-12T20:57:39.000Z"
   },
   {
-   "title": "Pudsey Bear completes 2,250 mile voyage",
-   "t_ko": "푸드시 베어, 영국 일주 2250마일 항해 완항",
-   "s_ko": "Big Bear Voyage 2026 프로젝트가 영국, 웨일스, 북아일랜드, 스코틀랜드 일주 3개월간 2250마일 항해를 완료하고 해밀톤 범메어 마리나로 귀항했다.\n자선 기금모금을 위한 이 항해는 요트 순항의 실제 계획·운영 사례를 보여준다.",
-   "cat": "기타",
-   "link": "https://www.sail-world.com/news/298782/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-11T11:10:00.000Z"
-  },
-  {
-   "title": "Eight Bells: John Rousmaniere",
-   "t_ko": "해양 안전 옹호자 존 라우스마니에 별세",
-   "s_ko": "요트 역사 분야의 권위자이자 해양 안전 옹호자인 존 라우스마니에가 8월 8일 82세로 별세했다.\n1979년 패스넷 레이스 중 포스 10 폭풍에서 48피트 슬루프 토스카나를 타고 생존한 경험이 있으며, 약 40권의 요트 관련 저작과 40,000마일 이상의 외양항 항해 기록을 남겼다.\n안전한 해양 활동 문화 발전에 기여한 선구자의 업적이 평가된다.",
-   "cat": "기타",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/11/eight-bells-john-rousmaniere/",
+   "title": "New vision for Caribbean racing circuit",
+   "t_ko": "카리브해 레이싱 회로 개편, 4개월 집중 시즌으로 재편성",
+   "s_ko": "카리브해 세일링협회(CSA)가 5년 일정을 개정해 주요 대회를 4개월 기간으로 압축했다.\n전문 팀과 고수준 아마추어팀에 명확한 캠프 기간을 제공하면서 카리브해 레이싱의 모험 정신은 유지한다.\nSt. Maarten Heineken Regatta가 시즌 기준점, Antigua Racing Cup은 앞당겨졌고, St. Thomas International Regatta(STIR)는 4월 8-11일로 복귀한다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/12/new-vision-for-caribbean-racing-circuit/",
    "source": "Scuttlebutt",
-   "date": "2026-08-11T21:24:27.000Z"
+   "date": "2026-08-12T18:40:32.000Z"
   },
   {
-   "title": "Making a Perspex switch panel",
-   "t_ko": "아크릴 투명 패널로 헬름 대시보드 만들기",
-   "s_ko": "10mm 검은색 폴리카보네이트 아크릴을 사용하여 조종실 스위치 패널을 직접 제작하는 방법을 소개한다.\n아크릴과 폴리카보네이트의 특성 차이: 폴리카보네이트는 가격이 2배 비싸지만 가공이 쉽고, 아크릴은 저렴하지만 균열에 취약하다.\n선주가 직접 선내 장비를 유지·보수할 때 참고할 수 있는 실용 정보다.",
+   "title": "Inside AC: How AI is changing the game",
+   "t_ko": "미국컵 38차 대회, AI가 설계와 경주 게임 체인지",
+   "s_ko": "영국 미국컵 도전팀 GB1의 설계 담당자 Nick Holroyd는 AI가 더 빠르고 효율적인 선체 설계에 활용되고 있으며, 경주 중 탑재까지 가능할 수 있다고 설명했다.\n뉴질랜드와 영국이 38차 미국컵 프로토콜을 8월 12일 확인했다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/11/inside-ac-how-ai-is-changing-the-game/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-11T18:51:39.000Z"
+  },
+  {
+   "title": "Make a big toot again by clearing seagull scum out of a boat air horn",
+   "t_ko": "에어혼 바다제비 배설물 청소법",
+   "s_ko": "선장이 예산 부족으로 저가 에어혼을 구입했는데, 바다제비 배설물이 축적되어 막혔다.\n전자음향기관이 손상되어 청소가 필요한 상황이다.",
    "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/making-a-perspex-switch-panel-106111",
+   "link": "https://www.pbo.co.uk/practical-projects/make-a-big-toot-again-by-clearing-seagull-scum-out-of-an-air-horn-106109",
    "source": "PBO",
-   "date": "2026-08-11T04:38:36.000Z"
+   "date": "2026-08-12T05:30:37.000Z"
   },
   {
-   "title": "Искусственный интеллект уже пришел в яхтинг…",
-   "t_ko": "요트 선주를 위한 AI 활용법: 항해 준비부터 경기 계획까지",
-   "s_ko": "러시아 네비게이터 바딤 미하일로프가 마르마리스 국제 레이스주간 준비를 사례로 ChatGPT, GigaChat, DeepSeek의 AI 도구를 항해술에 적용하는 방법을 연재한다.\n레이스 공지(NOR), 보트 선택, 계기 점검, 날씨 분석, 최종 전술까지 각 단계에서 AI의 장점과 한계를 실무 데이터로 검증한다.\n선주는 AI 보조도구가 시간을 절약하는 분야와 반드시 인적 확인이 필요한 부분을 구분하여 활용해야 한다.",
+   "title": "I built a ferrocement bluewater cruising yacht in 1980 and sailed it for the next 13 years",
+   "t_ko": "페로콘크리트 범양 항해 요트 13년 운항 기록",
+   "s_ko": "Beryl Chalmers는 1980년대 48피트 페로콘크리트 켓치를 6년에 걸쳐 자작하고 후장착했으며, 그 후 13년을 항해했다.\n제한된 자금으로 범양 항해 꿈을 현실화한 자력 조선 사례다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/boats/i-built-out-a-ferrocement-bluewater-cruising-yacht-in-1980-and-sailed-it-for-the-next-13-years-106105",
+   "source": "PBO",
+   "date": "2026-08-07T05:23:24.000Z"
+  },
+  {
+   "title": "Fair American: A shift to race mode",
+   "t_ko": "2026 NYYC 여성 국제 선수권, 14개국 20팀 참가",
+   "s_ko": "뉴욕요트클럽이 창설하는 여성 국제 선수권은 2026년 9월 12-19일 뉴포트에서 IC37 용골선으로 열린다.\n미국요트클럽 여성팀은 봄 2025부터 14명(경주팀과 대기팀)을 구성해 훈련 중이다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/12/fair-american-a-shift-to-race-mode/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-12T19:44:39.000Z"
+  },
+  {
+   "title": "Game time for 470 World Championship",
+   "t_ko": "2026 470 세계선수권, 28개국 74팀 엔시마서 경쟁",
+   "s_ko": "올림픽 혼합 투인원 딩기 470 세계선수권은 8월 12-16일 도쿄올림픽 개최지 일본 엔시마에서 열린다.\n스페인 Jordi Xammar는 3연패를 노리고 있으며, 엔시마 경험(동메달)을 활용할 수 있다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/10/game-time-for-470-world-championship/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-10T21:35:51.000Z"
+  },
+  {
+   "title": "Has Cowes Week bounced back for good?",
+   "t_ko": "카우스 주(週) 200주년, 입장 수 회복으로 부흥세",
+   "s_ko": "북세일스 카우스 위크 2026은 최근 수십 년 중 최고의 성과를 기록했으며, 참가팀의 만족도가 높다.\nIRC 제로 플릿이 브리태니아 컵을 위해 경쟁 중이다.",
+   "cat": "레이스",
+   "link": "https://www.yachtingworld.com/homepage/has-cowes-week-bounced-back-for-good-163647",
+   "source": "Yachting World",
+   "date": "2026-08-07T17:05:43.000Z"
+  },
+  {
+   "title": "Quentin Debois on standby in New York",
+   "t_ko": "벨기에 선수 Quentin Debois, 솔로 동향 대서양 횡단 기록 세울",
+   "s_ko": "Quentin Debois는 벨기에인 최초로 동쪽에서 서쪽으로 대서양을 솔로 항해하는 기록을 세웠으며, 8월 12일 대기 기간에 돌입했다.",
    "cat": "항해술",
-   "link": "https://yachtrussia.com/news/2026/08/11/20260811-iskusstvennyy-intellekt-uje-prishel-v-yahting.html",
-   "source": "Yacht Russia",
-   "date": "2026-08-11T00:00:00.000Z"
+   "link": "https://www.sail-world.com/news/298823/?source=rss",
+   "source": "Sail-World",
+   "date": "2026-08-12T15:25:00.000Z"
   },
   {
-   "title": "Пассажирами через Ла-Манш – под парусами",
-   "t_ko": "범장 카타마란 여객 페리 서비스 시험운항: 페캉-쇼어햄",
-   "s_ko": "9월 8~13일 프랑스 페캉과 영국 쇼어햄 사이 12인 이하 승객을 위한 5회 시험항해가 실시된다.\n운영사 세일링크는 2025년 도버-불로뉴 항로(24해리)에서 정기 여객 운송 경험을 바탕으로 더 먼 노선의 실현 가능성을 평가한다.\n시험항해는 전환 시간, 바람과 조류의 영향, 항만 절차, 연료 소비, 승객 수용성을 검증하는 실증 프로젝트다.",
-   "cat": "산업",
-   "link": "https://yachtrussia.com/news/2026/08/11/20260811-passajirami-cherez-la-mansh--pod-parusami.html",
-   "source": "Yacht Russia",
-   "date": "2026-08-11T00:00:00.000Z"
-  },
-  {
-   "title": "Why sailors look to the red sky?",
-   "t_ko": "선주가 알아야 할 하늘색 해석: \"아침 빨간 하늘은 경고, 저녁은 길조\"",
-   "s_ko": "하늘 색깔은 저기압 시스템 주변 입자 산란에 의해 결정되며, 중위도에서 폭풍이 서쪽에서 동쪽으로 이동하는 바람 패턴을 따른다.\n아침 빨간 하늘은 해 뜨는 동쪽의 폭풍을 비추고, 저녁 빨간 하늘은 이미 동쪽으로 지나간 날씨 체계를 나타낸다.\n전통 기상 속담이 중위도 풍향 시스템과 일치하는 원리를 이해하면 기상 판단 능력을 높일 수 있다.",
-   "cat": "안전",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/10/why-sailors-look-to-the-red-sky/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-10T15:07:28.000Z"
-  },
-  {
-   "title": "Fall forecast will be driven by El Niño",
-   "t_ko": "2026년 가을 기상: 엘니뇨의 영향",
-   "s_ko": "악웨더의 2026년 가을 예보에 따르면 강화되는 엘니뇨가 미국 전역의 기상 패턴을 주도할 것으로 예상된다.\n엘니뇨는 과다 강우와 가뭄 조건을 형성하며 각 지역의 날씨 변동성을 증가시킨다.\n외양항이나 연안 항해 계획 시 엘니뇨의 변동성 있는 기상 패턴을 고려하여 일정을 조정해야 한다.",
-   "cat": "안전",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/10/fall-forecast-will-be-driven-by-el-nino/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-10T14:09:30.000Z"
-  },
-  {
-   "title": "If it’s not written, it’s not required",
-   "t_ko": "경기 규칙: \"문서에 없으면 요구 사항도 없다\" (2025-2028 판)",
-   "s_ko": "경기규칙 해석 사례집(Case 32)은 경기 참가 선수가 공식 공지문(NOR)과 세일링 인스트럭션에만 의존하여 항로 운항 세부사항을 확인해야 함을 명시한다.\n구두 지시나 관례는 법적 구속력이 없으며, 모든 요구사항은 서면 문서로 명시되어야 한다.\n선주 및 선수는 레이스 참가 전 공식 문서를 정확히 숙지하여 분쟁을 예방해야 한다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/09/if-its-not-written-its-not-required/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-09T17:24:51.000Z"
-  },
-  {
-   "title": "Canada’s largest keelboat regatta",
-   "t_ko": "캐나다 최대 키보트 레이스주간: 체스터 레이스위크 반환",
-   "s_ko": "캐나다 최대 키보트 레이스 챔피언십인 체스터 레이스위크가 8월 12~15일 노바스코샤 마호 베이에서 개최되며, 패르 30 캐나다 전국 선수권과 12척의 J/105 함대가 참가한다.\n마호 베이의 변화하는 바람과 조류는 전술적 레이싱과 해안 경관을 제공하며, 개막식에서 상징적 스쿠너 블루노즈 II가 의식포를 발포한다.\n참가자는 지역의 변동성 큰 해황에 즉시 대응할 수 있는 항해 기술을 준비해야 한다.",
+   "title": "RORC Round Britain and Ireland Race day 4",
+   "t_ko": "RORC 영국·아일랜드 일주 레이스, Pace 선두",
+   "s_ko": "2026 RORC Round Britain and Ireland Race(1,805해리)는 출발 72시간 후 Johnny Vincent의 Volvo 70 Pace가 헤브리디스 북쪽 대서양 저기압을 타고 선두 질주 중이다.",
    "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/07/canadas-largest-keelboat-regatta-2/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-07T18:33:49.000Z"
+   "link": "https://www.sail-world.com/news/298831/?source=rss",
+   "source": "Sail-World",
+   "date": "2026-08-12T17:04:00.000Z"
   },
   {
-   "title": "Countdown to Golden Globe Race",
-   "t_ko": "골든글로브 레이스 2026 개최 임박: 17명 소금행, 9월 6일 시작",
-   "s_ko": "제4회 골든글로브 레이스가 9월 6일 프랑스 레 사블 올론에서 출발하며, 약 30,000해리 단독 무정박 항해(assisted 없음)를 위해 17명의 선수가 준비 중이다.\n역대 3회 대회에서 43번의 시도 중 9명만 완주했으며, 2022~23 시즌은 16명 중 5명이 완주했다.\n참가자 수와 자격은 제한되어 있으며, 단독 원양항해는 극도의 자기 관리와 선박 정비 능력을 요구한다.",
+   "title": "Who wants to be first X-15 World Champ?",
+   "t_ko": "X-15 윙포일급, 2026년 첫 세계선수권 개최",
+   "s_ko": "월드세일링이 공식 인정한 원 디자인 윙포일급 X-15는 2026년 11월 4-8일 이비자에서 첫 세계선수권을 개최한다.\n남성·여성·유스(19세 이하)·주니어(15세 이하) 부문과 마스터 부문을 인정하며, 스타보드의 플라스틱 영향 프로그램은 생산된 각 보드당 해변·해양 플라스틱 6kg을 제거한다.",
    "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/09/countdown-to-golden-globe-race/",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/08/who-wants-to-be-first-x-15-world-champ/",
    "source": "Scuttlebutt",
-   "date": "2026-08-09T19:14:28.000Z"
+   "date": "2026-08-08T18:44:53.000Z"
+  },
+  {
+   "title": "Siren song of a Catalina 22",
+   "t_ko": "항해자의 프로젝트 요트 도전기: Catalina 22 복원",
+   "s_ko": "미국 뉴포트의 항해자는 사용하지 않으면 계류 박탈 규정 때문에 저가 트레일러 20피트급 요트를 구입했고, 프로젝트 보트 복원을 진행 중이다.\n겨울 저장료 절감을 위해 자체 견인과 드라이브웨이 보관이 가능한 사이즈를 선택했다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/11/siren-song-of-a-catalina-22/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-11T21:07:23.000Z"
   }
  ]
 }

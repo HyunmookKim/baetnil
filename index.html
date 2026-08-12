@@ -3081,6 +3081,17 @@ function listRefresh(k){
   else if(k === 'market') renderMarket();
   else if(k === 'spots') renderSpots();
 }
+// ★ 목록 전체가 필요한 곳(운영자 화면 등)을 위한 창구.
+//   3.29 에서 목록을 쪽 단위({rows, done})로 바꾸면서, 배열로 받아 쓰던
+//   운영자 화면 두 곳을 빠뜨려 '사람' 탭이 통째로 죽었다.
+//   모양을 푸는 자리를 여기 하나로 모은다.
+async function listAll(api){
+  if(!api || typeof api.list !== 'function') return [];
+  try{
+    const r = await api.list(false);
+    return Array.isArray(r) ? r : ((r && r.rows) || []);
+  }catch(e){ return []; }
+}
 // '더 보기' 는 이어서 받는다. 처음부터 다시 받으면 같은 글이 겹친다.
 async function listMore(k, api){
   if(!api) return;
@@ -3593,8 +3604,7 @@ function setAdminTab(k){ adminTab = k; peopleQ = ''; openAdmin(); }
 
 // ── 신고된 글
 async function adminReports(){
-  let list = [];
-  try{ list = await window.__talk.list(); }catch(e){ list = []; }
+  const list = await listAll(window.__talk);
   talkList = list;
   const flagged = list.filter(t => t.hidden || (t.reportN || 0) > 0)
                       .sort((a,b)=> (b.reportN||0) - (a.reportN||0));
@@ -3715,7 +3725,7 @@ function peopleMerge(users, talk){
 async function adminPeople(){
   let users = [], talk = [];
   try{ users = await window.__people.list(); }catch(e){ users = []; }
-  try{ talk = talkList && talkList.length ? talkList : await window.__talk.list(); }catch(e){ talk = []; }
+  talk = (talkList && talkList.length) ? talkList : await listAll(window.__talk);
   peopleRows = peopleMerge(users, talk);
   try{ adminRows = await window.__admin.list(); }catch(e){ adminRows = adminRows || []; }
   try{ banRows = isAdmin('userBan') ? await window.__bans.list() : []; }catch(e){ banRows = []; }
@@ -6511,7 +6521,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.34';
+const APP_VER = '3.35';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

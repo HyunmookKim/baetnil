@@ -5788,6 +5788,31 @@ let pullDone = false;
 let pushWanted = false;
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 function setSync(t){ const el=document.getElementById('syncState'); if(el) el.textContent = t; }
+// ★ '오프라인 · 로컬' 한 마디로 뭉개면 사람이 엉뚱한 곳을 고친다.
+//   실제로 겪은 일 — 인터넷은 멀쩡한데 하루치 무료 한도를 다 써서 막힌 것을
+//   '오프라인' 이라고 띄웠다. 두 기기가 동시에 그러니 앱이 고장난 줄 알았다.
+//   무슨 일인지 정확히 말한다. 자세한 사연은 눌렀을 때 보여 준다.
+function cloudErrText(e){
+  const c = String((e && (e.code || e.message)) || '');
+  if(/resource-exhausted|429/.test(c)) return '오늘 클라우드 한도 다 씀 · 눌러서 확인';
+  if(/permission-denied/.test(c))      return '권한이 없습니다 · 눌러서 확인';
+  if(/unauthenticated/.test(c))        return '로그인이 풀렸습니다 · 눌러서 확인';
+  return '오프라인 · 로컬';
+}
+function cloudErrHelp(e){
+  const c = String((e && (e.code || e.message)) || '');
+  if(/resource-exhausted|429/.test(c))
+    return '오늘 쓸 수 있는 클라우드 사용량을 다 썼습니다.\n\n'
+      + '· 기기에 있는 기록은 그대로 있고, 앱은 이대로 다 쓸 수 있습니다.\n'
+      + '· 다른 기기와 맞추는 것만 잠시 멈춥니다.\n'
+      + '· 매일 새벽(한국 시간 오후 4시쯤)에 저절로 풀립니다.\n\n'
+      + '자꾸 이러면 운영자에게 알려 주세요 — 고객센터에서 보낼 수 있습니다.';
+  if(/permission-denied/.test(c))
+    return '이 배의 자료를 볼 권한이 없습니다.\n\n선주에게 등급을 확인해 달라고 하세요.';
+  if(/unauthenticated/.test(c))
+    return '로그인이 풀렸습니다.\n\n서랍 > 로그인 에서 다시 들어와 주세요.';
+  return '인터넷에 닿지 못했습니다.\n\n기기에 있는 기록으로 계속 쓰실 수 있습니다.';
+}
 const snapOf = arr => { const m={}; arr.forEach(i=>{ m[String(i.id)] = JSON.stringify(i); }); return m; };
 
 window.__initCloud = async function(api){
@@ -5795,7 +5820,7 @@ window.__initCloud = async function(api){
   await storageReady;
   setSync('연결 중…');
   try{ await cloudPull(); }
-  catch(e){ setSync('오프라인 · 로컬'); }
+  catch(e){ lastPushErr = cloudErrHelp(e); setSync(cloudErrText(e)); }
   window.addEventListener('online', ()=>{ if(cloud) cloudPull().catch(()=>{}); });
 };
 window.__cloudFailed = async function(){
@@ -6047,6 +6072,9 @@ function seedAskMark(on){
 }
 function cloudSeedCheck(){
   if(!(cloud && unlocked)) return;
+  // ★ 받아오기가 실패했으면 '자료가 없다' 가 아니라 '못 봤다' 이다.
+  //   그 상태에서 물으면 사람이 없는 줄 알고 올려서 덮어쓴다. 실제로 겪은 일이다.
+  if(!pullDone) return;
   if(cloudSeeded) return;                 // 클라우드에 이미 자료가 있다
   if(cloudSeedAsked()) return;
   // 물품만 보면 안 된다. 정비·항해일지·체크리스트만 있는 배도 올려야 한다.
@@ -6091,10 +6119,9 @@ function syncDown(){
   cloudPull().then(()=>{
     alert('클라우드에서 받아왔습니다.');
   }).catch(e=>{
-    const m = (e && (e.code ? e.code + ' \u2014 ' : '') + (e.message || String(e))) || '알 수 없는 오류';
-    lastPushErr = m;
-    setSync('받아오지 못함 · 눌러서 확인');
-    alert('받아오지 못했습니다.\n\n' + m);
+    lastPushErr = cloudErrHelp(e);
+    setSync(cloudErrText(e));
+    alert(cloudErrHelp(e));
   });
 }
 // 옛 이름 — 다른 곳에서 부르던 것이 있으면 올리기로 이어준다
@@ -6407,7 +6434,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.29';
+const APP_VER = '3.30';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -13001,10 +13028,14 @@ document.addEventListener('visibilitychange', ()=>{
       // ★ 지운 문서는 자국을 안 남긴다. 그래서 서버 개수를 함께 세어 둔다.
       //   앱이 합친 뒤 개수가 어긋나면 그 컬렉션만 통째로 다시 받는다.
       //   개수 세기와 조회를 줄줄이 기다리면 왕복이 배로 늘어 함께 보낸다.
+      //
+      // ★ 개수 세기(집계 질의)는 따로 노는 기능이라 이것만 막히는 일이 있다.
+      //   그때 통째로 죽으면 동기화 전체가 멎는다. 그 칸만 통째로 받고 넘어간다.
       const [cnt, snap] = await Promise.all([
-        getCountFromServer(col(name)),
+        getCountFromServer(col(name)).catch(()=>null),
         getDocs(query(col(name), where('_u', '>', b.u || '')))
       ]);
+      if(!cnt) return await fullColl(name);
       const r = rowsOf(snap);
       return { mode:'diff', rows:r.rows, n:cnt.data().count,
                u: (r.u > (b.u || '')) ? r.u : (b.u || '') };

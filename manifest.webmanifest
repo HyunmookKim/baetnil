@@ -1,7 +1,7 @@
 {
-  "name": "뱃일 — 선박 운용",
+  "name": "뱃일 — 배 타는 사람들",
   "short_name": "뱃일",
-  "description": "요트·낚시배 등 레저 선박의 적재·정비·연료·항해를 기록합니다.",
+  "description": "물때와 날씨, 정비 기록, 정박지와 장터까지. 배 타는 사람들을 위한 앱.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

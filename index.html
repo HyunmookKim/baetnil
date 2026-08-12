@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>뱃일 — 선박 운용</title>
+<title>뱃일 — 배 타는 사람들</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 /* 잠금(읽기전용) 모드: 수정 관련 UI 전부 숨김 */
@@ -3007,6 +3007,60 @@ function talkBody(v, blocks){
   };
 }
 
+// ── ★ 받아 둔 목록을 잠시 기억한다
+//
+//   탭을 오갈 때마다, 찾기 칸에 글자를 칠 때마다 다시 읽고 있었다.
+//   '여수' 두 글자를 치면 정박지 500개를 두 번 읽는다 — 1000번이다.
+//   한 번 받은 것은 잠시 들고 있고, 새로고침 버튼과
+//   글을 쓰거나 지웠을 때만 버린다.
+const LIST_TTL = 3e5;   // 5분. 더 길게 잡으면 남이 쓴 글이 안 보인다.
+let listCache = {};
+function listFresh(k){
+  const c = listCache[k];
+  return !!(c && (Date.now() - c.at < LIST_TTL));
+}
+function listSet(k, rows, done){
+  listCache[k] = { at: Date.now(), rows: rows || [], done: !!done };
+}
+function listDrop(k){
+  if(k) delete listCache[k]; else listCache = {};
+}
+function listRows(k){ return (listCache[k] && listCache[k].rows) || []; }
+function listDone(k){ return !!(listCache[k] && listCache[k].done); }
+// 모듈이 글을 쓰거나 지운 뒤 이 문을 두드린다 — 앱 곳곳에서 부르게 하면 한 군데는 빠뜨린다
+if(typeof window !== 'undefined') window.__listDrop = listDrop;
+function listRefresh(k){
+  listDrop(k);
+  if(k === 'talk') renderTalk();
+  else if(k === 'market') renderMarket();
+  else if(k === 'spots') renderSpots();
+}
+// '더 보기' 는 이어서 받는다. 처음부터 다시 받으면 같은 글이 겹친다.
+async function listMore(k, api){
+  if(!api) return;
+  try{
+    const r = await api.list(true);
+    listSet(k, listRows(k).concat(r.rows || []), r.done);
+  }catch(e){ alert('더 불러오지 못했습니다.\n\n' + ((e && e.message) || e)); }
+  listRefresh_draw(k);
+}
+function listRefresh_draw(k){
+  if(k === 'talk') renderTalk();
+  else if(k === 'market') renderMarket();
+  else if(k === 'spots') renderSpots();
+}
+async function talkMore(){   await listMore('talk',   window.__talk); }
+async function marketMore(){ await listMore('market', window.__market); }
+async function spotMore(){   await listMore('spots',  window.__spots); }
+// 목록 아래에 붙는 줄 — 한 곳에서만 만든다
+function listFoot(k, fn){
+  return listDone(k)
+    ? `<div class="mrnone">여기까지입니다 · <button class="minib blu" onclick="listRefresh('${k}')">새로고침</button></div>`
+    : `<div class="mrrow" style="justify-content:center;padding:12px">
+        <button class="mrbtn" onclick="${fn}()">더 보기</button>
+        <button class="mrbtn" style="margin-left:8px" onclick="listRefresh('${k}')">새로고침</button></div>`;
+}
+
 async function renderTalk(){
   const W = document.getElementById('talkWrap');
   if(!W) return;
@@ -3019,10 +3073,15 @@ async function renderTalk(){
       <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`;
     return;
   }
-  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
   await loadAdmin();
-  try{ talkList = await window.__talk.list(); }
-  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  if(!listFresh('talk')){
+    W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+    try{
+      const r = await window.__talk.list(false);
+      listSet('talk', r.rows, r.done);
+    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  }
+  talkList = listRows('talk');
 
   const kinds = `<div class="tfilt">`
     + `<button class="tchip${talkKind?'':' on'}" onclick="setTalkKind('')">전체</button>`
@@ -3056,7 +3115,8 @@ async function renderTalk(){
   W.innerHTML = kinds + regs
     + `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
         <button class="mrbtn ok" onclick="writeTalk()">글쓰기</button></div>`
-    + (rows || '<div class="mrnone">아직 글이 없습니다. 첫 글을 써 보세요.</div>');
+    + (rows || '<div class="mrnone">아직 글이 없습니다. 첫 글을 써 보세요.</div>')
+    + listFoot('talk', 'talkMore');
 }
 // ── 내 배 정비·수리 기록을 글에 붙인다
 // ★ 내 배 것만 붙인다. 남의 배 기록에는 손대지 않는다.
@@ -3829,10 +3889,14 @@ async function openExplore(biz){
       <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`;
     return;
   }
-  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
-  let list;
-  try{ list = await window.__pub.list(exploreBiz); }
-  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  // 배 둘러보기도 탭을 오갈 때마다 다시 읽고 있었다. 전체와 영업을 따로 기억한다.
+  const ck = 'explore:' + (exploreBiz ? '1' : '0');
+  if(!listFresh(ck)){
+    W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+    try{ listSet(ck, await window.__pub.list(exploreBiz), true); }
+    catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  }
+  const list = listRows(ck);
   const hid = hiddenBoats().length;
   exploreAll = list;
   // 운영자가 감춘 배는 목록에서 뺀다. 운영자에게는 표시해서 보여 준다.
@@ -6343,7 +6407,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.28';
+const APP_VER = '3.29';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -9592,10 +9656,15 @@ async function renderMarket(){
       <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`; return;
   }
   marketFirstNotice();
-  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
   await loadAdmin();
-  try{ marketList = await window.__market.list(); }
-  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  if(!listFresh('market')){
+    W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+    try{
+      const r = await window.__market.list(false);
+      listSet('market', r.rows, r.done);
+    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  }
+  marketList = listRows('market');
 
   const rows = marketList
     .filter(m => !m.hidden || isAdmin('postDel'))
@@ -9631,7 +9700,8 @@ async function renderMarket(){
         oninput="marketQ=this.value;renderMarket()"></div>
     <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
       <button class="mrbtn ok" onclick="writeItem()">+ 팔 물건 올리기</button></div>`
-    + (rows || '<div class="mrnone">아직 올라온 물건이 없습니다.</div>')
+    + (rows || `<div class="mrnone">${marketQ ? '받아 온 물건 중에는 없습니다. 더 보기로 넓혀 보세요.' : '아직 올라온 물건이 없습니다.'}</div>`)
+    + listFoot('market', 'marketMore')
     + marketNotice();
 }
 function itemMatch(m, q){
@@ -9909,10 +9979,15 @@ async function renderSpots(){
     W.innerHTML = `<div class="mrnone">정박지는 로그인해야 볼 수 있습니다<br><br>
       <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`; return;
   }
-  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
   await loadAdmin();
-  try{ spotList = await window.__spots.list(); }
-  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  if(!listFresh('spots')){
+    W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+    try{
+      const r = await window.__spots.list(false);
+      listSet('spots', r.rows, r.done);
+    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  }
+  spotList = listRows('spots');
 
   // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
   const rows = spotList
@@ -9938,7 +10013,8 @@ async function renderSpots(){
         oninput="spotQ=this.value;renderSpots()"></div>
     <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
       <button class="mrbtn ok" onclick="writeSpot()">+ 정박지 올리기</button></div>`
-    + (rows || '<div class="mrnone">아직 올라온 정박지가 없습니다. 아는 자리를 올려 주세요.</div>');
+    + (rows || `<div class="mrnone">${spotQ ? '받아 온 정박지 중에는 없습니다. 더 보기로 넓혀 보세요.' : '아직 올라온 정박지가 없습니다. 아는 자리를 올려 주세요.'}</div>`)
+    + listFoot('spots', 'spotMore');
 }
 function spotMatch(s, q){
   const t = String(q||'').trim().toLowerCase();
@@ -12811,7 +12887,7 @@ document.addEventListener('visibilitychange', ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where,
-            orderBy, limit, writeBatch, FieldPath, getCountFromServer } =
+            orderBy, limit, startAfter, writeBatch, FieldPath, getCountFromServer } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -13051,9 +13127,11 @@ document.addEventListener('visibilitychange', ()=>{
       async put(boatId, data){
         await setDoc(doc(fdb, 'boatPublic', String(boatId)),
           Object.assign({}, data, { owner: fauth.currentUser ? fauth.currentUser.uid : '' }));
+        bust('explore:0'); bust('explore:1');
       },
       async remove(boatId){
         try{ await deleteDoc(doc(fdb, 'boatPublic', String(boatId))); }catch(_){}
+        bust('explore:0'); bust('explore:1');
       },
       async list(biz){
         const snap = await getDocs(query(collection(fdb, 'boatPublic'),
@@ -13068,6 +13146,7 @@ document.addEventListener('visibilitychange', ()=>{
       // 일부만 고친다 (운영자가 감추거나 다시 올릴 때). 통째로 덮어쓰면 자료가 날아간다.
       async patch(boatId, body){
         await setDoc(doc(fdb, 'boatPublic', String(boatId)), body, { merge:true });
+        bust('explore:0'); bust('explore:1');
       }
     };
     // ── 참여 신청
@@ -13122,21 +13201,43 @@ document.addEventListener('visibilitychange', ()=>{
     };
     // ── 커뮤니티 글판
     // 모든 배가 같이 보는 곳. 배 밑(boats/…)이 아니라 따로 둔다.
+    // ── ★ 커뮤니티 목록을 쪽 단위로 받는다
+    //
+    //   전에는 탭을 열 때마다 글판 200개 · 정박지 500개 · 장터 300개를 통째로 읽었다.
+    //   찾기 칸에 글자를 칠 때마다도 다시 읽었다 — '여수' 두 글자에 1000번이다.
+    //   배 동기화를 500번에서 30번으로 줄여 놓고 여기를 두면 헛일이다.
+    //
+    //   쪽을 나누는 셈은 여기 한 곳에만 둔다. 컬렉션마다 따로 짜면 한 군데는 틀린다.
+    const PAGE_N = { community: 30, market: 30, spots: 100 };
+    const cursors = {};
+    async function pageList(name, ord, more){
+      const N = PAGE_N[name] || 30;
+      const parts = [collection(fdb, name), orderBy(ord, 'desc')];
+      // ★ 처음부터 받을 때 옛 자리를 안 지우면 첫 쪽을 건너뛴다
+      if(!more) cursors[name] = null;
+      else if(cursors[name]) parts.push(startAfter(cursors[name]));
+      parts.push(limit(N));
+      const snap = await getDocs(query.apply(null, parts));
+      if(snap.docs.length) cursors[name] = snap.docs[snap.docs.length - 1];
+      return { rows: snap.docs.map(d => d.data()), done: snap.docs.length < N };
+    }
+    // 글을 쓰거나 지우면 앱이 들고 있는 목록이 낡는다. 쓰는 그 자리에서 버리게 한다.
+    const bust = k => { try{ if(window.__listDrop) window.__listDrop(k); }catch(_){} };
+
     window.__talk = {
-      async list(){
-        const snap = await getDocs(query(collection(fdb, 'community'),
-          orderBy('ts', 'desc'), limit(200)));
-        return snap.docs.map(d => d.data());
-      },
+      async list(more){ return await pageList('community', 'ts', more); },
       async add(body){
         await setDoc(doc(fdb, 'community', String(body.id)), body);
+        bust('talk');
         return body.id;
       },
       async edit(id, patch){
         await setDoc(doc(fdb, 'community', String(id)), patch, { merge:true });
+        bust('talk');
       },
       async del(id){
         await deleteDoc(doc(fdb, 'community', String(id)));
+        bust('talk');
       }
     };
     // ── 운영자
@@ -13211,30 +13312,28 @@ document.addEventListener('visibilitychange', ()=>{
     // ── 정박지
     // 배 밖의 공용 자료다. 로그인한 사람은 누구나 보고 올린다.
     window.__spots = {
-      async list(){
-        const snap = await getDocs(query(collection(fdb,'spots'), limit(500)));
-        return snap.docs.map(d=>d.data());
-      },
+      // 정박지는 지역을 훑으며 찾는 자리라 한 쪽을 넉넉히 잡는다
+      async list(more){ return await pageList('spots', 'ts', more); },
       async put(body){
         await setDoc(doc(fdb,'spots',String(body.id)), body);
+        bust('spots');
         return body.id;
       },
       async edit(id, patch){
         await setDoc(doc(fdb,'spots',String(id)), patch, { merge:true });
+        bust('spots');
       },
       async del(id){
         await deleteDoc(doc(fdb,'spots',String(id)));
+        bust('spots');
       }
     };
     // ── 중고 장터
     window.__market = {
-      async list(){
-        const snap = await getDocs(query(collection(fdb,'market'), orderBy('ts','desc'), limit(300)));
-        return snap.docs.map(d=>d.data());
-      },
-      async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); return body.id; },
-      async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); },
-      async del(id){ await deleteDoc(doc(fdb,'market',String(id))); }
+      async list(more){ return await pageList('market', 'ts', more); },
+      async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); bust('market'); return body.id; },
+      async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); bust('market'); },
+      async del(id){ await deleteDoc(doc(fdb,'market',String(id))); bust('market'); }
     };
     // ── 고객센터
     window.__support = {

@@ -3037,11 +3037,15 @@ function talkPickRecord(rid){
   (Array.isArray(maint) ? maint : []).forEach(m=>{
     if(!m.lastDate) return;                      // 한 번도 안 한 것은 쓸 이야기가 없다
     rows.push({ v:'m:'+m.id, name:m.name || '(이름 없음)',
-                sub:'정기점검 · 마지막 ' + m.lastDate + (m.grp ? ' · ' + m.grp : '') });
+                sub:'정기점검 · 마지막 ' + m.lastDate + (m.grp ? ' · ' + m.grp : '')
+                    + (m.pin ? ' · 도면 위치' : '')
+                    + (m.photos && m.photos.length ? ' · 사진 ' + m.photos.length : '') });
   });
   (Array.isArray(repair) ? repair : []).forEach(r=>{
     rows.push({ v:'r:'+r.id, name:r.title || '(제목 없음)',
-                sub:'수리 · ' + (RP_LABEL[r.status] || '') + (r.doneDate ? ' · ' + r.doneDate : '') });
+                sub:'수리 · ' + (RP_LABEL[r.status] || '') + (r.doneDate ? ' · ' + r.doneDate : '')
+                    + (r.pin ? ' · 도면 위치' : '')
+                    + (r.photos && r.photos.length ? ' · 사진 ' + r.photos.length : '') });
   });
   if(!rows.length){ alert('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.'); return; }
   recPickTarget = rid;
@@ -3057,34 +3061,101 @@ function closeRecPick(){
   recPickTarget = null;
 }
 // 하나를 눌러서 곧바로 넣는다. 고르고 또 '넣기' 를 누르게 할 이유가 없다.
-function recPickTake(v){
+async function recPickTake(v){
   const rid = recPickTarget;
   const [kind, id] = String(v||'').split(':');
-  const text = (kind === 'm') ? talkRecordText('maint', id) : talkRecordText('repair', id);
   closeRecPick();
-  if(!text){ alert('그 기록을 찾지 못했습니다'); return; }
   if(!rid) return;
+  const blocks = await talkRecordBlocks(kind === 'm' ? 'maint' : 'repair', id);
+  if(!blocks.length){ alert('그 기록을 찾지 못했습니다'); return; }
+  // 사진까지 들어가므로 용량을 먼저 본다
+  const photos = blocks.filter(b=>b.t==='photo').map(b=>b.v);
+  const bud = photoBudget(photos);
+  if(!bud.ok){
+    alert('사진이 많아 ' + bud.dropped + '장은 넣지 못합니다.\n\n글을 올린 뒤 따로 올려 주세요.');
+  }
   // 편집기 안 커서 자리에 넣는다
-  setTimeout(()=>{ richInsert(rid, [{ t:'text', v:text }]); }, 60);
+  setTimeout(()=>{ richInsert(rid, blocks); }, 60);
+}
+// ★ 기록 하나를 글에 넣을 '덩어리' 로 바꾼다.
+//   글자만 넣으면 아무 의미가 없다 — 사진과 도면 위치가 있어야
+//   남이 보고 "아 거기 그거" 하고 알아본다.
+//   그래서 [글 + 사진 + 도면에 핀을 찍은 그림] 을 함께 만든다.
+async function talkRecordBlocks(kind, id){
+  const it = (kind === 'maint')
+    ? (Array.isArray(maint) ? maint : []).find(x=>String(x.id)===String(id))
+    : (Array.isArray(repair) ? repair : []).find(x=>String(x.id)===String(id));
+  if(!it) return [];
+  const out = [{ t:'text', v: talkRecordText(kind, it) }];
+  // 도면에 핀을 찍은 그림 — 위치를 말로 적어 봐야 아무도 못 찾는다
+  if(it.pin){
+    const shot = await pinShot(it.pin);
+    if(shot) out.push({ t:'photo', v: shot });
+  }
+  // 항목에 붙여 둔 사진
+  (it.photos || []).forEach(u=>{ if(u) out.push({ t:'photo', v:u }); });
+  return out;
 }
 // 기록 하나를 사람이 읽을 글로 바꾼다
-function talkRecordText(kind, id){
-  if(kind === 'maint'){
-    const m = (Array.isArray(maint) ? maint : []).find(x=>String(x.id)===String(id));
-    if(!m) return '';
-    const hist = (m.history || []).map(h=>h.date).slice(-3).join(', ');
-    return '[정비 기록] ' + (m.name || '') + '\n'
-      + (m.grp ? '계통: ' + m.grp + '\n' : '')
-      + '주기: ' + (m.months || '') + (UNIT_LABEL[m.unit || 'm'] || '') + '\n'
-      + '마지막: ' + (m.lastDate || '—') + '\n'
-      + (hist ? '이력: ' + hist + '\n' : '');
+function talkRecordText(kind, it){
+  // 예전에는 id 를 받았다. 항목을 그대로 받아도 되게 둘 다 받는다.
+  if(typeof it === 'string' || typeof it === 'number'){
+    it = (kind === 'maint')
+      ? (Array.isArray(maint) ? maint : []).find(x=>String(x.id)===String(it))
+      : (Array.isArray(repair) ? repair : []).find(x=>String(x.id)===String(it));
   }
-  const r = (Array.isArray(repair) ? repair : []).find(x=>String(x.id)===String(id));
-  if(!r) return '';
-  return '[수리 기록] ' + (r.title || '') + '\n'
-    + (r.grp ? '계통: ' + r.grp + '\n' : '')
-    + '상태: ' + (RP_LABEL[r.status] || '') + '\n'
-    + '발견: ' + (r.created || '—') + (r.doneDate ? ' · 완료: ' + r.doneDate : '') + '\n';
+  if(!it) return '';
+  const L = [];
+  if(kind === 'maint'){
+    L.push('[정비 기록] ' + (it.name || ''));
+    if(it.grp) L.push('계통: ' + it.grp);
+    L.push('주기: ' + (it.months || '') + (UNIT_LABEL[it.unit || 'm'] || ''));
+    L.push('마지막: ' + (it.lastDate || '—'));
+    const hist = (it.history || []).map(h=>h.date).slice(-5);
+    if(hist.length) L.push('이력: ' + hist.join(', ') + ' (모두 ' + it.history.length + '회)');
+  } else {
+    L.push('[수리 기록] ' + (it.title || ''));
+    if(it.grp) L.push('계통: ' + it.grp);
+    L.push('상태: ' + (RP_LABEL[it.status] || ''));
+    L.push('발견: ' + (it.created || '—') + (it.doneDate ? ' · 완료: ' + it.doneDate : ''));
+  }
+  if(it.pin) L.push('도면 위치: ' + (it.pin.map === 'side' ? '측면도' : '평면도') + ' (아래 그림)');
+  if(it.photos && it.photos.length) L.push('사진 ' + it.photos.length + '장');
+  if(it.note) L.push('', it.note);
+  return L.join('\n');
+}
+// 도면 그림 위에 핀을 찍어 한 장으로 만든다.
+// ★ '평면도 오른쪽 앞' 같은 말로는 아무도 못 찾는다. 그림이 있어야 한다.
+function pinShot(pin){
+  return new Promise(resolve=>{
+    try{
+      const src = (typeof dgSrc === 'function') ? dgSrc(pin.map) : null;
+      if(!src){ resolve(null); return; }
+      const img = new Image();
+      img.onload = () => {
+        try{
+          const W = Math.min(900, img.naturalWidth || 900);
+          const H = Math.round(W * (img.naturalHeight || 600) / (img.naturalWidth || 900));
+          const cv = document.createElement('canvas');
+          cv.width = W; cv.height = H;
+          const g = cv.getContext('2d');
+          g.fillStyle = '#0b1a29'; g.fillRect(0, 0, W, H);
+          g.drawImage(img, 0, 0, W, H);
+          const x = W * (Number(pin.x) || 0) / 100;
+          const y = H * (Number(pin.y) || 0) / 100;
+          const r = Math.max(9, Math.round(W / 60));
+          // 바깥 흰 테두리 + 안쪽 주황. 어떤 도면 위에서도 눈에 띈다.
+          g.beginPath(); g.arc(x, y, r + 3, 0, Math.PI * 2);
+          g.fillStyle = '#ffffff'; g.fill();
+          g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2);
+          g.fillStyle = '#ff5a3c'; g.fill();
+          resolve(cv.toDataURL('image/jpeg', 0.8));
+        }catch(e){ resolve(null); }
+      };
+      img.onerror = () => resolve(null);
+      img.src = src;
+    }catch(e){ resolve(null); }
+  });
 }
 function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
@@ -6043,7 +6114,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.20';
+const APP_VER = '3.21';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

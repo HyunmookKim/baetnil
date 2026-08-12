@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-3.14';
+const CACHE = 'baetnil-3.15';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png'];
 const TILE_HOSTS = ['tile.openstreetmap.org','tiles.openseamap.org'];

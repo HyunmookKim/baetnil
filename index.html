@@ -1954,13 +1954,15 @@ window.__onAuth = u => {
       }
     });
     if(changed && typeof sysSave === 'function') sysSave();
-    boats.forEach(b=>{ if(window.__saveBoat) window.__saveBoat(b); });
+    boats.forEach(b=>{ saveBoatCloud(b, true); });
     // 첫 pull 은 로그인 전에 지나가 권한이 없어 실패한다.
     // 로그인이 확정된 지금 배 목록을 받아 합치고, 그 배의 기록을 다시 받아온다.
     // 운영자인지 확인해서 서랍 메뉴를 켜거나 끈다
     if(typeof loadAdmin === 'function') loadAdmin().then(()=>{ paintAdminMenu(); });
     // 내가 막혔는지도 확인한다 (막히면 글·댓글을 못 쓴다)
     if(typeof loadMyBan === 'function') loadMyBan();
+    // 못 올린 배가 있으면 지금 다시 올린다
+    if(typeof retryDirtyBoats === 'function') retryDirtyBoats();
     const after = () => { if(typeof cloudSeedCheck === 'function') cloudSeedCheck(); };
     // 받아온 배가 화면에 나타나야 한다. 안 그리면 로그인해도 빈 화면이다.
     const redraw = () => { try{ ensureBoat(); applyBoatName(); switchTab(curTab); }catch(_){} };
@@ -2242,7 +2244,7 @@ function createBoat(){
   }
   const first = boats.length === 0;
   boats.push(nb);
-  if(window.__saveBoat) window.__saveBoat(nb);
+  saveBoatCloud(nb);
   if(!first){
     // 두 번째 이후의 배는 빈 기록으로 시작한다
     currentBoatId = nb.id; window.currentBoatId = currentBoatId;
@@ -2321,7 +2323,7 @@ function portPickSave(){
   if(b){
     b.lat = mapS.pick.lat; b.lon = mapS.pick.lon;
     saveMR();
-    if(window.__saveBoat) window.__saveBoat(b);
+    saveBoatCloud(b);
     syncPortSpot(b);        // 날씨 지점으로도 등록한다
   }
   portPickCtx = null; mapS = null;
@@ -3772,7 +3774,7 @@ function setPubUI(key, on){
   if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
   if(!setPub(b, key, on)) return;
   saveLocal();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   pushPublic(b);
   openPublish();
 }
@@ -3821,7 +3823,7 @@ function openIntro(){
 }
 function saveIntro(b){
   saveLocal();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   if(typeof schedulePush === 'function') schedulePush();
   pushPublic(b);
   // 소개는 두 곳에서 고칠 수 있다 — 내 배 > 배 소개, 공개 설정 > 소개 페이지.
@@ -4639,7 +4641,7 @@ function editMember(uid){
 }
 function saveBoatMembers(b, back, id){
   saveLocal();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   if(back === 'roster') openRoster();
   else if(back === 'ranks') openRanks();
   else if(back === 'rank') editRankUI(id);
@@ -4723,10 +4725,16 @@ function approveJoin(inviteId, uid, name){
       b.memberNames = b.memberNames || {};
       b.memberNames[uid] = name || '이름 미등록';
       saveLocal();
-      if(window.__saveBoat) window.__saveBoat(b);
-      if(window.__invites) window.__invites.close(inviteId).catch(()=>{});
-      alert('구성원으로 받았습니다');
-      openBoat('info');
+      // ★ 클라우드에 올라간 것을 확인하고 알린다.
+      //   안 올라갔는데 '받았습니다' 라고 하면 다음 받아오기에서 사라진다.
+      saveBoatCloud(b, true).then(ok=>{
+        if(window.__invites) window.__invites.close(inviteId).catch(()=>{});
+        if(ok) alert((name || '이 분') + ' 을 구성원으로 받았습니다');
+        else alert((name || '이 분') + ' 을 이 기기에는 받았습니다.\n\n'
+          + '다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n'
+          + '그때까지 다른 기기에서는 안 보일 수 있습니다.');
+        openBoat('roster');
+      });
     }
   });
 }
@@ -4792,14 +4800,64 @@ function addBoat(){
 // 내 배 — 버튼 줄은 어느 화면에 들어가도 그대로 남아 있어야 한다.
 // 눌렀더니 줄이 통째로 사라지면 지금 어디인지도, 돌아갈 길도 안 보인다.
 let boatTab = 'info';
+// [키, 이름, 여는 함수, 있어야 하는 권한(없으면 누구나)]
+// ★ 등급이 낮은 사람에게는 아예 안 보여야 한다.
+//   다만 안 보이게 하는 것은 편의일 뿐이다 — 각 화면도 열 때 권한을 다시 본다.
 const BOAT_TABS2 = [
-  ['roster',  '회원 명부',  'openRoster'],
-  ['ranks',   '등급 설정',  'openRanks'],
-  ['board',   '게시판',     'openBoard'],
-  ['tasks',   '할 일',      'openMyTasks'],
-  ['joins',   '가입 신청',  'openJoinReqs'],
-  ['publish', '공개 설정',  'openPublish']
+  ['roster',  '회원 명부',  'openRoster',    'roster'],
+  ['ranks',   '등급 설정',  'openRanks',     'ranks'],
+  ['board',   '게시판',     'openBoard',     'board'],
+  ['tasks',   '할 일',      'openMyTasks',   null],
+  ['joins',   '가입 신청',  'openJoinReqs',  'members'],
+  ['publish', '공개 설정',  'openPublish',   'publish']
 ];
+// 이 사람에게 보여 줄 버튼만 고른다
+function boatTabsFor(b){
+  if(!b) return [];
+  return BOAT_TABS2.filter(t => !t[3] || can(b, t[3], 'view'));
+}
+
+// ★ 배 문서를 클라우드에 저장하는 유일한 길.
+//   예전에는 여러 곳에서 window.__saveBoat 를 직접 불렀고,
+//   실패해도 console.warn 만 하고 넘어갔다. 그래서
+//   "구성원으로 받았습니다" 라고 알려 놓고 클라우드에는 안 올라갔고,
+//   다음 받아오기가 옛 자료로 덮어써서 방금 받은 사람이 사라졌다.
+//   이제 실패를 기억해 두고 다시 올린다.
+let boatDirty = new Set((function(){
+  try{ return JSON.parse(localStorage.getItem('bt_boatdirty') || '[]'); }catch(_){ return []; }
+})());
+function saveDirtyList(){
+  try{ localStorage.setItem('bt_boatdirty', JSON.stringify([...boatDirty])); }catch(_){}
+}
+async function saveBoatCloud(b, quiet){
+  if(!b || !b.id) return false;
+  if(!window.__saveBoat || !window.__user){
+    boatDirty.add(String(b.id)); saveDirtyList();
+    return false;                       // 로그인 전이면 나중에 올린다
+  }
+  let ok = false;
+  try{ ok = await window.__saveBoat(b); }catch(e){ ok = false; }
+  if(ok){
+    boatDirty.delete(String(b.id)); saveDirtyList();
+  } else {
+    boatDirty.add(String(b.id)); saveDirtyList();
+    setSync('배 정보 올리지 못함 · 눌러서 확인');
+    if(!quiet) alert('배 정보를 클라우드에 올리지 못했습니다.\n\n'
+      + '이 기기에는 저장되어 있고, 인터넷이 되면 다시 올립니다.\n'
+      + '다른 기기에서는 아직 안 보일 수 있습니다.');
+  }
+  return ok;
+}
+// 못 올린 배를 다시 올린다 (앱을 켤 때·로그인할 때)
+async function retryDirtyBoats(){
+  if(!boatDirty.size || !window.__user) return;
+  for(const id of [...boatDirty]){
+    const b = boats.find(x=>String(x.id)===String(id));
+    if(!b){ boatDirty.delete(id); continue; }
+    await saveBoatCloud(b, true);
+  }
+  saveDirtyList();
+}
 function setHeadTitle(t){
   const N = document.getElementById('hNav');
   if(N) N.innerHTML = `<h1 class="htit">${esc(t || '뱃일')}</h1>`;
@@ -4812,7 +4870,7 @@ function boatHead(cur){
       <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">배 소개</button>
     </div>
     <div class="subrow" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:6px">`
-    + BOAT_TABS2.map(([k,name,fn])=>
+    + boatTabsFor(curBoat()).map(([k,name,fn])=>
         `<button class="tab${cur===k?' on':''}" onclick="${fn}()">${name}</button>`).join('')
     + `</div>`;
 }
@@ -4952,7 +5010,7 @@ function refillWxLimits(){
     + '\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?')) return;
   applyWxLimits(b, true);
   saveLocal();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   openBoat('spec');
 }
 // 제원 화면의 모든 칸을 읽어 한 번에 저장한다.
@@ -4970,7 +5028,7 @@ function saveSpecNow(){
     n++;
   });
   saveLocal();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   if(typeof schedulePush === 'function') schedulePush();
   if(typeof renderWeather === 'function' && curScreen() === 'weather') renderWeather();
   alert('제원 ' + n + '칸을 저장했습니다.');
@@ -4997,7 +5055,7 @@ function boatField(k, v){
   const b = curBoat(); if(!b || !unlocked) return;
   const before = b.type;
   b[k] = v; saveMR(); applyBoatName();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
   if(k === 'type' && before !== v){
     // 선종이 바뀌면 없는 계통이 남을 수 있다. 지우지는 않고 알리기만 한다.
     const grps = MAINT_GRPS_BY_TYPE[v] || MAINT_GRPS_BY_TYPE.other;
@@ -5211,7 +5269,7 @@ function setBoatSpec(key, v){
   if(!t) delete b.spec[key];
   else b.spec[key] = (BOAT_SPEC[key] && BOAT_SPEC[key].text) ? t : parseFloat(t);
   saveMR();
-  if(window.__saveBoat) window.__saveBoat(b);
+  saveBoatCloud(b);
 }
 
 // 클라우드 배 문서에 들어가는 칸. 올리는 쪽(__saveBoat)과 받는 쪽(mergeCloudBoats)이
@@ -5526,6 +5584,13 @@ async function mergeCloudBoats(){
   list.forEach(cb => {
     const old = have[String(cb.id)];
     if(old){
+      // ★ 아직 클라우드에 못 올린 배는 덮지 않는다.
+      //   덮으면 방금 한 일(구성원 받기·등급 바꾸기)이 통째로 사라진다.
+      //   실제로 어머니를 크루로 받았는데 다음 받아오기에서 사라졌다.
+      if(boatDirty.has(String(cb.id))){
+        saveBoatCloud(old, true);        // 대신 다시 올린다
+        return;
+      }
       // 이미 있는 배는 두 번 넣지 않는다. 칸은 목록대로 전부 받는다.
       // 골라 받으면 빠뜨린 칸이 영영 안 내려온다 (2.6 의 제원 동기화 사고).
       BOAT_FIELDS.forEach(k => { if(cb[k] !== undefined && cb[k] !== null) old[k] = cb[k]; });
@@ -5931,7 +5996,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.14';
+const APP_VER = '3.15';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

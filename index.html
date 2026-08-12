@@ -562,6 +562,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
    두 줄에 담기게 이 줄에서만 칩을 촘촘히 한다. */
 .bsubs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px 2px}
 .bsubs .tab{font-size:11.5px;padding:7px 9px;white-space:nowrap}
+.bsubs .tab.fleetc{background:#123047;border-color:#2f6c96;color:#9ed3f5}
 /* 360px 폰에서는 한 줄이 더 생긴다. 거기서만 조금 더 조인다. */
 @media (max-width:380px){
   .bsubs{gap:4px;padding:8px 8px 2px}
@@ -817,7 +818,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()">고객센터 · 건의하기</button><button class="ditem" onclick="closeDrawer();openLegal('terms')">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()">언어 · Language</button><button class="ditem" onclick="closeDrawer();openLegal('terms')">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg>오늘</button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg>배</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>커뮤니티</button></nav>
 
 
@@ -2384,8 +2385,9 @@ function applyBoatName(){
     if(el) el.textContent = '배 등록하기 ▸';    // 눌러서 등록할 수 있음을 알린다
     return;
   }
-  if(el) el.textContent = b.name + (b.port ? ' · ' + b.port : '')
-        + (boats.length > 1 ? ' ▾' : '');
+  // ★ ▾ 는 배가 한 척이어도 남긴다. 눌러야 배를 더 등록할 수 있는 자리인데
+  //   한 척일 때 표시를 빼 두었더니 아무도 여기가 눌리는 줄 몰랐다.
+  if(el) el.textContent = b.name + (b.port ? ' · ' + b.port : '') + ' ▾';
   const dh = document.querySelector('#drawer .dhead');
   if(dh && dh.firstChild && dh.firstChild.nodeType === 3) dh.firstChild.textContent = b.name + ' ';
   document.title = b.name + ' 운용';
@@ -2468,7 +2470,7 @@ function openFleet(){
       </div>`
     + boats.map(b=>{
         const on = String(b.id) === String(currentBoatId);
-        const del = unlocked && canDelBoat(b);
+        const del = canDelBoat(b);   // 감추지 않는다 — 누르면 잠금을 되묻는다
         return `<div class="fleet${on?' cur':''}">
           <div class="fmain" onclick="switchBoat('${b.id}')">
             <div class="fname">${on?'<span class="fdot">●</span> ':''}${esc(b.name)}
@@ -2499,6 +2501,7 @@ async function askDelBoat(id){
   const b = boats.find(x=>String(x.id)===String(id));
   if(!b) return;
   if(!canDelBoat(b)){ alert('선주만 배를 지울 수 있습니다'); return; }
+  if(guardEdit('배를 지웁니다.', () => askDelBoat(id))) return;
   const mine = String(id) === String(currentBoatId);
   let n = 0;
   try{ n = mine ? items.length : 0; }catch(_){}
@@ -3132,6 +3135,7 @@ function listFoot(k, fn){
 async function renderTalk(){
   const W = document.getElementById('talkWrap');
   if(!W) return;
+  if(!featOn('talk')){ W.innerHTML = featClosedHtml('talk'); return; }
   if(!window.__talk){
     W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>';
     return;
@@ -3583,8 +3587,21 @@ const ADMIN_TABS = [
   { k:'reports', name:'신고된 글', need:'postDel' },
   { k:'boats',   name:'배',        need:'boatMod' },
   { k:'people',  name:'사람',      need:null      },
-  { k:'admins',  name:'운영자',    need:'admin'   }
+  { k:'admins',  name:'운영자',    need:'admin'   },
+  { k:'feat',    name:'기능 잠금',  need:'admin'   }
 ];
+function adminFeat(){
+  return `<div class="mrnone" style="text-align:left">
+      문제가 생긴 기능을 그 자리에서 잠글 수 있습니다.
+      앱을 새로 내지 않아도 되고, 모든 사람에게 곧바로 적용됩니다.<br>
+      잠가도 올라와 있던 자료는 지워지지 않습니다. 다시 열면 그대로 돌아옵니다.</div>`
+    + FEATURES.map(f=>`<div class="permrow">
+        <div class="permname">${esc(f.name)}<div class="permsub">${esc(f.why)}</div></div>
+        <div class="permbtns">
+          <button class="permb${featOn(f.k)?'':' on'}" onclick="setFeat('${f.k}',false)">잠금</button>
+          <button class="permb${featOn(f.k)?' on':''}" onclick="setFeat('${f.k}',true)">열림</button>
+        </div></div>`).join('');
+}
 async function openAdmin(){
   // 운영자가 아니면 화면 자체를 열지 않는다
   if(!isAdmin()){ alert('운영자만 볼 수 있습니다'); return; }
@@ -3600,7 +3617,8 @@ async function openAdmin(){
 
   let body = '';
   try{
-    if(adminTab === 'support')     body = await adminSupport();
+    if(adminTab === 'feat')        body = adminFeat();
+    else if(adminTab === 'support') body = await adminSupport();
     else if(adminTab === 'admins') body = await adminAdmins();
     else if(adminTab === 'people') body = await adminPeople();
     else if(adminTab === 'boats')  body = await adminBoats();
@@ -4080,6 +4098,7 @@ function openPublish(){
 function setPubUI(key, on, back){
   const b = curBoat(); if(!b) return;
   if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
+  if(guardEdit('배 공개 설정을 바꿉니다.', () => setPubUI(key, on, back))) return;
   if(!setPub(b, key, on)) return;
   saveLocal();
   saveBoatCloud(b);
@@ -4094,6 +4113,7 @@ function setPubUI(key, on, back){
 function setBizUI(on){
   const b = curBoat(); if(!b) return;
   if(!can(b, 'publish', 'write')){ alert('공개 설정을 바꿀 권한이 없습니다'); return; }
+  if(guardEdit('영업 배 여부를 바꿉니다.', () => setBizUI(on))) return;
   if(on && !confirm('영업 배로 켜면 배 이름과 선종이 밖으로 나갑니다.\n\n'
       + '커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n'
       + '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?')) return;
@@ -4156,7 +4176,8 @@ function saveIntro(b){
 // 글 넣기 → 사진 넣기 → 또 글 넣기 로 조립시키는 것은 게시판이 아니다.
 function editIntro(){
   const b = curBoat(); if(!b) return;
-  if(!can(b, 'publish', 'write') || !unlocked){ alert('고칠 권한이 없습니다'); return; }
+  if(!can(b, 'publish', 'write')){ alert('고칠 권한이 없습니다'); return; }
+  if(guardEdit('배 소개글을 고칩니다.', editIntro)) return;
   b.intro = b.intro || [];
   // 유튜브 줄은 편집기가 다루지 못한다 — 따로 떼어 두고 뒤에 그대로 붙인다
   const vids = b.intro.filter(x => x && x.t === 'video');
@@ -4182,6 +4203,7 @@ function editIntro(){
 }
 function addIntro(kind){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('배 소개에 넣습니다.', () => addIntro(kind))) return;
   b.intro = b.intro || [];
   if(kind === 'photo'){
     const inp = document.createElement('input');
@@ -4231,6 +4253,7 @@ function addIntro(kind){
 }
 function moveIntro(i, d){
   const b = curBoat(); if(!b || !b.intro) return;
+  if(guardEdit('배 소개 차례를 바꿉니다.', () => moveIntro(i, d))) return;
   const j = i + d;
   if(j < 0 || j >= b.intro.length) return;
   const t = b.intro[i]; b.intro[i] = b.intro[j]; b.intro[j] = t;
@@ -4238,6 +4261,7 @@ function moveIntro(i, d){
 }
 function delIntro(i){
   const b = curBoat(); if(!b || !b.intro) return;
+  if(guardEdit('배 소개에서 지웁니다.', () => delIntro(i))) return;
   if(!confirm('이 부분을 지울까요?')) return;
   b.intro.splice(i, 1);
   saveIntro(b);
@@ -4727,6 +4751,7 @@ function removeMember(b, uid){
 function toggleOpenJoin(){
   const b = curBoat(); if(!b) return;
   if(!can(b,'members','write')){ alert('권한이 없습니다'); return; }
+  if(guardEdit('참여 신청을 받을지 바꿉니다.', toggleOpenJoin)) return;
   b.openJoin = (b.openJoin === false);
   saveBoatMembers(b);
 }
@@ -4797,6 +4822,7 @@ function pickRank(uid){
 function removeMemberUI(uid){
   const b = curBoat(); if(!b) return;
   if(!can(b,'members','write')){ alert('구성원을 관리할 권한이 없습니다'); return; }
+  if(guardEdit('이 사람을 배에서 내보냅니다.', () => removeMemberUI(uid))) return;
   const nm = (b.memberNames||{})[uid] || '이 사람';
   if(!confirm(nm + ' 님을 이 배에서 내보낼까요?\n\n'
     + '이 배의 기록을 더 이상 보지 못합니다.\n다시 받으려면 새로 가입 신청을 받아야 합니다.')) return;
@@ -4808,6 +4834,7 @@ function removeMemberUI(uid){
 function editRoster(uid){
   const b = curBoat(); if(!b) return;
   if(!can(b,'dues','write')){ alert('기록할 권한이 없습니다'); return; }
+  if(guardEdit('회비 설정을 바꿉니다.', () => editRoster(uid))) return;
   const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
   const r = rosterOf(b, uid);
   const nd = r.duesFrom && r.duesCycle ? nextDueDate(r.duesFrom, r.duesCycle) : null;
@@ -4849,6 +4876,7 @@ function editRoster(uid){
 // 회비를 냈는지 바로 물어본다 — 따로 들어가게 하면 아무도 안 적는다
 function askPay(uid){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('회비를 납부로 기록합니다.', () => askPay(uid))) return;
   const r = rosterOf(b, uid);
   if(!r.duesAmount || !duesDue(b, uid)) return;
   const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
@@ -4902,6 +4930,7 @@ function openRanks(){
 }
 function addRankUI(){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('새 등급을 만듭니다.', addRankUI)) return;
   openForm({
     title: '새 등급',
     sub: '이름은 배에 맞게 지으세요 (예: 기관장, 갑판원, 낚시꾼)',
@@ -4941,16 +4970,19 @@ function editRankUI(id){
 }
 function renameRankUI(id, v){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('등급 이름을 바꿉니다.', () => renameRankUI(id, v))) return;
   if(!editRank(b, id, { name:v })) return;
   saveBoatMembers(b, 'rank', id);
 }
 function setPermUI(id, key, level){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('등급의 권한을 바꿉니다.', () => setPermUI(id, key, level))) return;
   if(!setPerm(b, id, key, level)) return;
   saveBoatMembers(b, 'rank', id);
 }
 function delRankUI(id){
   const b = curBoat(); if(!b) return;
+  if(guardEdit('등급을 지웁니다.', () => delRankUI(id))) return;
   const r = rankOf(b, id); if(!r) return;
   const n = Object.values(b.members||{}).filter(x=>String(x)===String(id)).length;
   if(!confirm(`'${r.name}' 등급을 지울까요?`
@@ -4988,6 +5020,7 @@ function copyJoinCode(){
 function editMember(uid){
   const b = curBoat(); if(!b) return;
   if(!canTouchMember(b, uid)){ alert('이 사람의 등급은 바꿀 수 없습니다'); return; }
+  if(guardEdit('이 사람의 등급을 바꿉니다.', () => editMember(uid))) return;
   const r = memberRows(b).find(x=>x.uid===uid); if(!r) return;
   // 나보다 낮은 등급만 줄 수 있다
   const opts = rankList(b).filter(x => x.pos > myPos(b))
@@ -5081,6 +5114,7 @@ async function openJoinReqs(){
 }
 function approveJoin(inviteId, uid, name){
   const b = curBoat(); if(!b || !can(b,'members','write')) return;
+  if(guardEdit('참여 신청을 받습니다.', () => approveJoin(inviteId, uid, name))) return;
   openForm({
     title: name || '참여 신청',
     sub: '어떤 권한으로 받을까요?',
@@ -5240,6 +5274,7 @@ function boatHead(cur){
   // ★ 두 줄로 나눠 두었더니 아홉 개가 세 줄이 됐다. 한 덩어리로 흘려보내면 두 줄에 담긴다.
   return `<div class="mrhead"><b>내 배</b><span style="flex:1"></span></div>
     <div class="bsubs">
+      <button class="tab fleetc" onclick="openFleet()">배 목록 ▾</button>
       <button class="tab${cur==='info'?' on':''}" onclick="openBoat('info')">기본정보</button>
       <button class="tab${cur==='spec'?' on':''}" onclick="openBoat('spec')">제원</button>
       <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">배소개</button>`
@@ -5347,7 +5382,12 @@ function openBoat(tab){
         신청을 안 받으려면 위에서 닫아 두세요.</div>
       ${memberBlock(b)}
       <div class="mrrow"><span class="mrlbl">기록</span><span class="mrm" style="flex:1">
-        물품 ${items.length} · 정기점검 ${maint.length} · 수리 ${repair.length} · 항해 ${voyage.length} · 주유 ${fuel.length}</span></div>`;
+        물품 ${items.length} · 정기점검 ${maint.length} · 수리 ${repair.length} · 항해 ${voyage.length} · 주유 ${fuel.length}</span></div>
+      <div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
+        <button class="mrbtn big" onclick="needEdit('배를 한 척 더 등록합니다.', addBoat)">+ 배 등록하기</button>
+        <button class="mrbtn big" onclick="needEdit('참여 코드로 다른 배에 신청합니다.', joinByCode)">참여 코드로 신청</button></div>
+      <div class="mrnone" style="text-align:left">배는 여러 척 등록할 수 있습니다.
+        등록해 둔 배를 오가려면 위의 <b>배 목록 ▾</b> 을 누르세요.</div>`;
   } else {
     // 세일 관련 항목은 세일링 요트에만 보여준다
     // 선종에 해당하는 항목만 보여준다 — 낚싯배에 리프 풍속은 쓸모가 없다
@@ -5878,6 +5918,22 @@ let pullDone = false;
 let pushWanted = false;
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 function setSync(t){ const el=document.getElementById('syncState'); if(el) el.textContent = t; }
+// ★ 언어를 골랐는데 화면이 하나도 안 바뀌면 고장으로 보인다.
+//   사전이 찰 때까지는 고르기 자체를 감추고, 바닥 메뉴만 먼저 사전을 거치게 해 둔다.
+//   나중에 사전을 채우면 이 자리를 늘려 가면 된다.
+function applyLang(){
+  const b = document.getElementById('langBtn');
+  if(b) b.style.display = (langReady().length > 1) ? '' : 'none';
+  [['tabHome','오늘'], ['tabBoat','배'], ['tabVoyage','항해일지'], ['tabCommunity','커뮤니티']]
+    .forEach(([id, k])=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      // 그림(svg)은 두고 글자만 바꾼다
+      const last = el.lastChild;
+      if(last && last.nodeType === 3) last.nodeValue = t(k);
+    });
+  try{ document.documentElement.lang = langNow(); }catch(e){}
+}
 // ★ '오프라인 · 로컬' 한 마디로 뭉개면 사람이 엉뚱한 곳을 고친다.
 //   실제로 겪은 일 — 인터넷은 멀쩡한데 하루치 무료 한도를 다 써서 막힌 것을
 //   '오프라인' 이라고 띄웠다. 두 기기가 동시에 그러니 앱이 고장난 줄 알았다.
@@ -5912,6 +5968,8 @@ window.__initCloud = async function(api){
   try{ await cloudPull(); }
   catch(e){ lastPushErr = cloudErrHelp(e); setSync(cloudErrText(e)); }
   window.addEventListener('online', ()=>{ if(cloud) cloudPull().catch(()=>{}); });
+  // 기능 잠금 상태를 한 번 받아 둔다 (읽기 한 번)
+  loadFeat().catch(()=>{});
 };
 window.__cloudFailed = async function(){
   await storageReady;
@@ -6533,7 +6591,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.37';
+const APP_VER = '3.40';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7952,7 +8010,7 @@ let boatSubTab = (function(){ try{ return localStorage.getItem('bt_boatsub') || 
 const SUBS = {
   home:      { get: () => homeSub,    set: 'setHomeSub',    list: () => HOMESUB_TITLES },
   boat:      { get: () => boatSubTab, set: 'setBoatSubTab', list: () => BOATSUB_TITLES },
-  community: { get: () => comSub,     set: 'setComSub',     list: () => COMSUB_TITLES }
+  community: { get: () => comSub,     set: 'setComSub',     list: () => comSubList() }
 };
 function paintHNav(){
   const N = document.getElementById('hNav');
@@ -7988,10 +8046,74 @@ let comSub = (function(){ try{ return localStorage.getItem('bt_comsub') || 'talk
 // ★ '영업' 은 원래 '배 둘러보기' 의 필터다. 따로 탭일 이유가 없다.
 //   좁은 폰에서 여섯 개는 제목 자리를 넘겨 밀어야만 보였다. 안으로 넣어 다섯으로.
 const COMSUB_TITLES = {talk:'글판', spots:'정박지', market:'중고 장터', explore:'배 둘러보기', news:'뉴스'};
+
+// ── ★ 커뮤니티 기능 켜고 끄기
+//
+//   왜 필요한가 — 중고 장터는 돈이 오가는 곳이고, 면책 조항이 아직 변호사 검토 전이다.
+//   베타 중에 사기가 한 건 나면 앱보다 운영자가 다친다.
+//   무언가 터졌을 때 앱을 새로 내지 않고 그 자리에서 잠글 수 있어야 한다.
+//
+//   ★ 기본은 켬이다. 자료를 못 받아왔다고 기능이 통째로 사라지면 안 된다.
+const FEATURES = [
+  { k:'talk',   name:'글판',      why:'커뮤니티 글쓰기' },
+  { k:'spots',  name:'정박지',    why:'정박지 올리기·보기' },
+  { k:'market', name:'중고 장터', why:'돈이 오가는 곳 — 문제가 생기면 여기부터 잠그세요' },
+  { k:'news',   name:'뉴스',      why:'해양 소식' }
+];
+let featOff = {};          // 꺼 둔 것만 담는다
+let featLoaded = false;
+function featOn(k){ return !featOff[k]; }
+async function loadFeat(){
+  if(featLoaded || !window.__config) return;
+  featLoaded = true;
+  try{
+    const o = await window.__config.get();
+    featOff = (o && o.off) || {};
+  }catch(e){ featOff = {}; }   // 못 받아오면 전부 켠 것으로 본다
+  paintHNav();
+}
+async function setFeat(k, on){
+  if(!isAdmin()){ alert('운영자만 바꿀 수 있습니다'); return; }
+  const next = Object.assign({}, featOff);
+  if(on) delete next[k]; else next[k] = true;
+  try{
+    await window.__config.set({ off: next });
+    featOff = next;
+    paintHNav();
+    if(typeof openAdmin === 'function') openAdmin();
+  }catch(e){ alert('바꾸지 못했습니다.\n\n' + ((e && e.message) || e)); }
+}
+// 꺼 둔 것은 하위 탭에서 뺀다. 운영자에게는 표시해서 보여 준다.
+function comSubList(){
+  const o = {};
+  Object.keys(COMSUB_TITLES).forEach(k=>{
+    if(featOn(k) || !FEATURES.some(f=>f.k===k)) o[k] = COMSUB_TITLES[k];
+    else if(isAdmin()) o[k] = COMSUB_TITLES[k] + ' (닫힘)';
+  });
+  return o;
+}
+// 닫힌 곳에 직접 들어왔을 때 (옛 주소·기억해 둔 화면)
+// 받침에 따라 조사를 고른다. '중고 장터은' 처럼 나오면 앱이 어설퍼 보인다.
+function josa(w, a, b){
+  const c = String(w || '').trim().slice(-1);
+  const n = c.charCodeAt(0);
+  if(!(n >= 0xAC00 && n <= 0xD7A3)) return a;    // 한글이 아니면 받침 있는 쪽
+  return ((n - 0xAC00) % 28) ? a : b;            // 받침 있음 → a, 없음 → b
+}
+function featClosedHtml(k){
+  const f = FEATURES.find(x=>x.k===k);
+  const nm = (f && f.name) || '이 기능';
+  return `<div class="mrnone" style="text-align:left">
+    <b>${esc(nm)}${josa(nm, '은', '는')} 지금 닫혀 있습니다.</b><br><br>
+    운영자가 잠시 잠가 두었습니다. 다시 열리면 이 자리에 나타납니다.<br>
+    궁금한 것은 서랍 › 고객센터로 알려 주세요.</div>`;
+}
 function setComSub(k){
   // 옛 이름 'biz' 로 불러도 길을 잃지 않게 둘러보기로 보내고 영업만 켠다
   if(k === 'biz'){ exploreBiz = true; k = 'explore'; }
   comSub = COMSUB_TITLES[k] ? k : 'explore';
+  // 닫힌 곳은 열지 않는다 (운영자는 확인할 수 있어야 하므로 통과시킨다)
+  if(!featOn(comSub) && !isAdmin()) comSub = 'explore';
   try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
   switchTab('community');
 }
@@ -9154,6 +9276,15 @@ function drawerTrash(){ closeDrawer(); switchTab('stow'); openTrash(); }
 //   백업 복원에서 한 번, 배 등록하기에서 또 한 번 같은 일을 겪었다.
 //   감추지 말고, 눌렀을 때 무엇이 필요한지 말하고 그 자리에서 풀어 준다.
 //   판단은 여기 한 곳에만 둔다 — 곳곳에 흩어 놓으면 또 하나를 빠뜨린다.
+// 함수 첫 줄에서 쓰는 꼴. 보기 전용이면 물어보고, 풀고, 그 일을 다시 한다.
+//   if(guardEdit('...', () => 이함수(a,b))) return;
+// ★ 왜 함수 안인가 — 버튼에만 걸면 새 버튼을 만들 때마다 또 빠뜨린다.
+//   실제로 신청 받기·영업 배·등급·회비가 보기 전용에서 그냥 바뀌고 있었다.
+function guardEdit(what, fn){
+  if(unlocked) return false;
+  needEdit(what, fn);
+  return true;
+}
 function needEdit(what, fn){
   if(unlocked){ fn(); return; }
   if(!confirm(what + '\n\n지금은 보기 전용입니다.\n실수로 고치는 것을 막으려고 잠가 두었습니다.\n\n편집 중으로 바꾸고 계속할까요?')) return;
@@ -9224,6 +9355,125 @@ function addVoyage(){
 // ★ 오류 신고에 기기 정보가 없으면 고칠 수가 없다.
 //   "무슨 폰 쓰세요?" 를 물으면 답이 안 온다. 앱이 알아서 붙인다.
 //   그리고 접수한 것은 클라우드에 남긴다 — 메일이 안 가도 사라지지 않는다.
+// ── 여러 나라 말
+//
+// 왜 지금 틀만 넣나
+//   앱 안에 서로 다른 한국어 문구가 3,841개(48,716자) 있다. 원고지 250매다.
+//   지금 전부 옮기면 4,000곳을 건드려야 하고, 그 뒤로는 기능 하나 만들 때마다 일이 세 배가 된다.
+//   게다가 옮겨 봐야 글판·정박지·장터·뉴스 내용은 한국어 그대로다.
+//   그래서 지금은 '나중에 채울 자리' 만 만들어 둔다.
+//
+// ★ 언어 고르기를 미리 화면에 내놓지 않는다.
+//   골랐는데 화면이 안 바뀌면 사람은 고장으로 본다. 안 넣느니만 못하다.
+//   사전이 LANG_SHOW_AT 만큼 차면 그때 저절로 나타난다.
+const LANGS = [
+  { v:'ko', name:'한국어' },
+  { v:'en', name:'English' },
+  { v:'ru', name:'Русский' }
+];
+// 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
+// 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
+const LANG_TOTAL = 3841;
+const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
+
+// 열쇠는 한국어 원문 그대로 쓴다.
+// 따로 'home.tab' 같은 이름을 붙이면 코드를 읽을 때 무슨 말인지 알 수 없고,
+// 한국어판에서는 사전을 안 거쳐도 그대로 나오므로 옮기다 만 자리가 안 깨진다.
+const I18N = {
+  ko: {},
+  en: {
+    '오늘':'Today', '배':'Boat', '항해일지':'Logbook', '커뮤니티':'Community',
+    '내 배':'My Boat', '기본정보':'Basics', '제원':'Specs', '배소개':'About',
+    '회원명부':'Crew', '등급설정':'Ranks', '게시판':'Board', '할일':'Tasks',
+    '가입신청':'Requests', '공개설정':'Sharing',
+    '글판':'Talk', '정박지':'Berths', '중고 장터':'Market', '배 둘러보기':'Boats', '뉴스':'News',
+    '로그인':'Sign in', '로그아웃':'Sign out', '계정':'Account',
+    '설정':'Settings', '언어':'Language', '고객센터 · 건의하기':'Support',
+    '약관 · 개인정보':'Terms & Privacy', '앱 새로 받기':'Reload app',
+    '데이터 백업':'Back up data', '백업 복원':'Restore backup',
+    '클라우드에 올리기':'Upload to cloud', '클라우드에서 받아오기':'Download from cloud',
+    '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
+    '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
+    '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '더 보기':'Show more', '새로고침':'Refresh', '찾기':'Search',
+    '날씨 · 물때':'Weather & Tide', '출항 전 점검':'Pre-departure check',
+    '지금 나갈 수 있나':'Can I go out now?', '해상 특보':'Marine warnings',
+    '바람':'Wind', '돌풍':'Gust', '파고':'Wave', '조위':'Tide height',
+    '수심':'Depth', '저조위 기준':'Chart datum', '바닥':'Bottom',
+    '마리나':'Marina', '항·부두':'Port', '방파제':'Breakwater', '묘박지':'Anchorage',
+    '정비':'Maintenance', '수리':'Repairs', '적재표':'Stowage', '주유':'Fuel',
+    '글쓰기':'Write', '올리기':'Post', '신고':'Report', '수정':'Edit'
+  },
+  ru: {
+    '오늘':'Сегодня', '배':'Судно', '항해일지':'Журнал', '커뮤니티':'Сообщество',
+    '내 배':'Моё судно', '기본정보':'Основное', '제원':'Характеристики', '배소개':'О судне',
+    '회원명부':'Экипаж', '등급설정':'Роли', '게시판':'Доска', '할일':'Задачи',
+    '가입신청':'Заявки', '공개설정':'Доступ',
+    '글판':'Форум', '정박지':'Стоянки', '중고 장터':'Барахолка', '배 둘러보기':'Суда', '뉴스':'Новости',
+    '로그인':'Войти', '로그아웃':'Выйти', '계정':'Аккаунт',
+    '설정':'Настройки', '언어':'Язык', '고객센터 · 건의하기':'Поддержка',
+    '약관 · 개인정보':'Условия и приватность', '앱 새로 받기':'Обновить приложение',
+    '데이터 백업':'Резервная копия', '백업 복원':'Восстановить из копии',
+    '클라우드에 올리기':'Выгрузить в облако', '클라우드에서 받아오기':'Загрузить из облака',
+    '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
+    '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
+    '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '더 보기':'Ещё', '새로고침':'Обновить', '찾기':'Поиск',
+    '날씨 · 물때':'Погода и прилив', '출항 전 점검':'Проверка перед выходом',
+    '지금 나갈 수 있나':'Можно ли выходить?', '해상 특보':'Штормовые предупреждения',
+    '바람':'Ветер', '돌풍':'Порывы', '파고':'Волна', '조위':'Уровень прилива',
+    '수심':'Глубина', '저조위 기준':'От нуля глубин', '바닥':'Грунт',
+    '마리나':'Марина', '항·부두':'Порт', '방파제':'Волнолом', '묘박지':'Якорная стоянка',
+    '정비':'Обслуживание', '수리':'Ремонт', '적재표':'Хранение', '주유':'Топливо',
+    '글쓰기':'Написать', '올리기':'Опубликовать', '신고':'Пожаловаться', '수정':'Изменить'
+  }
+};
+
+function langNow(){
+  try{
+    const v = localStorage.getItem('bt_lang');
+    if(v && LANGS.some(x=>x.v===v)) return v;
+  }catch(e){}
+  return 'ko';
+}
+// ★ 옮긴 말이 없으면 한국어 원문을 그대로 낸다. 빈 칸이 나오면 안 된다.
+function t(s){
+  const k = String(s == null ? '' : s);
+  const v = langNow();
+  if(v === 'ko') return k;
+  const d = I18N[v] || {};
+  return d[k] || k;
+}
+// 사전이 얼마나 찼나 (0~1)
+function langCoverage(v){
+  if(v === 'ko') return 1;
+  const d = I18N[v] || {};
+  return Math.min(1, Object.keys(d).length / LANG_TOTAL);
+}
+// 골라도 될 만큼 찬 말만 내놓는다
+function langReady(){
+  return LANGS.filter(x => x.v === 'ko' || langCoverage(x.v) >= LANG_SHOW_AT);
+}
+function setLang(v){
+  if(!LANGS.some(x=>x.v===v)) return;
+  try{ localStorage.setItem('bt_lang', v); }catch(e){}
+  location.reload();
+}
+function openLang(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  const cur = langNow();
+  P.innerHTML = `<div class="mrhead"><b>${t('언어')}</b><span style="flex:1"></span></div>`
+    + langReady().map(x=>`<div class="mrrow">
+        <span class="mrm" style="flex:1">${esc(x.name)}</span>
+        <button class="minib ${x.v===cur?'grn':'blu'}" onclick="setLang('${x.v}')">${
+          x.v===cur ? '쓰는 중' : '이 말로'}</button></div>`).join('')
+    + `<div class="mrnone" style="text-align:left">화면의 글자만 바뀝니다.
+        글판·정박지·장터에 올라온 내용과 뉴스는 쓴 사람의 말 그대로입니다.</div>`;
+  showPanel(P);
+  setHeadTitle(t('언어'));
+}
+
 // ── 약관 · 개인정보처리방침 · 위치정보
 //
 // 왜 필요한가
@@ -9791,6 +10041,7 @@ function priceText(m){
 async function renderMarket(){
   const W = document.getElementById('marketWrap');
   if(!W) return;
+  if(!featOn('market')){ W.innerHTML = featClosedHtml('market'); return; }
   if(!window.__market){
     W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>'; return;
   }
@@ -10128,6 +10379,7 @@ function spotDepthText(s){
 async function renderSpots(){
   const W = document.getElementById('spotWrap');
   if(!W) return;
+  if(!featOn('spots')){ W.innerHTML = featClosedHtml('spots'); return; }
   if(!window.__spots){
     W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>'; return;
   }
@@ -13031,6 +13283,7 @@ window.addEventListener('unhandledrejection', e=>showErr((e.reason&&e.reason.mes
 wxInit();
 // 앱을 열면 날씨를 미리 받아 둔다 — 오늘 탭이 비어 있지 않게
 try{ ensureWx(); }catch(e){}
+applyLang();
 applyLock();
 initStorage().then(()=>{
   ensureBoat(); applyAccount();
@@ -13530,6 +13783,17 @@ document.addEventListener('visibilitychange', ()=>{
       async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); bust('market'); return body.id; },
       async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); bust('market'); },
       async del(id){ await deleteDoc(doc(fdb,'market',String(id))); bust('market'); }
+    };
+    // ── 앱 설정 (운영자가 기능을 잠그고 여는 곳)
+    // ★ 문서 하나뿐이라 읽기 한 번이면 끝난다. 켤 때 한 번만 읽는다.
+    window.__config = {
+      async get(){
+        const d = await getDoc(doc(fdb, 'config', 'app'));
+        return d.exists() ? d.data() : null;
+      },
+      async set(body){
+        await setDoc(doc(fdb, 'config', 'app'), body, { merge:false });
+      }
     };
     // ── 고객센터
     window.__support = {

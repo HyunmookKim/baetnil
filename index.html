@@ -56,6 +56,11 @@
   font-size:12.5px;padding:10px 14px;line-height:1.6}
 .fleet .due{color:#FF9A8A}
 .chip.whochip{background:#14304a;color:#9ed0f5}
+/* ★ 커뮤니티 화면들은 덮개(mrPanel)가 아니라 본문에 바로 그린다.
+   덮개에는 좌우 여백이 있지만 여기는 없어서, 찾기 칸이 화면 끝에 딱 붙었다. */
+#talkWrap > .mrrow, #spotWrap > .mrrow, #marketWrap > .mrrow, #exploreWrap > .mrrow,
+#talkWrap > .ghead, #spotWrap > .ghead, #marketWrap > .ghead{
+  padding-left:12px; padding-right:12px}
 .fishbox{margin:2px 12px 10px;border:1px solid #12283e;border-radius:10px;background:#0b1a29;padding:4px 0}
 .catchrow{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;padding:5px 12px}
 .catchrow .cname{flex:1;min-width:0;color:#dfe8f2;font-size:14px;font-weight:700;
@@ -3770,6 +3775,11 @@ function adminAdd(){
 }
 
 // 커뮤니티 탭 안에 그린다. 덮개(mrPanel)로 띄우면 다른 탭 위에 얹힌 것처럼 보인다.
+// 영업 배만 보기 — 예전에는 따로 탭이었다. 둘러보기 안의 필터가 제자리다.
+function setExploreBiz(on){
+  exploreBiz = !!on;
+  openExplore(exploreBiz);
+}
 // 둘러보기 검색 — 배가 늘면 목록만으로는 못 찾는다
 let exploreQ = '', exploreAll = [];
 function exploreFilter(list){
@@ -3805,7 +3815,10 @@ async function openExplore(biz){
         ${x.biz?'<span class="chip notice">영업</span>':''}</div>
         <div class="fsub">${esc([x.port, x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
       </div></div>`).join('');
-  W.innerHTML = `<div class="mrrow"><span class="mrlbl">찾기</span>
+  W.innerHTML = `<div class="tfilt">
+      <button class="tchip${exploreBiz?'':' on'}" onclick="setExploreBiz(false)">전체</button>
+      <button class="tchip${exploreBiz?' on':''}" onclick="setExploreBiz(true)">영업</button></div>
+    <div class="mrrow"><span class="mrlbl">찾기</span>
       <input id="expQ" style="flex:1" value="${esc(exploreQ)}"
         placeholder="배 이름 · 항구 · 제조사 · 모델"
         oninput="exploreQ=this.value;openExplore(${exploreBiz})"></div>`
@@ -6167,7 +6180,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.22';
+const APP_VER = '3.23';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7616,8 +7629,12 @@ function setBoatSubTab(k){
 const MRSUB_TITLES = {maint:'정기점검', repair:'수리목록', fuel:'연료 기록', check:'출항 전 점검'};
 // 커뮤니티 안의 하위 화면
 let comSub = (function(){ try{ return localStorage.getItem('bt_comsub') || 'talk'; }catch(_){ return 'talk'; } })();
-const COMSUB_TITLES = {talk:'글판', spots:'정박지', market:'중고 장터', explore:'배 둘러보기', biz:'영업', news:'뉴스'};
+// ★ '영업' 은 원래 '배 둘러보기' 의 필터다. 따로 탭일 이유가 없다.
+//   좁은 폰에서 여섯 개는 제목 자리를 넘겨 밀어야만 보였다. 안으로 넣어 다섯으로.
+const COMSUB_TITLES = {talk:'글판', spots:'정박지', market:'중고 장터', explore:'배 둘러보기', news:'뉴스'};
 function setComSub(k){
+  // 옛 이름 'biz' 로 불러도 길을 잃지 않게 둘러보기로 보내고 영업만 켠다
+  if(k === 'biz'){ exploreBiz = true; k = 'explore'; }
   comSub = COMSUB_TITLES[k] ? k : 'explore';
   try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
   switchTab('community');
@@ -7674,7 +7691,7 @@ function switchTab(t){
   show('talkWrap',     t==='community' && comSub==='talk');
   show('spotWrap',     t==='community' && comSub==='spots');
   show('marketWrap',   t==='community' && comSub==='market');
-  show('exploreWrap',  t==='community' && (comSub==='explore' || comSub==='biz'));
+  show('exploreWrap',  t==='community' && comSub==='explore');
   show('newsWrap',     t==='community' && comSub==='news');
   if(!(t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'))) show('mrMapWrap', false);
   closeMR(); pinCancel();
@@ -7713,7 +7730,7 @@ function renderCurrent(){
     else if(comSub==='spots') renderSpots();
     else if(comSub==='market') renderMarket();
     else if(comSub==='news') renderNews();
-    else openExplore(comSub==='biz');
+    else openExplore(exploreBiz);
   }
   else if(t==='voyage') renderVoyage();
 }

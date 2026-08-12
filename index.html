@@ -808,7 +808,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()">고객센터 · 건의하기</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()">고객센터 · 건의하기</button><button class="ditem" onclick="closeDrawer();openLegal('terms')">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg>오늘</button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg>배</button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>항해일지</button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>커뮤니티</button></nav>
 
 
@@ -2034,6 +2034,9 @@ function openAccount(){
         로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.<br>
         여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.</div>
       <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="doGoogle()">Google 계정으로 계속하기</button></div>
+      <div class="mrnone" style="text-align:left">로그인하시면 <button class="minib blu" onclick="openLegal('terms')">이용약관</button>
+        과 <button class="minib blu" onclick="openLegal('privacy')">개인정보처리방침</button> 에 동의하신 것으로 봅니다.
+        만 14세 미만은 가입할 수 없습니다.</div>
       <div class="mrnone" style="text-align:center;padding:6px 0">또는 이메일로</div>
       <div class="mrrow"><span class="mrlbl">이메일</span>
         <input id="acEm" type="email" style="flex:1" autocomplete="username" placeholder="name@example.com"></div>
@@ -2073,12 +2076,25 @@ function authMsg(e){
 }
 async function doGoogle(){
   if(!window.__auth){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
+  // ★ 로그인하는 순간부터 개인정보가 서버로 간다. 동의가 그 앞에 서야 한다.
+  if(needAgree()){ openAgree(doGoogle); return; }
   acMsg('');
-  try{ await window.__auth.google(); openAccount(); }
+  try{ await window.__auth.google(); await pushAgree(); openAccount(); }
   catch(e){ acMsg(authMsg(e)); }
 }
 async function doEmail(isNew){
   if(!window.__auth){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
+  // ★ 가입이든 로그인이든 개인정보가 서버로 간다. 동의가 그 앞에 선다.
+  //   적던 이메일·비밀번호는 동의를 마치면 그대로 남아 있다 (화면을 다시 그리지 않는다).
+  if(needAgree()){
+    const em0 = (document.getElementById('acEm')||{}).value || '';
+    const pw0 = (document.getElementById('acPw')||{}).value || '';
+    openAgree(()=>{ openAccount();
+      const a = document.getElementById('acEm'), b = document.getElementById('acPw');
+      if(a) a.value = em0; if(b) b.value = pw0;
+      doEmail(isNew); });
+    return;
+  }
   const em = (document.getElementById('acEm').value||'').trim();
   const pw = document.getElementById('acPw').value||'';
   if(!em){ acMsg('이메일을 입력해 주세요.'); return; }
@@ -2087,6 +2103,7 @@ async function doEmail(isNew){
   try{
     if(isNew) await window.__auth.emailUp(em, pw);
     else      await window.__auth.emailIn(em, pw);
+    await pushAgree();
     openAccount();
   }catch(e){ acMsg(authMsg(e)); }
 }
@@ -2143,6 +2160,9 @@ function openWelcome(){
       <b>먼저 로그인해 주세요.</b> 로그인하면 쓰던 배와 기록을 그대로 불러오고,
       휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.</div>
     <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="doGoogle()">Google 계정으로 시작하기</button></div>
+    <div class="mrnone" style="text-align:left"><button class="minib blu" onclick="openLegal('terms')">이용약관</button>
+      · <button class="minib blu" onclick="openLegal('privacy')">개인정보처리방침</button>
+      · 만 14세 미만은 가입할 수 없습니다.</div>
     <div class="mrnone" style="text-align:center;padding:6px 0">또는</div>
     <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="openAccount()">이메일로 시작하기</button></div>
     <div class="mrnone" style="text-align:left">
@@ -6211,7 +6231,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.25';
+const APP_VER = '3.26';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8882,6 +8902,375 @@ function addVoyage(){
 // ★ 오류 신고에 기기 정보가 없으면 고칠 수가 없다.
 //   "무슨 폰 쓰세요?" 를 물으면 답이 안 온다. 앱이 알아서 붙인다.
 //   그리고 접수한 것은 클라우드에 남긴다 — 메일이 안 가도 사라지지 않는다.
+// ── 약관 · 개인정보처리방침 · 위치정보
+//
+// 왜 필요한가
+//  · 개인정보 보호법 제30조 — 개인정보를 처리하면 처리방침을 만들어
+//    이용자가 언제든 볼 수 있게 공개해야 한다. 의무다.
+//  · 이 앱은 이메일·이름·계정번호·위치·사진을 받는다. 해당된다.
+//  · 만 14세 미만은 법정대리인 동의를 따로 받아야 한다.
+//    그 절차를 만들지 않을 것이므로 가입을 막는다.
+//
+// ★ 그리고 이 앱에만 있는 위험이 하나 더 있다.
+//   날씨·물때·수심·특보를 보여 주고, 사람들이 그걸 보고 바다에 나간다.
+//   자료는 틀릴 수 있고 못 받아올 수도 있다. 그 한계를 약관에 또렷이 적고,
+//   출항 판단은 사람이 한다는 것을 못 박는다. 이건 법 때문이 아니라 사람이 다치기 때문이다.
+//
+// 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
+// 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
+const LEGAL_VER  = '1.0';
+const LEGAL_DATE = '2026년 8월 12일';
+const LEGAL_OWNER = { name: '김현묵', email: 'jaha814@gmail.com' };
+const LEGAL_BIZ = null;   // 사업자등록하면 { name:'상호', no:'000-00-00000', addr:'주소' }
+
+const LEGAL_DOCS = {
+terms: { title: '이용약관', body: `
+제1조 (목적)
+이 약관은 뱃일(이하 "이 앱")을 이용하는 데 필요한 사항을 정합니다.
+
+제2조 (운영자)
+이 앱은 {OWNER}(연락처 {EMAIL})가 개인 자격으로 만들어 운영합니다.{BIZ}
+
+제3조 (약관의 효력과 변경)
+① 이 약관은 앱 안에서 언제든지 볼 수 있습니다.
+② 운영자는 약관을 바꿀 수 있습니다. 바꾸면 앱 안에 알리고, 이용자에게 다시 동의를 받습니다.
+③ 바뀐 약관에 동의하지 않으면 이용을 그만두실 수 있습니다.
+
+제4조 (이용계약)
+① 이 앱에 가입하고 운영자가 이를 받아들이면 이용계약이 맺어집니다.
+② 만 14세 미만은 가입할 수 없습니다. 만 14세 미만의 개인정보를 처리하려면
+   법정대리인의 동의를 받아야 하는데, 이 앱은 그 절차를 두고 있지 않기 때문입니다.
+   배를 함께 타는 미성년자는 보호자 계정에 구성원으로 넣어 주십시오.
+③ 남의 이름이나 이메일로 가입할 수 없습니다.
+
+제5조 (서비스 내용)
+① 이 앱은 배의 물품·정비·수리·항해·주유 기록, 배 구성원 관리, 날씨와 물때 참고 정보,
+   정박지·중고 장터·글판 등 커뮤니티 기능을 제공합니다.
+② 현재 모든 기능은 무료입니다. 앞으로 일부 기능이 유료로 바뀔 수 있으며,
+   그때에는 미리 앱 안에 알리고 제12조를 따릅니다. 이미 무료로 쓰던 기능을
+   예고 없이 유료로 바꾸지 않습니다.
+
+제6조 (★ 날씨·물때·수심 정보의 한계와 출항 판단)
+① 이 앱이 보여 주는 바람·파고·조위·물때·수심·해상 특보는 모두 참고 자료입니다.
+   기상 예보와 조석 예보는 실제와 다를 수 있고, 인터넷이 끊기면 지난 자료가 보일 수 있습니다.
+② 정박지의 수심·바닥·시설 정보는 이용자들이 올린 것입니다.
+   운영자가 하나하나 확인하지 않으며, 사실과 다를 수 있습니다.
+③ 수심 환산 기능은 이용자가 입력한 측정값에서 조위를 뺀 계산 결과일 뿐이며,
+   해도 수심을 대신하지 않습니다.
+④ 출항 여부, 항로, 정박 자리, 접안 시각의 판단과 책임은 전적으로 이용자에게 있습니다.
+   이 앱을 해도·항행통보·기상청 실시간 특보·선박 계기 대신 쓰지 마십시오.
+⑤ 운영자는 이 앱의 정보를 믿고 한 판단으로 생긴 사고나 손해에 대하여
+   운영자의 고의 또는 중대한 과실이 없는 한 책임지지 않습니다.
+
+제7조 (이용자의 의무)
+이용자는 다음 행위를 해서는 안 됩니다.
+ 1. 남을 사칭하거나 남의 계정을 쓰는 행위
+ 2. 욕설·협박·혐오 표현, 남을 괴롭히는 글이나 사진
+ 3. 거짓 정보를 올려 남의 안전을 위협하는 행위 (없는 정박지, 틀린 수심 등)
+ 4. 광고·홍보를 반복해 올리는 행위
+ 5. 남의 개인정보나 사진을 동의 없이 올리는 행위
+ 6. 저작권 등 남의 권리를 침해하는 행위
+ 7. 법을 어기는 물건을 사고파는 행위
+ 8. 앱의 정상 동작을 방해하거나 부정한 방법으로 접근하는 행위
+
+제8조 (게시물)
+① 이용자가 올린 글·사진·기록의 권리는 그 이용자에게 있습니다.
+② 운영자는 앱을 운영하고 보여 주는 데 필요한 범위에서만 게시물을 씁니다.
+③ 제7조를 어긴 게시물은 신고가 쌓이면 자동으로 가려지고, 운영자가 지울 수 있습니다.
+④ 배 안의 기록(물품·정비·항해 등)은 그 배의 구성원만 볼 수 있습니다.
+   공개 설정을 켠 항목만 밖으로 나갑니다.
+
+제9조 (중고 장터)
+① 운영자는 거래 장소만 제공하는 중개자이며, 거래의 당사자가 아닙니다.
+② 물건의 상태, 가격, 인도, 하자, 환불에 관한 책임은 파는 사람과 사는 사람에게 있습니다.
+③ 운영자는 거래를 보증하거나 대금을 보관하지 않습니다.
+④ 먼저 돈을 보내지 마시고, 물건을 직접 보고 거래하시기 바랍니다.
+⑤ 사기 등 분쟁이 생기면 수사기관에 신고하시기 바라며, 운영자는 신고를 받아
+   해당 게시물을 내리고 계정을 정지하는 조치를 합니다.
+
+제10조 (서비스 중단)
+① 점검·고장·통신 장애·천재지변 등으로 서비스가 멈출 수 있습니다.
+② 미리 알 수 있는 중단은 앱 안에 알립니다.
+③ 이 앱은 개인이 운영하므로 예고 없이 서비스를 끝낼 수 있습니다.
+   그때에는 최소 30일 전에 알리고, 이용자가 자기 기록을 내려받을 수 있게 합니다.
+
+제11조 (계정 정지와 해지)
+① 이용자는 언제든 탈퇴할 수 있습니다.
+② 제7조를 어긴 경우 운영자는 게시물 삭제, 일시 정지, 이용 제한을 할 수 있습니다.
+③ 심하거나 반복되면 계정을 영구히 제한할 수 있습니다.
+④ 조치에 이의가 있으면 고객센터로 알려 주십시오.
+
+제12조 (유료 서비스)
+① 유료 기능이 생기면 가격, 결제 방법, 환불 기준을 결제 화면에 미리 알립니다.
+② 환불은 콘텐츠산업 진흥법과 전자상거래법 등 관련 법과 소비자분쟁해결기준을 따릅니다.
+③ 이 조항은 유료 기능이 실제로 생긴 때부터 효력이 있습니다.
+
+제13조 (책임의 한계)
+① 운영자는 이 앱을 있는 그대로 제공하며, 특정 목적에 맞을 것을 보증하지 않습니다.
+② 이용자 사이의 분쟁, 이용자가 올린 정보로 생긴 손해에 대해
+   운영자는 고의 또는 중대한 과실이 없는 한 책임지지 않습니다.
+③ 이용자의 기기 고장, 통신 장애, 계정 관리 소홀로 생긴 손해에 대해서도 같습니다.
+④ 이 조항은 소비자에게 불리하게 해석되지 않으며,
+   법이 정한 운영자의 책임을 면제하지 않습니다.
+
+제14조 (준거법과 관할)
+이 약관은 대한민국 법을 따릅니다. 분쟁이 생기면 민사소송법이 정한 법원에 소를 제기합니다.
+
+부칙
+이 약관은 {DATE}부터 적용합니다. (판 {VER})
+` },
+
+privacy: { title: '개인정보처리방침', body: `
+{OWNER}(이하 "운영자")는 뱃일(이하 "이 앱")을 운영하면서 이용자의 개인정보를
+소중히 다루며, 개인정보 보호법을 지킵니다.
+
+1. 무엇을 모으나
+ 가. 가입할 때
+   · Google 계정으로 로그인: 이메일, 이름(구글 표시 이름), 계정 식별번호
+   · 이메일로 가입: 이메일, 비밀번호(운영자는 볼 수 없습니다)
+ 나. 앱을 쓰면서 이용자가 직접 넣는 것
+   · 배 정보(이름·선종·홈포트·제원), 물품·정비·수리·주유 기록
+   · 항해일지(날짜·항로·좌표), 정박지 위치와 사진, 중고 장터 글과 사진
+   · 커뮤니티 글과 댓글, 배 구성원 이름과 등급, 연락처
+ 다. 고객센터에 문의할 때 (문제를 재현하려면 필요합니다)
+   · 문의 내용, 앱 판, 브라우저 종류, 화면 크기, 보던 화면 이름, 인터넷 연결 여부
+ 라. 위치
+   · 현재 위치(GPS): 날씨와 물때를 보여 주기 위해 이용자가 허락한 때에만 받습니다.
+     이 값은 기기 안에만 저장하고 서버로 보내지 않습니다.
+   · 홈포트·정박지·항해 좌표: 이용자가 직접 지도에서 찍은 값이며 서버에 저장됩니다.
+ ※ 주민등록번호, 카드번호, 계좌번호는 모으지 않습니다.
+
+2. 어떻게 모으나
+ 이용자가 앱에서 직접 넣거나, 로그인할 때 Google 계정에서 받아 옵니다.
+ 자동으로 모으는 것은 고객센터 문의에 붙는 기기 정보뿐입니다.
+
+3. 왜 쓰나
+ · 계정을 만들고 본인을 확인하기 위해
+ · 여러 기기에서 같은 기록을 보고, 배 구성원끼리 함께 관리하기 위해
+ · 배 위치에 맞는 날씨·물때·해상 특보를 보여 주기 위해
+ · 커뮤니티와 중고 장터를 운영하고, 신고를 처리하기 위해
+ · 오류를 고치고 문의에 답하기 위해
+ 이 밖의 목적으로는 쓰지 않으며, 목적이 바뀌면 미리 동의를 받습니다.
+
+4. 얼마나 갖고 있나
+ · 계정 정보: 탈퇴할 때까지
+ · 배 기록·게시물: 이용자가 지울 때까지, 또는 탈퇴할 때까지
+ · 고객센터 문의: 답변을 마친 뒤 3년 (분쟁 대비)
+ · 신고·제재 기록: 3년 (같은 일이 되풀이되는지 보기 위해)
+ 탈퇴하면 지체 없이 파기합니다. 다만 법이 보관하라고 정한 것은 그 기간 동안 따로 보관합니다.
+
+5. 남에게 주나
+ 주지 않습니다. 팔지도 않습니다.
+ 다만 법령에 따라 수사기관이 적법한 절차로 요구하면 그에 따릅니다.
+
+6. 맡겨서 처리하는 곳
+ · Google LLC (Firebase Authentication, Cloud Firestore)
+   - 하는 일: 로그인 처리, 자료 보관
+   - 자료가 있는 곳: 대한민국 서울 리전
+ 위탁 계약에는 개인정보를 안전하게 다루도록 하는 내용이 들어 있습니다.
+
+7. 어떻게 없애나
+ 보유 기간이 끝나거나 목적을 다하면 지체 없이 없앱니다.
+ 전자 파일은 되살릴 수 없는 방법으로 지웁니다.
+
+8. 이용자의 권리
+ 이용자는 언제든지 자기 개인정보를 보고, 고치고, 지우고, 처리를 멈추라고 할 수 있습니다.
+ · 앱 안에서: 서랍 › 계정, 내 배 › 기본 정보, 각 기록의 지우기
+ · 그 밖의 요청: 고객센터 또는 {EMAIL}
+ 요청을 받으면 지체 없이 처리하며, 처리 결과를 알려 드립니다.
+ 만 14세 이상 미성년자는 스스로 이 권리를 행사할 수 있습니다.
+
+9. 만 14세 미만
+ 이 앱은 만 14세 미만의 가입을 받지 않습니다.
+ 만 14세 미만인 것이 확인되면 계정과 자료를 지웁니다.
+
+10. 안전하게 지키기 위해 하는 일
+ · 접근 권한 관리: 배 구성원만 그 배의 기록을 볼 수 있고, 등급에 따라 할 수 있는 일이 다릅니다.
+   이 제한은 화면에서 감추는 것이 아니라 서버 규칙으로 막습니다.
+ · 전송 구간 암호화(HTTPS)
+ · 비밀번호는 Google Firebase가 처리하며 운영자는 볼 수 없습니다.
+ · 개인정보에 닿을 수 있는 사람은 운영자 한 명으로 제한합니다.
+
+11. 기기에 저장되는 것
+ 앱은 이용자의 기기(브라우저)에 다음을 저장합니다.
+ · 마지막으로 본 화면, 즐겨찾기 지점, 오프라인에서도 쓰기 위한 기록 사본
+ 브라우저 설정에서 사이트 데이터를 지우면 함께 지워집니다.
+
+12. 위치정보
+ · 현재 위치(GPS)는 이용자가 허락한 때에만 받고, 기기 안에서만 씁니다.
+   허락하지 않아도 앱은 쓸 수 있으며, 지점을 직접 고르시면 됩니다.
+ · 지도에서 직접 찍은 홈포트·정박지·항해 좌표는 서버에 저장됩니다.
+   항해 좌표는 그 배의 구성원만 볼 수 있고, 배를 공개해도 좌표는 밖으로 나가지 않습니다.
+ · 위치정보 이용에 관한 자세한 내용은 「위치정보 이용약관」을 봐 주십시오.
+
+13. 개인정보 보호책임자
+ · 성명: {OWNER}
+ · 연락처: {EMAIL}
+ 개인정보와 관련한 문의, 불만, 피해 구제는 위 연락처 또는 앱 안 고객센터로 알려 주십시오.
+
+14. 권익을 침해받았을 때
+ 아래 기관에 도움을 요청하실 수 있습니다.
+ · 개인정보 침해신고센터 (privacy.kisa.or.kr / 국번없이 118)
+ · 개인정보 분쟁조정위원회 (kopico.go.kr / 1833-6972)
+ · 대검찰청 사이버수사과 (spo.go.kr / 1301)
+ · 경찰청 사이버수사국 (ecrm.police.go.kr / 182)
+
+15. 방침이 바뀔 때
+ 내용을 고치면 앱 안에 알리고, 중요한 변경은 다시 동의를 받습니다.
+
+이 방침은 {DATE}부터 적용합니다. (판 {VER})
+` },
+
+location: { title: '위치정보 이용약관', body: `
+제1조 (목적)
+이 약관은 뱃일(이하 "이 앱")이 위치정보를 어떻게 다루는지 정합니다.
+
+제2조 (무엇에 쓰나)
+ · 현재 위치에 맞는 바람·파고·물때·해상 특보를 보여 주기 위해
+ · 배 홈포트에 가까운 조위 관측소를 골라, 잰 수심을 저조위 기준으로 바꾸기 위해
+ · 배가 있는 해역의 특보만 골라 보여 주기 위해
+ · 이용자가 지도에서 찍은 정박지 자리를 커뮤니티에 올리기 위해
+ · 이용자가 남긴 항해 항로를 그리기 위해
+
+제3조 (현재 위치)
+① 현재 위치(GPS)는 이용자가 기기에서 허락한 때에만 받습니다.
+② 받은 값은 기기 안에만 저장하며 서버로 보내지 않습니다.
+③ 허락을 거절해도 앱은 모두 쓸 수 있습니다. 지점을 직접 고르시면 됩니다.
+④ 허락은 기기 설정에서 언제든 거둘 수 있습니다.
+
+제4조 (직접 찍은 좌표)
+① 홈포트·정박지·항해 좌표는 이용자가 지도에서 직접 찍은 값이며 서버에 저장됩니다.
+② 항해 좌표는 그 배의 구성원만 볼 수 있습니다. 배를 공개해도 좌표는 밖으로 나가지 않습니다.
+③ 정박지 좌표는 커뮤니티에 공개됩니다. 올리기 전에 화면에서 확인하실 수 있으며,
+   올린 뒤에도 본인이 지울 수 있습니다.
+
+제5조 (보유 기간)
+저장된 좌표는 이용자가 지울 때까지, 또는 탈퇴할 때까지 보관하고 그 뒤 파기합니다.
+
+제6조 (제3자 제공)
+위치정보를 남에게 주지 않습니다. 법령에 따른 적법한 요구가 있을 때만 그에 따릅니다.
+
+제7조 (이용자의 권리)
+이용자는 자기 위치정보의 수집·이용·제공에 대한 동의를 언제든 거둘 수 있고,
+저장된 자료를 보거나 지워 달라고 할 수 있습니다. 연락처: {EMAIL}
+
+제8조 (만 14세 미만)
+이 앱은 만 14세 미만의 가입을 받지 않으므로 위치정보도 받지 않습니다.
+
+제9조 (문의)
+위치정보 관련 문의: {OWNER} ({EMAIL})
+
+이 약관은 {DATE}부터 적용합니다. (판 {VER})
+` }
+};
+
+// 문서 하나를 사람 읽을 글로 만든다. 이름·연락처는 한 곳(LEGAL_OWNER)에서만 온다.
+function legalText(k){
+  const d = LEGAL_DOCS[k];
+  if(!d) return '';
+  const biz = LEGAL_BIZ
+    ? ` 상호 ${LEGAL_BIZ.name}, 사업자등록번호 ${LEGAL_BIZ.no}, 주소 ${LEGAL_BIZ.addr}.`
+    : '';
+  return String(d.body)
+    .split('{OWNER}').join(LEGAL_OWNER.name)
+    .split('{EMAIL}').join(LEGAL_OWNER.email)
+    .split('{DATE}').join(LEGAL_DATE)
+    .split('{VER}').join(LEGAL_VER)
+    .split('{BIZ}').join(biz)
+    .trim();
+}
+function openLegal(k){
+  const key = LEGAL_DOCS[k] ? k : 'terms';
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  P.innerHTML = `<div class="mrhead"><b>약관·방침</b><span style="flex:1"></span></div>
+    <div class="subrow" style="display:flex">${
+      Object.entries(LEGAL_DOCS).map(([kk,v])=>
+        `<button class="tab${kk===key?' on':''}" onclick="openLegal('${kk}')">${esc(v.title)}</button>`).join('')}</div>
+    <div class="postbody" style="padding:12px;white-space:pre-wrap;line-height:1.65">${esc(legalText(key))}</div>
+    <div style="height:24px"></div>`;
+  showPanel(P);
+  setHeadTitle('약관·방침');
+}
+
+// ── 동의
+// 동의한 판을 기억한다. 판이 올라가면 다시 받는다.
+const AGREE_KEY = 'bt_agree';
+function agreeState(){
+  try{ return JSON.parse(localStorage.getItem(AGREE_KEY) || 'null'); }catch(e){ return null; }
+}
+function needAgree(){
+  const a = agreeState();
+  return !a || a.ver !== LEGAL_VER;
+}
+let agreeChk = { terms:false, privacy:false, age:false, loc:false };
+// ★ 동의는 로그인 앞에 선다. 로그인하면 그때부터 개인정보가 서버로 간다.
+//   next 는 동의를 마친 뒤에 이어서 할 일이다.
+let agreeNext = null;
+function openAgree(next){
+  agreeNext = next || null;
+  agreeChk = { terms:false, privacy:false, age:false, loc:false };
+  drawAgree();
+}
+function agreeToggle(k){
+  agreeChk[k] = !agreeChk[k];
+  drawAgree();
+}
+function agreeAll(){
+  const on = !(agreeChk.terms && agreeChk.privacy && agreeChk.age && agreeChk.loc);
+  agreeChk = { terms:on, privacy:on, age:on, loc:on };
+  drawAgree();
+}
+function drawAgree(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  const row = (k, name, must, doc) => `<div class="mrrow" style="align-items:flex-start">
+      <button class="tchip${agreeChk[k]?' on':''}" style="min-width:78px" onclick="agreeToggle('${k}')">${agreeChk[k]?'✓ 동의':'동의'}</button>
+      <span style="flex:1;padding-left:8px">${esc(name)} <b style="color:${must?'#F0803C':'#7b8794'}">(${must?'필수':'선택'})</b>${
+        doc?`<br><button class="minib blu" onclick="openLegal('${doc}')">내용 보기</button>`:''}</span></div>`;
+  const ok = agreeChk.terms && agreeChk.privacy && agreeChk.age;
+  P.innerHTML = `<div class="mrhead"><b>시작하기 전에</b><span style="flex:1"></span>
+      <button class="tab" onclick="agreeCancel()">취소</button></div>
+    <div class="mrnone" style="text-align:left">뱃일을 쓰시려면 아래에 동의해 주세요.
+      내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.</div>
+    <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="agreeAll()">모두 동의</button></div>
+    ${row('terms','이용약관', true, 'terms')}
+    ${row('privacy','개인정보 수집·이용', true, 'privacy')}
+    ${row('age','만 14세 이상입니다', true, '')}
+    ${row('loc','위치정보 이용', false, 'location')}
+    <div class="mrnone" style="text-align:left">위치정보에 동의하지 않아도 앱을 모두 쓸 수 있습니다.
+      그때는 지점을 직접 골라 주세요.</div>
+    <div class="mrnone" style="text-align:left;color:#F0803C">이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다.
+      출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)</div>
+    <div class="mrrow" style="padding:14px 12px">
+      <button class="mrbtn big${ok?' ok':''}" style="flex:1" onclick="doAgree()">${ok?'동의하고 계속':'필수 항목에 동의해 주세요'}</button></div>
+    <div style="height:24px"></div>`;
+  showPanel(P);
+  setHeadTitle('약관 동의');
+}
+function agreeCancel(){
+  agreeNext = null;
+  openAccount();
+}
+function doAgree(){
+  if(!(agreeChk.terms && agreeChk.privacy && agreeChk.age)){
+    alert('필수 항목 세 개에 모두 동의해 주셔야 합니다.');
+    return;
+  }
+  const body = { ver: LEGAL_VER, at: new Date().toISOString(), loc: !!agreeChk.loc };
+  try{ localStorage.setItem(AGREE_KEY, JSON.stringify(body)); }catch(e){}
+  const next = agreeNext; agreeNext = null;
+  if(typeof next === 'function') next();
+  else openAccount();
+}
+// 로그인한 사람의 동의 기록은 클라우드에도 남긴다.
+// 나중에 "동의받았다" 를 보여야 할 일이 생긴다. 기기에만 두면 지워진다.
+async function pushAgree(){
+  const a = agreeState();
+  if(!a || !window.__people || !window.__people.mark) return;
+  try{ await window.__people.mark({ agreeVer: a.ver, agreeAt: a.at, agreeLoc: !!a.loc }); }catch(e){}
+}
+
 const SUPPORT_MAIL = 'jaha814@gmail.com';
 const SUPPORT_KINDS = [
   { v:'bug',  name:'오류 신고',   sub:'앱이 이상하게 동작합니다' },
@@ -12646,13 +13035,15 @@ document.addEventListener('visibilitychange', ()=>{
     // 운영자가 사람을 찾아 조치하려면 이름이 있어야 한다.
     // 이름을 남기는 건 본인만, 통째로 훑는 건 운영자만 (규칙에서 막는다).
     window.__people = {
-      async mark(){
+      // extra 로 동의 기록 같은 것을 함께 남긴다.
+      // 따로 쓰는 길을 만들면 규칙을 또 손봐야 하고, 한쪽만 고쳐진다.
+      async mark(extra){
         const u = fauth.currentUser; if(!u) return;
         try{
-          await setDoc(doc(fdb, 'users', u.uid), {
+          await setDoc(doc(fdb, 'users', u.uid), Object.assign({
             uid: u.uid, name: u.displayName || '', email: u.email || '',
             ts: new Date().toISOString()
-          }, { merge:true });
+          }, extra || {}), { merge:true });
         }catch(_){}
       },
       async list(){

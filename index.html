@@ -341,6 +341,15 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .fbtn.go{background:#14304a;border-color:#4ad9ff;color:#cfefff}
 .fbtn.del{flex:0 0 auto;background:none;border:1px solid #7A3A30;color:#FF9A8A;font-weight:600}
 /* 도면 고르기 — 그림을 보고 눌러서 고른다 */
+/* 정비 기록 고르기 — 글쓰기 폼 위에 겹쳐 뜬다.
+   ★ openForm 은 화면에 하나뿐이라, 폼 위에 폼을 열면 원래 폼이 닫힌다.
+     실제로 '넣기' 를 누르면 글쓰기 창이 통째로 사라졌다. */
+#recPick{position:fixed;inset:0;background:#050a10;display:none;flex-direction:column;z-index:120}
+#recPickHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;
+  align-items:center;font-size:15px;font-weight:700;color:#c8dff0;flex:0 0 auto}
+#recPickHead .x{background:none;border:none;color:#8a97a8;font-size:22px;cursor:pointer}
+#recPickSub{padding:8px 16px 0;color:#8a97a8;font-size:12.5px;flex:0 0 auto}
+#recPickBody{flex:1;overflow:auto;padding:8px 0 24px}
 #dgPick{position:fixed;inset:0;background:#050a10;display:none;flex-direction:column;z-index:70}
 #dgPickHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;
   align-items:center;font-size:15px;font-weight:700;color:#c8dff0;flex:0 0 auto}
@@ -786,6 +795,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 <div id="communityWrap" style="display:none">
   
   <div id="talkWrap"></div>
+  <div id="spotWrap"></div>
   <div id="exploreWrap"></div>
 </div>
 <div id="mrPanel"></div>
@@ -834,6 +844,11 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   <div id="formBody"></div>
   <div class="formFoot" id="formFoot"></div>
 </div></div>
+<div id="recPick">
+  <div id="recPickHead"><span>정비 기록 넣기</span><button class="x" onclick="closeRecPick()">×</button></div>
+  <div id="recPickSub">글에 넣을 기록을 눌러 주세요 (내 배 기록만 나옵니다)</div>
+  <div id="recPickBody"></div>
+</div>
 <div id="dgPick">
   <div id="dgPickHead"><span id="dgPickTitle">도면 고르기</span><button class="x" onclick="closeDgPick()">×</button></div>
   <div id="dgPickSub"></div>
@@ -3009,6 +3024,11 @@ async function renderTalk(){
 }
 // ── 내 배 정비·수리 기록을 글에 붙인다
 // ★ 내 배 것만 붙인다. 남의 배 기록에는 손대지 않는다.
+// ★ 여기는 openForm 을 쓰면 안 된다.
+//   openForm 은 화면에 하나뿐이라, 글쓰기 폼 위에 또 열면 원래 폼이 닫힌다.
+//   실제로 '넣기' 를 누르면 글쓰기 창이 통째로 사라졌다.
+//   그래서 겹쳐 뜨는 전용 화면을 따로 둔다.
+let recPickTarget = null;
 function talkPickRecord(rid){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   if(!b){ alert('배를 등록하면 정비 기록을 붙일 수 있습니다'); return; }
@@ -3023,19 +3043,28 @@ function talkPickRecord(rid){
                 sub:'수리 · ' + (RP_LABEL[r.status] || '') + (r.doneDate ? ' · ' + r.doneDate : '') });
   });
   if(!rows.length){ alert('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.'); return; }
-  openForm({
-    title:'정비 기록 넣기',
-    sub:'글에 넣을 기록을 고르세요 (내 배 기록만 나옵니다)',
-    okText:'넣기',
-    fields:[ { key:'pick', label:'기록', type:'pick', value:rows[0].v, options:rows } ],
-    onOk: v => {
-      const [kind, id] = String(v.pick||'').split(':');
-      const text = (kind === 'm') ? talkRecordText('maint', id) : talkRecordText('repair', id);
-      if(!text){ alert('그 기록을 찾지 못했습니다'); return false; }
-      // 편집기 안 커서 자리에 넣는다
-      setTimeout(()=>{ richInsert(rid, [{ t:'text', v:text }]); }, 60);
-    }
-  });
+  recPickTarget = rid;
+  const B = document.getElementById('recPickBody');
+  B.innerHTML = rows.map(x=>`<div class="fleet" onclick="recPickTake('${esc(x.v)}')">
+      <div class="fmain"><div class="fname">${esc(x.name)}</div>
+        <div class="fsub">${esc(x.sub)}</div></div></div>`).join('');
+  document.getElementById('recPick').style.display = 'flex';
+}
+function closeRecPick(){
+  const el = document.getElementById('recPick');
+  if(el) el.style.display = 'none';
+  recPickTarget = null;
+}
+// 하나를 눌러서 곧바로 넣는다. 고르고 또 '넣기' 를 누르게 할 이유가 없다.
+function recPickTake(v){
+  const rid = recPickTarget;
+  const [kind, id] = String(v||'').split(':');
+  const text = (kind === 'm') ? talkRecordText('maint', id) : talkRecordText('repair', id);
+  closeRecPick();
+  if(!text){ alert('그 기록을 찾지 못했습니다'); return; }
+  if(!rid) return;
+  // 편집기 안 커서 자리에 넣는다
+  setTimeout(()=>{ richInsert(rid, [{ t:'text', v:text }]); }, 60);
 }
 // 기록 하나를 사람이 읽을 글로 바꾼다
 function talkRecordText(kind, id){
@@ -6013,7 +6042,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.18';
+const APP_VER = '3.19';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7462,7 +7491,7 @@ function setBoatSubTab(k){
 const MRSUB_TITLES = {maint:'정기점검', repair:'수리목록', fuel:'연료 기록', check:'출항 전 점검'};
 // 커뮤니티 안의 하위 화면
 let comSub = (function(){ try{ return localStorage.getItem('bt_comsub') || 'talk'; }catch(_){ return 'talk'; } })();
-const COMSUB_TITLES = {talk:'글판', explore:'배 둘러보기', biz:'영업', news:'뉴스'};
+const COMSUB_TITLES = {talk:'글판', spots:'정박지', explore:'배 둘러보기', biz:'영업', news:'뉴스'};
 function setComSub(k){
   comSub = COMSUB_TITLES[k] ? k : 'explore';
   try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
@@ -7518,6 +7547,7 @@ function switchTab(t){
   show('voyageWrap',   t==='voyage');
   show('communityWrap',t==='community');
   show('talkWrap',     t==='community' && comSub==='talk');
+  show('spotWrap',     t==='community' && comSub==='spots');
   show('exploreWrap',  t==='community' && (comSub==='explore' || comSub==='biz'));
   show('newsWrap',     t==='community' && comSub==='news');
   if(!(t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'))) show('mrMapWrap', false);
@@ -7554,6 +7584,7 @@ function renderCurrent(){
   }
   else if(t==='community'){
     if(comSub==='talk') renderTalk();
+    else if(comSub==='spots') renderSpots();
     else if(comSub==='news') renderNews();
     else openExplore(comSub==='biz');
   }
@@ -8672,6 +8703,372 @@ function addVoyage(){
   posHere('wxOut', v.id, true);      // 출발 위치도 지금 자리로 잡는다 (실패해도 조용히)
 }
 
+// ===== 정박지 =====
+// ★ 무엇을 담을지 실제 서비스들을 보고 정했다.
+//   해외 정박지 앱(Navily)이 가장 앞에 두는 것은 셋이다 —
+//   수심과 바닥, 어느 바람에 막히는가, 그리고 다녀온 사람의 한마디.
+//   국내 마리나(왕산·김포·서울 등)가 안내하는 것은 계류 규모·수심·
+//   전기·급수·급유·크레인·계류료·연락처다.
+//
+//   여기에 한국 바다의 사정을 하나 더 넣는다 —
+//   조수간만 차가 커서(서해는 9m 넘는 곳도 있다) '저조위에 바닥이 닿느냐'가
+//   들어갈 수 있느냐를 가른다. 그래서 수심은 '저조위 기준인지'를 함께 적는다.
+const SPOT_KINDS = [
+  { v:'marina', name:'마리나',   sub:'계류장·요트 전용' },
+  { v:'port',   name:'항·부두',  sub:'어항·물양장·물때 접안' },
+  { v:'break',  name:'방파제',   sub:'방파제 안쪽 접안' },
+  { v:'anchor', name:'묘박지',   sub:'앵커 내리는 자리' }
+];
+// 8방위. '이 방향에서 바람이 불면 막힌 것이 없다' 를 고른다.
+// 정박지에서 가장 먼저 보는 것이 이것이다.
+const SPOT_DIRS = ['N','NE','E','SE','S','SW','W','NW'];
+const SPOT_DIR_KO = { N:'북', NE:'북동', E:'동', SE:'남동',
+                      S:'남', SW:'남서', W:'서', NW:'북서' };
+const SPOT_BOTTOM = ['뻘','모래','자갈','바위','해초','섞임','모름'];
+const SPOT_FAC = [
+  { k:'power', name:'전기' }, { k:'water', name:'물' },
+  { k:'fuel',  name:'연료' }, { k:'toilet', name:'화장실' },
+  { k:'shower',name:'샤워' }, { k:'crane', name:'크레인·상하가' },
+  { k:'park',  name:'주차' }, { k:'shop',  name:'가게' }
+];
+const SPOT_HIDE_AT = 3;      // 신고가 이만큼 쌓이면 목록에서 내린다
+
+let spotList = [], spotQ = '', spotKind = '', spotOpenId = null, spotPickCtx = null;
+
+function spotOf(id){ return spotList.find(x=>String(x.id)===String(id)) || null; }
+function spotKindName(v){ return (SPOT_KINDS.find(k=>k.v===v)||{}).name || '정박지'; }
+// 지울 수 있는 사람 — 올린 본인과 운영자
+function canDelSpot(s){
+  if(!s) return false;
+  const me2 = meUid();
+  if(me2 && String(s.by) === String(me2)) return true;
+  return isAdmin('postDel');
+}
+// 고칠 수 있는 사람도 같다. 아무나 고치게 두면 누가 무엇을 바꿨는지 몰라 싸움이 난다.
+function canEditSpot(s){ return canDelSpot(s); }
+
+// 막힌 방향을 사람 말로. 여기가 정박지의 핵심이라 또렷하게 적는다.
+function spotShelterText(s){
+  const open = (s && s.open) || [];
+  if(!open.length) return '';
+  if(open.length >= 8) return '사방이 트여 있습니다 — 바람이 불면 위험합니다';
+  return open.map(d=>SPOT_DIR_KO[d] || d).join('·') + ' 바람에 트여 있습니다';
+}
+function spotDepthText(s){
+  if(!s || !s.depth) return '';
+  return s.depth + 'm' + (s.lowTide ? ' (저조위 기준)' : ' (기준 미상 — 물때를 확인하세요)');
+}
+
+async function renderSpots(){
+  const W = document.getElementById('spotWrap');
+  if(!W) return;
+  if(!window.__spots){
+    W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>'; return;
+  }
+  if(!window.__user){
+    W.innerHTML = `<div class="mrnone">정박지는 로그인해야 볼 수 있습니다<br><br>
+      <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`; return;
+  }
+  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+  await loadAdmin();
+  try{ spotList = await window.__spots.list(); }
+  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+
+  // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
+  const rows = spotList
+    .filter(s => !s.hidden || isAdmin('postDel'))
+    .filter(s => !spotKind || s.kind === spotKind)
+    .filter(s => spotMatch(s, spotQ))
+    .sort((a,b)=> String(a.name||'').localeCompare(String(b.name||'')))
+    .map(s=>{
+      const sh = spotShelterText(s);
+      return `<div class="fleet" onclick="openSpot('${esc(s.id)}')"><div class="fmain">
+        <div class="fname">${s.hidden?'<span class="chip notice">숨김</span> ':''}${esc(s.name||'이름 없음')}
+          <span class="chip">${esc(spotKindName(s.kind))}</span></div>
+        <div class="fsub">${esc([s.region, spotDepthText(s), sh].filter(Boolean).join(' · '))}</div>
+      </div></div>`;
+    }).join('');
+
+  W.innerHTML = `<div class="tfilt">`
+      + `<button class="tchip${spotKind?'':' on'}" onclick="setSpotKind('')">전체</button>`
+      + SPOT_KINDS.map(k=>`<button class="tchip${spotKind===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
+      + `</div>
+    <div class="mrrow"><span class="mrlbl">찾기</span>
+      <input id="spQ" style="flex:1" value="${esc(spotQ)}" placeholder="이름 · 지역"
+        oninput="spotQ=this.value;renderSpots()"></div>
+    <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
+      <button class="mrbtn ok" onclick="writeSpot()">+ 정박지 올리기</button></div>`
+    + (rows || '<div class="mrnone">아직 올라온 정박지가 없습니다. 아는 자리를 올려 주세요.</div>');
+}
+function spotMatch(s, q){
+  const t = String(q||'').trim().toLowerCase();
+  if(!t) return true;
+  return [s.name, s.region, s.note, spotKindName(s.kind)]
+    .some(v => String(v||'').toLowerCase().includes(t));
+}
+function setSpotKind(v){ spotKind = v; renderSpots(); }
+
+// ── 정박지 하나 보기
+async function openSpot(id){
+  const s = spotOf(id); if(!s) return;
+  spotOpenId = id;
+  const P = document.getElementById('mrPanel');
+  const fac = SPOT_FAC.filter(f => (s.fac||{})[f.k]).map(f=>`<span class="chip">${f.name}</span>`).join('');
+  const sh = spotShelterText(s);
+  const row = (label, v) => v ? `<div class="mrrow"><span class="mrlbl">${label}</span>
+      <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
+  P.innerHTML = `<div class="mrhead"><b>${esc(s.name||'')}</b><span style="flex:1"></span>
+      <button class="tab" onclick="backToSpots()">목록</button></div>
+    <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
+      ${s.region?`<span class="chip">${esc(s.region)}</span>`:''}
+      ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
+      ${canEditSpot(s)?`<button class="minib blu" style="margin-left:auto" onclick="writeSpot('${esc(s.id)}')">고치기</button>`:''}</div>
+    ${s.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 자리입니다.</div>':''}
+    ${sh ? `<div class="hwarn">${esc(sh)}</div>` : ''}
+    ${row('수심', spotDepthText(s))}
+    ${row('바닥', s.bottom)}
+    ${row('물때', s.tideNote)}
+    ${fac ? `<div class="mrrow"><span class="mrlbl">시설</span>
+        <span class="fchips" style="flex:1">${fac}</span></div>` : ''}
+    ${row('요금', s.fee)}
+    ${row('연락처', s.tel)}
+    ${s.note ? `<div class="ghead"><b>한마디</b></div><div class="postbody">${esc(s.note).replace(/\n/g,'<br>')}</div>` : ''}
+    ${(s.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
+    ${(s.lat!=null && s.lon!=null) ? mapBox('spotMap','40vh') : ''}
+    <div class="mrrow" style="gap:8px;padding:12px">
+      <button class="mrbtn" onclick="reportSpot('${esc(s.id)}')">신고</button>
+      ${canDelSpot(s)?`<button class="mrbtn warn" onclick="delSpot('${esc(s.id)}')">지우기</button>`:''}
+    </div>
+    <div class="mrnone" style="text-align:left">여기 적힌 것은 다녀온 사람이 올린 내용입니다.
+      실제 항해에는 공식 해도와 VTS 확인이 먼저입니다.</div>`;
+  showPanel(P);
+  if(s.lat != null && s.lon != null){
+    requestAnimationFrame(()=>{
+      mapInit('spotMap', [{ lat:s.lat, lon:s.lon, label:s.name || '' }], { mode:'view' });
+    });
+  }
+}
+function backToSpots(){
+  comSub = 'spots';
+  try{ localStorage.setItem('bt_comsub','spots'); }catch(_){}
+  closeBoat(); switchTab('community');
+}
+
+// ── 올리기·고치기
+// 자리는 지도에서 찍는다. 위도·경도를 손으로 치게 하지 않는다.
+function writeSpot(id){
+  if(!window.__user){ alert('로그인해야 올릴 수 있습니다'); return; }
+  if(myBan){ alert(banNotice()); return; }
+  const s = id ? spotOf(id) : null;
+  if(id && !s) return;
+  if(s && !canEditSpot(s)){ alert('올린 분과 운영자만 고칠 수 있습니다'); return; }
+  spotPickCtx = { id: id || null, draft: s ? JSON.parse(JSON.stringify(s)) : null };
+  spotPickPlace();
+}
+// 1단계 — 자리 찍기
+function spotPickPlace(){
+  const d = (spotPickCtx && spotPickCtx.draft) || null;
+  const has = !!(d && d.lat != null);
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>자리 찍기</b><span style="flex:1"></span>
+      <button class="tab" onclick="backToSpots()">취소</button>
+      <button class="tab on" onclick="spotPlaceNext()">다음</button></div>
+    ${mapBox('spotPickMap','48vh')}
+    <div class="mrnone" style="text-align:left">지도를 탭하면 그 자리로 정해집니다 · 끌어서 이동 · 두 손가락으로 확대<br>
+      배를 대는 자리에 최대한 가깝게 찍어 주세요.</div>
+    <div class="mrrow" style="justify-content:center">
+      <button class="mrbtn" onclick="spotUseGPS()">현재 위치로</button></div>`;
+  showPanel(P);
+  setHeadTitle('정박지');
+  requestAnimationFrame(()=>{
+    mapInit('spotPickMap', [], { mode:'pick', pick: has ? { lat:d.lat, lon:d.lon } : null });
+    if(!has) spotUseGPS(true);
+  });
+}
+function spotUseGPS(quiet){
+  if(!navigator.geolocation){ if(!quiet) alert('이 기기에서는 위치 기능을 사용할 수 없습니다.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      if(!mapS) return;
+      mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
+      const v = fitView([mapS.pick], 360, 300);
+      mapS.z = Math.max(v.z, 14);
+      mapS.cx = MERC.x(mapS.pick.lon, mapS.z); mapS.cy = MERC.y(mapS.pick.lat, mapS.z);
+      mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
+      mapPaint(true);
+    },
+    ()=>{ if(!quiet) alert('위치를 가져오지 못했습니다.'); }
+  );
+}
+function spotPlaceNext(){
+  if(!mapS || !mapS.pick){ alert('지도를 탭해서 자리를 찍어 주세요'); return; }
+  const d = (spotPickCtx.draft = spotPickCtx.draft || {});
+  d.lat = mapS.pick.lat; d.lon = mapS.pick.lon;
+  mapS = null;
+  spotForm();
+}
+// 2단계 — 내용 적기 (전부 눌러서 고른다)
+function spotForm(){
+  const d = spotPickCtx.draft || {};
+  d.open = Array.isArray(d.open) ? d.open : [];
+  d.fac = d.fac || {};
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>${spotPickCtx.id?'정박지 고치기':'정박지 올리기'}</b><span style="flex:1"></span>
+      <button class="tab" onclick="spotPickPlace()">← 자리</button>
+      <button class="tab on" onclick="spotSave()">올리기</button></div>
+    <div class="mrrow"><span class="mrlbl">이름</span>
+      <input id="spName" style="flex:1" placeholder="예: 안도항 물양장" value="${esc(d.name||'')}"></div>
+    <div class="mrrow"><span class="mrlbl">종류</span></div>
+    <div class="fchips" style="padding:0 12px 8px">${
+      SPOT_KINDS.map(k=>`<button class="tchip${(d.kind||'port')===k.v?' on':''}" onclick="spotSet('kind','${k.v}')">${k.name}</button>`).join('')}</div>
+
+    <div class="ghead"><b>바람이 막히나</b></div>
+    <div class="mrnone" style="text-align:left">여기서 <b>트여 있는</b> 방향을 눌러 주세요.
+      그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.</div>
+    <div class="fchips" style="padding:0 12px 10px">${
+      SPOT_DIRS.map(x=>`<button class="tchip${d.open.includes(x)?' on':''}" onclick="spotDir('${x}')">${SPOT_DIR_KO[x]}</button>`).join('')}</div>
+
+    <div class="ghead"><b>수심과 바닥</b></div>
+    <div class="mrrow"><span class="mrlbl">수심</span>
+      <input id="spDepth" type="number" inputmode="decimal" style="width:90px" value="${esc(String(d.depth||''))}"> m
+      <button class="tchip${d.lowTide?' on':''}" style="margin-left:8px" onclick="spotSet('lowTide',${d.lowTide?'false':'true'})">저조위 기준</button></div>
+    <div class="mrnone" style="text-align:left">우리 바다는 물때 차가 큽니다. 저조위(가장 낮을 때) 수심을 아시면 그걸 적고 칩을 켜 주세요.</div>
+    <div class="mrrow"><span class="mrlbl">바닥</span></div>
+    <div class="fchips" style="padding:0 12px 8px">${
+      SPOT_BOTTOM.map(x=>`<button class="tchip${d.bottom===x?' on':''}" onclick="spotSet('bottom','${x}')">${x}</button>`).join('')}</div>
+    <div class="mrrow"><span class="mrlbl">물때</span>
+      <input id="spTide" style="flex:1" placeholder="예: 중조 이상에만 접안" value="${esc(d.tideNote||'')}"></div>
+
+    <div class="ghead"><b>시설</b></div>
+    <div class="fchips" style="padding:0 12px 8px">${
+      SPOT_FAC.map(f=>`<button class="tchip${d.fac[f.k]?' on':''}" onclick="spotFac('${f.k}')">${f.name}</button>`).join('')}</div>
+
+    <div class="mrrow"><span class="mrlbl">요금</span>
+      <input id="spFee" style="flex:1" placeholder="예: 하루 3만원 / 무료" value="${esc(d.fee||'')}"></div>
+    <div class="mrrow"><span class="mrlbl">연락처</span>
+      <input id="spTel" style="flex:1" inputmode="tel" placeholder="예: 061-000-0000" value="${esc(d.tel||'')}"></div>
+    <div class="frow" style="padding:0 12px"><label>한마디</label>
+      <textarea id="spNote" rows="4" placeholder="다녀와서 알게 된 것을 적어 주세요">${esc(d.note||'')}</textarea></div>
+    <div class="fchips" style="padding:0 12px 16px">
+      <button class="fchip" onclick="spotPhoto()">+ 사진 넣기 (${(d.photos||[]).length}장)</button></div>`;
+  showPanel(P);
+  setHeadTitle('정박지');
+}
+function spotSet(k, v){
+  const d = spotPickCtx.draft = spotPickCtx.draft || {};
+  d[k] = (v === 'true') ? true : (v === 'false') ? false : (d[k] === v ? '' : v);
+  spotKeep(); spotForm();
+}
+function spotDir(x){
+  const d = spotPickCtx.draft = spotPickCtx.draft || {};
+  d.open = Array.isArray(d.open) ? d.open : [];
+  d.open = d.open.includes(x) ? d.open.filter(y=>y!==x) : d.open.concat([x]);
+  spotKeep(); spotForm();
+}
+function spotFac(k){
+  const d = spotPickCtx.draft = spotPickCtx.draft || {};
+  d.fac = d.fac || {};
+  d.fac[k] = !d.fac[k];
+  spotKeep(); spotForm();
+}
+// 칩을 누르면 화면을 다시 그리므로, 그 전에 글자 칸을 챙겨 둔다.
+// 안 그러면 적던 내용이 사라진다.
+function spotKeep(){
+  const d = spotPickCtx.draft = spotPickCtx.draft || {};
+  const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
+  const put = (k, id) => { const v = g(id); if(v !== undefined) d[k] = v; };
+  put('name','spName'); put('depth','spDepth'); put('tideNote','spTide');
+  put('fee','spFee'); put('tel','spTel'); put('note','spNote');
+}
+function spotPhoto(){
+  spotKeep();
+  const inp = document.getElementById('mrFile');
+  if(!inp) return;
+  inp.onchange = async ev => {
+    const files = [...(ev.target.files || [])];
+    ev.target.value = '';
+    if(!files.length) return;
+    const d = spotPickCtx.draft = spotPickCtx.draft || {};
+    d.photos = d.photos || [];
+    const shots = await resizePhotos(files);
+    d.photos = d.photos.concat(shots).slice(0, 4);   // 용량 때문에 넉 장까지
+    spotForm();
+  };
+  inp.click();
+}
+async function spotSave(){
+  spotKeep();
+  const d = spotPickCtx.draft || {};
+  const name = String(d.name||'').trim();
+  if(!name){ alert('이름을 넣어 주세요'); return; }
+  if(d.lat == null || d.lon == null){ alert('자리를 먼저 찍어 주세요'); return; }
+  const me2 = meUid();
+  const body = {
+    id: spotPickCtx.id || ('sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+    name, kind: d.kind || 'port',
+    lat: d.lat, lon: d.lon,
+    region: (typeof boatRegion === 'function' ? boatRegion() : '') || regionOfPoint(d.lat, d.lon),
+    open: Array.isArray(d.open) ? d.open : [],
+    depth: String(d.depth||'').trim(), lowTide: !!d.lowTide,
+    bottom: d.bottom || '', tideNote: String(d.tideNote||'').trim(),
+    fac: d.fac || {}, fee: String(d.fee||'').trim(), tel: String(d.tel||'').trim(),
+    note: String(d.note||'').trim(), photos: (d.photos||[]).slice(0,4),
+    by: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).by || me2 : me2,
+    byName: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).byName || meName() : meName(),
+    ts: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).ts || new Date().toISOString() : new Date().toISOString(),
+    reports: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).reports || {} : {},
+    reportN: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).reportN || 0 : 0,
+    hidden: spotPickCtx.id ? !!(spotOf(spotPickCtx.id)||{}).hidden : false
+  };
+  const bud = photoBudget(body.photos);
+  if(!bud.ok){ alert('사진 ' + bud.dropped + '장은 넣지 못했습니다.\n\n한 자리에 넣을 수 있는 용량을 넘었습니다.'); return; }
+  try{
+    await window.__spots.put(body);
+    const i = spotList.findIndex(x=>String(x.id)===String(body.id));
+    if(i >= 0) spotList[i] = body; else spotList.unshift(body);
+    spotPickCtx = null;
+    openSpot(body.id);
+  }catch(e){ alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)); }
+}
+// 배 홈포트가 없을 때 좌표만으로 지역을 잡는다
+function regionOfPoint(lat, lon){
+  if(typeof REGION_POINTS === 'undefined') return '';
+  let best = '', bd = Infinity;
+  REGION_POINTS.forEach(p=>{
+    const d = (p.lat-lat)*(p.lat-lat) + (p.lon-lon)*(p.lon-lon);
+    if(d < bd){ bd = d; best = p.r; }
+  });
+  return best;
+}
+function delSpot(id){
+  const s = spotOf(id); if(!s) return;
+  if(!canDelSpot(s)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
+  if(!confirm(`'${s.name}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
+  window.__spots.del(id)
+    .then(()=>{ spotList = spotList.filter(x=>String(x.id)!==String(id)); backToSpots(); })
+    .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
+}
+function reportSpot(id){
+  const s = spotOf(id); if(!s) return;
+  const me2 = meUid();
+  if(!me2){ alert('신고하려면 로그인이 필요합니다'); return; }
+  const reports = Object.assign({}, s.reports || {});
+  if(reports[me2]){ alert('이미 신고하신 자리입니다'); return; }
+  openForm({
+    title:'정박지 신고', sub:'무엇이 잘못됐나요?', okText:'신고',
+    fields:[ { key:'why', label:'사유', type:'pick', value:REPORT_REASONS[0].v,
+               options:REPORT_REASONS.map(r=>({ v:r.v, name:r.name, sub:r.sub })) } ],
+    onOk: v => {
+      reports[me2] = v.why;
+      const n = Object.keys(reports).length;
+      const patch = { reports, reportN:n, hidden: n >= SPOT_HIDE_AT };
+      window.__spots.edit(id, patch)
+        .then(()=>{ Object.assign(s, patch); alert('신고했습니다'); openSpot(id); })
+        .catch(e=>alert('신고하지 못했습니다.\n\n' + ((e&&e.message)||e)));
+    }
+  });
+}
+
 // ===== 물때 =====
 // ★ 지어내면 안 되는 곳이다. 낚시하는 사람은 물때로 날을 잡는다.
 //   삭(신월) 시각을 계산해 음력일을 구하고, 표로 물때 이름을 정한다.
@@ -9312,8 +9709,9 @@ function mapPaint(full){
   S.pts.forEach((p,i)=>{
     const c = i===0 ? '#4ade80' : (i===S.pts.length-1 ? '#ff5a3c' : '#ffd24a');
     h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
-    h += `<div class="mlbl" style="left:${(sx(p)+9).toFixed(1)}px;top:${(sy(p)-9).toFixed(1)}px">${
-      esc(p.time?p.time+' ':'')}${esc(p.label)}</div>`;
+    // ★ label 이 없으면 화면에 'undefined' 가 찍힌다. 없으면 아예 안 그린다.
+    const lab = [p.time || '', p.label || ''].filter(Boolean).join(' ');
+    if(lab) h += `<div class="mlbl" style="left:${(sx(p)+9).toFixed(1)}px;top:${(sy(p)-9).toFixed(1)}px">${esc(lab)}</div>`;
   });
   if(S.pick){
     h += `<div class="mgpin" style="left:${sx(S.pick).toFixed(1)}px;top:${sy(S.pick).toFixed(1)}px">
@@ -11429,6 +11827,24 @@ document.addEventListener('visibilitychange', ()=>{
       },
       async remove(uid){
         await deleteDoc(doc(fdb, 'bans', String(uid)));
+      }
+    };
+    // ── 정박지
+    // 배 밖의 공용 자료다. 로그인한 사람은 누구나 보고 올린다.
+    window.__spots = {
+      async list(){
+        const snap = await getDocs(query(collection(fdb,'spots'), limit(500)));
+        return snap.docs.map(d=>d.data());
+      },
+      async put(body){
+        await setDoc(doc(fdb,'spots',String(body.id)), body);
+        return body.id;
+      },
+      async edit(id, patch){
+        await setDoc(doc(fdb,'spots',String(id)), patch, { merge:true });
+      },
+      async del(id){
+        await deleteDoc(doc(fdb,'spots',String(id)));
       }
     };
     window.__initCloud(api);

@@ -796,6 +796,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   
   <div id="talkWrap"></div>
   <div id="spotWrap"></div>
+  <div id="marketWrap"></div>
   <div id="exploreWrap"></div>
 </div>
 <div id="mrPanel"></div>
@@ -6042,7 +6043,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.19';
+const APP_VER = '3.20';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7491,7 +7492,7 @@ function setBoatSubTab(k){
 const MRSUB_TITLES = {maint:'정기점검', repair:'수리목록', fuel:'연료 기록', check:'출항 전 점검'};
 // 커뮤니티 안의 하위 화면
 let comSub = (function(){ try{ return localStorage.getItem('bt_comsub') || 'talk'; }catch(_){ return 'talk'; } })();
-const COMSUB_TITLES = {talk:'글판', spots:'정박지', explore:'배 둘러보기', biz:'영업', news:'뉴스'};
+const COMSUB_TITLES = {talk:'글판', spots:'정박지', market:'중고 장터', explore:'배 둘러보기', biz:'영업', news:'뉴스'};
 function setComSub(k){
   comSub = COMSUB_TITLES[k] ? k : 'explore';
   try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
@@ -7548,6 +7549,7 @@ function switchTab(t){
   show('communityWrap',t==='community');
   show('talkWrap',     t==='community' && comSub==='talk');
   show('spotWrap',     t==='community' && comSub==='spots');
+  show('marketWrap',   t==='community' && comSub==='market');
   show('exploreWrap',  t==='community' && (comSub==='explore' || comSub==='biz'));
   show('newsWrap',     t==='community' && comSub==='news');
   if(!(t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'))) show('mrMapWrap', false);
@@ -7585,6 +7587,7 @@ function renderCurrent(){
   else if(t==='community'){
     if(comSub==='talk') renderTalk();
     else if(comSub==='spots') renderSpots();
+    else if(comSub==='market') renderMarket();
     else if(comSub==='news') renderNews();
     else openExplore(comSub==='biz');
   }
@@ -8701,6 +8704,344 @@ function addVoyage(){
   voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
   wxCapture('wxOut', v.id);          // 출항 시각 기준 날씨 자동 기록
   posHere('wxOut', v.id, true);      // 출발 위치도 지금 자리로 잡는다 (실패해도 조용히)
+}
+
+// ===== 중고 장터 =====
+// ★ 여기는 돈이 오간다. 사기가 가장 많이 생기는 자리다.
+//   그래서 기능보다 먼저 세 가지를 챙긴다.
+//    1) 고지 — 전자상거래법상 중개자는 '자신이 거래의 당사자가 아니라는 사실' 을
+//       미리 알려야 한다. 의무다. 안 하면 과태료·시정명령 대상이고
+//       분쟁이 나면 책임 소재가 흐려진다.
+//       ★ 고지했다고 완전 면책되는 것은 아니다 — 신고를 실제로 처리했는지를 본다.
+//         그래서 신고·자동숨김·운영자 화면을 함께 둔다.
+//         실제로 장터를 여는 날 전에는 변호사 검토를 받아야 한다.
+//    2) 안전거래 안내 — 선입금이 사기의 거의 전부다. 눈에 띄는 자리에 둔다.
+//    3) 신고와 자동 숨김 — 고지만 하고 방치하면 그것이 책임이 된다.
+const MARKET_CATS = [
+  { v:'boat',   name:'배',        sub:'요트·보트·낚시배' },
+  { v:'engine', name:'엔진·추진', sub:'선외기·선내기·프로펠러' },
+  { v:'sail',   name:'세일·로프', sub:'돛·시트·러닝리깅' },
+  { v:'elec',   name:'전자장비',  sub:'플로터·레이더·오토파일럿·무전기' },
+  { v:'safety', name:'안전장비',  sub:'구명조끼·구명뗏목·소화기' },
+  { v:'fish',   name:'낚시장비',  sub:'릴·로드·전동릴' },
+  { v:'etc',    name:'그 밖',     sub:'계류·정비 용품 등' }
+];
+const MARKET_STATES = [
+  { v:'sale', name:'판매중' },
+  { v:'hold', name:'예약중' },
+  { v:'done', name:'판매완료' }
+];
+const MARKET_HIDE_AT = 3;      // 신고가 이만큼 쌓이면 목록에서 내린다
+
+let marketList = [], marketQ = '', marketCat = '', marketOpenId = null, marketDraft = null;
+
+function itemOf(id){ return marketList.find(x=>String(x.id)===String(id)) || null; }
+function catName(v){ return (MARKET_CATS.find(c=>c.v===v)||{}).name || '그 밖'; }
+function stateName(v){ return (MARKET_STATES.find(c=>c.v===v)||{}).name || '판매중'; }
+function canDelItem(m){
+  if(!m) return false;
+  const me2 = meUid();
+  if(me2 && String(m.by) === String(me2)) return true;
+  return isAdmin('postDel');
+}
+function canEditItem(m){ return canDelItem(m); }
+
+// ★ 법으로 정해진 고지. 목록에도, 물건 하나하나에도 보인다.
+//   한 군데만 두면 사람들이 못 보고, 못 본 고지는 고지가 아니다.
+function marketNotice(){
+  return `<div class="mrnone" style="text-align:left;border-top:1px solid #12283e;margin-top:10px">
+    <b>뱃일은 거래의 당사자가 아닙니다.</b><br>
+    뱃일은 장터 자리를 빌려주는 중개자일 뿐이며, 물건과 거래에 관한 책임은
+    파는 사람(판매자)과 사는 사람(구매자)에게 있습니다.
+    물건 정보와 거래 조건은 반드시 직접 확인해 주세요.</div>`;
+}
+// ★ 선입금이 사기의 거의 전부다. 물건 화면에 늘 붙인다.
+function marketSafety(){
+  return `<div class="hwarn" style="margin:10px 12px">
+    <b>거래 전에 꼭 확인하세요</b><br>
+    · 물건을 보기 전에 <b>선입금하지 마세요</b>. 계약금도 마찬가지입니다.<br>
+    · 배·엔진은 직접 가서 <b>시운전</b>까지 보고 판단하세요.<br>
+    · 배는 등록·저당·압류가 남아 있을 수 있습니다. 서류를 확인하세요.<br>
+    · 시세보다 크게 싸면 한 번 더 의심하세요.</div>`;
+}
+// 처음 들어올 때 한 번은 눈으로 읽게 한다
+function marketFirstNotice(){
+  let seen = false;
+  try{ seen = localStorage.getItem('bt_market_ok') === 'y'; }catch(_){}
+  if(seen) return;
+  alert('중고 장터를 여시기 전에 알려 드립니다.\n\n'
+    + '뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n'
+    + '물건과 거래에 대한 책임은 파는 분과 사는 분에게 있습니다.\n\n'
+    + '물건을 보기 전에 돈부터 보내지 마세요.\n'
+    + '배·엔진은 직접 가서 시운전까지 보고 판단하세요.\n\n'
+    + '이상한 글은 신고해 주세요. 신고가 쌓이면 자동으로 내려갑니다.');
+  try{ localStorage.setItem('bt_market_ok', 'y'); }catch(_){}
+}
+// 가격을 사람이 읽게
+function priceText(m){
+  if(!m) return '';
+  if(m.free) return '무료 나눔';
+  if(m.offer) return '가격 제안';
+  const n = Number(m.price);
+  if(!isFinite(n) || n <= 0) return '';
+  return n.toLocaleString('ko-KR') + '원';
+}
+
+async function renderMarket(){
+  const W = document.getElementById('marketWrap');
+  if(!W) return;
+  if(!window.__market){
+    W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>'; return;
+  }
+  if(!window.__user){
+    W.innerHTML = `<div class="mrnone">장터는 로그인해야 볼 수 있습니다<br><br>
+      <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`; return;
+  }
+  marketFirstNotice();
+  W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+  await loadAdmin();
+  try{ marketList = await window.__market.list(); }
+  catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+
+  const rows = marketList
+    .filter(m => !m.hidden || isAdmin('postDel'))
+    .filter(m => !marketCat || m.cat === marketCat)
+    .filter(m => itemMatch(m, marketQ))
+    // 판 물건은 뒤로 보낸다. 아직 살 수 있는 것이 먼저다.
+    .sort((a,b)=>{
+      const da = a.state === 'done' ? 1 : 0, db = b.state === 'done' ? 1 : 0;
+      if(da !== db) return da - db;
+      return String(b.ts||'').localeCompare(String(a.ts||''));
+    })
+    .map(m=>{
+      const thumb = (m.photos && m.photos[0])
+        ? `<img src="${esc(m.photos[0])}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex:0 0 auto">` : '';
+      return `<div class="fleet" onclick="openItem('${esc(m.id)}')">
+        ${thumb}
+        <div class="fmain">
+          <div class="fname">${m.hidden?'<span class="chip notice">숨김</span> ':''}
+            ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span> `:''}
+            ${esc(m.title||'제목 없음')}</div>
+          <div class="fsub"><b style="color:#dfe8f2">${esc(priceText(m) || '가격 미정')}</b>
+            · ${esc(catName(m.cat))}${m.region?' · '+esc(m.region):''}
+            · ${esc(String(m.ts||'').slice(0,10))}</div>
+        </div></div>`;
+    }).join('');
+
+  W.innerHTML = `<div class="tfilt">`
+      + `<button class="tchip${marketCat?'':' on'}" onclick="setMarketCat('')">전체</button>`
+      + MARKET_CATS.map(c=>`<button class="tchip${marketCat===c.v?' on':''}" onclick="setMarketCat('${c.v}')">${c.name}</button>`).join('')
+      + `</div>
+    <div class="mrrow"><span class="mrlbl">찾기</span>
+      <input id="mkQ" style="flex:1" value="${esc(marketQ)}" placeholder="물건 이름 · 내용"
+        oninput="marketQ=this.value;renderMarket()"></div>
+    <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
+      <button class="mrbtn ok" onclick="writeItem()">+ 팔 물건 올리기</button></div>`
+    + (rows || '<div class="mrnone">아직 올라온 물건이 없습니다.</div>')
+    + marketNotice();
+}
+function itemMatch(m, q){
+  const t = String(q||'').trim().toLowerCase();
+  if(!t) return true;
+  return [m.title, m.note, catName(m.cat), m.region]
+    .some(v => String(v||'').toLowerCase().includes(t));
+}
+function setMarketCat(v){ marketCat = v; renderMarket(); }
+function backToMarket(){
+  comSub = 'market';
+  try{ localStorage.setItem('bt_comsub','market'); }catch(_){}
+  closeBoat(); switchTab('community');
+}
+
+async function openItem(id){
+  const m = itemOf(id); if(!m) return;
+  marketOpenId = id;
+  const P = document.getElementById('mrPanel');
+  const row = (label, v) => v ? `<div class="mrrow"><span class="mrlbl">${label}</span>
+      <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
+  const mine = canEditItem(m);
+  P.innerHTML = `<div class="mrhead"><b>${esc(m.title||'')}</b><span style="flex:1"></span>
+      <button class="tab" onclick="backToMarket()">목록</button></div>
+    <div class="postmeta">
+      ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span>`:''}
+      <span class="chip">${esc(catName(m.cat))}</span>
+      ${m.region?`<span class="chip">${esc(m.region)}</span>`:''}
+      ${(isAdmin() && m.by)
+        ? `<span class="whoa" onclick="openPerson('${esc(m.by)}')">${esc(m.byName||'')}</span>`
+        : esc(m.byName||'')}
+      · ${esc(String(m.ts||'').slice(0,10))}
+      ${mine?`<button class="minib blu" style="margin-left:auto" onclick="writeItem('${esc(m.id)}')">고치기</button>`:''}</div>
+    ${m.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
+    <div class="mrrow"><span class="mrlbl">가격</span>
+      <b class="mrv" style="flex:1;font-size:18px">${esc(priceText(m) || '가격 미정')}</b></div>
+    ${row('연식', m.year)}
+    ${row('사용 시간', m.hours ? m.hours + '시간' : '')}
+    ${row('있는 곳', m.place)}
+    ${row('연락', m.contact)}
+    ${(m.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
+    ${m.note ? `<div class="ghead"><b>설명</b></div><div class="postbody">${esc(m.note).replace(/\n/g,'<br>')}</div>` : ''}
+    ${mine ? `<div class="mrrow" style="gap:6px;padding:10px 12px"><span class="mrlbl">상태</span>`
+        + MARKET_STATES.map(s2=>`<button class="tchip${(m.state||'sale')===s2.v?' on':''}"
+            onclick="setItemState('${esc(m.id)}','${s2.v}')">${s2.name}</button>`).join('')
+        + `</div>` : ''}
+    ${marketSafety()}
+    <div class="mrrow" style="gap:8px;padding:12px">
+      <button class="mrbtn" onclick="reportItem('${esc(m.id)}')">신고</button>
+      ${canDelItem(m)?`<button class="mrbtn warn" onclick="delItem('${esc(m.id)}')">지우기</button>`:''}
+    </div>
+    ${marketNotice()}`;
+  showPanel(P);
+}
+
+// ── 올리기·고치기
+function writeItem(id){
+  if(!window.__user){ alert('로그인해야 올릴 수 있습니다'); return; }
+  if(myBan){ alert(banNotice()); return; }
+  const m = id ? itemOf(id) : null;
+  if(id && !m) return;
+  if(m && !canEditItem(m)){ alert('올린 분과 운영자만 고칠 수 있습니다'); return; }
+  marketDraft = m ? JSON.parse(JSON.stringify(m)) : { cat:'etc', state:'sale' };
+  itemForm();
+}
+function itemForm(){
+  const d = marketDraft || {};
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>${marketDraft && marketDraft.id ? '물건 고치기' : '팔 물건 올리기'}</b><span style="flex:1"></span>
+      <button class="tab" onclick="backToMarket()">취소</button>
+      <button class="tab on" onclick="itemSave()">올리기</button></div>
+    <div class="mrrow"><span class="mrlbl">제목</span>
+      <input id="mkTitle" style="flex:1" placeholder="예: 야마하 9.9마력 선외기" value="${esc(d.title||'')}"></div>
+    <div class="mrrow"><span class="mrlbl">품목</span></div>
+    <div class="fchips" style="padding:0 12px 8px">${
+      MARKET_CATS.map(c=>`<button class="tchip${(d.cat||'etc')===c.v?' on':''}" onclick="itemSet('cat','${c.v}')">${c.name}</button>`).join('')}</div>
+
+    <div class="mrrow"><span class="mrlbl">가격</span>
+      <input id="mkPrice" type="number" inputmode="numeric" style="flex:1"
+        placeholder="숫자만" value="${esc(String(d.price||''))}" ${(d.free||d.offer)?'disabled':''}> 원</div>
+    <div class="fchips" style="padding:0 12px 8px">
+      <button class="tchip${d.free?' on':''}" onclick="itemSet('free',${d.free?'false':'true'})">무료 나눔</button>
+      <button class="tchip${d.offer?' on':''}" onclick="itemSet('offer',${d.offer?'false':'true'})">가격 제안 받기</button></div>
+
+    <div class="mrrow"><span class="mrlbl">연식</span>
+      <input id="mkYear" type="number" inputmode="numeric" style="width:110px"
+        placeholder="예: 2015" value="${esc(String(d.year||''))}"> 년
+      <span class="mrlbl" style="width:auto;margin-left:10px">사용 시간</span>
+      <input id="mkHours" type="number" inputmode="numeric" style="width:100px"
+        placeholder="예: 450" value="${esc(String(d.hours||''))}"> h</div>
+    <div class="mrnone" style="text-align:left">배와 엔진은 연식과 사용 시간이 값을 가릅니다. 아는 대로 적어 주세요.</div>
+
+    <div class="mrrow"><span class="mrlbl">있는 곳</span>
+      <input id="mkPlace" style="flex:1" placeholder="예: 여수 원형마리나" value="${esc(d.place||'')}"></div>
+    <div class="mrrow"><span class="mrlbl">연락</span>
+      <input id="mkContact" style="flex:1" placeholder="예: 010-0000-0000 / 글판 쪽지" value="${esc(d.contact||'')}"></div>
+    <div class="frow" style="padding:0 12px"><label>설명</label>
+      <textarea id="mkNote" rows="5" placeholder="상태·수리 이력·같이 주는 것 등을 적어 주세요">${esc(d.note||'')}</textarea></div>
+    <div class="fchips" style="padding:0 12px 8px">
+      <button class="fchip" onclick="itemPhoto()">+ 사진 넣기 (${(d.photos||[]).length}장)</button></div>
+    ${marketSafety()}`;
+  showPanel(P);
+  setHeadTitle('중고 장터');
+}
+function itemKeep(){
+  const d = marketDraft = marketDraft || {};
+  const g = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
+  const put = (k, id) => { const v = g(id); if(v !== undefined) d[k] = v; };
+  put('title','mkTitle'); put('price','mkPrice'); put('year','mkYear');
+  put('hours','mkHours'); put('place','mkPlace'); put('contact','mkContact'); put('note','mkNote');
+}
+function itemSet(k, v){
+  itemKeep();
+  const d = marketDraft = marketDraft || {};
+  d[k] = (v === 'true') ? true : (v === 'false') ? false : v;
+  // 무료 나눔과 가격 제안은 같이 켤 수 없다
+  if(k === 'free' && d.free) d.offer = false;
+  if(k === 'offer' && d.offer) d.free = false;
+  itemForm();
+}
+function itemPhoto(){
+  itemKeep();
+  const inp = document.getElementById('mrFile');
+  if(!inp) return;
+  inp.onchange = async ev => {
+    const files = [...(ev.target.files || [])];
+    ev.target.value = '';
+    if(!files.length) return;
+    const d = marketDraft = marketDraft || {};
+    d.photos = (d.photos || []).concat(await resizePhotos(files)).slice(0, 5);
+    itemForm();
+  };
+  inp.click();
+}
+async function itemSave(){
+  itemKeep();
+  const d = marketDraft || {};
+  const title = String(d.title||'').trim();
+  if(!title){ alert('제목을 넣어 주세요'); return; }
+  if(!d.free && !d.offer && !(Number(d.price) > 0)){
+    alert('가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기] 를 눌러 주세요.');
+    return;
+  }
+  const old = d.id ? itemOf(d.id) : null;
+  const body = {
+    id: d.id || ('mk' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+    title, cat: d.cat || 'etc', state: d.state || 'sale',
+    price: d.free || d.offer ? 0 : (Number(d.price) || 0),
+    free: !!d.free, offer: !!d.offer,
+    year: String(d.year||'').trim(), hours: String(d.hours||'').trim(),
+    place: String(d.place||'').trim(), contact: String(d.contact||'').trim(),
+    note: String(d.note||'').trim(), photos: (d.photos||[]).slice(0,5),
+    region: (typeof boatRegion === 'function' ? boatRegion() : '') || '',
+    by: old ? old.by : meUid(), byName: old ? old.byName : meName(),
+    ts: old ? old.ts : new Date().toISOString(),
+    reports: old ? (old.reports || {}) : {},
+    reportN: old ? (old.reportN || 0) : 0,
+    hidden: old ? !!old.hidden : false
+  };
+  const bud = photoBudget(body.photos);
+  if(!bud.ok){ alert('사진 ' + bud.dropped + '장은 넣지 못했습니다.\n\n한 글에 넣을 수 있는 용량을 넘었습니다.'); return; }
+  try{
+    await window.__market.put(body);
+    const i = marketList.findIndex(x=>String(x.id)===String(body.id));
+    if(i >= 0) marketList[i] = body; else marketList.unshift(body);
+    marketDraft = null;
+    openItem(body.id);
+  }catch(e){ alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)); }
+}
+// 팔렸는지 표시 — 올린 사람만
+function setItemState(id, st){
+  const m = itemOf(id); if(!m) return;
+  if(!canEditItem(m)){ alert('올린 분만 바꿀 수 있습니다'); return; }
+  window.__market.edit(id, { state: st })
+    .then(()=>{ m.state = st; openItem(id); })
+    .catch(e=>alert('바꾸지 못했습니다.\n\n' + ((e&&e.message)||e)));
+}
+function delItem(id){
+  const m = itemOf(id); if(!m) return;
+  if(!canDelItem(m)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
+  if(!confirm(`'${m.title}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
+  window.__market.del(id)
+    .then(()=>{ marketList = marketList.filter(x=>String(x.id)!==String(id)); backToMarket(); })
+    .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
+}
+function reportItem(id){
+  const m = itemOf(id); if(!m) return;
+  const me2 = meUid();
+  if(!me2){ alert('신고하려면 로그인이 필요합니다'); return; }
+  const reports = Object.assign({}, m.reports || {});
+  if(reports[me2]){ alert('이미 신고하신 글입니다'); return; }
+  openForm({
+    title:'물건 신고', sub:'무엇이 잘못됐나요?', okText:'신고',
+    fields:[ { key:'why', label:'사유', type:'pick', value:REPORT_REASONS[0].v,
+               options:REPORT_REASONS.map(r=>({ v:r.v, name:r.name, sub:r.sub })) } ],
+    onOk: v => {
+      reports[me2] = v.why;
+      const n = Object.keys(reports).length;
+      const patch = { reports, reportN:n, hidden: n >= MARKET_HIDE_AT };
+      window.__market.edit(id, patch)
+        .then(()=>{ Object.assign(m, patch); alert('신고했습니다'); openItem(id); })
+        .catch(e=>alert('신고하지 못했습니다.\n\n' + ((e&&e.message)||e)));
+    }
+  });
 }
 
 // ===== 정박지 =====
@@ -11846,6 +12187,16 @@ document.addEventListener('visibilitychange', ()=>{
       async del(id){
         await deleteDoc(doc(fdb,'spots',String(id)));
       }
+    };
+    // ── 중고 장터
+    window.__market = {
+      async list(){
+        const snap = await getDocs(query(collection(fdb,'market'), orderBy('ts','desc'), limit(300)));
+        return snap.docs.map(d=>d.data());
+      },
+      async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); return body.id; },
+      async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); },
+      async del(id){ await deleteDoc(doc(fdb,'market',String(id))); }
     };
     window.__initCloud(api);
   }catch(e){

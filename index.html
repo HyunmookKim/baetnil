@@ -1474,6 +1474,52 @@ function resizePhoto(srcOrFile, cb){
 }
 
 // 여러 장을 차례로 줄인다
+// ── ★ 목록에 쓸 작은 사진
+//   56픽셀 자리에 180KB 원본을 내려받고 있었다. 목록 하나에 5MB.
+const THUMB_PX = 240;
+const THUMB_KB = 26;
+function makeThumb(src, cb){
+  const img = new Image();
+  img.onload = ()=>{
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if(!w || !h){ cb(null); return; }
+    const sc = Math.min(1, THUMB_PX / Math.max(w, h));
+    w = Math.round(w*sc); h = Math.round(h*sc);
+    const c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    c.getContext('2d').drawImage(img, 0, 0, w, h);
+    let q = 0.7, out = c.toDataURL('image/jpeg', q);
+    while(out.length > THUMB_KB*1024 && q > 0.3){ q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+    cb(out);
+  };
+  img.onerror = ()=>{ cb(null); };
+  img.src = String(src);
+}
+// 사진을 창고에 올리고 주소로 바꾼다.
+// ★ 이미 주소인 것(http 로 시작)은 그대로 둔다 — 고칠 때마다 또 올리면 창고가 쓰레기로 찬다.
+// ★ 창고를 못 쓰는 상황(로그인 전·오프라인)이면 예전처럼 문서에 담는다. 글은 올라가야 한다.
+async function toStored(list){
+  const photos = [], thumbs = [];
+  for(const p of (list || [])){
+    if(!p) continue;
+    if(/^https?:/i.test(p)){ photos.push(p); thumbs.push(''); continue; }
+    if(!window.__photos){ photos.push(p); thumbs.push(''); continue; }
+    let url = null, turl = '';
+    try{
+      const t = await new Promise(r => makeThumb(p, r));
+      url = await window.__photos.put(p);
+      if(t) turl = await window.__photos.put(t);
+    }catch(e){ url = null; }
+    photos.push(url || p);
+    thumbs.push(turl);
+  }
+  return { photos, thumbs };
+}
+// 목록에 보일 작은 사진. 없으면 원본을 쓴다 (옛 글은 썸네일이 없다).
+function thumbOf(o, i){
+  const k = i || 0;
+  return ((o && o.thumbs) || [])[k] || ((o && o.photos) || [])[k] || '';
+}
 function resizePhotos(list, cb){
   const out = [];
   const step = i => {
@@ -3294,19 +3340,30 @@ function writeTalk(id){
         return false;
       }
       try{ localStorage.setItem('bt_talkreg', v.region); }catch(_){}
-      if(t){
-        const patch = { kind:v.kind, region:v.region, title:v.title, blocks,
-                        body: blocks.filter(x=>x.t==='text').map(x=>x.v).join('\n\n'),
-                        edited: new Date().toISOString() };
-        window.__talk.edit(t.id, patch)
-          .then(()=>{ Object.assign(t, patch); openTalk(t.id); })
-          .catch(e=>alert('저장하지 못했습니다.\n\n' + ((e&&e.message)||e)));
-      } else {
-        const body = talkBody(v, blocks);
-        window.__talk.add(body)
-          .then(()=>{ talkList.unshift(body); openTalk(body.id); })
-          .catch(e=>alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)));
-      }
+      // ★ 사진을 창고로 보내고 주소만 남긴다.
+      //   글 안의 사진 자리(blocks)와 사진 목록(photos)이 같은 것을 가리켜야 하므로
+      //   옛 주소 → 새 주소 짝을 만들어 둘 다 바꾼다. 한쪽만 바꾸면 사진이 사라진다.
+      (async ()=>{
+        const st = await toStored(photos);
+        const map = {};
+        photos.forEach((p, i) => { map[p] = st.photos[i]; });
+        const blocks2 = blocks.map(x => x.t === 'photo' ? Object.assign({}, x, { v: map[x.v] || x.v }) : x);
+        try{
+          if(t){
+            const patch = { kind:v.kind, region:v.region, title:v.title, blocks:blocks2,
+                            photos: st.photos, thumbs: st.thumbs,
+                            body: blocks2.filter(x=>x.t==='text').map(x=>x.v).join('\n\n'),
+                            edited: new Date().toISOString() };
+            await window.__talk.edit(t.id, patch);
+            Object.assign(t, patch); openTalk(t.id);
+          } else {
+            const body = talkBody(v, blocks2);
+            body.photos = st.photos; body.thumbs = st.thumbs;
+            await window.__talk.add(body);
+            talkList.unshift(body); openTalk(body.id);
+          }
+        }catch(e){ alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)); }
+      })();
     }
   });
 }
@@ -6454,7 +6511,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.33';
+const APP_VER = '3.34';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -9748,8 +9805,10 @@ function marketRowsHtml(){
       return String(b.ts||'').localeCompare(String(a.ts||''));
     })
     .map(m=>{
-      const thumb = (m.photos && m.photos[0])
-        ? `<img src="${esc(m.photos[0])}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex:0 0 auto">` : '';
+      // ★ 56픽셀 자리에 원본을 내려받지 않는다
+      const tsrc = thumbOf(m, 0);
+      const thumb = tsrc
+        ? `<img src="${esc(tsrc)}" loading="lazy" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex:0 0 auto">` : '';
       return `<div class="fleet" onclick="openItem('${esc(m.id)}')">
         ${thumb}
         <div class="fmain">
@@ -9920,7 +9979,7 @@ async function itemSave(){
     free: !!d.free, offer: !!d.offer,
     year: String(d.year||'').trim(), hours: String(d.hours||'').trim(),
     place: String(d.place||'').trim(), contact: String(d.contact||'').trim(),
-    note: String(d.note||'').trim(), photos: (d.photos||[]).slice(0,5),
+    note: String(d.note||'').trim(), photos: [], thumbs: [],
     region: (typeof boatRegion === 'function' ? boatRegion() : '') || '',
     by: old ? old.by : meUid(), byName: old ? old.byName : meName(),
     ts: old ? old.ts : new Date().toISOString(),
@@ -9928,6 +9987,9 @@ async function itemSave(){
     reportN: old ? (old.reportN || 0) : 0,
     hidden: old ? !!old.hidden : false
   };
+  // 사진은 창고로 보내고 주소만 문서에 남긴다
+  const st = await toStored((d.photos||[]).slice(0,5));
+  body.photos = st.photos; body.thumbs = st.thumbs;
   const bud = photoBudget(body.photos);
   if(!bud.ok){ alert('사진 ' + bud.dropped + '장은 넣지 못했습니다.\n\n한 글에 넣을 수 있는 용량을 넘었습니다.'); return; }
   try{
@@ -10411,7 +10473,7 @@ async function spotSave(){
     depthFrom: d.depthFrom || null,
     bottom: d.bottom || '', tideNote: String(d.tideNote||'').trim(),
     fac: d.fac || {}, fee: String(d.fee||'').trim(), tel: String(d.tel||'').trim(),
-    note: String(d.note||'').trim(), photos: (d.photos||[]).slice(0,4),
+    note: String(d.note||'').trim(), photos: [], thumbs: [],
     by: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).by || me2 : me2,
     byName: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).byName || meName() : meName(),
     ts: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).ts || new Date().toISOString() : new Date().toISOString(),
@@ -10419,6 +10481,8 @@ async function spotSave(){
     reportN: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).reportN || 0 : 0,
     hidden: spotPickCtx.id ? !!(spotOf(spotPickCtx.id)||{}).hidden : false
   };
+  const st = await toStored((d.photos||[]).slice(0,4));
+  body.photos = st.photos; body.thumbs = st.thumbs;
   const bud = photoBudget(body.photos);
   if(!bud.ok){ alert('사진 ' + bud.dropped + '장은 넣지 못했습니다.\n\n한 자리에 넣을 수 있는 용량을 넘었습니다.'); return; }
   try{
@@ -12979,9 +13043,32 @@ document.addEventListener('visibilitychange', ()=>{
       messagingSenderId: "82328638435",
       appId: "1:82328638435:web:1ee439f2332ae62a8246d6"
     };
+    const { getStorage, ref: sref, uploadString, getDownloadURL, deleteObject } =
+      await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
     const fapp = initializeApp(firebaseConfig);
     const fdb = getFirestore(fapp);
     const fauth = getAuth(fapp);
+    const fst = getStorage(fapp);
+    // ── ★ 사진 창고
+    //   전에는 사진을 글자로 바꿔 문서 안에 넣었다. 그래서
+    //    · 목록을 열 때마다 원본이 통째로 딸려 왔다 (물건 30개면 5MB)
+    //    · 브라우저가 기억하지 못해 같은 사진을 백 번 받았다
+    //   창고에 올리면 주소가 고정되어 브라우저가 알아서 기억한다.
+    //   경로를 photos/{내 계정번호}/ 로 잡아 남의 자리에는 못 쓰게 막는다.
+    window.__photos = {
+      async put(dataUrl){
+        const u = fauth.currentUser;
+        if(!u) throw new Error('로그인해야 사진을 올릴 수 있습니다');
+        const name = Date.now().toString(36) + Math.random().toString(36).slice(2,8) + '.jpg';
+        const r = sref(fst, 'photos/' + u.uid + '/' + name);
+        await uploadString(r, dataUrl, 'data_url');
+        return await getDownloadURL(r);
+      },
+      // 지우기는 되면 좋고 안 되면 그만이다 — 사진이 남는 것보다 글이 안 지워지는 게 나쁘다
+      async del(url){
+        try{ await deleteObject(sref(fst, url)); }catch(_){}
+      }
+    };
 
     // ── 로그인
     // 계정 없이도 앱을 쓸 수 있다. 계정은 여러 기기에서 함께 보거나

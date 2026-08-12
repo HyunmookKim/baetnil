@@ -2130,8 +2130,10 @@ function openWelcome(){
       <b>먼저 로그인해 주세요.</b> 로그인하면 쓰던 배와 기록을 그대로 불러오고,
       휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.</div>
     <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="doGoogle()">Google 계정으로 시작하기</button></div>
-    <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="openAccount()">이메일로 로그인 · 회원가입</button></div>
+    <div class="mrnone" style="text-align:center;padding:6px 0">또는</div>
+    <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="openAccount()">이메일로 시작하기</button></div>
     <div class="mrnone" style="text-align:left">
+      <b>구글(gmail) 계정이 없어도 됩니다.</b> 쓰시는 아무 이메일로 가입하시면 됩니다.<br><br>
       바다에서는 인터넷이 안 될 때가 있습니다. 그럴 때는 로그인 없이 이 기기에서만 쓰다가
       나중에 로그인하셔도 됩니다.</div>
     <div class="mrrow" style="justify-content:center;padding:4px 12px 16px">
@@ -4525,6 +4527,10 @@ function openRoster(){
   if(!can(b,'roster','view')){ alert('명부를 볼 권한이 없습니다'); return; }
   const seeDues = can(b,'dues','view');
   const editD  = can(b,'dues','write');
+  // ★ 예전에는 명부에서 등급을 바꿀 길이 아예 없었다.
+  //   assignRank 는 있는데 화면에 버튼이 없어서, 크루를 정비 담당으로
+  //   올리려면 방법이 없었다. 구성원 관리 권한이 있는 사람에게만 보인다.
+  const canMem = can(b,'members','write');
   const al = seeDues ? rosterAlerts(b) : [];
   const P = document.getElementById('mrPanel');
   const rows = memberRows(b).map(m=>{
@@ -4539,7 +4545,12 @@ function openRoster(){
       <div class="fmain"><div class="fname">${esc(m.name)}${m.me?' <span class="chip">나</span>':''}
         <span class="chip">${esc(m.rankName)}</span></div>
         <div class="fsub">${bits.join(' · ') || '적어 둔 것 없음'}</div></div>
-      ${editD ? `<div class="fbtns"><button class="minib blu" onclick="editRoster('${esc(m.uid)}')">기록</button></div>` : ''}
+      <div class="fbtns">
+        ${editD ? `<button class="minib blu" onclick="editRoster('${esc(m.uid)}')">기록</button>` : ''}
+        ${(canMem && canTouchMember(b, m.uid))
+          ? `<button class="minib" onclick="pickRank('${esc(m.uid)}')">등급</button>
+             <button class="minib red" onclick="removeMemberUI('${esc(m.uid)}')">내보내기</button>` : ''}
+      </div>
     </div>`;
   }).join('');
   P.innerHTML = `<div class="mrhead"><b>회원 명부</b><span style="flex:1"></span>
@@ -4550,6 +4561,39 @@ function openRoster(){
       ).join('<br>')}</div>` : '')
     + rows;
   showPanel(P); boatKeepTabs('roster');
+}
+// 사람 하나의 등급을 바꾼다. 나보다 낮은 자리만 줄 수 있다.
+function pickRank(uid){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'members','write')){ alert('구성원을 관리할 권한이 없습니다'); return; }
+  if(!canTouchMember(b, uid)){ alert('이 사람의 등급은 바꿀 수 없습니다'); return; }
+  const nm = (b.memberNames||{})[uid] || '이 사람';
+  const opts = rankList(b).filter(x => x.pos > myPos(b));
+  if(!opts.length){ alert('줄 수 있는 등급이 없습니다'); return; }
+  openForm({
+    title: nm + ' 의 등급',
+    sub: '내 등급보다 낮은 자리만 줄 수 있습니다',
+    okText: '바꾸기',
+    fields: [ { key:'role', label:'등급', type:'pick',
+                value: String((b.members||{})[uid] || opts[0].id),
+                options: opts.map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) })) } ],
+    onOk: v => {
+      if(!assignRank(b, uid, v.role)) return false;
+      saveLocal();
+      saveBoatCloud(b, true).then(()=>openRoster());
+    }
+  });
+}
+// 사람 하나를 배에서 내보낸다
+function removeMemberUI(uid){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'members','write')){ alert('구성원을 관리할 권한이 없습니다'); return; }
+  const nm = (b.memberNames||{})[uid] || '이 사람';
+  if(!confirm(nm + ' 님을 이 배에서 내보낼까요?\n\n'
+    + '이 배의 기록을 더 이상 보지 못합니다.\n다시 받으려면 새로 가입 신청을 받아야 합니다.')) return;
+  if(!removeMember(b, uid)) return;
+  saveLocal();
+  saveBoatCloud(b, true).then(()=>openRoster());
 }
 // 한 사람의 명부 기록 고치기
 function editRoster(uid){
@@ -4604,12 +4648,21 @@ function askPay(uid){
   saveBoatMembers(b, 'roster');
 }
 // 등급을 한 줄로 요약한다 (전체 3 · 쓰기 5 · 보기 4 · 없음 5)
+// ★ 예전에는 "없음 5 · 보기 10 · 쓰기 2" 처럼 숫자만 늘어놓았다.
+//   그 등급이 무엇을 할 수 있는 등급인지 알 수가 없었다.
+//   이름으로 말해 준다 — 사람이 등급을 만들 때 보는 유일한 설명이다.
 function rankSummary(r){
   if(!r) return '';
   if(r.owner) return '모든 권한 · 고정';
-  const c = { full:0, write:0, view:0, none:0 };
-  PERMS.forEach(p => c[permOf(r, p.k)]++);
-  return PERM_LEVELS.filter(l=>c[l.v]).map(l=>l.name + ' ' + c[l.v]).join(' · ');
+  const nm = p => String(p.name || '').replace(/\s*\(.*\)/, '');
+  const w = PERMS.filter(p => PERM_ORDER[permOf(r, p.k)] >= PERM_ORDER.write);
+  const v = PERMS.filter(p => permOf(r, p.k) === 'view');
+  const few = list => list.slice(0, 3).map(nm).join('·')
+    + (list.length > 3 ? ' 외 ' + (list.length - 3) : '');
+  const bits = [];
+  if(w.length) bits.push(few(w) + ' 쓰기');
+  if(v.length) bits.push(v.length > 3 ? v.length + '가지 보기' : few(v) + ' 보기');
+  return bits.length ? bits.join(' · ') : '할 수 있는 일 없음';
 }
 // 등급 설정 화면
 function openRanks(){
@@ -6114,7 +6167,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.21';
+const APP_VER = '3.22';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

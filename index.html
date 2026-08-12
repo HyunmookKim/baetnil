@@ -1497,7 +1497,9 @@ function openForm(o){
         + ` data-ph="${esc(f.placeholder||'')}"`
         + ` onpaste="onRichPaste(event,'ff${i}')">${richHtml(f.value)}</div>`
         + `<div class="rst" id="ff${i}_st" style="display:none"></div>`
-        + `<div class="fchips"><button class="fchip" onclick="richPickPhoto('ff${i}')">+ 사진 넣기</button></div>`
+        + `<div class="fchips"><button class="fchip" onclick="richPickPhoto('ff${i}')">+ 사진 넣기</button>`
+        + (typeof f.extra === 'function' ? f.extra('ff' + i) : '')
+        + `</div>`
         + `<div class="fhint">그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.</div></div>`;
     }
     if(f.type === 'photos'){
@@ -2804,12 +2806,40 @@ function backToExplore(){
 // 익명이면 장난글이 는다.
 const TALK_KINDS = [
   { v:'ask',   name:'질문',   sub:'몰라서 묻는 것' },
-  { v:'maint', name:'정비',   sub:'고치고 손본 이야기' },
+  // '정비' 와 '장비' 가 헷갈린다는 말을 들었다. 경계를 또렷하게 적는다.
+  { v:'maint', name:'정비',   sub:'내 배를 고친 이야기 · 고장·수리' },
   { v:'trip',  name:'항해기', sub:'다녀온 곳' },
-  { v:'gear',  name:'장비',   sub:'써 본 물건' },
+  { v:'gear',  name:'장비',   sub:'사서 써 본 물건 · 제품 후기' },
   { v:'free',  name:'잡담',   sub:'그 밖의 이야기' }
 ];
 const REGIONS = ['경기·인천','충남','전북','전남','경남','부산','울산','경북','강원','제주','그 밖'];
+// 지역을 정하는 기준점. 배 홈포트에서 가장 가까운 곳을 그 배의 지역으로 본다.
+// ★ 지역마다 여러 점을 둔다 — 한 점만 두면 긴 해안선에서 엉뚱한 곳으로 붙는다.
+const REGION_POINTS = [
+  { r:'경기·인천', lat:37.45, lon:126.60 }, { r:'경기·인천', lat:37.05, lon:126.55 },
+  { r:'충남',      lat:36.78, lon:126.14 }, { r:'충남',      lat:36.30, lon:126.49 },
+  { r:'전북',      lat:35.98, lon:126.71 }, { r:'전북',      lat:35.62, lon:126.50 },
+  { r:'전남',      lat:34.76, lon:127.66 }, { r:'전남',      lat:34.79, lon:126.38 },
+  { r:'전남',      lat:34.31, lon:126.76 },
+  { r:'경남',      lat:34.84, lon:128.42 }, { r:'경남',      lat:35.09, lon:128.85 },
+  { r:'부산',      lat:35.10, lon:129.04 },
+  { r:'울산',      lat:35.50, lon:129.39 },
+  { r:'경북',      lat:36.03, lon:129.38 }, { r:'경북',      lat:37.00, lon:129.41 },
+  { r:'강원',      lat:37.75, lon:128.90 }, { r:'강원',      lat:38.20, lon:128.59 },
+  { r:'제주',      lat:33.51, lon:126.52 }, { r:'제주',      lat:33.24, lon:126.56 }
+];
+// 지금 보는 배의 지역. 배가 여러 척이면 지금 고른 배 기준이다
+// (앱은 늘 배 한 척을 보고 있으므로 따로 '대표 배' 를 두지 않는다).
+function boatRegion(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b || b.lat == null || b.lon == null) return '';
+  let best = '', bd = Infinity;
+  REGION_POINTS.forEach(p=>{
+    const d = (p.lat - b.lat) * (p.lat - b.lat) + (p.lon - b.lon) * (p.lon - b.lon);
+    if(d < bd){ bd = d; best = p.r; }
+  });
+  return best;
+}
 // 신고가 이만큼 쌓이면 사람 손 없이도 목록에서 내린다.
 // 운영자가 없는 새벽에도 험한 글이 오래 남아 있으면 안 된다.
 const TALK_HIDE_AT = 3;
@@ -2966,6 +2996,55 @@ async function renderTalk(){
         <button class="mrbtn ok" onclick="writeTalk()">글쓰기</button></div>`
     + (rows || '<div class="mrnone">아직 글이 없습니다. 첫 글을 써 보세요.</div>');
 }
+// ── 내 배 정비·수리 기록을 글에 붙인다
+// ★ 내 배 것만 붙인다. 남의 배 기록에는 손대지 않는다.
+function talkPickRecord(rid){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b){ alert('배를 등록하면 정비 기록을 붙일 수 있습니다'); return; }
+  const rows = [];
+  (Array.isArray(maint) ? maint : []).forEach(m=>{
+    if(!m.lastDate) return;                      // 한 번도 안 한 것은 쓸 이야기가 없다
+    rows.push({ v:'m:'+m.id, name:m.name || '(이름 없음)',
+                sub:'정기점검 · 마지막 ' + m.lastDate + (m.grp ? ' · ' + m.grp : '') });
+  });
+  (Array.isArray(repair) ? repair : []).forEach(r=>{
+    rows.push({ v:'r:'+r.id, name:r.title || '(제목 없음)',
+                sub:'수리 · ' + (RP_LABEL[r.status] || '') + (r.doneDate ? ' · ' + r.doneDate : '') });
+  });
+  if(!rows.length){ alert('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.'); return; }
+  openForm({
+    title:'정비 기록 넣기',
+    sub:'글에 넣을 기록을 고르세요 (내 배 기록만 나옵니다)',
+    okText:'넣기',
+    fields:[ { key:'pick', label:'기록', type:'pick', value:rows[0].v, options:rows } ],
+    onOk: v => {
+      const [kind, id] = String(v.pick||'').split(':');
+      const text = (kind === 'm') ? talkRecordText('maint', id) : talkRecordText('repair', id);
+      if(!text){ alert('그 기록을 찾지 못했습니다'); return false; }
+      // 편집기 안 커서 자리에 넣는다
+      setTimeout(()=>{ richInsert(rid, [{ t:'text', v:text }]); }, 60);
+    }
+  });
+}
+// 기록 하나를 사람이 읽을 글로 바꾼다
+function talkRecordText(kind, id){
+  if(kind === 'maint'){
+    const m = (Array.isArray(maint) ? maint : []).find(x=>String(x.id)===String(id));
+    if(!m) return '';
+    const hist = (m.history || []).map(h=>h.date).slice(-3).join(', ');
+    return '[정비 기록] ' + (m.name || '') + '\n'
+      + (m.grp ? '계통: ' + m.grp + '\n' : '')
+      + '주기: ' + (m.months || '') + (UNIT_LABEL[m.unit || 'm'] || '') + '\n'
+      + '마지막: ' + (m.lastDate || '—') + '\n'
+      + (hist ? '이력: ' + hist + '\n' : '');
+  }
+  const r = (Array.isArray(repair) ? repair : []).find(x=>String(x.id)===String(id));
+  if(!r) return '';
+  return '[수리 기록] ' + (r.title || '') + '\n'
+    + (r.grp ? '계통: ' + r.grp + '\n' : '')
+    + '상태: ' + (RP_LABEL[r.status] || '') + '\n'
+    + '발견: ' + (r.created || '—') + (r.doneDate ? ' · 완료: ' + r.doneDate : '') + '\n';
+}
 function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
 
@@ -2982,12 +3061,19 @@ function writeTalk(id){
     fields: [
       { key:'kind', label:'말머리', type:'pick', value: t ? t.kind : 'ask',
         options: TALK_KINDS.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
+      // 지역은 배 홈포트에서 자동으로 잡는다. 사람이 지난번에 고른 것이 있으면 그것이 먼저다.
       { key:'region', label:'지역', type:'pick',
-        value: t ? t.region : (lastReg || '그 밖'),
+        value: t ? t.region : (lastReg || boatRegion() || '그 밖'),
         options: REGIONS.map(r=>({ v:r, name:r })) },
       { key:'title', label:'제목', value: t ? t.title : '', placeholder:'제목' },
       { key:'doc', type:'rich', label:'내용',
-        value: t ? (t.blocks || []) : [], placeholder:'내용을 적어 주세요' }
+        value: t ? (t.blocks || []) : [], placeholder:'내용을 적어 주세요',
+        // 정비 이야기를 쓸 때 내 배의 정기점검·수리 기록을 그대로 붙일 수 있다.
+        // 손으로 옮겨 적으면 틀리고 번거롭다.
+        // 칸 번호를 손으로 적으면 칸 순서가 바뀔 때 엉뚱한 곳에 넣는다.
+        // openForm 이 실제 칸 이름을 넘겨준다.
+        extra: b ? (fid => `<button class="fchip" onclick="talkPickRecord('${fid}')">+ 내 배 정비 기록 넣기</button>`) : null
+      }
     ],
     del: (t && canDelTalk(t)) ? { text:'글 지우기', run: ()=>delTalk(t.id) } : null,
     onOk: v => {
@@ -5710,7 +5796,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.12';
+const APP_VER = '3.13';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -10164,43 +10250,125 @@ function wxPick(id){
   const s = wxSpots.find(x=>x.id===id); if(!s) return;
   wxCur = s; wxSet('bt_wxcur', s); wxData=null; renderWeather();
 }
+// ── 날씨 지점 (즐겨찾기)
+// ★ 예전에는 위도·경도를 손으로 치게 했다. 배 위에서 그걸 알 수가 없다.
+//   앱 안에 이미 지도에서 찍는 화면(홈포트)이 있는데 여기만 안 썼다.
+//   이제 지도를 눌러 고른다. 이름 고치기와 지우기도 있다.
+let wxSpotCtx = null;   // { id } — 고치는 중이면 그 지점, 새로 만들면 null
+
+function wxSpotRows(){
+  // 지점 하나하나에 고치기·지우기를 붙인다.
+  // 홈포트에서 자동으로 생긴 지점(port@…)은 배 정보를 고쳐야 바뀐다.
+  return wxSpots.map(s2=>{
+    const auto = String(s2.id).startsWith('port@');
+    return `<div class="fleet"><div class="fmain" onclick="wxPick('${esc(s2.id)}')">
+        <div class="fname">${esc(s2.name)}${wxCur && wxCur.id===s2.id?' <span class="chip whochip">보는 중</span>':''}
+          ${auto?'<span class="chip">홈포트</span>':''}</div>
+        <div class="fsub">${s2.lat!=null?s2.lat.toFixed(4)+', '+s2.lon.toFixed(4):'—'}</div>
+      </div>
+      <div class="fbtns">
+        <button class="minib blu" onclick="wxEditSpot('${esc(s2.id)}')">고치기</button>
+        <button class="minib red" onclick="wxDelSpot('${esc(s2.id)}')">지우기</button>
+      </div></div>`;
+  }).join('');
+}
+function wxSpotList(){
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>날씨 지점</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat();switchTab('home')">← 오늘</button></div>
+    <div class="mrnone" style="text-align:left">자주 보는 자리를 지도에서 찍어 두면 눌러서 바로 볼 수 있습니다.</div>
+    ${wxSpotRows() || '<div class="mrnone">아직 지점이 없습니다</div>'}
+    <div class="mrrow" style="justify-content:center;padding:14px">
+      <button class="mrbtn ok" onclick="wxAddSpot()">+ 지도에서 찍어 추가</button></div>`;
+  showPanel(P);
+  setHeadTitle('날씨 지점');
+}
 function wxAddSpot(){
-  if(!unlocked){ alert('편집 모드에서 추가할 수 있습니다.'); return; }
-  openForm({
-    title: '날씨 지점 추가',
-    sub: '위도·경도를 비워 두면 지금 있는 자리로 저장합니다',
-    okText: '추가',
-    fields: [
-      { key:'name', label:'지점 이름', value:'', placeholder:'예: 안도항' },
-      { key:'lat',  label:'위도 (비워도 됩니다)',  value:'', placeholder:'34.5330', mode:'decimal' },
-      { key:'lon',  label:'경도 (비워도 됩니다)',  value:'', placeholder:'127.7690', mode:'decimal' }
-    ],
-    onOk: v => {
-      if(!v.name){ alert('지점 이름을 넣어 주세요'); return false; }
-      const add = (lat,lon)=>{
-        wxSpots.push({ id:'s'+Date.now(), name:v.name, lat, lon, region: wxNearestRegion(lat,lon) });
-        wxSet('bt_spots', wxSpots); renderWeather();
-      };
-      if(v.lat || v.lon){
-        const la = parseFloat(v.lat), lo = parseFloat(v.lon);
-        if(isNaN(la) || isNaN(lo)){ alert('위도와 경도를 모두 숫자로 넣어 주세요'); return false; }
-        if(la < -90 || la > 90 || lo < -180 || lo > 180){ alert('위도·경도 범위를 확인해 주세요'); return false; }
-        add(la, lo);
-        return;
-      }
-      if(!navigator.geolocation){ alert('위치 기능을 쓸 수 없습니다. 위도·경도를 넣어 주세요.'); return false; }
-      navigator.geolocation.getCurrentPosition(
-        p => add(p.coords.latitude, p.coords.longitude),
-        () => alert('위치를 가져오지 못했습니다. 위도·경도를 직접 넣어 주세요.'));
-    }
+  wxSpotCtx = null;
+  wxSpotPick();
+}
+function wxEditSpot(id){
+  const s2 = wxSpots.find(x=>String(x.id)===String(id));
+  if(!s2){ alert('그 지점을 찾지 못했습니다'); return; }
+  if(String(id).startsWith('port@')){
+    alert('홈포트에서 자동으로 만들어진 지점입니다.\n\n내 배 > 기본 정보에서 홈포트를 고치면 함께 바뀝니다.');
+    return;
+  }
+  wxSpotCtx = { id };
+  wxSpotPick(s2);
+}
+// 지도를 눌러 자리를 고른다. 홈포트 고르는 화면과 같은 방식이다.
+function wxSpotPick(cur){
+  const P = document.getElementById('mrPanel');
+  const has = !!(cur && cur.lat != null);
+  P.innerHTML = `<div class="mrhead"><b>${cur?'지점 고치기':'날씨 지점 추가'}</b><span style="flex:1"></span>
+      <button class="tab" onclick="wxSpotList()">취소</button>
+      <button class="tab on" id="wxSpotSaveBtn" onclick="wxSpotSave()">저장</button></div>
+    <div class="mrrow"><span class="mrlbl">이름</span>
+      <input id="wxSpotName" style="flex:1" placeholder="예: 안도항" autocomplete="off"
+        value="${cur?esc(cur.name):''}"></div>
+    ${mapBox('wxSpotMap','48vh')}
+    <div class="mrnone" style="text-align:left">지도를 탭하면 그 자리로 정해집니다 · 끌어서 이동 · 두 손가락으로 확대</div>
+    <div class="mrrow" style="justify-content:center">
+      <button class="mrbtn" onclick="wxSpotGPS()">현재 위치로</button></div>`;
+  showPanel(P);
+  setHeadTitle(cur ? '지점 고치기' : '날씨 지점');
+  requestAnimationFrame(()=>{
+    mapInit('wxSpotMap', [], { mode:'pick', pick: has ? { lat:cur.lat, lon:cur.lon } : null });
+    if(!has) wxSpotGPS(true);
   });
 }
-function wxDelSpot(){
-  if(!unlocked || !wxCur || wxCur.id==='gps') return;
-  if(!confirm(`"${wxCur.name}" 지점을 삭제할까?`)) return;
-  wxSpots = wxSpots.filter(s=>s.id!==wxCur.id);
+function wxSpotGPS(quiet){
+  if(!navigator.geolocation){ if(!quiet) alert('이 기기에서는 위치 기능을 사용할 수 없습니다.'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      if(!mapS) return;
+      mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
+      const v = fitView([mapS.pick], 360, 300);
+      mapS.z = Math.max(v.z, 13);
+      mapS.cx = MERC.x(mapS.pick.lon, mapS.z); mapS.cy = MERC.y(mapS.pick.lat, mapS.z);
+      mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
+      mapPaint(true);
+    },
+    ()=>{ if(!quiet) alert('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'); }
+  );
+}
+function wxSpotSave(){
+  const el = document.getElementById('wxSpotName');
+  const name = String((el && el.value) || '').trim();
+  if(!name){ alert('지점 이름을 넣어 주세요'); return; }
+  if(!mapS || !mapS.pick){ alert('지도를 탭해서 자리를 찍어 주세요'); return; }
+  const lat = mapS.pick.lat, lon = mapS.pick.lon;
+  if(wxSpotCtx){
+    const s2 = wxSpots.find(x=>String(x.id)===String(wxSpotCtx.id));
+    if(s2){ s2.name = name; s2.lat = lat; s2.lon = lon; s2.region = wxNearestRegion(lat, lon);
+            if(wxCur && wxCur.id === s2.id){ wxCur = s2; wxSet('bt_wxcur', wxCur); wxData = null; } }
+  } else {
+    const spot = { id:'s'+Date.now(), name, lat, lon, region: wxNearestRegion(lat, lon) };
+    wxSpots.push(spot);
+    wxCur = spot; wxSet('bt_wxcur', wxCur); wxData = null;
+  }
   wxSet('bt_spots', wxSpots);
-  wxCur = wxSpots[0] || null; wxSet('bt_wxcur', wxCur); wxData=null; renderWeather();
+  wxSpotCtx = null; mapS = null;
+  closeBoat(); switchTab('home'); setHomeSub('weather');
+}
+function wxDelSpot(id){
+  const s2 = wxSpots.find(x=>String(x.id)===String(id));
+  if(!s2) return;
+  if(String(id).startsWith('port@')){
+    alert('홈포트에서 자동으로 만들어진 지점입니다.\n\n지워도 배를 열면 다시 생깁니다.\n'
+      + '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.');
+    return;
+  }
+  if(!confirm(`'${s2.name}' 지점을 지울까요?\n\n날씨 기록이 지워지는 것은 아닙니다.`)) return;
+  wxSpots = wxSpots.filter(x=>String(x.id)!==String(id));
+  wxSet('bt_spots', wxSpots);
+  // 보던 지점을 지웠으면 다른 곳으로 옮긴다 (빈 화면이 되면 안 된다)
+  if(wxCur && String(wxCur.id) === String(id)){
+    wxCur = wxSpots[0] || null;
+    wxSet('bt_wxcur', wxCur); wxData = null;
+  }
+  wxSpotList();
 }
 
 // ---------- 다리 ----------
@@ -10376,6 +10544,11 @@ function tideSource(){
 }
 
 const COLW = 34;   // 시간당 열 폭(px)
+// ★ 표 왼쪽 이름칸(시각·바람·풍속…)의 폭.
+//   이것을 안 더해서 주황 네모가 늘 왼쪽으로 두 칸쯤 밀려 있었다.
+//   머리글은 22시인데 네모는 20시를 가리켰다. 62 ÷ 34 ≈ 1.8칸.
+//   여기 한 곳에서만 정하고, 표 폭과 네모 자리가 같은 값을 쓴다.
+const WLBL = 62;   // .wlbl 의 width 와 같아야 한다
 
 function fmtHM(ts){ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+'시'; }
 function fmtMD(ts){ const d=new Date(ts); return (d.getMonth()+1)+'/'+d.getDate()+'('+'일월화수목금토'[d.getDay()]+')'; }
@@ -10411,7 +10584,7 @@ function renderWxSel(){
   if(hl && wxData._t0!=null){
     const col = Math.round((wxSel - wxData._t0)/3600e3);
     hl.style.display = col>=0 && col<wxData._n ? '' : 'none';
-    hl.style.left = (col*COLW)+'px';
+    hl.style.left = (WLBL + col * COLW) + 'px';
   }
 }
 
@@ -10445,7 +10618,7 @@ async function renderWeather(){
   const head = `<div class="wxbar"><div class="wxspots">
       <button class="tab${wxCur.id==='gps'?' on':''}" onclick="wxUseGPS()">현재 위치</button>
       ${wxSpots.map(s=>`<button class="tab${wxCur.id===s.id?' on':''}" onclick="wxPick('${s.id}')">${esc(s.name)}</button>`).join('')}
-      <button class="tab edt" onclick="wxAddSpot()">+</button>
+      <button class="tab edt" onclick="wxSpotList()">지점 관리</button>
     </div></div>`;
 
   if(!wxData || wxData.key !== wxCur.lat+','+wxCur.lon){
@@ -10529,7 +10702,7 @@ async function renderWeather(){
 
     const timeline = `
       <div class="wscroll" id="wxScroll">
-        <div class="wgrid" style="width:${N*COLW+62}px">
+        <div class="wgrid" style="width:${N * COLW + WLBL}px">
           <div class="wrow"><div class="wlbl"></div><div class="wcells wdrow">${rowDate}</div></div>
           <div class="wrow"><div class="wlbl">시각</div><div class="wcells">${rowHour}</div></div>
           <div class="wrow"><div class="wlbl">바람</div><div class="wcells">${rowArrow}</div></div>

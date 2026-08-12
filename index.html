@@ -2367,7 +2367,7 @@ function openFleet(){
       }).join('')
     + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
         <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button>
-        <button class="mrbtn big" onclick="joinBoat()">참여 신청</button></div>` : '');
+        <button class="mrbtn big" onclick="joinByCode()">참여 코드로 신청</button></div>` : '');
   showPanel(P);
 }
 // 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
@@ -3419,8 +3419,38 @@ function personFilter(list, q){
     || String(p.email||'').toLowerCase().includes(s)
     || String(p.uid||'').toLowerCase().includes(s));
 }
+// ★ 명부(users)는 3.9 부터 로그인할 때 만들어진다.
+//   그 전에 가입한 사람은 문서가 없어서 목록에 안 나온다.
+//   그래서 배 구성원과 글쓴이에서도 이름을 긁어모아 함께 보여 준다.
+//   (한 번이라도 앱을 다시 켜서 로그인하면 스스로 명부에 올라간다)
+function peopleMerge(users, talk){
+  const map = new Map();
+  const put = (uid, name, email, src) => {
+    const u = String(uid || '').trim();
+    if(!u) return;
+    const had = map.get(u);
+    if(had){
+      if(!had.name && name) had.name = name;
+      if(!had.email && email) had.email = email;
+      return;
+    }
+    map.set(u, { uid:u, name:name || '', email:email || '', src });
+  };
+  (users || []).forEach(x => put(x.uid, x.name, x.email, 'users'));
+  // 내 배들의 구성원
+  (typeof boats !== 'undefined' ? boats : []).forEach(b=>{
+    const nm = b.memberNames || {};
+    Object.keys(b.members || {}).forEach(uid => put(uid, nm[uid] || '', '', 'boat'));
+  });
+  // 글판에 글을 쓴 사람
+  (talk || []).forEach(t => put(t.by, t.byName || '', '', 'talk'));
+  return [...map.values()];
+}
 async function adminPeople(){
-  try{ peopleRows = await window.__people.list(); }catch(e){ peopleRows = []; }
+  let users = [], talk = [];
+  try{ users = await window.__people.list(); }catch(e){ users = []; }
+  try{ talk = talkList && talkList.length ? talkList : await window.__talk.list(); }catch(e){ talk = []; }
+  peopleRows = peopleMerge(users, talk);
   try{ adminRows = await window.__admin.list(); }catch(e){ adminRows = adminRows || []; }
   try{ banRows = isAdmin('userBan') ? await window.__bans.list() : []; }catch(e){ banRows = []; }
   const isBan = u => banRows.some(b=>String(b.uid)===String(u));
@@ -3430,6 +3460,9 @@ async function adminPeople(){
   return `<div class="mrrow"><span class="mrlbl">찾기</span>
       <input id="pQ" style="flex:1" value="${esc(peopleQ)}" placeholder="이름 또는 이메일"
         oninput="peopleQ=this.value;paintPeopleRows()"></div>
+    <div class="mrnone" style="text-align:left">모두 ${peopleRows.length}명.
+      명부는 앱을 켜서 로그인할 때 만들어집니다. 오래 안 들어온 분은
+      다음에 앱을 켜면 저절로 올라옵니다.</div>
     <div id="peopleRows">` + peopleRowsHtml(rows, adm, isBan) + `</div>`;
 }
 function peopleRowsHtml(rows, adm, isBan){
@@ -3623,6 +3656,15 @@ function adminAdd(){
 }
 
 // 커뮤니티 탭 안에 그린다. 덮개(mrPanel)로 띄우면 다른 탭 위에 얹힌 것처럼 보인다.
+// 둘러보기 검색 — 배가 늘면 목록만으로는 못 찾는다
+let exploreQ = '', exploreAll = [];
+function exploreFilter(list){
+  const q = String(exploreQ || '').trim().toLowerCase();
+  if(!q) return list;
+  return list.filter(x =>
+    [x.name, x.port, x.maker, x.model, x.typeName]
+      .some(v => String(v || '').toLowerCase().includes(q)));
+}
 async function openExplore(biz){
   exploreBiz = (biz === true);
   const W = document.getElementById('exploreWrap');
@@ -3638,9 +3680,10 @@ async function openExplore(biz){
   try{ list = await window.__pub.list(exploreBiz); }
   catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
   const hid = hiddenBoats().length;
+  exploreAll = list;
   // 운영자가 감춘 배는 목록에서 뺀다. 운영자에게는 표시해서 보여 준다.
-  const rows = filterHidden(list)
-    .filter(x => !x.adminHidden || isAdmin('boatMod'))
+  const rows = exploreFilter(filterHidden(list)
+    .filter(x => !x.adminHidden || isAdmin('boatMod')))
     .map(x=>`<div class="fleet" onclick="openBoatPage('${esc(x.id)}')">
       <div class="fmain"><div class="fname">${esc(x.name||'이름 없음')}
         <span class="chip">${esc(x.typeName||'')}</span>
@@ -3648,7 +3691,11 @@ async function openExplore(biz){
         ${x.biz?'<span class="chip notice">영업</span>':''}</div>
         <div class="fsub">${esc([x.port, x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
       </div></div>`).join('');
-  W.innerHTML = (rows || `<div class="mrnone">${exploreBiz?'영업 배가 아직 없습니다':'공개된 배가 아직 없습니다'}</div>`)
+  W.innerHTML = `<div class="mrrow"><span class="mrlbl">찾기</span>
+      <input id="expQ" style="flex:1" value="${esc(exploreQ)}"
+        placeholder="배 이름 · 항구 · 제조사 · 모델"
+        oninput="exploreQ=this.value;openExplore(${exploreBiz})"></div>`
+    + (rows || `<div class="mrnone">${exploreQ ? '찾는 배가 없습니다' : (exploreBiz?'영업 배가 아직 없습니다':'공개된 배가 아직 없습니다')}</div>`)
     + (hid ? `<div class="mrrow" style="justify-content:center;padding:12px">
         <button class="minib" onclick="openHidden()">숨긴 배 ${hid}척 보기</button></div>` : '');
 }
@@ -3675,7 +3722,7 @@ async function openBoatPage(id){
       ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>
     ${mine ? `<div class="mrnone">이미 이 배의 구성원입니다</div>`
       : `<div class="mrrow" style="padding:12px">
-          <button class="mrbtn big" style="width:100%" onclick="joinBoat('${esc(x.id)}')">이 배에 가입 신청</button></div>`}`
+          <button class="mrbtn big" style="width:100%" onclick="joinBoat('${esc(x.id)}','${esc(x.name||'')}')">이 배에 가입 신청</button></div>`}`
     + intro
     + sec('제원', spec ? `<div class="postbody">${esc(spec)}</div>` : '')
     + sec('연락처', x.phone ? `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>` : '')
@@ -4599,21 +4646,40 @@ function saveBoatMembers(b, back, id){
   else openBoat('info');
 }
 // 다른 배에 참여 신청하기
-function joinBoat(){
+// ★ 배를 눈으로 찾아 들어왔으면 그 자리에서 바로 신청해야 한다.
+//   참여 코드는 '배를 못 찾을 때 코드로 바로 찾아가는' 다른 길이다.
+//   예전에는 배 페이지에서 눌러도 코드를 또 물어서 아무도 못 들어왔다.
+function joinBoat(boatId, boatName){
+  if(!(typeof window!=='undefined' && window.__user)){
+    alert('참여하려면 먼저 로그인해 주세요'); return;
+  }
+  if(!window.__invites){ alert('인터넷에 연결된 상태에서만 신청할 수 있습니다'); return; }
+  const id = String(boatId || '').trim();
+  if(!id){ joinByCode(); return; }            // 어느 배인지 모르면 코드로 찾는다
+  if(boats.some(x=>String(x.id)===id)){ alert('이미 이 배의 구성원입니다'); return; }
+  if(!confirm((boatName ? boatName + ' 에' : '이 배에') + ' 가입을 신청할까요?\n\n'
+    + '선주가 승인하면 배 목록에 나타납니다.')) return;
+  window.__invites.request(id, window.__user)
+    .then(()=>alert('신청했습니다.\n\n선주가 승인하면 배 목록에 나타납니다.'))
+    .catch(e=>alert('신청하지 못했습니다: ' + ((e && e.message) || e)));
+}
+// 참여 코드로 찾아가기 — 둘러보기에 안 올라온 배에 들어갈 때 쓴다
+function joinByCode(){
   if(!(typeof window!=='undefined' && window.__user)){
     alert('참여하려면 먼저 로그인해 주세요'); return;
   }
   if(!window.__invites){ alert('인터넷에 연결된 상태에서만 신청할 수 있습니다'); return; }
   openForm({
-    title: '다른 배에 참여 신청',
-    sub: '선주에게 받은 참여 코드를 넣어 주세요',
+    title: '참여 코드로 신청',
+    sub: '둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다',
     okText: '신청',
     fields: [ { key:'code', label:'참여 코드', value:'', placeholder:'예: b1723…' } ],
     onOk: v => {
-      if(!v.code){ alert('참여 코드를 넣어 주세요'); return false; }
-      if(boats.some(x=>String(x.id)===String(v.code))){ alert('이미 이 배의 구성원입니다'); return false; }
-      window.__invites.request(String(v.code), window.__user)
-        .then(()=>alert('신청했습니다.\n선주가 승인하면 배 목록에 나타납니다.'))
+      const code = String(v.code || '').trim();
+      if(!code){ alert('참여 코드를 넣어 주세요'); return false; }
+      if(boats.some(x=>String(x.id)===code)){ alert('이미 이 배의 구성원입니다'); return false; }
+      window.__invites.request(code, window.__user)
+        .then(()=>alert('신청했습니다.\n\n선주가 승인하면 배 목록에 나타납니다.'))
         .catch(e=>alert('신청하지 못했습니다: ' + ((e && e.message) || e)));
     }
   });
@@ -5557,6 +5623,37 @@ function syncDown(){
 }
 // 옛 이름 — 다른 곳에서 부르던 것이 있으면 올리기로 이어준다
 function syncNow(){ syncUp(); }
+// ★ 컬렉션마다 어떤 등급 권한이 있어야 쓸 수 있는지.
+//   파이어스토어 규칙에 적힌 것과 반드시 같아야 한다 — 규칙이 진짜 방어선이고,
+//   앱이 더 느슨하면 보내 놓고 permission-denied 를 맞는다.
+//   실제로 크루원을 받은 뒤 이것 때문에 동기화가 통째로 막혔다.
+// 사람에게 보여 줄 이름 (오류 안내에 쓴다)
+const COLL_NAME = {
+  items:'물품', trash:'휴지통', lockers:'수납칸', shapes:'도형', dgimgs:'도면 사진',
+  maint:'정기점검', repair:'수리목록', mrtrash:'정비 휴지통', voyage:'항해일지',
+  fuel:'연료 기록', runs:'엔진 가동', contacts:'연락처', vdocs:'문서',
+  checkt:'출항 전 점검', posts:'게시판', meta:'배 정보'
+};
+const COLL_PERM = {
+  items:'stow', trash:'stow',
+  lockers:'diagram', shapes:'diagram', dgimgs:'diagram',
+  maint:'maint', repair:'maint', mrtrash:'maint',
+  voyage:'voyage',
+  fuel:'fuel', runs:'fuel',
+  contacts:'contact', vdocs:'contact',
+  checkt:'check',
+  posts:'board',
+  meta:'boat'
+};
+// 이 컬렉션을 내 등급으로 올릴 수 있는가.
+// 못 올리는 것은 아예 안 보낸다 — 보내 봐야 거부당하고, 같이 보낸 것까지 막힌다.
+function canPush(coll){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b) return false;
+  const key = COLL_PERM[coll];
+  if(!key) return false;
+  return can(b, key, 'write');
+}
 function schedulePush(){
   if(!cloud || !unlocked) return;
   // 받아오기가 끝나기 전이면 미뤄 둔다. 끝나면 이어서 올린다.
@@ -5605,19 +5702,57 @@ async function pushNow(){
     const payload = {setI, delI, setT, delT, setM, delM, setR, delR,
                      setV, delV, setF, delF, setC, delC, setD, delD, setK, delK, setMT, delMT,
                      setRN, delRN, setL, delL, setDG, delDG, setSH, delSH, setPO, delPO};
+    // ★ 내 등급으로 못 쓰는 컬렉션은 아예 빼고 보낸다.
+    //   보내 봐야 거부당할 뿐 아니라, 같은 배치에 실린 것까지 함께 막힌다.
+    const KEYOF = { setI:'items', delI:'items', setT:'trash', delT:'trash',
+      setM:'maint', delM:'maint', setR:'repair', delR:'repair',
+      setV:'voyage', delV:'voyage', setF:'fuel', delF:'fuel', setRN:'runs', delRN:'runs',
+      setC:'contacts', delC:'contacts', setD:'vdocs', delD:'vdocs',
+      setK:'checkt', delK:'checkt', setMT:'mrtrash', delMT:'mrtrash',
+      setL:'lockers', delL:'lockers', setSH:'shapes', delSH:'shapes',
+      setDG:'dgimgs', delDG:'dgimgs', setPO:'posts', delPO:'posts' };
+    const skipped = new Set();
+    for(const k in payload){
+      const coll = KEYOF[k];
+      if(coll && !canPush(coll)){
+        if(payload[k] && payload[k].length) skipped.add(coll);
+        payload[k] = [];
+      }
+    }
     let pushed = false;
     for(const k in payload){ if(payload[k] && payload[k].length){ pushed = true; break; } }
-    if(pushed){
-      await cloud.push(Object.assign({}, payload, {
+    if(pushed || canPush('meta')){
+      const res = await cloud.push(Object.assign({}, payload, {
+        meta: canPush('meta'),
         itemCount:items.length, trashCount:trash.length,
         maintCount:maint.length, repairCount:repair.length}));
-      // 올린 뒤에만 기준값을 갱신한다
-      lastCloud = curI; lastCloudTrash = curT; lastCloudMaint = curM; lastCloudRepair = curR;
-      lastCloudV = curV; lastCloudF = curF; lastCloudC = curC; lastCloudD = curD; lastCloudK = curK; lastCloudMT = curMT;
-      lastCloudRN = curRN; lastCloudL = curL; lastCloudDG = curDG; lastCloudSH = curSH; lastCloudPO = curPO;
+      // ★ 올라간 것만 기준값을 갱신한다.
+      //   못 올렸는데 갱신하면 그 내용은 영영 안 올라간다. 예전에 그렇게 잃을 뻔했다.
+      const okColl = (res && res.ok) || null;   // null 이면 전부 성공
+      const ok = c => !okColl || okColl.has(c);
+      if(ok('items'))    lastCloud = curI;
+      if(ok('trash'))    lastCloudTrash = curT;
+      if(ok('maint'))    lastCloudMaint = curM;
+      if(ok('repair'))   lastCloudRepair = curR;
+      if(ok('voyage'))   lastCloudV = curV;
+      if(ok('fuel'))     lastCloudF = curF;
+      if(ok('runs'))     lastCloudRN = curRN;
+      if(ok('contacts')) lastCloudC = curC;
+      if(ok('vdocs'))    lastCloudD = curD;
+      if(ok('checkt'))   lastCloudK = curK;
+      if(ok('mrtrash'))  lastCloudMT = curMT;
+      if(ok('lockers'))  lastCloudL = curL;
+      if(ok('shapes'))   lastCloudSH = curSH;
+      if(ok('dgimgs'))   lastCloudDG = curDG;
+      if(ok('posts'))    lastCloudPO = curPO;
       cloudSeeded = true;
+      if(res && res.failed && res.failed.length){
+        // 어느 것이 막혔는지 이름을 말해 준다. '알 수 없는 오류' 는 아무 도움이 안 된다.
+        throw new Error('막힌 자료: ' + res.failed.map(f=>COLL_NAME[f.coll] || f.coll).join(', ')
+          + ' — ' + (res.failed[0].msg || ''));
+      }
     }
-    setSync('동기화됨');
+    setSync(skipped.size ? '동기화됨 (권한 없는 것 제외)' : '동기화됨');
   }catch(e){
     console.error(e);
     lastPushErr = (e && (e.code ? e.code + ' — ' : '') + (e.message || String(e))) || '알 수 없는 오류';
@@ -5796,7 +5931,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.13';
+const APP_VER = '3.14';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -10978,17 +11113,37 @@ document.addEventListener('visibilitychange', ()=>{
         (p.delL||[]).forEach(k=>ops.push(['del','lockers',k]));
         (p.setDG||[]).forEach(i=>ops.push(['set','dgimgs',String(i.id),i]));
         (p.delDG||[]).forEach(k=>ops.push(['del','dgimgs',k]));
-        ops.push(['set','meta','info',{updatedAt:new Date().toISOString(),
-          itemCount:p.itemCount, trashCount:p.trashCount,
-          maintCount:p.maintCount, repairCount:p.repairCount}]);
-        for(let off=0; off<ops.length; off+=200){
-          const b = writeBatch(fdb);
-          ops.slice(off, off+200).forEach(o=>{
-            const r = dc(o[1], o[2]);
-            if(o[0]==='set') b.set(r, o[3]); else b.delete(r);
-          });
-          await b.commit();
+        // ★ meta 는 '배 정보' 쓰기 권한이 있어야 한다. 크루원에게는 없다.
+        //   예전에는 무조건 함께 썼고, 그래서 크루원은 물품 하나도 못 올렸다.
+        //   앱이 올려도 되는지 판단해서 p.meta 로 알려 준다.
+        if(p.meta){
+          ops.push(['set','meta','info',{updatedAt:new Date().toISOString(),
+            itemCount:p.itemCount, trashCount:p.trashCount,
+            maintCount:p.maintCount, repairCount:p.repairCount}]);
         }
+        // ★ 컬렉션마다 따로 보낸다 (perColl).
+        //   파이어스토어 배치는 전부 아니면 전무다. 한 컬렉션이 막히면
+        //   같이 실린 것까지 다 막힌다. 나눠 보내면 나머지는 올라간다.
+        const byColl = {};
+        ops.forEach(o=>{ (byColl[o[1]] = byColl[o[1]] || []).push(o); });
+        const failed = [], ok = new Set();
+        for(const coll in byColl){
+          const list = byColl[coll];
+          try{
+            for(let off=0; off<list.length; off+=200){
+              const b = writeBatch(fdb);
+              list.slice(off, off+200).forEach(o=>{
+                const r = dc(o[1], o[2]);
+                if(o[0]==='set') b.set(r, o[3]); else b.delete(r);
+              });
+              await b.commit();
+            }
+            ok.add(coll);
+          }catch(e){
+            failed.push({ coll, msg: (e && (e.code || e.message)) || String(e) });
+          }
+        }
+        return { ok, failed };
       }
     };
     // 배 지우기 — 딸린 기록까지 지운다.

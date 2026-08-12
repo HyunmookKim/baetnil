@@ -558,6 +558,15 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .wxbar{padding:10px 16px 2px}
 .wxspots{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
 .wxspots .tab{white-space:nowrap;flex-shrink:0}
+/* ★ 내 배 탭이 아홉 개라 세 줄이 됐다. 화면 위쪽을 통째로 먹는다.
+   두 줄에 담기게 이 줄에서만 칩을 촘촘히 한다. */
+.bsubs{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px 2px}
+.bsubs .tab{font-size:11.5px;padding:7px 9px;white-space:nowrap}
+/* 360px 폰에서는 한 줄이 더 생긴다. 거기서만 조금 더 조인다. */
+@media (max-width:380px){
+  .bsubs{gap:4px;padding:8px 8px 2px}
+  .bsubs .tab{font-size:11px;padding:6px 8px}
+}
 .wxnow{margin:8px 16px 0;background:var(--sf);border-radius:15px;padding:14px 15px}
 .wxnowtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
 .wxnowtop b{font-size:15.5px;font-weight:750;color:#EFF0F2}
@@ -2473,9 +2482,11 @@ function openFleet(){
           </div>
         </div>`;
       }).join('')
-    + (unlocked ? `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
-        <button class="mrbtn big" onclick="addBoat()">+ 배 등록하기</button>
-        <button class="mrbtn big" onclick="joinByCode()">참여 코드로 신청</button></div>` : '');
+    + `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
+        <button class="mrbtn big" onclick="needEdit('배를 한 척 더 등록합니다.', addBoat)">+ 배 등록하기</button>
+        <button class="mrbtn big" onclick="needEdit('참여 코드로 다른 배에 신청합니다.', joinByCode)">참여 코드로 신청</button></div>
+      <div class="mrnone" style="text-align:left">배는 여러 척 등록할 수 있습니다.
+        위에서 배를 누르면 그 배로 바뀌고, 기록·날씨·물때가 모두 그 배 기준이 됩니다.</div>`;
   showPanel(P);
 }
 // 목록에서 특정 배의 정보를 연다 (그 배로 바꾼 뒤 연다)
@@ -5164,13 +5175,15 @@ let boatTab = 'info';
 // [키, 이름, 여는 함수, 있어야 하는 권한(없으면 누구나)]
 // ★ 등급이 낮은 사람에게는 아예 안 보여야 한다.
 //   다만 안 보이게 하는 것은 편의일 뿐이다 — 각 화면도 열 때 권한을 다시 본다.
+// ★ 이름에 띄어쓰기를 넣으면 칩이 그만큼 넓어져 줄이 하나 더 생긴다.
+//   아홉 개가 세 줄이 되어 화면 위쪽을 통째로 먹었다. 붙여 쓴다.
 const BOAT_TABS2 = [
-  ['roster',  '회원 명부',  'openRoster',    'roster'],
-  ['ranks',   '등급 설정',  'openRanks',     'ranks'],
-  ['board',   '게시판',     'openBoard',     'board'],
-  ['tasks',   '할 일',      'openMyTasks',   null],
-  ['joins',   '가입 신청',  'openJoinReqs',  'members'],
-  ['publish', '공개 설정',  'openPublish',   'publish']
+  ['roster',  '회원명부',  'openRoster',    'roster'],
+  ['ranks',   '등급설정',  'openRanks',     'ranks'],
+  ['board',   '게시판',    'openBoard',     'board'],
+  ['tasks',   '할일',      'openMyTasks',   null],
+  ['joins',   '가입신청',  'openJoinReqs',  'members'],
+  ['publish', '공개설정',  'openPublish',   'publish']
 ];
 // 이 사람에게 보여 줄 버튼만 고른다
 function boatTabsFor(b){
@@ -5224,13 +5237,12 @@ function setHeadTitle(t){
   if(N) N.innerHTML = `<h1 class="htit">${esc(t || '뱃일')}</h1>`;
 }
 function boatHead(cur){
+  // ★ 두 줄로 나눠 두었더니 아홉 개가 세 줄이 됐다. 한 덩어리로 흘려보내면 두 줄에 담긴다.
   return `<div class="mrhead"><b>내 배</b><span style="flex:1"></span></div>
-    <div class="subrow" style="display:flex">
-      <button class="tab${cur==='info'?' on':''}" onclick="openBoat('info')">기본 정보</button>
+    <div class="bsubs">
+      <button class="tab${cur==='info'?' on':''}" onclick="openBoat('info')">기본정보</button>
       <button class="tab${cur==='spec'?' on':''}" onclick="openBoat('spec')">제원</button>
-      <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">배 소개</button>
-    </div>
-    <div class="subrow" style="display:flex;flex-wrap:wrap;gap:6px;padding-top:6px">`
+      <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">배소개</button>`
     + boatTabsFor(curBoat()).map(([k,name,fn])=>
         `<button class="tab${cur===k?' on':''}" onclick="${fn}()">${name}</button>`).join('')
     + `</div>`;
@@ -5306,8 +5318,8 @@ function openBoat(tab){
       <div class="posrow">${(b.lat != null && b.lon != null)
         ? `📍 ${fmtDeg(b.lat,['N','S'])} ${fmtDeg(b.lon,['E','W'])}`
         : `<span style="color:#7b8794">위치 미지정 — 날씨·물때가 이 자리를 기준으로 표시됩니다</span>`}${
-        unlocked ? `<button class="minib blu" onclick="openPortPick()">${
-          (b.lat != null) ? '지도에서 변경' : '지도에서 지정'}</button>` : ''}</div>
+        `<button class="minib blu" onclick="needEdit('홈포트 위치를 지도에서 정합니다.', openPortPick)">${
+          (b.lat != null) ? '지도에서 변경' : '지도에서 지정'}</button>`}</div>
       <div class="mrrow"><span class="mrlbl">제조사</span>${unlocked
         ? `<input value="${esc(b.maker||'')}" style="flex:1" placeholder="예: Beneteau" onchange="boatField('maker',this.value)">`
         : ro(b.maker)}</div>
@@ -6521,7 +6533,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.35';
+const APP_VER = '3.37';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8251,7 +8263,7 @@ function renderMaintList(){
       <div>엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.<br>
         마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.</div>
       <div class="emptysub">기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.</div>
-      ${unlocked ? `<button class="mrbtn" onclick="mrAdd('maint')">첫 항목 추가하기</button>` : ''}
+      ${true ? `<button class="mrbtn" onclick="needEdit('정비 항목을 넣습니다.', ()=>mrAdd('maint'))">첫 항목 추가하기</button>` : ''}
     </div>`;
     return;
   }
@@ -8321,7 +8333,7 @@ function renderRepairList(){
           <div>고장이나 손상을 발견했을 때 기록하는 곳입니다.<br>
             <b>고장 → 진행 중 → 완료</b> 순으로 상태를 바꿔 가며 관리합니다.</div>
           <div class="emptysub">사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.</div>
-          ${unlocked ? `<button class="mrbtn" onclick="mrAdd('repair')">첫 항목 등록하기</button>` : ''}
+          ${true ? `<button class="mrbtn" onclick="needEdit('수리 항목을 넣습니다.', ()=>mrAdd('repair'))">첫 항목 등록하기</button>` : ''}
         </div>`))
     + (done_.length ? `<div class="ghead" onclick="toggleDone()">
         <span class="garr">${showDone?'&#9662;':'&#9656;'}</span><b>완료된 수리</b><span class="gcnt">${done_.length}</span></div>`
@@ -9138,18 +9150,23 @@ function forceReload(){
 function closeDrawer(){ document.getElementById('drawerOv').classList.remove('open'); }
 function drawerGo(t){ closeDrawer(); switchTab(t); }
 function drawerTrash(){ closeDrawer(); switchTab('stow'); openTrash(); }
+// ★ 보기 전용일 때 버튼을 감추면 기능이 아예 없는 줄 안다.
+//   백업 복원에서 한 번, 배 등록하기에서 또 한 번 같은 일을 겪었다.
+//   감추지 말고, 눌렀을 때 무엇이 필요한지 말하고 그 자리에서 풀어 준다.
+//   판단은 여기 한 곳에만 둔다 — 곳곳에 흩어 놓으면 또 하나를 빠뜨린다.
+function needEdit(what, fn){
+  if(unlocked){ fn(); return; }
+  if(!confirm(what + '\n\n지금은 보기 전용입니다.\n실수로 고치는 것을 막으려고 잠가 두었습니다.\n\n편집 중으로 바꾸고 계속할까요?')) return;
+  toggleLock();
+  fn();
+}
 // ★ 예전에는 보기 전용일 때 이 버튼을 아예 감췄다.
 //   그러면 '데이터 백업' 은 보이는데 '백업 복원' 만 없어서 기능이 사라진 줄 안다.
 //   감추지 말고, 눌렀을 때 무엇이 필요한지 말해 준다.
 function drawerRestore(){
   closeDrawer();
-  if(!unlocked){
-    if(!confirm('백업 복원은 이 기기의 기록을 백업 파일 것으로 갈아 끼웁니다.\n\n'
-      + '실수를 막으려고 보기 전용에서는 잠가 두었습니다.\n\n'
-      + '편집 중으로 바꾸고 계속할까요?')) return;
-    toggleLock();
-  }
-  document.getElementById('restoreFile').click();
+  needEdit('백업 복원은 이 기기의 기록을 백업 파일 것으로 갈아 끼웁니다.',
+    ()=>{ document.getElementById('restoreFile').click(); });
 }
 
 // ----- 항해일지 -----
@@ -12826,7 +12843,7 @@ async function renderWeather(){
         설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.</div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button class="mrbtn" onclick="wxRetryGPS()">현재 위치 다시 시도</button>
-        ${unlocked ? `<button class="mrbtn" onclick="wxAddSpot()">지점 직접 추가</button>` : ''}
+        <button class="mrbtn" onclick="needEdit('날씨 지점을 추가합니다.', wxAddSpot)">지점 직접 추가</button>
       </div>
     </div>`;
     return;

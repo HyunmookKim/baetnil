@@ -5739,8 +5739,117 @@ window.__cloudFailed = async function(){
   setSync('오프라인 · 로컬');
 };
 
+// ── ★ 바뀐 것만 받아오기
+//
+//   전에는 배를 열 때마다 열다섯 컬렉션을 통째로 읽었다. 물품 354개인 배는
+//   한 번에 500번쯤. 무료 한도가 하루 5만 번이니 배 스무 척이 하루 세 번만 열어도
+//   막히고, 막히면 다음 날까지 앱이 안 열린다.
+//
+//   이제 올릴 때 문서마다 _u(올린 시각)를 찍어 두고, 받을 때는 그 뒤 것만 받는다.
+//   조심할 곳이 셋이다.
+//    1) 지운 문서는 자국이 안 남는다 → 서버 개수를 함께 세어 어긋나면 그 칸만 다시 받는다.
+//    2) 백업 복원처럼 로컬이 통째로 바뀌면 지난 셈이 거짓이 된다 → id 지문으로 확인한다.
+//    3) 옛 판 앱이 _u 없이 올릴 수 있다 → 반나절에 한 번은 무조건 통째로 받아 맞춘다.
+const SYNC_BASE_KEY = 'bt_sbase_';
+const SYNC_FULL_MS = 432e5;    // 12시간
+const SYNC_COLLS = ['items','trash','maint','repair','voyage','fuel','runs','contacts',
+                    'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs'];
+function localColl(k){
+  switch(k){
+    case 'items':    return items;
+    case 'trash':    return trash;
+    case 'maint':    return maint;
+    case 'repair':   return repair;
+    case 'voyage':   return voyage;
+    case 'fuel':     return fuel;
+    case 'runs':     return runs;
+    case 'contacts': return contacts;
+    case 'vdocs':    return vdocs;
+    case 'checkt':   return checkt;
+    case 'mrtrash':  return mrTrash;
+    case 'lockers':  return lockers;
+    case 'shapes':   return shapes;
+    case 'posts':    return posts;
+    case 'dgimgs':   return (typeof dgArr === 'function') ? dgArr() : [];
+  }
+  return [];
+}
+// 목록의 지문. 순서가 달라도 같은 값이 나와야 한다 — 받아오는 순서는 그때그때 다르다.
+function collHash(arr){
+  const a = Array.isArray(arr) ? arr : [];
+  const t = a.map(x=>String(x && x.id)).sort().join(',');
+  let h = 0;
+  for(let i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) | 0;
+  return a.length + ':' + h;
+}
+function syncBase(){
+  const id = window.currentBoatId;
+  if(!id) return null;
+  try{ return JSON.parse(localStorage.getItem(SYNC_BASE_KEY + String(id)) || 'null'); }
+  catch(e){ return null; }
+}
+function saveSyncBase(colls){
+  const id = window.currentBoatId;
+  if(!id) return;
+  const o = { at: Date.now(), c: {} };
+  SYNC_COLLS.forEach(k=>{
+    const arr = localColl(k);
+    o.c[k] = { n: arr.length, u: (colls && colls[k] && colls[k].u) || '', h: collHash(arr) };
+  });
+  try{ localStorage.setItem(SYNC_BASE_KEY + String(id), JSON.stringify(o)); }catch(e){}
+}
+function clearSyncBase(){
+  const id = window.currentBoatId;
+  try{ if(id) localStorage.removeItem(SYNC_BASE_KEY + String(id)); }catch(e){}
+}
+// 받은 것을 로컬과 합친다.
+// ★ 아무것도 안 왔다고 통째로 비우면 배 기록이 사라진다. 실제로 겪은 사고다.
+function mergeColl(prev, res){
+  const before = Array.isArray(prev) ? prev : [];
+  if(!res || !Array.isArray(res.rows)) return before;
+  if(res.mode === 'full') return res.rows;
+  const m = new Map(before.map(x=>[String(x && x.id), x]));
+  res.rows.forEach(x=> m.set(String(x && x.id), x));
+  return [...m.values()];
+}
+
+// 지난 셈 중 지금도 믿을 수 있는 칸만 고른다.
+// ★ 판단을 cloudPull 안에 풀어 두면 시험할 수가 없다. 여기 한 곳에 모은다.
+function syncPlan(st, now){
+  const base = {};
+  if(!st || !st.c) return base;
+  if(now - (st.at || 0) >= SYNC_FULL_MS) return base;   // 반나절에 한 번은 통째로
+  SYNC_COLLS.forEach(k=>{
+    const b = st.c[k];
+    // 로컬이 바뀌었으면(백업 복원 등) 지난 셈은 거짓이다
+    if(b && b.h === collHash(localColl(k))) base[k] = b;
+  });
+  return base;
+}
+// 받아온 것을 로컬과 합치고 개수를 맞춘다.
+// ★ 어긋나면 무언가 지워진 것이다 — 지운 문서는 자국을 안 남긴다.
+async function syncReconcile(C, getFull){
+  for(const k of SYNC_COLLS){
+    const res = C[k];
+    if(!res || res.mode !== 'diff') continue;
+    const merged = mergeColl(localColl(k), res);
+    C[k] = (merged.length === res.n)
+      ? { mode:'full', rows: merged, n: res.n, u: res.u }
+      : await getFull(k);
+  }
+  return C;
+}
+
 async function cloudPull(){
-  const r = await cloud.pull();
+  const base = syncPlan(syncBase(), Date.now());
+  const r = await cloud.pull(Object.keys(base).length ? base : null);
+  const C = await syncReconcile((r && r.colls) || {}, k => cloud.pullColl(k));
+  const g = k => (C[k] && Array.isArray(C[k].rows)) ? C[k].rows : null;
+  r.items = g('items'); r.trash = g('trash'); r.maint = g('maint');
+  r.repair = g('repair'); r.voyage = g('voyage'); r.fuel = g('fuel');
+  r.runs = g('runs'); r.contacts = g('contacts'); r.vdocs = g('vdocs');
+  r.checkt = g('checkt'); r.mrtrash = g('mrtrash'); r.lockers = g('lockers');
+  r.shapes = g('shapes'); r.posts = g('posts'); r.dgimgs = g('dgimgs');
   if(Array.isArray(r.maint) && r.maint.length) maint = r.maint;
   if(Array.isArray(r.repair) && r.repair.length) repair = r.repair;
   if(Array.isArray(r.voyage) && r.voyage.length) voyage = r.voyage;
@@ -5789,6 +5898,9 @@ async function cloudPull(){
     setSync('클라우드 비어있음');
     cloudSeedCheck();
   }
+  // ★ 로컬에 다 넣은 다음에 적어야 개수와 지문이 맞는다.
+  //   클라우드가 비어 있으면(seeded 아님) 지난 셈은 거짓이 되므로 버린다.
+  if(r.seeded) saveSyncBase(C); else clearSyncBase();
   if(curScreen()==='maint' || curScreen()==='repair') renderMR();
 }
 // 클라우드에 있는 내 배를 기기 목록에 합친다.
@@ -6231,7 +6343,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.26';
+const APP_VER = '3.28';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7383,6 +7495,9 @@ function backupData(){
 function restoreData(ev){
   const f = ev.target.files[0]; ev.target.value='';
   if(!f) return;
+  // ★ 복원은 로컬을 통째로 갈아 끼운다. 지난 셈을 그대로 두면
+  //   '바뀐 것 없음' 으로 보여 클라우드 자료를 영영 안 받아온다.
+  clearSyncBase();
   const r = new FileReader();
   r.onload = ()=>{
     try{
@@ -8920,7 +9035,7 @@ function addVoyage(){
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
 const LEGAL_VER  = '1.0';
 const LEGAL_DATE = '2026년 8월 12일';
-const LEGAL_OWNER = { name: '김현묵', email: 'jaha814@gmail.com' };
+const LEGAL_OWNER = { name: '김명준', email: 'jaha814@gmail.com' };
 const LEGAL_BIZ = null;   // 사업자등록하면 { name:'상호', no:'000-00-00000', addr:'주소' }
 
 const LEGAL_DOCS = {
@@ -12696,7 +12811,7 @@ document.addEventListener('visibilitychange', ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where,
-            orderBy, limit, writeBatch, FieldPath } =
+            orderBy, limit, writeBatch, FieldPath, getCountFromServer } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -12783,42 +12898,53 @@ document.addEventListener('visibilitychange', ()=>{
     };
     const col = name => collection(fdb, boatPath(), name);
     const dc  = (name, id) => doc(fdb, boatPath(), name, String(id));
+    // ★ 배 하나를 받아올 때마다 열다섯 컬렉션을 통째로 읽고 있었다.
+    //   물품만 354개인 배는 한 번에 500번쯤 읽는다. 무료 한도는 하루 5만 번이니
+    //   배 스무 척이 하루 세 번씩만 열어도 막힌다. 막히면 다음 날까지 앱이 안 열린다.
+    //   그래서 올릴 때 _u(올린 시각)를 찍어 두고, 받을 때는 그 뒤에 바뀐 것만 받는다.
+    const CO = ['items','trash','maint','repair','voyage','fuel','runs','contacts',
+                'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs'];
+    // 받은 문서에서 가장 늦은 _u 를 찾고, _u 는 떼어 낸다.
+    // ★ 떼지 않으면 앱 자료와 백업 파일에 알 수 없는 값이 섞인다.
+    function rowsOf(snap){
+      let u = '';
+      const rows = snap.docs.map(d=>{
+        const o = d.data() || {};
+        if(o._u && o._u > u) u = o._u;
+        delete o._u;
+        return o;
+      });
+      return { rows, u };
+    }
+    async function fullColl(name){
+      const snap = await getDocs(col(name));
+      const r = rowsOf(snap);
+      return { mode:'full', rows:r.rows, n:snap.size, u:r.u };
+    }
+    async function diffColl(name, b){
+      // ★ 지운 문서는 자국을 안 남긴다. 그래서 서버 개수를 함께 세어 둔다.
+      //   앱이 합친 뒤 개수가 어긋나면 그 컬렉션만 통째로 다시 받는다.
+      //   개수 세기와 조회를 줄줄이 기다리면 왕복이 배로 늘어 함께 보낸다.
+      const [cnt, snap] = await Promise.all([
+        getCountFromServer(col(name)),
+        getDocs(query(col(name), where('_u', '>', b.u || '')))
+      ]);
+      const r = rowsOf(snap);
+      return { mode:'diff', rows:r.rows, n:cnt.data().count,
+               u: (r.u > (b.u || '')) ? r.u : (b.u || '') };
+    }
     const api = {
-      async pull(){
+      async pull(base){
         const meta = await getDoc(doc(fdb, boatPath(), 'meta', 'info'));
-        const isnap = await getDocs(col('items'));
-        const tsnap = await getDocs(col('trash'));
-        const msnap = await getDocs(col('maint'));
-        const rsnap = await getDocs(col('repair'));
-        const vsnap = await getDocs(col('voyage'));
-        const fsnap = await getDocs(col('fuel'));
-        const rnsnap = await getDocs(col('runs'));
-        const csnap = await getDocs(col('contacts'));
-        const dsnap = await getDocs(col('vdocs'));
-        const ksnap = await getDocs(col('checkt'));
-        const mtsnap = await getDocs(col('mrtrash'));
-        const lsnap = await getDocs(col('lockers'));
-        const shsnap = await getDocs(col('shapes'));
-        const posnap = await getDocs(col('posts'));
-        const dgsnap = await getDocs(col('dgimgs'));
-        return {
-          seeded: meta.exists(),
-          items: isnap.docs.map(d=>d.data()),
-          trash: tsnap.docs.map(d=>d.data()),
-          maint: msnap.docs.map(d=>d.data()),
-          repair: rsnap.docs.map(d=>d.data()),
-          voyage: vsnap.docs.map(d=>d.data()),
-          fuel: fsnap.docs.map(d=>d.data()),
-          runs: rnsnap.docs.map(d=>d.data()),
-          contacts: csnap.docs.map(d=>d.data()),
-          vdocs: dsnap.docs.map(d=>d.data()),
-          checkt: ksnap.docs.map(d=>d.data()),
-          mrtrash: mtsnap.docs.map(d=>d.data()),
-          lockers: lsnap.docs.map(d=>d.data()),
-          shapes: shsnap.docs.map(d=>d.data()),
-          posts: posnap.docs.map(d=>d.data()),
-          dgimgs: dgsnap.docs.map(d=>d.data())
-        };
+        const colls = {};
+        await Promise.all(CO.map(async name => {
+          const b = base && base[name];
+          colls[name] = b ? await diffColl(name, b) : await fullColl(name);
+        }));
+        return { seeded: meta.exists(), colls };
+      },
+      async pullColl(name){
+        return await fullColl(name);
       },
       async push(p){
         const ops = [];
@@ -12865,6 +12991,9 @@ document.addEventListener('visibilitychange', ()=>{
         //   같이 실린 것까지 다 막힌다. 나눠 보내면 나머지는 올라간다.
         const byColl = {};
         ops.forEach(o=>{ (byColl[o[1]] = byColl[o[1]] || []).push(o); });
+        // ★ 올린 시각. 이 한 번의 올리기에 실린 것은 모두 같은 값을 갖는다.
+        //   컬렉션마다 따로 찍으면 언젠가 한 군데를 빠뜨린다.
+        const stamp = new Date().toISOString();
         const failed = [], ok = new Set();
         for(const coll in byColl){
           const list = byColl[coll];
@@ -12873,7 +13002,9 @@ document.addEventListener('visibilitychange', ()=>{
               const b = writeBatch(fdb);
               list.slice(off, off+200).forEach(o=>{
                 const r = dc(o[1], o[2]);
-                if(o[0]==='set') b.set(r, o[3]); else b.delete(r);
+                // 원래 내용은 그대로 두고 자국만 얹는다
+                if(o[0]==='set') b.set(r, Object.assign({}, o[3], { _u: stamp }));
+                else b.delete(r);
               });
               await b.commit();
             }

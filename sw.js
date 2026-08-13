@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-3.43';
+const CACHE = 'baetnil-3.44';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -66,27 +66,21 @@ async function trimPhotos(){
   }catch(_){}
 }
 
-// 창고 사진 — 저장분 우선.
-// ★ 사진 주소는 올릴 때마다 새로 만들어지므로, 같은 주소의 내용이 바뀌는 일이 없다.
-//   그래서 저장분에 있으면 그것을 믿어도 된다.
+// 창고 사진 — 담아 둔 것이 있으면 그것부터. 없으면 그냥 받아온다.
+//
+// ★ 여기서 '아무 사진이나' 담으면 안 된다.
+//   글판·장터·정박지 사진까지 담으면 400장이 남의 사진으로 차 버리고,
+//   정작 배에 나갔을 때 내 물품·정비·도면 사진이 없다.
+//   그래서 서비스워커는 스스로 담지 않는다.
+//   무엇을 남길지는 앱이 고른다 (primePhoto · keepPhoto).
+//   여기 없는 사진도 브라우저가 한 시간쯤은 자기 저장분에 들고 있으므로
+//   같은 화면을 다시 봐도 인터넷을 다시 쓰지 않는다.
 async function photoFetch(req){
-  let c = null;
   try{
-    c = await caches.open(PHOTOS);
+    const c = await caches.open(PHOTOS);
     const hit = await c.match(req, { ignoreVary:true });
     if(hit) return hit;
   }catch(_){}
-  // ★ <img> 는 no-cors 로 받아오는데, 그렇게 받은 것은 속을 볼 수 없는 껍데기라
-  //   저장분에 담으면 브라우저가 자리를 몇 배로 잡는다.
-  //   그래서 먼저 cors 로 받아 본다. 창고가 cors 를 안 주면 그때 원래대로 받는다.
-  try{
-    const res = await fetch(req.url, { mode:'cors', credentials:'omit' });
-    if(res && res.ok){
-      if(c) c.put(req, res.clone()).then(trimPhotos).catch(()=>{});
-      return res;
-    }
-  }catch(_){}
-  // 담지는 못해도 사진은 보여야 한다
   try{ return await fetch(req); }catch(_){ return new Response('', { status:504 }); }
 }
 

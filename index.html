@@ -1615,6 +1615,65 @@ async function primePhoto(url, dataUrl){
       headers: { 'Content-Type': blob.type || 'image/jpeg' } }));
   }catch(_){}
 }
+// ★ 폰에 남길 사진은 '배 사진' 만이다.
+//
+//   왜 —
+//   폰에 남기는 자리는 400장으로 정해 두었다. 글판·장터·정박지 사진까지
+//   담으면 그 자리가 남의 사진으로 차고, 정작 배에 나갔을 때
+//   내 물품·정비·도면 사진이 없다. 배에서 보려고 찍은 그 사진이 말이다.
+//   그래서 서비스워커는 스스로 담지 않고, 여기서 골라 넣어 준 것만 남는다.
+//
+//   남기는 것 — 적재표 물품 · 정기점검 · 수리 · 항해일지 · 서류 · 배 게시판 · 도면
+//   안 남기는 것 — 글판 · 정박지 · 중고 장터 · 배 소개
+//     (그 셋은 뭍에서 인터넷이 있을 때 보는 것이고,
+//      브라우저가 한 시간쯤은 알아서 들고 있어 다시 봐도 인터넷을 새로 쓰지 않는다)
+const PHOTO_KEEP_MAX = 400;   // sw.js 의 PHOTO_KEEP 과 같아야 한다 — 검사에서 확인한다
+const KEEP_PER_RUN = 40;      // 한 번에 몰아 받지 않는다 (데이터 요금)
+// 배에서 봐야 하는 사진 주소를 모은다
+function boatPhotoUrls(){
+  const out = [];
+  const add = a => (Array.isArray(a) ? a : []).forEach(x=>{
+    if(typeof x === 'string' && /^https?:/i.test(x)) out.push(x); });
+  [ (typeof items==='undefined'?[]:items), (typeof maint==='undefined'?[]:maint),
+    (typeof repair==='undefined'?[]:repair), (typeof voyage==='undefined'?[]:voyage),
+    (typeof vdocs==='undefined'?[]:vdocs), (typeof posts==='undefined'?[]:posts)
+  ].forEach(list=>{
+    (Array.isArray(list) ? list : []).forEach(o => { if(o) add(o.photos); });
+  });
+  // 도면 — 작은 사본은 자료 안에 있으니 큰 것만 챙긴다
+  if(typeof dgImgs !== 'undefined') add([dgImgs.plan, dgImgs.side]);
+  return [...new Set(out)];
+}
+// 사진 한 장을 폰에 챙겨 둔다. 이미 있으면 아무 일도 안 한다.
+async function keepPhoto(url){
+  try{
+    if(!url || !/^https?:/i.test(url)) return false;
+    if(typeof caches === 'undefined') return false;
+    const c = await caches.open(PHOTO_CACHE);
+    if(await c.match(url)) return false;
+    const res = await fetch(url, { mode:'cors', credentials:'omit' });
+    if(!res || !res.ok) return false;
+    await c.put(url, res);
+    return true;
+  }catch(_){ return false; }
+}
+let keepBusy = false;
+// 인터넷이 있을 때 미리 챙겨 둔다 — 배에 나가면 늦다
+async function keepBoatPhotos(){
+  if(keepBusy) return 0;
+  if(typeof navigator !== 'undefined' && navigator.onLine === false) return 0;
+  keepBusy = true;
+  let got = 0;
+  try{
+    const urls = boatPhotoUrls().slice(0, PHOTO_KEEP_MAX);
+    for(const u of urls){
+      if(await keepPhoto(u)) got++;
+      if(got >= KEEP_PER_RUN) break;      // 나머지는 다음 기회에
+    }
+  }catch(_){}
+  keepBusy = false;
+  return got;
+}
 // ★ 사진을 창고로 보내고 → 문서에 들어갈 크기를 재고 → 옛 주소를 새 주소로 바꿀 짝까지 만든다.
 //
 //   왜 한 함수인가 —
@@ -6287,6 +6346,8 @@ async function cloudPull(){
   //   클라우드가 비어 있으면(seeded 아님) 지난 셈은 거짓이 되므로 버린다.
   if(r.seeded) saveSyncBase(C); else clearSyncBase();
   if(curScreen()==='maint' || curScreen()==='repair') renderMR();
+  // 배 사진을 폰에 챙겨 둔다 — 기다리지 않는다
+  setTimeout(()=>{ try{ keepBoatPhotos(); }catch(_){} }, 1500);
 }
 // 클라우드에 있는 내 배를 기기 목록에 합친다.
 // 2.5 까지 앱은 배를 올리기만 하고 받아오지는 않았다. 그래서 컴퓨터에서 켜면
@@ -6736,7 +6797,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.43';
+const APP_VER = '3.44';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -13453,6 +13514,7 @@ document.addEventListener('error', e=>{
   el.alt = '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요';
 }, true);
 window.addEventListener('online', ()=>{
+  try{ keepBoatPhotos(); }catch(_){}
   document.querySelectorAll('img.imgfail').forEach(el=>{
     const u = el.getAttribute('src');
     el.classList.remove('imgfail');

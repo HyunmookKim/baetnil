@@ -457,7 +457,12 @@ body.locked .edt{display:none!important}
 :root{--bg:#101214;--sf:#181B1F;--sf2:#1B1E22;--bd:#2B2F35;--tx:#D7D9DC;--th:#F2F3F5;--tm:#84898F;--td:#5A5F66;--ac:#FF7A45;--acd:#17130F;--red:#F05B52;--yel:#E8B33C;--grn:#46B87C}
 body{background:var(--bg);color:var(--tx);padding-bottom:66px}
 header{background:var(--bg);border-bottom:1px solid #1F2226}
-.sub{font-size:10px;letter-spacing:.18em;color:var(--td);font-weight:600}
+/* ★ 배 이름 + 홈포트 + 동기화 상태가 한 줄에 다 안 들어가면 낱말이 중간에서 끊겨
+   '오프라인 · 로 / 컬' 처럼 흉하게 두 줄이 된다. 넘치면 … 로 줄인다. */
+.sub{font-size:10px;letter-spacing:.18em;color:var(--td);font-weight:600;
+  display:flex;gap:8px;align-items:baseline;white-space:nowrap;overflow:hidden}
+#boatSub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+#syncState{flex:0 0 auto}
 h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 #syncState{font-size:10.5px;font-weight:600;color:var(--tm);letter-spacing:.02em}
 .tab{background:var(--sf2);border:1px solid var(--bd);border-radius:999px;color:#C4C8CD;font-size:12.5px;font-weight:700;padding:8px 13px}
@@ -7156,7 +7161,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.47';
+const APP_VER = '3.48';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -13877,6 +13882,10 @@ document.addEventListener('error', e=>{
   const el = e.target;
   if(!el || el.tagName !== 'IMG') return;
   if(!/^https?:/i.test(el.getAttribute('src') || '')) return;   // 문서에 담긴 옛 사진은 해당 없음
+  // ★ 지도 타일은 사진이 아니다.
+  //   인터넷이 없을 때 지도 칸마다 '사진을 불러오지 못했습니다' 가 도배됐다.
+  //   타일은 원래 안 보이면 그냥 비는 것이 맞다.
+  if(el.classList.contains('mt')) return;
   el.classList.add('imgfail');
   el.alt = '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요';
 }, true);

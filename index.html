@@ -1002,6 +1002,54 @@ let posts = [];
 // FLOORPLAN / SIDEVIEW 는 First 45f5 기본값일 뿐이고,
 // 실제로는 배마다 dgImgs 에 따로 저장한다. null 이면 아직 도면이 없는 배.
 let dgImgs = { plan: null, side: null };
+// ★ 도면의 '작은 사본' — 문서 안에 남겨 두는 640픽셀짜리.
+//
+//   왜 두 벌인가
+//   큰 도면은 창고(Storage)로 보낸다. 700KB 짜리를 파이어스토어 문서에 넣으면
+//   문서 하나 한계(1MB)에 턱걸이하고, 동기화할 때마다 그만큼을 주고받는다.
+//   그런데 창고로 보내면 도면이 '주소' 가 되어 두 가지가 깨진다.
+//     1) 배 위에서 인터넷이 없으면 도면이 안 보인다. 도면은 배 위에서 보는 것이다.
+//     2) 도면에 핀을 찍어 한 장으로 만드는 일(pinShot)은 캔버스에 그려야 하는데,
+//        남의 주소에서 온 그림을 캔버스에 그리면 브라우저가 그 캔버스를 잠근다.
+//   그래서 작은 사본을 문서에 남긴다. 50KB 남짓이라 부담이 없고,
+//   인터넷이 없을 때도 핀 그림을 만들 때도 이것을 쓴다.
+let dgSmall = { plan: null, side: null };
+const DG_SMALL_PX = 760;
+const DG_SMALL_KB = 70;
+// 도면 한 장을 작은 사본으로 줄인다
+function dgShrink(src, cb){
+  try{
+    const img = new Image();
+    img.onload = ()=>{
+      try{
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if(!w || !h){ cb(null); return; }
+        const sc = Math.min(1, DG_SMALL_PX / Math.max(w, h));
+        w = Math.round(w*sc); h = Math.round(h*sc);
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        let q = 0.8, out = c.toDataURL('image/jpeg', q);
+        while(out.length > DG_SMALL_KB*1024 && q > 0.3){ q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+        cb(out);
+      }catch(e){ cb(null); }   // 이미 창고에서 온 그림이면 캔버스가 잠겨 여기로 온다
+    };
+    img.onerror = ()=>cb(null);
+    img.src = String(src);
+  }catch(e){ cb(null); }
+}
+// 화면에 쓸 도면. 창고 주소가 있으면 그것, 없으면 작은 사본.
+function dgShowSrc(k){
+  const key = (k === 'side') ? 'side' : 'plan';
+  return dgImgs[key] || dgSmall[key] || null;
+}
+// 창고에서 못 받았을 때 작은 사본으로 갈아 끼운다 (배 위에서 인터넷이 없다)
+function dgFallback(el, k){
+  const key = (k === 'side') ? 'side' : 'plan';
+  if(!el || el.dataset.fell === '1') return;
+  el.dataset.fell = '1';
+  if(dgSmall[key]) el.src = dgSmall[key];
+}
 // 앱 도면 창고에 올라간 도면이면 그 번호. 백업에는 이 번호만 들어간다.
 let dgRef = { plan: null, side: null };
 // 공개 목록에 띄울지 여부. 창고 저장과는 별개다 — 안 띄워도 창고에는 남는다.
@@ -1010,21 +1058,27 @@ function dgSrc(k){ return dgImgs[k==='side' ? 'side' : 'plan']; }
 // 저장·동기화용: id 붙은 문서 배열 <-> 객체 변환
 
 // ===== 선종별 기본 도면 =====
+// ★ 3.43 에서 다시 그렸다.
+//   전에는 셋 다 '껍데기 선체' 하나뿐이었다. 세일링 요트 측면도에 마스트도 돛도 없었다.
+//   측면도는 마스트·붐·리깅 정비 위치에 핀을 찍으라고 있는 것인데,
+//   그릴 것이 없으니 찍을 데가 없었다. 모터보트·낚싯배도 조타실도 엔진도 없었다.
+//   기본 도면은 새로 온 사람이 제일 먼저 고르는 것이다. 껍데기를 내놓으면 안 된다.
 // 선으로 그린 개략도다. 사진이 아니라 SVG 라 몇 KB 밖에 안 되고 확대해도 안 깨진다.
 // 사용자는 이 위에 자기 배의 칸을 그려 넣으면 된다.
 function svgUrl(t){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t); }
 const DG_BUILTIN = {
   first45: { name:'베네토 퍼스트 45f5', type:'sail' },   // 그림은 아래에서 붙인다
   sail: { name:"세일링 요트 (일반)", type:"sail",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 22 C154 120 82 302 68 470 C60 624 76 802 98 950 L302 950 C324 802 340 624 332 470 C318 302 246 120 200 22 Z\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 40 L200 946\"/></svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M60 238 C200 216 620 206 900 200 C934 198 946 214 940 236 L936 258 C700 316 300 324 120 296 C86 290 60 264 60 238 Z\"/><path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M470 300 L470 392 L560 396 L580 300\"/><path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M700 296 L700 356 L716 356 L716 292\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"7 7\" d=\"M40 268 L960 268\"/></svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 22 C154 120 82 302 68 470 C60 624 76 802 98 950 L302 950 C324 802 340 624 332 470 C318 302 246 120 200 22 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 40 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M126 372 C160 344 240 344 274 372 C286 470 288 566 280 640 L120 640 C112 566 114 470 126 372 Z\"/> <circle cx=\"200\" cy=\"404\" r=\"13\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M182 470 L218 470 L218 512 L182 512 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 668 L288 668 L282 890 L118 890 Z\"/> <circle cx=\"200\" cy=\"720\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M170 856 L230 856 L230 884 L170 884 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M188 214 L212 214 L212 246 L188 246 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1300\"><rect width=\"1000\" height=\"1300\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L935 1078\"/> <path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L78 1108\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M556 100 Q 392 470 258 1052 L560 1034 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M566 132 L922 1058 L648 1000 Z\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"5\" stroke-linecap=\"round\" d=\"M562 1104 L545 70\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"4\" stroke-linecap=\"round\" d=\"M558 1036 L250 1056\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M520 452 L580 448 M528 760 L586 757\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M70 1112 C320 1130 640 1122 930 1076 L950 1122 C900 1182 700 1206 430 1208 C300 1209 190 1200 120 1188 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M404 1108 C480 1078 620 1074 700 1094\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M176 1116 L188 1142 L378 1138 L390 1114\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M424 1206 L404 1288 L506 1292 L522 1200\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M244 1200 L236 1274 L262 1276 L272 1197\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 1168 L970 1168\"/> </svg>" },
   power: { name:"모터보트·요트 (일반)", type:"power",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 40 C168 44 116 150 88 330 C68 520 70 796 78 952 L322 952 C330 796 332 520 312 330 C284 150 232 44 200 40 Z\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 58 L200 948\"/></svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M70 220 L900 196 C940 200 950 226 940 250 L120 306 C88 300 68 262 70 220 Z\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"7 7\" d=\"M40 272 L960 272\"/></svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 26 C150 130 76 320 66 500 C60 660 74 820 92 950 L308 950 C326 820 340 660 334 500 C324 320 250 130 200 26 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 44 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 300 C150 268 250 268 288 300 C298 400 300 500 292 580 L108 580 C100 500 102 400 112 300 Z\"/> <circle cx=\"200\" cy=\"360\" r=\"17\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M104 616 L296 616 L292 900 L108 900 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M150 660 L250 660 L250 780 L150 780 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M176 190 L224 190 L224 232 L176 232 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><rect width=\"1000\" height=\"520\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M62 300 C320 306 620 298 872 254 L946 306 C880 358 420 376 152 358 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M516 298 L516 268 L540 186 L800 176 L866 250 L866 268\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M560 200 L788 192\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M596 180 L606 122 L744 116 L758 176\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M620 138 L738 134\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M104 296 L104 254 M244 292 L244 250 M384 288 L384 248 M100 254 L388 246\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M556 302 L556 344 L706 344 L706 298\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M540 340 L232 358\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M236 336 L226 382\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M170 356 L164 400 L184 402 L192 354\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 330 L970 330\"/> </svg>" },
   fishing: { name:"낚시·유어선 (일반)", type:"fishing",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 34 C170 40 124 168 100 348 C80 528 80 800 88 950 L312 950 C320 800 320 528 300 348 C276 168 230 40 200 34 Z\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 52 L200 946\"/></svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 420\"><rect width=\"1000\" height=\"420\" fill=\"#0a0f14\"/><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M80 216 L840 176 C900 172 934 190 936 222 L130 300 C96 292 78 254 80 216 Z\"/><path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"7 7\" d=\"M40 268 L960 268\"/></svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 24 C148 132 74 330 64 510 C58 668 72 826 90 952 L310 952 C328 826 342 668 336 510 C326 330 252 132 200 24 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 42 L200 948\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M110 400 L290 400 L286 610 L114 610 Z\"/> <circle cx=\"200\" cy=\"452\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M148 660 L252 660 L252 790 L148 790 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M120 236 L280 236 L276 340 L124 340 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M110 830 L290 830 L288 916 L112 916 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><rect width=\"1000\" height=\"520\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M66 286 C330 296 640 288 878 232 L950 292 C884 352 420 372 156 352 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M420 282 L432 166 L646 158 L662 276\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M452 192 L634 186\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M446 216 L446 274 M636 210 L636 268\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3.5\" stroke-linecap=\"round\" d=\"M540 158 L546 62\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M506 82 L582 78\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M118 288 L118 240 M212 286 L212 238 M306 284 L306 236 M114 240 L310 234\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M726 268 L726 222 M812 258 L812 212 M722 222 L816 210\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M160 282 L160 264 L340 260 L340 278\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M470 292 L470 336 L618 336 L618 288\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M460 334 L236 352\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M240 330 L230 376\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M176 350 L170 392 L190 394 L198 348\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 318 L970 318\"/> </svg>" },
 };
+
 DG_BUILTIN.first45.plan = FLOORPLAN;
 DG_BUILTIN.first45.side = SIDEVIEW;
 for(const k in DG_BUILTIN){
@@ -1060,7 +1114,10 @@ function dgArr(){
     if(seed === 'first45')  d = { id:k, ref:'seed' };
     else if(seed)           d = { id:k, ref:'seed:'+seed };         // 선종별 기본 도면
     else if(dgRef[k])       d = { id:k, ref:'lib:'+dgRef[k] };      // 앱 창고에 있는 도면
+    else if(/^https?:/i.test(v)) d = { id:k, url:v };                // 창고에 올린 내 도면 — 주소만
     else                    d = { id:k, img:v };                    // 아직 창고에 못 올린 것 — 그림째 보관
+    // 작은 사본은 어느 경우든 함께 남긴다 — 인터넷이 없을 때와 핀 그림을 만들 때 쓴다
+    if(dgSmall[k] && !d.img) d.small = dgSmall[k];
     if(dgPub[k] === true) d.pub = true;
     a.push(d);
   }
@@ -1071,7 +1128,8 @@ function dgFromArr(a){
   const o = { plan:null, side:null };
   (Array.isArray(a)?a:[]).forEach(d=>{
     if(!d || (d.id!=='plan' && d.id!=='side')) return;
-    if(typeof d.img==='string' && d.img) o[d.id] = d.img;   // 인라인 (창고에 못 올린 것·옛 백업)
+    if(typeof d.url==='string' && d.url) o[d.id] = d.url;   // 창고에 올린 도면 — 주소
+    else if(typeof d.img==='string' && d.img) o[d.id] = d.img;   // 인라인 (창고에 못 올린 것·옛 백업)
     else if(d.ref==='seed') o[d.id] = dgSeedUrl(d.id, 'first45');
     else if(typeof d.ref==='string' && d.ref.startsWith('seed:'))
       o[d.id] = dgSeedUrl(d.id, d.ref.slice(5));            // 선종별 기본 도면
@@ -1081,6 +1139,14 @@ function dgFromArr(a){
   return o;
 }
 // 창고 번호만 따로 읽는다
+// 작은 사본만 따로 읽는다
+function dgSmallFromArr(a){
+  const o = { plan:null, side:null };
+  (Array.isArray(a)?a:[]).forEach(d=>{
+    if(d && (d.id==='plan'||d.id==='side') && typeof d.small==='string' && d.small) o[d.id] = d.small;
+  });
+  return o;
+}
 function dgRefFromArr(a){
   const o = { plan:null, side:null };
   (Array.isArray(a)?a:[]).forEach(d=>{
@@ -1832,6 +1898,8 @@ async function chooseDgPick(i){
   dgImgs = { ...dgImgs, [kind]: url };
   dgRef  = { ...dgRef,  [kind]: d.libId || null };
   dgPub  = { ...dgPub,  [kind]: false };
+  // 고른 도면도 작은 사본을 만들어 둔다 (핀 그림·오프라인용)
+  dgShrink(url, sm => { if(sm){ dgSmall = { ...dgSmall, [kind]: sm }; saveLocal(); } });
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
   if(typeof applyStowDg==='function') applyStowDg();
@@ -1895,8 +1963,12 @@ function uploadDg(k){
     if(!f) return;
     resizeDg(f, async url=>{
       const key = (k==='side' ? 'side' : 'plan');
-      dgImgs = { ...dgImgs, [key]: url };
-      dgRef  = { ...dgRef,  [key]: null };   // 창고에 올리기 전 — 아직 번호가 없다
+      // 작은 사본을 먼저 만든다 — 아직 내 기기의 그림이라 캔버스가 잠기지 않는다
+      const small = await new Promise(r => dgShrink(url, r));
+      const st = await storePhotos([url]);          // 큰 도면은 창고로
+      dgSmall = { ...dgSmall, [key]: small || null };
+      dgImgs = { ...dgImgs, [key]: st.photos[0] || url };
+      dgRef  = { ...dgRef,  [key]: null };   // 앱 도면 창고 번호는 아직 없다
       dgPub  = { ...dgPub,  [key]: false };
       saveLocal();
       if(typeof schedulePush==='function') schedulePush();
@@ -3358,7 +3430,14 @@ function talkRecordText(kind, it){
 function pinShot(pin){
   return new Promise(resolve=>{
     try{
-      const src = (typeof dgSrc === 'function') ? dgSrc(pin.map) : null;
+      // ★ 작은 사본을 먼저 쓴다.
+      //   창고 주소에서 온 그림을 캔버스에 그리면 브라우저가 캔버스를 잠가
+      //   toDataURL 이 막힌다 — 핀 그림이 통째로 안 만들어진다.
+      //   작은 사본은 문서 안에 있는 그림이라 그럴 일이 없다.
+      const key = (pin && pin.map === 'side') ? 'side' : 'plan';
+      const src = (typeof dgSmall !== 'undefined' && dgSmall[key])
+        ? dgSmall[key]
+        : ((typeof dgSrc === 'function') ? dgSrc(pin.map) : null);
       if(!src){ resolve(null); return; }
       const img = new Image();
       img.onload = () => {
@@ -5845,7 +5924,8 @@ async function loadBoatData(){
   shapes  = await get('shapes', []);
   posts   = await get('posts', []);
   seedLockersIfNeeded();
-  { const _dg = await get('dgimgs', []); dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
+  { const _dg = await get('dgimgs', []); dgImgs = dgFromArr(_dg); dgSmall = dgSmallFromArr(_dg);
+    dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
   dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
   seedDgIfNeeded();
 }
@@ -5879,8 +5959,10 @@ async function initStorage(){
     try{ posts = JSON.parse(localStorage.getItem('bt_posts')||'[]'); }catch(_){ posts=[]; }
     seedLockersIfNeeded();
     try{ const _dg = JSON.parse(localStorage.getItem('bt_dgimgs')||'[]');
-      dgImgs = dgFromArr(_dg); dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
-    catch(_){ dgImgs={plan:null,side:null}; dgRef={plan:null,side:null}; dgPub={plan:false,side:false}; }
+      dgImgs = dgFromArr(_dg); dgSmall = dgSmallFromArr(_dg);
+      dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
+    catch(_){ dgImgs={plan:null,side:null}; dgSmall={plan:null,side:null};
+              dgRef={plan:null,side:null}; dgPub={plan:false,side:false}; }
     seedDgIfNeeded();
   }
   boats.forEach(b => migrateRanks(b));   // 옛 역할로 저장된 배를 등급으로 옮긴다
@@ -6165,7 +6247,8 @@ async function cloudPull(){
   if(Array.isArray(r.shapes) && r.shapes.length) shapes = r.shapes;
   if(Array.isArray(r.posts) && r.posts.length) posts = r.posts;
   if(Array.isArray(r.dgimgs) && r.dgimgs.length){
-    dgImgs = dgFromArr(r.dgimgs); dgRef = dgRefFromArr(r.dgimgs); dgPub = dgPubFromArr(r.dgimgs);
+    dgImgs = dgFromArr(r.dgimgs); dgSmall = dgSmallFromArr(r.dgimgs);
+    dgRef = dgRefFromArr(r.dgimgs); dgPub = dgPubFromArr(r.dgimgs);
     dgResolve();   // 번호만 온 도면은 창고에서 받아온다
   }
   lastCloudMaint = snapOf(Array.isArray(r.maint)? r.maint : []);
@@ -6509,12 +6592,14 @@ let fpShown = FP_UNSET;
 function applyStowDg(){
   const fp = document.getElementById('fp');
   const none = document.getElementById('fpNone');
-  const src = dgImgs.plan;
+  const src = dgShowSrc('plan');
   if(src === fpShown) return;
   fpShown = src;
   // 도면이 없으면 도면 보는 법 설명도 숨긴다 (설명할 도면이 없다)
   const hint = document.getElementById('hint');
   if(src){
+    fp.dataset.fell = '';
+    fp.onerror = ()=>dgFallback(fp, 'plan');
     fp.src = src; fp.style.display = '';
     none.style.display = 'none';
     map.classList.remove('nodg');
@@ -6651,7 +6736,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.42';
+const APP_VER = '3.43';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -7852,11 +7937,13 @@ function restoreData(ev){
       // 도면 이미지: 백업에 있으면 그것을, 없으면 칸이 기본 71칸일 때만 기본 도면을 쓴다.
       if(Array.isArray(data.dgimgs) && data.dgimgs.length){
         dgImgs = dgFromArr(data.dgimgs);
+        dgSmall = dgSmallFromArr(data.dgimgs);
         dgRef  = dgRefFromArr(data.dgimgs);
         dgPub  = dgPubFromArr(data.dgimgs);
         dgResolve();
       } else {
         dgImgs = { plan:null, side:null };
+        dgSmall = { plan:null, side:null };
         dgRef  = { plan:null, side:null };
         dgPub  = { plan:false, side:false };
         seedDgIfNeeded();
@@ -8818,7 +8905,7 @@ function setMapKind(k, keepView){
   const t = (curScreen()==='repair') ? 'repair' : 'maint';
   const items = t==='maint' ? maint : repair;
   const pins = items.filter(i=>i.pin && i.pin.map===k);
-  const src = dgSrc(k);
+  const src = dgShowSrc(k);
   if(!src){
     document.getElementById('mrMap').innerHTML =
       `<div style="padding:60px 20px;text-align:center;color:#8a97a8">`
@@ -8829,7 +8916,8 @@ function setMapKind(k, keepView){
     return;
   }
   document.getElementById('mrMap').innerHTML =
-    `<div id="mrPan"><img src="${src}" style="width:100%;display:block;opacity:.92" draggable="false">`
+    `<div id="mrPan"><img src="${src}" style="width:100%;display:block;opacity:.92" draggable="false"`
+    + ` onerror="dgFallback(this,'${k}')">`
     + `<svg id="mrShLayer" viewBox="0 0 100 100" preserveAspectRatio="none">${shSvg(shOf(k))}</svg>`
     + pinLayer(pins, t) + `</div>`
     + `<div class="mrzoom"><button onclick="dgZoom(1.5)">+</button>`

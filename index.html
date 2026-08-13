@@ -495,6 +495,10 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .mrm{font-size:12px;color:var(--tm);margin-top:5px;padding-left:0;line-height:1.5}
 .seedb{font-size:9px;color:var(--yel);border:1px solid #6E5622;border-radius:4px;padding:0 4px;vertical-align:1px}
 .mrnone{color:#3A3F46;font-size:12.5px;text-align:center;margin-top:26px;line-height:1.7}
+.likeb{background:#12212e;border:1px solid #2f5a7a;color:#9ed3f5;border-radius:16px;
+  padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.likeb.on{background:#143a2a;border-color:#2f7a58;color:#8ee6b4}
+.tcnt.good{background:#143a2a;color:#8ee6b4}
 .imgfail{min-width:120px;min-height:70px;border:1px dashed #4a5568;border-radius:8px;
   background:#161a1f;color:#8a97a8;font-size:11.5px;padding:8px;object-fit:contain}
 .mrnone2{font-size:11px;color:#3A3F46}
@@ -3240,6 +3244,7 @@ function canDelTalk(t){
 }
 
 // 글에 붙는 배 정보. 어느 배 사람이 쓴 글인지 보여 준다.
+// 새 글에는 반응 숫자 자리를 0으로 둔다 — 없으면 '도움된 순' 으로 못 줄 세운다
 function talkBody(v, blocks){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const photos = blocks.filter(x => x.t === 'photo').map(x => x.v);
@@ -3253,6 +3258,7 @@ function talkBody(v, blocks){
     by: meUid() || '',
     byName: meName(),
     boatName: (b && b.name) || '',
+    likeN: 0,
     boatType: (b && BOAT_TYPES[b.type]) || '',
     ts: new Date().toISOString(),
     reports: {}, reportN: 0, hidden: false,
@@ -3368,7 +3374,8 @@ async function renderTalk(){
       return `<div class="fleet" onclick="openTalk('${esc(t.id)}')">
         <div class="fmain"><div class="fname">
           <span class="chip">${esc(kn)}</span> ${esc(t.title||'(제목 없음)')}
-          ${n?`<span class="tcnt">${n}</span>`:''}
+          ${n?`<span class="tcnt" title="댓글">${n}</span>`:''}
+          ${(Number(t.likeN)||0) > 0 ? `<span class="tcnt good" title="도움됐어요">${Number(t.likeN)}</span>` : ''}
           ${t.hidden?'<span class="chip notice">숨김</span>':''}</div>
           <div class="fsub">${(isAdmin() && t.by)
               ? `<span class="whoa" onclick="event.stopPropagation();openPerson('${esc(t.by)}')">${esc(t.byName||'(이름 없음)')}</span>`
@@ -3524,6 +3531,86 @@ function pinShot(pin){
     }catch(e){ resolve(null); }
   });
 }
+// ===== 반응 =====
+//
+// 왜 넣는가 —
+//   순위를 매기려는 것이 아니다. 글 쓴 사람이 반응을 받게 하려는 것이다.
+//   정박지 수심을 재서 정성껏 올렸는데 아무 기척이 없으면 두 번은 안 올린다.
+//
+// ★ 이름을 곳마다 다르게 둔다.
+//   글판·게시판은 재미가 아니라 쓸모다 — '좋아요' 보다 '도움됐어요' 가 맞다.
+//   정박지는 '가봤어요', 장터는 '찜' 이 그 자리에서 하는 말이다.
+const LIKE_LABEL = { talk:'도움됐어요', post:'도움됐어요', spots:'가봤어요', market:'찜' };
+//
+// ★ 누가 눌렀는지는 문서에 적지 않는다.
+//   1,000명이 누른 글 하나에 계정 번호를 다 적으면 그 글이 30KB 가 되고,
+//   목록 30개를 열면 900KB 다. 지금까지 줄여 온 것을 도로 까먹는다.
+//   숫자만 문서에 두고, 내가 눌렀는지는 내 폰에 둔다.
+//   기기를 바꾸면 다시 누를 수 있지만 그 정도는 감수할 만하다.
+const LIKE_KEY = 'bt_likes';
+function likedAll(){
+  try{ return JSON.parse(localStorage.getItem(LIKE_KEY) || '{}') || {}; }catch(_){ return {}; }
+}
+function likedOn(kind, id){ return !!likedAll()[kind + ':' + id]; }
+function likedMark(kind, id, on){
+  const o = likedAll(), k = kind + ':' + id;
+  if(on) o[k] = 1; else delete o[k];
+  try{ localStorage.setItem(LIKE_KEY, JSON.stringify(o)); }catch(_){}
+}
+// ★ 0이면 숫자를 아예 안 보인다.
+//   사람이 적을 때 '도움됐어요 0' 이 줄줄이 있으면 죽은 동네로 보인다.
+//   안 넣느니만 못하다.
+function likeCount(n){ const c = Number(n) || 0; return c > 0 ? ' ' + c : ''; }
+function likeBtn(kind, id, n){
+  const on = likedOn(kind, id);
+  return `<button class="likeb${on ? ' on' : ''}" id="lk_${kind}_${esc(String(id))}"`
+    + ` onclick="event.stopPropagation();toggleLike('${kind}','${esc(String(id))}')">`
+    + `${on ? '✓ ' : ''}${LIKE_LABEL[kind] || '도움됐어요'}${likeCount(n)}</button>`;
+}
+// 그 자리의 자료를 찾는다
+function likeRowOf(kind, id){
+  const eq = x => String(x.id) === String(id);
+  if(kind === 'talk')   return (talkList   || []).find(eq) || null;
+  if(kind === 'spots')  return (spotList   || []).find(eq) || null;
+  if(kind === 'market') return (marketList || []).find(eq) || null;
+  if(kind === 'post')   return (typeof postOf === 'function') ? postOf(id) : null;
+  return null;
+}
+// 단추 하나만 다시 그린다 — 화면을 통째로 다시 그리면 보던 자리를 잃는다
+function likeRepaint(kind, id, n){
+  const el = document.getElementById('lk_' + kind + '_' + id);
+  if(!el) return;
+  const on = likedOn(kind, id);
+  el.classList.toggle('on', on);
+  el.innerHTML = (on ? '✓ ' : '') + (LIKE_LABEL[kind] || '도움됐어요') + likeCount(n);
+}
+async function toggleLike(kind, id){
+  if(kind !== 'post' && !window.__user){ alert('로그인해야 누를 수 있습니다'); return; }
+  const row = likeRowOf(kind, id);
+  if(!row) return;
+  const was = likedOn(kind, id);
+  const before = Number(row.likeN) || 0;
+  const next = Math.max(0, before + (was ? -1 : 1));
+  // ★ 화면을 먼저 바꾼다. 인터넷을 기다리게 하면 안 눌린 줄 알고 또 누른다.
+  row.likeN = next;
+  likedMark(kind, id, !was);
+  likeRepaint(kind, id, next);
+  try{
+    if(kind === 'post'){
+      save();                                   // 배 게시판은 배 자료다
+    } else {
+      const api = { talk: window.__talk, spots: window.__spots, market: window.__market }[kind];
+      if(!api) throw new Error('인터넷에 연결되어 있지 않습니다');
+      await api.edit(id, { likeN: next });
+    }
+  }catch(e){
+    // 되돌린다 — 화면과 실제가 어긋난 채로 두면 안 된다
+    row.likeN = before;
+    likedMark(kind, id, was);
+    likeRepaint(kind, id, before);
+    alert('누르지 못했습니다.\n\n' + ((e && e.message) || e));
+  }
+}
 function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
 
@@ -3613,6 +3700,8 @@ async function openTalk(id){
     ${t.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
     ${renderBlocks(t.blocks || [], `talkPhotos('${esc(t.id)}')`)}
     <div class="mrrow" style="gap:8px;padding:12px">
+      ${likeBtn('talk', t.id, t.likeN)}
+      <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportTalk('${esc(t.id)}')">신고</button>
       ${canDelTalk(t)?`<button class="mrbtn warn" onclick="delTalk('${esc(t.id)}')">지우기</button>`:''}
     </div>
@@ -4680,6 +4769,8 @@ function openPost(id){
       : `<div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>`
         + (p.photos||[]).map((u,i)=>
             `<img class="postimg" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
+    <div class="mrrow" style="gap:8px;padding:12px">
+      ${likeBtn('post', p.id, p.likeN)}</div>
     <div class="ghead"><b>댓글</b><span class="gcnt">${(p.comments||[]).length}</span></div>
     ${cs}
     ${can(b,'board','write')?`<div class="mrrow" style="padding:12px">
@@ -6797,7 +6888,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.44';
+const APP_VER = '3.45';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -10376,6 +10467,8 @@ async function openItem(id){
         + `</div>` : ''}
     ${marketSafety()}
     <div class="mrrow" style="gap:8px;padding:12px">
+      ${likeBtn('market', m.id, m.likeN)}
+      <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportItem('${esc(m.id)}')">신고</button>
       ${canDelItem(m)?`<button class="mrbtn warn" onclick="delItem('${esc(m.id)}')">지우기</button>`:''}
     </div>
@@ -10479,7 +10572,7 @@ async function itemSave(){
     free: !!d.free, offer: !!d.offer,
     year: String(d.year||'').trim(), hours: String(d.hours||'').trim(),
     place: String(d.place||'').trim(), contact: String(d.contact||'').trim(),
-    note: String(d.note||'').trim(), photos: [], thumbs: [],
+    note: String(d.note||'').trim(), photos: [], thumbs: [], likeN: old ? (old.likeN||0) : 0,
     region: (typeof boatRegion === 'function' ? boatRegion() : '') || '',
     by: old ? old.by : meUid(), byName: old ? old.byName : meName(),
     ts: old ? old.ts : new Date().toISOString(),
@@ -10692,6 +10785,8 @@ async function openSpot(id){
     ${(s.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
     ${(s.lat!=null && s.lon!=null) ? mapBox('spotMap','40vh') : ''}
     <div class="mrrow" style="gap:8px;padding:12px">
+      ${likeBtn('spots', s.id, s.likeN)}
+      <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportSpot('${esc(s.id)}')">신고</button>
       ${canDelSpot(s)?`<button class="mrbtn warn" onclick="delSpot('${esc(s.id)}')">지우기</button>`:''}
     </div>
@@ -10974,6 +11069,7 @@ async function spotSave(){
     bottom: d.bottom || '', tideNote: String(d.tideNote||'').trim(),
     fac: d.fac || {}, fee: String(d.fee||'').trim(), tel: String(d.tel||'').trim(),
     note: String(d.note||'').trim(), photos: [], thumbs: [],
+    likeN: spotPickCtx.id ? ((spotOf(spotPickCtx.id)||{}).likeN || 0) : 0,
     by: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).by || me2 : me2,
     byName: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).byName || meName() : meName(),
     ts: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).ts || new Date().toISOString() : new Date().toISOString(),

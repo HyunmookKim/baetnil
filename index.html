@@ -501,6 +501,11 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .seedb{font-size:9px;color:var(--yel);border:1px solid #6E5622;border-radius:4px;padding:0 4px;vertical-align:1px}
 .mrnone{color:#3A3F46;font-size:12.5px;text-align:center;margin-top:26px;line-height:1.7}
 .hcard.ins{border-color:#2f6c96;background:#0f1d29}
+.hcard.intro{border-color:#2b4a63}
+.introl{display:flex;gap:10px;align-items:baseline;padding:7px 0;line-height:1.55}
+.introl b{flex:0 0 auto;color:#9ed3f5;font-size:13.5px;font-weight:700}
+.introl span{flex:1;min-width:0;color:#8a97a8;font-size:12.5px}
+@media (max-width:380px){ .introl{display:block} .introl span{display:block;margin-top:2px} }
 .insstep{display:flex;gap:10px;align-items:flex-start;padding:14px 14px;border-bottom:1px solid #1c2530;
   font-size:14px;line-height:1.6;color:#cfd8e3}
 .instx{flex:1;min-width:0}
@@ -2293,11 +2298,19 @@ function openAccount(){
       <div class="mrnone" style="text-align:left">운영자로 세워 달라고 할 때 이 번호를 알려 주시면 됩니다.</div>
       <div class="mrrow" style="justify-content:flex-end">
         <button class="mrbtn warn" onclick="doSignOut()">로그아웃</button></div>
+      <div class="mrrow"><span class="mrlbl">옛 사진</span>
+        <span class="mrm" style="flex:1">문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다</span>
+        <b class="mrv" id="oldPhotoN">—</b></div>
       <div class="ddiv"></div>
       <div class="mrnone" style="text-align:left">계정을 아주 지우면 클라우드에 있는 내 배 기록과
         커뮤니티에 올린 글이 함께 사라집니다. 되돌릴 수 없습니다.</div>
       <div class="mrrow" style="justify-content:flex-end">
         <button class="mrbtn warn" onclick="openWipe()">계정 지우기</button></div>`;
+    // 옛 사진이 몇 장 남았는지 — 화면을 그린 뒤에 채운다
+    setTimeout(()=>{ try{
+      const el = document.getElementById('oldPhotoN');
+      if(el) el.textContent = oldPhotoCount() + '장';
+    }catch(_){} }, 0);
   } else {
     P.innerHTML = `<div class="mrhead"><b>로그인</b><span style="flex:1"></span>
         </div>
@@ -3460,10 +3473,10 @@ async function listAll(api){
   }catch(e){ return []; }
 }
 // '더 보기' 는 이어서 받는다. 처음부터 다시 받으면 같은 글이 겹친다.
-async function listMore(k, api){
+async function listMore(k, api, ord){
   if(!api) return;
   try{
-    const r = await api.list(true);
+    const r = await api.list(true, ord);
     listSet(k, listRows(k).concat(r.rows || []), r.done);
   }catch(e){ alert('더 불러오지 못했습니다.\n\n' + ((e && e.message) || e)); }
   listRefresh_draw(k);
@@ -3473,7 +3486,7 @@ function listRefresh_draw(k){
   else if(k === 'market') renderMarket();
   else if(k === 'spots') renderSpots();
 }
-async function talkMore(){   await listMore('talk',   window.__talk); }
+async function talkMore(){   await listMore('talk',   window.__talk, talkSort); }
 async function marketMore(){ await listMore('market', window.__market); }
 async function spotMore(){   await listMore('spots',  window.__spots); }
 // 목록 아래에 붙는 줄 — 한 곳에서만 만든다
@@ -3502,7 +3515,7 @@ async function renderTalk(){
   if(!listFresh('talk')){
     W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
     try{
-      const r = await window.__talk.list(false);
+      const r = await window.__talk.list(false, talkSort);
       listSet('talk', r.rows, r.done);
     }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
   }
@@ -3538,7 +3551,14 @@ async function renderTalk(){
         </div></div>`;
     }).join('');
 
-  W.innerHTML = kinds + regs
+  const sorts = `<div class="tfilt">`
+    + `<button class="tchip${talkSort==='ts'?' on':''}" onclick="setTalkSort('ts')">새 글 순</button>`
+    + `<button class="tchip${talkSort==='likeN'?' on':''}" onclick="setTalkSort('likeN')">도움된 순</button>`
+    + `</div>`;
+  W.innerHTML = kinds + regs + sorts
+    + (talkSort === 'likeN'
+        ? `<div class="mrnone" style="text-align:left">도움됐어요가 눌린 순서입니다.
+            아주 오래된 글은 여기 안 나올 수 있습니다.</div>` : '')
     + `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
         <button class="mrbtn ok" onclick="writeTalk()">글쓰기</button></div>`
     + (rows || '<div class="mrnone">아직 글이 없습니다. 첫 글을 써 보세요.</div>')
@@ -3804,6 +3824,112 @@ function paintInstallMenu(){
   if(el) el.style.display = isStandalone() ? 'none' : '';
 }
 
+// ===== 옛 자료 손보기 =====
+//
+// 왜 필요한가 —
+//   3.34~3.43 에서 사진을 문서 밖 창고로 옮겼다. 그런데 옮겨지는 것은
+//   '그 뒤에 새로 저장한 것' 뿐이다. 이미 올라가 있던 사진은 그대로 문서 안에 있다.
+//   그것들이 남아 있는 한 문서는 무겁고, 동기화할 때마다 그만큼을 주고받는다.
+//
+// ★ 조심할 것
+//   1. 자료를 고치는 일이다. 한 번에 몰아 하지 않는다 — 중간에 끊기면 반쪽이 된다.
+//      한 번에 몇 장씩만 옮기고, 다음에 또 온다.
+//   2. 창고에 못 올리면 그냥 둔다. 억지로 지우지 않는다.
+//   3. 내 배 자료만 손댄다. 남이 올린 글은 남의 것이다.
+const OLDFIX_PER_RUN = 6;          // 한 번에 옮길 사진 수
+let oldFixBusy = false;
+// 문서 안에 글자로 든 사진인가 (창고 주소가 아닌 것)
+function isInlinePhoto(v){
+  return typeof v === 'string' && v.slice(0, 5) === 'data:';
+}
+// 옛 사진이 몇 장 남아 있나
+function oldPhotoCount(){
+  let n = 0;
+  const cnt = a => (Array.isArray(a) ? a : []).forEach(x => { if(isInlinePhoto(x)) n++; });
+  [ (typeof items==='undefined'?[]:items), (typeof maint==='undefined'?[]:maint),
+    (typeof repair==='undefined'?[]:repair), (typeof voyage==='undefined'?[]:voyage),
+    (typeof vdocs==='undefined'?[]:vdocs), (typeof posts==='undefined'?[]:posts)
+  ].forEach(list => (Array.isArray(list) ? list : []).forEach(o => { if(o) cnt(o.photos); }));
+  try{ (curBoat() && curBoat().intro || []).forEach(x=>{ if(x && x.t==='photo' && isInlinePhoto(x.v)) n++; }); }catch(_){}
+  ['plan','side'].forEach(k=>{ if(typeof dgImgs !== 'undefined' && isInlinePhoto(dgImgs[k])) n++; });
+  return n;
+}
+// 옛 사진을 조금씩 창고로 옮긴다
+async function fixOldPhotos(){
+  if(oldFixBusy) return 0;
+  if(!window.__photos) return 0;                       // 창고를 못 쓰면 나중에
+  if(typeof navigator !== 'undefined' && navigator.onLine === false) return 0;
+  oldFixBusy = true;
+  let 옮김 = 0, 바뀜 = false;
+  try{
+    const lists = [ (typeof items==='undefined'?null:items), (typeof maint==='undefined'?null:maint),
+                    (typeof repair==='undefined'?null:repair), (typeof voyage==='undefined'?null:voyage),
+                    (typeof vdocs==='undefined'?null:vdocs) ];
+    for(const list of lists){
+      if(!Array.isArray(list)) continue;
+      for(const o of list){
+        if(옮김 >= OLDFIX_PER_RUN) break;
+        if(!o || !Array.isArray(o.photos)) continue;
+        for(let i = 0; i < o.photos.length; i++){
+          if(옮김 >= OLDFIX_PER_RUN) break;
+          if(!isInlinePhoto(o.photos[i])) continue;
+          const st = await storePhotos([o.photos[i]]);
+          const u = st.photos[0];
+          if(u && !isInlinePhoto(u)){ o.photos[i] = u; 옮김++; 바뀜 = true; }
+          else break;                                  // 못 올렸다 — 이번엔 그만둔다
+        }
+      }
+      if(옮김 >= OLDFIX_PER_RUN) break;
+    }
+    if(바뀜){ save(); }
+  }catch(_){}
+  oldFixBusy = false;
+  return 옮김;
+}
+// 옛 도면도 창고로 (작은 사본을 먼저 만든다 — 그래야 핀 그림을 계속 만들 수 있다)
+async function fixOldDrawings(){
+  if(!window.__photos) return 0;
+  let n = 0;
+  for(const k of ['plan','side']){
+    try{
+      if(typeof dgImgs === 'undefined' || !isInlinePhoto(dgImgs[k])) continue;
+      if(typeof dgSeedKeyOf === 'function' && dgSeedKeyOf(k, dgImgs[k])) continue;   // 기본 도면은 그대로
+      const big = dgImgs[k];
+      const small = dgSmall[k] || await new Promise(r => dgShrink(big, r));
+      const st = await storePhotos([big]);
+      if(st.photos[0] && !isInlinePhoto(st.photos[0])){
+        dgSmall = { ...dgSmall, [k]: small || null };
+        dgImgs  = { ...dgImgs,  [k]: st.photos[0] };
+        n++;
+      }
+    }catch(_){}
+  }
+  if(n){ saveLocal(); if(typeof schedulePush === 'function') schedulePush(); }
+  return n;
+}
+// 내가 올린 옛 글에 반응 숫자 자리를 채운다.
+// ★ 이것이 없으면 '도움된 순' 으로 줄 세울 때 그 칸이 없는 글이 통째로 빠진다.
+async function fixOldLikes(){
+  if(!window.__user) return 0;
+  const me2 = meUid();
+  let n = 0;
+  for(const [name, api] of [['talk', window.__talk], ['spots', window.__spots], ['market', window.__market]]){
+    if(!api) continue;
+    const list = name === 'talk' ? talkList : name === 'spots' ? spotList : marketList;
+    for(const o of (Array.isArray(list) ? list : [])){
+      if(!o || String(o.by) !== String(me2)) continue;
+      if(typeof o.likeN === 'number') continue;
+      try{ await api.edit(o.id, { likeN: 0 }); o.likeN = 0; n++; }catch(_){}
+    }
+  }
+  return n;
+}
+// 켠 뒤 조용히 한 번씩 손본다. 사람 앞을 막지 않는다.
+async function fixOldQuietly(){
+  try{ await fixOldDrawings(); }catch(_){}
+  try{ await fixOldPhotos(); }catch(_){}
+}
+
 // ===== 반응 =====
 //
 // 왜 넣는가 —
@@ -3883,6 +4009,16 @@ async function toggleLike(kind, id){
     likeRepaint(kind, id, before);
     alert('누르지 못했습니다.\n\n' + ((e && e.message) || e));
   }
+}
+// ★ '도움된 순' 은 파이어스토어가 그 칸으로 줄을 세운다.
+//   그런데 그 칸이 없는 문서는 아예 안 나온다 — 옛 글이 통째로 사라진다.
+//   그래서 켤 때 내 옛 글에 0 을 채워 두고(fixOldLikes), 그 뒤에 쓴다.
+//   남이 쓴 옛 글은 내가 못 고치므로, 고를 때 그 사실을 적어 준다.
+let talkSort = 'ts';
+function setTalkSort(v){
+  talkSort = (v === 'likeN') ? 'likeN' : 'ts';
+  listDrop('talk');          // 줄 세우기가 바뀌면 받아 둔 것은 못 쓴다
+  renderTalk();
 }
 function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
@@ -6712,6 +6848,10 @@ async function cloudPull(){
   if(curScreen()==='maint' || curScreen()==='repair') renderMR();
   // 배 사진을 폰에 챙겨 둔다 — 기다리지 않는다
   setTimeout(()=>{ try{ keepBoatPhotos(); }catch(_){} }, 1500);
+  // 옛 사진·도면이 아직 문서 안에 있으면 조금씩 창고로 옮긴다
+  setTimeout(()=>{ try{ fixOldQuietly(); }catch(_){} }, 4000);
+  // 내가 쓴 옛 글에 반응 숫자 자리를 채운다 — '도움된 순' 에서 빠지지 않게
+  setTimeout(()=>{ try{ fixOldLikes(); }catch(_){} }, 6000);
 }
 // 클라우드에 있는 내 배를 기기 목록에 합친다.
 // 2.5 까지 앱은 배를 올리기만 하고 받아오지는 않았다. 그래서 컴퓨터에서 켜면
@@ -7161,7 +7301,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.48';
+const APP_VER = '3.51';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8796,6 +8936,32 @@ function renderCurrent(){
 
 // ===== 오늘 =====
 // 앱을 켜는 첫 이유는 '오늘 나갈 수 있나' 이다. 한 화면에서 답이 나와야 한다.
+// ★ 처음 온 사람이 보는 카드. 이 앱이 뭘 해 주는지 네 줄로 말한다.
+//   기능 이름을 늘어놓지 않는다 — '무엇이 편해지는가' 로 적는다.
+const INTRO_LINES = [
+  ['지금 나가도 되나', '바람·돌풍·파고·물때를 한 화면에서 보고 판단합니다'],
+  ['그거 어디 뒀더라', '배 도면 위에 칸을 그려 두고 물건을 넣어 둡니다'],
+  ['정비 때를 놓치지 않게', '주기마다 알려 주고, 한 일은 기록으로 남습니다'],
+  ['항해일지', '출항·입항 시각과 그때 날씨·위치까지 함께 남습니다']
+];
+function introCard(){
+  return `<div class="hcard intro"><div class="hct"><b>뱃일이 하는 일</b></div>`
+    + INTRO_LINES.map(([t, d]) =>
+        `<div class="introl"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')
+    + `<div class="mrrow" style="padding:12px 0 2px">
+        <button class="mrbtn ok" style="width:100%" onclick="openBoatSetup()">배 등록하기</button></div>
+      <div class="hmute" style="margin-top:8px">배가 없어도 날씨·물때·정박지는 볼 수 있습니다.</div></div>`;
+}
+// 오늘 화면에서 곧바로 현재 위치를 잡는다.
+// ★ 앱을 켜자마자 위치를 묻지 않는다 — 까닭도 모르고 묻는 창은 대부분 거절당한다.
+//   무엇에 쓰는지 화면에 적어 두고, 누른 사람에게만 묻는다.
+function homeUseGPS(){
+  try{
+    if(typeof wxUseGPS === 'function') wxUseGPS();
+    const L = document.getElementById('homeList');
+    if(L) setTimeout(()=>{ try{ renderHome(); }catch(_){} }, 1200);
+  }catch(_){}
+}
 function homeCard(title, body, go, goName){
   return `<div class="hcard"><div class="hct"><b>${title}</b>${
       go ? `<button class="minib blu" onclick="${go}">${esc(goName||'보기')}</button>` : ''
@@ -8810,14 +8976,30 @@ function renderHome(){
   // ★ 홈 화면에 추가 안내가 제일 위다. 이걸 안 하면 다음에 다시 안 온다.
   out += installCard();
 
-  // 배가 없어도 오늘 탭은 열린다. 다만 등록하러 갈 길을 맨 위에 둔다.
+  // ★ 처음 온 사람에게는 이 앱이 뭘 해 주는지부터 말한다.
+  //
+  //   왜 —
+  //   지금까지 첫 화면은 '날씨 자료를 아직 받지 못했습니다 / 배 등록 / 0 / 11' 이었다.
+  //   빈 껍데기 세 칸이다. 광고를 보고 들어온 사람은 30초 안에
+  //   '이거 나한테 필요하겠다' 를 느껴야 하는데 느낄 거리가 없었다.
   if(!b){
-    out += homeCard('배 등록', '<div class="hmute">배를 등록하면 물품·정비·항해 기록을 쓸 수 있습니다.</div>',
-                    'openBoatSetup()', '등록하기');
+    out += introCard();
   }
 
   // ── 날씨와 출항 판단
-  let wxBody = '<div class="hmute">날씨 자료를 아직 받지 못했습니다</div>';
+  // ★ 세 가지를 갈라 말한다. 다 '못 받았습니다' 로 뭉뚱그리면 고장으로 보인다.
+  //   1) 어디 날씨인지 아직 못 정했다 → 정하는 길을 준다
+  //   2) 정했는데 아직 받는 중이다   → 받는 중이라고 말한다
+  //   3) 받았다                      → 보여 준다
+  let wxBody;
+  if(typeof wxCur === 'undefined' || !wxCur){
+    wxBody = `<div class="hmute">어디 날씨를 볼지 아직 정하지 않았습니다.<br>
+        배를 등록하지 않아도 날씨와 물때는 볼 수 있습니다.</div>
+      <div class="mrrow" style="padding:10px 0 2px">
+        <button class="mrbtn" style="width:100%" onclick="homeUseGPS()">지금 있는 곳 날씨 보기</button></div>`;
+  } else {
+    wxBody = '<div class="hmute">날씨를 받는 중입니다…</div>';
+  }
   try{
     const idx = wxNowIdx();
     const now = (idx >= 0 && typeof wxAt === 'function') ? wxAt(idx) : null;
@@ -8861,8 +9043,10 @@ function renderHome(){
   }catch(e){}
 
   // ── 출항 전 점검
+  // ★ 배가 없으면 이 화면은 열리지 않는다(배를 등록하라고 한다).
+  //   그런데 첫 화면에 '0 / 11' 만 떠 있으면, 눌러 보고 나서야 못 쓴다는 것을 안다.
   try{
-    const lists = (typeof ckLists === 'function') ? ckLists() : [];
+    const lists = (b && typeof ckLists === 'function') ? ckLists() : [];
     const cur = lists.find(x => String(x.id) === String(typeof ckCurId!=='undefined' ? ckCurId : '')) || lists[0];
     if(cur){
       const items2 = (checkt || []).filter(x => String(x.list) === String(cur.id));
@@ -14326,7 +14510,8 @@ document.addEventListener('visibilitychange', ()=>{
     const bust = k => { try{ if(window.__listDrop) window.__listDrop(k); }catch(_){} };
 
     window.__talk = {
-      async list(more){ return await pageList('community', 'ts', more); },
+      // ord: 'ts'(새 글 순) 또는 'likeN'(도움된 순)
+      async list(more, ord){ return await pageList('community', ord === 'likeN' ? 'likeN' : 'ts', more); },
       async add(body){
         await setDoc(doc(fdb, 'community', String(body.id)), body);
         bust('talk');

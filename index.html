@@ -8426,7 +8426,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.67';
+const APP_VER = '3.68';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -12732,12 +12732,107 @@ const SPOT_FAC = [
   { k:'shower',name:'샤워' }, { k:'crane', name:'크레인·상하가' },
   { k:'park',  name:'주차' }, { k:'shop',  name:'가게' }
 ];
+// ===== 기본 정박지 (관에서 받은 자료) =====
+// ★ 왜 클라우드가 아니라 앱 안에 넣나
+//   전국 어항까지 넣으면 천 곳이 넘는다. 그걸 클라우드에 두면 사람마다
+//   앱을 켤 때마다 천 건을 받아 온다 — 요금도 시간도 감당이 안 된다.
+//   그리고 배 위에서는 인터넷이 자주 끊긴다. 정박지야말로 바로 그때 필요한 자료다.
+//   그래서 관 자료는 앱에 넣어 두고, 사람들이 채운 것(수심·바닥·사진)만
+//   클라우드에서 받아 그 위에 덮는다. id 가 같으면 사람이 채운 것이 이긴다.
+// 자료: 공공데이터포털 · 해양수산부 마리나 정보 (2025-01-24)
+// 칸 이름을 짧게 쓴 것은 파일 크기 때문이다 — i:id n:이름 la:위도 lo:경도 r:지역 f:시설 p:계획단계 t:설명
+const SPOT_SEED = [
+{i:'gov_m1',n:'사곡 마리나',k:'marina',la:34.90535,lo:128.5708,r:'경남',f:'fuel,water',p:true,t:"경상남도 거제시 사등면 사곡리 757-2번지 일원\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 수리점 이용\n조류 — 사두도 북측에서 창조류는 0.kn로 남쪽으로 흐르며 낙조류는 0.3kn로 북동쪽으로 흐른다. 복잡한 해안선의 영향으로 비교적 약한 편이다.\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m2',n:'팽목 마리나',k:'marina',la:34.37565,lo:126.13582,r:'전남',f:'',p:true,t:"전라남도 진도군 임회면 남동리 산85-7번지 일원(팽목항 일원)\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m3',n:'명동 마리나',k:'marina',la:35.09267,lo:128.72323,r:'경남',f:'',p:true,t:"경상남도 창원시 진해구 명동 335번지 일원\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m4',n:'구산 마리나',k:'marina',la:35.0684,lo:128.58976,r:'경남',f:'',p:true,t:"경상남도 마산시 구산면 심리 산179-1 일원\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m5',n:'당항포 마리나',k:'marina',la:35.05816,lo:128.40622,r:'경남',f:'fuel,water',p:false,t:"경상남도 고성군 회화면 봉동리 183-5번지 일원\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 당항포 인근 해역은 유조선 통항금지해역으로 조류는 진해만에서 유입되며 동측해상에서 창조류와 낙조류가 0.6kn 0.9kn로 나타나고 유속은 느린 편이다."},
+{i:'gov_m6',n:'여수엑스포 마리나',k:'marina',la:34.75192,lo:127.75171,r:'전남',f:'fuel,water',p:false,t:"전라남도 여수시 수정동 332 일원 (공사중)\n급유 : 이동 주유 이용급수 : 계류장 내 수도 이용수리 : 선외기 종류의 소형 선박만 가능\n조류 — 여수항 동방파제 부근에서 창조류 1.9kn, 낙조류 1.4kn로 나타나며 오동도 부근에서는 창조류 0.7kn, 낙조류 1.4kn로 나타난다."},
+{i:'gov_m7',n:'수영만 마리나',k:'marina',la:35.15976,lo:129.1402,r:'부산',f:'fuel,water',p:false,t:"부산광역시 해운대구 해운대 해변로 84\n급유 : 이동 주유급유급수 : 계류장 내 수도이용수리 : 선외기 종류의 소형 선박만 가능\n조류 — 일반적으로 해안선에 평행하게 흐르고 있으며, 광안대교 부근에서 서~동으로, 동~서로 흐르며, 유속은 0.2kn로 나타나고, 대체로 느린 편이다."},
+{i:'gov_m8',n:'충무 마리나',k:'marina',la:34.82864,lo:128.4387,r:'경남',f:'fuel,water',p:false,t:"경상남도 통영시 도남로 269-20(도남동 639)\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 가조도 북부로 안정항로와 가조도 동부에서 칠천도 북서부를 지나가는 통영항로 부근의 조류는 0.5kn~0.9kn정도로 빠르지 않은 편이며, 칠천도 동부의 칠천수도 부근에는 1.4kn~1.8kn정도의 창조류와 낙조류가 발생된다. 용초도는 섬을 따라가며 거의 완벽한 왕복성 조류의 특성을 나타낸다. 한산도와 용초도 사이의 장강 수도에서 최대 2.9kn의 창조류와 1.5kn의 낙조류가 형성된다.한산도는 육지쪽에 가깝게 있어 조류가 약한 편이다."},
+{i:'gov_m9',n:'완도 마리나',k:'marina',la:34.31689,lo:126.75505,r:'전남',f:'fuel,water',p:true,t:"전라남도 완도군 완도읍 북방파제 704번지 일원\n급유 : 일반 유튜취급소 이용급수 : 자체조달수리 : 완도항 수리점 이용\n조류 — 조류의 회전방향은 완도를 중심으로 동쪽에서는 반시계방향, 완도 서쪽은 시계방향이 나타난다. 최대 창조류는 해안선을 따라 서쪽과 북쪽으로 흐르며, 낙조류는 그 반대이다. 완도 동쪽에서는 3.1kn로 크게 나타났으며, 대부분의 수로에서 1.9kn 정도이다. 완도 서쪽에서는 2.9kn이상 나타난다. 완도항 내에서 창조류는 북서방향으로 흐르며 낙조류는 남동방향으로 흐른다. 유속은 각각 1.5kn, 1.4km로 나타난다.\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m10',n:'화원 마리나',k:'marina',la:34.68917,lo:126.25838,r:'전남',f:'',p:true,t:"전라남도 해남군 화원면 주광리 74-2번지 일원\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m11',n:'백운포 마리나',k:'marina',la:35.0957,lo:129.10964,r:'부산',f:'',p:true,t:"부산광역시 남구 용호동 895-3번지 일원\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m12',n:'하동 마리나',k:'marina',la:34.95616,lo:127.89203,r:'경남',f:'',p:true,t:"경상남도 하동군 금남면 대치리 1-1번지 일원\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m13',n:'강릉 마리나(강릉항 마리나)',k:'marina',la:37.77238,lo:128.95145,r:'강원',f:'fuel,water',p:false,t:"강원도 강릉시 창해로14번길 51-20\n급유 : 이동 주유 이용급수 : 자체조달수리 : 주문진 소재 선박수리점 이용\n조류 — 강릉항에 인접한 묵호항에서의 평균해수면은 0.19m, 대조승은 0m, 평균고조간격은 2시간 57분이다."},
+{i:'gov_m14',n:'남열 마리나',k:'marina',la:34.57384,lo:127.48087,r:'전남',f:'fuel,water',p:true,t:"전라남도 고흥군 영남면 남열리 212-3번지 일원\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 소옥대도 남측으로 창조류, 낙조류가 각각 0.7kn로 나타나며, 마리나항 북동측의 낭도항 주변으로 창조류, 낙조류가 각각 0.9kn로 나타난다.\n※ 국가 마리나 계획 단계로 잡힌 곳입니다. 가시기 전에 확인해 주세요."},
+{i:'gov_m15',n:'삼천포 마리나',k:'marina',la:34.9625,lo:128.04001,r:'경남',f:'fuel,water',p:false,t:"경상남도 사천시 해안관광로 339(송포동 1370-3)\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 삼천포항 선박 수리점, 조선소 이용\n조류 — 삼천포 마리나항 남측의 대방수도에서 창조류, 낙조류가 각각 4.0kn, 4.2kn로 강하게 나타나며, 남서측 진주만 부근에서는 창조류, 낙조류가 각각 1.1kn, 0.8kn로 나타난다."},
+{i:'gov_m16',n:'김녕항 마리나(제주)',k:'marina',la:33.55954,lo:126.73716,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 제주시 구좌읍 구좌해안로 229-16\n급유 : 수협 탱크로리 및 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 제주도 연안의 평균 조차는 대조 시에 2.7m에 이르나 소조 시에는 1.3m에 불과하다. 일년 중 최대만조일은 음력 7월의 대조 시에 발생하는데 평균해수면이 제주항에서는 1.54m, 서귀포항에서는 1.8m로 높아진다. 풍향이 조류에 영향을 미치기도 하여 제주도연안에서 겨울의 북서풍은 조고와 해수면을 낮추는데 비하여 여름의 남동풍은 조고와 해수면을 높인다. 따라서 해수면이 가장 높은 기간은 6월에서 10월까지이다."},
+{i:'gov_m17',n:'김녕항 마리나(김녕 요트투어)',k:'marina',la:33.55809,lo:126.73772,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 제주시 구좌읍 구좌해안로 229-16\n급유 : 수협 탱크로리 및 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 제주도 연안의 평균 조차는 대조 시에 2.7m에 이르나 소조 시에는 1.3m에 불과하다. 일년 중 최대만조일은 음력 7월의 대조 시에 발생하는데 평균해수면이 제주항에서는 1.54m, 서귀포항에서는 1.8m로 높아진다. 풍향이 조류에 영향을 미치기도 하여 제주도연안에서 겨울의 북서풍은 조고와 해수면을 낮추는데 비하여 여름의 남동풍은 조고와 해수면을 높인다. 따라서 해수면이 가장 높은 기간은 6월에서 10월까지이다."},
+{i:'gov_m18',n:'포항 구항 마리나',k:'marina',la:36.04083,lo:129.37264,r:'경북',f:'fuel,water',p:false,t:"경상북도 포항시 남구 운하로 205(송도동)\n급유 : 일반 유류 취급소 이용급수 : 급수이용수리 : 각 항구 선박수리점 이용\n조류 — 포항에서의 평균해수면은 0.12m, 대조승은 0.2m, 평균고조간격은 4시간 9분이다."},
+{i:'gov_m19',n:'오산항 마리나',k:'marina',la:36.88911,lo:129.41681,r:'경북',f:'fuel,water',p:false,t:"경상북도 울진군 매화면 오산항길 59\n급유 : 이동 주유 이용급수 : 자체조달수리 : 죽변항 조선소 이용\n조류 — 오산항에 인접한 후포에서의 평균해수면은 0.14m, 대조승은 0.2m, 평균고조간격은 3시간 11분이다."},
+{i:'gov_m20',n:'속초 마리나',k:'marina',la:38.19223,lo:128.58982,r:'강원',f:'fuel,water',p:false,t:"강원도 속초시 조양동 1544-2\n급유 : 일반 유류 취급소 이용급수 : 급수전이용수리 : 각 항구 선박수리점 이용\n조류 — 속초의 평균해수면은 0.19m이고, 대조승은 0.3m, 평균고조간격은 3시간이다."},
+{i:'gov_m21',n:'통영항 마리나(통영)',k:'marina',la:34.82768,lo:128.4342,r:'경남',f:'fuel,water',p:false,t:"경상남도 통영시 큰발개1길 33\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 수리점 이용\n조류 — 가조도 북부로 안정항로와 가조도 동부에서 칠천도 북서부를 지나가는 통영항로 부근의 조류는 0.5kn~0.9kn정도로 빠르지 않은 편이며, 칠천도 동부의 칠천수도 부근에는 1.4kn~1.8kn정도의 창조류와 낙조류가 발생된다. 용초도는 섬을 따라가며 거의 완벽한 왕복성 조류의 특성을 나타낸다. 한산도와 용초도 사이의 장강 수도에서 최대 2.9kn의 창조류와 1.5kn의 낙조류가 형성된다.한산도는 육지쪽에 가깝게 있어 조류가 약한 편이다."},
+{i:'gov_m22',n:'지세포 마리나',k:'marina',la:34.83341,lo:128.70277,r:'경남',f:'fuel,water',p:false,t:"경상남도 거제시 일운면 지세포해안로 41(어항부지)\n급유 : 수협선박급유소, 탱크로리급수 : 급수전 및 자체조달수리 : 소형선박수리\n조류 — 지세포의 평균해수면은 0.96m이고, 대조승은 1.8m이며, 평균고조간격은 8시간 17분이다."},
+{i:'gov_m23',n:'서울 마리나',k:'marina',la:37.53462,lo:126.91124,r:'경기·인천',f:'fuel,water',p:false,t:"서울 영등포구 여의서로 160\n급유 : 일반 유류 취급점 이용급수 : 자체 조달수리 : 마리나 시설 이용"},
+{i:'gov_m24',n:'김포 마리나',k:'marina',la:37.60015,lo:126.79053,r:'그 밖',f:'fuel,water',p:false,t:"경기도 김포시 고촌읍 아라육로 270번길 73\n급유 : 이동 주유 이용급수 : 계류장내 수도 이용수리 : 마리나 시설 이용"},
+{i:'gov_m25',n:'격포항 마리나',k:'marina',la:35.61936,lo:126.46309,r:'전북',f:'fuel,water',p:false,t:"전라북도 부안군 변산면 격포리\n급유 : 수협 면세유급수 : 자체조달수리 : 간단한 선박수리\n조류 — 변산반도 서측해역은 외해로부터 유입된 창조류는 북동류하고 일부는 줄포만 입구로 2.5Kn이상 강하게 유입되며 낙조류는 이와 반대로 흐른다. 연간 최강 창조류는 0.8~2.8Kn이고 연간 최강낙조류는 0.8~2.7Kn이다."},
+{i:'gov_m26',n:'도두항 마리나(제주도)',k:'marina',la:33.50865,lo:126.46545,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 제주시 도두항서길 26\n급유 : 이동 주유 이용급수 : 자체조달수리 : 제주항 소재 선박조선소 이용\n조류 — 제주도 연안의 평균 조차는 대조 시에 2.7m에 이르나 소조 시에는 1.3m에 불과하다. 일년 중 최대만조일은 음력 7월의 대조 시에 발생하는데 평균해수면이 제주항에서는 1.54m, 서귀포항에서는 1.8m로 높아진다. 풍향이 조류에 영향을 미치기도 하여 제주도연안에서 겨울의 북서풍은 조고와 해수면을 낮추는데 비하여 여름의 남동풍은 조고와 해수면을 높인다. 따라서 해수면이 가장 높은 기간은 6월에서 10월까지이다."},
+{i:'gov_m27',n:'도두항 마리나(한라대학)',k:'marina',la:33.50663,lo:126.46513,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 제주시 도두항서길 26\n급유 : 이동 주유 이용급수 : 자체조달수리 : 제주항 소재 선박조선소 이용\n조류 — 제주도 연안의 평균 조차는 대조 시에 2.7m에 이르나 소조 시에는 1.3m에 불과하다. 일년 중 최대만조일은 음력 7월의 대조 시에 발생하는데 평균해수면이 제주항에서는 1.54m, 서귀포항에서는 1.8m로 높아진다. 풍향이 조류에 영향을 미치기도 하여 제주도연안에서 겨울의 북서풍은 조고와 해수면을 낮추는데 비하여 여름의 남동풍은 조고와 해수면을 높인다. 따라서 해수면이 가장 높은 기간은 6월에서 10월까지이다."},
+{i:'gov_m28',n:'도두항 마리나(Blue One)',k:'marina',la:33.50717,lo:126.46393,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 제주시 도공로 4-6\n급유 : 이동 주유 이용급수 : 자체조달수리 : 제주항 소재 선박조선소 이용\n조류 — 제주도 연안의 평균 조차는 대조 시에 2.7m에 이르나 소조 시에는 1.3m에 불과하다. 일년 중 최대만조일은 음력 7월의 대조 시에 발생하는데 평균해수면이 제주항에서는 1.54m, 서귀포항에서는 1.8m로 높아진다. 풍향이 조류에 영향을 미치기도 하여 제주도연안에서 겨울의 북서풍은 조고와 해수면을 낮추는데 비하여 여름의 남동풍은 조고와 해수면을 높인다. 따라서 해수면이 가장 높은 기간은 6월에서 10월까지이다."},
+{i:'gov_m29',n:'중문 마리나(마린파크)',k:'marina',la:33.24308,lo:126.41728,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 서귀포시 중문관광로 154-17(색달동 2950-5번지)\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 이 지역의 조류는 창조류 1kn전 후의 흐름을 보이며, 낙조류는 1kn미만의 흐름으로 조류가 제주도 다른 지역에 비해서 약한 편이다."},
+{i:'gov_m30',n:'대포항 마리나(JM그랑블루요트)',k:'marina',la:33.23826,lo:126.43943,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 서귀포시 대포로 174(대포동)\n급유 : 이동 주유 이용급수 : 자체조달수리 : 서귀포 또는 모슬포항 소재 수리시설 이용\n조류 — 창조류는 1kn전 후의 흐름을 보이며, 낙조류는 1kn미만의 흐름으로 조류가 제주도 다른 지역에 비해서 약한 편이다."},
+{i:'gov_m31',n:'목포 마리나',k:'marina',la:34.78355,lo:126.38877,r:'전남',f:'fuel,water',p:false,t:"전라남도 목포시 산정동 삼학로 88\n급유 : 이동 주유 이용급수 : 계류장 내 수도이용수리 : 선외기 종류의 소형 선박만 가능\n조류 — 목포항 부근에서 창조류 0.5kn, 낙조류 0.3kn로 조류가 약하게 나타난다."},
+{i:'gov_m32',n:'소호 마리나',k:'marina',la:34.73768,lo:127.65072,r:'전남',f:'fuel,water',p:false,t:"전라남도 여수시 소호동 소호로 392\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 소호 마리나항 남동측의 소경도 부근으로 창조류는 서측, 낙조류는 남동측으로 흐르며 각각 0.3km로 다소 약하게 나타난다.돌산도 신기선착장 부근은 왕복성 조류가 해안선 방향으로 평행하게 흐흐고 화태도 부근의 유속은 창, 낙조류가 각각 3.0kn, 2.9kn를 나타내고 있으며, 종호동 방파제부근 유속은 창, 낙조류가 각각 0.5kn, 0.8kn로 나타난다."},
+{i:'gov_m33',n:'왕산 마리나',k:'marina',la:37.4562,lo:126.35913,r:'그 밖',f:'',p:false,t:"인천시 중구 을왕동 980번지\n예정"},
+{i:'gov_m34',n:'전곡 마리나',k:'marina',la:37.18653,lo:126.65028,r:'그 밖',f:'fuel,water',p:false,t:"경기도 화성시 서신면 전곡항로 5\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 아산만 부근의 풍도에서 평균해수면은 4.32m, 대조승은 7.9m, 소조승은 6.0m이며, 평균고조간격은 4시간 08분이다."},
+{i:'gov_m35',n:'수산 마리나',k:'marina',la:38.07716,lo:128.67522,r:'강원',f:'fuel,water',p:false,t:"강원도 양양군 손양면 수산1길 20-24\n급유 : 이동 주유 이용급수 : 자체조달수리 : 주문진, 속초항 소재 선박수리점 이용\n조류 — 수산항의 평균해수면은 0.2m이고, 대조승은 0.3m, 평균고조간격은 2시간 57분이다."},
+{i:'gov_m36',n:'양포 마리나(양포항 마리나)',k:'marina',la:35.87773,lo:129.52013,r:'경북',f:'fuel,water',p:false,t:"경상북도 포항시 남구 장기면 양포항길 6\n급유 : 일반 유류취급소 이용급수  급수전 이용수리 : 각 항구 수리점 이용\n조류 — 양포항에서의 평균해수면은 0.12m, 대조승은 0.2m, 평균고조간격은 4시간 50분이다."},
+{i:'gov_m37',n:'후포 마리나(후포항 마리나)',k:'marina',la:36.67633,lo:129.4519,r:'경북',f:'fuel,water',p:false,t:"경상북도 울진군 후포면 울진대게로 98\n급유 : 일반 유류 취급소 이용급수 : 급수전 이용수리 : 소형선박수리\n조류 — 후포에서의 평균해수면은 0.14m, 대조승은 0.2m, 평균고조간격은 3시간 11분이다."},
+{i:'gov_m38',n:'제부 마리나',k:'marina',la:37.17666,lo:126.62611,r:'그 밖',f:'',p:false,t:"경기도 화성시 서신면 제부리 제부항 일원"},
+{i:'gov_m39',n:'삼길포항 마리나',k:'marina',la:37.00659,lo:126.45107,r:'충남',f:'',p:false,t:"충남 서산시 대산읍 화곡리"}
+];
+const SPOT_SEED_FROM = '해양수산부 자료';
+// 관 자료 한 줄을 앱이 쓰는 정박지 모양으로 바꾼다
+function seedSpotRow(x){
+  const fac = {};
+  String(x.f||'').split(',').filter(Boolean).forEach(k=>{ fac[k] = true; });
+  return { id:x.i, name:x.n, kind:x.k, lat:x.la, lon:x.lo, region:x.r,
+           fac, note:x.t || '', plan:!!x.p, seed:true,
+           by:'', byName:SPOT_SEED_FROM, ts:'',
+           open:[], depth:'', lowTide:false, depthFrom:null, bottom:'',
+           tideNote:'', fee:'', tel:'', photos:[], thumbs:[],
+           likeN:0, reports:{}, reportN:0, hidden:false };
+}
+// ★ 화면에 뿌릴 정박지는 언제나 여기서 가져온다.
+//   목록·찾기·자세히 보기가 저마다 따로 모으면 한 곳은 반드시 관 자료를 빠뜨린다.
+function spotsAll(){
+  const have = new Set((spotList||[]).map(s=>String(s.id)));
+  return (spotList||[]).concat(SPOT_SEED.filter(x=>!have.has(String(x.i))).map(seedSpotRow));
+}
+// 내 자리 — 배 홈포트가 먼저, 없으면 지금 보고 있는 날씨 지점
+function herePos(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(b && b.lat != null && b.lon != null) return { lat:b.lat, lon:b.lon };
+  if(typeof wxCur !== 'undefined' && wxCur && wxCur.lat != null)
+    return { lat:wxCur.lat, lon:wxCur.lon };
+  return null;
+}
+// 여기서 몇 마일인가 (모르면 null)
+function spotNm(s){
+  const h = herePos();
+  if(!h || s.lat == null || s.lon == null) return null;
+  return hav(h.lat, h.lon, s.lat, s.lon) / 1.852;   // km → 해리
+}
 const SPOT_HIDE_AT = 3;      // 신고가 이만큼 쌓이면 목록에서 내린다
 
-let spotList = [], spotQ = '', spotKind = '', spotOpenId = null, spotPickCtx = null;
+let spotList = [], spotQ = '', spotOpenId = null, spotPickCtx = null;
+// ★ 배 종류에 따라 처음 켜지는 거르기가 다르다.
+//   낚시배는 마리나에 갈 일이 없다 — '항·부두' 로 시작한다.
+//   요트·보트는 '전체' 로 시작한다. 우리나라 마리나가 서른 곳뿐이라
+//   긴 항해는 어항과 방파제로 다닌다. 마리나만 보여 주면 쓸모가 없다.
+//   한 번 바꾸면 그것을 기억한다.
+let spotKind = (function(){
+  try{ const v = localStorage.getItem('bt_spotkind'); if(v != null) return v; }catch(_){}
+  return null;   // 아직 안 골랐다 — 배 종류를 보고 정한다
+})();
+function spotKindNow(){
+  if(spotKind != null) return spotKind;
+  return (typeof isFishing === 'function' && isFishing()) ? 'port' : '';
+}
 let spotDepthCtx = null;   // 수심 환산 화면 — { raw:잰 값(m), ts:잰 시각 }
 
-function spotOf(id){ return spotList.find(x=>String(x.id)===String(id)) || null; }
+function spotOf(id){ return spotsAll().find(x=>String(x.id)===String(id)) || null; }
 function spotKindName(v){ return (SPOT_KINDS.find(k=>k.v===v)||{}).name || '정박지'; }
 // 지울 수 있는 사람 — 올린 본인과 운영자
 function canDelSpot(s){
@@ -12747,7 +12842,13 @@ function canDelSpot(s){
   return isAdmin('postDel');
 }
 // 고칠 수 있는 사람도 같다. 아무나 고치게 두면 누가 무엇을 바꿨는지 몰라 싸움이 난다.
-function canEditSpot(s){ return canDelSpot(s); }
+// ★ 다만 관 자료(seed)는 다르다. 이름과 자리만 있고 수심·바닥·막힌 방향이 비어 있다.
+//   채워 넣으라고 넣어 둔 것이므로 로그인한 사람이면 누구나 처음 한 번 채울 수 있다.
+//   채우고 나면 그 사람 것이 되어, 그 뒤로는 본인과 운영자만 고친다.
+function canEditSpot(s){
+  if(s && s.seed) return !!meUid();
+  return canDelSpot(s);
+}
 
 // 막힌 방향을 사람 말로. 여기가 정박지의 핵심이라 또렷하게 적는다.
 function spotShelterText(s){
@@ -12787,8 +12888,8 @@ async function renderSpots(){
   spotList = listRows('spots');
 
   W.innerHTML = `<div class="tfilt">`
-      + `<button class="tchip${spotKind?'':' on'}" onclick="setSpotKind('')">전체</button>`
-      + SPOT_KINDS.map(k=>`<button class="tchip${spotKind===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
+      + `<button class="tchip${spotKindNow()?'':' on'}" onclick="setSpotKind('')">전체</button>`
+      + SPOT_KINDS.map(k=>`<button class="tchip${spotKindNow()===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
       + `</div>
     <div class="qbox"><input id="spQ" value="${esc(spotQ)}"
         placeholder="정박지 이름 · 지역으로 찾기"
@@ -12799,17 +12900,32 @@ async function renderSpots(){
 }
 // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
 function spotRowsHtml(){
-  const rows = spotList
+  // ★ 가까운 순이 먼저다. 이름 순으로 놓으면 전국 천 곳에서 내 앞바다를 못 찾는다.
+  //   내 자리를 모를 때만 이름 순으로 놓는다.
+  const here = herePos();
+  const rows = spotsAll()
     .filter(s => !s.hidden || isAdmin('postDel'))
-    .filter(s => !spotKind || s.kind === spotKind)
+    .filter(s => !spotKindNow() || s.kind === spotKindNow())
     .filter(s => spotMatch(s, spotQ))
-    .sort((a,b)=> String(a.name||'').localeCompare(String(b.name||'')))
+    .sort((a,b)=>{
+      if(here){
+        const x = spotNm(a), y = spotNm(b);
+        if(x != null && y != null) return x - y;
+        if(x != null) return -1;
+        if(y != null) return 1;
+      }
+      return String(a.name||'').localeCompare(String(b.name||''));
+    })
     .map(s=>{
       const sh = spotShelterText(s);
+      const nm = spotNm(s);
       return `<div class="fleet" onclick="openSpot('${esc(s.id)}')"><div class="fmain">
         <div class="fname">${s.hidden?'<span class="chip notice">숨김</span> ':''}${esc(s.name||'이름 없음')}
-          <span class="chip">${esc(spotKindName(s.kind))}</span></div>
-        <div class="fsub">${esc([s.region, spotDepthText(s), sh].filter(Boolean).join(' · '))}</div>
+          <span class="chip">${esc(spotKindName(s.kind))}</span>
+          ${s.plan?'<span class="chip notice">계획</span>':''}
+          ${(Number(s.cmtN)||0) ? `<span class="tcnt" title="다녀온 이야기">${Number(s.cmtN)}</span>` : ''}</div>
+        <div class="fsub">${esc([nm != null ? (nm < 10 ? nm.toFixed(1) : Math.round(nm)) + ' NM' : '',
+            s.region, spotDepthText(s), sh].filter(Boolean).join(' · '))}</div>
       </div></div>`;
     }).join('');
   return (rows || `<div class="mrnone" style="text-align:left">${spotQ
@@ -12835,12 +12951,17 @@ function spotMatch(s, q){
   return [s.name, s.region, s.note, spotKindName(s.kind)]
     .some(v => String(v||'').toLowerCase().includes(t));
 }
-function setSpotKind(v){ spotKind = v; renderSpots(); }
+function setSpotKind(v){
+  spotKind = v;
+  try{ localStorage.setItem('bt_spotkind', v); }catch(_){}
+  renderSpots();
+}
 
 // ── 정박지 하나 보기
 async function openSpot(id){
   const s = spotOf(id); if(!s) return;
   spotOpenId = id;
+  if(!s.seed && !spotCmts[String(id)]) await loadSpotCmts(id);
   const P = document.getElementById('mrPanel');
   const fac = SPOT_FAC.filter(f => (s.fac||{})[f.k]).map(f=>`<span class="chip">${f.name}</span>`).join('');
   const sh = spotShelterText(s);
@@ -12853,6 +12974,12 @@ async function openSpot(id){
       ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
       ${canEditSpot(s)?`<button class="minib blu" style="margin-left:auto" onclick="writeSpot('${esc(s.id)}')">고치기</button>`:''}</div>
     ${s.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 자리입니다.</div>':''}
+    ${s.seed ? `<div class="mrnone" style="text-align:left">
+        <b>${esc(SPOT_SEED_FROM)}입니다.</b> 이름과 자리만 들어 있습니다.
+        ${s.plan ? '<br>국가 마리나 <b>계획 단계</b>로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.' : ''}
+        <br>다녀오셨으면 수심 · 바닥 · 막힌 방향을 채워 주세요.
+        ${meUid() ? `<div style="margin-top:10px"><button class="mrbtn ok" onclick="writeSpot('${esc(s.id)}')">내용 채우기</button></div>` : ''}
+      </div>` : ''}
     ${sh ? `<div class="hwarn">${esc(sh)}</div>` : ''}
     ${row('수심', spotDepthText(s))}
     ${row('바닥', s.bottom)}
@@ -12864,20 +12991,87 @@ async function openSpot(id){
     ${s.note ? `<div class="ghead"><b>한마디</b></div><div class="postbody">${esc(s.note).replace(/\n/g,'<br>')}</div>` : ''}
     ${(s.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
     ${(s.lat!=null && s.lon!=null) ? mapBox('spotMap','40vh') : ''}
-    <div class="mrrow" style="gap:8px;padding:12px">
+    ${s.seed ? '' : `<div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('spots', s.id, s.likeN)}
       <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportSpot('${esc(s.id)}')">신고</button>
       ${canDelSpot(s)?`<button class="mrbtn warn" onclick="delSpot('${esc(s.id)}')">지우기</button>`:''}
-    </div>
-    <div class="mrnone" style="text-align:left">여기 적힌 것은 다녀온 사람이 올린 내용입니다.
-      실제 항해에는 공식 해도와 VTS 확인이 먼저입니다.</div>`;
+    </div>`}
+    <div class="mrnone" style="text-align:left">여기 적힌 것은 관에서 받은 자료와 다녀온 사람이 올린 내용입니다.
+      실제 항해에는 공식 해도와 VTS 확인이 먼저입니다.</div>
+    ${s.seed ? '' : spotCmtHtml(s)}`;
   showPanel(P);
   if(s.lat != null && s.lon != null){
     requestAnimationFrame(()=>{
       mapInit('spotMap', [{ lat:s.lat, lon:s.lon, label:s.name || '' }], { mode:'view' });
     });
   }
+}
+// ===== 정박지 댓글 =====
+// ★ 정박지야말로 댓글이 제일 필요한 자리다.
+//   "작년에 갔더니 부잔교가 없어졌습니다", "썰물에 바닥이 닿습니다" 같은 말은
+//   자리 설명을 통째로 고치는 것보다 댓글로 쌓이는 것이 맞다.
+//   누가 언제 다녀와서 한 말인지가 그대로 남는다.
+//   글판 댓글과 같은 방(comments)·같은 규칙을 쓴다. 새로 만들지 않는다.
+let spotCmts = {};
+async function loadSpotCmts(id){
+  if(!window.__cmt) return;
+  try{ spotCmts[String(id)] = await window.__cmt.list('spots', id); }
+  catch(_){ spotCmts[String(id)] = spotCmts[String(id)] || []; }
+}
+function spotCmtHtml(s){
+  const all = (spotCmts[String(s.id)] || [])
+    .slice().sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
+  const cs = all.map(c=>{
+    const mine = String(c.by) === String(meUid());
+    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+        <span>${esc(String(c.ts||'').slice(0,10))}</span>
+        ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delSpotComment('${esc(s.id)}','${esc(c.id)}')">&#10005;</button>`:''}</div>
+      <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
+  }).join('');
+  return `<div class="ghead"><b>다녀온 이야기</b><span class="gcnt">${all.length}</span></div>
+    ${cs || '<div class="mrnone" style="text-align:left">아직 없습니다. 다녀오셨으면 어땠는지 남겨 주세요.</div>'}
+    <div class="mrrow" style="padding:12px">
+      <button class="mrbtn big" style="width:100%" onclick="writeSpotComment('${esc(s.id)}')">글 남기기</button></div>`;
+}
+function writeSpotComment(id){
+  const s = spotOf(id); if(!s) return;
+  if(!window.__user){ alert('로그인해야 글을 남길 수 있습니다'); return; }
+  if(myBan){ alert(banNotice()); return; }
+  if(!window.__cmt){ alert('인터넷에 연결되어 있지 않습니다'); return; }
+  // ★ 관 자료에는 아직 클라우드에 문서가 없다. 댓글만 달면 어디에도 안 붙는다.
+  if(s.seed){ alert('아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.'); return; }
+  openForm({
+    title:'다녀온 이야기', okText:'남기기',
+    sub:'수심 · 바닥 · 접안 상태처럼 다음 사람에게 도움 될 말을 남겨 주세요',
+    fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'',
+              placeholder:'언제 다녀오셨는지도 함께 적어 주시면 좋습니다' }],
+    onOk: v => {
+      if(!v.text){ alert('내용을 넣어 주세요'); return false; }
+      const c = { id:newId(), by:meUid()||'', byName:meName(),
+                  text:v.text, ts:new Date().toISOString() };
+      window.__cmt.add('spots', s.id, c)
+        .then(()=>{
+          const k = String(s.id);
+          spotCmts[k] = (spotCmts[k] || []).concat([c]);
+          s.cmtN = (Number(s.cmtN) || 0) + 1;
+          openSpot(s.id);
+        })
+        .catch(e=>alert('남기지 못했습니다.\n\n' + ((e&&e.message)||e)));
+    }
+  });
+}
+function delSpotComment(id, cid){
+  const s = spotOf(id); if(!s) return;
+  if(!confirm('이 글을 지울까요?')) return;
+  window.__cmt.del('spots', id, cid)
+    .then(()=>{
+      const k = String(id);
+      spotCmts[k] = (spotCmts[k] || []).filter(c=>String(c.id)!==String(cid));
+      s.cmtN = Math.max(0, (Number(s.cmtN) || 0) - 1);
+      openSpot(id);
+    })
+    .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
 }
 function backToSpots(){
   comSub = 'spots';
@@ -13157,6 +13351,9 @@ async function spotSave(){
     reportN: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).reportN || 0 : 0,
     hidden: spotPickCtx.id ? !!(spotOf(spotPickCtx.id)||{}).hidden : false
   };
+  // ★ 관 자료를 채우면 그때 진짜 자료가 된다. seed 표시를 달고 올리면
+  //   다음에 켤 때 또 '아직 안 채워졌다' 고 나온다.
+  delete body.seed; delete body.plan;
   // 찾기용 조각 — 나중에 자리가 많아져도 서버에서 바로 찾을 수 있게 지금부터 담아 둔다
   body.kw = kwOf(body.name, body.byName, body.region);
   const st = await storePhotos((d.photos||[]).slice(0,4));

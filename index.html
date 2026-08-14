@@ -139,7 +139,22 @@ body.locked .pm, body.locked .pe, body.locked .pd, body.locked .pg{display:none}
 body.locked .trestore, body.locked .tdelp{display:none}
 
 #lockBtn.unlocked{border-color:#3a8a5a;color:#7aefaa}
-body{background:#0a1628;color:#e8eef5;font-family:'Segoe UI','Apple SD Gothic Neo',sans-serif;min-height:100vh}
+/* ★ 글씨체 — 앱의 인상을 가장 크게 좌우한다.
+   시스템 글꼴(맑은 고딕·애플 SD 고딕)은 굵기가 400/700 둘뿐이라
+   무엇을 키우려면 굵게 하는 수밖에 없다. 그래서 화면이 늘 우락부락해진다.
+   프리텐다드 가변 글꼴을 실으면 200~700 사이를 자유롭게 쓸 수 있다.
+   큰 글씨를 '가늘게' 쓸 수 있게 되는 것 — 이것이 고급스러워 보이는 핵심이다.
+   글꼴 파일은 따로 받는다 (400KB). 못 받아도 시스템 글꼴로 그대로 보인다. */
+@font-face{
+  font-family:'Pretendard';
+  src:url('font.woff2') format('woff2-variations'),
+      url('font.woff2') format('woff2');
+  font-weight:200 700;
+  font-display:swap;
+}
+body{background:#0a1628;color:#e8eef5;min-height:100vh;
+  font-family:'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif;
+  font-optical-sizing:auto;letter-spacing:-.012em}
 header{border-bottom:1px solid #1e3a5a;background:#081020;position:sticky;top:0;z-index:20}
 .hrow{padding:10px 16px 6px;display:flex;align-items:center;justify-content:space-between}
 .sub{font-size:10px;letter-spacing:2px;color:#4a8ab5;text-transform:uppercase}
@@ -215,9 +230,9 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 #formPhotos{display:flex;flex-wrap:wrap}
 .box{position:absolute;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:all .12s}
 .box span{font-size:6.4px;text-align:center;line-height:1;padding:1px;text-shadow:0 1px 3px #000;white-space:nowrap}
-.b-n{border:1.5px solid #2a5a8a88;background:#0a204033}.b-n span{color:#7ab5d8}
-.b-w{border:1.5px dashed #b58a3a99;background:#3a2a0a33}.b-w span{color:#d8b878}
-.b-d{border:1.5px solid #6a4a9a99;background:#2a1a4a33}.b-d span{color:#b89ae0}
+.b-n{border:1.5px solid rgba(156,198,232,.42);background:rgba(10,32,52,.30)}.b-n span{color:#A9CBE4}
+.b-w{border:1.5px dashed rgba(217,174,99,.55);background:rgba(58,42,10,.24)}.b-w span{color:#DFC08A}
+.b-d{border:1.5px solid rgba(154,168,214,.48);background:rgba(38,34,66,.28)}.b-d span{color:#C3C9E8}
 /* 사용자가 그린 도형 — 도면 위, 수납칸 아래에 깔린다 */
 #shLayer,#mrShLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:visible}
 #shLayer line,#shLayer rect,#shLayer polygon,
@@ -246,8 +261,8 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 #mrMap.drawing #mrShLayer line{stroke-width:3}
 #mrGhost{position:absolute;border:2px dashed #4ad9ff;background:#4ad9ff22;border-radius:2px;pointer-events:none;z-index:4}
 .lkt.lock.on{background:#3a2a14;border-color:#7a5a2a;color:#f0c98a}
-.has{border-color:#2faa6a!important;background:#1a6a3a44!important}.has span{color:#7aefaa!important}
-.sel{border-color:#5ab0e8!important;background:#2a6aa055!important}.sel span{color:#bfe6ff!important}
+/* (칸 색은 아래 3단계에서 한 군데로 모았다) */
+
 .mark{position:absolute;font-size:9px;color:#4a8ab5;pointer-events:none}
 #hint{text-align:center;padding:8px 12px;font-size:11px;color:#2a4a6a}
 #hint .w{color:#d8b878}#hint .d{color:#8a6ac0}
@@ -453,10 +468,15 @@ body{padding-bottom:62px}
 .mhist{font-size:11px;color:#4a789e;margin:4px 0}
 body.locked .edt{display:none!important}
 
-/* ============ C테마 : Field Tool ============ */
-:root{--bg:#101214;--sf:#181B1F;--sf2:#1B1E22;--bd:#2B2F35;--tx:#D7D9DC;--th:#F2F3F5;--tm:#84898F;--td:#5A5F66;--ac:#FF7A45;--acd:#17130F;--red:#F05B52;--yel:#E8B33C;--grn:#46B87C}
-body{background:var(--bg);color:var(--tx);padding-bottom:66px}
-header{background:var(--bg);border-bottom:1px solid #1F2226}
+/* ============ D테마 : 새벽 바다 ============ */
+/* ★ 앞의 C테마는 이름 그대로 '연장' 이었다. 주황은 공사장의 색이고,
+   멀쩡한 항목까지 초록 알약이 붙어 화면이 늘 시끄러웠다.
+   여기서는 아이콘(새벽 바다)과 같은 결로 맞추고,
+   손봐야 할 것에만 색을 쓴다. */
+:root{--bg:#081521;--sf:#0E1D2B;--sf2:#132633;--bd:#1B2E3E;--bd2:#132433;--tx:#D6E2EC;--th:#F1F7FC;--tm:#6E8497;--td:#4A5F72;--ac:#9CC6E8;--acd:#08131F;--acs:#16344C;--red:#E4756A;--yel:#D9AE63;--grn:#5FB894}
+body{background:linear-gradient(#0B1C2C 0%,#081521 34%,#05101A 100%) fixed;color:var(--tx);
+  padding-bottom:66px;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+header{background:rgba(8,21,33,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd2)}
 /* ★ 배 이름 + 홈포트 + 동기화 상태가 한 줄에 다 안 들어가면 낱말이 중간에서 끊겨
    '오프라인 · 로 / 컬' 처럼 흉하게 두 줄이 된다. 넘치면 … 로 줄인다. */
 .sub{font-size:10px;letter-spacing:.18em;color:var(--td);font-weight:600;
@@ -563,6 +583,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .cbodyc{flex:1;min-width:0}
 .callb{text-decoration:none;flex-shrink:0}
 .ckrow{display:flex;align-items:center;gap:12px;margin:9px 16px 0;background:var(--sf);border-radius:13px;padding:13px 14px;cursor:pointer}
+/* (아래 D테마에서 유리로 바꾼다) */
 .ckrow.on{opacity:.6}
 .ckbox{width:22px;height:22px;border-radius:7px;border:2px solid #3A3F46;display:flex;align-items:center;justify-content:center;color:var(--acd);flex-shrink:0}
 .ckrow.on .ckbox{background:var(--grn);border-color:var(--grn)}
@@ -695,6 +716,531 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .newsm{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--td)}
 .newsm a{color:#C4C8CD}
 #map.nodg .mark{display:none}
+
+/* ============ D테마 — 짜임 ============ */
+/* ★ 여기부터가 '색이 아니라 결' 을 바꾸는 부분이다.
+   1. 줄마다 두르던 상자를 없앤다 — 상자가 겹치면 서식 작성 화면처럼 보인다.
+   2. 멀쩡한 것에는 색을 안 쓴다 — 손봐야 할 것만 눈에 띄어야 한다.
+   3. 급한 줄은 왼쪽에 가는 띠 — 알약보다 조용하고 더 빨리 읽힌다.
+   4. 한글은 자간을 벌리지 않는다 — 낱말이 흩어져 보인다. */
+
+/* 줄 */
+.mr{background:transparent;border:none;border-radius:0;margin:0 16px;padding:15px 2px;
+  border-bottom:1px solid var(--bd2);position:relative}
+.mr:active{background:#0D1D2B}
+.gitem{margin-top:0}
+.mr.late::before,.mr.soon::before{content:'';position:absolute;left:-10px;top:14px;bottom:14px;
+  width:2.5px;border-radius:2px}
+.mr.late::before{background:var(--red)}
+.mr.soon::before{background:var(--yel)}
+.mr.cur{border-color:transparent;background:transparent}
+.mr.cur .cn{color:#7FD1AC}
+.cn{font-size:16px;font-weight:600;color:var(--th);letter-spacing:-.01em}
+.mrm{font-size:12px;color:var(--tm);margin-top:6px;line-height:1.55}
+
+/* 상태 — 알약 대신 글씨. 멀쩡한 것은 흐리게. */
+.st{font-size:12.5px;font-weight:600;white-space:nowrap;flex-shrink:0;letter-spacing:.01em}
+.st.ok,.st.none{color:var(--td);font-weight:500}
+.st.soon{color:var(--yel)}
+.st.late{color:var(--red);font-weight:700}
+
+/* 무리 이름 */
+.ghead{margin:30px 16px 2px;padding:0 2px 8px;gap:8px;align-items:center;
+  border-bottom:1px solid var(--bd2)}
+.ghead b{font-size:11.5px;font-weight:700;color:#5A7288;letter-spacing:.04em}
+.garr{color:#3A4E5F;font-size:10px;width:10px}
+.gsum{font-size:11px;font-weight:700;color:var(--tm);opacity:.8}
+.gdot{width:5px;height:5px}
+.gcnt{font-size:10.5px;color:#354A5C}
+
+/* 단추 — 주황 덩어리를 없앤다 */
+.mrbtn{background:transparent;border:1px solid var(--bd);color:var(--tx);
+  border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600}
+.mrbtn.ok{background:var(--acs);border-color:#27506F;color:var(--ac)}
+.mrbtn.warn{background:none;border-color:#4A2A28;color:var(--red)}
+.tab{background:transparent;border:1px solid var(--bd);color:var(--tm);font-weight:600}
+.tab.on{background:var(--acs);border-color:#2A5673;color:var(--ac)}
+#lockBtn{background:transparent;border:1px solid var(--bd);color:var(--tm)}
+#lockBtn.unlocked{background:transparent;border-color:#2E5A48;color:#6FB795}
+
+/* 딱지 — 채우지 않고 선만 */
+.chip{background:transparent;border:1px solid var(--bd);color:var(--tm);font-weight:600;padding:2px 8px}
+.nchip{background:transparent;border:1px solid var(--bd);color:var(--tm)}
+
+/* 맨 윗줄 — 한글에 자간을 벌리지 않는다 */
+.sub{font-size:10.5px;letter-spacing:.01em;color:var(--td);font-weight:600}
+#boatSub{color:#88A0B4}
+.subrow button{color:var(--tm);font-weight:600}
+.subrow button.on{color:var(--th)}
+
+/* 아래 탭 — 고른 것 뒤의 네모를 없앤다 */
+#tabbar{background:rgba(5,14,22,.94);backdrop-filter:blur(12px);border-top:1px solid var(--bd2)}
+#tabbar button{color:var(--td);font-weight:600;font-size:10px}
+#tabbar button.on{color:var(--ac);background:transparent}
+
+/* 판·서랍 */
+#panel,#mrPanel{background:#0C1B28;border-top:1px solid var(--bd)}
+#drawer{background:#0C1B28;border-left:1px solid var(--bd)}
+.hcard{background:var(--sf);border:1px solid var(--bd2)}
+.hcard.ins{border-color:#27506F;background:#0E2233}
+.hcard.intro{border-color:var(--bd)}
+
+/* ============ D테마 — 글자와 크기 ============ */
+/* ★ 왜 이것이 핵심인가
+   지금까지 화면이 우락부락했던 진짜 까닭은 색이 아니라 '굵기' 였다.
+   .cn 750, .stat b 800, .ghead b 800 … 거의 모든 글자가 굵었다.
+   다 굵으면 아무것도 안 도드라진다. 그래서 크기를 키워서 구분하려 들고,
+   그러면 화면이 꽉 차서 더 답답해진다.
+
+   바꾼 원칙 세 가지
+   1. 큰 글씨일수록 가늘게 (표제 300, 계기 숫자 250)
+   2. 작은 글씨는 굵기 대신 색으로 구분한다
+   3. 굵기는 500 을 넘지 않는다 — 강조는 '색' 과 '크기' 로만 */
+
+/* 표제 — 화면 이름을 제대로 세운다 */
+.hrow{padding:12px 20px 8px;align-items:flex-start}
+.sub{font-size:14.5px;font-weight:450;letter-spacing:-.015em;color:var(--th);
+  display:flex;gap:9px;align-items:baseline}
+#boatSub{color:var(--th)}
+#syncState{font-size:10.5px;font-weight:500;color:var(--td);letter-spacing:.02em}
+#hNav{margin-top:5px}
+#stowTools,#mrSub,.subrow{padding:12px 20px 0}
+.subrow button,#mrSub button{font-size:15px;font-weight:450;letter-spacing:-.015em}
+.subrow button.on,#mrSub button.on{font-weight:550}
+
+/* 계기 숫자 — 요트 계기판처럼. 크고 가늘게, 상자 없이 가는 선으로만 나눈다 */
+.statrow{display:flex;gap:0;margin:16px 20px 6px;
+  border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2)}
+.stat{flex:1;background:transparent;border-radius:0;padding:16px 4px 15px;text-align:center;
+  position:relative}
+.stat + .stat::before{content:'';position:absolute;left:0;top:16px;bottom:16px;
+  width:1px;background:var(--bd2)}
+.stat b{display:block;font-size:31px;font-weight:250;color:var(--th);
+  letter-spacing:-.03em;line-height:1.05;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:7px;font-size:9.5px;font-weight:600;color:var(--td);
+  letter-spacing:.16em}
+
+/* 줄 — 이름은 가볍게, 곁글은 더 흐리게 */
+.mr{margin:0 20px;padding:16px 2px}
+.cn{font-size:16.5px;font-weight:450;color:var(--th);letter-spacing:-.02em}
+.mrm{font-size:12px;font-weight:400;color:var(--tm);margin-top:7px;letter-spacing:-.005em}
+.st{font-size:12.5px;font-weight:500}
+.st.late{font-weight:600}
+.mr.late::before,.mr.soon::before{left:-12px}
+
+/* 무리 이름 */
+.ghead{margin:32px 20px 2px}
+.ghead b{font-size:10.5px;font-weight:600;color:#57708A;letter-spacing:.15em}
+
+/* 단추 — 테두리를 없앤다. 선이 많으면 화면이 시끄럽다. */
+.tab,.mrbtn{border:none;background:var(--sf2);color:var(--tx);
+  font-size:13px;font-weight:450;letter-spacing:-.01em;padding:9px 15px;border-radius:11px}
+.tab.on,.mrbtn.ok{background:var(--acs);color:var(--ac);font-weight:550}
+.mrbtn.warn{background:#25171A;color:var(--red)}
+#lockBtn{background:var(--sf2);color:var(--tm);border:none}
+#lockBtn.unlocked{background:#12291F;color:#6FB795;border:none}
+.tab.iconb{background:var(--sf2)}
+.chip{border:none;background:var(--sf2);color:var(--tm);font-size:11px;font-weight:500;padding:3px 9px}
+.nchip{border:none;background:var(--sf2);color:var(--tm)}
+
+/* 판 안쪽 — 이름표와 값 */
+.mrlbl{font-size:11.5px;font-weight:450;color:var(--td)}
+.mrv{font-weight:450;color:var(--th)}
+.mrv2{font-size:11.5px;font-weight:400;color:var(--tm)}
+.mrtop b{font-size:10px;font-weight:600;letter-spacing:.16em;color:var(--td)}
+
+/* 카드 — 두께를 뺀다 */
+.hcard{border:1px solid var(--bd2);border-radius:16px}
+.hrow2{font-size:14px;font-weight:400;line-height:1.85}
+
+/* 아래 탭 */
+#tabbar button{font-size:9.5px;font-weight:500;letter-spacing:.02em}
+
+/* 입력칸 — 테두리를 옅게, 안쪽 여백을 넓게 */
+#panel input,#panel select,#panel textarea,
+#mrPanel input,#mrPanel select,#mrPanel textarea,
+#searchWrap input{background:#0B1926;border:1px solid var(--bd2);font-weight:450}
+
+/* ============ D테마 — 바탕의 공기 ============ */
+/* ★ 지금까지 바탕은 '어두운 회색 판' 이었다. 판은 아무 느낌도 주지 않는다.
+   아이콘의 새벽 하늘을 화면 맨 위에 아주 옅게 깔아 둔다.
+   눈에 띄면 안 된다 — 알아채지 못하는 정도라야 한다.
+   대신 화면을 위아래로 훑을 때 '공기' 가 있다는 느낌이 남는다. */
+body::before{
+  content:'';position:fixed;left:0;right:0;top:0;height:44vh;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(120% 78% at 18% -12%, rgba(126,170,200,.16) 0%, rgba(126,170,200,0) 62%),
+    radial-gradient(90% 60% at 88% -6%, rgba(230,180,143,.075) 0%, rgba(230,180,143,0) 58%);
+}
+/* (층 순서는 원래대로 둔다 — 여기서 건드리면 판이 머리줄 뒤로 간다) */
+main,#views,body>div{position:relative}
+
+/* 화면 이름 — 자리를 제대로 준다 */
+#hNav b,#hNav .htitle{font-weight:500;letter-spacing:-.025em}
+
+/* 줄에 숨 쉴 자리 */
+.mr{padding:17px 2px}
+.ghead{padding:0 2px 9px}
+
+/* 가로선은 더 옅게 — 선이 진하면 표(表)처럼 보인다 */
+.mr{border-bottom-color:#101F2D}
+.ghead{border-bottom-color:#101F2D}
+.statrow{border-color:#101F2D}
+.stat + .stat::before{background:#101F2D}
+
+/* 곁글의 날짜는 한 단 더 가라앉힌다 */
+.mrm{color:#61798C}
+
+/* ============ D테마 — 남은 단추와 카드 ============ */
+/* ★ .tab / .mrbtn 만 손봐서는 부족했다.
+   오늘 화면의 작은 단추(.minib), 하위 탭(.hsub), 큰 숫자(.hbig) 가
+   옛 모습 그대로 남아 있었다. 화면 하나만 보고 끝내면 이렇게 된다. */
+
+/* 작은 단추 — 테두리를 없애고 옅게 채운다 */
+.minib{border:none;background:var(--sf2);color:var(--tx);
+  min-height:34px;padding:7px 14px;border-radius:11px;font-size:12.5px;font-weight:450}
+.minib.blu{background:var(--acs);color:var(--ac)}
+.minib.grn{background:#12291F;color:#6FB795}
+.minib.red{background:#25171A;color:var(--red)}
+
+/* 카드 — 테두리를 없애고 바탕색만으로 띄운다 */
+.hcard{background:#0D1D2B;border:none;border-radius:18px;padding:17px 18px;margin-bottom:12px}
+.hcard.ins{background:#0E2233;border:none}
+.hcard.intro{background:#0D1D2B;border:none}
+.hct{margin-bottom:10px}
+.hct b{font-size:14.5px;font-weight:500;letter-spacing:-.02em;color:var(--th)}
+
+/* 큰 숫자 — 계기판과 같은 결로 */
+.hbig{font-size:38px;font-weight:250;line-height:1.05;letter-spacing:-.035em;
+  margin:6px 0 4px;color:var(--th);font-variant-numeric:tabular-nums}
+.hmute{font-size:12px;font-weight:400;color:var(--tm);opacity:1;margin-top:5px}
+.hrow2{font-size:13.5px;font-weight:400;line-height:1.9;color:var(--tx)}
+.hwarn{font-size:12.5px;font-weight:400;color:#E9A79E;line-height:1.65}
+
+/* 화면 안 하위 탭 — 밑줄만 남긴다 */
+.hsub{font-size:15px;font-weight:450;letter-spacing:-.02em;color:var(--tm);
+  padding:2px 0 6px;margin-right:18px;border-bottom:2px solid transparent}
+.hsub.on{color:var(--th);font-weight:550;border-bottom-color:var(--ac)}
+.hsubs{padding:12px 20px 0}
+
+/* 내 배 안쪽 이름표 */
+.mrsecthead{padding:14px 20px 2px;font-size:10.5px;font-weight:600;
+  letter-spacing:.15em;color:var(--td);opacity:1}
+.fhint{font-size:12px;font-weight:400;color:var(--tm);opacity:1;margin-top:7px}
+
+/* ============ D테마 — 바탕은 아이콘 그대로 ============ */
+/* ★ 아이콘의 새벽 바다를 그대로 앱 바탕으로 쓴다.
+   배와 물에 비친 배(그림자)만 뺐다. 해와 빛길은 그대로다.
+   수평선은 맨 윗줄 바로 아래에 둔다 — 아래쪽이 어두운 바다여야 글이 읽힌다.
+   그림 파일이 아니라 그림 명령(SVG)이라 어떤 화면 크기에서도 안 뭉갠다. */
+body{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.27'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.23'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.20'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.18'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.12'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.05'/></svg>") no-repeat fixed 0 0/cover, #040C15}
+body::before{display:none}
+/* ★ 맨 윗줄은 하늘 그대로의 색으로 채운다.
+   비워 두면 수평선의 밝은 띠가 하위 탭 글씨를 잡아먹는다. */
+header{background:linear-gradient(to bottom,#122a44 0%,#1a3c5c 100%);
+  backdrop-filter:none;border-bottom:none}
+#tabbar{background:rgba(4,12,20,.82);backdrop-filter:blur(14px)}
+
+/* 바탕이 살아 있으니 그 위의 것들은 '유리' 처럼 얹는다 */
+.tab,.mrbtn,.minib,.chip{background:rgba(255,255,255,.075)}
+.tab.on,.mrbtn.ok,.minib.blu{background:rgba(156,198,232,.19)}
+#lockBtn{background:rgba(255,255,255,.075)}
+#lockBtn.unlocked{background:rgba(95,184,148,.16)}
+.mrbtn.warn,.minib.red{background:rgba(228,117,106,.15)}
+.minib.grn{background:rgba(95,184,148,.16)}
+.hcard{background:rgba(10,26,40,.60);backdrop-filter:blur(12px)}
+.hcard.ins{background:rgba(20,48,70,.62)}
+.hcard.intro{background:rgba(10,26,40,.60)}
+/* ★ 판·서랍은 불투명해야 한다.
+   반투명으로 두면 내 배 화면 뒤로 앞 탭의 딱지가 비쳐서
+   지금 어느 화면인지 알 수 없게 된다. */
+#panel,#mrPanel,#drawer{background:#071522;backdrop-filter:none}
+#mrPanel.full{background:#071522}
+
+/* 가로선은 흰빛을 아주 옅게 — 바탕이 밝은 쪽에서도 선이 보이게 */
+.mr,.ghead{border-bottom-color:rgba(255,255,255,.055)}
+.statrow{border-color:rgba(255,255,255,.055)}
+.stat + .stat::before{background:rgba(255,255,255,.055)}
+#panel input,#panel select,#panel textarea,
+#mrPanel input,#mrPanel select,#mrPanel textarea,
+#searchWrap input{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
+
+/* ============ D테마 — 바다 위에 얹히는 것들 ============ */
+/* ★ 바탕이 살아 있으니, 그 위의 것들은 '판때기' 가 아니라
+   물 위에 얹힌 유리처럼 보여야 한다. 검은 상자를 다 걷어낸다. */
+
+/* 출항 전 점검 — 줄마다 검은 판이라 바다가 아예 안 보였다 */
+.ckrow{background:rgba(255,255,255,.045);margin:8px 20px 0;padding:14px 15px;border-radius:14px}
+.ckrow.on{opacity:.5}
+.ckbox{border:2px solid rgba(255,255,255,.22)}
+.ckrow.on .ckbox{background:var(--grn);border-color:var(--grn)}
+.cklbl{font-weight:450}
+
+/* 아래 탭줄 — 시커먼 띠로 바다를 뚝 자르지 않게 */
+#tabbar{background:linear-gradient(to bottom,rgba(4,12,21,.35),rgba(4,12,21,.86));
+  backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.05)}
+
+/* 맨 윗줄 — 하늘이 그대로 비치게 (수평선은 그 아래에 있다) */
+header{background:linear-gradient(to bottom,rgba(10,24,40,.55),rgba(16,40,64,.18));
+  backdrop-filter:blur(10px);border-bottom:none}
+
+/* 카드 — 유리 */
+.hcard{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:none}
+.hcard.ins{background:rgba(120,180,230,.10)}
+.hcard.intro{background:rgba(255,255,255,.05)}
+
+/* 도면 — 기본 도면은 바탕이 비어 있으니 바다 위에 바로 얹힌다.
+   사용자가 올린 사진 도면은 색을 건드리지 않고 '물 위에 놓인 종이' 로만 보이게 한다. */
+#mapWrap{padding:10px 16px 16px}
+#map img{opacity:1;filter:none;border-radius:12px}
+#map img[src^="data:image/png"],#map img[src^="data:image/jpeg"],
+#map img[src^="https"],#map img[src^="blob"]{
+  box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:.94}
+
+/* 내 배 화면 — 입력칸도 유리로 */
+#mrPanel input,#mrPanel textarea,#mrPanel select,
+#panel input,#panel textarea,#panel select{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:11px;color:var(--tx);padding:11px 12px;font-size:14px;font-weight:450}
+#mrPanel .mrrow{margin:9px 0}
+.mrsecthead{color:var(--td)}
+
+/* 도면 위 안내 글 */
+#hint,.fhint{color:var(--tm)}
+
+/* 전체 화면(내 배·명부·기록…)일 때 머리줄에는 한 줄만 남긴다 */
+body.panelfull header > *:not(.hrow){display:none!important}
+
+/* ============ 화면 갈아 끼우기 ============ */
+/* ★ 이 앱에는 '뒤 화면 위에 얹히는 창' 이 여섯 가지 있었다.
+     · #mrPanel      내 배·기록 등 35개 화면
+     · #panel        물품 목록
+     · #formOv       입력 화면
+     · #hatPanelOv   할 일
+     · #trashView    휴지통
+     · #helpOv       도움말
+
+   앞서 이것들을 '화면을 꽉 채우는 덮개' 로 바꿨는데, 그것은 고친 게 아니었다.
+   뒤 내용이 그대로 살아 있고 그 위에 큰 판을 덮은 것뿐이라
+   바탕이 안 이어지고, 스크롤이 두 겹이 되고, 언제든 다시 비칠 수 있다.
+
+   지금은 탭을 바꿀 때와 똑같이 한다 —
+   있던 내용이 자리에서 빠지고(display:none) 그 자리에 새 화면이 들어온다.
+   그래서 뒤에 아무것도 없다. 바탕은 몸통의 새벽 바다가 그대로 이어진다. */
+#mrPanel,#panel,#trashView,#helpOv,#formOv,#hatPanelOv{
+  position:static;inset:auto;left:auto;right:auto;top:auto;bottom:auto;
+  width:auto;max-width:none;height:auto;max-height:none;
+  background:transparent;box-shadow:none;border:none;border-radius:0;
+  z-index:auto;overflow:visible;
+  align-items:stretch;justify-content:stretch;padding:0;
+}
+#mrPanel .formBox,
+#formOv .formBox,#hatPanelOv #hatPanelBody,#trashView .trashBox,#helpOv .helpbox{
+  position:static;width:auto;max-width:none;height:auto;max-height:none;
+  background:transparent;border:none;border-radius:0;box-shadow:none;overflow:visible;
+}
+/* 화면 하나가 쓰는 여백 — 아래 탭줄에 안 가리게 아래를 넉넉히 둔다 */
+#mrPanel,#panel,#formOv .formBox,#hatPanelOv #hatPanelBody,
+#trashView .trashBox,#helpOv .helpbox{
+  padding:14px 20px calc(86px + env(safe-area-inset-bottom));
+}
+#panel{display:none;flex-direction:column}
+#panel.open{display:block}
+#mrPanel.open{display:block}
+#mrPanel.full{top:auto;bottom:auto;padding:14px 20px calc(86px + env(safe-area-inset-bottom))}
+
+/* 화면이 떠 있을 때 머리줄에는 한 줄만 남긴다 */
+body.panelfull header > *:not(.hrow){display:none!important}
+
+/* ============ 2단계 — 전체 화면 안쪽 결 ============ */
+/* ★ 오늘·출항 전 점검과 같은 결로 맞춘다.
+   지금은 이름표와 값이 각각 상자에 갇혀 있어서 서식 작성 화면처럼 보인다.
+   한 줄이 하나의 유리 카드가 되고, 그 안에서 이름표는 왼쪽·값은 오른쪽에 앉는다. */
+#mrPanel.full{padding:14px 20px calc(24px + env(safe-area-inset-bottom))}
+#panel{padding:14px 20px calc(24px + env(safe-area-inset-bottom))}
+
+#mrPanel.full .mrrow{
+  background:rgba(255,255,255,.045);border-radius:14px;
+  padding:13px 15px;margin:9px 0;gap:12px;align-items:center}
+#mrPanel.full .mrrow.edt,
+#mrPanel.full .mrrow:empty{background:transparent;padding:2px 0;margin:6px 0}
+#mrPanel.full .mrlbl{
+  width:58px;flex-shrink:0;font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  color:#5E7488}
+#mrPanel.full .mrv{font-size:15px;font-weight:450;color:var(--th)}
+#mrPanel.full .mrv2{font-size:12px;color:var(--tm)}
+#mrPanel.full input,#mrPanel.full select,#mrPanel.full textarea{
+  background:transparent;border:none;border-radius:0;padding:0;
+  font-size:15px;font-weight:450;color:var(--th);flex:1;min-width:0}
+#mrPanel.full input::placeholder,#mrPanel.full textarea::placeholder{color:#48607A}
+#mrPanel.full select{appearance:none;-webkit-appearance:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236E8497' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat right center}
+#mrPanel.full textarea{resize:vertical;min-height:44px;line-height:1.6}
+
+/* 무리 이름표 */
+#mrPanel.full .mrtop b,#mrPanel.full .mrsecthead{
+  font-size:10.5px;font-weight:600;letter-spacing:.15em;color:#4A5F72}
+#mrPanel.full .mrtop{margin:20px 0 4px}
+
+/* 화면 안 하위 탭(배 목록·기본정보·제원…) */
+#mrPanel.full .bsubs,#mrPanel.full .mrhead{padding:0;margin:0 0 10px}
+
+/* 물품 목록 화면도 같은 결 */
+#panel .prow,#panel .sr{background:rgba(255,255,255,.045);border-radius:14px;
+  padding:13px 15px;margin:9px 0;border:none}
+
+/* ============ 3단계 — 수납칸 색 체계 ============ */
+/* ★ 눈에 보이는 성질마다 뜻을 하나씩만 맡긴다.
+     선 모양   = 칸 종류 (실선 = 바닥 칸 · 점선 = 벽면·선반)
+     테두리 색 = 층      (하늘빛 = 1층 · 라벤더 = 2층 갑판)
+     채움      = 물건 유무
+     흰 테두리 = 지금 고른 칸
+   지금까지는 '물건 있음(초록)' 이 테두리 색을 통째로 덮어써서,
+   2층 칸에 물건이 들어가면 2층인지 알 수 없게 됐다. */
+.box{border-radius:3px}
+.b-n{border:1.6px solid rgba(150,196,232,.55);background:transparent}
+.b-n span{color:#9FC2DC}
+.b-w{border:1.6px dashed rgba(150,196,232,.55);background:transparent}
+.b-w span{color:#9FC2DC}
+.b-2{border-color:rgba(178,170,226,.66)}
+.b-2 span{color:#B9B4E4}
+/* 물건이 든 칸 — 테두리 색(층)은 그대로 두고 '채움' 만 바꾼다 */
+.has{border-color:inherit;background:rgba(90,196,164,.26);
+  box-shadow:inset 0 0 0 1px rgba(120,224,188,.55)}
+.has span{color:#B6EDD6}
+.b-n.has{border-color:rgba(150,196,232,.62)}
+.b-2.has{border-color:rgba(178,170,226,.72)}
+/* 고른 칸 — 색을 바꾸지 않고 흰 테두리를 두른다 (층·종류가 안 지워진다) */
+.sel{outline:2px solid #fff;outline-offset:1px;background:rgba(255,255,255,.16)}
+.sel span{color:#fff}
+.sel.has{background:rgba(160,240,210,.30)}
+
+/* ============ 2단계 — 물품 목록 화면 ============ */
+/* ★ 화면은 전체로 바뀌었는데 안쪽이 옛 모습 그대로였다.
+   파란 큰 단추와 갈색 상자가 새벽 바다 위에서 겉돌았다. */
+#panel .ph{padding:2px 0 12px;border-bottom:1px solid rgba(255,255,255,.06);gap:10px}
+#panel .pz{font-size:10.5px;font-weight:600;letter-spacing:.12em;color:#5E7488}
+#panel .pl{font-size:19px;font-weight:500;letter-spacing:-.02em;color:var(--th)}
+#panel .x,#panel #backBtn{background:none;border:none;color:var(--tm);font-size:20px}
+#panel .pform{padding:14px 0 12px;border-bottom:1px solid rgba(255,255,255,.06)}
+#panel .pform .t{font-size:10.5px;font-weight:600;letter-spacing:.12em;color:#5E7488;margin-bottom:10px}
+#panel input[type=text]{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+  border-radius:11px;color:var(--tx);padding:11px 12px;font-size:14px;font-weight:450}
+#panel .bp{background:var(--acs);border:none;border-radius:12px;color:var(--ac);
+  padding:12px 0;font-size:14px;font-weight:550}
+#panel .bs{background:rgba(255,255,255,.06);border:none;border-radius:12px;color:var(--tm)}
+#panel .chk{color:var(--tm);font-size:12.5px}
+#pitems{padding:10px 0 24px}
+
+/* 물품 한 줄 — 유리 카드 */
+.it{background:rgba(255,255,255,.045);border:none;border-radius:13px;
+  padding:12px 14px;margin-bottom:8px}
+.it .nm{font-size:14.5px;font-weight:450;color:var(--th)}
+.it .meta{font-size:11.5px;color:var(--tm);margin-top:4px}
+.it .meta b{color:#7FD1AC;font-weight:500}
+.it .meta i{color:#5E7488}
+.it.editing{background:rgba(156,198,232,.14)}
+/* 상자·공구함 — 안에 또 물건이 들어가는 것. 따뜻한 색으로 갈래를 구분한다 */
+.it.isbox{background:rgba(217,174,99,.10);box-shadow:inset 0 0 0 1px rgba(217,174,99,.28)}
+.it.isbox .nm{color:#E4C58E}
+.it.hl{box-shadow:inset 0 0 0 1.5px var(--yel)}
+.openb{background:rgba(217,174,99,.16)!important;border:none!important;border-radius:9px;
+  color:#E4C58E!important;font-size:11px!important;padding:4px 10px!important;font-weight:500}
+.pe{color:#9CC6E8}.pd{color:#DD8078}.pm{color:#7FD1AC}.pg{color:#D9AE63}
+.pbtn{background:rgba(255,255,255,.06);border:none;border-radius:10px;color:var(--tx);
+  padding:8px 12px;font-size:12.5px;font-weight:450}
+.fp1 img{border:1px solid rgba(255,255,255,.12);border-radius:8px}
+
+/* 도면 아래 안내 한 줄 — 새 색 체계에 맞춘다 */
+#hint{font-size:11px;color:var(--td);line-height:1.7}
+#hint .w{color:#9FC2DC}
+#hint .d{color:#B9B4E4}
+#hint .g{color:#7FD1AC}
+
+/* ============ 화면의 바탕도 새벽 바다 ============ */
+/* ★ 앞서 화면(내 배·물품 목록·입력·휴지통·도움말)의 바탕을 단색으로 깔았다.
+   뒤가 비치는 것을 막으려고 그랬는데, 그 바람에 새벽 바다까지 가려서
+   결국 '앞에 뜬 창' 과 똑같아 보였다.
+
+   고치는 법 — 화면에도 몸통과 '똑같은 그림' 을 깔면 된다.
+   background-attachment:fixed 는 화면(뷰포트) 기준으로 자리를 잡으므로,
+   몸통의 바탕과 한 치도 어긋나지 않고 겹친다.
+   그래서 뒤는 안 비치면서, 새벽 바다는 그대로 이어진다. */
+#mrPanel,
+#mrPanel.full,
+#panel,
+#formOv .formBox,
+#hatPanelOv #hatPanelBody,
+#trashView .trashBox,
+#helpOv .helpbox{
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.27'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.23'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.20'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.18'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.12'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.05'/></svg>") no-repeat fixed 0 0/cover, #040C15;
+}
+
+/* 화면 이름이 머리줄에 이미 떠 있으면 화면 안에서는 감춘다 (두 번 안 보이게) */
+body.panelfull #panel .ph .pl,
+body.panelfull #trashView .trashHead > span,
+body.panelfull .formHead > span{display:none}
+body.panelfull #panel .ph{padding-top:0}
+
+/* ============ 4단계 — 날씨 · 물때 ============ */
+/* ★ 날씨 화면은 아직 '검은 판 위의 표' 였다. 바다 위로 올린다.
+   다만 표는 읽는 것이 목적이라, 카드보다 '가는 선으로 나눈 표' 가 맞다. */
+.wxnow,.wxtl,.wxtide{background:rgba(255,255,255,.045);border:none;border-radius:16px}
+.wxnowtop b{font-size:15.5px;font-weight:500;color:var(--th)}
+.wxb b{font-size:26px;font-weight:250;color:var(--th);letter-spacing:-.03em}
+.wxb i{font-size:9.5px;font-weight:600;letter-spacing:.12em;color:var(--td)}
+.wxsun{border-top:1px solid rgba(255,255,255,.07);color:var(--tm)}
+.wxday{font-weight:600;color:#8FA6B8;border-top:1px solid rgba(255,255,255,.07)}
+.wxbarwrap{background:rgba(255,255,255,.07)}
+.wxv{font-weight:500}
+.wxtidetop b{font-size:14px;font-weight:500;color:var(--th)}
+.trow{background:rgba(255,255,255,.045);border:none;border-radius:13px;padding:11px 13px}
+
+/* 시간표 — 바탕이 밝은 쪽에서도 줄이 보이게 흰빛을 옅게 */
+.wlbl{background:rgba(6,17,28,.86);backdrop-filter:blur(10px);color:var(--tm);font-weight:600}
+.wlbl i{color:var(--td)}
+.wdate{color:#8FA6B8;font-weight:600;border-left:1px solid rgba(255,255,255,.09)}
+.wch{color:var(--tm);font-weight:500}
+.wlbr{color:var(--tx)}
+.wbx{color:var(--td)}
+/* 밤 시간대 — 검은 칠 대신 옅게 가라앉힌다 */
+.wnight{background:rgba(0,0,0,.22)}
+.wxslots i{opacity:.9}
+
+/* 도면 위 사용자가 그린 도형 */
+#shLayer rect,#shLayer polygon,#mrShLayer rect,#mrShLayer polygon{fill:rgba(255,255,255,.045)}
+
+/* 칸 그리기 중 표시 — 청록이 새 판에서 너무 튄다 */
+#map.lkedit .box{outline:1px dashed rgba(156,198,232,.55)}
+#map.lkedit .box.lkon{outline:2px solid #9CC6E8}
+#map.lkedit .box::after{background:#9CC6E8;border:2px solid #071522}
+#lkGhost,#mrGhost{border:2px dashed #9CC6E8;background:rgba(156,198,232,.14)}
+
+/* ============ 4단계 — 남은 상자·표시 ============ */
+.wxbox{background:rgba(255,255,255,.045);border:none;border-radius:16px;color:var(--tx)}
+.wxbox b{color:var(--th);font-weight:500}
+/* 특보가 떠 있을 때만 붉게 — 이건 소리쳐야 하는 자리다 */
+.wxbox.warn{background:rgba(228,117,106,.13);border:none;
+  box-shadow:inset 0 0 0 1px rgba(228,117,106,.34)}
+.wxbox.warn b{color:#F0958C}
+.wxfoot{color:var(--tm)}
+.wxfoot a{color:var(--ac)}
+.qres{background:rgba(255,255,255,.045);border-radius:14px}
+.wxwarn{background:rgba(217,174,99,.10);border-left:2px solid rgba(217,174,99,.5);
+  color:var(--tm)}
+.wxwarn b{color:#D9AE63}
+/* 고른 시각 표시 — 주황을 걷어낸다 */
+#wxHl{border:1.5px solid var(--ac);border-radius:7px}
+.caltoday b{color:var(--ac)}
+.hrowi input[type=radio]{accent-color:#9CC6E8}
+.hrowi{border-bottom:1px solid rgba(255,255,255,.06)}
+.hrowi label{color:var(--tx);font-weight:450}
+#hatPanelBody{background:transparent}
+.hexp{color:var(--tm)}
+.selbar{background:rgba(255,255,255,.045);border-radius:14px}
+.selmid{color:var(--tx)}
+.selmid>b{color:var(--th);font-weight:500}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0a1628">
@@ -764,7 +1310,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
     <div class="mark" style="left:50%;top:82%;transform:translateX(-50%);color:#6a4a9a;letter-spacing:2px;font-size:8px">── 2층 (갑판) ──</div>
   </div>
 </div>
-<div id="hint">칸 클릭 · 초록=물품있음 · <span class="w">점선=벽면/선반</span> · <span class="d">보라=2층</span> · 상자 · 이동 · 합치기 · 사진</div>
+<div id="hint">칸 클릭 · <span class="g">청록으로 찬 칸=물건 있음</span> · <span class="w">점선=벽면·선반</span> · <span class="d">라벤더=2층(갑판)</span></div>
 
 <div id="listView"></div>
 
@@ -1091,14 +1637,14 @@ function svgUrl(t){ return 'data:image/svg+xml;charset=utf-8,' + encodeURICompon
 const DG_BUILTIN = {
   first45: { name:'베네토 퍼스트 45f5', type:'sail' },   // 그림은 아래에서 붙인다
   sail: { name:"세일링 요트 (일반)", type:"sail",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 22 C154 120 82 302 68 470 C60 624 76 802 98 950 L302 950 C324 802 340 624 332 470 C318 302 246 120 200 22 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 40 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M126 372 C160 344 240 344 274 372 C286 470 288 566 280 640 L120 640 C112 566 114 470 126 372 Z\"/> <circle cx=\"200\" cy=\"404\" r=\"13\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M182 470 L218 470 L218 512 L182 512 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 668 L288 668 L282 890 L118 890 Z\"/> <circle cx=\"200\" cy=\"720\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M170 856 L230 856 L230 884 L170 884 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M188 214 L212 214 L212 246 L188 246 Z\"/> </svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1300\"><rect width=\"1000\" height=\"1300\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L935 1078\"/> <path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L78 1108\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M556 100 Q 392 470 258 1052 L560 1034 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M566 132 L922 1058 L648 1000 Z\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"5\" stroke-linecap=\"round\" d=\"M562 1104 L545 70\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"4\" stroke-linecap=\"round\" d=\"M558 1036 L250 1056\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M520 452 L580 448 M528 760 L586 757\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M70 1112 C320 1130 640 1122 930 1076 L950 1122 C900 1182 700 1206 430 1208 C300 1209 190 1200 120 1188 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M404 1108 C480 1078 620 1074 700 1094\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M176 1116 L188 1142 L378 1138 L390 1114\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M424 1206 L404 1288 L506 1292 L522 1200\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M244 1200 L236 1274 L262 1276 L272 1197\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 1168 L970 1168\"/> </svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 22 C154 120 82 302 68 470 C60 624 76 802 98 950 L302 950 C324 802 340 624 332 470 C318 302 246 120 200 22 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 40 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M126 372 C160 344 240 344 274 372 C286 470 288 566 280 640 L120 640 C112 566 114 470 126 372 Z\"/> <circle cx=\"200\" cy=\"404\" r=\"13\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M182 470 L218 470 L218 512 L182 512 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 668 L288 668 L282 890 L118 890 Z\"/> <circle cx=\"200\" cy=\"720\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M170 856 L230 856 L230 884 L170 884 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M188 214 L212 214 L212 246 L188 246 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1300\"><path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L935 1078\"/> <path fill=\"none\" stroke=\"#6d8299\" stroke-width=\"1.6\" d=\"M545 70 L78 1108\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M556 100 Q 392 470 258 1052 L560 1034 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M566 132 L922 1058 L648 1000 Z\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"5\" stroke-linecap=\"round\" d=\"M562 1104 L545 70\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"4\" stroke-linecap=\"round\" d=\"M558 1036 L250 1056\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M520 452 L580 448 M528 760 L586 757\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M70 1112 C320 1130 640 1122 930 1076 L950 1122 C900 1182 700 1206 430 1208 C300 1209 190 1200 120 1188 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M404 1108 C480 1078 620 1074 700 1094\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" d=\"M176 1116 L188 1142 L378 1138 L390 1114\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M424 1206 L404 1288 L506 1292 L522 1200\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M244 1200 L236 1274 L262 1276 L272 1197\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 1168 L970 1168\"/> </svg>" },
   power: { name:"모터보트·요트 (일반)", type:"power",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 26 C150 130 76 320 66 500 C60 660 74 820 92 950 L308 950 C326 820 340 660 334 500 C324 320 250 130 200 26 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 44 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 300 C150 268 250 268 288 300 C298 400 300 500 292 580 L108 580 C100 500 102 400 112 300 Z\"/> <circle cx=\"200\" cy=\"360\" r=\"17\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M104 616 L296 616 L292 900 L108 900 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M150 660 L250 660 L250 780 L150 780 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M176 190 L224 190 L224 232 L176 232 Z\"/> </svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><rect width=\"1000\" height=\"520\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M62 300 C320 306 620 298 872 254 L946 306 C880 358 420 376 152 358 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M516 298 L516 268 L540 186 L800 176 L866 250 L866 268\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M560 200 L788 192\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M596 180 L606 122 L744 116 L758 176\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M620 138 L738 134\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M104 296 L104 254 M244 292 L244 250 M384 288 L384 248 M100 254 L388 246\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M556 302 L556 344 L706 344 L706 298\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M540 340 L232 358\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M236 336 L226 382\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M170 356 L164 400 L184 402 L192 354\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 330 L970 330\"/> </svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 26 C150 130 76 320 66 500 C60 660 74 820 92 950 L308 950 C326 820 340 660 334 500 C324 320 250 130 200 26 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 44 L200 946\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M112 300 C150 268 250 268 288 300 C298 400 300 500 292 580 L108 580 C100 500 102 400 112 300 Z\"/> <circle cx=\"200\" cy=\"360\" r=\"17\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M104 616 L296 616 L292 900 L108 900 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M150 660 L250 660 L250 780 L150 780 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M176 190 L224 190 L224 232 L176 232 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M62 300 C320 306 620 298 872 254 L946 306 C880 358 420 376 152 358 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M516 298 L516 268 L540 186 L800 176 L866 250 L866 268\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M560 200 L788 192\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M596 180 L606 122 L744 116 L758 176\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M620 138 L738 134\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M104 296 L104 254 M244 292 L244 250 M384 288 L384 248 M100 254 L388 246\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M556 302 L556 344 L706 344 L706 298\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M540 340 L232 358\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M236 336 L226 382\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M170 356 L164 400 L184 402 L192 354\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 330 L970 330\"/> </svg>" },
   fishing: { name:"낚시·유어선 (일반)", type:"fishing",
-    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><rect width=\"400\" height=\"1000\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 24 C148 132 74 330 64 510 C58 668 72 826 90 952 L310 952 C328 826 342 668 336 510 C326 330 252 132 200 24 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 42 L200 948\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M110 400 L290 400 L286 610 L114 610 Z\"/> <circle cx=\"200\" cy=\"452\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M148 660 L252 660 L252 790 L148 790 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M120 236 L280 236 L276 340 L124 340 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M110 830 L290 830 L288 916 L112 916 Z\"/> </svg>",
-    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><rect width=\"1000\" height=\"520\" fill=\"#0a0f14\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M66 286 C330 296 640 288 878 232 L950 292 C884 352 420 372 156 352 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M420 282 L432 166 L646 158 L662 276\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M452 192 L634 186\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M446 216 L446 274 M636 210 L636 268\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3.5\" stroke-linecap=\"round\" d=\"M540 158 L546 62\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M506 82 L582 78\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M118 288 L118 240 M212 286 L212 238 M306 284 L306 236 M114 240 L310 234\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M726 268 L726 222 M812 258 L812 212 M722 222 L816 210\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M160 282 L160 264 L340 260 L340 278\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M470 292 L470 336 L618 336 L618 288\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M460 334 L236 352\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M240 330 L230 376\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M176 350 L170 392 L190 394 L198 348\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 318 L970 318\"/> </svg>" },
+    planSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 1000\"><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M200 24 C148 132 74 330 64 510 C58 668 72 826 90 952 L310 952 C328 826 342 668 336 510 C326 330 252 132 200 24 Z\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.2\" stroke-dasharray=\"6 7\" d=\"M200 42 L200 948\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2\" stroke-linejoin=\"round\" d=\"M110 400 L290 400 L286 610 L114 610 Z\"/> <circle cx=\"200\" cy=\"452\" r=\"16\" fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M148 660 L252 660 L252 790 L148 790 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M120 236 L280 236 L276 340 L124 340 Z\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M110 830 L290 830 L288 916 L112 916 Z\"/> </svg>",
+    sideSvg: "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 520\"><path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M66 286 C330 296 640 288 878 232 L950 292 C884 352 420 372 156 352 Z\"/> <path fill=\"none\" stroke=\"#9fb3c8\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M420 282 L432 166 L646 158 L662 276\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M452 192 L634 186\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"1.8\" d=\"M446 216 L446 274 M636 210 L636 268\"/> <path fill=\"none\" stroke=\"#dfe8f2\" stroke-width=\"3.5\" stroke-linecap=\"round\" d=\"M540 158 L546 62\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M506 82 L582 78\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M118 288 L118 240 M212 286 L212 238 M306 284 L306 236 M114 240 L310 234\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M726 268 L726 222 M812 258 L812 212 M722 222 L816 210\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" d=\"M160 282 L160 264 L340 260 L340 278\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2\" stroke-dasharray=\"7 6\" d=\"M470 292 L470 336 L618 336 L618 288\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" d=\"M460 334 L236 352\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"3\" d=\"M240 330 L230 376\"/> <path fill=\"none\" stroke=\"#7f94aa\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M176 350 L170 392 L190 394 L198 348\"/> <path fill=\"none\" stroke=\"#3d5064\" stroke-width=\"1.4\" stroke-dasharray=\"8 8\" d=\"M30 318 L970 318\"/> </svg>" },
 };
 
 DG_BUILTIN.first45.plan = FLOORPLAN;
@@ -2216,6 +2762,7 @@ function openHelp(key){
   if(!el){
     el = document.createElement('div');
     el.id = 'helpOv';
+    setTimeout(()=>{ try{ watchScreens(); }catch(_){} }, 0);
     el.onclick = e => { if(e.target === el) closeHelp(); };
     document.body.appendChild(el);
   }
@@ -7235,7 +7782,7 @@ function buildBoxes(){
     const d = document.createElement('div');
     d.id = 'bx_'+l.id;
     d.dataset.id = l.id;     // 칸 편집에서 어느 칸인지 알아야 한다
-    d.className = 'box ' + (l.wall?'b-w':l.deck2?'b-d':'b-n') + ' s-' + lkShapeOf(l);
+    d.className = 'box ' + (l.wall ? 'b-w' : 'b-n') + (l.deck2 ? ' b-2' : '') + ' s-' + lkShapeOf(l);
     d.style.cssText = `left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`;
     d.innerHTML = '<span></span>';
     d.onclick = ()=>{ if(typeof lkEdit!=='undefined' && lkEdit) return; openLocker(l.id); };
@@ -7348,7 +7895,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.53';
+const APP_VER = '3.59';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8726,13 +9273,15 @@ function addMonths(iso, m){
 }
 function fmtDate(d){ const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 const today = () => fmtDate(new Date());
+// ★ k = 갈래. 색을 직접 들고 다니지 않고 갈래만 넘긴다.
+//   그래야 화면 결을 바꿀 때 여기를 안 건드려도 된다.
 function mStatus(it){
-  if(!it.lastDate) return {c:'#5A5F66', t:'미기록', next:null, days:null};
+  if(!it.lastDate) return {c:'#5A5F66', t:'미기록', k:'none', next:null, days:null};
   const nd = addPeriod(it.lastDate, it.months, it.unit||'m');
   const days = Math.floor((nd - new Date())/864e5);
-  if(days<0)   return {c:'#F05B52', t:'지남 '+(-days)+'일', next:nd, days};
-  if(days<=30) return {c:'#E8B33C', t:'남음 '+days+'일',  next:nd, days};
-  return {c:'#46B87C', t:'남음 '+days+'일', next:nd, days};
+  if(days<0)   return {c:'#E4756A', t:'지남 '+(-days)+'일', k:'late', next:nd, days};
+  if(days<=30) return {c:'#D9AE63', t:'남음 '+days+'일',  k:'soon', next:nd, days};
+  return {c:'#5FB894', t:'남음 '+days+'일', k:'ok', next:nd, days};
 }
 const DS = {maint:()=>maint, repair:()=>repair, voyage:()=>voyage, fuel:()=>fuel, run:()=>runs, contact:()=>contacts, vdoc:()=>vdocs};
 const getMR = (t,id) => (DS[t]?DS[t]():[]).find(x=>String(x.id)===String(id));
@@ -9254,10 +9803,10 @@ function renderMaintList(){
     if(closed) return head;
     return head + arr.map(it=>{
       const s=mStatus(it);
-      return `<div class="mr gitem" onclick="openMR('maint','${it.id}')">
+      return `<div class="mr gitem ${s.k}" onclick="openMR('maint','${it.id}')">
         <div class="ct"><div class="cn">${esc(it.name || '(이름 없음)')}${it.seed?' <span class="seedb">초안</span>':''}</div>
           ${it.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), it.who))}</span>`:''}
-          <span class="chip" style="background:${s.c}">${s.t}</span></div>
+          <span class="st ${s.k}">${s.t}</span></div>
         <div class="mrm">주기 ${it.months}${UNIT_LABEL[it.unit||'m']} · 마지막 ${it.lastDate||'—'}${s.next?' · 다음 '+fmtDate(s.next):''}${it.pin?' · 핀':''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}</div>
       </div>`;
     }).join('');
@@ -9267,7 +9816,8 @@ function renderMaintList(){
 // ===== 수리목록 =====
 const RP_ORDER = {open:0, progress:1, done:2};
 const RP_LABEL = {open:'고장', progress:'진행중', done:'완료'};
-const RP_COLOR = {open:'#F05B52', progress:'#E8B33C', done:'#46B87C'};
+const RP_COLOR = {open:'#E4756A', progress:'#D9AE63', done:'#5FB894'};
+const RP_K = {open:'late', progress:'soon', done:'ok'};
 let showDone = false;
 function toggleDone(){ showDone = !showDone; renderRepairList(); }
 function renderRepairList(){
@@ -9276,10 +9826,10 @@ function renderRepairList(){
     .sort((a,b)=>(RP_ORDER[a.status]-RP_ORDER[b.status]) || String(b.created||'').localeCompare(String(a.created||'')));
   const done_ = repair.filter(it=>it.status==='done')
     .sort((a,b)=>String(b.doneDate||'').localeCompare(String(a.doneDate||'')));
-  const row = it => `<div class="mr" onclick="openMR('repair','${it.id}')">
+  const row = it => `<div class="mr ${RP_K[it.status]||''}" onclick="openMR('repair','${it.id}')">
       <div class="ct"><div class="cn">${esc(it.title || '(제목 없음)')}</div>
         ${it.grp?`<span class="chip nchip">${esc(it.grp)}</span>`:''}
-        <span class="chip" style="background:${RP_COLOR[it.status]||'#5A5F66'}">${RP_LABEL[it.status]||it.status}</span></div>
+        <span class="st ${RP_K[it.status]||'none'}">${RP_LABEL[it.status]||it.status}</span></div>
       <div class="mrm">발견 ${it.created||'—'}${it.doneDate?' · 완료 '+it.doneDate:''}${it.pin?' · 핀':''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}${it.note?' · '+esc(it.note).slice(0,30):''}</div>
     </div>`;
   L.innerHTML =
@@ -9352,7 +9902,7 @@ function openMR(t, id){
       <div class="mrrow"><span class="mrlbl">마지막</span>${unlocked
         ?`<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
         :`<b class="mrv">${it.lastDate||'—'}</b>`}
-        <span class="chip" style="background:${s.c}">${s.t}</span>${s.next?`<span class="mrv2">다음 ${fmtDate(s.next)}</span>`:''}</div>
+        <span class="st ${s.k}">${s.t}</span>${s.next?`<span class="mrv2">다음 ${fmtDate(s.next)}</span>`:''}</div>
       <div class="mrrow"><span class="mrlbl">담당</span>
         <b class="mrv" style="flex:1">${it.who ? esc(taskOwnerName(curBoat(), it.who)) : '없음'}</b>
         ${can(curBoat(),'task','write')
@@ -9369,7 +9919,7 @@ function openMR(t, id){
             <option value="open"${it.status==='open'?' selected':''}>고장</option>
             <option value="progress"${it.status==='progress'?' selected':''}>진행중</option>
             <option value="done"${it.status==='done'?' selected':''}>완료</option></select>`
-        :`<span class="chip" style="background:${RP_COLOR[it.status]}">${RP_LABEL[it.status]}</span>`}
+        :`<span class="st ${RP_K[it.status]||'none'}">${RP_LABEL[it.status]}</span>`}
         <span class="mrv2">발견 ${it.created||'—'}${it.doneDate?' · 완료 '+it.doneDate:''}</span></div>
       <div class="mrrow"><span class="mrlbl">계통</span>${unlocked
         ?`<input list="grpList" value="${esc(it.grp||'')}" style="width:130px" placeholder="엔진/전기…" onchange="mrField('grp',this.value.trim())">`
@@ -10028,6 +10578,87 @@ function openDrawer(){ document.getElementById('drawerOv').classList.add('open')
 // 머리줄 이름을 그 화면 이름으로 바꾸고 아래 탭 불을 끈다.
 // 그렇게 하지 않으면 머리줄에 '적재표' 가 남고 아래 탭도 적재표가 켜져 있어서,
 // 다른 탭 위에 얹힌 것처럼 보인다. 사용자가 여러 번 지적한 것이 이것이다.
+// ★ '앞에 뜨는 창' 을 없애기 위한 한 군데.
+//   화면(내 배·물품 목록·입력·휴지통·도움말·할 일) 중 하나라도 떠 있으면
+//   머리줄에서 앞 탭의 도구줄·검색창을 감춘다.
+//   여는 곳마다 손으로 켜고 끄면 반드시 한 곳이 빠진다. 그래서 스스로 살피게 한다.
+const SCREEN_IDS = ['mrPanel','panel','formOv','hatPanelOv','trashView','helpOv'];
+
+// ★ 탭에 붙어 있는 내용들. 화면이 바뀌면 이것들은 '사라진다' (감추는 게 아니라 자리에서 빠진다).
+const TAB_CONTENT = ['searchWrap','stowTools','mrSub','mapWrap','listView','hint',
+  'homeWrap','weatherWrap','checkWrap','maintWrap','repairWrap','fuelWrap','contactsWrap',
+  'mrMapWrap','voyageWrap','communityWrap','talkWrap','spotWrap','marketWrap',
+  'exploreWrap','newsWrap'];
+window.TAB_CONTENT = TAB_CONTENT;
+
+// ★ 화면 갈아 끼우기
+//   앞에 창을 띄우지 않는다. 탭을 바꿀 때처럼, 있던 내용이 자리에서 빠지고
+//   그 자리에 새 화면이 들어온다. 그래서 뒤에 아무것도 남지 않는다.
+//   화면 안에서 또 화면을 열 수도 있으므로(내 배 → 입력 화면) 차곡차곡 쌓아 둔다.
+const SCREEN_STACK = [];
+function isShown(el){
+  return !!el && getComputedStyle(el).display !== 'none';
+}
+function screenPush(id){
+  const el = document.getElementById(id);
+  if(!el || SCREEN_STACK.indexOf(id) >= 0) return;
+  const under = SCREEN_STACK.length ? [SCREEN_STACK[SCREEN_STACK.length-1]] : TAB_CONTENT;
+  const hid = [];
+  under.forEach(x=>{
+    const e = document.getElementById(x);
+    if(isShown(e)){ e.style.display = 'none'; hid.push(x); }
+  });
+  el.dataset.hid = JSON.stringify(hid);
+  SCREEN_STACK.push(id);
+  document.body.classList.add('panelfull');
+  // 머리줄 이름을 그 화면 이름으로 바꾸고 아래 탭 불을 끈다.
+  // 안 그러면 머리줄에 '적재표' 가 남아 다른 탭 위에 얹힌 것처럼 보인다.
+  try{
+    const t = el.querySelector('.pl, .trashHead > span, .formHead > span, .mrhead > b, .mrtop > b');
+    const nm = t && String(t.textContent || '').trim();
+    if(nm) setHeadTitle(nm);
+    ['tabHome','tabBoat','tabVoyage','tabCommunity'].forEach(x=>{
+      const e = document.getElementById(x); if(e) e.classList.remove('on');
+    });
+  }catch(_){}
+  try{ window.scrollTo(0, 0); }catch(_){}
+}
+function screenPop(id){
+  const i = SCREEN_STACK.lastIndexOf(id);
+  if(i < 0) return;
+  SCREEN_STACK.splice(i, 1);
+  const el = document.getElementById(id);
+  let hid = [];
+  try{ hid = JSON.parse((el && el.dataset.hid) || '[]'); }catch(_){}
+  hid.forEach(x=>{ const e = document.getElementById(x); if(e) e.style.display = ''; });
+  if(el) delete el.dataset.hid;
+  if(!SCREEN_STACK.length){
+    document.body.classList.remove('panelfull');
+    try{ restorePanel(); }catch(_){}
+  }
+}
+// 여는 곳·닫는 곳이 수십 군데다. 한 곳이라도 빠지면 거기서 앞창이 다시 생긴다.
+// 그래서 부르는 쪽을 고치지 않고, 화면이 켜지고 꺼지는 것을 스스로 지켜본다.
+function syncScreen(){
+  SCREEN_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(isShown(el)) screenPush(id);
+    else screenPop(id);
+  });
+}
+function watchScreens(){
+  SCREEN_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el || el.dataset.scrw) return;
+    el.dataset.scrw = '1';
+    new MutationObserver(syncScreen).observe(el, {attributes:true, attributeFilter:['class','style']});
+  });
+  syncScreen();
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchScreens);
+else watchScreens();
+
 function showPanel(P){
   P = P || document.getElementById('mrPanel');
   if(!P) return;
@@ -13400,19 +14031,21 @@ const DIRS = ['북','북북동','북동','동북동','동','동남동','남동',
 const dirName = d => DIRS[Math.round(((d%360)/22.5))%16];
 const ms2kt = v => v*1.94384;
 
+// ★ 안전 → 위험 다섯 단계. 뜻은 그대로 두고 결만 새벽 바다 판에 맞춘다.
+//   형광에 가까운 색은 바다 위에서 튀고, 흔들리는 배에서 눈이 피로해진다.
 function wxWindColor(kt){
-  if(kt < 8)  return '#46B87C';
-  if(kt < 14) return '#8FCB4A';
-  if(kt < 20) return '#E8B33C';
-  if(kt < 27) return '#F0803C';
-  return '#F05B52';
+  if(kt < 8)  return '#5FB894';
+  if(kt < 14) return '#9CC08A';
+  if(kt < 20) return '#D9AE63';
+  if(kt < 27) return '#DE9068';
+  return '#E4756A';
 }
 function wxWaveColor(m){
-  if(m < 0.5) return '#46B87C';
-  if(m < 1.0) return '#8FCB4A';
-  if(m < 1.5) return '#E8B33C';
-  if(m < 2.5) return '#F0803C';
-  return '#F05B52';
+  if(m < 0.5) return '#5FB894';
+  if(m < 1.0) return '#9CC08A';
+  if(m < 1.5) return '#D9AE63';
+  if(m < 2.5) return '#DE9068';
+  return '#E4756A';
 }
 
 // ---------- 데이터 취득 ----------
@@ -14029,7 +14662,7 @@ async function renderWeather(){
         const py = v => Hh-pad - (v-vmin)/((vmax-vmin)||1)*(Hh-pad*2);
         const path = tv.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+py(p.v).toFixed(1)).join(' ');
         tideRow = `<svg class="wtidesvg" width="${N*COLW}" height="${Hh}" viewBox="0 0 ${N*COLW} ${Hh}" preserveAspectRatio="none">
-          <path d="${path}" fill="none" stroke="#5FA8D3" stroke-width="2"/></svg>`;
+          <path d="${path}" fill="none" stroke="#9CC6E8" stroke-width="2"/></svg>`;
       }
       for(let i=0;i<N;i++){
         const ts = t0 + i*3600e3;
@@ -14061,7 +14694,7 @@ async function renderWeather(){
                 +'T'+String(bd.getHours()).padStart(2,'0')+':'+String(bd.getMinutes()).padStart(2,'0');
     let bridgeResult = '';
     if(quickClr>0 && !(ad>0)){
-      bridgeResult = `<div class="qres"><div class="qsub" style="color:#E8B33C">
+      bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">
         배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.<br>
         입력하지 않으면 통과 여부를 계산할 수 없습니다.</div></div>`;
     }
@@ -14070,7 +14703,7 @@ async function renderWeather(){
       if(tv!=null){
         const clr = quickClr + (cur.hat - tv);
         const m = clr - ad;
-        const c = m>=mg ? '#46B87C' : m>=0 ? '#E8B33C' : '#F05B52';
+        const c = m>=mg ? '#5FB894' : m>=0 ? '#D9AE63' : '#E4756A';
         const verdict = m>=mg ? '통과 가능' : m>=0 ? '여유 부족 — 위험' : '통과 불가';
         bridgeResult = `<div class="qres">
           <div class="qbig" style="color:${c}">${clr.toFixed(2)}<i>m</i></div>

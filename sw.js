@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-3.53';
+const CACHE = 'baetnil-3.59';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -9,7 +9,7 @@ const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려�
 //   앱 버전을 올려도 지우지 않는다 — 지우면 배에 나갈 때마다 처음부터 다시 받아야 한다.
 const PHOTO_HOSTS = ['firebasestorage.googleapis.com'];
 const PHOTO_KEEP = 400;          // 이보다 많아지면 오래된 것부터 버린다
-const ASSETS = ['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-180.png'];
+const ASSETS = ['./','./index.html','./manifest.webmanifest','./font.woff2','./icon-192.png','./icon-512.png','./icon-180.png'];
 const TILE_HOSTS = ['tile.openstreetmap.org','tiles.openseamap.org'];
 
 // ★ 왜 이렇게 하는가 (2.13 까지 실제로 겪은 사고)

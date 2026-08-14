@@ -238,9 +238,26 @@ ${JSON.stringify(payload)}`;
   const shortlist = [...fresh, ...olds].slice(0, 45);
   await enrich(shortlist);
   const picked = await selectAndTranslate(shortlist, seen);
-  const news = { updated: new Date().toISOString(), candidates: all.length,
-    items: picked.map(x=>({ title:x.title, t_ko:x.t_ko, s_ko:x.s_ko, cat:x.cat, link:x.link, source:x.source, date:x.date })) };
+  // ★ 이레치를 쌓아 둔다 (한국 소식과 같은 까닭)
+  //   전에는 돌 때마다 통째로 덮어써서 지난번 것이 사라졌다.
+  //   해외 소식은 월·목 두 번만 도니까 더 잘 사라졌다.
+  const KEEP_DAYS = 7;
+  const cut = Date.now() - KEEP_DAYS * 864e5;
+  let prev = null;
+  try{ prev = JSON.parse(fs.readFileSync('news.json', 'utf8')); }catch(_){}
+  const fresh2 = picked.map(x=>({ title:x.title, t_ko:x.t_ko, s_ko:x.s_ko, cat:x.cat,
+                                  link:x.link, source:x.source, date:x.date }));
+  const byLink = new Map();
+  for(const r of [...fresh2, ...((prev && prev.items) || [])]){
+    if(!r || !r.link) continue;
+    const t = new Date(r.date || 0).getTime();
+    if(!isFinite(t) || t < cut) continue;
+    if(!byLink.has(r.link)) byLink.set(r.link, r);
+  }
+  const items = [...byLink.values()].sort((a,b)=> new Date(b.date) - new Date(a.date));
+  const news = { updated: new Date().toISOString(), candidates: all.length, items };
   fs.writeFileSync('news.json', JSON.stringify(news, null, 1));
+  console.log('해외 소식 쌓인 것', items.length, '건');
   saveSeen(seen, picked);
   const newCnt = picked.filter(x=> !seen.includes(x.link)).length;
   console.log('news.json 저장:', picked.length, '건 선별 (새 기사', newCnt, '건)');

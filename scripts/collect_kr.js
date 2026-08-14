@@ -49,9 +49,61 @@ async function collectGov(){
     }catch(e){ console.warn('GOV FAIL', g.name, e.message); }
   }
   const seen = new Set();
-  return out
+  return dedupeEvent(out
     .filter(x=>{ const k=x.title.slice(0,25); if(seen.has(k)) return false; seen.add(k); return true; })
-    .sort((a,b)=> new Date(b.date)-new Date(a.date));
+    .sort((a,b)=> new Date(b.date)-new Date(a.date)));
+}
+
+// ★ 같은 사건, 다른 기사를 하나로 묶는다.
+//   피드가 넷이라 큰 사고가 나면 같은 일이 네 군데에 다 걸린다.
+//   앞 25자 완전 일치만 보던 옛 방식으로는
+//   '여수 해상 어선 전복…' 과 '[속보] 여수 앞바다 어선 전복' 이 다른 것으로 남았다.
+//   제목의 낱말이 절반 넘게 겹치면 같은 사건으로 보고 하나만 남긴다.
+const STOP = new Set(['속보','단독','종합','오늘','내일','관련','대한','위한','통해','밝혀',
+                      '했다','한다','있다','없다','되다','기사','뉴스','사진','영상']);
+function wordsOf(t){
+  return new Set(String(t||'')
+    .replace(/\[[^\]]*\]/g, ' ')            // [속보] 같은 머리표 제거
+    .replace(/[^가-힣0-9a-zA-Z]+/g, ' ')
+    .split(/\s+/)
+    .map(w => w.replace(/(에서|으로|에게|까지|부터|이나|라도|마다|보다|처럼|한다|했다|된다|되다)$/, ''))
+    .filter(w => w.length >= 2 && !STOP.has(w)));
+}
+function overlap(a, b){
+  if(!a.size || !b.size) return 0;
+  let n = 0;
+  for(const w of a) if(b.has(w)) n++;
+  return n / Math.min(a.size, b.size);
+}
+// ★ 낱말만으로는 부족하다.
+//   한국어는 붙여 쓰는 말이 많아 '수상레저기구' 와 '수상레저' 가 다른 낱말이 된다.
+//   두 글자씩 겹쳐 자르면 이런 것도 걸린다.
+function gramsOf(t){
+  const c = String(t||'').replace(/\[[^\]]*\]/g,'').replace(/[^가-힣0-9a-zA-Z]/g,'');
+  const g = new Set();
+  for(let i = 0; i + 2 <= c.length; i++) g.add(c.slice(i, i + 2));
+  return g;
+}
+function sameEvent(a, b){
+  // 둘 중 하나만 걸려도 같은 사건으로 본다
+  return overlap(a.w, b.w) >= 0.5 || overlap(a.g, b.g) >= 0.45;
+}
+function dedupeEvent(rows){
+  const kept = [];
+  for(const r of rows){
+    const key = { w: wordsOf(r.title), g: gramsOf(r.title) };
+    const dup = kept.find(k => sameEvent(key, k._k));
+    if(dup){
+      // 제목이 더 긴 쪽이 대개 더 자세하다 — 그쪽을 남긴다
+      if(String(r.title).length > String(dup.title).length){
+        dup.title = r.title; dup.link = r.link; dup.press = r.press;
+        dup._k = key;                       // ★ 열쇠도 같이 갈아야 다음 것과 제대로 견준다
+      }
+      continue;
+    }
+    kept.push(Object.assign({ _k:key }, r));
+  }
+  return kept.map(x=>{ const y = Object.assign({}, x); delete y._k; return y; });
 }
 
 // AI 선별: 후보 중 배 쓰는 사람에게 의미 있는 것만
@@ -65,6 +117,10 @@ async function pickGov(items){
 특정 지역 사람만 겨냥하지 마라.
 
 최대 ${GOV_MAX}건을 골라 중요한 순서로 정렬해라.
+
+★ 같은 사건은 한 건만 골라라.
+   여러 언론사가 같은 사고·같은 발표를 따로 쓴다. 제목이 달라도 같은 일이면 하나만 남겨라.
+   남길 때는 가장 자세하고 사실이 많이 담긴 것을 골라라.
 우선: 해상 안전·사고, 수상레저/선박 규정·제도 변경, 항로·항만 운영, 기상·해상 상황,
      낚시어선·유어선 안전과 단속, 마리나·요트 산업, 면허·자격 제도
 제외: 수산물 가격·양식·어업 경영, 지역 축제·관광 홍보, 인사·수상(受賞)·행사 개최,
@@ -240,12 +296,49 @@ async function collectWx(){
   return { src:'NONE', active: [], summary:'자동 확인 불가 — 아래 기상청 링크로 직접 확인' };
 }
 
+// ★ 이레치를 쌓아 둔다
+//   전에는 돌 때마다 통째로 덮어써서 어제 소식이 그냥 사라졌다.
+//   배 타는 사람은 며칠씩 바다에 있다. 사흘 만에 들어왔는데 오늘 것만 있으면
+//   그 사흘은 통째로 못 본다.
+//   이레가 지난 것은 버린다 — 안 그러면 파일이 끝없이 커진다.
+const KEEP_DAYS = 7;
+const dayOf = r => String(r && r.date || '').slice(0, 10);
+function mergeDays(oldRows, newRows){
+  const cut = Date.now() - KEEP_DAYS * 864e5;
+  const byLink = new Map();
+  // 새 것을 먼저 담는다 — 같은 기사면 이번에 받은 쪽이 이긴다
+  for(const r of [...(newRows||[]), ...(oldRows||[])]){
+    if(!r || !r.link) continue;
+    const t = new Date(r.date || 0).getTime();
+    if(!isFinite(t) || t < cut) continue;
+    if(!byLink.has(r.link)) byLink.set(r.link, r);
+  }
+  // ★ 같은 사건 묶기는 '같은 날 안에서만' 한다.
+  //   날을 넘어 묶으면 어제 목록이 오늘 바뀌어 버린다.
+  const byDay = new Map();
+  for(const r of byLink.values()){
+    const d = dayOf(r);
+    if(!byDay.has(d)) byDay.set(d, []);
+    byDay.get(d).push(r);
+  }
+  const out = [];
+  for(const d of [...byDay.keys()].sort().reverse()){
+    out.push(...dedupeEvent(byDay.get(d).sort((a,b)=> new Date(b.date)-new Date(a.date))));
+  }
+  return out;
+}
+
 (async ()=>{
   const govAll = await collectGov();
-  const gov = await pickGov(govAll);
+  const govNew = await pickGov(govAll);
   const wx = await collectWx();
-  console.log('한국소식', gov.length, '건 / 특보', wx.src,
-    (wx.zones ? wx.zones.length + '구역' : (wx.active||[]).length + '줄'));
+  // 지난번에 모아 둔 것을 읽어 함께 담는다 (없으면 이번 것만)
+  let prev = null;
+  try{ prev = JSON.parse(fs.readFileSync('kr.json', 'utf8')); }catch(_){}
+  const gov = mergeDays((prev && prev.gov) || [], govNew);
+  const days = new Set(gov.map(dayOf)).size;
+  console.log('한국소식 이번', govNew.length, '건 / 쌓인 것', gov.length, '건 (', days, '일치 )',
+    '/ 특보', wx.src, (wx.zones ? wx.zones.length + '구역' : (wx.active||[]).length + '줄'));
   fs.writeFileSync('kr.json', JSON.stringify({ updated:new Date().toISOString(), gov, wx }, null, 1));
   console.log('kr.json 저장 완료');
 })().catch(e=>{ console.error(e); process.exit(1); });

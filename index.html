@@ -1343,7 +1343,7 @@ body.panelfull #panel .ph{padding-top:0}
 
 </style>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0a1628">
+<meta name="theme-color" content="#122a44">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="선내적재표">
@@ -4184,7 +4184,7 @@ async function renderTalk(){
     .filter(t => !talkRegion || t.region === talkRegion)
     .map(t=>{
       const kn = (TALK_KINDS.find(k=>k.v===t.kind)||{}).name || '잡담';
-      const n = (t.comments||[]).length;
+      const n = (t.comments||[]).length + (Number(t.cmtN) || 0);
       return `<div class="fleet" onclick="openTalk('${esc(t.id)}')">
         <div class="fmain"><div class="fname">
           <span class="chip">${esc(kn)}</span> ${esc(t.title||'(제목 없음)')}
@@ -4688,9 +4688,12 @@ async function toggleLike(kind, id){
     if(kind === 'post'){
       save();                                   // 배 게시판은 배 자료다
     } else {
-      const api = { talk: window.__talk, spots: window.__spots, market: window.__market }[kind];
-      if(!api) throw new Error('인터넷에 연결되어 있지 않습니다');
-      await api.edit(id, { likeN: next });
+      // ★ 전에는 '읽고 → 1 더해 → 쓰기' 였다. 둘이 동시에 누르면 하나가 사라지고,
+      //   한 사람이 몇 번이고 누를 수 있었다.
+      //   이제 누가 눌렀는지 방을 하나 남기고, 숫자는 서버가 더한다.
+      const COLL = { talk:'community', spots:'spots', market:'market' }[kind];
+      if(!window.__like || !COLL) throw new Error('인터넷에 연결되어 있지 않습니다');
+      await window.__like.set(COLL, id, !was);
     }
   }catch(e){
     // 되돌린다 — 화면과 실제가 어긋난 채로 두면 안 된다
@@ -4774,17 +4777,31 @@ function writeTalk(id){
   });
 }
 
+// 글마다 글 밖의 방에서 받아 온 댓글 (글 id → 댓글 배열)
+const talkCmts = {};
+async function loadTalkCmts(id){
+  if(!window.__cmt) return;
+  try{ talkCmts[String(id)] = await window.__cmt.list('community', id); }
+  catch(_){ talkCmts[String(id)] = talkCmts[String(id)] || []; }
+}
 async function openTalk(id){
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   talkOpenId = id;
   const kn = (TALK_KINDS.find(k=>k.v===t.kind)||{}).name || '잡담';
   const P = document.getElementById('mrPanel');
-  const cs = (t.comments||[]).map(c=>{
+  // 글 밖의 방에 든 댓글을 아직 안 받아 왔으면 지금 받아온다
+  if(!talkCmts[String(id)]) await loadTalkCmts(id);
+  // ★ 옛 글은 댓글이 글 안에 배열로 들어 있다. 새 글은 글 밖의 방에 하나씩 들어간다.
+  //   옛것을 옮기지 않고 둘 다 읽어서 시간순으로 합친다 (옮기다 잃어버릴 일이 없다).
+  const all = ((t.comments||[]).map(c=>Object.assign({old:true}, c)))
+    .concat(talkCmts[String(t.id)] || [])
+    .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
+  const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
     return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
-        ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delTalkComment('${esc(t.id)}','${esc(c.id)}')">&#10005;</button>`:''}</div>
+        ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delTalkComment('${esc(t.id)}','${esc(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
   P.innerHTML = `<div class="mrhead"><b>${esc(t.title||'')}</b><span style="flex:1"></span>
@@ -4804,7 +4821,7 @@ async function openTalk(id){
       <button class="mrbtn" onclick="reportTalk('${esc(t.id)}')">신고</button>
       ${canDelTalk(t)?`<button class="mrbtn warn" onclick="delTalk('${esc(t.id)}')">지우기</button>`:''}
     </div>
-    <div class="ghead"><b>댓글</b><span class="gcnt">${(t.comments||[]).length}</span></div>
+    <div class="ghead"><b>댓글</b><span class="gcnt">${all.length}</span></div>
     ${cs}
     <div class="mrrow" style="padding:12px">
       <button class="mrbtn big" style="width:100%" onclick="writeTalkComment('${esc(t.id)}')">댓글 쓰기</button></div>`;
@@ -4832,20 +4849,38 @@ function writeTalkComment(id){
       if(!v.text){ alert('내용을 넣어 주세요'); return false; }
       const c = { id:newId(), by:meUid()||'', byName:meName(),
                   text:v.text, ts:new Date().toISOString() };
-      const next = (t.comments||[]).concat([c]);
-      window.__talk.edit(t.id, { comments: next })
-        .then(()=>{ t.comments = next; openTalk(t.id); })
+      if(!window.__cmt){ alert('인터넷에 연결되어 있지 않습니다'); return; }
+      window.__cmt.add('community', t.id, c)
+        .then(()=>{
+          const k = String(t.id);
+          talkCmts[k] = (talkCmts[k] || []).concat([c]);
+          t.cmtN = (Number(t.cmtN) || 0) + 1;
+          openTalk(t.id);
+        })
         .catch(e=>alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)));
     }
   });
 }
-function delTalkComment(id, cid){
+function delTalkComment(id, cid, isOld){
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   if(!confirm('이 댓글을 지울까요?')) return;
-  const next = (t.comments||[]).filter(c=>String(c.id)!==String(cid));
-  window.__talk.edit(t.id, { comments: next })
-    .then(()=>{ t.comments = next; openTalk(t.id); })
+  // 옛 글에 배열로 남아 있던 댓글은 배열에서 뺀다
+  if(isOld){
+    const next = (t.comments||[]).filter(c=>String(c.id)!==String(cid));
+    window.__talk.edit(t.id, { comments: next })
+      .then(()=>{ t.comments = next; openTalk(t.id); })
+      .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
+    return;
+  }
+  if(!window.__cmt){ alert('인터넷에 연결되어 있지 않습니다'); return; }
+  window.__cmt.del('community', t.id, cid)
+    .then(()=>{
+      const k = String(t.id);
+      talkCmts[k] = (talkCmts[k] || []).filter(c=>String(c.id)!==String(cid));
+      t.cmtN = Math.max(0, (Number(t.cmtN) || 0) - 1);
+      openTalk(t.id);
+    })
     .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
 }
 
@@ -7994,7 +8029,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.60';
+const APP_VER = '3.61';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -11660,9 +11695,9 @@ async function renderMarket(){
       + `<button class="tchip${marketCat?'':' on'}" onclick="setMarketCat('')">전체</button>`
       + MARKET_CATS.map(c=>`<button class="tchip${marketCat===c.v?' on':''}" onclick="setMarketCat('${c.v}')">${c.name}</button>`).join('')
       + `</div>
-    <div class="mrrow"><span class="mrlbl">찾기</span>
-      <input id="mkQ" style="flex:1" value="${esc(marketQ)}" placeholder="물건 이름 · 내용"
-        oninput="marketFilter(this.value)"></div>
+    <div class="qbox"><input id="mkQ" value="${esc(marketQ)}"
+        placeholder="물건 이름 · 내용으로 찾기"
+        oninput="marketFilter(this.value)" autocomplete="off"></div>
     <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
       <button class="mrbtn ok" onclick="writeItem()">+ 팔 물건 올리기</button></div>
     <div id="marketRows">` + marketRowsHtml() + `</div>`;
@@ -11999,9 +12034,9 @@ async function renderSpots(){
       + `<button class="tchip${spotKind?'':' on'}" onclick="setSpotKind('')">전체</button>`
       + SPOT_KINDS.map(k=>`<button class="tchip${spotKind===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
       + `</div>
-    <div class="mrrow"><span class="mrlbl">찾기</span>
-      <input id="spQ" style="flex:1" value="${esc(spotQ)}" placeholder="이름 · 지역"
-        oninput="spotFilter(this.value)"></div>
+    <div class="qbox"><input id="spQ" value="${esc(spotQ)}"
+        placeholder="정박지 이름 · 지역으로 찾기"
+        oninput="spotFilter(this.value)" autocomplete="off"></div>
     <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
       <button class="mrbtn ok" onclick="writeSpot()">+ 정박지 올리기</button></div>
     <div id="spotRows">` + spotRowsHtml() + `</div>`;
@@ -14940,8 +14975,9 @@ document.addEventListener('visibilitychange', ()=>{
 (async ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc, query, where,
-            orderBy, limit, startAfter, writeBatch, FieldPath, getCountFromServer } =
+    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc,
+            query, where, orderBy, limit, startAfter, writeBatch, FieldPath,
+            getCountFromServer, increment } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -15355,6 +15391,55 @@ document.addEventListener('visibilitychange', ()=>{
       },
       async del(id){
         await deleteDoc(doc(fdb, 'community', String(id)));
+        bust('talk');
+      }
+    };
+    // ── 댓글
+    // ★ 왜 글 밖으로 뺐나
+    //   전에는 댓글을 글 문서 안에 배열로 넣었다. 세 가지가 깨진다.
+    //   1) 파이어스토어 문서는 1MB 를 못 넘는다 — 댓글 몇백 개면 글이 통째로 막힌다
+    //   2) 댓글 하나 달 때마다 글 전체를 다시 쓴다 — 둘이 동시에 달면 하나가 사라진다
+    //   3) 규칙으로 '남의 댓글은 못 건드린다' 를 만들 수 없다 (배열 통째로 갈아치울 수 있다)
+    //   댓글마다 자기 방을 주면 셋 다 풀린다.
+    //   옛 글에 배열로 남아 있는 댓글은 그대로 두고 함께 보여 준다 (옮기지 않는다).
+    const cmtCol = (coll, id) => collection(fdb, coll, String(id), 'comments');
+    window.__cmt = {
+      async list(coll, id){
+        const snap = await getDocs(query(cmtCol(coll, id), orderBy('ts')));
+        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+      },
+      async add(coll, id, c){
+        await setDoc(doc(cmtCol(coll, id), String(c.id)), c);
+        // 목록에서 댓글 수를 보여 주려면 글에도 숫자를 둬야 한다.
+        // 서버가 더하게 한다 — 읽고 쓰면 동시에 달릴 때 하나가 사라진다.
+        try{ await updateDoc(doc(fdb, coll, String(id)), { cmtN: increment(1) }); }catch(_){}
+        bust('talk');
+      },
+      async del(coll, id, cid){
+        await deleteDoc(doc(cmtCol(coll, id), String(cid)));
+        try{ await updateDoc(doc(fdb, coll, String(id)), { cmtN: increment(-1) }); }catch(_){}
+        bust('talk');
+      }
+    };
+    // ── 좋아요
+    // ★ 전에는 '읽고 → 1 더해 → 쓰기' 였다. 동시에 누르면 하나가 사라지고,
+    //   한 사람이 몇 번이고 누를 수 있었다.
+    //   누가 눌렀는지 방을 하나씩 남기고, 숫자는 서버가 더한다.
+    window.__like = {
+      async mine(coll, id){
+        const u = fauth.currentUser; if(!u) return false;
+        try{ const d = await getDoc(doc(fdb, coll, String(id), 'likes', u.uid)); return d.exists(); }
+        catch(_){ return false; }
+      },
+      async set(coll, id, on){
+        const u = fauth.currentUser;
+        if(!u) throw new Error('로그인해야 누를 수 있습니다');
+        const ref = doc(fdb, coll, String(id), 'likes', u.uid);
+        const had = (await getDoc(ref)).exists();
+        if(on === had) return;                       // 이미 그 상태면 숫자를 건드리지 않는다
+        if(on) await setDoc(ref, { ts: new Date().toISOString() });
+        else   await deleteDoc(ref);
+        await updateDoc(doc(fdb, coll, String(id)), { likeN: increment(on ? 1 : -1) });
         bust('talk');
       }
     };

@@ -71,6 +71,7 @@
 .whoa{color:#8ab4d8;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .chip.late{background:#7A3A30;color:#FF9A8A}
 .chip.notice{background:#7a5a2a;color:#f0c98a}
+.chip.good{background:#17453a;color:#7aefaa;border-color:#2a6a58}
 .postmeta{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#8a97a8;
   font-size:12.5px;border-bottom:1px solid #12283e}
 .postbody{padding:14px;color:#dfe8f2;font-size:14.5px;line-height:1.7;white-space:pre-wrap}
@@ -193,6 +194,10 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .rich div{min-height:1.7em}
 .rst{font-size:12px;opacity:.8;margin-top:6px;color:#7ab5d8}
 .rmark{display:inline}
+/* 지난 모집 — 지우지 않고 흐리게 둔다 */
+.fleet.dim{opacity:.5}
+/* 항해일지 묶음 이름 */
+.vsec{padding:14px 20px 4px;color:var(--tm);font-size:12.5px;letter-spacing:.02em}
 /* 글판 거르기 */
 .tfilt{display:flex;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;
   padding:8px 12px 0;scrollbar-width:none}
@@ -1474,7 +1479,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 </div>
 <div id="weatherWrap" style="display:none"><div id="weatherList"></div></div>
 <div id="voyageWrap" style="display:none">
-  <div class="mrhead"><span style="flex:1"></span><button class="tab edt" onclick="addVoyage()">+ 기록</button></div>
+  <div class="mrhead"><span style="flex:1"></span><button class="tab edt" onclick="addPlan()">+ 예정</button><button class="tab edt" onclick="addVoyage()">+ 기록</button></div>
   <div id="voyageList"></div>
 </div>
 <div id="fuelWrap" style="display:none">
@@ -2434,6 +2439,7 @@ function resizePhotos(list, cb){
 // 여러 칸을 한 화면에서 채우고, 자주 쓰는 값은 눌러서 넣을 수 있게 한다.
 let formCtx = null;
 let formPick = {};   // '고르기' 항목에서 지금 고른 값
+let formPicks = {};  // '여러 개 고르기' 항목에서 지금 고른 값들
 let formPhotoList = [];   // 이 화면에 붙은 사진들
 function closeForm(){
   const el = document.getElementById('formOv');
@@ -2447,7 +2453,7 @@ function openForm(o){
   const sub = document.getElementById('formSub');
   sub.textContent = o.sub || '';
   sub.style.display = o.sub ? '' : 'none';
-  formPick = {};
+  formPick = {}; formPicks = {};
   document.getElementById('formBody').innerHTML = (o.fields||[]).map((f,i)=>{
     if(f.type === 'pick'){
       formPick[f.key] = f.value;
@@ -2455,6 +2461,18 @@ function openForm(o){
         + (f.options||[]).map(op=>
             `<button class="fopt${String(op.v)===String(f.value)?' on':''}" data-v="${esc(String(op.v))}"`
             + ` onclick="formPickSet('${esc(f.key)}',${i},'${esc(String(op.v))}')">`
+            + `<b>${esc(op.name)}</b>${op.sub ? `<span>${esc(op.sub)}</span>` : ''}</button>`).join('')
+        + `</div></div>`;
+    }
+    // ★ 여러 개 고르기 — '어떤 분을 구하는지' 처럼 답이 여럿인 칸에 쓴다.
+    //   하나 고르기(pick)와 생김새를 같게 둔다. 사람이 두 가지를 배울 일이 없다.
+    if(f.type === 'picks'){
+      formPicks[f.key] = Array.isArray(f.value) ? f.value.slice() : [];
+      const on = formPicks[f.key];
+      return `<div class="frow"><label>${esc(f.label||'')}</label><div class="fpick" id="fp${i}">`
+        + (f.options||[]).map(op=>
+            `<button class="fopt${on.indexOf(String(op.v))>=0?' on':''}" data-v="${esc(String(op.v))}"`
+            + ` onclick="formPicksToggle('${esc(f.key)}',${i},'${esc(String(op.v))}')">`
             + `<b>${esc(op.name)}</b>${op.sub ? `<span>${esc(op.sub)}</span>` : ''}</button>`).join('')
         + `</div></div>`;
     }
@@ -2570,6 +2588,14 @@ function onFormPaste(e, i){
   if(box) box.innerHTML = '<div class="fhint">사진을 넣는 중…</div>';
   resizePhotos(photos.concat(files), out=>formPhotoAdd(out));
 }
+function formPicksToggle(key, i, v){
+  const cur = formPicks[key] || (formPicks[key] = []);
+  const at = cur.indexOf(String(v));
+  if(at >= 0) cur.splice(at, 1); else cur.push(String(v));
+  const box = document.getElementById('fp' + i);
+  if(!box) return;
+  [...box.children].forEach(b => b.classList.toggle('on', cur.indexOf(b.dataset.v) >= 0));
+}
 function formPickSet(key, i, v){
   formPick[key] = v;
   const box = document.getElementById('fp' + i);
@@ -2585,6 +2611,7 @@ function formVals(){
   const out = {};
   (o.fields||[]).forEach((f,i)=>{
     if(f.type === 'pick'){ out[f.key] = formPick[f.key]; return; }
+    if(f.type === 'picks'){ out[f.key] = (formPicks[f.key] || []).slice(); return; }
     if(f.type === 'rich'){ out[f.key] = richBlocks(document.getElementById('ff' + i)); return; }
     if(f.type === 'photos'){ out[f.key] = formPhotoList.slice(); return; }
     const el = document.getElementById('ff' + i);
@@ -3832,7 +3859,7 @@ function buildPublic(b){
   if(pubOn(b,'voyage')){
     o.voyage = (typeof voyage!=='undefined' ? voyage : [])
       // ★ 항해마다 따로 감출 수 있다. pub 이 false 인 것은 밖으로 안 나간다.
-      .filter(v => v && v.pub !== false)
+      .filter(v => v && v.pub !== false && !v.plan)
       .map(v => ({ id:v.id, date:v.date || '', title:v.title || '',
                    from:v.from || '', to:v.to || '', note:v.note || '' }));
   }
@@ -3981,8 +4008,55 @@ const TALK_KINDS = [
   { v:'maint', name:'정비',   sub:'내 배를 고친 이야기 · 고장·수리' },
   { v:'trip',  name:'항해기', sub:'다녀온 곳' },
   { v:'gear',  name:'장비',   sub:'사서 써 본 물건 · 제품 후기' },
-  { v:'free',  name:'잡담',   sub:'그 밖의 이야기' }
+  { v:'free',  name:'잡담',   sub:'그 밖의 이야기' },
+  // ★ '크루' 라고 하지 않는다.
+  //   낚시배 타는 분들은 '출조·동출', 모터보트는 '같이 나가실 분' 이라고 한다.
+  //   크루는 요트 말이다. 배 세 종류를 한 자리에 담아야 하므로 요트 말을 쓰면 안 된다.
+  { v:'ride',  name:'같이 타기', sub:'같이 탈 사람 구하기 · 탈 자리 구하기' }
 ];
+
+// ===== 같이 타기 =====
+// ★ 돈을 받고 사람을 태우려면 신고·등록이 있어야 한다.
+//   낚시 목적이면 낚시어선업 신고, 사람을 태우고 받으려면 마리나선박 대여업 등록이다.
+//   그래서 이 앱에는 금액 칸을 아예 만들지 않는다.
+//   금액 칸을 만드는 순간 앱이 무등록 영업을 거들어 준 자리가 된다.
+const RIDE_TRIP = [
+  { v:'air',  name:'바람 쐬기',    sub:'가볍게 한 바퀴' },
+  { v:'fish', name:'낚시 · 출조',  sub:'' },
+  { v:'long', name:'먼 거리',      sub:'1박 이상' },
+  { v:'race', name:'시합 · 레이스', sub:'' },
+  { v:'move', name:'배 옮기기',    sub:'회항 · 이동' }
+];
+const RIDE_WANT = [
+  { v:'new',   name:'처음이어도 괜찮습니다', sub:'' },
+  { v:'exp',   name:'배 타보신 분',        sub:'' },
+  { v:'lic',   name:'면허 있는 분',         sub:'' },
+  { v:'watch', name:'밤 당직 서실 분',      sub:'' },
+  { v:'gear',  name:'낚시 장비 있으신 분',   sub:'' }
+];
+const RIDE_COST = [
+  { v:'none',  name:'없습니다',    sub:'제가 냅니다' },
+  { v:'share', name:'기름값 나눔',  sub:'기름값 · 입출항비를 나눕니다' }
+];
+const RIDE_CLOSE = [
+  { v:'3', name:'출항 3일 전까지', sub:'' },
+  { v:'1', name:'출항 전날까지',   sub:'' },
+  { v:'0', name:'출항 당일까지',   sub:'' }
+];
+const RIDE_LAW = '돈을 받고 사람을 태우려면 낚시어선업 신고나 마리나선박 대여업 등록이 있어야 합니다. '
+               + '기름값을 나누는 정도까지만 적어 주세요. 금액은 적을 수 없습니다.';
+const rideName = (arr, v) => (arr.find(x => x.v === String(v)) || {}).name || '';
+// 마감 날짜 — 출항일에서 며칠 앞인가. 여기 한 곳에서만 센다.
+function rideDeadline(date, close){
+  if(!date) return '';
+  const d = new Date(date + 'T00:00:00');
+  if(isNaN(d)) return '';
+  d.setDate(d.getDate() - (Number(close) || 0));
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+// 마감이 지났나
+const rideOver = r => !!(r && r.until && r.until < today());
 const REGIONS = ['경기·인천','충남','전북','전남','경남','부산','울산','경북','강원','제주','그 밖'];
 // 지역을 정하는 기준점. 배 홈포트에서 가장 가까운 곳을 그 배의 지역으로 본다.
 // ★ 지역마다 여러 점을 둔다 — 한 점만 두면 긴 해안선에서 엉뚱한 곳으로 붙는다.
@@ -4027,7 +4101,8 @@ const ADMIN_PERMS = [
   { k:'postDel', name:'글 지우기',       sub:'신고된 글 지우기 · 숨김 풀기' },
   { k:'boatMod', name:'배 감추기·지우기', sub:'둘러보기에 올라온 배' },
   { k:'userBan', name:'사람 막기',       sub:'글·댓글 못 쓰게 막기' },
-  { k:'admin',   name:'운영자 임명',      sub:'다른 사람을 운영자로 세우기' }
+  { k:'admin',   name:'운영자 임명',      sub:'다른 사람을 운영자로 세우기' },
+  { k:'series',  name:'연재 글 올리기',   sub:'뉴스 ▸ 연재에 옮긴 글 올리기' }
 ];
 // ★ 최고 운영자 — 이 앱의 주인이다.
 //   앱으로는 누구도 권한을 바꾸거나 해임할 수 없다. 규칙에서도 막는다.
@@ -4088,6 +4163,31 @@ function isAdmin(perm){
   const perms = adminMe.perms || {};
   return perms[perm] === true;
 }
+// ★ 연재자 — '연재 글 올리기' 하나만 켜진 사람.
+//   운영자가 아니다. 남의 글도, 사람 명부도 못 본다.
+//   이름표를 여기 한 곳에서만 정한다 — 명부와 운영자 목록 두 곳에서 갈리면 안 된다.
+function permOnlySeries(perms){
+  const p = perms || {};
+  return p.series === true
+      && !ADMIN_PERMS.some(pm => pm.k !== 'series' && p[pm.k] === true);
+}
+function amSeriesOnly(){ return !!adminMe && permOnlySeries(adminMe.perms); }
+function roleChip(a){
+  if(!a) return '';
+  if(a.owner) return '<span class="chip">최고 운영자</span>';
+  return permOnlySeries(a.perms)
+    ? '<span class="chip whochip">연재자</span>'
+    : '<span class="chip whochip">운영자</span>';
+}
+// 연재를 올릴 수 있나 / 이 글을 고칠 수 있나 / 지울 수 있나
+function canSeries(){ return isAdmin('series'); }
+function canEditSeries(x){
+  const u = meUid();
+  return !!(x && u && String(x.by) === String(u) && isAdmin('series'));
+}
+// ★ 지우기는 글쓴이 본인 말고 '글 지우기' 운영자도 된다.
+//   연재자와 연락이 끊긴 채 저작권 문제가 생기면 손댈 사람이 있어야 한다.
+function canDelSeries(x){ return canEditSeries(x) || isAdmin('postDel'); }
 function canDelTalk(t){
   if(!t) return false;
   const me2 = meUid();
@@ -4114,6 +4214,9 @@ function talkBody(v, blocks){
     boatType: (b && BOAT_TYPES[b.type]) || '',
     ts: new Date().toISOString(),
     reports: {}, reportN: 0, hidden: false,
+    cmtN: 0,
+    // 찾기용 조각 — 제목과 올린 사람 이름만
+    kw: kwOf(String(v.title || ''), meName()),
     comments: []
   };
 }
@@ -4216,16 +4319,19 @@ async function renderTalk(){
     + `</div>`;
 
   // 숨은 글은 목록에서 뺀다. 운영자에게는 표시해서 보여 준다.
-  const rows = talkList
-    .filter(t => !t.hidden || isAdmin('postDel'))
-    .filter(t => !talkKind || t.kind === talkKind)
-    .filter(t => !talkRegion || t.region === talkRegion)
-    .map(t=>{
+  // ★ 글 한 줄 — 목록과 찾은 결과가 같은 모양이어야 한다. 한 군데서 그린다.
+  function talkRow(t){
       const kn = (TALK_KINDS.find(k=>k.v===t.kind)||{}).name || '잡담';
       const n = (t.comments||[]).length + (Number(t.cmtN) || 0);
-      return `<div class="fleet" onclick="openTalk('${esc(t.id)}')">
+      // ★ 같이 타기는 날짜가 지나면 쓸모없는 글이다. 지운 것처럼 보이면 안 되고,
+      //   그렇다고 새 글과 나란히 있으면 안 된다. 흐리게 두고 '마감' 을 붙인다.
+      const rd = t.ride;
+      const dim = rd && (rd.open === false || rideOver(rd));
+      return `<div class="fleet${dim?' dim':''}" onclick="openTalk('${esc(t.id)}')">
         <div class="fmain"><div class="fname">
           <span class="chip">${esc(kn)}</span> ${esc(t.title||'(제목 없음)')}
+          ${rd ? (dim ? '<span class="chip">마감</span>'
+                      : `<span class="chip good">${Number(rd.n)||1}자리</span>`) : ''}
           ${n?`<span class="tcnt" title="댓글">${n}</span>`:''}
           ${(Number(t.likeN)||0) > 0 ? `<span class="tcnt good" title="도움됐어요">${Number(t.likeN)}</span>` : ''}
           ${t.hidden?'<span class="chip notice">숨김</span>':''}</div>
@@ -4234,13 +4340,34 @@ async function renderTalk(){
               : esc(t.byName||'')}${t.boatName?' · '+esc(t.boatName):''}
             ${t.region?' · '+esc(t.region):''} · ${esc(String(t.ts||'').slice(0,10))}</div>
         </div></div>`;
-    }).join('');
+  }
+  const rows = talkList
+    .filter(t => !t.hidden || isAdmin('postDel'))
+    .filter(t => !talkKind || t.kind === talkKind)
+    .filter(t => !talkRegion || t.region === talkRegion)
+    .map(talkRow).join('');
 
   const sorts = `<div class="tfilt">`
     + `<button class="tchip${talkSort==='ts'?' on':''}" onclick="setTalkSort('ts')">새 글 순</button>`
     + `<button class="tchip${talkSort==='likeN'?' on':''}" onclick="setTalkSort('likeN')">도움된 순</button>`
     + `</div>`;
-  W.innerHTML = kinds + regs + sorts
+  const qbox = `<div class="qbox"><input id="talkQ" value="${esc(talkQ)}"
+      placeholder="제목 · 올린 사람으로 찾기"
+      oninput="talkFilterUI(this.value)" autocomplete="off"></div>`;
+  // 찾는 중이면 찾은 것만 보여 준다 (말머리·지역·정렬은 찾을 때 뜻이 없다)
+  if(talkQ.trim()){
+    const found = (talkFound || []).filter(t => !t.hidden || isAdmin('postDel'));
+    W.innerHTML = qbox
+      + (talkFinding
+          ? '<div class="mrnone">찾는 중…</div>'
+          : (found.map(talkRow).join('')
+             || `<div class="mrnone">'${esc(talkQ.trim())}' 로 찾은 글이 없습니다.<br><br>
+                  제목과 올린 사람 이름에서 찾습니다. 글 내용은 찾지 않습니다.</div>`));
+    const el = document.getElementById('talkQ');
+    if(el){ el.focus(); try{ el.setSelectionRange(el.value.length, el.value.length); }catch(_){} }
+    return;
+  }
+  W.innerHTML = qbox + kinds + regs + sorts
     + (talkSort === 'likeN'
         ? `<div class="mrnone" style="text-align:left">도움됐어요가 눌린 순서입니다.
             아주 오래된 글은 여기 안 나올 수 있습니다.</div>` : '')
@@ -4746,6 +4873,31 @@ async function toggleLike(kind, id){
 //   그래서 켤 때 내 옛 글에 0 을 채워 두고(fixOldLikes), 그 뒤에 쓴다.
 //   남이 쓴 옛 글은 내가 못 고치므로, 고를 때 그 사실을 적어 준다.
 let talkSort = 'ts';
+// ── 글판 찾기 (제목 · 올린 사람)
+let talkQ = '';           // 지금 찾고 있는 말
+let talkFound = null;     // 찾은 결과 (null 이면 그냥 목록)
+let talkFinding = false;
+let talkQTimer = null;
+function talkFilterUI(v){
+  talkQ = String(v || '');
+  clearTimeout(talkQTimer);
+  // 한 글자 칠 때마다 서버에 물어보면 돈이 샌다. 손을 멈추면 그때 물어본다.
+  talkQTimer = setTimeout(talkFind, 350);
+}
+async function talkFind(){
+  const q = talkQ.trim();
+  if(!q){ talkFound = null; renderTalk(); return; }
+  if(!window.__talk || !window.__talk.find){ talkFound = []; renderTalk(); return; }
+  talkFinding = true; renderTalk();
+  try{
+    const rows = await window.__talk.find(kwQuery(q), 60);
+    // 조각은 헐겁게 걸린다 — 정말 들어맞는 것만 남긴다
+    talkFound = rows.filter(r => kwHit(r, q))
+                    .sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
+  }catch(e){ talkFound = []; }
+  talkFinding = false;
+  renderTalk();
+}
 function setTalkSort(v){
   talkSort = (v === 'likeN') ? 'likeN' : 'ts';
   listDrop('talk');          // 줄 세우기가 바뀌면 받아 둔 것은 못 쓴다
@@ -4800,6 +4952,7 @@ function writeTalk(id){
             const patch = { kind:v.kind, region:v.region, title:v.title, blocks:blocks2,
                             photos: st.photos, thumbs: st.thumbs,
                             body: blocks2.filter(x=>x.t==='text').map(x=>x.v).join('\n\n'),
+                            kw: kwOf(String(v.title || ''), t.byName || meName()),
                             edited: new Date().toISOString() };
             await window.__talk.edit(t.id, patch);
             Object.assign(t, patch); openTalk(t.id);
@@ -4852,7 +5005,11 @@ async function openTalk(id){
       · ${esc(String(t.ts||'').slice(0,10))}
       ${String(t.by)===String(meUid())?`<button class="minib blu" style="margin-left:auto" onclick="writeTalk('${esc(t.id)}')">고치기</button>`:''}</div>
     ${t.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
+    ${rideHead(t)}
     ${renderBlocks(t.blocks || [], `talkPhotos('${esc(t.id)}')`)}
+    ${t.kind === 'ride' ? `<div class="mrnone" style="text-align:left">
+        타고 싶으시면 아래 <b>댓글</b>로 말씀해 주세요. 태우실 분이 보고 정합니다.<br>
+        ${esc(RIDE_LAW)}</div>` : ''}
     <div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('talk', t.id, t.likeN)}
       <span style="flex:1"></span>
@@ -4864,6 +5021,21 @@ async function openTalk(id){
     <div class="mrrow" style="padding:12px">
       <button class="mrbtn big" style="width:100%" onclick="writeTalkComment('${esc(t.id)}')">댓글 쓰기</button></div>`;
   showPanel(P);
+}
+// ★ 같이 타기 글 맨 위 요약. 글을 다 읽지 않아도 갈지 말지 정할 수 있어야 한다.
+//   예정 항해에서 올린 글에만 붙는다 — 손으로 쓴 '자리 구합니다' 글에는 안 붙는다.
+function rideHead(t){
+  const r = t && t.ride;
+  if(!r) return '';
+  const dim = (r.open === false) || rideOver(r);
+  const want = (r.want||[]).map(v=>rideName(RIDE_WANT,v)).join(' · ') || '누구나';
+  return `<div class="wxbox"><b>${dim ? '마감된 모집입니다' : '같이 탈 사람을 구합니다'}</b>
+      <div>${esc(r.date||'')} 출항 · ${Number(r.n)||1}자리 · ${esc(rideName(RIDE_TRIP, r.trip))}</div>
+      ${(r.from||r.to) ? `<div>${esc(r.from||'—')} → ${esc(r.to||'—')}</div>` : ''}
+      <div>구하는 분 — ${esc(want)}</div>
+      <div>비용 — ${esc(rideName(RIDE_COST, r.cost))}</div>
+      <div class="wxfoot">${esc(r.boatType||'')}${r.port?' · '+esc(r.port):''}</div>
+      ${r.until && !dim ? `<div class="wxfoot">${esc(r.until)} 까지 받습니다</div>` : ''}</div>`;
 }
 function talkPhotos(id){
   const t = talkList.find(x=>String(x.id)===String(id));
@@ -4971,7 +5143,7 @@ function delTalk(id){
 //   여기 검사는 '잘못 눌러서 사고 나는 것' 을 막는 편의일 뿐이다.
 function paintAdminMenu(){
   const el = document.getElementById('dAdmin');
-  if(el) el.style.display = isAdmin() ? '' : 'none';
+  if(el) el.style.display = (isAdmin() && !amSeriesOnly()) ? '' : 'none';
 }
 // 내 계정 번호. 남을 운영자로 임명하려면 그 사람의 번호를 받아야 한다.
 function copyMyUid(){
@@ -5060,7 +5232,7 @@ function adminFeat(){
 }
 async function openAdmin(){
   // 운영자가 아니면 화면 자체를 열지 않는다
-  if(!isAdmin()){ alert('운영자만 볼 수 있습니다'); return; }
+  if(!isAdmin() || amSeriesOnly()){ alert('운영자만 볼 수 있습니다'); return; }
   const P = document.getElementById('mrPanel');
   const tabsOn = ADMIN_TABS.filter(t => !t.need || isAdmin(t.need));
   if(!tabsOn.some(t => t.k === adminTab)) adminTab = tabsOn.length ? tabsOn[0].k : 'people';
@@ -5232,7 +5404,7 @@ function peopleRowsHtml(rows, adm, isBan){
     const a = adm(p.uid);
     return `<div class="fleet" onclick="openPerson('${esc(p.uid)}')"><div class="fmain">
       <div class="fname">${esc(p.name || '(이름 없음)')}
-        ${a && a.owner ? '<span class="chip">최고 운영자</span>' : a ? '<span class="chip whochip">운영자</span>' : ''}
+        ${roleChip(a)}
         ${isBan(p.uid) ? '<span class="chip late">막힘</span>' : ''}</div>
       <div class="fsub">${esc(p.email || p.uid)}</div>
     </div></div>`;
@@ -5250,7 +5422,7 @@ function paintPeopleRows(){
 
 // ── 한 사람 화면 — 여기서 운영자로 세우고, 권한을 켜고 끄고, 막는다
 async function openPerson(uid){
-  if(!isAdmin()){ alert('운영자만 볼 수 있습니다'); return; }
+  if(!isAdmin() || amSeriesOnly()){ alert('운영자만 볼 수 있습니다'); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>사람</b><span style="flex:1"></span>
       <button class="tab" onclick="openAdmin()">← 운영자</button></div>
@@ -5271,7 +5443,7 @@ async function openPerson(uid){
     : canAppoint
       ? `<div class="mrnone" style="text-align:left">${a
           ? '할 수 있는 일을 켜고 끕니다. 모두 끄면 운영자에서 내립니다.'
-          : '아직 운영자가 아닙니다. 아래에서 할 수 있는 일을 켜면 운영자가 됩니다.'}</div>
+          : '아직 아무 일도 맡지 않았습니다. 아래에서 할 수 있는 일을 켜 주세요.'}</div>
         <div class="fchips" style="padding:0 12px 10px">`
         + ADMIN_PERMS.map(pm=>
             `<button class="tchip${perms[pm.k]?' on':''}"
@@ -5385,7 +5557,7 @@ async function adminAdmins(){
         const on = ADMIN_PERMS.filter(pm=>perms[pm.k]).map(pm=>pm.name).join(' · ');
         return `<div class="fleet" onclick="openPerson('${esc(a.uid)}')"><div class="fmain">
           <div class="fname">${esc(a.name || '(이름 없음)')}
-            ${a.owner ? '<span class="chip">최고 운영자</span>' : ''}
+            ${roleChip(a)}
             ${adminIsMe(a.uid) ? '<span class="chip whochip">나</span>' : ''}</div>
           <div class="fsub">${esc(on || '할 수 있는 일이 없습니다')}</div>
         </div></div>`;
@@ -5485,7 +5657,7 @@ function exploreFilterUI(v){
 // 남의 배 소개 페이지
 let boatPageTab = 'intro';
 let boatPageData = null;
-function setBoatPageTab(k){ boatPageTab = k; paintBoatPage(); }
+function setBoatPageTab(k){ boatPageTab = k; pubVoyId = ''; paintBoatPage(); }
 // ★ 전에는 배 소개·제원·항해일지·정비… 를 위에서 아래로 죽 이어 붙였다.
 //   자료가 많은 배는 한참 밀어야 항해일지가 나왔다.
 //   위에 메뉴를 두고 고른 것만 보여 준다. 공개로 켜 둔 것만 메뉴에 뜬다.
@@ -5504,6 +5676,17 @@ function boatPageSecs(x){
           ['gear','보유 장비'],['roster','구성원'],['board','게시판'],['phone','연락처']]
          .filter(([k]) => has[k]);
 }
+// ★ 항해 이름 — 제목이 있으면 제목, 없으면 '출발 → 도착', 둘 다 없으면 빈 값.
+//   빈 값이면 부르는 쪽에서 날짜를 대신 쓴다. 여기서 '(제목 없음)' 을 만들지 않는다.
+function pubVoyName(v){
+  const t = String((v && v.title) || '').trim();
+  if(t) return t;
+  if(v && (v.from || v.to)) return (v.from || '—') + ' → ' + (v.to || '—');
+  return '';
+}
+let pubVoyId = '';
+function pubVoyOpen(id){ pubVoyId = String(id); paintBoatPage(); try{ window.scrollTo(0,0); }catch(_){} navPush('pubvoy'); }
+function pubVoyBack(){ if(!pubVoyId) return false; pubVoyId = ''; paintBoatPage(); return true; }
 function boatPageBody(x, k){
   if(k === 'intro') return (x.intro||[]).map(p=>
       p.t === 'photo' ? `<div class="introrow"><img src="${esc(p.v)}" style="max-width:100%;border-radius:12px;display:block"></div>`
@@ -5515,13 +5698,27 @@ function boatPageBody(x, k){
               .filter(Boolean).join(' · ');
     return `<div class="postbody">${esc(t)}</div>`;
   }
-  if(k === 'voyage') return (x.voyage||[]).map(v=>
-      `<div class="mr"><div class="ct"><div class="cn">${esc(
-          (v.title && v.title.trim()) ||
-          ((v.from || v.to) ? ((v.from || '—') + ' → ' + (v.to || '—')) : '(제목 없음)')
-        )}</div></div>
-       <div class="mrm">${esc(v.date||'')}</div>
-       ${v.note?`<div class="postbody" style="padding-top:6px">${esc(v.note).replace(/\n/g,'<br>')}</div>`:''}</div>`).join('');
+  if(k === 'voyage'){
+    // ★ 눌러 들어가면 한 항해만 보인다. 목록에는 이름과 날짜만 둔다.
+    if(pubVoyId){
+      const v = (x.voyage||[]).find(z=>String(z.id)===String(pubVoyId));
+      if(v) return `<div class="mrrow"><button class="mrbtn" onclick="pubVoyBack()">← 항해일지</button></div>
+        <div class="postmeta">${esc(v.date||'')}</div>
+        <div class="mrhead"><b>${esc(pubVoyName(v) || v.date || '')}</b></div>
+        ${(v.from || v.to) ? `<div class="mrrow"><span class="mrlbl">항로</span>
+            <b class="mrv" style="flex:1">${esc(v.from||'—')} → ${esc(v.to||'—')}</b></div>` : ''}
+        ${v.note ? `<div class="postbody">${esc(v.note).replace(/\n/g,'<br>')}</div>`
+                 : '<div class="mrnone">적어 둔 내용이 없습니다.</div>'}`;
+    }
+    return (x.voyage||[]).map(v=>{
+      const nm = pubVoyName(v);
+      // ★ 제목을 안 쓴 항해가 훨씬 많다. 그런 항해는 날짜 하나로 충분하다.
+      //   '(제목 없음)' 이라고 적으면 목록이 그 글자로 도배된다.
+      return `<div class="mr" onclick="pubVoyOpen('${esc(String(v.id))}')">
+        <div class="ct"><div class="cn">${esc(nm || v.date || '')}</div></div>
+        ${nm ? `<div class="mrm">${esc(v.date||'')}</div>` : ''}</div>`;
+    }).join('');
+  }
   if(k === 'maint') return (x.maint||[]).map(m=>
       `<div class="mr"><div class="ct"><div class="cn">${esc(m.name||'')}</div>
        <span class="st ok">${esc(m.lastDate||'')}</span></div>
@@ -5566,6 +5763,7 @@ async function openBoatPage(id){
   if(!x){ alert('공개된 자료가 없습니다'); return; }
   boatPageData = x;
   boatPageTab = 'intro';
+  pubVoyId = '';
   paintBoatPage();
 }
 
@@ -5880,7 +6078,7 @@ function openBoard(){
   if(!can(b,'board','view')){ alert('게시판을 볼 권한이 없습니다'); return; }
   boardOpenId = null;
   const write = can(b,'board','write');
-  const rows = postList().map(p=>{
+  const rows = postList().filter(p => postHit(p, postQ)).map(p=>{
     const kn = (POST_KINDS.find(k=>k.v===p.kind)||{}).name || '일반';
     const nc = (p.comments||[]).length;
     return `<div class="fleet" onclick="openPost('${esc(p.id)}')">
@@ -5892,7 +6090,12 @@ function openBoard(){
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>게시판</b><span style="flex:1"></span>
       </div>`
-    + (rows || '<div class="mrnone">아직 글이 없습니다</div>')
+    + `<div class="qbox"><input id="postQ" value="${esc(postQ)}"
+         placeholder="제목 · 올린 사람으로 찾기"
+         oninput="postFilterUI(this.value)" autocomplete="off"></div>`
+    + (rows || (postQ.trim()
+        ? `<div class="mrnone">'${esc(postQ.trim())}' 로 찾은 글이 없습니다</div>`
+        : '<div class="mrnone">아직 글이 없습니다</div>'))
     + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="writePost()">+ 글쓰기</button></div>` : '');
   showPanel(P); boatKeepTabs('board');
@@ -8108,7 +8311,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.62';
+const APP_VER = '3.66';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8548,7 +8751,9 @@ window.addEventListener('popstate', ()=>{
   if(typeof OVERLAY_STACK !== 'undefined' && OVERLAY_STACK.length){
     closeTopOverlay(); return;
   }
-  // 3) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
+  // 3) 배 둘러보기에서 항해 하나를 펼쳐 놨으면 목록으로 먼저 돌아간다
+  if(typeof pubVoyId !== 'undefined' && pubVoyId){ pubVoyBack(); return; }
+  // 4) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
   //    (내 배·물품 목록·입력·휴지통·도움말·할 일 — 쌓인 순서대로)
   if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length){
     closeTopScreen(); return;
@@ -10161,6 +10366,13 @@ function openMR(t, id){
              <button class="permb${it.pub === false ? ' on' : ''}" onclick="mrField('pub', false)">이 항해는 비공개</button>`
           : `<b class="mrv">${it.pub === false ? '비공개' : '공개'}</b>`}</div>` : '')
       + tf('날짜','date',it.date,'date','')
+      + rideBox(it)
+      // ★ 예정 항해에는 '나간 뒤' 칸(도착·거리·시간·항적)을 안 보여 준다.
+      //   아직 있지도 않은 숫자를 빈 칸으로 늘어놓으면 뭘 적어야 하나 헷갈린다.
+      //   출항하면 [출항했습니다] 를 눌러 진짜 항해일지가 되고, 그때 다 나온다.
+      + (isPlan(it)
+        ? tf('출발지','from',it.from) + tf('도착지(예정)','to',it.to)
+        : (''
       // 낚시배일 때만 물때와 조과가 붙는다. 요트·보트 항해일지는 그대로다.
       + (isFishing() ? tideRow(it) + catchBox(it) : '')
       + legRow('출발','from','timeOut','wxOut', it)
@@ -10200,6 +10412,7 @@ function openMR(t, id){
                  <b style="color:#8ab4d8">지도에서</b>를 누르면 됩니다</span>${
                  unlocked ? `<div style="margin-top:10px"><button class="mrbtn" onclick="posHere('wxOut')">지금 여기로 출발 위치 잡기</button></div>` : ''}</div>`)
       + `<div id="pickWrap" style="display:none"></div>`
+        ))
       + (it.weather ? tf('날씨(옛기록)','weather',it.weather) : '');
   } else if(t==='run'){
     body = tf('날짜','date',it.date,'date','')
@@ -11100,16 +11313,89 @@ function wClip(str, max){
   }
   return out;
 }
+// ★ 배 게시판·항해일지는 '내 배 자료' 다. 폰에 이미 다 들어 있다.
+//   그래서 서버에 물어볼 것도, 조각을 담아 둘 것도 없다. 폰 안에서 바로 찾는다.
+//   즉시 나오고, 인터넷이 없어도 된다.
+let voyQ = '';
+function voyFilterUI(v){ voyQ = String(v || ''); renderVoyage(); }
+// 날짜로도 찾는다 — '2026-08', '08-11', '2026' 다 걸린다
+function voyHit(v, q){
+  const t = kwNorm(q);
+  if(!t) return true;
+  const raw = String(q || '').trim().toLowerCase();
+  const date = String(v.date || '');
+  const hay = kwNorm([v.title, v.from, v.to, v.note].join(' '));
+  return raw.split(/\s+/).every(w =>
+    hay.indexOf(kwNorm(w)) >= 0 || date.indexOf(w) >= 0);
+}
+let postQ = '';
+function postFilterUI(v){ postQ = String(v || ''); if(typeof openBoard === 'function') openBoard(); }
+function postHit(p, q){
+  const t = kwNorm(q);
+  if(!t) return true;
+  const hay = kwNorm([p.title, p.byName].join(' '));
+  return t.split(/\s+/).every(w => hay.indexOf(w) >= 0);
+}
 // 제목을 치는 동안 남은 칸을 보여 주고, 넘으면 더 안 들어가게 자른다
 function vTitleCount(el){
   if(wCells(el.value) > TITLE_CELLS) el.value = wClip(el.value);
   const n = document.getElementById('vTitleN');
   if(n) n.textContent = wCells(el.value) + '/' + TITLE_CELLS;
 }
+// ===== 찾기용 조각 =====
+// ★ 파이어스토어는 '낱말 가운데 찾기' 를 못 한다.
+//   그래서 글을 올릴 때 미리 조각을 내어 담아 두고, 찾을 때 그 조각으로 물어본다.
+//
+//   왜 두 글자 조각인가
+//     한국어는 띄어쓰기가 사람마다 다르고 조사가 붙는다.
+//     '엔진오일' 을 '오일' 로 찾으려면 낱말만으로는 안 된다.
+//     두 글자씩 겹쳐 자르면(엔진·진오·오일) 가운데 글자로도 찾힌다.
+//     영어·러시아어도 같은 방식이면 규칙이 하나로 끝난다.
+//
+//   ★ 제목과 올린 사람 이름만 담는다. 본문은 안 담는다 —
+//     본문까지 담으면 조각이 수백 개가 되어 글 문서가 커지고, 읽을 때마다 돈이 더 나간다.
+const KW_MAX = 120;
+function kwNorm(t){
+  return String(t || '').toLowerCase()
+    .replace(/[^0-9a-z가-힣ㄱ-ㅎㅏ-ㅣ\u3040-\u30ff\u4e00-\u9fff\u0400-\u04ff]+/g, ' ')
+    .trim();
+}
+function kwOf(){
+  const out = new Set();
+  for(const raw of arguments){
+    const t = kwNorm(raw);
+    if(!t) continue;
+    for(const w of t.split(/\s+/)){
+      if(!w) continue;
+      out.add(w);                                  // 낱말 통째로
+      for(let i = 0; i + 2 <= w.length; i++) out.add(w.slice(i, i + 2));   // 두 글자 조각
+    }
+  }
+  return [...out].slice(0, KW_MAX);
+}
+// 찾는 말도 같은 방식으로 조각 낸다. 서버에는 조각 열 개까지만 물어볼 수 있다.
+function kwQuery(q){
+  const t = kwNorm(q);
+  if(!t) return [];
+  const g = new Set();
+  for(const w of t.split(/\s+/)){
+    if(w.length < 2) { if(w) g.add(w); continue; }
+    for(let i = 0; i + 2 <= w.length; i++) g.add(w.slice(i, i + 2));
+  }
+  return [...g].slice(0, 10);
+}
+// 서버가 준 것 중에서 정말 들어맞는 것만 고른다 (조각은 헐겁게 걸린다)
+function kwHit(o, q){
+  const t = kwNorm(q);
+  if(!t) return true;
+  const hay = kwNorm((o && o.title) || '') + ' ' + kwNorm((o && o.byName) || '');
+  return t.split(/\s+/).every(w => hay.indexOf(w) >= 0);
+}
 function fmtNum(n){ return (Math.round(n*10)/10).toLocaleString('ko-KR'); }
 function voyStats(){
   const y = String(new Date().getFullYear());
-  const arr = voyage.filter(v=>(v.date||'').startsWith(y));
+  // ★ 예정 항해는 아직 안 나간 것이다. 올해 항해 수에 넣으면 거짓말이 된다.
+  const arr = voyage.filter(v=>!isPlan(v) && (v.date||'').startsWith(y));
   const nm = arr.reduce((s,v)=>s+(parseFloat(v.nm)||0),0);
   const eh = arr.reduce((s,v)=>s+(parseFloat(v.engineH)||0),0);
   return {cnt:arr.length, nm, eh, y};
@@ -11136,16 +11422,191 @@ function renderVoyage(){
   const L = document.getElementById('voyageList');
   const st = voyStats();
   const head = `<div class="statrow"><div class="stat"><b>${st.cnt}</b><span>${st.y} 항해</span></div><div class="stat"><b>${fmtNum(st.nm)}</b><span>거리 NM</span></div><div class="stat"><b>${fmtNum(st.eh)}</b><span>엔진 h</span></div></div>`;
-  const arr = [...voyage].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const arr = [...voyage]
+    .filter(v => voyHit(v, voyQ))
+    .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const qbox = `<div class="qbox"><input id="voyQ" value="${esc(voyQ)}"
+      placeholder="제목 · 날짜 · 항로로 찾기"
+      oninput="voyFilterUI(this.value)" autocomplete="off"></div>`;
   // ★ 목록에는 제목과 날짜만. 나머지는 눌러 들어가면 다 있다.
   //   제목을 안 쓰신 항해는 지금까지처럼 '출발 → 도착' 을 제목 자리에 쓴다.
   const vTitle = v => (v.title && String(v.title).trim())
     || (esc(v.from || v.timeOut || '—') + ' → ' + esc(v.to || v.timeIn || '—'));
-  L.innerHTML = head + (arr.map(v=>`<div class="mr" onclick="openMR('voyage','${v.id}')">
-      <div class="ct"><div class="cn">${v.title && String(v.title).trim() ? esc(v.title) : vTitle(v)}</div>
+  const row = v => `<div class="mr" onclick="openMR('voyage','${v.id}')">
+      <div class="ct"><div class="cn">${isPlan(v)?'<span class="chip">예정</span> ':''}${v.title && String(v.title).trim() ? esc(v.title) : vTitle(v)}
+      ${v.rideOn ? `<span class="chip good">같이 타기 ${Number(v.rideN)||1}자리</span>` : ''}</div>
       ${v.pub === false ? '<span class="chip">비공개</span>' : ''}</div>
       <div class="mrm">${v.date||'—'}${isFishing()&&catchCount(v)?' · '+catchCount(v)+'마리':''}</div>
-    </div>`).join('') || '<div class="mrnone">기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.</div>');
+    </div>`;
+  // ★ 예정은 날짜가 가까운 것이 위로 온다 (지난 항해는 최근 것이 위).
+  //   같은 줄에 섞으면 다음에 나갈 날이 목록 한가운데 파묻힌다.
+  const plans = arr.filter(isPlan).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  const past  = arr.filter(v=>!isPlan(v));
+  const planBox = plans.length
+    ? `<div class="vsec">앞으로 나갈 항해</div>` + plans.map(row).join('') + `<div class="vsec">지난 항해</div>`
+    : '';
+  L.innerHTML = head + qbox + planBox + (past.map(row).join('') || (voyQ.trim()
+        ? `<div class="mrnone">'${esc(voyQ.trim())}' 로 찾은 항해가 없습니다.</div>`
+        : '<div class="mrnone">기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.</div>'));
+}
+// ── 같이 타기 칸 (예정 항해에서만 보인다)
+function rideBox(it){
+  if(!isPlan(it)) return '';
+  const head = `<div class="mrrow"><span class="mrlbl">예정</span>
+      <b class="mrv" style="flex:1">아직 나가지 않은 항해입니다</b>
+      ${unlocked?`<button class="minib grn" onclick="planStart()">출항했습니다</button>`:''}</div>`;
+  if(!it.rideOn){
+    return head + `<div class="mrrow"><span class="mrlbl">같이 타기</span>
+      <span class="mrm" style="flex:1;color:#7b8794">구하면 글판에 올라갑니다</span>
+      ${unlocked?`<button class="mrbtn ok" onclick="rideEdit()">사람 구하기</button>`:''}</div>`;
+  }
+  const want = (it.rideWant||[]).map(v=>rideName(RIDE_WANT,v)).join(' · ') || '누구나';
+  const over = rideOver(it.rideUntil ? {until:it.rideUntil} : null);
+  return head + `<div class="wxbox"><b>같이 타기${over?' — 마감됐습니다':''}</b>
+      <div>${Number(it.rideN)||1}자리 · ${esc(rideName(RIDE_TRIP,it.rideTrip))} · ${esc(rideName(RIDE_COST,it.rideCost))}</div>
+      <div>구하는 분 — ${esc(want)}</div>
+      ${it.rideNote?`<div class="wxfoot">${esc(it.rideNote)}</div>`:''}
+      <div class="wxfoot">${it.rideUntil?esc(it.rideUntil)+' 까지 받습니다':''}</div></div>`
+    + (unlocked?`<div class="mrrow" style="gap:8px;justify-content:flex-end">
+        <button class="mrbtn" onclick="rideEdit()">모집 고치기</button>
+        ${it.ridePost?`<button class="mrbtn" onclick="rideGoPost()">글판에서 보기</button>`:''}
+        <button class="mrbtn warn" onclick="rideStop()">모집 그만두기</button></div>`:'');
+}
+// ★ 모집 내용을 담는 자리를 한 곳에서만 만든다.
+//   항해일지에도 글판 글에도 같은 것이 들어가야 한다. 두 군데서 만들면 어긋난다.
+function rideInfo(it){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  return { vid:String(it.id), date:it.date||'', from:it.from||'', to:it.to||'',
+           n:Number(it.rideN)||1, trip:it.rideTrip||'air', want:(it.rideWant||[]).slice(),
+           cost:it.rideCost||'none', until:it.rideUntil||'', open:!!it.rideOn,
+           boatType:(b && BOAT_TYPES[b.type]) || '', port:(b && b.homeport) || '' };
+}
+function rideTitle(it){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const md = String(it.date||'').slice(5).replace('-','/');
+  const where = it.from || (b && b.homeport) || '';
+  return (md + ' ' + where + ' ' + rideName(RIDE_TRIP, it.rideTrip)
+          + ' · ' + (Number(it.rideN)||1) + '자리').replace(/\s+/g,' ').trim();
+}
+function rideLines(it){
+  const want = (it.rideWant||[]).map(v=>rideName(RIDE_WANT,v)).join(' · ');
+  return [ (it.date||'') + ' 출항 예정입니다.',
+           '자리 — ' + (Number(it.rideN)||1),
+           '무슨 항해 — ' + rideName(RIDE_TRIP, it.rideTrip),
+           (it.from||it.to) ? ('항로 — ' + (it.from||'—') + ' → ' + (it.to||'—')) : '',
+           '구하는 분 — ' + (want || '누구나'),
+           '비용 — ' + rideName(RIDE_COST, it.rideCost),
+           it.rideUntil ? (it.rideUntil + ' 까지 받습니다') : '',
+           it.rideNote || '' ].filter(Boolean);
+}
+function rideEdit(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  if(!meUid()){ alert('로그인해야 같이 탈 사람을 구할 수 있습니다'); return; }
+  if(!it.date){ alert('먼저 출항 날짜를 정해 주세요'); return; }
+  openForm({
+    title: it.rideOn ? '모집 고치기' : '같이 탈 사람 구하기',
+    okText: it.rideOn ? '저장' : '글판에 올리기',
+    sub: RIDE_LAW,
+    fields: [
+      { key:'n', label:'몇 자리', type:'pick', value:String(Number(it.rideN)||1),
+        options:[{v:'1',name:'1자리'},{v:'2',name:'2자리'},{v:'3',name:'3자리'},
+                 {v:'4',name:'4자리'},{v:'5',name:'5자리 이상'}] },
+      { key:'trip', label:'무슨 항해', type:'pick',
+        value: it.rideTrip || (isFishing() ? 'fish' : 'air'), options:RIDE_TRIP },
+      { key:'want', label:'어떤 분', type:'picks',
+        value: (it.rideWant && it.rideWant.length) ? it.rideWant : ['new'], options:RIDE_WANT },
+      { key:'cost', label:'비용', type:'pick', value: it.rideCost || 'none', options:RIDE_COST },
+      { key:'close', label:'언제까지', type:'pick',
+        value: String(it.rideClose == null ? '1' : it.rideClose), options:RIDE_CLOSE },
+      { key:'note', type:'multi', rows:4, label:'한마디', value: it.rideNote || '',
+        placeholder:'만나는 곳, 챙겨 오실 것, 그 밖에 알려 주실 말씀' }
+    ],
+    onOk: v => {
+      if(!(v.want||[]).length){ alert('어떤 분을 구하시는지 하나는 골라 주세요'); return false; }
+      // ★ 금액이 적히면 안 된다 — 무등록 유상 운송이 된다.
+      //   비용 칸에 숫자를 못 넣게 막아도 '한마디' 로 새면 소용이 없다. 여기서도 막는다.
+      if(/[0-9][0-9,.]*\s*(원|만원|천원|만 원|천 원)/.test(String(v.note||''))){
+        alert('금액은 적을 수 없습니다.\n\n' + RIDE_LAW); return false; }
+      it.rideOn = true;
+      it.rideN = Number(v.n) || 1;
+      it.rideTrip = v.trip;
+      it.rideWant = (v.want||[]).slice();
+      it.rideCost = v.cost;
+      it.rideClose = Number(v.close) || 0;
+      it.rideUntil = rideDeadline(it.date, it.rideClose);
+      it.rideNote = String(v.note||'').trim();
+      saveMR();
+      ridePush(it);
+      openMR('voyage', it.id);
+    }
+  });
+}
+async function ridePush(it){
+  if(!window.__talk){ alert('인터넷에 이어지면 글판에 올라갑니다.\n\n모집 내용은 저장했습니다.'); return; }
+  const blocks = [{ t:'text', v: rideLines(it).join('\n') }];
+  try{
+    if(it.ridePost){
+      await window.__talk.edit(it.ridePost, {
+        title: rideTitle(it), blocks, body: rideLines(it).join('\n\n'),
+        ride: rideInfo(it), kw: kwOf(rideTitle(it), meName()) });
+    }else{
+      const post = talkBody({ kind:'ride', title: rideTitle(it),
+                              region: boatRegion() || '그 밖' }, blocks);
+      post.ride = rideInfo(it);
+      await window.__talk.add(post);
+      it.ridePost = post.id; saveMR();
+    }
+    try{ listDrop('talk'); }catch(_){}   // 글판 목록을 새로 받게 한다
+    openMR('voyage', it.id);
+  }catch(e){ alert('글판에 올리지 못했습니다.\n\n' + ((e&&e.message)||e)); }
+}
+function rideStop(it, quiet){
+  const v = it || getMR('voyage', mrOpenId); if(!v) return;
+  if(!quiet && !confirm('모집을 그만둘까요?\n\n글판에 올린 글은 마감으로 바뀝니다.')) return;
+  v.rideOn = false; saveMR();
+  if(v.ridePost && window.__talk){
+    const info = rideInfo(v); info.open = false;
+    window.__talk.edit(v.ridePost, { ride: info }).catch(()=>{});
+  }
+  if(!quiet) openMR('voyage', v.id);
+}
+function rideGoPost(){
+  const it = getMR('voyage', mrOpenId);
+  if(!it || !it.ridePost) return;
+  const id = it.ridePost;
+  closeMR(); switchTab('community'); setComSub('talk');
+  setTimeout(()=>{ try{ openTalk(id); }catch(_){} }, 250);
+}
+const isPlan = v => !!(v && v.plan);
+// ★ 예정 항해 — 모집이 없어도 그 자체로 쓸모가 있다.
+//   그 날 날씨·물때를 미리 볼 수 있고, 출항 전 점검이 그 날짜에 붙고,
+//   진짜 나가는 날 새로 만들지 않고 열기만 하면 된다.
+//   (항해 중에 정신없어서 기록을 놓친다는 말이 여러 번 있었다)
+function addPlan(){
+  if(!unlocked) return;
+  const d = new Date(); d.setDate(d.getDate() + 7);
+  const p = n => String(n).padStart(2,'0');
+  const v = {id:newId(), plan:true,
+             date: d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),
+             title:'', pub:true,
+             from:'', to:'', nm:'', hours:'', engineH:'', crew:'',
+             timeOut:'', timeIn:'',
+             logs:[], weather:'', note:'', photos:[], wxOut:null, wxIn:null,
+             posOut:null, posIn:null};
+  voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
+}
+// 예정 → 진짜 항해. 이때 비로소 시각·위치·날씨를 잡는다.
+function planStart(){
+  const it = getMR('voyage', mrOpenId); if(!it || !isPlan(it)) return;
+  if(!confirm('지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.')) return;
+  const p = n => String(n).padStart(2,'0'); const now = new Date();
+  it.plan = false;
+  it.date = today();
+  it.timeOut = p(now.getHours())+':'+p(now.getMinutes());
+  if(it.rideOn) rideStop(it, true);      // 나갔으면 모집은 닫는다
+  saveMR(); renderVoyage(); openMR('voyage', it.id);
+  wxCapture('wxOut', it.id);
+  posHere('wxOut', it.id, true);
 }
 function addVoyage(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
@@ -12077,6 +12538,7 @@ async function itemSave(){
     reportN: old ? (old.reportN || 0) : 0,
     hidden: old ? !!old.hidden : false
   };
+  body.kw = kwOf(body.title, body.byName);
   // 사진은 창고로 보내고 주소만 문서에 남긴다
   const st = await storePhotos((d.photos||[]).slice(0,5));
   body.photos = st.photos; body.thumbs = st.thumbs;
@@ -12580,6 +13042,8 @@ async function spotSave(){
     reportN: spotPickCtx.id ? (spotOf(spotPickCtx.id)||{}).reportN || 0 : 0,
     hidden: spotPickCtx.id ? !!(spotOf(spotPickCtx.id)||{}).hidden : false
   };
+  // 찾기용 조각 — 나중에 자리가 많아져도 서버에서 바로 찾을 수 있게 지금부터 담아 둔다
+  body.kw = kwOf(body.name, body.byName, body.region);
   const st = await storePhotos((d.photos||[]).slice(0,4));
   body.photos = st.photos; body.thumbs = st.thumbs;
   if(!st.ok){ alert(storeShortMsg(st.dropped, '한 자리')); return; }
@@ -13048,7 +13512,13 @@ function logAdd(){
   it.logs.push({ id:newId(), time:p(now.getHours())+':'+p(now.getMinutes()),
                  kind: isFishing() ? '포인트' : '세일', text:'', wx:null, pos:null });
   it.seed = false; saveMR(); openMR('voyage', mrOpenId);
-  wxCapture('log:' + it.logs[it.logs.length-1].id);
+  const lid = it.logs[it.logs.length-1].id;
+  wxCapture('log:' + lid);
+  // ★ 위치도 같이 잡는다.
+  //   전에는 날씨만 잡고 위치는 사람이 따로 눌러야 했다.
+  //   항해 중에는 손이 바빠서 그걸 놓친다 — 나중에 어디였는지 알 수가 없다.
+  //   실패해도 조용히 넘어간다 (권한을 안 줬을 수 있다).
+  posHere('log:' + lid, it.id, true);
 }
 function logField(lid, k, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
@@ -14237,6 +14707,163 @@ async function checkNewsBadge(){
     updateBadge();
   }catch(e){}
 }
+// ── 뉴스 화면
+// ★ 셋으로 나눈다. 전에는 한국 소식 열네 건 아래에 해외 소식이 붙어서,
+//   해외를 보려면 한참 밀어야 했다. 연재까지 붙이면 아무도 못 본다.
+let newsSub = (function(){ try{ return localStorage.getItem('bt_newssub') || 'kr'; }catch(_){ return 'kr'; } })();
+function setNewsSub(k){
+  newsSub = k;
+  try{ localStorage.setItem('bt_newssub', k); }catch(_){}
+  renderNews();
+}
+// 마지막으로 뉴스를 본 시각 — 그 뒤에 올라온 것에 '새로' 를 붙인다
+function newsSeenAt(){
+  try{ return localStorage.getItem('bt_newsat') || ''; }catch(_){ return ''; }
+}
+function newsMarkAt(){
+  try{ localStorage.setItem('bt_newsat', new Date().toISOString()); }catch(_){}
+}
+const newsIsNew = n => {
+  const at = newsSeenAt();
+  return !!at && String(n.date || '') > at;
+};
+// 날짜별로 묶어 보여 준다 — 며칠 만에 들어와도 어느 날 것인지 바로 안다
+function newsByDay(rows, draw){
+  const days = new Map();
+  (rows || []).forEach(n=>{
+    const d = String(n.date || '').slice(0, 10) || '날짜 모름';
+    if(!days.has(d)) days.set(d, []);
+    days.get(d).push(n);
+  });
+  const today = new Date().toISOString().slice(0, 10);
+  const yest  = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  const name = d => d === today ? '오늘' : d === yest ? '어제' : d;
+  return [...days.keys()].sort().reverse().map(d=>{
+    const n = days.get(d).filter(newsIsNew).length;
+    return `<div class="secl">${esc(name(d))}${n?` <span class="chip">새로 ${n}</span>`:''}</div>`
+         + days.get(d).map(draw).join('');
+  }).join('');
+}
+function krRow(n){
+  return `<div class="mr newsr">
+    <div class="cn" style="font-size:14px">${newsIsNew(n)?'<span class="chip">새로</span> ':''}${esc(n.title)}</div>
+    <div class="newsm"><span>${esc(n.source||'')}${n.press?' · '+esc(n.press):''}</span>
+    <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">원문</a></div></div>`;
+}
+function wwRow(n){
+  return `<div class="mr newsr">
+    <div class="ct"><div class="cn">${newsIsNew(n)?'<span class="chip">새로</span> ':''}${esc(n.t_ko||n.title||'')}</div>
+      ${n.cat?`<span class="chip nchip">${esc(n.cat)}</span>`:''}</div>
+    ${n.s_ko?`<div class="newss">${esc(n.s_ko)}</div>`:''}
+    <div class="newsm"><span>${esc(n.source||'')}</span>
+    <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">원문 보기</a></div>
+  </div>`;
+}
+// ===== 연재 =====
+// ★ 왜 뉴스 수집 파일이 아니라 따로 두나
+//   수집 파일은 돌 때마다 갈아 끼운다. 연재는 몇 달에 걸쳐 이어지므로 사라지면 안 된다.
+//   그리고 남의 글을 옮긴 것이라 '저자·매체·원문 링크' 가 반드시 붙어야 한다.
+//   허락 조건에 그렇게 적혀 있고, 하나라도 빠지면 허락이 날아간다.
+//   그래서 그 세 칸은 비워 두면 아예 저장이 안 되게 막는다.
+let seriesList = null;
+async function loadSeries(force){
+  if(seriesList && !force) return seriesList;
+  if(!window.__series){ seriesList = []; return seriesList; }
+  try{ seriesList = await window.__series.list(); }catch(e){ seriesList = []; }
+  return seriesList;
+}
+async function seriesHtml(){
+  const rows = await loadSeries();
+  const can = canSeries();
+  const add = can
+    ? `<div class="mrrow" style="justify-content:flex-end;padding:8px 0">
+         <button class="mrbtn ok" onclick="writeSeries()">+ 연재 글 올리기</button></div>`
+    : '';
+  if(!rows.length){
+    return add + `<div class="mrnone" style="text-align:left">아직 올라온 연재가 없습니다.<br><br>
+      해외 요트 매체의 글을 허락받아 옮겨 싣는 자리입니다.</div>`;
+  }
+  // 번호 순서로 쌓인다 — 새 글이 위로 밀지 않는다
+  const sorted = [...rows].sort((a,b)=> (Number(a.no)||0) - (Number(b.no)||0));
+  return add + sorted.map(x=>`<div class="mr" onclick="openSeries('${esc(x.id)}')">
+      <div class="ct"><div class="cn">${x.no?`<span class="chip">${esc(String(x.no))}편</span> `:''}${esc(x.title||'')}</div></div>
+      <div class="mrm">${esc(x.author||'')} · ${esc(x.source||'')}${x.date?' · '+esc(String(x.date).slice(0,10)):''}</div>
+    </div>`).join('');
+}
+async function openSeries(id){
+  const rows = await loadSeries();
+  const x = rows.find(r=>String(r.id)===String(id));
+  if(!x) return;
+  const P = document.getElementById('mrPanel');
+  P.innerHTML = `<div class="mrhead"><b>${esc(x.title||'')}</b><span style="flex:1"></span>
+      <button class="tab" onclick="closeBoat()">목록</button></div>
+    <div class="postmeta">${x.no?`<span class="chip">${esc(String(x.no))}편</span>`:''}
+      ${esc(x.author||'')} · ${esc(x.source||'')}${x.date?' · '+esc(String(x.date).slice(0,10)):''}</div>
+    <div class="wxbox"><b>원문</b>
+      ${x.origTitle?`<div>${esc(x.origTitle)}</div>`:''}
+      <div class="wxfoot"><a href="${esc(x.link||'#')}" target="_blank" rel="noopener">${esc(x.link||'')}</a></div>
+      <div class="wxfoot">저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.</div></div>
+    <div class="postbody">${esc(x.body||'').replace(/\n/g,'<br>')}</div>
+    ${(canEditSeries(x)||canDelSeries(x))?`<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px">
+        ${canEditSeries(x)?`<button class="mrbtn" onclick="writeSeries('${esc(x.id)}')">고치기</button>`:''}
+        ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${esc(x.id)}')">지우기</button>`:''}</div>`:''}`;
+  showPanel(P);
+}
+function writeSeries(id){
+  if(!canSeries()){ alert('연재 글을 올릴 권한이 없습니다'); return; }
+  const x = id ? (seriesList||[]).find(r=>String(r.id)===String(id)) : null;
+  // 남이 올린 연재는 고치지 못한다 (규칙에서도 막혀 있다)
+  if(x && !canEditSeries(x)){ alert('남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.'); return; }
+  openForm({
+    title: x ? '연재 고치기' : '연재 글 올리기',
+    okText: x ? '저장' : '올리기',
+    sub: '저자 · 매체 · 원문 링크는 허락 조건입니다. 비우면 저장되지 않습니다.',
+    fields: [
+      { key:'no',        label:'몇 편',    value: x ? String(x.no||'') : '', placeholder:'1' },
+      { key:'title',     label:'제목',     value: x ? x.title : '', placeholder:'옮긴 제목' },
+      { key:'origTitle', label:'원제',     value: x ? x.origTitle : '', placeholder:'원문 제목' },
+      { key:'author',    label:'저자',     value: x ? x.author : '', placeholder:'예: Вадим Михалов' },
+      { key:'source',    label:'매체',     value: x ? x.source : '', placeholder:'예: Yacht Russia' },
+      { key:'link',      label:'원문 링크', value: x ? x.link : '', placeholder:'https://…' },
+      { key:'body', type:'multi', rows:14, label:'본문', value: x ? x.body : '', placeholder:'옮긴 본문' }
+    ],
+    onOk: v => {
+      // ★ 세 칸은 허락 조건이다. 하나라도 비면 안 된다.
+      if(!v.title){ alert('제목을 넣어 주세요'); return false; }
+      if(!v.author){ alert('저자를 넣어 주세요.\n\n허락 조건이라 빠지면 안 됩니다.'); return false; }
+      if(!v.source){ alert('매체 이름을 넣어 주세요.\n\n허락 조건이라 빠지면 안 됩니다.'); return false; }
+      if(!/^https?:\/\//i.test(String(v.link||'').trim())){
+        alert('원문 링크를 넣어 주세요 (https:// 로 시작).\n\n허락 조건이라 빠지면 안 됩니다.'); return false; }
+      if(!v.body){ alert('본문을 넣어 주세요'); return false; }
+      const body = {
+        id: x ? x.id : ('sr' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+        no: Number(v.no) || 0,
+        title: String(v.title).trim(), origTitle: String(v.origTitle||'').trim(),
+        author: String(v.author).trim(), source: String(v.source).trim(),
+        link: String(v.link).trim(), body: String(v.body),
+        by: meUid() || '', byName: meName(),
+        date: x ? x.date : new Date().toISOString(),
+        ts: new Date().toISOString()
+      };
+      (async ()=>{
+        try{
+          await window.__series.put(body);
+          await loadSeries(true);
+          newsSub = 'sr'; renderNews();
+          openSeries(body.id);
+        }catch(e){ alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)); }
+      })();
+    }
+  });
+}
+function delSeries(id){
+  const x = (seriesList||[]).find(r=>String(r.id)===String(id));
+  if(!canDelSeries(x)) return;
+  if(!confirm('이 연재 글을 지울까요?')) return;
+  window.__series.del(id)
+    .then(async ()=>{ await loadSeries(true); closeBoat(); newsSub='sr'; renderNews(); })
+    .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
+}
 async function renderNews(force){
   const L = document.getElementById('newsList');
   if(!newsCache || !krCache || force){
@@ -14244,33 +14871,29 @@ async function renderNews(force){
     await loadKr(force);
     try{ const r = await fetch(DATA_BASE+'news.json?v='+Date.now(), {cache:'no-store'}); newsCache = r.ok ? await r.json() : null; }catch(e){ newsCache = null; }
   }
-  let html = '';
-  // ── 한국 해양 소식 (특보는 날씨탭으로 이동)
   const gov = (krCache && krCache.gov) || [];
-  if(gov.length){
-    // ★ 수집기가 14건을 골라 담는데 여기서 6건만 그리면 나머지는 버려진다.
-    //   '뉴스가 며칠째 그대로' 로 보이던 데에는 이것도 한몫했다.
-    html += '<div class="secl">한국 해양 소식</div>' + gov.slice(0,14).map(n=>
-      `<div class="mr newsr"><div class="cn" style="font-size:14px">${esc(n.title)}</div>
-       <div class="newsm"><span>${esc(n.source||'')}${n.date?' · '+String(n.date).slice(0,10):''}</span>
-       <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">원문</a></div></div>`).join('');
-  }
-  // ── 해외 소식
-  html += '<div class="secl">해외 소식</div>';
-  if(newsCache && newsCache.items && newsCache.items.length){
-    const up = newsCache.updated ? new Date(newsCache.updated) : null;
-    html += `<div class="newsup">마지막 수집 ${up?up.toLocaleDateString('ko-KR'):'—'} · ${newsCache.items.length}건 선별</div>`
-      + newsCache.items.map(n=>`<div class="mr newsr">
-        <div class="ct"><div class="cn">${esc(n.t_ko||n.title||'')}</div>${n.cat?`<span class="chip nchip">${esc(n.cat)}</span>`:''}</div>
-        ${n.s_ko?`<div class="newss">${esc(n.s_ko)}</div>`:''}
-        <div class="newsm"><span>${esc(n.source||'')}${n.date?' · '+String(n.date).slice(0,10):''}</span>
-        <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">원문 보기</a></div>
-      </div>`).join('');
+  const ww  = (newsCache && newsCache.items) || [];
+  const nNew = (rows, f) => rows.filter(f || newsIsNew).length;
+  const tabs = `<div class="subrow">`
+    + [['kr','한국 소식', nNew(gov)], ['ww','해외 소식', nNew(ww)], ['sr','연재', 0]]
+        .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tcnt">${c}</span>`:''}</button>`).join('')
+    + `</div>`;
+  let html = tabs;
+  if(newsSub === 'kr'){
+    html += gov.length ? newsByDay(gov, krRow)
+      : '<div class="mrnone">아직 모인 소식이 없습니다.</div>';
+  } else if(newsSub === 'ww'){
+    const up = newsCache && newsCache.updated ? new Date(newsCache.updated) : null;
+    html += ww.length
+      ? `<div class="newsup">마지막 수집 ${up?up.toLocaleDateString('ko-KR'):'—'} · ${ww.length}건</div>`
+        + newsByDay(ww, wwRow)
+      : '<div class="mrnone">아직 수집된 뉴스가 없습니다.<br>잠시 후 다시 확인해 주세요.</div>';
   } else {
-    html += '<div class="mrnone">아직 수집된 뉴스가 없습니다.<br>잠시 후 다시 확인해 주세요.</div>';
+    html += await seriesHtml();
   }
   L.innerHTML = html;
   markSeen();
+  newsMarkAt();
   badgeState = {fresh:false, wx:false};
   updateBadge();
 }
@@ -15559,6 +16182,16 @@ document.addEventListener('visibilitychange', ()=>{
     window.__talk = {
       // ord: 'ts'(새 글 순) 또는 'likeN'(도움된 순)
       async list(more, ord){ return await pageList('community', ord === 'likeN' ? 'likeN' : 'ts', more); },
+      // ★ 제목·올린 사람으로 찾기
+      //   글을 올릴 때 담아 둔 조각(kw)으로 서버에 물어본다.
+      //   맞는 글만 받아오므로, 글이 10만 개가 돼도 받아오는 양은 그대로다.
+      //   조각은 헐겁게 걸리므로, 받아온 뒤 앱에서 한 번 더 걸러 정확히 맞는 것만 남긴다.
+      async find(grams, n){
+        if(!grams || !grams.length) return [];
+        const snap = await getDocs(query(collection(fdb, 'community'),
+          where('kw', 'array-contains-any', grams.slice(0, 10)), limit(n || 60)));
+        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+      },
       async add(body){
         await setDoc(doc(fdb, 'community', String(body.id)), body);
         bust('talk');
@@ -15621,6 +16254,16 @@ document.addEventListener('visibilitychange', ()=>{
         await updateDoc(doc(fdb, coll, String(id)), { likeN: increment(on ? 1 : -1) });
         bust('talk');
       }
+    };
+    // ── 연재 (허락받아 옮긴 글)
+    // 뉴스 수집 파일은 돌 때마다 갈아 끼우므로 여기에 둘 수 없다.
+    window.__series = {
+      async list(){
+        const snap = await getDocs(query(collection(fdb, 'series'), orderBy('no')));
+        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+      },
+      async put(body){ await setDoc(doc(fdb, 'series', String(body.id)), body); },
+      async del(id){ await deleteDoc(doc(fdb, 'series', String(id))); }
     };
     // ── 운영자
     // 코드에 계정을 박지 않는다. 사람을 바꿀 때 앱을 다시 안 내려도 되게.

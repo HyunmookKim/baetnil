@@ -7301,7 +7301,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.51';
+const APP_VER = '3.52';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8938,19 +8938,37 @@ function renderCurrent(){
 // 앱을 켜는 첫 이유는 '오늘 나갈 수 있나' 이다. 한 화면에서 답이 나와야 한다.
 // ★ 처음 온 사람이 보는 카드. 이 앱이 뭘 해 주는지 네 줄로 말한다.
 //   기능 이름을 늘어놓지 않는다 — '무엇이 편해지는가' 로 적는다.
-const INTRO_LINES = [
+// ★ 두 덩어리로 나눈다.
+//   배를 '타는' 사람과 배를 '가진' 사람은 고픈 것이 다르다.
+//   앞의 넷은 배가 없어도 오늘 당장 쓸 수 있는 것들이고,
+//   뒤의 셋은 배를 등록해야 열린다. 섞어 놓으면 배 없는 사람이 '나랑 상관없네' 하고 나간다.
+const INTRO_OPEN = [
   ['지금 나가도 되나', '바람·돌풍·파고·물때를 한 화면에서 보고 판단합니다'],
-  ['그거 어디 뒀더라', '배 도면 위에 칸을 그려 두고 물건을 넣어 둡니다'],
-  ['정비 때를 놓치지 않게', '주기마다 알려 주고, 한 일은 기록으로 남습니다'],
-  ['항해일지', '출항·입항 시각과 그때 날씨·위치까지 함께 남습니다']
+  ['어디에 댈까',     '정박지 수심·요금·연락처를 다녀온 사람들과 함께 모읍니다'],
+  ['중고 장터',       '닻·세일·구명조끼… 배 장비를 사고팝니다'],
+  ['글판',            '배 타는 사람들끼리 묻고 답합니다. 해양 뉴스와 특보도 함께']
 ];
+const INTRO_OWN = [
+  ['그거 어디 뒀더라',     '배 도면 위에 칸을 그려 두고 물건을 넣어 둡니다'],
+  ['정비 때를 놓치지 않게', '주기마다 알려 주고, 한 일은 기록으로 남습니다'],
+  ['항해일지',             '출항·입항 시각과 그때 날씨·위치까지 함께 남습니다']
+];
+function introLines(list){
+  return list.map(([t, d]) =>
+    `<div class="introl"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('');
+}
 function introCard(){
-  return `<div class="hcard intro"><div class="hct"><b>뱃일이 하는 일</b></div>`
-    + INTRO_LINES.map(([t, d]) =>
-        `<div class="introl"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')
+  return `<div class="hcard intro">
+      <div class="hct"><b>배 타는 사람이면</b></div>`
+    + introLines(INTRO_OPEN)
     + `<div class="mrrow" style="padding:12px 0 2px">
-        <button class="mrbtn ok" style="width:100%" onclick="openBoatSetup()">배 등록하기</button></div>
-      <div class="hmute" style="margin-top:8px">배가 없어도 날씨·물때·정박지는 볼 수 있습니다.</div></div>`;
+        <button class="mrbtn ok" style="width:100%" onclick="switchTab('community')">커뮤니티 둘러보기</button></div>
+      <div class="hmute" style="margin-top:8px">여기까지는 배가 없어도 바로 쓸 수 있습니다.</div></div>
+    <div class="hcard intro"><div class="hct"><b>배를 가지고 있으면</b></div>`
+    + introLines(INTRO_OWN)
+    + `<div class="mrrow" style="padding:12px 0 2px">
+        <button class="mrbtn" style="width:100%" onclick="openBoatSetup()">배 등록하기</button></div>
+      <div class="hmute" style="margin-top:8px">등록하면 그 배 기준으로 날씨·물때·정비가 맞춰집니다.</div></div>`;
 }
 // 오늘 화면에서 곧바로 현재 위치를 잡는다.
 // ★ 앱을 켜자마자 위치를 묻지 않는다 — 까닭도 모르고 묻는 창은 대부분 거절당한다.
@@ -11197,7 +11215,12 @@ function spotRowsHtml(){
         <div class="fsub">${esc([s.region, spotDepthText(s), sh].filter(Boolean).join(' · '))}</div>
       </div></div>`;
     }).join('');
-  return (rows || `<div class="mrnone">${spotQ ? '받아 온 정박지 중에는 없습니다. 더 보기로 넓혀 보세요.' : '아직 올라온 정박지가 없습니다. 아는 자리를 올려 주세요.'}</div>`)
+  return (rows || `<div class="mrnone" style="text-align:left">${spotQ
+      ? '받아 온 정박지 중에는 없습니다. 더 보기로 넓혀 보세요.'
+      : `<b>아직 올라온 정박지가 없습니다.</b><br><br>
+         다녀오신 마리나·항구·묘박지를 하나만 올려 주세요.<br>
+         이름과 자리만 찍어도 됩니다. 수심·요금·연락처는 아는 만큼만.<br><br>
+         뒤에 오는 사람이 그걸 보고 댑니다.`}</div>`)
     + listFoot('spots', 'spotMore');
 }
 // ★ 글자 한 자에 화면을 통째로 다시 그리면 찾기 칸이 새로 생긴다.

@@ -1341,6 +1341,40 @@ body.panelfull #panel .ph{padding-top:0}
 .sr{border-bottom:1px solid rgba(255,255,255,.06);padding:11px 13px}
 .sr:active{background:rgba(156,198,232,.14)}
 
+/* 하위 탭을 한 단 내렸다 — 이제 머리줄 폭을 다 쓴다 */
+#hNav{margin-top:0;padding:2px 20px 0}
+#hNav .hsubs{padding:0}
+#hNav .htit{margin:0;padding:0 0 2px}
+/* 화면이 떠 있을 때도 이름은 남긴다 (하위 탭 자리에 화면 이름이 들어간다) */
+body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
+.hrow{padding:12px 20px 4px}
+.sub{font-size:12px;color:#8AA0B4}
+.htit{font-size:20px;font-weight:500;letter-spacing:-.03em;color:var(--th)}
+
+/* ============ 머리줄 — 하위 탭이 폭을 다 쓰게 ============ */
+/* ★ 하위 탭이 [편집 중]·[☰] 와 한 줄을 나눠 쓰느라 잘렸다.
+   (커뮤니티는 다섯 개라 '배 둘러보기' 부터 밀어야 보였다)
+   한 단 내리면 22px 를 먹는다 — 780px 화면에서 목록 한 줄이 사라진다.
+   그래서 내리지 않는다. 단추를 오른쪽 위에 띄우고,
+   하위 탭이 그 아래를 지나가게 한다. 높이는 하나도 안 늘어난다. */
+/* ★ 단추를 오른쪽 위에 띄우고 탭이 그 아래를 지나가게도 해 봤는데,
+      탭 글씨가 단추에 가려 버렸다. 단추는 40px 인데 이름 줄은 16px 이라
+      한 줄 안에 들어가지 않는다.
+      그래서 첫 줄은 단추 높이로 두고, 위아래 여백을 최대한 조여
+      늘어나는 폭을 줄였다. */
+.hrow{position:relative;padding:5px 20px 2px;align-items:center;gap:10px}
+.hrow .hleft{flex:1 1 auto;min-width:0}
+.hrow .btns{flex:0 0 auto}
+.sub{padding-right:0}
+.hrow .tab,#lockBtn,.tab.iconb{padding:6px 12px;font-size:12.5px}
+.tab.iconb{padding:6px 9px}
+/* 둘째 줄(하위 탭·화면 이름) — 높이를 고정한다.
+   항해일지는 하위 탭이 없어 이름만 들어가는데, 높이가 다르면 탭을 옮길 때 튄다. */
+#hNav{margin:0;height:30px;display:flex;align-items:center;padding:0 20px}
+#hNav .hsubs{width:100%;padding:0}
+#hNav .htit{margin:0;font-size:19px;font-weight:500;letter-spacing:-.03em;color:var(--th);line-height:1.1}
+.hsub{padding:2px 0 5px}
+
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122a44">
@@ -1356,13 +1390,14 @@ body.panelfull #panel .ph{padding-top:0}
     <div class="hleft">
       <div class="sub"><span id="boatSub" onclick="openFleet()" style="cursor:pointer">뱃일</span>
         <span id="syncState" onclick="syncTap()" style="cursor:pointer"></span></div>
-      <div id="hNav"></div>
     </div>
     <div class="btns">
       <button class="tab" id="lockBtn" onclick="toggleLock()">편집 중</button>
       <button class="tab iconb" id="menuBtn" onclick="openDrawer()" aria-label="메뉴"><span class="bdot" id="menuDot"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     </div>
   </div>
+  <!-- ★ 하위 탭은 단추와 줄을 나눠 쓰지 않는다. 한 단 내려서 폭을 다 쓴다. -->
+  <div id="hNav"></div>
   <div id="stowTools" style="display:none">
     <button class="tab" id="tabToggle" onclick="toggleView()">목록</button>
     <button class="tab" id="sortTab" onclick="cycleSort()">가나다순</button>
@@ -3796,7 +3831,10 @@ function buildPublic(b){
   // 항해일지 — 좌표와 정박지는 뺀다. 빈 배가 어디 있는지 알려주는 셈이 된다.
   if(pubOn(b,'voyage')){
     o.voyage = (typeof voyage!=='undefined' ? voyage : [])
-      .map(v => ({ id:v.id, date:v.date || '', title:v.title || '', note:v.note || '' }));
+      // ★ 항해마다 따로 감출 수 있다. pub 이 false 인 것은 밖으로 안 나간다.
+      .filter(v => v && v.pub !== false)
+      .map(v => ({ id:v.id, date:v.date || '', title:v.title || '',
+                   from:v.from || '', to:v.to || '', note:v.note || '' }));
   }
   // 정비 — 항목과 날짜만. 메모에 연락처나 개인정보가 섞여 있을 수 있다.
   if(pubOn(b,'maint')){
@@ -5445,51 +5483,92 @@ function exploreFilterUI(v){
   else openExplore(exploreBiz);
 }
 // 남의 배 소개 페이지
-async function openBoatPage(id){
-  if(!window.__pub) return;
-  let x;
-  try{ x = await window.__pub.one(id); }
-  catch(e){ alert('불러오지 못했습니다'); return; }
-  if(!x){ alert('공개된 자료가 없습니다'); return; }
-  const sec = (title, body) => body ? `<div class="ghead"><b>${esc(title)}</b></div>${body}` : '';
-  const intro = (x.intro||[]).map(p=>
-    p.t === 'photo' ? `<div class="introrow"><img src="${esc(p.v)}" style="max-width:100%;border-radius:8px;display:block"></div>`
-    : p.t === 'video' ? `<div class="introrow"><a class="mrbtn" href="${esc(p.v)}" target="_blank" rel="noopener">유튜브 열기</a></div>`
-    : `<div class="postbody">${esc(p.v).replace(/\n/g,'<br>')}</div>`).join('');
-  const spec = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
-                 x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
-                 .filter(Boolean).join(' · ');
-  const mine = boats.some(b=>String(b.id)===String(id));
+let boatPageTab = 'intro';
+let boatPageData = null;
+function setBoatPageTab(k){ boatPageTab = k; paintBoatPage(); }
+// ★ 전에는 배 소개·제원·항해일지·정비… 를 위에서 아래로 죽 이어 붙였다.
+//   자료가 많은 배는 한참 밀어야 항해일지가 나왔다.
+//   위에 메뉴를 두고 고른 것만 보여 준다. 공개로 켜 둔 것만 메뉴에 뜬다.
+function boatPageSecs(x){
+  const has = {
+    intro:  (x.intro||[]).length,
+    spec:   !!(x.maker || x.model || x.year || x.loa || x.beam),
+    voyage: (x.voyage||[]).length,
+    maint:  (x.maint||[]).length,
+    gear:   (x.gear||[]).length,
+    roster: (x.roster||[]).length,
+    board:  (x.posts||[]).length,
+    phone:  !!x.phone
+  };
+  return [['intro','배 소개'],['spec','제원'],['voyage','항해일지'],['maint','정비 기록'],
+          ['gear','보유 장비'],['roster','구성원'],['board','게시판'],['phone','연락처']]
+         .filter(([k]) => has[k]);
+}
+function boatPageBody(x, k){
+  if(k === 'intro') return (x.intro||[]).map(p=>
+      p.t === 'photo' ? `<div class="introrow"><img src="${esc(p.v)}" style="max-width:100%;border-radius:12px;display:block"></div>`
+      : p.t === 'video' ? `<div class="introrow"><a class="mrbtn" href="${esc(p.v)}" target="_blank" rel="noopener">유튜브 열기</a></div>`
+      : `<div class="postbody">${esc(p.v).replace(/\n/g,'<br>')}</div>`).join('');
+  if(k === 'spec'){
+    const t = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
+                x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
+              .filter(Boolean).join(' · ');
+    return `<div class="postbody">${esc(t)}</div>`;
+  }
+  if(k === 'voyage') return (x.voyage||[]).map(v=>
+      `<div class="mr"><div class="ct"><div class="cn">${esc(
+          (v.title && v.title.trim()) ||
+          ((v.from || v.to) ? ((v.from || '—') + ' → ' + (v.to || '—')) : '(제목 없음)')
+        )}</div></div>
+       <div class="mrm">${esc(v.date||'')}</div>
+       ${v.note?`<div class="postbody" style="padding-top:6px">${esc(v.note).replace(/\n/g,'<br>')}</div>`:''}</div>`).join('');
+  if(k === 'maint') return (x.maint||[]).map(m=>
+      `<div class="mr"><div class="ct"><div class="cn">${esc(m.name||'')}</div>
+       <span class="st ok">${esc(m.lastDate||'')}</span></div>
+       <div class="mrm">${esc(m.grp||'')}</div></div>`).join('');
+  if(k === 'gear')   return `<div class="postbody">${(x.gear||[]).map(g=>esc(g.name)).join(' · ')}</div>`;
+  if(k === 'roster') return `<div class="postbody">${(x.roster||[]).map(r=>esc(r.name)+' ('+esc(r.rank)+')').join(' · ')}</div>`;
+  if(k === 'board')  return (x.posts||[]).map(p=>
+      `<div class="mr"><div class="ct"><div class="cn">${esc(p.title||'')}</div></div>
+       <div class="mrm">${esc(String(p.ts||'').slice(0,10))}</div>
+       <div class="postbody" style="padding-top:6px">${esc(p.body||'').replace(/\n/g,'<br>')}</div></div>`).join('');
+  if(k === 'phone')  return `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>`;
+  return '';
+}
+function paintBoatPage(){
+  const x = boatPageData; if(!x) return;
+  const secs = boatPageSecs(x);
+  if(!secs.some(([k])=>k===boatPageTab)) boatPageTab = secs.length ? secs[0][0] : 'intro';
+  const mine = boats.some(b=>String(b.id)===String(x.id));
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToExplore()">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
       ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>
     ${mine ? `<div class="mrnone">이미 이 배의 구성원입니다</div>`
-      : `<div class="mrrow" style="padding:12px">
-          <button class="mrbtn big" style="width:100%" onclick="joinBoat('${esc(x.id)}','${esc(x.name||'')}')">이 배에 가입 신청</button></div>`}`
-    + intro
-    + sec('제원', spec ? `<div class="postbody">${esc(spec)}</div>` : '')
-    + sec('연락처', x.phone ? `<div class="postbody"><a class="mrbtn" href="tel:${esc(x.phone)}">${esc(x.phone)}</a></div>` : '')
-    + sec('보유 장비', (x.gear||[]).length
-        ? `<div class="postbody">${x.gear.map(g=>esc(g.name)).join(' · ')}</div>` : '')
-    + sec('항해일지', (x.voyage||[]).length
-        ? x.voyage.map(v=>`<div class="cmt"><div class="cmthead">${esc(v.title||'')}<span>${esc(v.date||'')}</span></div>
-            <div class="cmtbody">${esc(v.note||'')}</div></div>`).join('') : '')
-    + sec('정비 기록', (x.maint||[]).length
-        ? x.maint.map(m=>`<div class="cmt"><div class="cmthead">${esc(m.name||'')}<span>${esc(m.lastDate||'')}</span></div></div>`).join('') : '')
-    + sec('구성원', (x.roster||[]).length
-        ? `<div class="postbody">${x.roster.map(r=>esc(r.name)+' ('+esc(r.rank)+')').join(' · ')}</div>` : '')
-    + sec('게시판', (x.posts||[]).length
-        ? x.posts.map(p=>`<div class="cmt"><div class="cmthead">${esc(p.title||'')}<span>${esc(String(p.ts||'').slice(0,10))}</span></div>
-            <div class="cmtbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div></div>`).join('') : '')
-    // 신고·차단은 맨 아래. 위에 두면 이 화면이 신고하는 곳처럼 보인다.
-    + `<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 12px 24px;
-         border-top:1px solid #12283e;margin-top:12px">
-        <button class="minib" onclick="reportBoat('${esc(x.id)}')">신고</button>
-        <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`;
+      : `<div class="mrrow" style="padding:12px 0">
+          <button class="mrbtn ok big" style="width:100%" onclick="joinBoat('${esc(x.id)}','${esc(x.name||'')}')">이 배에 가입 신청</button></div>`}
+    ${secs.length ? `<div class="bsubs">` + secs.map(([k,n])=>
+        `<button class="tab${k===boatPageTab?' on':''}" onclick="setBoatPageTab('${k}')">${esc(n)}</button>`).join('') + `</div>` : ''}
+    ${secs.length ? boatPageBody(x, boatPageTab)
+                  : '<div class="mrnone">아직 공개한 자료가 없습니다.</div>'}
+    <div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px;
+         border-top:1px solid rgba(255,255,255,.06);margin-top:12px">
+      <button class="minib" onclick="reportBoat('${esc(x.id)}')">신고</button>
+      <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">안 보기</button></div>`;
   showPanel(P);
 }
+async function openBoatPage(id){
+  if(!window.__pub) return;
+  let x;
+  try{ x = await window.__pub.one(id); }
+  catch(e){ alert('불러오지 못했습니다'); return; }
+  if(!x){ alert('공개된 자료가 없습니다'); return; }
+  boatPageData = x;
+  boatPageTab = 'intro';
+  paintBoatPage();
+}
+
 // 공개 설정 화면
 function openPublish(){
   const b = curBoat(); if(!b) return;
@@ -8029,7 +8108,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.61';
+const APP_VER = '3.62';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8465,12 +8544,16 @@ window.addEventListener('popstate', ()=>{
     navPush('lkEdit');
     return;
   }
-  // 2) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
+  // 2) 덮개(사진·고르기·서랍)가 있으면 그것부터 걷는다 — 화면보다 위에 있다
+  if(typeof OVERLAY_STACK !== 'undefined' && OVERLAY_STACK.length){
+    closeTopOverlay(); return;
+  }
+  // 3) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
   //    (내 배·물품 목록·입력·휴지통·도움말·할 일 — 쌓인 순서대로)
   if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length){
     closeTopScreen(); return;
   }
-  // 3) 오늘이 아니면 오늘로 — 여기서 한 번 더 뒤로 밀면 앱이 닫힌다
+  // 4) 오늘이 아니면 오늘로 — 여기서 한 번 더 뒤로 밀면 앱이 닫힌다
   if(curTab !== 'home'){ switchTab('home'); navPush('home'); return; }
 });
 // 되돌리기 버튼 표시 갱신
@@ -10062,7 +10145,22 @@ function openMR(t, id){
         ?`<input list="grpList" value="${esc(it.grp||'')}" style="width:130px" placeholder="엔진/전기…" onchange="mrField('grp',this.value.trim())">`
         :`<b class="mrv">${esc(it.grp||'—')}</b>`}</div>`;
   } else if(t==='voyage'){
-    body = tf('날짜','date',it.date,'date','')
+    // ★ 제목 — 목록에는 날짜와 제목만 보인다. 안 쓰면 '출발 → 도착' 이 대신 들어간다.
+    //   길이는 글자 수가 아니라 '칸' 으로 잰다 (한글 2칸·로마자 1칸).
+    //   한글 30자와 영문 60자가 같은 폭이 되므로 어느 말로 써도 목록이 안 깨진다.
+    body = `<div class="mrrow"><span class="mrlbl">제목</span>${unlocked
+        ? `<input value="${esc(it.title||'')}" style="flex:1" placeholder="안 쓰면 출발 → 도착 이 대신 들어갑니다"
+             oninput="vTitleCount(this)" onchange="mrField('title', wClip(this.value))">
+           <span class="mrv2" id="vTitleN">${wCells(it.title||'')}/${TITLE_CELLS}</span>`
+        : `<b class="mrv">${esc(it.title||'—')}</b>`}</div>`
+      // ★ 이 항해만 따로 감출 수 있다.
+      //   손님 태운 날이나 개인 항해를 빼고 보여 주고 싶을 때 쓴다.
+      //   배 공개 설정에서 '항해일지' 를 켜 두었을 때만 뜻이 있다.
+      + (pubOn(curBoat(), 'voyage') ? `<div class="mrrow"><span class="mrlbl">공개</span>${unlocked
+          ? `<button class="permb${it.pub === false ? '' : ' on'}" onclick="mrField('pub', true)">공개</button>
+             <button class="permb${it.pub === false ? ' on' : ''}" onclick="mrField('pub', false)">이 항해는 비공개</button>`
+          : `<b class="mrv">${it.pub === false ? '비공개' : '공개'}</b>`}</div>` : '')
+      + tf('날짜','date',it.date,'date','')
       // 낚시배일 때만 물때와 조과가 붙는다. 요트·보트 항해일지는 그대로다.
       + (isFishing() ? tideRow(it) + catchBox(it) : '')
       + legRow('출발','from','timeOut','wxOut', it)
@@ -10805,7 +10903,49 @@ function syncScreen(){
     else screenPop(id);
   });
 }
+// ── 덮개 (사진·고르기·서랍)
+// 화면을 갈아 끼우지 않는다. 위에 잠깐 덮었다가 걷는다.
+// 다만 뒤로 가기로 걷을 수 있어야 한다 — 그래서 발자국은 똑같이 남긴다.
+const OVERLAY_IDS = ['photoView','recPick','dgPick','drawerOv'];
+const OVERLAY_STACK = [];
+window.OVERLAY_STACK = OVERLAY_STACK;
+function overlayPush(id){
+  if(OVERLAY_STACK.indexOf(id) >= 0) return;
+  OVERLAY_STACK.push(id);
+  try{ navPush('over:' + id); }catch(_){}
+}
+function overlayPop(id){
+  const i = OVERLAY_STACK.lastIndexOf(id);
+  if(i >= 0) OVERLAY_STACK.splice(i, 1);
+}
+// 맨 위 덮개를 걷는다 (뒤로 가기가 쓴다)
+function closeTopOverlay(){
+  const id = OVERLAY_STACK[OVERLAY_STACK.length - 1];
+  if(!id) return false;
+  const F = {
+    photoView: ()=>{ const e = document.getElementById('photoView'); if(e) e.style.display = 'none'; },
+    recPick:   ()=>closeRecPick(),
+    dgPick:    ()=>closeDgPick(),
+    drawerOv:  ()=>closeDrawer()
+  };
+  try{ if(F[id]){ F[id](); return true; } }catch(_){}
+  const el = document.getElementById(id);
+  if(el){ el.classList.remove('open'); el.style.display = 'none'; }
+  return true;
+}
 function watchScreens(){
+  OVERLAY_IDS.forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el || el.dataset.ovw) return;
+    el.dataset.ovw = '1';
+    new MutationObserver(()=>{
+      OVERLAY_IDS.forEach(x=>{
+        const e = document.getElementById(x);
+        if(!e) return;
+        if(isShown(e)) overlayPush(x); else overlayPop(x);
+      });
+    }).observe(el, {attributes:true, attributeFilter:['class','style']});
+  });
   SCREEN_IDS.forEach(id=>{
     const el = document.getElementById(id);
     if(!el || el.dataset.scrw) return;
@@ -10932,6 +11072,40 @@ function drawerRestore(){
 }
 
 // ----- 항해일지 -----
+// ★ 글자 수로 자르면 언어마다 폭이 딴판이 된다.
+//   한글 30자와 영어 30자는 화면에서 두 배 차이다. 러시아어도 마찬가지다.
+//   그래서 '칸' 으로 센다 — 한글·한자·가나는 2칸, 로마자·숫자·키릴은 1칸.
+//   한글 30자 = 영문 60자 = 60칸. 어느 말로 써도 같은 폭이 된다.
+function wCells(str){
+  let n = 0;
+  for(const ch of String(str || '')){
+    const c = ch.codePointAt(0);
+    n += (c >= 0x1100 && (
+            c <= 0x115F || (c >= 0x2E80 && c <= 0xA4CF) ||
+            (c >= 0xAC00 && c <= 0xD7A3) || (c >= 0xF900 && c <= 0xFAFF) ||
+            (c >= 0xFE30 && c <= 0xFE6F) || (c >= 0xFF00 && c <= 0xFF60) ||
+            (c >= 0xFFE0 && c <= 0xFFE6) || (c >= 0x1F300 && c <= 0x1FAFF)
+          )) ? 2 : 1;
+  }
+  return n;
+}
+const TITLE_CELLS = 60;                     // 한글 30자 · 영문 60자
+function wClip(str, max){
+  max = max || TITLE_CELLS;
+  let n = 0, out = '';
+  for(const ch of String(str || '')){
+    const w = wCells(ch);
+    if(n + w > max) return out;
+    n += w; out += ch;
+  }
+  return out;
+}
+// 제목을 치는 동안 남은 칸을 보여 주고, 넘으면 더 안 들어가게 자른다
+function vTitleCount(el){
+  if(wCells(el.value) > TITLE_CELLS) el.value = wClip(el.value);
+  const n = document.getElementById('vTitleN');
+  if(n) n.textContent = wCells(el.value) + '/' + TITLE_CELLS;
+}
 function fmtNum(n){ return (Math.round(n*10)/10).toLocaleString('ko-KR'); }
 function voyStats(){
   const y = String(new Date().getFullYear());
@@ -10963,17 +11137,22 @@ function renderVoyage(){
   const st = voyStats();
   const head = `<div class="statrow"><div class="stat"><b>${st.cnt}</b><span>${st.y} 항해</span></div><div class="stat"><b>${fmtNum(st.nm)}</b><span>거리 NM</span></div><div class="stat"><b>${fmtNum(st.eh)}</b><span>엔진 h</span></div></div>`;
   const arr = [...voyage].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  // ★ 목록에는 제목과 날짜만. 나머지는 눌러 들어가면 다 있다.
+  //   제목을 안 쓰신 항해는 지금까지처럼 '출발 → 도착' 을 제목 자리에 쓴다.
+  const vTitle = v => (v.title && String(v.title).trim())
+    || (esc(v.from || v.timeOut || '—') + ' → ' + esc(v.to || v.timeIn || '—'));
   L.innerHTML = head + (arr.map(v=>`<div class="mr" onclick="openMR('voyage','${v.id}')">
-      <div class="ct"><div class="cn">${esc(v.from || v.timeOut || '—')} → ${esc(v.to || v.timeIn || '—')}</div>
-      <span class="chip nchip">${v.nm?fmtNum(parseFloat(v.nm))+' NM':'—'}</span></div>
-      <div class="mrm">${v.date||'—'}${(v.timeOut&&v.from)?' · '+v.timeOut:''}${(()=>{const n=trkPoints(v).length; return n?' · 📍'+n:'';})()}${v.logs&&v.logs.length?' · 기록 '+v.logs.length:''}${(isFishing()&&catchCount(v))?' · 조과 '+catchCount(v)+'마리':''}${v.engineH?' · 엔진 '+v.engineH+'h':''}${v.crew?' · '+esc(v.crew):''}${v.photos&&v.photos.length?' · 사진 '+v.photos.length:''}</div>
+      <div class="ct"><div class="cn">${v.title && String(v.title).trim() ? esc(v.title) : vTitle(v)}</div>
+      ${v.pub === false ? '<span class="chip">비공개</span>' : ''}</div>
+      <div class="mrm">${v.date||'—'}${isFishing()&&catchCount(v)?' · '+catchCount(v)+'마리':''}</div>
     </div>`).join('') || '<div class="mrnone">기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.</div>');
 }
 function addVoyage(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const p = n => String(n).padStart(2,'0');
   const now = new Date();
-  const v = {id:newId(), date:today(), from:'', to:'', nm:'', hours:'', engineH:'', crew:'',
+  const v = {id:newId(), date:today(), title:'', pub:true,
+             from:'', to:'', nm:'', hours:'', engineH:'', crew:'',
              timeOut: p(now.getHours())+':'+p(now.getMinutes()), timeIn:'',
              logs:[], weather:'', note:'', photos:[], wxOut:null, wxIn:null,
              posOut:null, posIn:null};

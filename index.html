@@ -3824,6 +3824,49 @@ function paintInstallMenu(){
   if(el) el.style.display = isStandalone() ? 'none' : '';
 }
 
+// ===== 지운 사진 치우기 =====
+//
+// 왜 —
+//   글·물건·자리를 지워도 창고에 올려 둔 사진은 그대로 남았다.
+//   아무 데서도 안 보이는 사진이 자리를 차지하고, 그만큼 매달 돈이 나간다.
+//   지우는 그 자리에서 함께 치운다.
+//
+// ★ 조심할 것
+//   1. 창고 규칙은 '내가 올린 사진' 만 지우게 한다.
+//      운영자가 남의 글을 지울 때는 사진이 안 지워진다 — 그것이 맞다.
+//      남의 자리를 함부로 건드리게 하면 그것대로 위험하다.
+//   2. 못 지워도 조용히 넘어간다. 글은 이미 지워졌고 이것은 뒷정리다.
+//   3. 문서에 담긴 옛 사진(data:)은 창고에 없다. 건드리지 않는다.
+function photoUrlsOf(o){
+  const out = [];
+  if(!o) return out;
+  const add = a => (Array.isArray(a) ? a : []).forEach(x=>{
+    if(typeof x === 'string' && /^https?:/i.test(x)) out.push(x); });
+  add(o.photos); add(o.thumbs);
+  (Array.isArray(o.blocks) ? o.blocks : []).forEach(x=>{
+    if(x && x.t === 'photo' && typeof x.v === 'string' && /^https?:/i.test(x.v)) out.push(x.v); });
+  return [...new Set(out)];
+}
+// 창고에서 치운다. 폰에 담아 둔 사본도 함께 버린다.
+async function dropPhotos(urls){
+  const list = (Array.isArray(urls) ? urls : [urls]).filter(
+    u => typeof u === 'string' && /^https?:/i.test(u));
+  if(!list.length) return 0;
+  let n = 0;
+  for(const u of list){
+    try{ if(window.__photos) { await window.__photos.del(u); n++; } }catch(_){}
+    try{
+      if(typeof caches !== 'undefined'){
+        const c = await caches.open(PHOTO_CACHE);
+        await c.delete(u);
+      }
+    }catch(_){}
+  }
+  return n;
+}
+// 글·물건·자리 하나를 지울 때 그 안의 사진까지 치운다
+function dropPhotosOf(o){ return dropPhotos(photoUrlsOf(o)); }
+
 // ===== 옛 자료 손보기 =====
 //
 // 왜 필요한가 —
@@ -4195,6 +4238,7 @@ function delTalk(id){
   if(!canDelTalk(t)){ alert('이 글은 지울 수 없습니다'); return; }
   if(!confirm('이 글을 지울까요?\n\n되돌릴 수 없습니다.')) return;
   window.__talk.del(t.id).then(()=>{
+    dropPhotosOf(t);                       // 창고에 남은 사진도 함께 치운다
     talkList = talkList.filter(x=>String(x.id)!==String(t.id));
     backToTalk();
   }).catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
@@ -4955,8 +4999,10 @@ function delIntro(i){
   const b = curBoat(); if(!b || !b.intro) return;
   if(guardEdit('배 소개에서 지웁니다.', () => delIntro(i))) return;
   if(!confirm('이 부분을 지울까요?')) return;
+  const gone = b.intro[i];
   b.intro.splice(i, 1);
   saveIntro(b);
+  if(gone && gone.t === 'photo') dropPhotos(gone.v);
 }
 // ===== 배별 게시판 =====
 // 배마다 게시판 하나. 공지·인수인계·일반 글과 댓글.
@@ -5026,6 +5072,7 @@ function delPost(id){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const p = postOf(id);
   if(!p || !canEditPost(b, p)){ if(p) alert('이 글은 지울 수 없습니다'); return null; }
+  dropPhotosOf(p);
   posts = posts.filter(x => String(x.id) !== String(id));
   save();
   return p;
@@ -7301,7 +7348,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.52';
+const APP_VER = '3.53';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8717,8 +8764,10 @@ const TAB_TITLES = {home:'오늘', boat:'배', voyage:'항해일지', community:
   stow:'적재표', maint:'정기점검', repair:'수리목록', weather:'날씨 · 물때',
   fuel:'연료 기록', news:'뉴스', contacts:'문서 · 연락처', check:'출항 전 점검'};
 const HOMESUB_TITLES = {today:'오늘', weather:'날씨 · 물때', check:'출항 전 점검'};
-const BOATSUB_TITLES = {stow:'적재표', maint:'정기점검', repair:'수리목록',
-                        fuel:'연료 기록', docs:'문서 · 연락처'};
+// ★ 이름이 길면 360픽셀 화면에서 마지막 칸이 [편집 중] 단추에 잘려 보인다.
+//   옆으로 밀어 볼 수는 있지만, 잘린 글자는 고장으로 읽힌다. 짧게 줄인다.
+const BOATSUB_TITLES = {stow:'적재표', maint:'정기점검', repair:'수리',
+                        fuel:'연료', docs:'문서'};
 // ★ 앱을 켜면 언제나 '오늘' 부터 나온다.
 //   마지막에 본 하위 화면을 기억해 두면, 날씨를 보고 껐을 때 다음에 켜도
 //   날씨가 먼저 나온다. 앱을 켜는 첫 이유는 '오늘 나갈 수 있나' 이므로
@@ -9506,7 +9555,9 @@ function mrPurge(tid){
 }
 function mrDelPhoto(i){
   const it=getMR(mrOpenType,mrOpenId); if(!it||!it.photos) return;
+  const gone = it.photos[i];
   it.photos.splice(i,1); saveMR(); openMR(mrOpenType,mrOpenId);
+  dropPhotos(gone);                        // 창고에서도 치운다
 }
 // 적재표와 같은 까닭으로 화질을 올리고 창고로 보낸다.
 // 정비 사진은 '그때 어떻게 생겼었나' 를 남기는 것이라 화질이 더 중요하다.
@@ -11083,7 +11134,8 @@ function delItem(id){
   if(!canDelItem(m)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
   if(!confirm(`'${m.title}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
   window.__market.del(id)
-    .then(()=>{ marketList = marketList.filter(x=>String(x.id)!==String(id)); backToMarket(); })
+    .then(()=>{ dropPhotosOf(m);
+                marketList = marketList.filter(x=>String(x.id)!==String(id)); backToMarket(); })
     .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
 }
 function reportItem(id){
@@ -11586,7 +11638,8 @@ function delSpot(id){
   if(!canDelSpot(s)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
   if(!confirm(`'${s.name}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
   window.__spots.del(id)
-    .then(()=>{ spotList = spotList.filter(x=>String(x.id)!==String(id)); backToSpots(); })
+    .then(()=>{ dropPhotosOf(s);
+                spotList = spotList.filter(x=>String(x.id)!==String(id)); backToSpots(); })
     .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
 }
 function reportSpot(id){

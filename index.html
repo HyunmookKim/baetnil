@@ -8568,7 +8568,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.75';
+const APP_VER = '3.76';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -17057,8 +17057,11 @@ document.addEventListener('visibilitychange', ()=>{
     // dglibimg   : 도면 그림 본체 (고를 때만 한 장 읽는다)
     window.__dglib = {
       async publish(rec, url){
-        await setDoc(doc(fdb, 'dglibimg', String(rec.id)), { img: String(url||'') });
+        // ★ 목록(dglib)을 먼저 만든다. 그림(dglibimg)이 먼저면 규칙이 '누구 것인지'
+        //   알 수가 없어서 아무나 아무 번호에나 그림을 끼워 넣을 수 있었다.
+        //   순서를 바꾸니 규칙에서 주인을 확인할 수 있다.
         await setDoc(doc(fdb, 'dglib', String(rec.id)), rec);
+        await setDoc(doc(fdb, 'dglibimg', String(rec.id)), { img: String(url||'') });
         return rec.id;
       },
       async list(kind){
@@ -17075,8 +17078,10 @@ document.addEventListener('visibilitychange', ()=>{
         return d.exists() ? (d.data().img || '') : '';
       },
       async remove(id){
-        await deleteDoc(doc(fdb, 'dglib', String(id)));
+        // ★ 그림을 먼저 지운다. 목록을 먼저 지우면 '누구 것인지' 를 볼 수 없어
+        //   그림이 지워지지 않고 남는다.
         try{ await deleteDoc(doc(fdb, 'dglibimg', String(id))); }catch(_){}
+        await deleteDoc(doc(fdb, 'dglib', String(id)));
       }
     };
     // ── 커뮤니티 글판

@@ -206,6 +206,12 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .rich:empty:before,.rich>div:only-child:empty:before{content:attr(data-ph);opacity:.45}
 .rich img.rimg{display:block;max-width:100%;border-radius:9px;margin:10px 0}
 .rich div{min-height:1.7em}
+.rich .rhead{margin:14px 0 6px;font-size:17.5px;font-weight:700;line-height:1.5;color:var(--th,#f1f7fc)}
+.rich .rhead:first-child{margin-top:0}
+.rich b,.rich strong{font-weight:700;color:var(--th,#f1f7fc)}
+/* 글에 들어간 소제목 */
+.pbhead{padding:18px 14px 2px;font-size:16.5px;font-weight:700;line-height:1.5;color:var(--th,#f1f7fc)}
+.postbody b{font-weight:700;color:var(--th,#f1f7fc)}
 .rst{font-size:12px;opacity:.8;margin-top:6px;color:#7ab5d8}
 .rmark{display:inline}
 /* 지난 모집 — 지우지 않고 흐리게 둔다 */
@@ -2047,11 +2053,22 @@ function blocksFromText(text, photos){
 // 워드처럼 그냥 쓰다가 사진을 붙여넣으면 커서 자리에 사진이 들어가고,
 // 그 뒤로 계속 써진다. 글 칸과 사진 칸을 나누면 게시판이 아니라 조립기가 된다.
 
+// 글자 한 덩이를 화면에 낼 때 거치는 단 한 곳.
+// ★ esc 를 먼저 한다. 순서를 바꾸면 남이 넣은 <script> 가 그대로 그려진다.
+// 굵은 글씨는 저장할 때 **…** 로 적어 둔다 — 그냥 글자라 옛 글과 그대로 섞인다.
+// 한 줄을 넘지 않게 막는다 ([^*\n]) — 별표 하나가 글 전체를 굵게 만들지 않도록.
+function richInline(s){
+  return esc(String(s == null ? '' : s))
+    .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
+    .replace(/\n/g, '<br>');
+}
+
 // 블록 → 편집기 안 내용
 function richHtml(blocks){
-  const out = (blocks || []).map(x => x.t === 'photo'
-    ? `<img class="rimg" src="${esc(x.v)}">`
-    : `<div>${esc(x.v || '').replace(/\n/g, '<br>')}</div>`).join('');
+  const out = (blocks || []).map(x =>
+    x.t === 'photo' ? `<img class="rimg" src="${esc(x.v)}">`
+    : x.t === 'head' ? `<h4 class="rhead">${richInline(x.v)}</h4>`
+    : `<div>${richInline(x.v)}</div>`).join('');
   return out || '<div><br></div>';
 }
 
@@ -2059,30 +2076,62 @@ function richHtml(blocks){
 function richBlocks(el){
   if(!el) return [];
   const out = [];
+  const clean = v => String(v || '').replace(/\u00a0/g, ' ');
   const pushText = v => {
-    const t = String(v || '').replace(/\u00a0/g, ' ').replace(/\n{3,}/g, '\n\n');
+    const t = clean(v).replace(/\n{3,}/g, '\n\n');
     if(!t.trim()) return;
     const last = out[out.length - 1];
     if(last && last.t === 'text'){ last.v = (last.v + '\n' + t.trim()).trim(); return; }
     out.push({ t:'text', v:t.trim() });
   };
-  let buf = '';
+  // 소제목은 한 줄이 통째로 하나다. 글 덩이에 섞으면 다시 떼어 낼 수 없다.
+  const pushHead = v => {
+    const t = clean(v).replace(/\s+/g, ' ').trim();
+    if(t) out.push({ t:'head', v:t });
+  };
+  // 이 마디가 굵은가. 편집기는 <b> 를 만들 때도 있고 style 로 만들 때도 있다 —
+  // 둘 다 봐야 한다. 하나만 보면 어떤 기기에서 굵기가 저장되지 않는다.
+  const isBold = n => {
+    const tag = n.tagName.toLowerCase();
+    if(tag === 'b' || tag === 'strong') return true;
+    const w = String((n.style && n.style.fontWeight) || '');
+    return w === 'bold' || w === 'bolder' || Number(w) >= 600;
+  };
+  // 굵기 표시는 글자 마디마다 붙인다. 마디를 감싼 덩이에 붙이면
+  // 그 안에 줄바꿈이 들어가 별표가 짝을 잃는다.
+  const mark = v => clean(v).split('\n').map(seg => {
+    const m = seg.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    return m[2] ? m[1] + '**' + m[2] + '**' + m[3] : seg;
+  }).join('\n');
+  let buf = '', deep = 0;
   const walk = node => {
     node.childNodes.forEach(n => {
-      if(n.nodeType === 3){ buf += n.nodeValue; return; }
+      if(n.nodeType === 3){ buf += (deep > 0 ? mark(n.nodeValue) : n.nodeValue); return; }
       if(n.nodeType !== 1) return;
       const tag = n.tagName.toLowerCase();
       if(tag === 'img'){
         pushText(buf); buf = '';
         const u = n.getAttribute('src') || '';
-        if(/^data:image\//i.test(u)) out.push({ t:'photo', v:u });
+        // ★ 창고에 올라간 사진은 https 주소다. 이것을 안 받으면
+        //   글을 한 번 고칠 때마다 이미 올려 둔 사진이 통째로 사라졌다.
+        if(/^data:image\//i.test(u) || /^https?:/i.test(u)) out.push({ t:'photo', v:u });
         return;
       }
       if(tag === 'br'){ buf += '\n'; return; }
+      // 소제목 — 그 줄만 따로 떼어 낸다
+      if((n.classList && n.classList.contains('rhead')) || /^h[1-6]$/.test(tag)){
+        pushText(buf); buf = '';
+        walk(n);
+        pushHead(buf); buf = '';
+        return;
+      }
       // div·p 는 한 줄이다
-      const block = (tag === 'div' || tag === 'p' || tag === 'li' || /^h[1-6]$/.test(tag));
+      const block = (tag === 'div' || tag === 'p' || tag === 'li');
       if(block && buf && !buf.endsWith('\n')) buf += '\n';
+      const b = isBold(n);
+      if(b) deep++;
       walk(n);
+      if(b) deep--;
       if(block && buf && !buf.endsWith('\n')) buf += '\n';
     });
   };
@@ -2176,6 +2225,42 @@ function richInsert(id, blocks, mark){
   }catch(_){}
   el.focus();
 }
+// 커서가 있는 줄을 소제목으로 바꾼다 (다시 누르면 되돌린다).
+// ★ 줄 전체를 바꾼다 — 글자 몇 개만 소제목이 되는 일은 없어야 한다.
+function richHead(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.focus();
+  const sel = window.getSelection();
+  if(!sel || !sel.rangeCount) return;
+  const r0 = sel.getRangeAt(0);
+  let n = r0.startContainer;
+  if(n === el) n = el.childNodes[Math.min(r0.startOffset, el.childNodes.length - 1)];
+  while(n && n.parentNode && n.parentNode !== el) n = n.parentNode;
+  if(!n || n === el || n.parentNode !== el) return;
+  if(n.nodeType !== 1 || n.tagName.toLowerCase() === 'img') return;
+  const now = !!(n.classList && n.classList.contains('rhead'));
+  const d = document.createElement(now ? 'div' : 'h4');
+  if(!now) d.className = 'rhead';
+  while(n.firstChild) d.appendChild(n.firstChild);
+  if(!d.firstChild) d.appendChild(document.createElement('br'));
+  el.replaceChild(d, n);
+  try{
+    const r = document.createRange();
+    r.selectNodeContents(d); r.collapse(false);
+    sel.removeAllRanges(); sel.addRange(r);
+  }catch(_){}
+}
+// 고른 글자를 굵게 (다시 누르면 되돌린다)
+function richBold(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.focus();
+  // ★ styleWithCSS 를 꺼야 <b> 로 나온다. 켜져 있으면 style 로 나오는데
+  //   그러면 기기마다 모양이 달라진다. richBlocks 는 둘 다 알아본다.
+  try{ document.execCommand('styleWithCSS', false, false); }catch(_){}
+  try{ document.execCommand('bold', false, null); }catch(_){}
+}
 // 사진 넣기 버튼 (붙여넣기가 안 되는 곳에서도 쓸 수 있게)
 function richPickPhoto(id){
   const inp = document.createElement('input');
@@ -2195,9 +2280,17 @@ function richPickPhoto(id){
 
 // 블록을 화면에 그린다 (글·사진이 섞인 순서 그대로)
 function renderBlocks(blocks, tag){
-  return (blocks||[]).map((x,i)=> x.t === 'photo'
-    ? `<img class="postimg" src="${esc(x.v)}"${tag ? ` onclick="pvOpen(${tag},${i})"` : ''}>`
-    : `<div class="postbody">${esc(x.v||'').replace(/\n/g,'<br>')}</div>`).join('');
+  // ★ 사진 번호는 블록 번호가 아니다. 사진 목록은 사진만 걸러 만든 것이라
+  //   글이 섞여 있으면 번호가 어긋나 엉뚱한 사진이 열리거나 아무것도 안 열렸다.
+  let np = 0;
+  return (blocks||[]).map(x => {
+    if(x.t === 'photo'){
+      const k = np++;
+      return `<img class="postimg" src="${esc(x.v)}"${tag ? ` onclick="pvOpen(${tag},${k})"` : ''}>`;
+    }
+    if(x.t === 'head') return `<div class="pbhead">${richInline(x.v)}</div>`;
+    return `<div class="postbody">${richInline(x.v)}</div>`;
+  }).join('');
 }
 
 // 붙여넣은 내용을 글·사진 조각으로 순서대로 나눈다.
@@ -2501,10 +2594,16 @@ function openForm(o){
         + ` data-ph="${esc(f.placeholder||'')}"`
         + ` onpaste="onRichPaste(event,'ff${i}')">${richHtml(f.value)}</div>`
         + `<div class="rst" id="ff${i}_st" style="display:none"></div>`
-        + `<div class="fchips"><button class="fchip" onclick="richPickPhoto('ff${i}')">+ 사진 넣기</button>`
+        + `<div class="fchips">`
+        // ★ onmousedown 을 막아야 한다. 안 막으면 단추를 누르는 순간 글 칸에서
+        //   손이 떠나 '어디를 고를지' 를 잃어버려서 굵게가 걸리지 않는다.
+        + `<button class="fchip" onmousedown="event.preventDefault()" onclick="richHead('ff${i}')">소제목</button>`
+        + `<button class="fchip" onmousedown="event.preventDefault()" onclick="richBold('ff${i}')"><b>굵게</b></button>`
+        + `<button class="fchip" onclick="richPickPhoto('ff${i}')">+ 사진 넣기</button>`
         + (typeof f.extra === 'function' ? f.extra('ff' + i) : '')
         + `</div>`
-        + `<div class="fhint">그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.</div></div>`;
+        + `<div class="fhint">그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.<br>`
+        + `줄에 커서를 두고 <b>소제목</b>, 글자를 골라서 <b>굵게</b>.</div></div>`;
     }
     if(f.type === 'photos'){
       formPhotoList = Array.isArray(f.value) ? f.value.slice() : [];
@@ -5766,9 +5865,9 @@ function pubVoyPhoto(i){
 }
 function boatPageBody(x, k){
   if(k === 'intro') return (x.intro||[]).map(p=>
-      p.t === 'photo' ? `<div class="introrow"><img src="${esc(p.v)}" style="max-width:100%;border-radius:12px;display:block"></div>`
-      : p.t === 'video' ? `<div class="introrow"><a class="mrbtn" href="${esc(p.v)}" target="_blank" rel="noopener">유튜브 열기</a></div>`
-      : `<div class="postbody">${esc(p.v).replace(/\n/g,'<br>')}</div>`).join('');
+      (p && (p.t === 'photo' || p.t === 'video'))
+        ? `<div class="introrow">${introInner(p, { r:12 })}</div>`
+        : introInner(p)).join('');
   if(k === 'spec'){
     const t = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
                 x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
@@ -5923,6 +6022,21 @@ function pushPublic(b){
   if(data) window.__pub.put(b.id, data).catch(()=>{});
   else window.__pub.remove(b.id).catch(()=>{});
 }
+// 소개 한 조각을 그린다.
+// ★ 세 곳(소개 고치기·배 화면·배 둘러보기)이 같은 것을 따로 그리고 있었다.
+//   갈래를 하나 더할 때마다 한 곳을 빠뜨린다. 여기 한 곳만 고친다.
+function introInner(x, o){
+  o = o || {};
+  if(!x) return '';
+  if(x.t === 'photo')
+    return `<img src="${esc(x.v)}" style="max-width:100%;border-radius:${o.r || 8}px;display:block">`;
+  if(x.t === 'video')
+    return `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`;
+  if(x.t === 'head')
+    return `<div class="pbhead"${o.flat ? ' style="padding:6px 0 2px"' : ''}>${richInline(x.v)}</div>`;
+  return `<div class="postbody"${o.flat ? ' style="padding:0"' : ''}>${richInline(x.v)}</div>`;
+}
+
 // ===== 소개 페이지 =====
 // 글·사진·유튜브 링크를 섞어서 쓰는 자유 지면. 게시판과 같은 구조다.
 const INTRO_KINDS = [
@@ -5935,11 +6049,7 @@ function openIntro(){
   if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
   b.intro = b.intro || [];
   const rows = b.intro.map((x,i)=>{
-    const body = x.t === 'photo'
-      ? `<img src="${esc(x.v)}" style="max-width:100%;border-radius:8px;display:block">`
-      : x.t === 'video'
-        ? `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`
-        : `<div class="postbody" style="padding:0">${esc(x.v).replace(/\n/g,'<br>')}</div>`;
+    const body = introInner(x, { flat:true });
     return `<div class="introrow">${body}
       <div class="introbtns">
         <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
@@ -7121,11 +7231,7 @@ function openBoat(tab){
     b.intro = b.intro || [];
     const canEd = can(b, 'publish', 'write') && unlocked;
     const rows = b.intro.map((x,i)=>{
-      const inner = x.t === 'photo'
-        ? `<img src="${esc(x.v)}" style="max-width:100%;border-radius:8px;display:block">`
-        : x.t === 'video'
-          ? `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`
-          : `<div class="postbody" style="padding:0">${esc(x.v).replace(/\n/g,'<br>')}</div>`;
+      const inner = introInner(x, { flat:true });
       return `<div class="introrow">${inner}${canEd ? `
         <div class="introbtns">
           <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
@@ -8451,7 +8557,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.71';
+const APP_VER = '3.72';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15414,6 +15520,19 @@ async function seriesHtml(){
 //   ① 내가 쓴 글 — 저자는 나. 매체도 원문 링크도 없다.
 //   ② 옮긴 글 — 남의 글이라 저자·매체·원문 링크가 반드시 있어야 한다 (허락 조건).
 //   옛 글에는 mine 칸이 없다. 그때는 원문 링크가 있으면 옮긴 글로 본다.
+// 연재 본문. 옛 글은 body 에 글자 하나로 들어 있다 — 블록으로 바꿔 읽는다.
+// ★ 새로 저장할 때도 body 에 글자를 그대로 남긴다. 옛 판 앱이 그것을 읽는다.
+function seriesBody(x){
+  if(!x) return [];
+  if(Array.isArray(x.blocks) && x.blocks.length) return x.blocks;
+  const s = String(x.body || '');
+  return s ? [{ t:'text', v:s }] : [];
+}
+// 본문 속 사진 목록 (눌러서 크게 볼 때 쓴다)
+function seriesPhotos(id){
+  const x = (seriesList||[]).find(r=>String(r.id)===String(id));
+  return x ? seriesBody(x).filter(z=>z.t==='photo').map(z=>z.v) : [];
+}
 function seriesMine(x){
   if(!x) return false;
   if(typeof x.mine === 'boolean') return x.mine;
@@ -15433,7 +15552,7 @@ async function openSeries(id){
       ${x.origTitle?`<div>${esc(x.origTitle)}</div>`:''}
       ${x.link?`<div class="wxfoot"><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.link)}</a></div>`:''}
       <div class="wxfoot">저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.</div></div>`}
-    <div class="postbody">${esc(x.body||'').replace(/\n/g,'<br>')}</div>
+    ${renderBlocks(seriesBody(x), `seriesPhotos('${esc(x.id)}')`)}
     ${(canEditSeries(x)||canDelSeries(x))?`<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px">
         ${canEditSeries(x)?`<button class="mrbtn" onclick="writeSeries('${esc(x.id)}')">고치기</button>`:''}
         ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${esc(x.id)}')">지우기</button>`:''}</div>`:''}`;
@@ -15459,7 +15578,7 @@ function writeSeries(id){
       { key:'origTitle', label:'원제',     value: x ? x.origTitle : '', placeholder:'옮긴 글일 때만' },
       { key:'source',    label:'매체',     value: x ? x.source : '', placeholder:'옮긴 글일 때만 · 예: Yacht Russia' },
       { key:'link',      label:'원문 링크', value: x ? x.link : '', placeholder:'옮긴 글일 때만 · https://…' },
-      { key:'body', type:'multi', rows:14, label:'본문', value: x ? x.body : '', placeholder:'본문' }
+      { key:'body', type:'rich', label:'본문', value: seriesBody(x), placeholder:'본문' }
     ],
     onOk: v => {
       const mine = String(v.mine) === '1';
@@ -15471,21 +15590,33 @@ function writeSeries(id){
         if(!/^https?:\/\//i.test(String(v.link||'').trim())){
           alert('원문 링크를 넣어 주세요 (https:// 로 시작).\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.'); return false; }
       }
-      if(!v.body){ alert('본문을 넣어 주세요'); return false; }
-      const body = {
-        id: x ? x.id : ('sr' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
-        no: Number(v.no) || 0, mine,
-        title: String(v.title).trim(),
-        origTitle: mine ? '' : String(v.origTitle||'').trim(),
-        author: String(v.author).trim(),
-        source: mine ? '' : String(v.source).trim(),
-        link: mine ? '' : String(v.link).trim(), body: String(v.body),
-        by: meUid() || '', byName: meName(),
-        date: x ? x.date : new Date().toISOString(),
-        ts: new Date().toISOString()
-      };
+      // 편집기는 블록을 그대로 돌려준다. 사진은 그 안에 섞여 있다.
+      const blocks = Array.isArray(v.body) ? v.body : [];
+      const plain  = blocks.filter(z=>z.t!=='photo').map(z=>z.v).join('\n\n');
+      const photos = blocks.filter(z=>z.t==='photo').map(z=>z.v);
+      if(!plain.trim() && !photos.length){ alert('본문을 넣어 주세요'); return false; }
       (async ()=>{
         try{
+          // ★ 사진을 창고로 보내고 주소만 남긴다. 문서 안에 담으면
+          //   연재는 긴 글이라 금세 문서 한 개 크기(1MB)에 걸린다.
+          const st = await storePhotos(photos);
+          if(!st.ok) alert(storeShortMsg(st.dropped, '한 연재 글'));
+          const blocks2 = st.fix(blocks);
+          const body = {
+            id: x ? x.id : ('sr' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
+            no: Number(v.no) || 0, mine,
+            title: String(v.title).trim(),
+            origTitle: mine ? '' : String(v.origTitle||'').trim(),
+            author: String(v.author).trim(),
+            source: mine ? '' : String(v.source).trim(),
+            link: mine ? '' : String(v.link).trim(),
+            // body 는 글자 그대로 남긴다 — 옛 판 앱이 이것을 읽는다
+            body: plain,
+            blocks: blocks2, photos: st.photos, thumbs: st.thumbs,
+            by: meUid() || '', byName: meName(),
+            date: x ? x.date : new Date().toISOString(),
+            ts: new Date().toISOString()
+          };
           await window.__series.put(body);
           await loadSeries(true);
           newsSub = 'sr'; renderNews();

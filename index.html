@@ -174,7 +174,16 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .sr .sq{margin-left:auto;font-size:12px;color:#7aefaa;white-space:nowrap}
 .srnone{padding:11px;font-size:12px;color:#3a5a7a;text-align:center}
 #mapWrap{padding:14px;display:flex;justify-content:center}
-#map{position:relative;width:min(420px,100%)}
+#map{position:relative;width:min(420px,100%);transition:transform .18s ease-out}
+/* 확대했을 때만 잘라낸다 — 평소에는 도면이 넘칠 일이 없다 */
+#mapWrap.zoomed{overflow:hidden}
+.itnote{padding:8px 12px 2px;color:var(--tm);font-size:12px;text-align:center}
+#mapZBtn{display:none;margin:0 auto 8px;padding:7px 16px;font-size:12.5px;font-weight:700;
+  background:var(--acs);border:1px solid var(--ac);border-radius:999px;color:var(--th);cursor:pointer}
+/* 찾아간 칸을 잠깐 깜빡여 준다 — 확대만 하면 어느 것인지 모른다 */
+@keyframes zflash{0%,100%{box-shadow:inset 0 0 0 2px rgba(120,224,188,.55)}
+  50%{box-shadow:inset 0 0 0 3px #fff, 0 0 12px rgba(255,255,255,.8)}}
+.box.zflash{animation:zflash .7s ease-in-out 3}
 #map img{display:block;width:100%;height:auto;filter:brightness(1.1);opacity:.82;pointer-events:none}
 /* 수납칸 모양 — 배 안의 칸이 전부 네모는 아니다 */
 .box.s-circ{border-radius:50% !important}
@@ -1450,6 +1459,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
     <div class="mark" style="left:50%;top:82%;transform:translateX(-50%);color:#6a4a9a;letter-spacing:2px;font-size:8px">── 2층 (갑판) ──</div>
   </div>
 </div>
+<button id="mapZBtn" style="display:none" onclick="mapZReset()">원래대로</button>
 <div id="hint">칸 클릭 · <span class="g">청록으로 찬 칸=물건 있음</span> · <span class="w">점선=벽면·선반</span> · <span class="d">라벤더=2층(갑판)</span></div>
 
 <div id="listView"></div>
@@ -8426,7 +8436,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.69';
+const APP_VER = '3.70';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8953,6 +8963,7 @@ function setLkTool(t){
   }
 }
 function toggleLkEdit(){
+  try{ mapZReset(); }catch(_){}   // 확대한 채로 그리면 어디를 그리는지 모른다
   if(!lkEdit && !lkCanEdit()) return;
   lkEdit = !lkEdit;
   map.classList.toggle('lkedit', lkEdit);
@@ -9195,6 +9206,68 @@ function openBox(boxId){
   refreshBoxes();
 }
 function goBack(){ inBox = null; editId = null; moveId = null; mergeId = null; updateHeader(); resetForm(); renderPanelItems(); }
+// ===== 도면 확대 =====
+// ★ 적재표 도면에는 확대가 없었다. 칸이 71개인 배에서 작은 네모 하나를
+//   눈으로 찾는 것은 사실상 불가능하다.
+//   좌표 계산(lkPct)은 getBoundingClientRect 를 쓰므로 CSS 확대와 어긋나지 않는다.
+//   확대·되돌리기를 여기 한 곳에서만 한다.
+let mapZ = null;                 // {s, x, y} · null 이면 원래 크기
+const MAPZ_MAX = 4;
+function mapZApply(){
+  const m = document.getElementById('map');
+  const w = document.getElementById('mapWrap');
+  if(!m) return;
+  if(!mapZ){
+    m.style.transform = '';
+    m.style.transformOrigin = '';
+    if(w) w.classList.remove('zoomed');
+    const b = document.getElementById('mapZBtn'); if(b) b.style.display = 'none';
+    return;
+  }
+  m.style.transformOrigin = '0 0';
+  m.style.transform = `translate(${mapZ.x}px, ${mapZ.y}px) scale(${mapZ.s})`;
+  if(w) w.classList.add('zoomed');
+  const b = document.getElementById('mapZBtn'); if(b) b.style.display = 'block';
+}
+function mapZReset(){ mapZ = null; mapZApply(); }
+// 수납칸 하나를 화면 가운데로 끌어와 확대한다
+function mapFocusLocker(id, flash){
+  const l = (typeof lkGet === 'function') ? lkGet(id) : null;
+  const m = document.getElementById('map');
+  if(!l || !m) return false;
+  const W = m.clientWidth, H = m.clientHeight;
+  if(!W || !H) return false;
+  // 칸이 화면의 절반쯤 되게 확대한다. 아주 작은 칸도 너무 크게 키우지 않는다.
+  const wPct = Math.max(2, Number(l.w) || 0);
+  const hPct = Math.max(2, Number(l.h) || 0);
+  const s = Math.max(1.4, Math.min(MAPZ_MAX, Math.min(50 / wPct, 50 / hPct)));
+  const cx = (Number(l.x) || 0) + wPct / 2;   // 칸 가운데 (%)
+  const cy = (Number(l.y) || 0) + hPct / 2;
+  mapZ = { s, x: W/2 - (cx/100)*W*s, y: H/2 - (cy/100)*H*s };
+  mapZApply();
+  if(flash !== false){
+    const bx = m.querySelector(`.box[data-id="${String(id)}"]`);
+    if(bx){
+      bx.classList.add('zflash');
+      setTimeout(()=>{ try{ bx.classList.remove('zflash'); }catch(_){} }, 2400);
+    }
+  }
+  return true;
+}
+// ★ 물품 줄을 누르면 — 목록을 닫고 도면으로 나가서 그 칸을 확대한다.
+//   정비·수리의 [도면에서 보기](pinShow)와 같은 흐름이다.
+function showItemOnMap(id){
+  const it = getItem(id); if(!it) return;
+  const lk = it.lockerId || (it.parentId ? (getItem(it.parentId)||{}).lockerId : null);
+  if(!lk){ alert('이 물품은 아직 수납칸에 넣지 않았습니다'); return; }
+  closePanel();
+  view = 'map'; toggleView(true);
+  requestAnimationFrame(()=>{
+    if(!mapFocusLocker(lk)) return;
+    const l = lkGet(lk);
+    if(l) setHeadTitle && setHeadTitle(l.label || '');
+  });
+}
 function closePanel(){ selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
 
 function resetForm(){
@@ -9478,7 +9551,8 @@ function renderPanelItems(){
   const wrap = document.getElementById('pitems');
   const li = selected ? sortItems(currentList()) : [];
   if(li.length===0){ wrap.innerHTML = '<div style="color:#2a4a6a;font-size:12px;text-align:center;margin-top:14px">등록된 물품 없음</div>'; }
-  else wrap.innerHTML = li.map(it=>{
+  else wrap.innerHTML = `<div class="itnote">물품을 누르면 도면에서 이 칸을 크게 보여 드립니다</div>`
+    + li.map(it=>{
     const mv = moveId===it.id ? `<select class="mv" onchange="renderMoveSub(this.value, ${it.id})"><option value="">이동할 구역 선택…</option>${zoneOrder().map(z=>`<option value="${z}">${z}</option>`).join('')}</select><div id="mvSubWrap_${it.id}"></div>` : '';
     const mg = mergeId===it.id ? mergePanelHTML(it) : '';
     const hl = hlId===it.id ? ' hl' : '';
@@ -9498,7 +9572,8 @@ function renderPanelItems(){
     }
     return `<div class="it ${editId===it.id?'editing':''}${hl}">
       <div class="itrow">${thumbHTML(it)}
-      <div style="flex:1"><div class="nm">${esc(it.name || '(이름 없음)')}</div>
+      <div style="flex:1;cursor:pointer" onclick="showItemOnMap(${it.id})"
+        title="누르면 도면에서 이 칸을 크게 봅니다"><div class="nm">${esc(it.name || '(이름 없음)')}</div>
       <div class="meta">×<b>${esc(it.qty)}</b>${esc(it.unit||'')}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
       <div class="ops">
         <button class="pg" onclick="toggleMerge(${it.id})">합침</button>
@@ -9570,7 +9645,10 @@ function hintWanted(){
       && (typeof boatSubTab === 'undefined' || boatSubTab === 'stow')
       && (typeof view === 'undefined' || view === 'map');
 }
+// ★ 그리기를 켜거나 목록으로 가면 확대를 푼다.
+//   확대한 채로 칸을 그리면 사람이 자기가 어디를 그리는지 모른다.
 function toggleView(force){
+  try{ mapZReset(); }catch(_){}
   if(force!==true) view = (view==='map'?'list':'map');
   const isMap = view==='map';
   document.getElementById('mapWrap').style.display = isMap?'flex':'none';

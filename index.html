@@ -174,12 +174,17 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .sr .sq{margin-left:auto;font-size:12px;color:#7aefaa;white-space:nowrap}
 .srnone{padding:11px;font-size:12px;color:#3a5a7a;text-align:center}
 #mapWrap{padding:14px;display:flex;justify-content:center}
-#map{position:relative;width:min(420px,100%);transition:transform .18s ease-out}
-/* 확대했을 때만 잘라낸다 — 평소에는 도면이 넘칠 일이 없다 */
-#mapWrap.zoomed{overflow:hidden}
+#map{position:relative;width:min(420px,100%);will-change:transform}
+/* ★ 확대했을 때만 잘라낸다. 평소에는 도면이 넘칠 일이 없고,
+   늘 잘라내면 칸 이름표가 도면 가장자리에서 잘린다. */
+#mapWrap{position:relative}
+#mapWrap.zoomed{overflow:hidden;touch-action:none}
 .itnote{padding:8px 12px 2px;color:var(--tm);font-size:12px;text-align:center}
-#mapZBtn{display:none;margin:0 auto 8px;padding:7px 16px;font-size:12.5px;font-weight:700;
-  background:var(--acs);border:1px solid var(--ac);border-radius:999px;color:var(--th);cursor:pointer}
+.mapzoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:5px;z-index:6}
+.mapzoom button{width:34px;height:34px;border-radius:9px;border:1px solid var(--bd);
+  background:rgba(8,21,33,.82);color:var(--tx);font-size:17px;font-weight:700;
+  line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mapzoom button:active{background:var(--acs);border-color:var(--ac);color:var(--th)}
 /* 찾아간 칸을 잠깐 깜빡여 준다 — 확대만 하면 어느 것인지 모른다 */
 @keyframes zflash{0%,100%{box-shadow:inset 0 0 0 2px rgba(120,224,188,.55)}
   50%{box-shadow:inset 0 0 0 3px #fff, 0 0 12px rgba(255,255,255,.8)}}
@@ -1458,8 +1463,12 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
     <div class="mark" style="right:-5px;top:48%;transform:rotate(90deg)">우현</div>
     <div class="mark" style="left:50%;top:82%;transform:translateX(-50%);color:#6a4a9a;letter-spacing:2px;font-size:8px">── 2층 (갑판) ──</div>
   </div>
+  <div class="mapzoom">
+    <button onclick="stowZoom(1.5)" aria-label="확대">+</button>
+    <button onclick="stowZoom(1/1.5)" aria-label="축소">&minus;</button>
+    <button id="mapZBack" style="display:none" onclick="mapZReset()" aria-label="원래대로">&#10530;</button>
+  </div>
 </div>
-<button id="mapZBtn" style="display:none" onclick="mapZReset()">원래대로</button>
 <div id="hint">칸 클릭 · <span class="g">청록으로 찬 칸=물건 있음</span> · <span class="w">점선=벽면·선반</span> · <span class="d">라벤더=2층(갑판)</span></div>
 
 <div id="listView"></div>
@@ -8326,7 +8335,13 @@ function buildBoxes(){
     d.className = 'box ' + (l.wall ? 'b-w' : 'b-n') + (l.deck2 ? ' b-2' : '') + ' s-' + lkShapeOf(l);
     d.style.cssText = `left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`;
     d.innerHTML = '<span></span>';
-    d.onclick = ()=>{ if(typeof lkEdit!=='undefined' && lkEdit) return; openLocker(l.id); };
+    // ★ 끌어서 도면을 옮긴 것이지 칸을 누른 것이 아니다.
+    //   이걸 안 보면 도면을 조금만 움직여도 엉뚱한 칸이 열린다.
+    d.onclick = ()=>{
+      if(typeof lkEdit!=='undefined' && lkEdit) return;
+      if(typeof mapPanned !== 'undefined' && mapPanned > 6){ mapPanned = 0; return; }
+      openLocker(l.id);
+    };
     map.appendChild(d);
   });
   builtKey = lockerKey();
@@ -8436,7 +8451,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.70';
+const APP_VER = '3.71';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -8963,7 +8978,9 @@ function setLkTool(t){
   }
 }
 function toggleLkEdit(){
-  try{ mapZReset(); }catch(_){}   // 확대한 채로 그리면 어디를 그리는지 모른다
+  // ★ 확대한 채로 칸을 그리면 사람이 어디를 그리는지 모른다.
+  //   그리기를 켤 때만 원래 크기로 돌린다 (끌 때는 보던 자리를 그대로 둔다).
+  try{ if(!lkEdit) mapZReset(); }catch(_){}
   if(!lkEdit && !lkCanEdit()) return;
   lkEdit = !lkEdit;
   map.classList.toggle('lkedit', lkEdit);
@@ -9206,45 +9223,74 @@ function openBox(boxId){
   refreshBoxes();
 }
 function goBack(){ inBox = null; editId = null; moveId = null; mergeId = null; updateHeader(); resetForm(); renderPanelItems(); }
-// ===== 도면 확대 =====
-// ★ 적재표 도면에는 확대가 없었다. 칸이 71개인 배에서 작은 네모 하나를
-//   눈으로 찾는 것은 사실상 불가능하다.
-//   좌표 계산(lkPct)은 getBoundingClientRect 를 쓰므로 CSS 확대와 어긋나지 않는다.
-//   확대·되돌리기를 여기 한 곳에서만 한다.
-let mapZ = null;                 // {s, x, y} · null 이면 원래 크기
-const MAPZ_MAX = 4;
-function mapZApply(){
-  const m = document.getElementById('map');
-  const w = document.getElementById('mapWrap');
-  if(!m) return;
-  if(!mapZ){
-    m.style.transform = '';
-    m.style.transformOrigin = '';
-    if(w) w.classList.remove('zoomed');
-    const b = document.getElementById('mapZBtn'); if(b) b.style.display = 'none';
-    return;
-  }
-  m.style.transformOrigin = '0 0';
-  m.style.transform = `translate(${mapZ.x}px, ${mapZ.y}px) scale(${mapZ.s})`;
-  if(w) w.classList.add('zoomed');
-  const b = document.getElementById('mapZBtn'); if(b) b.style.display = 'block';
+// ===== 적재표 도면 확대·이동 =====
+// ★ 정비 화면 도면(dgV/dgBind)과 같은 방식이다. 손가락 두 개로 확대하고,
+//   끌어서 옮기고, 오른쪽 위 [+][−][⤢] 로도 된다.
+//   3.70 에서는 물품을 눌렀을 때만 확대되고 그 뒤로 못 움직였다 — 그것을 고친 것이다.
+//
+//   좌표 계산(lkPct)은 map.getBoundingClientRect() 를 쓰므로
+//   CSS 확대·이동과 저절로 맞는다. 칸 그리기는 그대로 돌아간다.
+//   다만 그리는 중(lkEdit)에는 끌기가 겹치므로 이동을 끈다.
+const MAPZ_MIN = 1, MAPZ_MAX = 6;
+let mapZ = { s:1, x:0, y:0 };
+let mapTouched = false;          // 한 번이라도 확대했나 (확대 전에는 페이지 넘김에 맡긴다)
+function mapEl(){ return document.getElementById('map'); }
+function mapFrame(){ return document.getElementById('mapWrap'); }
+function mapSize(){
+  const m = mapEl();
+  const W = m ? m.clientWidth : 1, H = m ? m.clientHeight : 1;
+  return { W, H, pw: W*mapZ.s, ph: H*mapZ.s };
 }
-function mapZReset(){ mapZ = null; mapZApply(); }
+function mapClamp(){
+  const { W, H, pw, ph } = mapSize();
+  // 판이 틀보다 크면 빈 곳이 안 보이게, 작으면 가운데로
+  mapZ.x = pw <= W ? (W-pw)/2 : Math.min(0, Math.max(W-pw, mapZ.x));
+  mapZ.y = ph <= H ? (H-ph)/2 : Math.min(0, Math.max(H-ph, mapZ.y));
+}
+function mapApply(anim){
+  const m = mapEl(), f = mapFrame();
+  if(!m) return;
+  m.style.transformOrigin = '0 0';
+  m.style.transition = anim ? 'transform .18s ease-out' : 'none';
+  m.style.transform = `translate(${mapZ.x}px, ${mapZ.y}px) scale(${mapZ.s})`;
+  if(f) f.classList.toggle('zoomed', mapTouched);
+  const b = document.getElementById('mapZBack');
+  if(b) b.style.display = mapTouched ? 'block' : 'none';
+}
+function stowZoom(mul, cx, cy){
+  const m = mapEl(); if(!m) return;
+  const W = m.clientWidth, H = m.clientHeight;
+  if(cx == null){ cx = W/2; cy = H/2; }
+  const ns = Math.max(MAPZ_MIN, Math.min(MAPZ_MAX, mapZ.s*mul));
+  if(ns === mapZ.s) return;
+  const k = ns/mapZ.s;
+  mapZ.x = cx - (cx - mapZ.x)*k;
+  mapZ.y = cy - (cy - mapZ.y)*k;
+  mapZ.s = ns;
+  mapTouched = (ns > 1);
+  mapClamp(); mapApply(true);
+}
+function mapZReset(anim){
+  mapZ = { s:1, x:0, y:0 };
+  mapTouched = false;
+  mapApply(anim !== false);
+}
 // 수납칸 하나를 화면 가운데로 끌어와 확대한다
 function mapFocusLocker(id, flash){
   const l = (typeof lkGet === 'function') ? lkGet(id) : null;
-  const m = document.getElementById('map');
+  const m = mapEl();
   if(!l || !m) return false;
   const W = m.clientWidth, H = m.clientHeight;
   if(!W || !H) return false;
-  // 칸이 화면의 절반쯤 되게 확대한다. 아주 작은 칸도 너무 크게 키우지 않는다.
+  // 칸이 화면 절반쯤 되게. 아주 작은 칸도 너무 크게 키우지 않는다.
   const wPct = Math.max(2, Number(l.w) || 0);
   const hPct = Math.max(2, Number(l.h) || 0);
   const s = Math.max(1.4, Math.min(MAPZ_MAX, Math.min(50 / wPct, 50 / hPct)));
-  const cx = (Number(l.x) || 0) + wPct / 2;   // 칸 가운데 (%)
+  const cx = (Number(l.x) || 0) + wPct / 2;
   const cy = (Number(l.y) || 0) + hPct / 2;
   mapZ = { s, x: W/2 - (cx/100)*W*s, y: H/2 - (cy/100)*H*s };
-  mapZApply();
+  mapTouched = true;
+  mapClamp(); mapApply(true);
   if(flash !== false){
     const bx = m.querySelector(`.box[data-id="${String(id)}"]`);
     if(bx){
@@ -9265,8 +9311,73 @@ function showItemOnMap(id){
   requestAnimationFrame(()=>{
     if(!mapFocusLocker(lk)) return;
     const l = lkGet(lk);
-    if(l) setHeadTitle && setHeadTitle(l.label || '');
+    if(l && typeof setHeadTitle === 'function') setHeadTitle(l.label || '');
   });
+}
+// ── 끌기 · 두 손가락 확대
+// ★ 칸 그리기(lkEdit)가 켜져 있으면 손대지 않는다. 같은 끌기를 둘이 나눠 가질 수 없다.
+//   끌고 난 뒤에는 칸이 열리면 안 된다 — 옮기려던 것이지 누른 것이 아니다.
+let mapPanned = 0;
+function stowZoomBind(){
+  const f = mapFrame(); if(!f || f.__mz) return;
+  f.__mz = true;
+  let drag = null, pinch = null;
+  const pt = e => { const r = f.getBoundingClientRect();
+    return { x:e.clientX-r.left, y:e.clientY-r.top }; };
+  f.addEventListener('pointerdown', e=>{
+    if(lkEdit) return;
+    if(e.target.closest && e.target.closest('.mapzoom')) return;
+    drag = pt(e); mapPanned = 0;
+  });
+  f.addEventListener('pointermove', e=>{
+    if(lkEdit || !drag || pinch) return;
+    if(!mapTouched) return;                 // 확대 전에는 페이지 넘김에 맡긴다
+    const sz = mapSize();
+    if(sz.pw <= sz.W && sz.ph <= sz.H) return;
+    const q = pt(e), dx = q.x-drag.x, dy = q.y-drag.y;
+    mapPanned += Math.abs(dx)+Math.abs(dy);
+    mapZ.x += dx; mapZ.y += dy; drag = q;
+    mapClamp(); mapApply(false);
+  });
+  f.addEventListener('pointerup', ()=>{ drag = null; });
+  f.addEventListener('pointercancel', ()=>{ drag = null; });
+  f.addEventListener('touchstart', e=>{
+    if(lkEdit) return;
+    if(e.touches.length === 2){
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                           e.touches[0].clientY-e.touches[1].clientY);
+      const r = f.getBoundingClientRect();
+      drag = null;                          // 끌기와 확대가 겹치면 화면이 튄다
+      pinch = { d, s:mapZ.s,
+        cx:(e.touches[0].clientX+e.touches[1].clientX)/2 - r.left,
+        cy:(e.touches[0].clientY+e.touches[1].clientY)/2 - r.top };
+    }
+  }, {passive:true});
+  f.addEventListener('touchmove', e=>{
+    if(lkEdit) return;
+    if(pinch && e.touches.length === 2){
+      e.preventDefault();
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                           e.touches[0].clientY-e.touches[1].clientY);
+      const want = Math.max(MAPZ_MIN, Math.min(MAPZ_MAX, pinch.s * (d/pinch.d)));
+      const k = want/mapZ.s;
+      mapZ.x = pinch.cx - (pinch.cx - mapZ.x)*k;
+      mapZ.y = pinch.cy - (pinch.cy - mapZ.y)*k;
+      mapZ.s = want;
+      mapTouched = (want > 1);
+      mapPanned += 20;                      // 확대 뒤 손을 떼도 칸이 열리면 안 된다
+      mapClamp(); mapApply(false);
+    }
+  }, {passive:false});
+  f.addEventListener('touchend', e=>{ if(e.touches.length < 2){ pinch = null; drag = null; } });
+  // 마우스 휠로도 확대 (컴퓨터에서 쓰는 사람)
+  f.addEventListener('wheel', e=>{
+    if(lkEdit) return;
+    e.preventDefault();
+    const r = f.getBoundingClientRect();
+    stowZoom(e.deltaY < 0 ? 1.2 : 1/1.2, e.clientX-r.left, e.clientY-r.top);
+  }, {passive:false});
+  window.addEventListener('resize', ()=>{ if(mapTouched){ mapClamp(); mapApply(false); } });
 }
 function closePanel(){ selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
 
@@ -9649,6 +9760,7 @@ function hintWanted(){
 //   확대한 채로 칸을 그리면 사람이 자기가 어디를 그리는지 모른다.
 function toggleView(force){
   try{ mapZReset(); }catch(_){}
+  try{ stowZoomBind(); }catch(_){}
   if(force!==true) view = (view==='map'?'list':'map');
   const isMap = view==='map';
   document.getElementById('mapWrap').style.display = isMap?'flex':'none';
@@ -16280,6 +16392,7 @@ window.addEventListener('online', ()=>{
 });
 paintInstallMenu();
 wrapPainters();
+try{ stowZoomBind(); }catch(_){}
 applyLang();
 applyLock();
 initStorage().then(()=>{

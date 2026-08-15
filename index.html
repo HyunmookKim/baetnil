@@ -213,6 +213,10 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .pbhead{padding:18px 14px 2px;font-size:16.5px;font-weight:700;line-height:1.5;color:var(--th,#f1f7fc)}
 .postbody b{font-weight:700;color:var(--th,#f1f7fc)}
 .rst{font-size:12px;opacity:.8;margin-top:6px;color:#7ab5d8}
+/* 정박지 — 인터넷이 없을 때 위에 뜨는 한 줄 */
+.spotoff{margin:10px 14px 2px;padding:10px 12px;border-radius:12px;
+  background:rgba(217,174,99,.10);border:1px solid rgba(217,174,99,.35);
+  color:var(--yel,#D9AE63);font-size:12.5px;line-height:1.55}
 .rmark{display:inline}
 /* 지난 모집 — 지우지 않고 흐리게 둔다 */
 .fleet.dim{opacity:.5}
@@ -5078,6 +5082,7 @@ function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
 
 function writeTalk(id){
+  if(guardEdit('커뮤니티에 글을 씁니다.', ()=>writeTalk(id))) return;
   if(!window.__user){ alert('로그인해야 글을 쓸 수 있습니다'); return; }
   if(myBan){ alert(banNotice()); return; }
   const t = id ? talkList.find(x=>String(x.id)===String(id)) : null;
@@ -5219,6 +5224,7 @@ function backToTalk(){
   switchTab('community');
 }
 function writeTalkComment(id){
+  if(guardEdit('커뮤니티 글에 댓글을 답니다.', ()=>writeTalkComment(id))) return;
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   if(!window.__user){ alert('로그인해야 댓글을 쓸 수 있습니다'); return; }
@@ -5243,6 +5249,7 @@ function writeTalkComment(id){
   });
 }
 function delTalkComment(id, cid, isOld){
+  if(guardEdit('댓글을 지웁니다.', ()=>delTalkComment(id, cid, isOld))) return;
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   if(!confirm('이 댓글을 지울까요?')) return;
@@ -5296,6 +5303,7 @@ function reportTalk(id){
   });
 }
 function delTalk(id){
+  if(guardEdit('커뮤니티 글을 지웁니다.', ()=>delTalk(id))) return;
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   if(!canDelTalk(t)){ alert('이 글은 지울 수 없습니다'); return; }
@@ -6314,6 +6322,7 @@ function openBoard(){
   showPanel(P); boatKeepTabs('board');
 }
 function writePost(id){
+  if(guardEdit('배 게시판에 글을 씁니다.', ()=>writePost(id))) return;
   const b = curBoat(); if(!b) return;
   const p = id ? postOf(id) : null;
   if(id && !canEditPost(b, p)) return;
@@ -6410,6 +6419,7 @@ function openPost(id){
   showPanel(P);
 }
 function writeComment(pid){
+  if(guardEdit('배 게시판 글에 댓글을 답니다.', ()=>writeComment(pid))) return;
   openForm({
     title: '댓글',
     okText: '올리기',
@@ -6422,6 +6432,7 @@ function writeComment(pid){
   });
 }
 function delCommentUI(pid, cid){
+  if(guardEdit('댓글을 지웁니다.', ()=>delCommentUI(pid, cid))) return;
   if(!confirm('이 댓글을 지울까요?')) return;
   if(delComment(pid, cid)) openPost(pid);
 }
@@ -8557,7 +8568,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.72';
+const APP_VER = '3.74';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -11675,6 +11686,16 @@ function drawerTrash(){ closeDrawer(); switchTab('stow'); openTrash(); }
 //   if(guardEdit('...', () => 이함수(a,b))) return;
 // ★ 왜 함수 안인가 — 버튼에만 걸면 새 버튼을 만들 때마다 또 빠뜨린다.
 //   실제로 신청 받기·영업 배·등급·회비가 보기 전용에서 그냥 바뀌고 있었다.
+// ★ 보기 전용일 때 무엇을 막고 무엇을 여는가 — 여기 한 번만 적는다.
+//
+//   막는다 : 글·댓글·정박지·장터·연재를 올리고 고치고 지우는 것.
+//            단추에 '보기 전용' 이라고 써 놓고 글이 써지면 그 표시가 거짓말이 된다.
+//   연다   : 신고 — 안전장치다. 잠가 두고 쓰는 사람이 신고를 못 하면 안 된다.
+//            찜·도움됐어요 — 구경하다 누르는 것이라 막으면 성가시기만 하다.
+//            고객센터·연재자 신청 — 앱이 이상할 때 알리는 길이라 늘 열어 둔다.
+//
+//   막을 때는 그냥 안 된다고 하지 않는다. '편집 중으로 바꾸고 계속할까요' 를 묻고
+//   예 하면 그 자리에서 하던 일을 이어 간다 (needEdit).
 function guardEdit(what, fn){
   if(unlocked) return false;
   needEdit(what, fn);
@@ -12530,8 +12551,14 @@ const SUPPORT_KINDS = [
   { v:'bug',  name:'오류 신고',   sub:'앱이 이상하게 동작합니다' },
   { v:'idea', name:'건의',       sub:'이런 것이 있으면 좋겠습니다' },
   { v:'ask',  name:'물어보기',    sub:'쓰는 법을 모르겠습니다' },
-  { v:'etc',  name:'그 밖',      sub:'위에 없는 이야기' }
+  { v:'etc',  name:'그 밖',      sub:'위에 없는 이야기' },
+  // ★ 고객센터 화면에서는 안 고르게 한다 (SUPPORT_ASK).
+  //   연재는 물어볼 것이 따로 있어서 전용 화면(applySeries)으로 받는다.
+  //   여기에 두는 까닭은 접수함에서 이름이 제대로 나오게 하려는 것뿐이다.
+  { v:'series', name:'연재자 신청', sub:'글을 이어서 올리고 싶습니다' }
 ];
+// 고객센터 화면에서 고를 수 있는 갈래
+const SUPPORT_ASK = SUPPORT_KINDS.filter(k => k.v !== 'series');
 let supportRows = [];
 
 // 기기 정보 — 사람이 적게 하지 않고 앱이 붙인다
@@ -12555,7 +12582,7 @@ function openSupport(){
     okText: '보내기',
     fields: [
       { key:'kind', label:'무엇인가요', type:'pick', value:'bug',
-        options: SUPPORT_KINDS.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
+        options: SUPPORT_ASK.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
       { key:'text', type:'multi', rows:6, label:'내용',
         placeholder:'어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다' }
     ],
@@ -12619,14 +12646,19 @@ async function adminSupport(){
   });
   return rows.map(s=>{
     const kn = (SUPPORT_KINDS.find(x=>x.v===s.kind) || {}).name || '문의';
+    // 연재자 신청은 답장이 아니라 '권한을 켜 주는 일' 이라 눈에 띄게 둔다
+    const sr = (s.kind === 'series');
     return `<div class="fleet"><div class="fmain">
       <div class="fname">${s.done?'<span class="chip">확인함</span> ':'<span class="chip notice">새 글</span> '}
-        <span class="chip">${esc(kn)}</span> ${esc(String(s.text||'').slice(0, 40))}</div>
+        <span class="chip${sr?' notice':''}">${esc(kn)}</span> ${esc(String(s.text||'').slice(0, 40))}</div>
       <div class="fsub">${esc(s.byName||'')}${s.email?' · '+esc(s.email):''} · ${esc(String(s.ts||'').slice(0,16).replace('T',' '))}</div>
       <div class="fsub" style="color:#5a7a9a;word-break:break-all">${esc(s.info||'')}</div>
       <div class="postbody" style="padding:6px 0">${esc(s.text||'').replace(/\n/g,'<br>')}</div>
+      ${sr && s.by ? `<div class="mrnone" style="text-align:left;margin:6px 0">
+        켜 주시려면 <b>[보낸 사람]</b> → <b>연재 글 올리기</b> 를 켜면 됩니다.
+        연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.</div>` : ''}
       <div class="fchips" style="margin-top:6px">
-        ${s.by?`<button class="tchip" onclick="openPerson('${esc(s.by)}')">보낸 사람</button>`:''}
+        ${s.by?`<button class="tchip${sr?' on':''}" onclick="openPerson('${esc(s.by)}')">보낸 사람</button>`:''}
         <button class="tchip${s.done?' on':''}" onclick="supportDone('${esc(s.id)}',${s.done?'false':'true'})">${s.done?'다시 새 글로':'확인함'}</button>
       </div></div></div>`;
   }).join('');
@@ -12847,6 +12879,7 @@ async function openItem(id){
 
 // ── 올리기·고치기
 function writeItem(id){
+  if(guardEdit('장터에 물건을 올리거나 고칩니다.', ()=>writeItem(id))) return;
   if(!window.__user){ alert('로그인해야 올릴 수 있습니다'); return; }
   if(myBan){ alert(banNotice()); return; }
   const m = id ? itemOf(id) : null;
@@ -12971,6 +13004,7 @@ function setItemState(id, st){
     .catch(e=>alert('바꾸지 못했습니다.\n\n' + ((e&&e.message)||e)));
 }
 function delItem(id){
+  if(guardEdit('장터 글을 지웁니다.', ()=>delItem(id))) return;
   const m = itemOf(id); if(!m) return;
   if(!canDelItem(m)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
   if(!confirm(`'${m.title}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
@@ -13280,37 +13314,56 @@ function spotDepthText(s){
   return s.depth + 'm' + (s.lowTide ? ' (저조위 기준)' : ' (기준 미상 — 물때를 확인하세요)');
 }
 
+// ★ 인터넷이 없어도 열린다.
+//   정박지 152곳을 클라우드가 아니라 앱 안에 넣어 둔 까닭이 바로 이것이다 —
+//   먼바다에서 신호가 끊긴 채 피항할 곳을 찾을 때가 이 자료가 제일 필요한 때다.
+//   예전에는 여기서 클라우드 손잡이가 없으면 그냥 돌아섰다.
+//   앱 안에 자료를 넣어 둔 뜻이 통째로 없어져 있었다.
+//
+//   오프라인에서는 로그인 확인도 건너뛴다 — 신호가 없으면 로그인 상태를
+//   확인하는 것 자체가 안 될 수 있는데, 그것 때문에 피항할 어항을 못 보면 안 된다.
+//   관 자료는 공공 자료라 가릴 까닭도 없다.
+function spotsOffline(){ return !window.__spots; }
+
 async function renderSpots(){
   const W = document.getElementById('spotWrap');
   if(!W) return;
   if(!featOn('spots')){ W.innerHTML = featClosedHtml('spots'); return; }
-  if(!window.__spots){
-    W.innerHTML = '<div class="mrnone">인터넷에 연결된 상태에서만 볼 수 있습니다</div>'; return;
-  }
-  if(!window.__user){
+  const off = spotsOffline();
+  if(!off && !window.__user){
     W.innerHTML = `<div class="mrnone">정박지는 로그인해야 볼 수 있습니다<br><br>
       <button class="mrbtn" onclick="openAccount()">로그인하러 가기</button></div>`; return;
   }
-  await loadAdmin();
-  if(!listFresh('spots')){
-    W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
-    try{
-      const r = await window.__spots.list(false);
-      listSet('spots', r.rows, r.done);
-    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+  if(off){
+    // 앞서 받아 둔 것이 남아 있으면 그것도 함께 보여 준다 (없으면 관 자료만)
+    spotList = listRows('spots');
+  } else {
+    await loadAdmin();
+    if(!listFresh('spots')){
+      W.innerHTML = '<div class="mrnone">불러오는 중…</div>';
+      try{
+        const r = await window.__spots.list(false);
+        listSet('spots', r.rows, r.done);
+      }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+    }
+    spotList = listRows('spots');
   }
-  spotList = listRows('spots');
 
-  W.innerHTML = `<div class="tfilt">`
+  W.innerHTML = (off
+      ? `<div class="spotoff">인터넷이 없습니다 — 관에서 낸 정박지는 그대로 보입니다.
+           사람들이 올린 곳과 다녀온 이야기는 연결되면 보입니다.</div>`
+      : '')
+    + `<div class="tfilt">`
       + `<button class="tchip${spotKindNow()?'':' on'}" onclick="setSpotKind('')">전체</button>`
       + SPOT_KINDS.map(k=>`<button class="tchip${spotKindNow()===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
       + `</div>
     <div class="qbox"><input id="spQ" value="${esc(spotQ)}"
         placeholder="정박지 이름 · 지역으로 찾기"
-        oninput="spotFilter(this.value)" autocomplete="off"></div>
-    <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-      <button class="mrbtn ok" onclick="writeSpot()">+ 정박지 올리기</button></div>
-    <div id="spotRows">` + spotRowsHtml() + `</div>`;
+        oninput="spotFilter(this.value)" autocomplete="off"></div>`
+    // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 감춘다.
+    + (off ? '' : `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
+      <button class="mrbtn ok" onclick="writeSpot()">+ 정박지 올리기</button></div>`)
+    + `<div id="spotRows">` + spotRowsHtml() + `</div>`;
 }
 // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
 function spotRowsHtml(){
@@ -13449,6 +13502,7 @@ function spotCmtHtml(s){
       <button class="mrbtn big" style="width:100%" onclick="writeSpotComment('${esc(s.id)}')">글 남기기</button></div>`;
 }
 function writeSpotComment(id){
+  if(guardEdit('다녀온 이야기를 남깁니다.', ()=>writeSpotComment(id))) return;
   const s = spotOf(id); if(!s) return;
   if(!window.__user){ alert('로그인해야 글을 남길 수 있습니다'); return; }
   if(myBan){ alert(banNotice()); return; }
@@ -13476,6 +13530,7 @@ function writeSpotComment(id){
   });
 }
 function delSpotComment(id, cid){
+  if(guardEdit('다녀온 이야기를 지웁니다.', ()=>delSpotComment(id, cid))) return;
   const s = spotOf(id); if(!s) return;
   if(!confirm('이 글을 지울까요?')) return;
   window.__cmt.del('spots', id, cid)
@@ -13496,6 +13551,7 @@ function backToSpots(){
 // ── 올리기·고치기
 // 자리는 지도에서 찍는다. 위도·경도를 손으로 치게 하지 않는다.
 function writeSpot(id){
+  if(guardEdit('정박지를 올리거나 고칩니다.', ()=>writeSpot(id))) return;
   if(!window.__user){ alert('로그인해야 올릴 수 있습니다'); return; }
   if(myBan){ alert(banNotice()); return; }
   const s = id ? spotOf(id) : null;
@@ -13792,6 +13848,7 @@ function regionOfPoint(lat, lon){
   return best;
 }
 function delSpot(id){
+  if(guardEdit('정박지를 지웁니다.', ()=>delSpot(id))) return;
   const s = spotOf(id); if(!s) return;
   if(!canDelSpot(s)){ alert('올린 분과 운영자만 지울 수 있습니다'); return; }
   if(!confirm(`'${s.name}' 을 지울까요?\n\n되돌릴 수 없습니다.`)) return;
@@ -15501,10 +15558,11 @@ async function loadSeries(force){
 async function seriesHtml(){
   const rows = await loadSeries();
   const can = canSeries();
+  // 연재자면 올리는 단추, 아니면 신청하는 길. 빈자리로 두면 어떻게 끼는지 알 수 없다.
   const add = can
     ? `<div class="mrrow" style="justify-content:flex-end;padding:8px 0">
          <button class="mrbtn ok" onclick="writeSeries()">+ 연재 글 올리기</button></div>`
-    : '';
+    : seriesApplyHtml();
   if(!rows.length){
     return add + `<div class="mrnone" style="text-align:left">아직 올라온 연재가 없습니다.</div>`;
   }
@@ -15516,6 +15574,71 @@ async function seriesHtml(){
           x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
     </div>`).join('');
 }
+// ── 연재자 신청
+// ★ 왜 새 컬렉션을 안 만드나
+//   신청서를 담을 곳을 새로 만들면 파이어스토어 규칙을 고쳐 다시 게시해야 한다.
+//   고객센터(support)가 이미 '사람이 보내고 운영자만 읽는 곳' 이다. 거기에 얹는다.
+//   운영자 접수함에서 [보낸 사람] → 권한 켜기까지 이미 길이 나 있다.
+const SERIES_REQ_KEY = 'bt_seriesreq';
+function seriesAsked(){
+  try{ return localStorage.getItem(SERIES_REQ_KEY) || ''; }catch(_){ return ''; }
+}
+function seriesApplyHtml(){
+  const asked = seriesAsked();
+  if(asked){
+    return `<div class="mrnone" style="text-align:left">
+      <b>연재자 신청을 보냈습니다.</b> (${esc(asked.slice(0,10))})<br>
+      운영자가 보고 켜 드리면 여기에 글 올리는 단추가 생깁니다.
+      <div class="fchips" style="margin-top:8px">
+        <button class="tchip" onclick="applySeries()">다시 보내기</button></div></div>`;
+  }
+  return `<div class="mrnone" style="text-align:left">
+    연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.<br>
+    직접 쓰신 항해기나, 허락을 받아 옮기실 글이 있으면 신청해 주세요.
+    <div class="fchips" style="margin-top:8px">
+      <button class="tchip" onclick="applySeries()">연재자 신청</button></div></div>`;
+}
+function applySeries(){
+  if(!meUid() || !window.__user){
+    alert('연재자 신청은 로그인하고 하실 수 있습니다.');
+    if(typeof openAccount === 'function') openAccount();
+    return;
+  }
+  if(typeof myBan !== 'undefined' && myBan){ alert(banNotice()); return; }
+  openForm({
+    title: '연재자 신청',
+    okText: '보내기',
+    sub: '운영자가 보고 켜 드립니다. 켜지면 뉴스 ▸ 연재에 글 올리는 단추가 생깁니다.',
+    fields: [
+      { key:'mine', label:'어떤 글을 올리시겠습니까', type:'pick', value:'1',
+        options:[ { v:'1', name:'직접 쓴 글', sub:'항해기 · 정비기 · 기고' },
+                  { v:'0', name:'옮긴 글',   sub:'남의 글을 허락받아 옮김' } ] },
+      { key:'about', type:'multi', rows:5, label:'어떤 글인가요',
+        placeholder:'무엇을 얼마나 쓰실 생각인지 적어 주세요' },
+      { key:'link', label:'그동안 쓰신 글 (선택)', placeholder:'https://…' }
+    ],
+    onOk: v => {
+      const about = String(v.about || '').trim();
+      if(!about){ alert('어떤 글인지 적어 주세요'); return false; }
+      const mine = String(v.mine) === '1';
+      // ★ 옮긴 글은 허락이 조건이다. 신청 단계에서 미리 알려 둔다 —
+      //   켜 준 뒤에 몰랐다고 하면 그때는 이미 남의 글이 올라가 있다.
+      if(!mine && !confirm('옮긴 글은 저자·매체·원문 링크가 모두 있어야 올라갑니다.\n'
+        + '저작권자 허락도 미리 받으셔야 합니다.\n\n알겠습니다, 신청할까요?')) return false;
+      const lines = [
+        mine ? '직접 쓴 글' : '옮긴 글 (허락 필요)',
+        about,
+        String(v.link || '').trim() ? ('그동안 쓴 글: ' + String(v.link).trim()) : ''
+      ].filter(Boolean);
+      (async ()=>{
+        await sendSupport('series', lines.join('\n'));
+        try{ localStorage.setItem(SERIES_REQ_KEY, new Date().toISOString()); }catch(_){}
+        if(typeof renderNews === 'function') renderNews();
+      })();
+    }
+  });
+}
+
 // ★ 연재는 두 가지다.
 //   ① 내가 쓴 글 — 저자는 나. 매체도 원문 링크도 없다.
 //   ② 옮긴 글 — 남의 글이라 저자·매체·원문 링크가 반드시 있어야 한다 (허락 조건).
@@ -15559,6 +15682,7 @@ async function openSeries(id){
   showPanel(P);
 }
 function writeSeries(id){
+  if(guardEdit('연재 글을 올리거나 고칩니다.', ()=>writeSeries(id))) return;
   if(!canSeries()){ alert('연재 글을 올릴 권한이 없습니다'); return; }
   const x = id ? (seriesList||[]).find(r=>String(r.id)===String(id)) : null;
   // 남이 올린 연재는 고치지 못한다 (규칙에서도 막혀 있다)
@@ -15627,6 +15751,7 @@ function writeSeries(id){
   });
 }
 function delSeries(id){
+  if(guardEdit('연재 글을 지웁니다.', ()=>delSeries(id))) return;
   const x = (seriesList||[]).find(r=>String(r.id)===String(id));
   if(!canDelSeries(x)) return;
   if(!confirm('이 연재 글을 지울까요?')) return;

@@ -205,7 +205,25 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
   padding:12px 13px;font-size:16px;line-height:1.7;outline:none;-webkit-user-select:text;user-select:text}
 .rich:empty:before,.rich>div:only-child:empty:before{content:attr(data-ph);opacity:.45}
 .rich img.rimg{display:block;max-width:100%;border-radius:9px;margin:10px 0}
+/* 글 편집기 도구줄 — 글 칸 바로 위에 붙는다 (워드패드와 같은 자리) */
+.rtool{display:flex;flex-wrap:wrap;align-items:center;gap:4px;
+  background:var(--sf2,#132633);border:1px solid var(--bd,#1B2E3E);border-bottom:none;
+  border-radius:10px 10px 0 0;padding:6px 7px}
+.rtool .rtb,.rtool .fchip{background:transparent;border:1px solid transparent;border-radius:8px;
+  color:var(--tx,#D6E2EC);font-family:inherit;font-size:14px;font-weight:700;
+  padding:8px 12px;min-height:38px;line-height:1.2;cursor:pointer;white-space:nowrap}
+.rtool .rtb:active,.rtool .fchip:active{background:var(--acs,#16344C)}
+.rtool .rtb.red{color:var(--red,#E4756A);border-color:var(--red,#E4756A)}
+.rtsep{width:1px;height:18px;background:var(--bd,#1B2E3E);margin:0 3px;flex:none}
+.rtool + .rich{border-radius:0 0 10px 10px}
+/* 고른 사진 — 눌러서 지울 수 있다는 것이 보여야 한다 */
+.rich img.rimg.sel{outline:2px solid var(--ac,#9CC6E8);outline-offset:2px}
 .rich div{min-height:1.7em}
+/* 글머리표·번호 매기기 */
+.rich .rlist,.postbody .pblist{margin:8px 0;padding-left:26px}
+.rich .rlist li,.postbody .pblist li{margin:3px 0;line-height:1.7}
+.postbody .pblist{white-space:normal}
+.rich u,.postbody u{text-underline-offset:2px}
 .rich .rhead{margin:14px 0 6px;font-size:17.5px;font-weight:700;line-height:1.5;color:var(--th,#f1f7fc)}
 .rich .rhead:first-child{margin-top:0}
 .rich b,.rich strong{font-weight:700;color:var(--th,#f1f7fc)}
@@ -2057,93 +2075,148 @@ function blocksFromText(text, photos){
 // 워드처럼 그냥 쓰다가 사진을 붙여넣으면 커서 자리에 사진이 들어가고,
 // 그 뒤로 계속 써진다. 글 칸과 사진 칸을 나누면 게시판이 아니라 조립기가 된다.
 
-// 글자 한 덩이를 화면에 낼 때 거치는 단 한 곳.
-// ★ esc 를 먼저 한다. 순서를 바꾸면 남이 넣은 <script> 가 그대로 그려진다.
-// 굵은 글씨는 저장할 때 **…** 로 적어 둔다 — 그냥 글자라 옛 글과 그대로 섞인다.
-// 한 줄을 넘지 않게 막는다 ([^*\n]) — 별표 하나가 글 전체를 굵게 만들지 않도록.
+// ── 글 서식 — 무엇을 허락할지만 적는다
+// ★ 막을 것을 세지 않는다. 세는 쪽은 반드시 하나를 빠뜨린다.
+//   여기 적힌 꼬리표만 남고 나머지는 알맹이 글자만 뽑힌다.
+const RICH_TAGS = { B:'b', STRONG:'b', I:'i', EM:'i', U:'u', S:'s', STRIKE:'s', DEL:'s' };
+// 마디 하나를 안전한 글자로 바꾼다
+function richClean(node){
+  let out = '';
+  if(!node) return out;
+  node.childNodes.forEach(n => {
+    if(n.nodeType === 3){ out += esc(String(n.nodeValue).replace(/\u00a0/g, ' ')); return; }
+    if(n.nodeType !== 1) return;
+    if(n.tagName === 'BR'){ out += '<br>'; return; }
+    let inner = richClean(n);
+    if(!inner) return;
+    // 편집기가 꼬리표 대신 style 로 만들 때도 있다. 그것도 받아 준다.
+    const st = n.style || {};
+    const w = String(st.fontWeight || '');
+    const d = String(st.textDecorationLine || st.textDecoration || '');
+    if(String(st.fontStyle || '') === 'italic') inner = '<i>' + inner + '</i>';
+    if(d.indexOf('underline') >= 0) inner = '<u>' + inner + '</u>';
+    if(d.indexOf('line-through') >= 0) inner = '<s>' + inner + '</s>';
+    if(w === 'bold' || w === 'bolder' || Number(w) >= 600) inner = '<b>' + inner + '</b>';
+    const keep = RICH_TAGS[n.tagName];
+    out += keep ? ('<' + keep + '>' + inner + '</' + keep + '>') : inner;
+  });
+  return out;
+}
+// 저장돼 있던 글자도 화면에 낼 때 한 번 더 거른다.
+// ★ DOMParser 로 읽는다 — 죽은 문서라 그림도 안 부르고 무엇도 안 돈다.
+//   innerHTML 로 읽으면 <img onerror=…> 가 그 자리에서 돈다.
+function richSafe(html){
+  const src = String(html == null ? '' : html);
+  if(src.indexOf('<') < 0) return esc(src);
+  try{ return richClean(new DOMParser().parseFromString(src, 'text/html').body); }
+  catch(_){ return esc(src); }
+}
+// 꼬리표를 떼어 낸 알맹이 글자 (본문 저장·찾기·옛 판 호환)
+function richText(html){
+  return String(html == null ? '' : html)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+// 옛 글자 한 덩이 (서식이 없던 시절 — esc 하고 **굵게** 만 살린다)
 function richInline(s){
   return esc(String(s == null ? '' : s))
     .replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>')
     .replace(/\n/g, '<br>');
+}
+// 블록 하나의 글자를 화면에 낸다 — 한 곳에서만 고른다.
+// h:1 이면 서식이 든 안전한 글자, 없으면 옛 글이다.
+function richInl(x){
+  if(!x) return '';
+  return x.h ? richSafe(x.v) : richInline(x.v);
+}
+// 목록 블록을 그린다 (편집기용 / 화면용)
+function richListHtml(x, cls){
+  const tag = x && x.ord ? 'ol' : 'ul';
+  const li = ((x && x.items) || []).map(i => `<li>${richSafe(i)}</li>`).join('');
+  return `<${tag} class="${cls}">${li || '<li><br></li>'}</${tag}>`;
+}
+// 블록에서 글자만 뽑는다 (본문·찾기·옛 판). ★ 한 곳에서만 한다.
+function blocksText(blocks){
+  return (blocks || []).filter(x => x && x.t !== 'photo').map(x =>
+      x.t === 'list' ? ((x.items || []).map(i => '· ' + richText(i)).join('\n'))
+    : (x.h ? richText(x.v) : String(x.v == null ? '' : x.v))
+  ).join('\n\n').trim();
 }
 
 // 블록 → 편집기 안 내용
 function richHtml(blocks){
   const out = (blocks || []).map(x =>
     x.t === 'photo' ? `<img class="rimg" src="${esc(x.v)}">`
-    : x.t === 'head' ? `<h4 class="rhead">${richInline(x.v)}</h4>`
-    : `<div>${richInline(x.v)}</div>`).join('');
+    : x.t === 'head' ? `<h4 class="rhead">${richInl(x)}</h4>`
+    : x.t === 'list' ? richListHtml(x, 'rlist')
+    : `<div>${richInl(x)}</div>`).join('');
   return out || '<div><br></div>';
 }
 
 // 편집기 안 내용 → 블록 (보이는 순서 그대로)
+// ★ 글자는 '안전한 글자'(h:1) 로 담는다. 서식이 들어오면서 별표 방식으로는
+//   기울임·밑줄·취소선을 담을 수가 없어졌다. 옛 글(h 없음)은 그대로 읽는다.
 function richBlocks(el){
   if(!el) return [];
   const out = [];
-  const clean = v => String(v || '').replace(/\u00a0/g, ' ');
-  const pushText = v => {
-    const t = clean(v).replace(/\n{3,}/g, '\n\n');
-    if(!t.trim()) return;
+  let buf = '';
+  const flush = () => {
+    const v = buf.replace(/^(<br>)+/, '').replace(/(<br>)+$/, '');
+    buf = '';
+    if(!richText(v).trim()) return;
     const last = out[out.length - 1];
-    if(last && last.t === 'text'){ last.v = (last.v + '\n' + t.trim()).trim(); return; }
-    out.push({ t:'text', v:t.trim() });
+    if(last && last.t === 'text'){ last.v = last.v + '<br>' + v; last.h = 1; return; }
+    out.push({ t:'text', h:1, v });
   };
-  // 소제목은 한 줄이 통째로 하나다. 글 덩이에 섞으면 다시 떼어 낼 수 없다.
-  const pushHead = v => {
-    const t = clean(v).replace(/\s+/g, ' ').trim();
-    if(t) out.push({ t:'head', v:t });
-  };
-  // 이 마디가 굵은가. 편집기는 <b> 를 만들 때도 있고 style 로 만들 때도 있다 —
-  // 둘 다 봐야 한다. 하나만 보면 어떤 기기에서 굵기가 저장되지 않는다.
-  const isBold = n => {
-    const tag = n.tagName.toLowerCase();
-    if(tag === 'b' || tag === 'strong') return true;
-    const w = String((n.style && n.style.fontWeight) || '');
-    return w === 'bold' || w === 'bolder' || Number(w) >= 600;
-  };
-  // 굵기 표시는 글자 마디마다 붙인다. 마디를 감싼 덩이에 붙이면
-  // 그 안에 줄바꿈이 들어가 별표가 짝을 잃는다.
-  const mark = v => clean(v).split('\n').map(seg => {
-    const m = seg.match(/^(\s*)([\s\S]*?)(\s*)$/);
-    return m[2] ? m[1] + '**' + m[2] + '**' + m[3] : seg;
-  }).join('\n');
-  let buf = '', deep = 0;
+  const line = html => { if(buf) buf += '<br>'; buf += html; };
   const walk = node => {
-    node.childNodes.forEach(n => {
-      if(n.nodeType === 3){ buf += (deep > 0 ? mark(n.nodeValue) : n.nodeValue); return; }
+    [...node.childNodes].forEach(n => {
+      if(n.nodeType === 3){
+        const v = esc(String(n.nodeValue).replace(/\u00a0/g, ' '));
+        if(v.trim()) buf += v;
+        return;
+      }
       if(n.nodeType !== 1) return;
-      const tag = n.tagName.toLowerCase();
-      if(tag === 'img'){
-        pushText(buf); buf = '';
+      const tag = n.tagName;
+      if(tag === 'IMG'){
+        flush();
         const u = n.getAttribute('src') || '';
         // ★ 창고에 올라간 사진은 https 주소다. 이것을 안 받으면
         //   글을 한 번 고칠 때마다 이미 올려 둔 사진이 통째로 사라졌다.
         if(/^data:image\//i.test(u) || /^https?:/i.test(u)) out.push({ t:'photo', v:u });
         return;
       }
-      if(tag === 'br'){ buf += '\n'; return; }
-      // 소제목 — 그 줄만 따로 떼어 낸다
-      if((n.classList && n.classList.contains('rhead')) || /^h[1-6]$/.test(tag)){
-        pushText(buf); buf = '';
-        walk(n);
-        pushHead(buf); buf = '';
+      if(tag === 'BR'){ buf += '<br>'; return; }
+      if(tag === 'UL' || tag === 'OL'){
+        flush();
+        const items = [...n.children].filter(c => c.tagName === 'LI')
+          .map(c => richClean(c)).filter(x => richText(x).trim());
+        if(items.length) out.push({ t:'list', ord: tag === 'OL' ? 1 : 0, items });
         return;
       }
-      // div·p 는 한 줄이다
-      const block = (tag === 'div' || tag === 'p' || tag === 'li');
-      if(block && buf && !buf.endsWith('\n')) buf += '\n';
-      const b = isBold(n);
-      if(b) deep++;
-      walk(n);
-      if(b) deep--;
-      if(block && buf && !buf.endsWith('\n')) buf += '\n';
+      if((n.classList && n.classList.contains('rhead')) || /^H[1-6]$/.test(tag)){
+        flush();
+        const v = richClean(n).replace(/<br>/g, ' ').replace(/\s+/g, ' ').trim();
+        if(richText(v).trim()) out.push({ t:'head', h:1, v });
+        return;
+      }
+      // 안에 사진이나 목록이 있으면 한 줄로 뭉치지 않고 안으로 들어간다
+      if(n.querySelector && n.querySelector('img, ul, ol, h1, h2, h3, h4, h5, h6, .rhead')){
+        if(tag === 'DIV' || tag === 'P') flush();
+        walk(n);
+        return;
+      }
+      if(tag === 'DIV' || tag === 'P' || tag === 'LI'){ line(richClean(n)); return; }
+      buf += richClean(n);
     });
   };
   walk(el);
-  pushText(buf);
+  flush();
   return out;
 }
-
 // 편집기에 붙여넣기 — 커서 자리에 글과 사진을 순서대로 꽂는다
 function onRichPaste(e, id){
   const cd = e.clipboardData || (typeof window !== 'undefined' && window.clipboardData);
@@ -2229,6 +2302,101 @@ function richInsert(id, blocks, mark){
   }catch(_){}
   el.focus();
 }
+// ── 도구줄 — 워드패드에 있는 것을 그대로 둔다.
+// ★ 글자 얼굴(가/A/А)은 사전을 거친다. 나라마다 글자가 다르다.
+const RICH_TOOLS = [
+  { name:'굵게',    fn:'richCmd', arg:'bold',                face:'<b>가</b>' },
+  { name:'기울임',  fn:'richCmd', arg:'italic',              face:'<i>가</i>' },
+  { name:'밑줄',    fn:'richCmd', arg:'underline',           face:'<u>가</u>' },
+  { name:'취소선',  fn:'richCmd', arg:'strikeThrough',       face:'<s>가</s>' },
+  { sep:true },
+  { name:'소제목',  fn:'richHead' },
+  { name:'글머리표', fn:'richCmd', arg:'insertUnorderedList', face:'•' },
+  { name:'번호',    fn:'richCmd', arg:'insertOrderedList',   face:'1.' },
+  { sep:true }
+];
+// 도구줄 단추 하나. 브라우저가 가진 편집 기능을 그대로 쓴다.
+function richCmd(id, cmd){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.focus();
+  // ★ styleWithCSS 를 꺼야 <b><i><u> 로 나온다. 켜져 있으면 style 로 나오는데
+  //   그러면 기기마다 모양이 갈린다. richClean 은 둘 다 알아본다.
+  try{ document.execCommand('styleWithCSS', false, false); }catch(_){}
+  try{ document.execCommand(cmd, false, null); }catch(_){}
+}
+// ── 편집기 안 사진을 글자처럼 다룬다
+// ★ 예전에는 사진을 한 번 넣으면 뺄 길이 아예 없었다. 백스페이스도 안 먹었다.
+//   사진이 글 칸의 바로 아래 자식이라 브라우저가 '글자 사이' 로 보지 않기 때문이다.
+//   그래서 두 길을 다 둔다 — 눌러서 [사진 지우기], 그리고 백스페이스·딜리트.
+function richSelImg(id){
+  const el = document.getElementById(id);
+  return el ? el.querySelector('img.rimg.sel') : null;
+}
+function richMarkImg(id, img){
+  const el = document.getElementById(id); if(!el) return;
+  el.querySelectorAll('img.rimg.sel').forEach(x=>x.classList.remove('sel'));
+  if(img) img.classList.add('sel');
+  const b = document.getElementById(id + '_del');
+  if(b) b.style.display = img ? '' : 'none';
+}
+// 사진을 누르면 고른 표시를 하고 커서를 그 뒤에 둔다 (백스페이스로도 지워지게)
+function richTap(e, id){
+  const t = e && e.target;
+  if(t && t.tagName === 'IMG'){
+    richMarkImg(id, t);
+    try{
+      const r = document.createRange(); r.setStartAfter(t); r.collapse(true);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }catch(_){}
+    return;
+  }
+  richMarkImg(id, null);
+}
+function richDropImg(id, img){
+  if(!img || !img.parentNode) return false;
+  img.parentNode.removeChild(img);
+  richMarkImg(id, null);
+  const el = document.getElementById(id); if(el) el.focus();
+  return true;
+}
+function richDelImg(id){
+  const img = richSelImg(id);
+  if(!img){ alert('지울 사진을 먼저 한 번 눌러 주세요.'); return; }
+  richDropImg(id, img);
+}
+// 커서 바로 앞(뒤)에 사진이 있나. 글자 사이면 손대지 않는다.
+function richImgNear(el, back){
+  const s = window.getSelection();
+  if(!s || !s.rangeCount || !s.isCollapsed) return null;
+  const r = s.getRangeAt(0);
+  let n = r.startContainer;
+  const o = r.startOffset;
+  if(n.nodeType === 3){
+    // 글 조각 한가운데면 보통 지우기다
+    if(back ? o > 0 : o < String(n.nodeValue || '').length) return null;
+  } else if(n.childNodes && n.childNodes.length){
+    const c = n.childNodes[back ? o - 1 : o];
+    if(c && c.tagName === 'IMG') return c;
+  }
+  // 위로 올라가며 바로 앞(뒤) 형제를 본다
+  while(n && n !== el){
+    const sib = back ? n.previousSibling : n.nextSibling;
+    if(sib) return (sib.tagName === 'IMG') ? sib : null;
+    n = n.parentNode;
+  }
+  return null;
+}
+function richKey(e, id){
+  if(e.key !== 'Backspace' && e.key !== 'Delete') return;
+  const el = document.getElementById(id); if(!el) return;
+  const picked = richSelImg(id);
+  if(picked){ e.preventDefault(); richDropImg(id, picked); return; }
+  const img = richImgNear(el, e.key === 'Backspace');
+  if(!img) return;
+  e.preventDefault();
+  richDropImg(id, img);
+}
 // 커서가 있는 줄을 소제목으로 바꾼다 (다시 누르면 되돌린다).
 // ★ 줄 전체를 바꾼다 — 글자 몇 개만 소제목이 되는 일은 없어야 한다.
 function richHead(id){
@@ -2256,15 +2424,8 @@ function richHead(id){
   }catch(_){}
 }
 // 고른 글자를 굵게 (다시 누르면 되돌린다)
-function richBold(id){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.focus();
-  // ★ styleWithCSS 를 꺼야 <b> 로 나온다. 켜져 있으면 style 로 나오는데
-  //   그러면 기기마다 모양이 달라진다. richBlocks 는 둘 다 알아본다.
-  try{ document.execCommand('styleWithCSS', false, false); }catch(_){}
-  try{ document.execCommand('bold', false, null); }catch(_){}
-}
+// 옛 이름 — 부르는 곳이 남아 있을 수 있다
+function richBold(id){ richCmd(id, 'bold'); }
 // 사진 넣기 버튼 (붙여넣기가 안 되는 곳에서도 쓸 수 있게)
 function richPickPhoto(id){
   const inp = document.createElement('input');
@@ -2292,8 +2453,9 @@ function renderBlocks(blocks, tag){
       const k = np++;
       return `<img class="postimg" src="${esc(x.v)}"${tag ? ` onclick="pvOpen(${tag},${k})"` : ''}>`;
     }
-    if(x.t === 'head') return `<div class="pbhead">${richInline(x.v)}</div>`;
-    return `<div class="postbody">${richInline(x.v)}</div>`;
+    if(x.t === 'head') return `<div class="pbhead">${richInl(x)}</div>`;
+    if(x.t === 'list') return `<div class="postbody">${richListHtml(x, 'pblist')}</div>`;
+    return `<div class="postbody">${richInl(x)}</div>`;
   }).join('');
 }
 
@@ -2593,21 +2755,31 @@ function openForm(o){
         + `</div></div>`;
     }
     if(f.type === 'rich'){
+      const fid = 'ff' + i;
+      // ★ 도구줄은 글 칸 '위' 에 붙인다 — 워드패드와 같은 자리다.
+      //   아래에 뒀더니 글을 쓰다 손을 내렸다 올려야 해서 불편하다고 지적받았다.
+      //   onmousedown 을 막는 것은 그대로 둔다. 안 막으면 단추를 누르는 순간
+      //   글 칸에서 손이 떠나 '어디를 고를지' 를 잃어버려 굵게가 안 걸린다.
       return `<div class="frow"><label>${esc(f.label||'내용')}</label>`
-        + `<div class="rich" id="ff${i}" contenteditable="true"`
-        + ` data-ph="${esc(f.placeholder||'')}"`
-        + ` onpaste="onRichPaste(event,'ff${i}')">${richHtml(f.value)}</div>`
-        + `<div class="rst" id="ff${i}_st" style="display:none"></div>`
-        + `<div class="fchips">`
-        // ★ onmousedown 을 막아야 한다. 안 막으면 단추를 누르는 순간 글 칸에서
-        //   손이 떠나 '어디를 고를지' 를 잃어버려서 굵게가 걸리지 않는다.
-        + `<button class="fchip" onmousedown="event.preventDefault()" onclick="richHead('ff${i}')">소제목</button>`
-        + `<button class="fchip" onmousedown="event.preventDefault()" onclick="richBold('ff${i}')"><b>굵게</b></button>`
-        + `<button class="fchip" onclick="richPickPhoto('ff${i}')">+ 사진 넣기</button>`
-        + (typeof f.extra === 'function' ? f.extra('ff' + i) : '')
+        + `<div class="rtool">`
+        + RICH_TOOLS.map(b => b.sep
+            ? `<span class="rtsep"></span>`
+            : `<button class="rtb" title="${esc(t(b.name))}"`
+              + ` onmousedown="event.preventDefault()"`
+              + ` onclick="${b.fn}('${fid}'${b.arg ? ",'" + b.arg + "'" : ''})">${b.face || esc(t(b.name))}</button>`
+          ).join('')
+        + `<button class="rtb" onclick="richPickPhoto('${fid}')">${esc(t('사진'))}</button>`
+        + `<button class="rtb red" id="${fid}_del" style="display:none" onclick="richDelImg('${fid}')">${esc(t('사진 지우기'))}</button>`
+        + (typeof f.extra === 'function' ? f.extra(fid) : '')
         + `</div>`
-        + `<div class="fhint">그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.<br>`
-        + `줄에 커서를 두고 <b>소제목</b>, 글자를 골라서 <b>굵게</b>.</div></div>`;
+        + `<div class="rich" id="${fid}" contenteditable="true"`
+        + ` data-ph="${esc(f.placeholder||'')}"`
+        + ` onpaste="onRichPaste(event,'${fid}')"`
+        + ` onkeydown="richKey(event,'${fid}')"`
+        + ` onclick="richTap(event,'${fid}')">${richHtml(f.value)}</div>`
+        + `<div class="rst" id="${fid}_st" style="display:none"></div>`
+        + `<div class="fhint">${esc(t('그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.'))}<br>`
+        + `${esc(t('사진을 지우려면 사진을 한 번 누르고 백스페이스를 누르시면 됩니다.'))}</div></div>`;
     }
     if(f.type === 'photos'){
       formPhotoList = Array.isArray(f.value) ? f.value.slice() : [];
@@ -4352,7 +4524,7 @@ function talkBody(v, blocks){
     kind: TALK_KINDS.some(k => k.v === v.kind) ? v.kind : 'free',
     title: String(v.title || '').trim(),
     blocks,
-    body: blocks.filter(x => x.t === 'text').map(x => x.v).join('\n\n'),
+    body: blocksText(blocks),
     region: REGIONS.includes(v.region) ? v.region : '그 밖',
     by: meUid() || '',
     byName: meName(),
@@ -5127,7 +5299,7 @@ function writeTalk(id){
           if(t){
             const patch = { kind:v.kind, region:v.region, title:v.title, blocks:blocks2,
                             photos: st.photos, thumbs: st.thumbs,
-                            body: blocks2.filter(x=>x.t==='text').map(x=>x.v).join('\n\n'),
+                            body: blocksText(blocks2),
                             kw: kwOf(String(v.title || ''), t.byName || meName()),
                             edited: new Date().toISOString() };
             await window.__talk.edit(t.id, patch);
@@ -5523,12 +5695,17 @@ function adminBoatDel(id){
 }
 
 // ── 사람 명부 — 운영자만 본다 (규칙에서 막혀 있다)
+// 사람을 가리키는 짧은 표. 이름이 같은 사람이 있어도 이것으로 가른다.
+// ★ 이메일 대신 이것을 쓴다. 이 값만으로는 누구인지 알 수 없어서 훨씬 안전하다.
+function uidTail(u){
+  const t = String(u == null ? '' : u);
+  return t ? ('·' + t.slice(-6)) : '';
+}
 function personFilter(list, q){
   const s = String(q||'').trim().toLowerCase();
   if(!s) return list;
   return list.filter(p =>
     String(p.name||'').toLowerCase().includes(s)
-    || String(p.email||'').toLowerCase().includes(s)
     || String(p.uid||'').toLowerCase().includes(s));
 }
 // ★ 명부(users)는 3.9 부터 로그인할 때 만들어진다.
@@ -5570,7 +5747,7 @@ async function adminPeople(){
   const rows = personFilter(peopleRows, peopleQ)
     .sort((a,b)=> String(a.name||'').localeCompare(String(b.name||'')));
   return `<div class="qbox"><input id="pQ" value="${esc(peopleQ)}"
-        placeholder="이름 또는 이메일로 찾기"
+        placeholder="${esc(t('이름 또는 계정 번호로 찾기'))}"
         oninput="peopleQ=this.value;paintPeopleRows()" autocomplete="off"></div>
     <div class="mrnone" style="text-align:left">모두 ${peopleRows.length}명.
       명부는 앱을 켜서 로그인할 때 만들어집니다. 오래 안 들어온 분은
@@ -5585,7 +5762,7 @@ function peopleRowsHtml(rows, adm, isBan){
       <div class="fname">${esc(p.name || '(이름 없음)')}
         ${roleChip(a)}
         ${isBan(p.uid) ? '<span class="chip late">막힘</span>' : ''}</div>
-      <div class="fsub">${esc(p.email || p.uid)}</div>
+      <div class="fsub">${esc(uidTail(p.uid))}</div>
     </div></div>`;
   }).join('') + (rows.length > 200 ? '<div class="mrnone">200명까지만 보여 드립니다. 이름으로 찾아 주세요.</div>' : '');
 }
@@ -5645,7 +5822,9 @@ async function openPerson(uid){
   P.innerHTML = `<div class="mrhead"><b>사람</b><span style="flex:1"></span>
       <button class="tab" onclick="openAdmin()">← 운영자</button></div>
     <div class="mrrow"><span class="mrlbl">이름</span><b class="mrv">${esc(personCur.name || '(이름 없음)')}</b></div>
-    ${personCur.email?`<div class="mrrow"><span class="mrlbl">이메일</span><b class="mrv">${esc(personCur.email)}</b></div>`:''}
+    ${''/* ★ 이메일은 보여 주지 않는다. 앱 명부에 담지도 않는다 —
+           목적에 필요한 최소한만 다룬다는 방침(10항)에 맞춘 것이다.
+           정말 필요하면 파이어베이스 콘솔의 Authentication 에서 본다. */}
     <div class="mrrow"><span class="mrlbl">계정 번호</span>
       <span class="mrm" style="flex:1;word-break:break-all">${esc(String(uid))}</span></div>
     <div class="ghead"><b>운영자 권한</b></div>
@@ -6041,8 +6220,10 @@ function introInner(x, o){
   if(x.t === 'video')
     return `<a class="mrbtn" href="${esc(x.v)}" target="_blank" rel="noopener">유튜브 열기</a>`;
   if(x.t === 'head')
-    return `<div class="pbhead"${o.flat ? ' style="padding:6px 0 2px"' : ''}>${richInline(x.v)}</div>`;
-  return `<div class="postbody"${o.flat ? ' style="padding:0"' : ''}>${richInline(x.v)}</div>`;
+    return `<div class="pbhead"${o.flat ? ' style="padding:6px 0 2px"' : ''}>${richInl(x)}</div>`;
+  if(x.t === 'list')
+    return `<div class="postbody"${o.flat ? ' style="padding:0"' : ''}>${richListHtml(x, 'pblist')}</div>`;
+  return `<div class="postbody"${o.flat ? ' style="padding:0"' : ''}>${richInl(x)}</div>`;
 }
 
 // ===== 소개 페이지 =====
@@ -6057,13 +6238,15 @@ function openIntro(){
   if(!can(b,'publish','write')){ alert('권한이 없습니다'); return; }
   b.intro = b.intro || [];
   const rows = b.intro.map((x,i)=>{
+    // ★ 보기 전용일 때는 손대는 단추를 감춘다.
+    //   '보기 전용' 이라고 써 놓고 지우기 단추가 줄마다 붙어 있으면 표시가 거짓말이 된다.
     const body = introInner(x, { flat:true });
-    return `<div class="introrow">${body}
+    return `<div class="introrow">${body}${unlocked ? `
       <div class="introbtns">
         <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
         <button class="minib" onclick="moveIntro(${i},1)">↓</button>
         <button class="minib red" onclick="delIntro(${i})">지우기</button>
-      </div></div>`;
+      </div>` : ''}</div>`;
   }).join('');
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>소개 페이지</b><span style="flex:1"></span>
@@ -6354,7 +6537,7 @@ function writePost(id){
       // 편집기는 블록을 그대로 돌려준다. 사진은 그 안에 섞여 있다.
       const blocks = Array.isArray(v.body) ? v.body : [];
       const photos = blocks.filter(x => x.t === 'photo').map(x => x.v);
-      const plain  = blocks.filter(x => x.t === 'text').map(x => x.v).join('\n\n');
+      const plain  = blocksText(blocks);
       if(!plain && !photos.length){ alert('내용을 넣어 주세요'); return false; }
       // ★ 사진을 창고로 보내고 주소만 남긴다.
       //   예전에는 배 게시판 사진이 파이어스토어 문서 안에 통째로 들어갔다.
@@ -6995,12 +7178,28 @@ function joinBoat(boatId, boatName){
   if(!window.__invites){ alert('인터넷에 연결된 상태에서만 신청할 수 있습니다'); return; }
   const id = String(boatId || '').trim();
   if(!id){ joinByCode(); return; }            // 어느 배인지 모르면 코드로 찾는다
-  if(boats.some(x=>String(x.id)===id)){ alert('이미 이 배의 구성원입니다'); return; }
-  if(!confirm((boatName ? boatName + ' 에' : '이 배에') + ' 가입을 신청할까요?\n\n'
-    + '선주가 승인하면 배 목록에 나타납니다.')) return;
-  window.__invites.request(id, window.__user)
-    .then(()=>alert('신청했습니다.\n\n선주가 승인하면 배 목록에 나타납니다.'))
-    .catch(e=>alert('신청하지 못했습니다: ' + ((e && e.message) || e)));
+  if(boats.some(x=>String(x.id)===id)){ alert(t('이미 이 배의 구성원입니다')); return; }
+  askJoin(id, boatName);
+}
+// 신청서 — 선주에게 한마디를 남긴다.
+// ★ 이름만 덜렁 가는 신청은 선주가 받을지 말지 판단할 근거가 없다.
+function askJoin(boatId, boatName){
+  openForm({
+    title: t('참여 신청'),
+    sub: (boatName ? boatName + ' — ' : '') + t('선주가 승인하면 배 목록에 나타납니다.'),
+    okText: t('신청'),
+    fields: [
+      { key:'msg', type:'multi', rows:4, label: t('선장님께 한마디'),
+        placeholder: t('누구인지, 어떻게 알게 되었는지 적어 주세요') }
+    ],
+    onOk: v => {
+      const msg = String(v.msg || '').trim();
+      if(!msg){ alert(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
+      window.__invites.request(boatId, window.__user, msg)
+        .then(()=>alert(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
+        .catch(e=>alert(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
+    }
+  });
 }
 // 참여 코드로 찾아가기 — 둘러보기에 안 올라온 배에 들어갈 때 쓴다
 function joinByCode(){
@@ -7009,17 +7208,23 @@ function joinByCode(){
   }
   if(!window.__invites){ alert('인터넷에 연결된 상태에서만 신청할 수 있습니다'); return; }
   openForm({
-    title: '참여 코드로 신청',
-    sub: '둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다',
-    okText: '신청',
-    fields: [ { key:'code', label:'참여 코드', value:'', placeholder:'예: b1723…' } ],
+    title: t('참여 코드로 신청'),
+    sub: t('둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다'),
+    okText: t('신청'),
+    fields: [
+      { key:'code', label: t('참여 코드'), value:'', placeholder:'b1723…' },
+      { key:'msg', type:'multi', rows:4, label: t('선장님께 한마디'),
+        placeholder: t('누구인지, 어떻게 알게 되었는지 적어 주세요') }
+    ],
     onOk: v => {
       const code = String(v.code || '').trim();
-      if(!code){ alert('참여 코드를 넣어 주세요'); return false; }
-      if(boats.some(x=>String(x.id)===code)){ alert('이미 이 배의 구성원입니다'); return false; }
-      window.__invites.request(code, window.__user)
-        .then(()=>alert('신청했습니다.\n\n선주가 승인하면 배 목록에 나타납니다.'))
-        .catch(e=>alert('신청하지 못했습니다: ' + ((e && e.message) || e)));
+      const msg = String(v.msg || '').trim();
+      if(!code){ alert(t('참여 코드를 넣어 주세요')); return false; }
+      if(boats.some(x=>String(x.id)===code)){ alert(t('이미 이 배의 구성원입니다')); return false; }
+      if(!msg){ alert(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
+      window.__invites.request(code, window.__user, msg)
+        .then(()=>alert(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
+        .catch(e=>alert(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
     }
   });
 }
@@ -7036,11 +7241,13 @@ async function openJoinReqs(){
   P.innerHTML = `<div class="mrhead"><b>참여 신청</b><span style="flex:1"></span>
       <button class="tab" onclick="openBoat('info')">← 내 배</button></div>`
     + list.map(v=>`<div class="fleet">
-        <div class="fmain"><div class="fname">${esc(v.name||'이름 미등록')}</div>
-          <div class="fsub">${esc(v.email||'')}</div></div>
+        <div class="fmain"><div class="fname">${esc(v.name||t('이름 미등록'))}
+            <span class="chip">${esc(uidTail(v.uid))}</span></div>
+          ${v.msg ? `<div class="postbody" style="padding:6px 0">${esc(v.msg).replace(/\n/g,'<br>')}</div>` : ''}
+          <div class="fsub">${esc(String(v.ts||'').slice(0,10))}</div></div>
         <div class="fbtns">
-          <button class="minib blu" onclick="approveJoin('${esc(v.id)}','${esc(v.uid)}','${esc(v.name||'')}')">받기</button>
-          <button class="minib red" onclick="rejectJoin('${esc(v.id)}')">거절</button>
+          <button class="minib blu" onclick="approveJoin('${esc(v.id)}','${esc(v.uid)}','${esc(v.name||'')}')">${esc(t('받기'))}</button>
+          <button class="minib red" onclick="rejectJoin('${esc(v.id)}')">${esc(t('거절'))}</button>
         </div></div>`).join('');
   showPanel(P); boatKeepTabs('joins');
 }
@@ -8568,7 +8775,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.76';
+const APP_VER = '3.78';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -11731,7 +11938,13 @@ function guardEdit(what, fn){
 }
 function needEdit(what, fn){
   if(unlocked){ fn(); return; }
-  if(!confirm(what + '\n\n지금은 보기 전용입니다.\n실수로 고치는 것을 막으려고 잠가 두었습니다.\n\n편집 중으로 바꾸고 계속할까요?')) return;
+  // ★ 번역은 여기 한 곳에서 한다.
+  //   부르는 쪽에서 t('…') 로 감쌌더니, 그 함수 안에 const t 라는 지역 변수가 있는 곳이
+  //   많아서 't 를 아직 쓸 수 없습니다' 로 터졌다 — 커뮤니티 글 지우기가 통째로 죽었다.
+  //   부르는 쪽은 한국어 그대로 넘기고, 옮기는 일은 여기서만 한다.
+  if(!confirm(t(what) + '\n\n' + t('지금은 보기 전용입니다.')
+    + '\n' + t('실수로 고치는 것을 막으려고 잠가 두었습니다.')
+    + '\n\n' + t('편집 중으로 바꾸고 계속할까요?'))) return;
   toggleLock();
   fn();
 }
@@ -12133,7 +12346,68 @@ const I18N = {
     '수심':'Depth', '저조위 기준':'Chart datum', '바닥':'Bottom',
     '마리나':'Marina', '항·부두':'Port', '방파제':'Breakwater', '묘박지':'Anchorage',
     '정비':'Maintenance', '수리':'Repairs', '적재표':'Stowage', '주유':'Fuel',
-    '글쓰기':'Write', '올리기':'Post', '신고':'Report', '수정':'Edit'
+    '글쓰기':'Write', '올리기':'Post', '신고':'Report', '수정':'Edit',
+    // ── 3.78 에서 새로 넣은 것
+    '가':'A',
+    '굵게':'Bold',
+    '기울임':'Italic',
+    '밑줄':'Underline',
+    '취소선':'Strikethrough',
+    '소제목':'Heading',
+    '글머리표':'Bullet list',
+    '번호':'Numbered list',
+    '사진':'Photo',
+    '사진 지우기':'Remove photo',
+    '그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.':'Just write. If you paste text with photos, the photos go in where you paste them.',
+    '사진을 지우려면 사진을 한 번 누르고 백스페이스를 누르시면 됩니다.':'To remove a photo, tap it once and press backspace.',
+    '참여 신청':'Join request',
+    '참여 코드로 신청':'Join with a code',
+    '참여 코드':'Join code',
+    '신청':'Send',
+    '선장님께 한마디':'Message to the skipper',
+    '누구인지, 어떻게 알게 되었는지 적어 주세요':'Say who you are and how you know this boat',
+    '한마디 적어 주세요. 선주가 보고 판단합니다.':'Please write a message — the owner decides based on it.',
+    '선주가 승인하면 배 목록에 나타납니다.':'Once the owner approves, the boat appears in your list.',
+    '둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다':'For boats not listed, use the code the owner gave you',
+    '참여 코드를 넣어 주세요':'Please enter the join code',
+    '이미 이 배의 구성원입니다':'You are already a member of this boat',
+    '신청했습니다.':'Request sent.',
+    '신청하지 못했습니다':'Could not send the request',
+    '이름 미등록':'No name',
+    '받기':'Accept',
+    '거절':'Decline',
+    '이름 또는 계정 번호로 찾기':'Search by name or account number',
+    '커뮤니티에 글을 씁니다.':'Write a community post.',
+    '커뮤니티 글을 지웁니다.':'Delete a community post.',
+    '커뮤니티 글에 댓글을 답니다.':'Comment on a community post.',
+    '댓글을 지웁니다.':'Delete a comment.',
+    '배 게시판에 글을 씁니다.':'Write on the boat board.',
+    '배 게시판 글에 댓글을 답니다.':'Comment on a boat board post.',
+    '정박지를 올리거나 고칩니다.':'Add or edit a mooring.',
+    '정박지를 지웁니다.':'Delete a mooring.',
+    '다녀온 이야기를 남깁니다.':'Leave a visit note.',
+    '다녀온 이야기를 지웁니다.':'Delete a visit note.',
+    '장터에 물건을 올리거나 고칩니다.':'List or edit an item for sale.',
+    '장터 글을 지웁니다.':'Delete a marketplace listing.',
+    '연재 글을 올리거나 고칩니다.':'Publish or edit a series article.',
+    '연재 글을 지웁니다.':'Delete a series article.',
+    '연재자 신청':'Apply as a writer',
+    '연재 글 올리기':'Publish series articles',
+    '글을 이어서 올리고 싶습니다':'I would like to publish a series',
+    '어떤 글을 올리시겠습니까':'What will you publish?',
+    '직접 쓴 글':'My own writing',
+    '옮긴 글':'Reprinted with permission',
+    '어떤 글인가요':'Tell us about it',
+    '그동안 쓰신 글 (선택)':'Something you have written (optional)',
+    '무엇을 얼마나 쓰실 생각인지 적어 주세요':'Say what you plan to write and how often',
+    '어떤 글인지 적어 주세요':'Please describe what you will write',
+    '연재자 신청을 보냈습니다.':'Your writer application has been sent.',
+    '다시 보내기':'Send again',
+    '인터넷이 없습니다 — 관에서 낸 정박지는 그대로 보입니다.':'No internet — official moorings are still available.',
+    '사람들이 올린 곳과 다녀온 이야기는 연결되면 보입니다.':'Places added by others and their notes appear when you reconnect.',
+    '지금은 보기 전용입니다.':'This is view-only right now.',
+    '실수로 고치는 것을 막으려고 잠가 두었습니다.':'It is locked so nothing gets changed by accident.',
+    '편집 중으로 바꾸고 계속할까요?':'Switch to editing and continue?',
   },
   ru: {
     '오늘':'Сегодня', '배':'Судно', '항해일지':'Журнал', '커뮤니티':'Сообщество',
@@ -12156,7 +12430,68 @@ const I18N = {
     '수심':'Глубина', '저조위 기준':'От нуля глубин', '바닥':'Грунт',
     '마리나':'Марина', '항·부두':'Порт', '방파제':'Волнолом', '묘박지':'Якорная стоянка',
     '정비':'Обслуживание', '수리':'Ремонт', '적재표':'Хранение', '주유':'Топливо',
-    '글쓰기':'Написать', '올리기':'Опубликовать', '신고':'Пожаловаться', '수정':'Изменить'
+    '글쓰기':'Написать', '올리기':'Опубликовать', '신고':'Пожаловаться', '수정':'Изменить',
+    // ── 3.78 에서 새로 넣은 것
+    '가':'А',
+    '굵게':'Жирный',
+    '기울임':'Курсив',
+    '밑줄':'Подчёркнутый',
+    '취소선':'Зачёркнутый',
+    '소제목':'Подзаголовок',
+    '글머리표':'Маркеры',
+    '번호':'Нумерация',
+    '사진':'Фото',
+    '사진 지우기':'Удалить фото',
+    '그냥 쓰시면 됩니다. 글을 사진째 복사해 붙여넣으면 사진이 그 자리에 들어갑니다.':'Просто пишите. Если вставить текст с фото, фото попадут на то же место.',
+    '사진을 지우려면 사진을 한 번 누르고 백스페이스를 누르시면 됩니다.':'Чтобы удалить фото, нажмите на него и затем Backspace.',
+    '참여 신청':'Заявка на вступление',
+    '참여 코드로 신청':'Вступить по коду',
+    '참여 코드':'Код вступления',
+    '신청':'Отправить',
+    '선장님께 한마디':'Сообщение капитану',
+    '누구인지, 어떻게 알게 되었는지 적어 주세요':'Напишите, кто вы и откуда знаете это судно',
+    '한마디 적어 주세요. 선주가 보고 판단합니다.':'Напишите сообщение — владелец решает по нему.',
+    '선주가 승인하면 배 목록에 나타납니다.':'После одобрения владельцем судно появится в вашем списке.',
+    '둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다':'Для судов не из списка используйте код от владельца',
+    '참여 코드를 넣어 주세요':'Введите код вступления',
+    '이미 이 배의 구성원입니다':'Вы уже в составе экипажа этого судна',
+    '신청했습니다.':'Заявка отправлена.',
+    '신청하지 못했습니다':'Не удалось отправить заявку',
+    '이름 미등록':'Без имени',
+    '받기':'Принять',
+    '거절':'Отклонить',
+    '이름 또는 계정 번호로 찾기':'Поиск по имени или номеру аккаунта',
+    '커뮤니티에 글을 씁니다.':'Написать пост в сообществе.',
+    '커뮤니티 글을 지웁니다.':'Удалить пост в сообществе.',
+    '커뮤니티 글에 댓글을 답니다.':'Оставить комментарий к посту.',
+    '댓글을 지웁니다.':'Удалить комментарий.',
+    '배 게시판에 글을 씁니다.':'Написать на доске судна.',
+    '배 게시판 글에 댓글을 답니다.':'Комментарий к записи на доске судна.',
+    '정박지를 올리거나 고칩니다.':'Добавить или изменить стоянку.',
+    '정박지를 지웁니다.':'Удалить стоянку.',
+    '다녀온 이야기를 남깁니다.':'Оставить отзыв о посещении.',
+    '다녀온 이야기를 지웁니다.':'Удалить отзыв о посещении.',
+    '장터에 물건을 올리거나 고칩니다.':'Разместить или изменить объявление.',
+    '장터 글을 지웁니다.':'Удалить объявление.',
+    '연재 글을 올리거나 고칩니다.':'Опубликовать или изменить статью.',
+    '연재 글을 지웁니다.':'Удалить статью.',
+    '연재자 신청':'Заявка автора',
+    '연재 글 올리기':'Публикация статей',
+    '글을 이어서 올리고 싶습니다':'Хочу вести рубрику',
+    '어떤 글을 올리시겠습니까':'Что вы будете публиковать?',
+    '직접 쓴 글':'Собственный текст',
+    '옮긴 글':'Перепечатка с разрешения',
+    '어떤 글인가요':'Расскажите о материале',
+    '그동안 쓰신 글 (선택)':'Ваши прежние тексты (необязательно)',
+    '무엇을 얼마나 쓰실 생각인지 적어 주세요':'Напишите, о чём и как часто планируете писать',
+    '어떤 글인지 적어 주세요':'Опишите, о чём будете писать',
+    '연재자 신청을 보냈습니다.':'Заявка автора отправлена.',
+    '다시 보내기':'Отправить снова',
+    '인터넷이 없습니다 — 관에서 낸 정박지는 그대로 보입니다.':'Нет интернета — официальные стоянки по-прежнему доступны.',
+    '사람들이 올린 곳과 다녀온 이야기는 연결되면 보입니다.':'Места от других и отзывы появятся при подключении.',
+    '지금은 보기 전용입니다.':'Сейчас режим только для просмотра.',
+    '실수로 고치는 것을 막으려고 잠가 두었습니다.':'Заблокировано, чтобы ничего не изменить случайно.',
+    '편집 중으로 바꾸고 계속할까요?':'Переключиться на правку и продолжить?',
   }
 };
 
@@ -15744,7 +16079,7 @@ function writeSeries(id){
       }
       // 편집기는 블록을 그대로 돌려준다. 사진은 그 안에 섞여 있다.
       const blocks = Array.isArray(v.body) ? v.body : [];
-      const plain  = blocks.filter(z=>z.t!=='photo').map(z=>z.v).join('\n\n');
+      const plain  = blocksText(blocks);
       const photos = blocks.filter(z=>z.t==='photo').map(z=>z.v);
       if(!plain.trim() && !photos.length){ alert('본문을 넣어 주세요'); return false; }
       (async ()=>{
@@ -16704,7 +17039,7 @@ document.addEventListener('visibilitychange', ()=>{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
     const { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc,
             query, where, orderBy, limit, startAfter, writeBatch, FieldPath,
-            getCountFromServer, increment } =
+            getCountFromServer, increment, deleteField } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
@@ -17033,11 +17368,13 @@ document.addEventListener('visibilitychange', ()=>{
     // 신청서에는 어느 배인지(boatId)가 반드시 들어가야 한다.
     // 규칙이 그 배의 선주인지 확인해서 읽기를 허용하기 때문이다.
     window.__invites = {
-      async request(boatId, me){
+      async request(boatId, me, msg){
         const id = 'iv' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        // ★ 이메일은 안 보낸다. 선주는 계정 번호와 한마디를 보고 판단한다.
+        //   배에 사람을 태우는 일은 앱에서 끝나지 않는다 — 어차피 전화하거나 만난다.
         await setDoc(doc(fdb, 'invites', id), {
           id, boatId: String(boatId), uid: me.uid,
-          name: me.name || '', email: me.email || '',
+          name: me.name || '', msg: String(msg || '').slice(0, 500),
           status: 'pending', ts: new Date().toISOString()
         });
         return id;
@@ -17227,8 +17564,15 @@ document.addEventListener('visibilitychange', ()=>{
       async mark(extra){
         const u = fauth.currentUser; if(!u) return;
         try{
+          // ★ 이메일은 담지 않는다.
+          //   로그인 수단으로는 Firebase Authentication 에 있어야 하지만,
+          //   앱 명부(users)에까지 복사해 두면 규칙에 구멍이 났을 때 통째로 샌다.
+          //   담지 않으면 샐 것이 없다. 정말 필요할 때는 콘솔에서 본다.
+          //   deleteField 는 예전에 담아 둔 것을 지우려고 함께 보낸다 —
+          //   덮어쓰기(merge)라 칸만 빼면 옛 문서에는 그대로 남는다.
           await setDoc(doc(fdb, 'users', u.uid), Object.assign({
-            uid: u.uid, name: u.displayName || '', email: u.email || '',
+            uid: u.uid, name: u.displayName || '',
+            email: deleteField(),
             ts: new Date().toISOString()
           }, extra || {}), { merge:true });
         }catch(_){}

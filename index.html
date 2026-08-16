@@ -5428,7 +5428,7 @@ async function openTalk(id){
     return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delTalkComment('${esc(t.id)}','${esc(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
-      <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
+      <div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',t.title))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToTalk()">목록</button></div>
@@ -5439,7 +5439,8 @@ async function openTalk(id){
         : esc(t.byName||'')}${t.boatName?' · '+esc(t.boatName):''}${t.boatType?' · '+esc(t.boatType):''}
       · ${esc(String(t.ts||'').slice(0,10))}
       ${String(t.by)===String(meUid())?`<button class="minib blu" style="margin-left:auto" onclick="writeTalk('${esc(t.id)}')">고치기</button>`:''}</div>
-    ${trBar('community', t.id, (t.title||'') + ' ' + (t.body||''))}
+    ${trBar('community', t.id, (t.title||'') + ' ' + (t.body||''),
+        all.map(c=>String(c.text||'')).join(' '))}
     ${t.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
     ${rideHead(t)}
     ${renderBlocks(tv ? trBlocks(t.blocks || [], tv.body) : (t.blocks || []), `talkPhotos('${esc(t.id)}')`)}
@@ -5502,6 +5503,7 @@ function writeTalkComment(id){
           const k = String(t.id);
           talkCmts[k] = (talkCmts[k] || []).concat([c]);
           t.cmtN = (Number(t.cmtN) || 0) + 1;
+          trDrop('community', t.id);   // 옮겨 둔 것에 이 댓글이 없다
           openTalk(t.id);
         })
         .catch(e=>alert('올리지 못했습니다.\n\n' + ((e&&e.message)||e)));
@@ -5517,7 +5519,7 @@ function delTalkComment(id, cid, isOld){
   if(isOld){
     const next = (t.comments||[]).filter(c=>String(c.id)!==String(cid));
     window.__talk.edit(t.id, { comments: next })
-      .then(()=>{ t.comments = next; openTalk(t.id); })
+      .then(()=>{ t.comments = next; trDrop('community', t.id); openTalk(t.id); })
       .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
     return;
   }
@@ -5527,6 +5529,7 @@ function delTalkComment(id, cid, isOld){
       const k = String(t.id);
       talkCmts[k] = (talkCmts[k] || []).filter(c=>String(c.id)!==String(cid));
       t.cmtN = Math.max(0, (Number(t.cmtN) || 0) - 1);
+      trDrop('community', t.id);
       openTalk(t.id);
     })
     .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));
@@ -6822,8 +6825,13 @@ function openMyTasks(){
   showPanel(P); boatKeepTabs('tasks');
 }
 // ===== 회원 명부 =====
-// 사람마다 회비·오는 주기·부재·메모를 적어 둔다.
-// 회비 계산까지는 하지 않는다 — 적어 두고 날짜가 되면 알려주는 정도다.
+// 사람마다 회비 주기·오는 주기·부재·메모를 적어 둔다.
+//
+// ★ 회비 '금액' 은 앱에 담지 않는다 (3.82 에서 뺐다).
+//   얼마를 주고받았는지를 앱이 들고 있으면 돈거래를 앱이 거드는 모양이 되고,
+//   플레이스토어에도 「금융 정보」를 다루는 앱으로 신고해야 한다.
+//   회비는 만나서 알아서 하는 것이다. 앱은 '언제 받을 때가 됐는지' 만 알려 준다.
+//   그것만으로도 잊어버리지 않는다는 목적은 다 이룬다.
 const DUES_CYCLES = [
   { v:'',  name:'없음',   sub:'회비를 안 받는 사람' },
   { v:'m', name:'매달',   sub:'한 달에 한 번' },
@@ -6887,11 +6895,12 @@ function addDay(s){
   const d = new Date(Date.UTC(p.y, p.m-1, p.d + 1));
   return d.toISOString().slice(0,10);
 }
-function payDues(b, uid, amount, date){
+// ★ 얼마를 냈는지는 안 적는다. '언제 냈는지' 만 있으면 다음 납부일을 셀 수 있다.
+function payDues(b, uid, date){
   const r = setRoster(b, uid, {});
   if(!r) return null;
   r.pays = r.pays || [];
-  r.pays.push({ id:newId(), date: date || today(), amount: Number(amount) || 0 });
+  r.pays.push({ id:newId(), date: date || today() });
   r.pays.sort((a,c)=> String(a.date).localeCompare(String(c.date)));
   return r;
 }
@@ -6932,6 +6941,19 @@ function migrateRanks(b){
     if(map[v]) b.members[uid] = map[v].id;         // 옛 역할 이름 → 등급 id
     else if(!rankOf(b, v)) b.members[uid] = view.id;  // 모르는 값이면 맨 아래로
   });
+}
+// 이미 적어 둔 회비 금액을 지운다.
+// ★ 화면에서 감추기만 하면 값은 그대로 남는다. 남아 있으면 여전히
+//   앱이 금액을 들고 있는 것이라 뺀 뜻이 없다. 열 때 한 번 훑어서 지운다.
+function dropDues(b){
+  if(!b || !b.roster) return false;
+  let hit = false;
+  Object.keys(b.roster).forEach(uid=>{
+    const r = b.roster[uid]; if(!r) return;
+    if(r.duesAmount){ r.duesAmount = 0; hit = true; }
+    (r.pays || []).forEach(p=>{ if(p && p.amount != null){ delete p.amount; hit = true; } });
+  });
+  return hit;
 }
 // 선주 수 (마지막 선주 보호에 쓴다)
 function ownerCount(b){
@@ -6987,7 +7009,7 @@ function openRoster(){
   const rows = memberRows(b).map(m=>{
     const r = rosterOf(b, m.uid);
     const bits = [];
-    if(seeDues && r.duesAmount) bits.push('회비 ' + Number(r.duesAmount).toLocaleString() + '원 '
+    if(seeDues && r.duesCycle) bits.push(t('회비') + ' '
       + ((DUES_CYCLES.find(c=>c.v===r.duesCycle)||{}).name || ''));
     if(r.visitNote) bits.push(r.visitNote);
     if(isAway(b, m.uid)) bits.push('~' + r.awayTo + ' 부재' + (r.awayNote ? ' (' + r.awayNote + ')' : ''));
@@ -7061,8 +7083,6 @@ function editRoster(uid){
     sub: (nd ? '다음 납부일 ' + nd : '회비 없음') + (paid ? ' · 납부 ' + paid + '회' : ''),
     okText: '저장',
     fields: [
-      { key:'duesAmount', label:'회비 (원)', value: r.duesAmount ? String(r.duesAmount) : '',
-        placeholder:'50000', mode:'numeric' },
       { key:'duesCycle', label:'회비 주기', type:'pick', value: r.duesCycle || '',
         options: DUES_CYCLES.map(c=>({ v:c.v, name:c.name, sub:c.sub })) },
       { key:'duesFrom', label:'회비 시작일', value: r.duesFrom || '',
@@ -7081,7 +7101,7 @@ function editRoster(uid){
         alert('날짜는 2026-08-20 처럼 적어 주세요'); return false;
       }
       setRoster(b, uid, {
-        duesAmount: v.duesAmount ? Number(String(v.duesAmount).replace(/[^0-9]/g,'')) : 0,
+        duesAmount: 0,                       // ★ 금액은 안 담는다 (옛 값도 여기서 지워진다)
         duesCycle: v.duesCycle, duesFrom: v.duesFrom,
         visitNote: v.visitNote, awayTo: v.awayTo, awayNote: v.awayNote, memo: v.memo
       });
@@ -7094,11 +7114,10 @@ function editRoster(uid){
 function askPay(uid){
   const b = curBoat(); if(!b) return;
   if(guardEdit('회비를 납부로 기록합니다.', () => askPay(uid))) return;
-  const r = rosterOf(b, uid);
-  if(!r.duesAmount || !duesDue(b, uid)) return;
+  if(!duesDue(b, uid)) return;
   const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
   if(!confirm(`${m.name} 님의 회비 납부일이 지났습니다.\n\n지금 납부로 기록할까요?`)) return;
-  payDues(b, uid, r.duesAmount);
+  payDues(b, uid);
   saveBoatMembers(b, 'roster');
 }
 // 등급을 한 줄로 요약한다 (전체 3 · 쓰기 5 · 보기 4 · 없음 5)
@@ -8064,6 +8083,16 @@ async function initStorage(){
     seedDgIfNeeded();
   }
   boats.forEach(b => migrateRanks(b));   // 옛 역할로 저장된 배를 등급으로 옮긴다
+  // 회비 금액은 앱에 두지 않는다 — 옛 배에 남아 있으면 지운다.
+  // ★ 이것은 사람이 고치는 일이 아니라 뒷정리다. 그래서 보기 전용 잠금과 상관없다.
+  //   클라우드에는 회비를 쓸 수 있는 사람만 올린다 — 남의 배는 어차피 규칙이 막는다.
+  let duesGone = false;
+  boats.forEach(b => {
+    if(!dropDues(b)) return;
+    duesGone = true;
+    try{ if(can(b, 'dues', 'write')) saveBoatMembers(b, 'roster'); }catch(_){}
+  });
+  if(duesGone){ try{ saveLocal(); }catch(_){} }
   refreshBoxes(); drawShapes(); renderList();
 }
 
@@ -8877,7 +8906,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.80';
+const APP_VER = '3.82';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -12524,6 +12553,8 @@ const I18N = {
     '사진을 넣는 중…':'Adding photos…',
     '지울 사진을 먼저 한 번 눌러 주세요.':'Tap the photo you want to remove first.',
     '사진은 글자와 같습니다 — 백스페이스로 지워집니다.':'Photos behave like characters — backspace deletes them.',
+    // ── 3.82 에서 새로 넣은 것
+    '회비':'Dues',
   },
   ru: {
     '오늘':'Сегодня', '배':'Судно', '항해일지':'Журнал', '커뮤니티':'Сообщество',
@@ -12622,6 +12653,8 @@ const I18N = {
     '사진을 넣는 중…':'Добавляем фото…',
     '지울 사진을 먼저 한 번 눌러 주세요.':'Сначала нажмите на фото, которое хотите удалить.',
     '사진은 글자와 같습니다 — 백스페이스로 지워집니다.':'Фото ведут себя как символы — удаляются клавишей Backspace.',
+    // ── 3.82 에서 새로 넣은 것
+    '회비':'Взносы',
   }
 };
 
@@ -12705,10 +12738,23 @@ function trSameLang(text, lang){
   return true;
 }
 
+// 댓글이 달리거나 지워지면 옮겨 둔 것을 버린다.
+// ★ 안 버리면 새 댓글만 영영 원문으로 남는다 (서버에 담아 둔 것에 그 댓글이 없다).
+function trDrop(coll, id){
+  const k = trKey(coll, id);
+  Object.keys(TR_GOT).forEach(x => { if(x.indexOf(k + ':') === 0) delete TR_GOT[x]; });
+}
 // 지금 이 글을 옮겨서 보고 있나 (아니면 null — 원문 그대로다)
 function trView(coll, id){
   if(!TR_ON[trKey(coll, id)]) return null;
   return TR_GOT[trKey(coll, id) + ':' + langNow()] || null;
+}
+// 옮긴 댓글이 있으면 그것을, 없으면 쓴 사람 말 그대로 낸다.
+// ★ 서버는 한 번에 옮길 수 있는 만큼만 옮긴다. 못 옮긴 댓글은 원문으로 남는다 —
+//   빈 칸이 되는 것보다 낫다.
+function trCmt(tv, id, orig){
+  const v = tv && tv.c && tv.c[String(id)];
+  return (v == null || v === '') ? String(orig == null ? '' : orig) : String(v);
 }
 // 옮긴 것이 있으면 그것을, 없으면 원문을 낸다
 function trPick(tv, field, orig){
@@ -12754,8 +12800,9 @@ function trBlocks(blocks, text){
   return out;
 }
 
-// 글 위에 붙는 한 줄
-function trBar(coll, id, src){
+// 글 위에 붙는 한 줄.
+// src 는 글, cmt 는 댓글을 다 이어 붙인 것 — 어느 말로 쓰였나 가릴 때만 쓴다.
+function trBar(coll, id, src, cmt){
   const key = trKey(coll, id);
   if(TR_ON[key]){
     return `<div class="trbar"><span>${esc(t('자동 번역된 글입니다'))}</span>
@@ -12765,7 +12812,12 @@ function trBar(coll, id, src){
   if(TR_BUSY[key]) return `<div class="trbar"><span>${esc(t('옮기는 중…'))}</span></div>`;
   if(!meUid()) return '';                                   // 함수가 로그인한 사람만 받는다
   if(navigator && navigator.onLine === false) return '';     // 인터넷이 없으면 못 옮긴다
-  if(trSameLang(src, langNow())) return '';                  // 이미 내 말로 쓰인 글
+  // ★ 글과 댓글을 따로 견준다.
+  //   둘 다 내 말이면 단추를 안 낸다 — 한국어뿐인 글에 번역 단추가 붙으면 고장으로 보인다.
+  //   하나라도 남의 말이면 낸다 — 못 읽는 것이 있는데 길이 없으면 그게 더 답답하다.
+  //   댓글은 통째로 견주므로, 한국어 댓글 서른 개 사이의 러시아어 하나로는 안 뜬다.
+  const c = String(cmt == null ? '' : cmt).trim();
+  if(trSameLang(src, langNow()) && (!c || trSameLang(c, langNow()))) return '';
   return `<div class="trbar"><span style="flex:1"></span>
     <button class="minib blu" onclick="trGo('${esc(coll)}','${esc(id)}')">${esc(t('번역해서 보기'))}</button></div>`;
 }
@@ -14076,7 +14128,8 @@ async function openSpot(id){
       ${s.region?`<span class="chip">${esc(s.region)}</span>`:''}
       ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
       ${canEditSpot(s)?`<button class="minib blu" style="margin-left:auto" onclick="writeSpot('${esc(s.id)}')">고치기</button>`:''}</div>
-    ${s.seed ? '' : trBar('spots', s.id, (s.name||'') + ' ' + (s.note||''))}
+    ${s.seed ? '' : trBar('spots', s.id, (s.name||'') + ' ' + (s.note||''),
+        (spotCmts[String(s.id)]||[]).map(c=>String(c.text||'')).join(' '))}
     ${s.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 자리입니다.</div>':''}
     ${s.seed ? `<div class="mrnone" style="text-align:left">
         <b>${esc(SPOT_SEED_FROM)}입니다.</b> 이름과 자리만 들어 있습니다.
@@ -14124,6 +14177,7 @@ async function loadSpotCmts(id){
   catch(_){ spotCmts[String(id)] = spotCmts[String(id)] || []; }
 }
 function spotCmtHtml(s){
+  const tv = trView('spots', s.id);
   const all = (spotCmts[String(s.id)] || [])
     .slice().sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
@@ -14131,7 +14185,7 @@ function spotCmtHtml(s){
     return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delSpotComment('${esc(s.id)}','${esc(c.id)}')">&#10005;</button>`:''}</div>
-      <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
+      <div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
   return `<div class="ghead"><b>다녀온 이야기</b><span class="gcnt">${all.length}</span></div>
     ${cs || '<div class="mrnone" style="text-align:left">아직 없습니다. 다녀오셨으면 어땠는지 남겨 주세요.</div>'}
@@ -14160,6 +14214,7 @@ function writeSpotComment(id){
           const k = String(s.id);
           spotCmts[k] = (spotCmts[k] || []).concat([c]);
           s.cmtN = (Number(s.cmtN) || 0) + 1;
+          trDrop('spots', s.id);
           openSpot(s.id);
         })
         .catch(e=>alert('남기지 못했습니다.\n\n' + ((e&&e.message)||e)));
@@ -14175,6 +14230,7 @@ function delSpotComment(id, cid){
       const k = String(id);
       spotCmts[k] = (spotCmts[k] || []).filter(c=>String(c.id)!==String(cid));
       s.cmtN = Math.max(0, (Number(s.cmtN) || 0) - 1);
+      trDrop('spots', id);
       openSpot(id);
     })
     .catch(e=>alert('지우지 못했습니다.\n\n' + ((e&&e.message)||e)));

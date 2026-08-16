@@ -75,6 +75,8 @@
 .postmeta{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#8a97a8;
   font-size:12.5px;border-bottom:1px solid #12283e}
 .postbody{padding:14px;color:#dfe8f2;font-size:14.5px;line-height:1.7;white-space:pre-wrap}
+.trbar{display:flex;align-items:center;gap:8px;padding:8px 14px;color:#8a97a8;font-size:12.5px;
+  border-bottom:1px solid #12283e}
 .cmt{padding:10px 14px;border-bottom:1px solid #12283e}
 .cmthead{display:flex;align-items:center;gap:8px;color:#8ab4d8;font-size:12.5px;font-weight:600}
 .cmthead span{color:#93AABD;font-weight:400}
@@ -5327,6 +5329,8 @@ async function openTalk(id){
   const t = talkList.find(x=>String(x.id)===String(id));
   if(!t) return;
   talkOpenId = id;
+  // 옮겨 보기 — 안 눌렀으면 null 이라 원문 그대로 나온다
+  const tv = trView('community', t.id);
   const kn = (TALK_KINDS.find(k=>k.v===t.kind)||{}).name || '잡담';
   const P = document.getElementById('mrPanel');
   // 글 밖의 방에 든 댓글을 아직 안 받아 왔으면 지금 받아온다
@@ -5343,7 +5347,7 @@ async function openTalk(id){
         ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delTalkComment('${esc(t.id)}','${esc(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t.title||'')}</b><span style="flex:1"></span>
+  P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',t.title))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToTalk()">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
       ${t.region?`<span class="chip">${esc(t.region)}</span>`:''}
@@ -5352,9 +5356,10 @@ async function openTalk(id){
         : esc(t.byName||'')}${t.boatName?' · '+esc(t.boatName):''}${t.boatType?' · '+esc(t.boatType):''}
       · ${esc(String(t.ts||'').slice(0,10))}
       ${String(t.by)===String(meUid())?`<button class="minib blu" style="margin-left:auto" onclick="writeTalk('${esc(t.id)}')">고치기</button>`:''}</div>
+    ${trBar('community', t.id, (t.title||'') + ' ' + (t.body||''))}
     ${t.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
     ${rideHead(t)}
-    ${renderBlocks(t.blocks || [], `talkPhotos('${esc(t.id)}')`)}
+    ${renderBlocks(tv ? trBlocks(t.blocks || [], tv.body) : (t.blocks || []), `talkPhotos('${esc(t.id)}')`)}
     ${t.kind === 'ride' ? `<div class="mrnone" style="text-align:left">
         타고 싶으시면 아래 <b>댓글</b>로 말씀해 주세요. 태우실 분이 보고 정합니다.<br>
         ${esc(RIDE_LAW)}</div>` : ''}
@@ -6050,11 +6055,23 @@ function pubVoyPhoto(i){
   const v = (x.voyage||[]).find(z=>String(z.id)===String(pubVoyId));
   if(v) pvOpen(v.photos||[], i);
 }
+// 소개 덩이에서 글자만 뽑는다 (어느 말로 쓰였는지 가릴 때 쓴다)
+function introText(intro){
+  return (intro || []).filter(p => p && p.t !== 'photo' && p.t !== 'video')
+    .map(p => p.t === 'list' ? ((p.items || []).map(i => richText(i)).join(' '))
+                             : (p.h ? richText(p.v) : String(p.v == null ? '' : p.v)))
+    .join(' ');
+}
 function boatPageBody(x, k){
-  if(k === 'intro') return (x.intro||[]).map(p=>
+  if(k === 'intro'){
+    // 옮겨 보는 중이면 글자만 갈아 끼운다 — 사진·영상은 제자리에 남는다
+    const tv = trView('boatPublic', x.id);
+    const rows = tv ? trBlocks(x.intro || [], tv.intro) : (x.intro || []);
+    return rows.map(p=>
       (p && (p.t === 'photo' || p.t === 'video'))
         ? `<div class="introrow">${introInner(p, { r:12 })}</div>`
         : introInner(p)).join('');
+  }
   if(k === 'spec'){
     const t = [ x.maker && ('제조 ' + x.maker), x.model, x.year && (x.year + '년'),
                 x.loa && ('길이 ' + x.loa + 'm'), x.beam && ('폭 ' + x.beam + 'm') ]
@@ -6131,6 +6148,8 @@ function paintBoatPage(){
       <button class="tab" onclick="backToExplore()">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(x.typeName||'')}</span>
       ${x.biz?'<span class="chip notice">영업</span>':''}${esc(x.port||'')}</div>
+    ${(boatPageTab === 'intro' && (x.intro||[]).length)
+      ? trBar('boatPublic', x.id, introText(x.intro)) : ''}
     ${mine ? `<div class="mrnone">이미 이 배의 구성원입니다</div>`
       : `<div class="mrrow" style="padding:12px 0">
           <button class="mrbtn ok big" style="width:100%" onclick="joinBoat('${esc(x.id)}','${esc(x.name||'')}')">이 배에 가입 신청</button></div>`}
@@ -8775,7 +8794,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.78';
+const APP_VER = '3.79';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -12317,7 +12336,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 3841;
+const LANG_TOTAL = 3850;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -12408,6 +12427,16 @@ const I18N = {
     '지금은 보기 전용입니다.':'This is view-only right now.',
     '실수로 고치는 것을 막으려고 잠가 두었습니다.':'It is locked so nothing gets changed by accident.',
     '편집 중으로 바꾸고 계속할까요?':'Switch to editing and continue?',
+    // ── 3.79 에서 새로 넣은 것
+    '번역해서 보기':'Translate',
+    '원어로 보기':'See original',
+    '자동 번역된 글입니다':'Machine translated',
+    '옮기는 중…':'Translating…',
+    '지금은 옮길 수 없습니다':'Translation is unavailable right now',
+    '옮겨 온 것이 없습니다':'Nothing came back',
+    '옮기지 못했습니다':'Could not translate',
+    '화면의 글자가 바뀝니다.':'This changes the text of the app.',
+    '사람들이 올린 글은 쓴 사람의 말 그대로 둡니다 — 글을 열면 번역 단추가 나옵니다.':'Posts stay in the language they were written in — open one and a Translate button appears.',
   },
   ru: {
     '오늘':'Сегодня', '배':'Судно', '항해일지':'Журнал', '커뮤니티':'Сообщество',
@@ -12492,6 +12521,16 @@ const I18N = {
     '지금은 보기 전용입니다.':'Сейчас режим только для просмотра.',
     '실수로 고치는 것을 막으려고 잠가 두었습니다.':'Заблокировано, чтобы ничего не изменить случайно.',
     '편집 중으로 바꾸고 계속할까요?':'Переключиться на правку и продолжить?',
+    // ── 3.79 에서 새로 넣은 것
+    '번역해서 보기':'Перевести',
+    '원어로 보기':'Показать оригинал',
+    '자동 번역된 글입니다':'Машинный перевод',
+    '옮기는 중…':'Перевод…',
+    '지금은 옮길 수 없습니다':'Перевод сейчас недоступен',
+    '옮겨 온 것이 없습니다':'Ничего не получено',
+    '옮기지 못했습니다':'Не удалось перевести',
+    '화면의 글자가 바뀝니다.':'Меняется текст интерфейса.',
+    '사람들이 올린 글은 쓴 사람의 말 그대로 둡니다 — 글을 열면 번역 단추가 나옵니다.':'Записи остаются на языке автора — откройте запись, и появится кнопка перевода.',
   }
 };
 
@@ -12534,10 +12573,132 @@ function openLang(){
         <span class="mrm" style="flex:1">${esc(x.name)}</span>
         <button class="minib ${x.v===cur?'grn':'blu'}" onclick="setLang('${x.v}')">${
           x.v===cur ? '쓰는 중' : '이 말로'}</button></div>`).join('')
-    + `<div class="mrnone" style="text-align:left">화면의 글자만 바뀝니다.
-        글판·정박지·장터에 올라온 내용과 뉴스는 쓴 사람의 말 그대로입니다.</div>`;
+    + `<div class="mrnone" style="text-align:left">${esc(t('화면의 글자가 바뀝니다.'))}
+        ${esc(t('사람들이 올린 글은 쓴 사람의 말 그대로 둡니다 — 글을 열면 번역 단추가 나옵니다.'))}</div>`;
   showPanel(P);
   setHeadTitle(t('언어'));
+}
+
+// ── 남의 말로 쓴 글 옮겨 보기
+//
+// ★ 화면 글자(t·I18N)와는 다른 일이다.
+//   화면 글자는 우리가 미리 옮겨 둔다. 사람들이 쓴 글은 우리가 미리 알 수 없다.
+//
+// ★ 올라오는 대로 다 옮기지 않는다.
+//   아무도 안 읽는 글까지 값을 치르게 되고, 고치면 또 옮겨야 한다.
+//   보는 사람이 눌렀을 때만 옮긴다. 한 번 옮긴 것은 서버가 그 글 밑에 담아 두므로
+//   같은 글을 보는 두 번째 사람부터는 값이 안 든다. (레딧이 이렇게 한다.)
+//
+// ★ 원문을 지우지 않는다.
+//   옮긴 글은 기계가 만든 것이라 틀릴 수 있다. 특히 수심·요금·연락처가 그렇다.
+//   그래서 '원어로 보기' 를 늘 옆에 둔다.
+const TR_ON   = {};   // 'community:ab12'      → 지금 옮긴 것을 보고 있다
+const TR_GOT  = {};   // 'community:ab12:en'   → 옮겨 온 것
+const TR_BUSY = {};   // 부르는 중 (두 번 누르면 두 번 부른다)
+
+function trKey(coll, id){ return String(coll) + ':' + String(id); }
+
+// 이 글이 이미 보는 사람 말로 쓰였나 — 글자를 세어서 가린다.
+// ★ 한국어 글에 '번역해서 보기' 가 붙어 있으면 한국 사람은 고장으로 본다.
+//   말을 정확히 알아낼 필요는 없다. 어느 글자가 제일 많은지만 보면 된다.
+function trSameLang(text, lang){
+  const x = String(text == null ? '' : text).slice(0, 400);
+  const han = (x.match(/[가-힣]/g) || []).length;
+  const cyr = (x.match(/[А-Яа-яЁё]/g) || []).length;
+  const lat = (x.match(/[A-Za-z]/g) || []).length;
+  const top = Math.max(han, cyr, lat);
+  if(top < 2) return true;                 // 숫자·기호뿐이면 옮길 것이 없다
+  if(lang === 'ko') return han === top;
+  if(lang === 'ru') return cyr === top;
+  if(lang === 'en') return lat === top;
+  return true;
+}
+
+// 지금 이 글을 옮겨서 보고 있나 (아니면 null — 원문 그대로다)
+function trView(coll, id){
+  if(!TR_ON[trKey(coll, id)]) return null;
+  return TR_GOT[trKey(coll, id) + ':' + langNow()] || null;
+}
+// 옮긴 것이 있으면 그것을, 없으면 원문을 낸다
+function trPick(tv, field, orig){
+  const v = tv && tv[field];
+  return (v == null || v === '') ? String(orig == null ? '' : orig) : String(v);
+}
+// 옮겨 온 글자를 블록에 도로 끼운다.
+// ★ 사진은 건드리지 않는다 — 사진이 있던 자리에 그대로 남는다.
+//   본문은 저장할 때 블록을 빈 줄로 이어 붙인 것이라(blocksText), 빈 줄로 도로 가른다.
+function trBlocks(blocks, text){
+  const src = String(text == null ? '' : text);
+  // ★ 옮겨 온 것이 없으면 원문을 그대로 둔다.
+  //   빈 글자로 갈아 끼우면 본문이 통째로 사라진 화면이 된다 —
+  //   사람은 그것을 '글이 지워졌다' 로 읽는다.
+  if(!src.trim()) return blocks || [];
+  const parts = src.split(/\n{2,}/);
+  let i = 0;
+  const out = (blocks || []).map(b => {
+    if(!b) return null;
+    if(b.t === 'photo' || b.t === 'video') return b;   // 사진·영상은 옮길 글자가 없다
+    const raw = parts[i++];
+    const v = String(raw == null ? '' : raw);
+    // ★ 목록은 목록으로 돌려놓는다. 뽑을 때 줄마다 · 를 붙였으므로 그것을 떼고 가른다.
+    //   그냥 글 한 덩이로 두면 화면에 '· ' 가 글자로 찍혀 나온다.
+    if(b.t === 'list'){
+      const items = v.split('\n').map(z => z.replace(/^·\s*/, '')).filter(z => z.trim());
+      return { t:'list', ord: b.ord, items: items.length ? items : [v] };
+    }
+    return { t: (b.t === 'head' ? 'head' : 'text'), v };
+  }).filter(Boolean);
+  // 옮기면서 줄이 갈릴 수 있다. 남은 조각을 버리지 않고 뒤에 붙인다.
+  while(i < parts.length){ if(parts[i].trim()) out.push({ t:'text', v:parts[i] }); i++; }
+  return out;
+}
+
+// 글 위에 붙는 한 줄
+function trBar(coll, id, src){
+  const key = trKey(coll, id);
+  if(TR_ON[key]){
+    return `<div class="trbar"><span>${esc(t('자동 번역된 글입니다'))}</span>
+      <span style="flex:1"></span>
+      <button class="minib" onclick="trOff('${esc(coll)}','${esc(id)}')">${esc(t('원어로 보기'))}</button></div>`;
+  }
+  if(TR_BUSY[key]) return `<div class="trbar"><span>${esc(t('옮기는 중…'))}</span></div>`;
+  if(!meUid()) return '';                                   // 함수가 로그인한 사람만 받는다
+  if(navigator && navigator.onLine === false) return '';     // 인터넷이 없으면 못 옮긴다
+  if(trSameLang(src, langNow())) return '';                  // 이미 내 말로 쓰인 글
+  return `<div class="trbar"><span style="flex:1"></span>
+    <button class="minib blu" onclick="trGo('${esc(coll)}','${esc(id)}')">${esc(t('번역해서 보기'))}</button></div>`;
+}
+
+async function trGo(coll, id){
+  const key = trKey(coll, id), lang = langNow();
+  if(TR_GOT[key + ':' + lang]){ TR_ON[key] = true; trRepaint(coll, id); return; }
+  if(TR_BUSY[key]) return;
+  if(!window.__tr){ alert(t('지금은 옮길 수 없습니다')); return; }
+  TR_BUSY[key] = true; trRepaint(coll, id);
+  try{
+    const got = await window.__tr.get(coll, id, lang);
+    if(!got) throw new Error(t('옮겨 온 것이 없습니다'));
+    TR_GOT[key + ':' + lang] = got;
+    TR_ON[key] = true;
+  }catch(e){
+    alert(t('옮기지 못했습니다') + '\n\n' + ((e && e.message) || e));
+  }
+  TR_BUSY[key] = false;
+  trRepaint(coll, id);
+}
+function trOff(coll, id){ TR_ON[trKey(coll, id)] = false; trRepaint(coll, id); }
+
+// 보고 있던 화면을 그대로 다시 그린다.
+// ★ 화면을 부분만 갈아 끼우지 않는다 — 여는 함수 하나만 다시 부르면
+//   제목·본문·단추가 늘 같은 곳에서 만들어져 어긋날 자리가 없다.
+function trRepaint(coll, id){
+  try{
+    if(coll === 'community') openTalk(id);
+    else if(coll === 'series') openSeries(id);
+    else if(coll === 'market') openItem(id);
+    else if(coll === 'spots')  openSpot(id);
+    else if(coll === 'boatPublic') paintBoatPage();
+  }catch(_){}
 }
 
 // ── 약관 · 개인정보처리방침 · 위치정보
@@ -13205,7 +13366,8 @@ async function openItem(id){
   const row = (label, v) => v ? `<div class="mrrow"><span class="mrlbl">${label}</span>
       <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
   const mine = canEditItem(m);
-  P.innerHTML = `<div class="mrhead"><b>${esc(m.title||'')}</b><span style="flex:1"></span>
+  const tv = trView('market', m.id);
+  P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',m.title))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToMarket()">목록</button></div>
     <div class="postmeta">
       ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span>`:''}
@@ -13216,6 +13378,7 @@ async function openItem(id){
         : esc(m.byName||'')}
       · ${esc(String(m.ts||'').slice(0,10))}
       ${mine?`<button class="minib blu" style="margin-left:auto" onclick="writeItem('${esc(m.id)}')">고치기</button>`:''}</div>
+    ${trBar('market', m.id, (m.title||'') + ' ' + (m.note||''))}
     ${m.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 글입니다.</div>':''}
     <div class="mrrow"><span class="mrlbl">가격</span>
       <b class="mrv" style="flex:1;font-size:18px">${esc(priceText(m) || '가격 미정')}</b></div>
@@ -13224,7 +13387,7 @@ async function openItem(id){
     ${row('있는 곳', m.place)}
     ${row('연락', m.contact)}
     ${(m.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
-    ${m.note ? `<div class="ghead"><b>설명</b></div><div class="postbody">${esc(m.note).replace(/\n/g,'<br>')}</div>` : ''}
+    ${m.note ? `<div class="ghead"><b>설명</b></div><div class="postbody">${esc(trPick(tv,'note',m.note)).replace(/\n/g,'<br>')}</div>` : ''}
     ${mine ? `<div class="mrrow" style="gap:6px;padding:10px 12px"><span class="mrlbl">상태</span>`
         + MARKET_STATES.map(s2=>`<button class="tchip${(m.state||'sale')===s2.v?' on':''}"
             onclick="setItemState('${esc(m.id)}','${s2.v}')">${s2.name}</button>`).join('')
@@ -13795,14 +13958,17 @@ async function openSpot(id){
   const P = document.getElementById('mrPanel');
   const fac = SPOT_FAC.filter(f => (s.fac||{})[f.k]).map(f=>`<span class="chip">${f.name}</span>`).join('');
   const sh = spotShelterText(s);
+  // 관에서 받은 자리(seed)는 서버에 글이 없다 — 옮길 것도 없다
+  const tv = s.seed ? null : trView('spots', s.id);
   const row = (label, v) => v ? `<div class="mrrow"><span class="mrlbl">${label}</span>
       <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
-  P.innerHTML = `<div class="mrhead"><b>${esc(s.name||'')}</b><span style="flex:1"></span>
+  P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'name',s.name))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToSpots()">목록</button></div>
     <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
       ${s.region?`<span class="chip">${esc(s.region)}</span>`:''}
       ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
       ${canEditSpot(s)?`<button class="minib blu" style="margin-left:auto" onclick="writeSpot('${esc(s.id)}')">고치기</button>`:''}</div>
+    ${s.seed ? '' : trBar('spots', s.id, (s.name||'') + ' ' + (s.note||''))}
     ${s.hidden?'<div class="hwarn">신고가 쌓여 목록에서 내려간 자리입니다.</div>':''}
     ${s.seed ? `<div class="mrnone" style="text-align:left">
         <b>${esc(SPOT_SEED_FROM)}입니다.</b> 이름과 자리만 들어 있습니다.
@@ -13818,7 +13984,7 @@ async function openSpot(id){
         <span class="fchips" style="flex:1">${fac}</span></div>` : ''}
     ${row('요금', s.fee)}
     ${row('연락처', s.tel)}
-    ${s.note ? `<div class="ghead"><b>한마디</b></div><div class="postbody">${esc(s.note).replace(/\n/g,'<br>')}</div>` : ''}
+    ${s.note ? `<div class="ghead"><b>한마디</b></div><div class="postbody">${esc(trPick(tv,'note',s.note)).replace(/\n/g,'<br>')}</div>` : ''}
     ${(s.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
     ${(s.lat!=null && s.lon!=null) ? mapBox('spotMap','40vh') : ''}
     ${s.seed ? '' : `<div class="mrrow" style="gap:8px;padding:12px">
@@ -16029,16 +16195,18 @@ async function openSeries(id){
   const x = rows.find(r=>String(r.id)===String(id));
   if(!x) return;
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(x.title||'')}</b><span style="flex:1"></span>
+  const tv = trView('series', x.id);
+  P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',x.title))}</b><span style="flex:1"></span>
       <button class="tab" onclick="closeBoat()">목록</button></div>
     <div class="postmeta">${x.no?`<span class="chip">${esc(String(x.no))}편</span>`:''}
       ${[esc(x.author||''), esc(x.source||''),
          x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
+    ${trBar('series', x.id, (x.title||'') + ' ' + (x.body||''))}
     ${seriesMine(x) ? '' : `<div class="wxbox"><b>원문</b>
       ${x.origTitle?`<div>${esc(x.origTitle)}</div>`:''}
       ${x.link?`<div class="wxfoot"><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.link)}</a></div>`:''}
       <div class="wxfoot">저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.</div></div>`}
-    ${renderBlocks(seriesBody(x), `seriesPhotos('${esc(x.id)}')`)}
+    ${renderBlocks(tv ? trBlocks(seriesBody(x), tv.body) : seriesBody(x), `seriesPhotos('${esc(x.id)}')`)}
     ${(canEditSeries(x)||canDelSeries(x))?`<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px">
         ${canEditSeries(x)?`<button class="mrbtn" onclick="writeSeries('${esc(x.id)}')">고치기</button>`:''}
         ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${esc(x.id)}')">지우기</button>`:''}</div>`:''}`;
@@ -17055,6 +17223,8 @@ document.addEventListener('visibilitychange', ()=>{
     };
     const { getStorage, ref: sref, uploadString, getDownloadURL, deleteObject } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+    const { getFunctions, httpsCallable } =
+      await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js');
     const fapp = initializeApp(firebaseConfig);
     const fdb = getFirestore(fapp);
     const fauth = getAuth(fapp);
@@ -17531,6 +17701,26 @@ document.addEventListener('visibilitychange', ()=>{
       },
       async put(body){ await setDoc(doc(fdb, 'series', String(body.id)), body); },
       async del(id){ await deleteDoc(doc(fdb, 'series', String(id))); }
+    };
+    // ── 글 옮기기
+    // ★ 열쇠는 앱에 없다. 앱은 통째로 내려가는 파일이라 무엇을 적어 두든 다 보인다.
+    //   열쇠를 넣으면 남이 그것으로 번역을 돌리고 요금은 우리 앞으로 온다.
+    //   그래서 서버에 있는 함수(tr)에게 '이 글을 이 말로 옮겨 줘' 라고 부탁만 한다.
+    //
+    // ★ 함수를 부르기 전에 먼저 글 밑을 들여다본다.
+    //   누가 이미 옮겨 본 글이면 그 결과가 …/tr/{말} 에 담겨 있다.
+    //   담긴 것을 읽으면 함수를 깨우지 않으니 빠르고, 값도 안 든다.
+    //   담는 것은 함수만 한다 — 앱에는 쓰기 권한이 없다 (규칙에서 막았다).
+    const ffn = getFunctions(fapp, 'asia-northeast3');
+    window.__tr = {
+      async get(coll, id, lang){
+        try{
+          const d = await getDoc(doc(fdb, String(coll), String(id), 'tr', String(lang)));
+          if(d.exists()) return d.data();
+        }catch(_){}
+        const r = await httpsCallable(ffn, 'tr')({ coll:String(coll), id:String(id), lang:String(lang) });
+        return (r && r.data) || null;
+      }
     };
     // ── 운영자
     // 코드에 계정을 박지 않는다. 사람을 바꿀 때 앱을 다시 안 내려도 되게.

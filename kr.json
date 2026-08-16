@@ -1,6 +1,46 @@
 {
- "updated": "2026-08-15T21:11:17.591Z",
+ "updated": "2026-08-16T21:10:31.273Z",
  "gov": [
+  {
+   "title": "[오늘의 날씨] 강원(17일, 월)…최대 60㎜ 소나기, 해상 사고 주의",
+   "press": "뉴스1",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE16R3NHOUFCNWUxa29jYklxRGhxUGdKVFBHLWdlOEttTkFOTk1sXzJPNDJxNENxb05CeHlVZDNnOC1OZmdQZkFLZFVxR2JPOTc2UWNlS9IBWkFVX3lxTFB6QUZaVnpQaFpoLTF5ZURZSU4tT1R4RWdad2ROWlNac01TQ21KZmpjdF9qMFhJTmRUcWxBRkl0VDJIOVVEOUFLa0wyT0JjUHAxWm5ldW4yTGROQQ?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-16T20:00:00.000Z",
+   "cat": "기상"
+  },
+  {
+   "title": "독일 북해 블레이드 낙하가 드러낸 해상풍력의 민낯 — 한국은 안전 체계를 갖추고 있는가",
+   "press": "koreayouthdaily.com",
+   "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBWalpkOE4wTWxvMF81UE95MmJUX2JjRTQ0V2hSc0dJdnczWTlLQjM1N2wzSXgweEEyWkY3Q3BOZjVWdUxXTFY2ck03UGRvYnNYUUM2bFNn?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-16T17:30:45.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "당진 도비도 해상서 해루질하던 남녀 2명 물에 빠져 심정지 상태로 구조:경찰연합신문",
+   "press": "경찰연합신문",
+   "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTE5vQTIzTV9NYWdvTW9LTllZMHZXU1A1MU1jbXRUbFMxa0c0NGozU1lkWFViVkFjYlJqS1BPbmYxZ2lISXdDd0xWeWNiQ04yMHYz0gFsQVVfeXFMTmRPLUk3Yll0SDNRQ3ZHWWo5Um53MVRuN0Y4clpFYWhnSlFhNjFneXVtc0xNdkk1VmF1QzdhYl9ia1ZXQXNteVREY1FBTWVzb2RGNFpUYVdsamtzbEo4ZXlrbDU5cXNJUGlZYnBF?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-16T05:15:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "올들어 인천대교 해상 추락자 13명…지난해보다 2명 많아",
+   "press": "연합뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9KZ2pvZXlncS03TlpHVXpfR0NuQmVCd0ZWVXBUZzBzMWhranRhOC1pUHBkUzZGZFk4dk1hS1QyWV9ibkpNRzN1dFV0cWs2bGkyZmRCc2FTYWprYXgxalQzQtIBYEFVX3lxTE9KZ2pvZXlncS03TlpHVXpfR0NuQmVCd0ZWVXBUZzBzMWhranRhOC1pUHBkUzZGZFk4dk1hS1QyWV9ibkpNRzN1dFV0cWs2bGkyZmRCc2FTYWprYXgxalQzQg?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-16T02:09:36.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "충남 당진 해상서 2명 심정지 후 사망…해루질 사고 추정",
+   "press": "KBS 뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1vXzJtUTAzNWhNRVltdndfdEVJbE5GdDd0TFJ2YTdEWnB4OHRmb2hwY2NMUUhjbVhFV3VzSjdlM1BmM1A0NDVwc24yRnZKSHQxaG1laFl1QmlBb1U?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-16T00:43:00.000Z",
+   "cat": "안전"
+  },
   {
    "title": "해경, 연휴 기간 해양 사고 대응 인력 집중 배치",
    "press": "G1방송",
@@ -11,7 +51,7 @@
   },
   {
    "title": "포항시, 구룡포 보릿돌교 일원 ‘위험구역’ 지정…육·해상 출입 통제",
-   "press": "breaknews.com",
+   "press": "브레이크뉴스",
    "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTE1ySGFXYjZBLVdQcERtaFkwM2xlbWZSOU13c2tlR2RBTTJQSmdJVm41enpyTlBSMjVqVU1lX1A0cHk0N0p4TFY3Yw?oc=5",
    "source": "해양안전",
    "date": "2026-08-15T08:35:00.000Z",
@@ -34,12 +74,36 @@
    "cat": "산업"
   },
   {
+   "title": "서해해경청, 공정한 바다 질서 회복 위해 불법 해양 시설물 특별단속 추진",
+   "press": "뉴스데일리",
+   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9wYkoxWDVNOWVRMEFoQmU3ekxZZ2ZSdHVhZzJwYjlxazh4VjQxZV9PMHhsa2NkU0xqV3gyaFpQLVFYeXV5M2hFU202WkdGd2phNmI3RGJVZmFuS2lnQlJJY25TdExFUFlRTmNz?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-15T04:55:19.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "속초해경, 피서철 막바지 연휴 맞아 해양사고 예방 총력에 나서",
+   "press": "강원신문",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1FcVhoaGpncWFDWWctRkZuWTNJclh4M0NMenM5STM1bUw5UktfM3A0VmVkSW5jb1dTaVlFUl93ellwRXpROHRKVVUzeE1LcHZweXE0d3NMMjF4NFFCOHVrRXZrcG1XbXB6?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-15T02:12:15.000Z",
+   "cat": "안전"
+  },
+  {
    "title": "사천해경, 강풍·너울성 파도 대비 연안사고 위험예보제 '관심' 발령",
    "press": "네이트",
    "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE5NZ1h0TzVkRW82VEF2aEsxSzJiWkRuVXFJX3lETzd5Q0tZbFhsNkZjRXNQbFpTYWMwN0xoZEdxN3FPOWpob2NQRXAwT3h5RHRzRVlV?oc=5",
    "source": "해양안전",
    "date": "2026-08-15T01:27:00.000Z",
    "cat": "기상"
+  },
+  {
+   "title": "목포 어선서 그라인더 작업 중 몸에 불 붙어…40대 중상",
+   "press": "뉴시스",
+   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9qR0wtc0VOYlV0VTdJTUIwTjhVTGVPZ2RCM0JkQ2dPSTlGUmp1ckJkM0N6OGttU094Z0Q2ZkllcHduLURGOVZNZ3pydFRHUEZwdVNDdTVmQnRTelo4czNkWEswRHF1ZVpCSXM0MWptOWdDWFNMb2JwVNIBeEFVX3lxTE9qR0wtc0VOYlV0VTdJTUIwTjhVTGVPZ2RCM0JkQ2dPSTlGUmp1ckJkM0N6OGttU094Z0Q2ZkllcHduLURGOVZNZ3pydFRHUEZwdVNDdTVmQnRTelo4czNkWEswRHF1ZVpCSXM0MWptOWdDWFNMb2JwVA?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-08-15T00:22:00.000Z",
+   "cat": "안전"
   },
   {
    "title": "휴가철 경남 남해안 수상 안전 '경고등'…카약 전복·사망사고도",
@@ -66,6 +130,14 @@
    "cat": "안전"
   },
   {
+   "title": "[단독] 오스테드 인천해상풍력 '항로 위협' 면적 또 축소 불가피",
+   "press": "인천투데이",
+   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE53djVjOGZVY2d0NkxFUjhzVVUwVGVmQWxrQmJZZUlsTW1Ob0ZocmVoTW1hNnRsa3JXV2kxY2dBNl9XWUNyRkN5el9TbktSd2hfVXY0a0lUWlZzbV9xUHdnN0RmQmVPT0JGaG5RQktYVG0?oc=5",
+   "source": "해양정책",
+   "date": "2026-08-14T08:33:52.000Z",
+   "cat": "항만"
+  },
+  {
    "title": "평택해양경찰서,배는 뒤집혔어도 생명은 지켰다 여름철 해양안전 ‘구명조끼’ 착용 강조",
    "press": "내외뉴스통신",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1jUVRUTm5YMU52bVd6WEh6WVhNdnU3Y25fRUEzR3FZSWNZSnBCSzFmRW9oNnJFNDkyM25BdTMxWC1hMENJLXA1ajV4X3l1NWdQb1FwS0pPOERzUEdkdmF2UjVxU202VkdFVXI0MdIBcEFVX3lxTFBuRFE2cV9IbDk0Q1BUakxsdGVRSnkwRWdoNGQyZWVCNGU3ZHFuSXhnTDhqamh4QmxERUF4LTIwUjJ4Z1hWR2owMUl0R1c1bUd1UzJoVEZXbW52dE13T2NvYkhCQnoxSUJMMEFZQi1TbFY?oc=5",
@@ -79,6 +151,14 @@
    "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE82WWZwU1hpQ2JkZTY3bU5OMzU3WUpUc3JSRXo1T0NiSWtFTzF0TklvOEk3VElNMWtlYXNsSm9rQXA5MVQ4R3ZPekpPVmFLMjNubW1lWTU2NTRwRDB5YmF1bW85ZWVKN1R5ckxz?oc=5",
    "source": "해양안전",
    "date": "2026-08-14T07:35:14.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "인천해경, 서해 조업안전망 강화 위해 민·관·군·경 협의회 열어",
+   "press": "인천뉴스",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE0yZDE4RU1JNEkxbWtOMWp5WmY4VW1vMGtNN0VSMFE2dXpqWkt4eEw1RnpmU0t0b2EySEtMNVk3UkFJNmM0LTdxX3hIQkJDOVZWY1ZzS2dRLW5JSkEwQkt1cTdYbklzMVZ2Y3g1TEdR?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-08-14T07:11:22.000Z",
    "cat": "안전"
   },
   {
@@ -260,7 +340,12 @@
  ],
  "wx": {
   "src": "NEWS",
-  "active": [],
-  "summary": "발효 중인 해상 특보 없음"
+  "active": [
+   "제주 남쪽 먼바다에 풍랑주의보…남해 먼바다에 풍랑주의보 유지",
+   "제주도산지에 호우주의보 해제…남해 먼바다에 풍랑주의보 유지",
+   "남해 먼바다에 풍랑주의보 해제",
+   "제주도산지에 호우주의보 해제…남해 먼바다에 풍랑주의보 유지"
+  ],
+  "summary": "※ 언론 보도 기준 — 기상청 실시간 확인 필수"
  }
 }

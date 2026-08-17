@@ -1677,7 +1677,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1856;
+const LANG_TOTAL = 1805;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2092,20 +2092,15 @@ const I18N = {
     '엔진 시간':'Engine hours',
     '중간 기록에서 계산':'from the log entries',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Engine hours are part of the time under way.',
-    '엔진을 끄고 있던 시간은':'Time with the engine off is',
-    '세일로 간 시간은':'Time under sail is',
-    '입니다.':'.',
     '항적':'Track',
     '점 {n}개 · 끌어서 이동 · 두 손가락으로 확대':'{n} points · drag to pan · pinch to zoom',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'This map is for reviewing records. Use official charts for navigation.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Map © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
     '저장된 위치가 없습니다':'No positions saved',
     '위치를 남기면 이곳에 항적이 표시됩니다':'Save positions and the track appears here',
-    '출발·도착·중간기록에서':'In departure, arrival or a log entry',
     '지금 여기':'Here, now',
     '또는':'or',
     '지도에서':'On the map',
-    '를 누르면 됩니다':'',
     '지금 여기로 출발 위치 잡기':'Set departure to my position',
     '가동시간':'Running hours',
     '시간':'h',
@@ -2154,7 +2149,6 @@ const I18N = {
     '문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다':'Photos still stored inside documents move to storage a few at a time on each launch',
     '계정 지우기':'Delete my account',
     'Google 계정으로 계속하기':'Continue with Google',
-    '로그인하시면':'By signing in you accept the',
     '이용약관':'Terms of Service',
     '개인정보처리방침':'Privacy Policy',
     '또는 이메일로':'or with email',
@@ -2183,9 +2177,7 @@ const I18N = {
     '도움된 순':'Most helpful',
     '+ 내 배 정비 기록 넣기':'+ Attach a service record',
     '고치기':'Edit',
-    '타고 싶으시면 아래':'If you want to come along, use the',
     '댓글':'Comments',
-    '로 말씀해 주세요. 태우실 분이 보고 정합니다.':'below. The skipper reads it and decides.',
     '댓글 쓰기':'Write a comment',
     '불러오지 못했습니다.':'Could not load.',
     '사람':'Person',
@@ -2215,12 +2207,7 @@ const I18N = {
     '뱃일은 거래의 당사자가 아닙니다.':'Baetnil is not a party to the sale.',
     '뱃일은 장터 자리를 빌려주는 중개자일 뿐이며, 물건과 거래에 관한 책임은 파는 사람(판매자)과 사는 사람(구매자)에게 있습니다. 물건 정보와 거래 조건은 반드시 직접 확인해 주세요.':'Baetnil only provides the marketplace space. Responsibility for the goods and the deal rests with the seller and the buyer. Always check the item and the terms yourself.',
     '거래 전에 꼭 확인하세요':'Check before you deal',
-    '· 물건을 보기 전에':'· Before you see the item,',
-    '선입금하지 마세요':'do not pay in advance',
-    '. 계약금도 마찬가지입니다.':'. A deposit counts too.',
-    '· 배·엔진은 직접 가서':'· For a boat or engine, go and see it',
     '시운전':'under way',
-    '까지 보고 판단하세요.':'before you decide.',
     '· 배는 등록·저당·압류가 남아 있을 수 있습니다. 서류를 확인하세요.':'· A boat may still carry registration, mortgage or seizure. Check the papers.',
     '· 시세보다 크게 싸면 한 번 더 의심하세요.':'· Far below market price is a reason to be suspicious.',
     '장터는 로그인해야 볼 수 있습니다':'Sign in to see the marketplace',
@@ -2242,9 +2229,6 @@ const I18N = {
     '+ 연재 글 올리기':'+ Publish an article',
     '아직 올라온 연재가 없습니다.':'No articles yet.',
     '운영자가 보고 켜 드리면 여기에 글 올리는 단추가 생깁니다.':'Once an admin approves you, a publish button appears here.',
-    '연재는':'Articles may be posted',
-    '허락받은 분만':'only by approved writers',
-    '올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'. This section also reprints other people’s work.',
     '직접 쓰신 항해기나, 허락을 받아 옮기실 글이 있으면 신청해 주세요.':'Apply if you have your own voyage writing, or a text you have permission to reprint.',
     '원문':'Original',
     '저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.':'Reprinted with the copyright holder’s permission. No unauthorised reproduction.',
@@ -2256,15 +2240,8 @@ const I18N = {
     '\n\n다시 시도할까요?':'\n\nTry again?',
     '\n\n메일로 보내시겠습니까?':'\n\nSend it by email instead?',
     '\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?':'\n\nValues you edited yourself will be overwritten too. Continue?',
-    ' (엔진 ':' (engine ',
     ' (현재 위치)':' (current location)',
     ' (휴지통 {n}개)':' ({n} in the bin)',
-    ' · 계속 켜둔 것으로 봄':' · counted as left running',
-    ' 님을 이 배에서 내보낼까요?\n\n':' — remove them from this boat?\n\n',
-    ' 으로 보내 주세요.':' and send it there, please.',
-    ' 을 구성원으로 받았습니다':' joined the crew',
-    ' 을 이 기기에는 받았습니다.\n\n':' was saved on this device.\n\n',
-    ' 해역':' waters',
     '"{name}" — 오늘({d}) 완료 처리할까?':'Mark "{name}" done today ({d})?',
     '"{name}" 기준값을 삭제할까?':'Delete the reference value "{name}"?',
     '"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?':'Move the list "{name}" and its {n} items to the bin?',
@@ -2277,11 +2254,8 @@ const I18N = {
     '(돌풍 {n})':'(gusts {n})',
     '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?':'(Item locations, coordinates, dues and private notes never go out, even when this is on.)\n\nContinue?',
     '(사라진 배)':'(boat is gone)',
-    '(오른쪽 위':'(top right',
     '(자동)':'(auto)',
     '(저조위 기준)':'(from lowest tide)',
-    '(점 세 개) 를 누릅니다':'(the three dots)',
-    '(주소창 옆':'(next to the address bar',
     '+ 계정 번호로 세우기':'+ Add by account ID',
     '+ 글':'+ Text',
     '+ 사진':'+ Photo',
@@ -2322,14 +2296,7 @@ const I18N = {
     '<b>완료</b>로 바꾸면 완료일이 기록되고 목록 아래로 접힙니다.<br><br>':'Setting it to <b>Done</b> records the date and folds it to the bottom of the list.<br><br>',
     '<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>':'<b>Scheduled maintenance</b> is work on a fixed cycle. Register jobs like engine oil every 6 months or zinc anodes every 12 months and the app tells you how long is left.<br><br>',
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>':'<b>In progress</b> means parts are ordered or work has started.<br>',
-    'Safari로 열기':'Open in Safari',
-    '[보낸 사람]':'[Sender]',
     '[사진1]':'[Photo 1]',
-    '[설치]':'[Install]',
-    '[앱 설치]':'[Install app]',
-    '[추가]':'[Add]',
-    '[홈 화면에 추가]':'[Add to Home Screen]',
-    'h · 세일 ':'h · sail ',
     '{dirs} 바람에 트여 있습니다':'Open to wind from {dirs}',
     '{d} 출항':'Departs {d}',
     '{d}m (저조위 기준 · 잰 값 {r}m − 그때 조위 {t}m)':'{d} m (from lowest tide · measured {r} m − tide then {t} m)',
@@ -2390,7 +2357,6 @@ const I18N = {
     '계정 번호를 넣어 주세요':'Enter the account ID',
     '계정을 아주 지우면 클라우드에 있는 내 배 기록과 커뮤니티에 올린 글이 함께 사라집니다. 되돌릴 수 없습니다.':'Deleting your account for good also removes your boat records in the cloud and your community posts. This cannot be undone.',
     '계획':'Planned',
-    '계획 단계':'at the planning stage',
     '고객센터':'Support',
     '고등어':'Mackerel',
     '고장 → 진행 중 → 완료':'broken → in progress → done',
@@ -2414,10 +2380,8 @@ const I18N = {
     '공개된 자료가 없습니다':'Nothing has been published',
     '공개를 내렸습니다.\n이미 가져간 사람의 도면은 그대로 남습니다.':'Unpublished.\nCopies people already took stay with them.',
     '공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.':'Published. Others can now use it through "Pick from public drawings".',
-    '공유':'Share',
     '공지':'Notice',
     '공지는 게시판 관리 권한이 있어야 쓸 수 있습니다.\n일반 글로 올립니다.':'Notices need board permission.\nPosting as an ordinary post.',
-    '과':' and ',
     '관측':'Observation',
     '관측소 자료가 닿지 않는 바다이거나, 잰 시각이 자료 기간 밖입니다. 없는 숫자를 지어내면 배가 얹히므로 그냥 두겠습니다.':'Either no station covers this water, or the time you measured is outside the data range. Making up a number runs boats aground, so we leave it blank.',
     '광고·도배':'Spam',
@@ -2430,7 +2394,6 @@ const I18N = {
     '구성원만 봅니다':'Crew only',
     '구성원을 관리할 권한이 없습니다':'You do not have permission to manage the crew',
     '구역':'Zone',
-    '국가 마리나':'National marina',
     '권한을 바꾸려면 운영자 임명 권한이 필요합니다.':'Changing permissions requires the right to appoint administrators.',
     '권한이 없습니다':'You do not have permission',
     '그 기록을 찾지 못했습니다':'That record could not be found',
@@ -2445,7 +2408,6 @@ const I18N = {
     '그 지점을 찾지 못했습니다':'That place could not be found',
     '그대로':'Unchanged',
     '그때까지 다른 기기에서는 안 보일 수 있습니다.':'Until then it may not appear on your other devices.',
-    '근사값':'approximate',
     '글':'Text',
     '글 보기':'View post',
     '글 신고':'Report post',
@@ -2474,7 +2436,6 @@ const I18N = {
     '기온':'Air temp',
     '기준':'Datum',
     '기준값 (약최고고조위 HAT)':'Datum (highest astronomical tide, HAT)',
-    '기준이라 그대로 적으면 저조 때 얹힙니다.':'is the datum — write it as measured and you will ground at low water.',
     '기한 지남':'Overdue',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>':'Overdue shows red; within 30 days shows yellow.<br><br>',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.':'Overdue shows red; within 30 days shows yellow.',
@@ -2509,7 +2470,6 @@ const I18N = {
     '남서':'SW',
     '남을 헐뜯거나 괴롭힘':'Insulting or harassing others',
     '남의 글을 허락받아 옮김':'Reposted with the author\'s permission',
-    '남의 댓글':'Someone else\'s comment',
     '남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.':'You cannot edit someone else\'s series.\n\nOnly the person who posted it can.',
     '남해식':'South-coast naming',
     '내 계정 번호\n\n':'My account ID\n\n',
@@ -2537,21 +2497,16 @@ const I18N = {
     '다녀와서 알게 된 것을 적어 주세요':'Write what you learned after visiting',
     '다른 기기에서는 아직 안 보일 수 있습니다.':'It may not show on your other devices yet.',
     '다른 목록으로 옮기기':'Move to another list',
-    '다른 브라우저로 열기':'Open in another browser',
     '다른 사람을 운영자로 세우기':'Appoint another administrator',
     '다리 통과 높이를 계산할 때 쓰는 기준값입니다':'The datum used to work out bridge clearance',
     '다리 통과높이':'Bridge clearance',
     '다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n':'It just could not be uploaded to the cloud. It will upload again once you are online.\n',
     '다시':'Again',
-    '다시 로그인한 뒤':'after signing in again',
     '다시 보기':'View again',
     '다시 새 글로':'Mark unread',
     '다시 시도':'Try again',
     '다시 올리기':'Upload again',
     '다운샷':'Drop shot',
-    '다음 ':'Next ',
-    '단 리프':'-reef',
-    '단추':'button',
     '달의 삭 시각으로 음력일을 구해 정합니다.':'The lunar day is worked out from the time of the new moon.',
     '댓글을 쓸 권한이 없습니다':'You do not have permission to comment',
   
@@ -2602,7 +2557,6 @@ const I18N = {
     '등급이 너무 적습니다. 하나는 남겨 두세요.':'Too few ranks. Keep at least one.',
     '등록된 물품 없음':'No items yet',
     '등록한 뒤에는 <b>도면에서 보기</b>로 그 자리를 확대해서 볼 수 있습니다.<br><br>':'Once pinned, <b>Show on drawing</b> zooms right to that spot.<br><br>',
-    '로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.':' — check before you go.',
     '로그인 계정':'Signed in as',
     '로그인하면 쓰던 배와 기록을 그대로 불러오고, 휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.':'Signing in brings back your boat and records, and shows the same thing on your phone and computer.',
     '로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.':'You can use the whole app on this device without signing in.',
@@ -2618,11 +2572,6 @@ const I18N = {
     '로그인해야 사진을 올릴 수 있습니다':'You must sign in to upload photos',
     '로그인해야 신고할 수 있습니다':'You must sign in to report',
     '로그인해야 올릴 수 있습니다':'You must sign in to post this',
-    '를 누릅니다':' ',
-    '를 누릅니다 (네모에서 화살표가 위로 나온 그림)':' (the square with an arrow pointing up)',
-    '를 등록해 두는 곳입니다.':' is registered here.',
-    '를 자동으로 잡아 기준을 넘었는지 알려 드립니다.':' automatically and tells you when a limit is passed.',
-    '를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.':'. A columnist is not an administrator — the admin screen stays closed to them.',
     '리프':'Reef',
     '릴·로드·전동릴':'Reels, rods, electric reels',
     '링크 (없으면 비워 두세요)':'Link (leave blank if none)',
@@ -2653,8 +2602,6 @@ const I18N = {
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Register a boat first. You can change anything you enter later.',
     '먼저 백업을 받아 두시길 권합니다.':'We recommend taking a backup first.',
     '먼저 출항 날짜를 정해 주세요':'Set the departure date first',
-    '메인세일 ':'Mainsail ',
-    '메일 앱을 열지 못했습니다.\n\n':'Could not open your mail app.\n\n',
     '메탈지그':'Metal jig',
     '명부를 볼 권한이 없습니다':'You do not have permission to view the crew list',
     '몇 자리':'How many berths',
@@ -2671,7 +2618,6 @@ const I18N = {
     '목록 이름을 넣어 주세요':'Enter a list name',
     '목록 지우기':'Delete the list',
     '목록에 없는 것을 적어 주세요':'Write something not on the list',
-    '목록을':' the list',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'There is only one list. Add another list first.',
     '목포':'Mokpo',
     '몰라서 묻는 것':'Asking because you do not know',
@@ -2698,7 +2644,6 @@ const I18N = {
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'No tide data yet. You can enter high and low water yourself.',
     '물때 자료를 받는 중…':'Fetching tide data…',
     '물어보기':'Ask a question',
-    '물품 위치, 좌표, 회비, 개인 메모는':'Item locations, coordinates, dues and private notes are',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Items, maintenance, repairs, logbook, documents, drawings, board',
     '물품을 누르면 도면에서 이 칸을 크게 보여 드립니다':'Tap an item to zoom to its locker on the drawing',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'This is a locker for items. Draw walls and partitions with Line, Rectangle or Triangle.',
@@ -2721,16 +2666,13 @@ const I18N = {
     '발효 중인 해상 특보 없음':'No marine warnings in force',
     '방어':'Yellowtail',
     '방파제 안쪽 접안':'Alongside inside the breakwater',
-    '방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Tap the directions. Wind from those bearings makes the boat roll, or worse.',
     '배 감추기·지우기':'Hide or delete boats',
     '배 공개 설정':'Boat publishing',
     '배 공개 설정을 바꿉니다.':'Change the boat\'s publishing settings.',
     '배 기록':'Boat records',
     '배 길이 넣기':'Enter the boat\'s length',
-    '배 길이를 넣어 두시면 그에 맞는':'Enter the boat\'s length and the matching',
     '배 길이와 선종으로 다시 계산합니다.\n\n':'Recalculate from the boat\'s length and type.\n\n',
     '배 높이':'Air draft',
-    '배 높이(공기흘수)를 먼저 입력해 주세요. 아래':'Enter the boat\'s air draft first. Below,',
     '배 목록을 받지 못함 · 눌러서 확인':'Could not fetch the boat list · tap to see why',
     '배 소개':'About the boat',
     '배 소개 차례를 바꿉니다.':'Reorder the boat\'s introduction.',
@@ -2822,7 +2764,6 @@ const I18N = {
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Could not load the photo — check your internet connection',
     '사진을 읽지 못했습니다':'Could not read the photo',
     '사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.':'The image is too large to save. Use a simpler drawing image.',
-    '사진이 많아 ':'There are many photos, so ',
     '사파리에서만 됩니다. 크롬이나 카카오톡·인스타그램 안에서 열었다면 먼저 사파리로 열어 주세요.':'This only works in Safari. If you opened it in Chrome or inside KakaoTalk or Instagram, open it in Safari first.',
     '살림통 총 용량입니다.':'The total capacity of the live well.',
     '삼치':'Spanish mackerel',
@@ -2888,7 +2829,6 @@ const I18N = {
     '수면부터 배의 가장 높은 곳까지의 높이입니다. 안테나를 포함한 실측값을 넣어 주세요. 교량 통과 판단에 쓰입니다.':'From the waterline to the highest point of the boat. Enter a measured value including the antenna. Used to judge bridge clearance.',
     '수심 · 바닥 · 접안 상태처럼 다음 사람에게 도움 될 말을 남겨 주세요':'Leave what helps the next person — depth, bottom, what the berth is like',
     '수심 환산':'Depth conversion',
-    '수심계 값은':'The sounder reading',
     '수심계로 잰 값 넣기 — 저조위 기준으로 바꿔 드립니다':'Enter the sounder reading — we convert it to lowest-tide datum',
     '수심계에 나온 값':'The value on the sounder',
     '수심과 바닥':'Depth and bottom',
@@ -2905,7 +2845,6 @@ const I18N = {
     '시각':'Time',
     '시각을 먼저 입력해 주세요':'Enter the time first',
     '시간 초과':'Timed out',
-    '시간으로 넣을까요?\n':'Enter it in hours?\n',
     '시작하기 전에':'Before you start',
     '식수·생활용수 탱크의 총 용량입니다. 며칠 나가는 항해를 준비할 때 참고가 됩니다.':'Total capacity of the drinking and domestic water tanks. Useful when planning a passage of several days.',
     '신고·차단':'Reports and blocks',
@@ -2925,13 +2864,10 @@ const I18N = {
     '신청을 불러오지 못했습니다: ':'Could not load the requests: ',
     '쓰기':'Write',
     '쓰는 법을 모르겠습니다':'I do not know how to use it',
-    '쓰는 중':'Writing',
     '쓴 사람':'Author',
     '쓸 수 있습니다':'you can use',
     '아나고':'Conger eel',
-    '아래로 내려':'Move down',
     '아래에 적어 주세요':'Write it below',
-    '아래쪽 가운데':'bottom centre',
     '아무도 안 맡은 일':'Unassigned',
     '아직 공개한 자료가 없습니다.':'You have not published anything yet.',
     '아직 글이 없습니다':'No posts yet',
@@ -2974,11 +2910,8 @@ const I18N = {
     '얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>':'Set how often it repeats. The unit can be <b>days, weeks or months</b>.<br><br>',
     '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.':'To remove it, clear the home port under My Boat > Basics.',
     '없으면 비워 두세요':'Leave blank if none',
-    '에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.':'. You must be 14 or older to sign up.',
-    '에 지울 수 있습니다.':' you can delete it.',
     '에기':'Egi jig',
     '에깅':'Eging',
-    '에서 안테나 끝까지의 실측값을 넣습니다.':' to the top of the antenna — enter a measured value.',
     '엔진 가동':'Engine hours',
     '엔진 끔':'Engine off',
     '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 주기를 대략적인 기간으로 잡고 메모에 시간을 적어 두시면 됩니다.':'Engine service is often based on running hours (250 hours, say). In that case set a rough interval and note the hours in the memo.',
@@ -2986,9 +2919,7 @@ const I18N = {
     '엔진OFF':'Engine OFF',
     '엔진ON':'Engine ON',
     '엔진·추진':'Engine and drive',
-    '엔진오일, 아연 아노드처럼':'like engine oil or zinc anodes',
     '여기까지입니다 ·':'That is all ·',
-    '여기서':'here',
     '여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.':'Sign in to see the same thing on several devices, or to run the boat together with other people.',
     '여수':'Yeosu',
     '여유 부족 — 위험':'Too little clearance — risky',
@@ -3032,10 +2963,8 @@ const I18N = {
     '오늘 물때 입력':'Enter today\'s tide',
     '오류 신고':'Report a bug',
     '오류: {msg}':'Error: {msg}',
-    '오른쪽 위':'top right',
     '오징어':'Squid',
     '오징어살':'Squid strip',
-    '올려 두신 글에 달린':'The comments on your posts',
     '올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.':'We will not ask again once it is uploaded — use [Sync now] in the menu any time.',
     '올리지 못했습니다.\n\n':'Could not upload it.\n\n',
     '올린 분과 운영자만 고칠 수 있습니다':'Only the poster and an administrator can edit this',
@@ -3057,7 +2986,6 @@ const I18N = {
     '요트·보트·낚시배':'Yachts, boats, fishing boats',
     '욕설·비방':'Abuse',
     '우럭':'Rockfish',
-    '우리 바다는 물때 차가 큽니다. 수심계 값은':'Our tides run large. A sounder reading is',
     '운영자 세우기':'Appoint an administrator',
     '운영자 임명':'Appoint administrators',
     '운영자가 보고 켜 드립니다. 켜지면 뉴스 ▸ 연재에 글 올리는 단추가 생깁니다.':'An administrator reviews it and switches it on. Once on, a post button appears under News ▸ Series.',
@@ -3083,8 +3011,6 @@ const I18N = {
     '유튜브 링크':'YouTube link',
     '유튜브 열기':'Open on YouTube',
     '유튜브 주소':'YouTube address',
-    '은 글과 함께 사라집니다.':' go with the post.',
-    '의':' of ',
     '이 거리보다 시정이 나쁘면 나가지 않는다고 정해 둔 값입니다.':'The visibility below which you have decided not to go out.',
     '이 글은 고칠 수 없습니다':'This post cannot be edited',
     '이 글은 지울 수 없습니다':'This post cannot be deleted',
@@ -3109,7 +3035,6 @@ const I18N = {
     '이 등급은 지울 수 없습니다':'This rank cannot be deleted',
     '이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.':'The {n} people in this rank drop to the lowest rank.',
     '이 등급인 사람이 각 화면에서 할 수 있는 일입니다.':'What people in this rank can do on each screen.',
-    '이 말로':'in this language',
     '이 물품은 아직 수납칸에 넣지 않았습니다':'This item is not in a locker yet',
     '이 배':'this boat',
     '이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.':'Hide this boat from the list?\n\nIt is hidden on this device only.\nYou can bring it back at any time.',
@@ -3126,9 +3051,7 @@ const I18N = {
     '이 사람의 등급은 바꿀 수 없습니다':'This person\'s rank cannot be changed',
     '이 사람의 등급을 바꿉니다.':'Change this person\'s rank.',
     '이 신청을 거절할까요?':'Turn down this request?',
-    '이 앱의 날씨·물때·수심은':'The weather, tides and depths in this app are',
     '이 연재 글을 지울까요?':'Delete this series post?',
-    '이 자리·이 시각은 조위 자료가 없어':'There is no tide data for this place and time, so it',
     '이 파고를 넘으면 나가지 않는다고 정해 둔 값입니다.':'The wave height above which you have decided not to go out.',
     '이 풍속부터 2단으로 줄입니다.':'The wind speed at which you go to the second reef.',
     '이 풍속부터 3단으로 줄입니다. 없으면 비워 두세요.':'The wind speed at which you go to the third reef. Leave blank if you have none.',
@@ -3159,13 +3082,8 @@ const I18N = {
     '인터넷에 연결된 상태에서만 신고할 수 있습니다':'Reporting needs an internet connection',
     '인터넷에 연결된 상태에서만 신청할 수 있습니다':'Applying needs an internet connection',
     '인터넷에 이어지면 글판에 올라갑니다.\n\n모집 내용은 저장했습니다.':'It will go up on the board once you are online.\n\nYour call for crew has been saved.',
-    '일 남음':' days left',
     '일 년에 한 번':'Once a year',
-    '일 지남':' days overdue',
     '일반':'General',
-    '입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.':' (±10–20 cm). Before you actually pass under a bridge, check with VTS and judge by a measured height including the antenna.',
-    '입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.':'. Measure at high water and write it down as it is, and you will ground at low water.',
-    '입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'. Whether to sail and where to lie is the user\'s judgement and responsibility. (Terms, article 6)',
   
 
     // ── 3.90 · 외국어 ⑦
@@ -3185,10 +3103,7 @@ const I18N = {
     '잡담':'Chat',
     '잡은 것':'Catch',
     '장비':'Gear',
-    '장은 넣지 못합니다.\n\n글을 올린 뒤 따로 올려 주세요.':' photos cannot be added.\n\nPost the text first, then add them separately.',
     '잰 값과 잰 시각을 넣으면 그 시각':'Enter the reading and the time, and the tide at that moment',
-    '잰 그때':'at the time of measuring',
-    '잰 그때 물 높이 기준':'Relative to the water level when measured',
     '잰 시각':'Time measured',
     '저자':'Author',
     '저자를 넣어 주세요':'Please enter the author',
@@ -3234,7 +3149,6 @@ const I18N = {
     '제목 없음':'No title',
     '제목과 올린 사람 이름에서 찾습니다. 글 내용은 찾지 않습니다.':'Searches titles and author names, not the body of posts.',
     '제목을 넣어 주세요':'Please enter a title',
-    '제원 ':'Specs ',
     '제조 {v}':'Built by {v}',
     '제조사 · 모델 · 연식':'Builder · model · year',
     '제조사·모델·연식은 나중에 도움을 구할 때 상대가 배를 파악하는 데 쓰입니다. 지금 몰라도 되고, 나중에 채워도 됩니다.':'The builder, model and year help people understand your boat when you ask for advice later. You do not need to know them now — fill them in later.',
@@ -3244,17 +3158,14 @@ const I18N = {
     '조금':'Neap tide',
     '조위 {n}cm':'Tide {n} cm',
     '조위 자료가 없어 환산할 수 없습니다.\n\n수심을 손으로 적어 주세요.':'There is no tide data, so it cannot be converted.\n\nPlease write the depth by hand.',
-    '조위는 국립해양조사원 만조·간조 자료를 보간한':'The tide is interpolated from the national hydrographic office\'s high and low water data —',
     '조위를 빼서':'subtracts the tide and',
     '좁은 수로를 지날 때 감당할 수 있는 조류 세기입니다.':'The tidal stream you can handle in a narrow channel.',
-    '주기가 정해진 정비':'Maintenance on a fixed cycle',
     '주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.':'If it comes round on a cycle it is scheduled maintenance; if it came up suddenly it is a repair.',
     '주꾸미':'Webfoot octopus',
     '주마다':'Weekly',
     '주마다 초기화':'Reset weekly',
     '주소는 https:// 로 시작해야 합니다':'The address must start with https://',
     '주소를 넣으면 눌러서 봅니다':'Add an address and it opens with a tap',
-    '주소창 옆':'next to the address bar',
     '주인':'Owner',
     '주차':'Parking',
     '줄 수 있는 등급이 없습니다':'There is no rank you can grant',
@@ -3295,7 +3206,6 @@ const I18N = {
     '진행 중인 항목이 없습니다':'Nothing in progress',
     '질문':'Question',
     '찜':'Saved',
-    '참고 자료':'reference information',
     '참돔':'Red sea bream',
     '참여 신청을 받습니다.':'Join requests are open.',
     '참여 신청을 받을지 바꿉니다.':'Change whether join requests are open.',
@@ -3328,7 +3238,6 @@ const I18N = {
     '출항 전 점검처럼 나갈 때마다 하는 것':'Things you do every time you go out, like pre-departure checks',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'Splitting them by situation — before departure, after arrival — makes them easy to find',
     '출항 전날까지':'Until the day before departure',
-    '출항 한계 풍속·파고':'Wind and wave limits for going out',
     '충남':'South Chungcheong',
     '충전':'Charging',
     '카드채비':'Sabiki rig',
@@ -3337,11 +3246,8 @@ const I18N = {
     '칸 이름':'Locker name',
     '칸 이름과 구역을 모두 넣어 주세요':'Please enter both the locker name and the zone',
     '칸에서 이름으로 찾아 세울 수도 있습니다.':'You can also find and appoint them by name from the crew list.',
-    '칸을 저장했습니다.':'The locker has been saved.',
     '칸이 겹치면 도면에서 누를 때 어느 칸인지 헷갈립니다.\n그래도 이대로 둘까요?':'Overlapping lockers make it unclear which one you are tapping.\nLeave it as it is anyway?',
     '커뮤니티 글쓰기':'Posting in the community',
-    '켜 주시려면':'To switch it on,',
-    '켜도 나가지 않습니다.':' are never published, even when this is on.',
     '켬':'On',
     '크게':'Bigger',
     '크기':'Size',
@@ -3360,7 +3266,6 @@ const I18N = {
     '통과 시각':'Passing time',
     '통영':'Tongyeong',
     '투망':'Setting the net',
-    '트여 있는':'open to',
     '특보':'Warning',
     '특보 수집 대기 중':'Waiting for warnings',
     '파고 {n}m':'Waves {n} m',
@@ -3406,7 +3311,6 @@ const I18N = {
     '항목 지우기':'Delete item',
     '항목을 연 뒤 <b>핀 지정</b>을 누르고 도면에서 해당 위치를 탭하면 됩니다.':'Open the entry, tap <b>Set pin</b>, then tap the place on the drawing.',
     '항목이 배의 어느 위치인지 도면에 표시해 둘 수 있습니다.<br><br>':'You can mark on the drawing where on the boat an entry belongs.<br><br>',
-    '항해 내내 엔진을 켠 것으로 보고 ':'Counting the engine as running for the whole passage, ',
     '항해 중 있었던 일을 시각과 함께 남겨 주세요':'Note what happened during the passage, with the time',
     '항해기':'Passage report',
     '항해기 · 정비기 · 기고':'Passage reports · maintenance write-ups · columns',
@@ -3431,14 +3335,12 @@ const I18N = {
     '홈포트 위치를 지도에서 정합니다.':'Set the home port on the map.',
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n내 배 > 기본 정보에서 홈포트를 고치면 함께 바뀝니다.':'This spot was created automatically from the home port.\n\nChange the home port under My Boat > Basics and this changes too.',
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n지워도 배를 열면 다시 생깁니다.\n':'This spot was created automatically from the home port.\n\nDelete it and it comes back next time you open the boat.\n',
-    '화면':'screen',
     '화면이 보이지 않음':'Screen not visible',
     '화장실':'Toilet',
     '확인 글자':'Confirmation text',
     '확인함':'Checked',
     '환산':'Convert',
     '환산값이 0보다 작습니다.\n\n잰 값이나 잰 시각을 다시 봐 주세요.':'The converted value is below zero.\n\nCheck the reading and the time you measured it.',
-    '환산할 수 없습니다':'cannot be converted',
     '회비 밀림':'Dues overdue',
     '회비 설정을 바꿉니다.':'Change the dues settings.',
     '회비 시작일':'Dues start date',
@@ -3545,6 +3447,56 @@ const I18N = {
     '해양경찰 긴급신고':'Coast guard emergency',
     '해양수산부 민원':'Ministry of Oceans and Fisheries enquiries',
     '해치·창문 닫힘, 커버 씌우기':'Hatches and windows shut, covers on',
+  
+
+    // ── 3.91 · 토막 문장 되돌림
+    '(엔진 {e}h · 세일 {s})':'(engine {e} h · sail {s})',
+    '(오른쪽 위 <b>⋮</b> → <b>다른 브라우저로 열기</b>)':'(top right <b>⋮</b> → <b>Open in another browser</b>)',
+    '(주소창 옆 <b>···</b> → <b>Safari로 열기</b>)':'(next to the address bar <b>···</b> → <b>Open in Safari</b>)',
+    '<b>[설치]</b> 를 누릅니다':'Tap <b>[Install]</b>',
+    '<b>[앱 설치]</b> 또는 <b>[홈 화면에 추가]</b> 를 누릅니다':'Tap <b>[Install app]</b> or <b>[Add to Home Screen]</b>',
+    '{addr} 으로 보내 주세요.':'Please send it to {addr}.',
+    '{name} 님을 이 배에서 내보낼까요?':'Remove {name} from this boat?',
+    '{name} 을 구성원으로 받았습니다':'{name} has joined the crew',
+    '{name} 을 이 기기에는 받았습니다.':'{name} was accepted on this device.',
+    '{n}일 남음':'{n} days left',
+    '{n}일 지남':'{n} days overdue',
+    '{r} 해역':'{r} waters',
+    '· 물건을 보기 전에 <b>선입금하지 마세요</b>. 계약금도 마찬가지입니다.':'· <b>Do not pay in advance</b> before you have seen the goods — that includes deposits.',
+    '· 배·엔진은 직접 가서 <b>시운전</b>까지 보고 판단하세요.':'· For a boat or engine, go and see it and take a <b>sea trial</b> before you decide.',
+    '계속 켜둔 것으로 봄':'counted as left running',
+    '국가 마리나 <b>계획 단계</b>로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.':'This is a national marina still at the <b>planning stage</b> — check before you go.',
+    '글을 올린 뒤 따로 올려 주세요.':'Post the text first, then add them separately.',
+    '다음 {d}':'Next {d}',
+    '로그인하시면 {terms}과 {privacy}에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.':'By signing in you agree to the {terms} and the {privacy}. You must be 14 or older to sign up.',
+    '메일 앱을 열지 못했습니다.':'Could not open your mail app.',
+    '목록을 <b>아래로 내려</b> <b>[홈 화면에 추가]</b> 를 누릅니다':'Scroll <b>down</b> the list and tap <b>[Add to Home Screen]</b>',
+    '물품 위치, 좌표, 회비, 개인 메모는 <b>켜도 나가지 않습니다.</b>':'Item locations, coordinates, dues and private notes <b>never go out, even when this is on.</b>',
+    '배 길이를 넣어 두시면 그에 맞는 <b>출항 한계 풍속·파고</b>를 자동으로 잡아 기준을 넘었는지 알려 드립니다.':'Enter the boat\'s length and matching <b>wind and wave limits</b> are set for you, with a warning when they are passed.',
+    '배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.':'Enter the boat\'s air draft first. Use <b>Change</b> below and give a measured height up to the top of the antenna.',
+    '보안을 위해 <b>다시 로그인한 뒤</b>에 지울 수 있습니다.':'For security you can delete it only <b>after signing in again</b>.',
+    '사용 중':'In use',
+    '사진이 많아 {n}장은 넣지 못합니다.':'There are too many photos — {n} could not be added.',
+    '수심계 값은 <b>잰 그때 물 높이 기준</b>입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.':'A sounder reading is <b>relative to the water level when you measured</b>. Measure at high water, write it down as it is, and you will ground at low water.',
+    '엔진 표시 {n}개 반영':'{n} engine marks applied',
+    '엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.':'This is where you register <b>work on a fixed cycle</b>, like engine oil or zinc anodes.',
+    '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Tap the directions this berth is <b>open to</b>. Wind from those bearings makes the boat roll, or worse.',
+    '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Only <b>approved contributors</b> may post a series. This is a place for reprinting other people\'s writing, which is why.',
+    '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Tap <b>[Add]</b> at the top right',
+    '올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.':'<b>Other people\'s comments</b> on your posts go with the post.',
+    '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'Our tides run large. A sounder reading is relative to <b>the moment you measured</b>, so writing it down as it is will ground you at low water.',
+    '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'The weather, tides and depths in this app are <b>for reference</b>. Whether to sail and where to lie is your judgement and your responsibility. (Terms, article 6)',
+    '이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'There is no tide data for this place and time, so it <b>cannot be converted</b>.',
+    '제원 {n}칸을 저장했습니다.':'{n} specification fields saved.',
+    '조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.':'The tide is an <b>approximation</b> interpolated from the national hydrographic office\'s high and low water data (±10–20 cm). Before you actually pass under a bridge, check with VTS and judge by a measured height including the antenna.',
+    '주소창 옆 <b>⋮</b> (점 세 개) 를 누릅니다':'Tap the <b>⋮</b> (three dots) next to the address bar',
+    '출발·도착·중간기록에서 <b style="color:#6FD9A0">지금 여기</b> 또는 <b style="color:#8ab4d8">지도에서</b> 를 누르면 됩니다':'On a departure, arrival or log entry, tap <b style="color:#6FD9A0">Here now</b> or <b style="color:#8ab4d8">On the map</b>',
+    '켜 주시려면 <b>[보낸 사람]</b> → <b>연재 글 올리기</b> 를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.':'To switch it on, go to <b>[Sender]</b> → <b>Post to series</b>. A columnist is not an administrator — the admin screen stays closed to them.',
+    '타고 싶으시면 아래 <b>댓글</b>로 말씀해 주세요. 태우실 분이 보고 정합니다.':'If you would like to come along, say so in the <b>comments</b> below. The skipper reads them and decides.',
+    '항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?':'Count the engine as running for the whole passage and enter {h} hours?',
+    '해상 특보':'Marine warnings',
+    '해상 특보 발효 중':'Marine warning in force',
+    '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Tap the <b>Share</b> button<span class="insico">⬆︎</span> at the <b>bottom centre</b> of the screen (a square with an arrow pointing up)',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -3953,20 +3905,15 @@ const I18N = {
     '엔진 시간':'Моточасы',
     '중간 기록에서 계산':'по записям в журнале',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Моточасы входят во время в пути.',
-    '엔진을 끄고 있던 시간은':'Время с выключенным двигателем —',
-    '세일로 간 시간은':'Время под парусом —',
-    '입니다.':'.',
     '항적':'Трек',
     '점 {n}개 · 끌어서 이동 · 두 손가락으로 확대':'{n} точек · тяните для сдвига · щипок для масштаба',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'Карта для просмотра записей. Для навигации используйте официальные карты.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Карта © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
     '저장된 위치가 없습니다':'Нет сохранённых позиций',
     '위치를 남기면 이곳에 항적이 표시됩니다':'Сохраняйте позиции — здесь появится трек',
-    '출발·도착·중간기록에서':'В отходе, приходе или записи журнала',
     '지금 여기':'Здесь и сейчас',
     '또는':'или',
     '지도에서':'На карте',
-    '를 누르면 됩니다':'',
     '지금 여기로 출발 위치 잡기':'Отход — моя позиция',
     '가동시간':'Наработка',
     '시간':'ч',
@@ -4015,7 +3962,6 @@ const I18N = {
     '문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다':'Фото внутри документов постепенно переносятся в хранилище при каждом запуске',
     '계정 지우기':'Удалить аккаунт',
     'Google 계정으로 계속하기':'Продолжить с Google',
-    '로그인하시면':'Входя, вы принимаете',
     '이용약관':'Условия использования',
     '개인정보처리방침':'Политику конфиденциальности',
     '또는 이메일로':'или по эл. почте',
@@ -4044,9 +3990,7 @@ const I18N = {
     '도움된 순':'Полезные',
     '+ 내 배 정비 기록 넣기':'+ Вставить запись обслуживания',
     '고치기':'Изменить',
-    '타고 싶으시면 아래':'Хотите пойти — напишите в',
     '댓글':'Комментарии',
-    '로 말씀해 주세요. 태우실 분이 보고 정합니다.':'ниже. Капитан прочтёт и решит.',
     '댓글 쓰기':'Написать комментарий',
     '불러오지 못했습니다.':'Не удалось загрузить.',
     '사람':'Человек',
@@ -4076,12 +4020,7 @@ const I18N = {
     '뱃일은 거래의 당사자가 아닙니다.':'Baetnil не является стороной сделки.',
     '뱃일은 장터 자리를 빌려주는 중개자일 뿐이며, 물건과 거래에 관한 책임은 파는 사람(판매자)과 사는 사람(구매자)에게 있습니다. 물건 정보와 거래 조건은 반드시 직접 확인해 주세요.':'Baetnil лишь предоставляет площадку. Ответственность за товар и сделку несут продавец и покупатель. Всегда проверяйте товар и условия сами.',
     '거래 전에 꼭 확인하세요':'Проверьте перед сделкой',
-    '· 물건을 보기 전에':'· Пока не увидели товар,',
-    '선입금하지 마세요':'не платите вперёд',
-    '. 계약금도 마찬가지입니다.':'. Задаток — тоже.',
-    '· 배·엔진은 직접 가서':'· Судно и двигатель смотрите лично',
     '시운전':'на ходу',
-    '까지 보고 판단하세요.':'и только потом решайте.',
     '· 배는 등록·저당·압류가 남아 있을 수 있습니다. 서류를 확인하세요.':'· На судне могут висеть регистрация, залог или арест. Проверьте документы.',
     '· 시세보다 크게 싸면 한 번 더 의심하세요.':'· Цена сильно ниже рынка — повод насторожиться.',
     '장터는 로그인해야 볼 수 있습니다':'Войдите, чтобы видеть барахолку',
@@ -4103,9 +4042,6 @@ const I18N = {
     '+ 연재 글 올리기':'+ Опубликовать статью',
     '아직 올라온 연재가 없습니다.':'Статей пока нет.',
     '운영자가 보고 켜 드리면 여기에 글 올리는 단추가 생깁니다.':'Когда администратор одобрит, здесь появится кнопка публикации.',
-    '연재는':'Статьи публикуют',
-    '허락받은 분만':'только одобренные авторы',
-    '올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'. Этот раздел перепечатывает и чужие тексты.',
     '직접 쓰신 항해기나, 허락을 받아 옮기실 글이 있으면 신청해 주세요.':'Подайте заявку, если у вас есть свой рассказ или текст с разрешением на перепечатку.',
     '원문':'Оригинал',
     '저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.':'Перепечатано с разрешения правообладателя. Несанкционированное копирование запрещено.',
@@ -4117,15 +4053,8 @@ const I18N = {
     '\n\n다시 시도할까요?':'\n\nПопробовать ещё раз?',
     '\n\n메일로 보내시겠습니까?':'\n\nОтправить по почте?',
     '\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?':'\n\nЗначения, которые вы задали вручную, тоже будут перезаписаны. Продолжить?',
-    ' (엔진 ':' (двигатель ',
     ' (현재 위치)':' (текущее место)',
     ' (휴지통 {n}개)':' (в корзине: {n})',
-    ' · 계속 켜둔 것으로 봄':' · считается, что работал непрерывно',
-    ' 님을 이 배에서 내보낼까요?\n\n':' — исключить из экипажа судна?\n\n',
-    ' 으로 보내 주세요.':' — отправьте туда, пожалуйста.',
-    ' 을 구성원으로 받았습니다':' принят(а) в экипаж',
-    ' 을 이 기기에는 받았습니다.\n\n':' сохранено на этом устройстве.\n\n',
-    ' 해역':' акватория',
     '"{name}" — 오늘({d}) 완료 처리할까?':'Отметить «{name}» выполненным сегодня ({d})?',
     '"{name}" 기준값을 삭제할까?':'Удалить опорное значение «{name}»?',
     '"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?':'Переместить список «{name}» вместе с {n} пунктами в корзину?',
@@ -4138,11 +4067,8 @@ const I18N = {
     '(돌풍 {n})':'(порывы {n})',
     '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?':'(Места хранения, координаты, взносы и личные заметки не публикуются даже при включении.)\n\nПродолжить?',
     '(사라진 배)':'(судна больше нет)',
-    '(오른쪽 위':'(вверху справа',
     '(자동)':'(авто)',
     '(저조위 기준)':'(от малой воды)',
-    '(점 세 개) 를 누릅니다':'(три точки)',
-    '(주소창 옆':'(рядом с адресной строкой',
     '+ 계정 번호로 세우기':'+ Добавить по номеру аккаунта',
     '+ 글':'+ Текст',
     '+ 사진':'+ Фото',
@@ -4183,14 +4109,7 @@ const I18N = {
     '<b>완료</b>로 바꾸면 완료일이 기록되고 목록 아래로 접힙니다.<br><br>':'При переводе в <b>Готово</b> записывается дата и запись сворачивается вниз списка.<br><br>',
     '<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>':'<b>Регламент</b> — работы с заданной периодичностью. Внесите, например, масло двигателя раз в 6 месяцев или цинковые аноды раз в 12 месяцев, и приложение покажет, сколько осталось.<br><br>',
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>':'<b>В работе</b> — детали заказаны или работа начата.<br>',
-    'Safari로 열기':'Открыть в Safari',
-    '[보낸 사람]':'[Отправитель]',
     '[사진1]':'[Фото 1]',
-    '[설치]':'[Установить]',
-    '[앱 설치]':'[Установить приложение]',
-    '[추가]':'[Добавить]',
-    '[홈 화면에 추가]':'[На экран «Домой»]',
-    'h · 세일 ':'ч · под парусом ',
     '{dirs} 바람에 트여 있습니다':'Открыто ветру с направлений {dirs}',
     '{d} 출항':'Выход {d}',
     '{d}m (저조위 기준 · 잰 값 {r}m − 그때 조위 {t}m)':'{d} м (от малой воды · замер {r} м − уровень {t} м)',
@@ -4251,7 +4170,6 @@ const I18N = {
     '계정 번호를 넣어 주세요':'Введите номер аккаунта',
     '계정을 아주 지우면 클라우드에 있는 내 배 기록과 커뮤니티에 올린 글이 함께 사라집니다. 되돌릴 수 없습니다.':'При полном удалении аккаунта исчезнут и записи о судне в облаке, и ваши публикации в сообществе. Отменить нельзя.',
     '계획':'В планах',
-    '계획 단계':'на стадии проекта',
     '고객센터':'Поддержка',
     '고등어':'Скумбрия',
     '고장 → 진행 중 → 완료':'неисправно → в работе → готово',
@@ -4275,10 +4193,8 @@ const I18N = {
     '공개된 자료가 없습니다':'Ничего не опубликовано',
     '공개를 내렸습니다.\n이미 가져간 사람의 도면은 그대로 남습니다.':'Снято с публикации.\nУ тех, кто уже скачал, чертёж останется.',
     '공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.':'Опубликовано. Другие смогут взять его через «Выбрать из общих чертежей».',
-    '공유':'Поделиться',
     '공지':'Объявление',
     '공지는 게시판 관리 권한이 있어야 쓸 수 있습니다.\n일반 글로 올립니다.':'Для объявлений нужны права на доску.\nПубликуем как обычную запись.',
-    '과':' и ',
     '관측':'Наблюдение',
     '관측소 자료가 닿지 않는 바다이거나, 잰 시각이 자료 기간 밖입니다. 없는 숫자를 지어내면 배가 얹히므로 그냥 두겠습니다.':'Либо ни один пост не покрывает эту акваторию, либо время замера вне периода данных. Выдуманное число сажает судно на мель, поэтому оставляем пусто.',
     '광고·도배':'Реклама и флуд',
@@ -4291,7 +4207,6 @@ const I18N = {
     '구성원만 봅니다':'Только для экипажа',
     '구성원을 관리할 권한이 없습니다':'Нет прав управлять экипажем',
     '구역':'Зона',
-    '국가 마리나':'Государственная марина',
     '권한을 바꾸려면 운영자 임명 권한이 필요합니다.':'Чтобы менять права, нужно право назначать администраторов.',
     '권한이 없습니다':'Нет прав',
     '그 기록을 찾지 못했습니다':'Такая запись не найдена',
@@ -4306,7 +4221,6 @@ const I18N = {
     '그 지점을 찾지 못했습니다':'Это место не найдено',
     '그대로':'Без изменений',
     '그때까지 다른 기기에서는 안 보일 수 있습니다.':'До этого на других устройствах может не отображаться.',
-    '근사값':'приблизительно',
     '글':'Текст',
     '글 보기':'Открыть запись',
     '글 신고':'Пожаловаться на запись',
@@ -4335,7 +4249,6 @@ const I18N = {
     '기온':'Температура',
     '기준':'Отсчёт',
     '기준값 (약최고고조위 HAT)':'Опорный уровень (наивысший астрономический прилив, HAT)',
-    '기준이라 그대로 적으면 저조 때 얹힙니다.':'— это отсчёт; запишете как есть, и в малую воду сядете на грунт.',
     '기한 지남':'Просрочено',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>':'Просроченное — красным, до 30 дней — жёлтым.<br><br>',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.':'Просроченное — красным, до 30 дней — жёлтым.',
@@ -4370,7 +4283,6 @@ const I18N = {
     '남서':'ЮЗ',
     '남을 헐뜯거나 괴롭힘':'Оскорбления и травля',
     '남의 글을 허락받아 옮김':'Перепечатка с разрешения автора',
-    '남의 댓글':'Чужой комментарий',
     '남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.':'Чужую серию изменить нельзя.\n\nЭто может сделать только автор публикации.',
     '남해식':'Южное побережье',
     '내 계정 번호\n\n':'Мой номер аккаунта\n\n',
@@ -4398,21 +4310,16 @@ const I18N = {
     '다녀와서 알게 된 것을 적어 주세요':'Напишите, что узнали после визита',
     '다른 기기에서는 아직 안 보일 수 있습니다.':'На других устройствах пока может не отображаться.',
     '다른 목록으로 옮기기':'Перенести в другой список',
-    '다른 브라우저로 열기':'Открыть в другом браузере',
     '다른 사람을 운영자로 세우기':'Назначить другого администратора',
     '다리 통과 높이를 계산할 때 쓰는 기준값입니다':'Опорный уровень для расчёта прохода под мостом',
     '다리 통과높이':'Проход под мостом',
     '다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n':'Просто не удалось выгрузить в облако. Выгрузим, как появится интернет.\n',
     '다시':'Ещё раз',
-    '다시 로그인한 뒤':'после повторного входа',
     '다시 보기':'Посмотреть снова',
     '다시 새 글로':'Пометить непрочитанным',
     '다시 시도':'Повторить',
     '다시 올리기':'Загрузить снова',
     '다운샷':'Дроп-шот',
-    '다음 ':'Далее ',
-    '단 리프':'-й риф',
-    '단추':'кнопку',
     '달의 삭 시각으로 음력일을 구해 정합니다.':'Лунный день считается по моменту новолуния.',
     '댓글을 쓸 권한이 없습니다':'Нет прав комментировать',
   
@@ -4463,7 +4370,6 @@ const I18N = {
     '등급이 너무 적습니다. 하나는 남겨 두세요.':'Слишком мало ролей. Оставьте хотя бы одну.',
     '등록된 물품 없음':'Вещей пока нет',
     '등록한 뒤에는 <b>도면에서 보기</b>로 그 자리를 확대해서 볼 수 있습니다.<br><br>':'После установки метки кнопка <b>Показать на чертеже</b> приблизит это место.<br><br>',
-    '로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.':' — уточните перед выходом.',
     '로그인 계정':'Вход выполнен как',
     '로그인하면 쓰던 배와 기록을 그대로 불러오고, 휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.':'После входа вернутся ваше судно и записи, и на телефоне и на компьютере будет одно и то же.',
     '로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.':'Всем приложением можно пользоваться на этом устройстве и без входа.',
@@ -4479,10 +4385,6 @@ const I18N = {
     '로그인해야 사진을 올릴 수 있습니다':'Чтобы загружать фото, нужно войти',
     '로그인해야 신고할 수 있습니다':'Чтобы пожаловаться, нужно войти',
     '로그인해야 올릴 수 있습니다':'Чтобы опубликовать, нужно войти',
-    '를 누릅니다':' ',
-    '를 누릅니다 (네모에서 화살표가 위로 나온 그림)':' (квадрат со стрелкой вверх)',
-    '를 등록해 두는 곳입니다.':' — регистрируется здесь.',
-    '를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.':'. Автор колонки — не администратор, админ-экран ему не открывается.',
     '리프':'Риф',
     '릴·로드·전동릴':'Катушки, удилища, электрокатушки',
     '링크 (없으면 비워 두세요)':'Ссылка (оставьте пустым, если нет)',
@@ -4513,8 +4415,6 @@ const I18N = {
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Сначала зарегистрируйте судно. Всё введённое можно потом изменить.',
     '먼저 백업을 받아 두시길 권합니다.':'Советуем сначала сделать резервную копию.',
     '먼저 출항 날짜를 정해 주세요':'Сначала укажите дату выхода',
-    '메인세일 ':'Грот ',
-    '메일 앱을 열지 못했습니다.\n\n':'Не удалось открыть почтовое приложение.\n\n',
     '메탈지그':'Металлический джиг',
     '명부를 볼 권한이 없습니다':'Нет прав смотреть список экипажа',
     '몇 자리':'Сколько мест',
@@ -4531,7 +4431,6 @@ const I18N = {
     '목록 이름을 넣어 주세요':'Введите название списка',
     '목록 지우기':'Удалить список',
     '목록에 없는 것을 적어 주세요':'Впишите то, чего нет в списке',
-    '목록을':' список',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'Список только один. Сначала добавьте ещё один.',
     '목포':'Мокпхо',
     '몰라서 묻는 것':'Спрашиваю, потому что не знаю',
@@ -4558,7 +4457,6 @@ const I18N = {
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'Данных о приливе пока нет. Полную и малую воду можно ввести вручную.',
     '물때 자료를 받는 중…':'Получение данных о приливе…',
     '물어보기':'Задать вопрос',
-    '물품 위치, 좌표, 회비, 개인 메모는':'Места хранения, координаты, взносы и личные заметки',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Вещи, регламент, ремонт, судовой журнал, документы, чертежи, доска',
     '물품을 누르면 도면에서 이 칸을 크게 보여 드립니다':'Нажмите на вещь — рундук приблизится на чертеже',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'Это рундук для вещей. Стены и переборки рисуйте линией, прямоугольником или треугольником.',
@@ -4581,16 +4479,13 @@ const I18N = {
     '발효 중인 해상 특보 없음':'Действующих морских предупреждений нет',
     '방어':'Лакедра',
     '방파제 안쪽 접안':'К стенке внутри мола',
-    '방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Отметьте направления. Ветер оттуда раскачивает судно или создаёт опасность.',
     '배 감추기·지우기':'Скрытие и удаление судов',
     '배 공개 설정':'Публикация судна',
     '배 공개 설정을 바꿉니다.':'Изменить настройки публикации судна.',
     '배 기록':'Записи судна',
     '배 길이 넣기':'Укажите длину судна',
-    '배 길이를 넣어 두시면 그에 맞는':'Укажите длину судна, и подходящие',
     '배 길이와 선종으로 다시 계산합니다.\n\n':'Пересчитать по длине и типу судна.\n\n',
     '배 높이':'Высота судна',
-    '배 높이(공기흘수)를 먼저 입력해 주세요. 아래':'Сначала укажите высоту судна (надводный габарит). Ниже',
     '배 목록을 받지 못함 · 눌러서 확인':'Не удалось получить список судов · нажмите, чтобы узнать',
     '배 소개':'О судне',
     '배 소개 차례를 바꿉니다.':'Изменить порядок рассказа о судне.',
@@ -4682,7 +4577,6 @@ const I18N = {
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Не удалось загрузить фото — проверьте подключение к интернету',
     '사진을 읽지 못했습니다':'Не удалось прочитать фото',
     '사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.':'Изображение слишком велико. Возьмите более простой чертёж.',
-    '사진이 많아 ':'Фотографий много, поэтому ',
     '사파리에서만 됩니다. 크롬이나 카카오톡·인스타그램 안에서 열었다면 먼저 사파리로 열어 주세요.':'Работает только в Safari. Если вы открыли ссылку в Chrome, KakaoTalk или Instagram, сначала откройте её в Safari.',
     '살림통 총 용량입니다.':'Полный объём садка.',
     '삼치':'Испанская скумбрия',
@@ -4748,7 +4642,6 @@ const I18N = {
     '수면부터 배의 가장 높은 곳까지의 높이입니다. 안테나를 포함한 실측값을 넣어 주세요. 교량 통과 판단에 쓰입니다.':'От ватерлинии до самой высокой точки судна. Введите измеренное значение вместе с антенной. Используется для расчёта прохода под мостами.',
     '수심 · 바닥 · 접안 상태처럼 다음 사람에게 도움 될 말을 남겨 주세요':'Оставьте то, что поможет следующему: глубину, грунт, каково швартоваться',
     '수심 환산':'Пересчёт глубины',
-    '수심계 값은':'Показание эхолота',
     '수심계로 잰 값 넣기 — 저조위 기준으로 바꿔 드립니다':'Введите показание эхолота — переведём к отсчёту от малой воды',
     '수심계에 나온 값':'Значение на эхолоте',
     '수심과 바닥':'Глубина и грунт',
@@ -4765,7 +4658,6 @@ const I18N = {
     '시각':'Время',
     '시각을 먼저 입력해 주세요':'Сначала укажите время',
     '시간 초과':'Время ожидания истекло',
-    '시간으로 넣을까요?\n':'Ввести в часах?\n',
     '시작하기 전에':'Прежде чем начать',
     '식수·생활용수 탱크의 총 용량입니다. 며칠 나가는 항해를 준비할 때 참고가 됩니다.':'Полный объём танков питьевой и бытовой воды. Пригодится при подготовке к переходу на несколько дней.',
     '신고·차단':'Жалобы и блокировки',
@@ -4785,13 +4677,10 @@ const I18N = {
     '신청을 불러오지 못했습니다: ':'Не удалось загрузить заявки: ',
     '쓰기':'Запись',
     '쓰는 법을 모르겠습니다':'Не понимаю, как этим пользоваться',
-    '쓰는 중':'Пишет',
     '쓴 사람':'Автор',
     '쓸 수 있습니다':'можно использовать',
     '아나고':'Морской угорь',
-    '아래로 내려':'Вниз',
     '아래에 적어 주세요':'Напишите ниже',
-    '아래쪽 가운데':'внизу по центру',
     '아무도 안 맡은 일':'Никому не поручено',
     '아직 공개한 자료가 없습니다.':'Вы ещё ничего не опубликовали.',
     '아직 글이 없습니다':'Записей пока нет',
@@ -4834,11 +4723,8 @@ const I18N = {
     '얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>':'Задайте периодичность. Единица — <b>дни, недели или месяцы</b>.<br><br>',
     '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.':'Чтобы убрать, очистите порт приписки в «Моё судно > Основное».',
     '없으면 비워 두세요':'Оставьте пустым, если нет',
-    '에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.':'. Регистрация возможна с 14 лет.',
-    '에 지울 수 있습니다.':' можно удалить.',
     '에기':'Эги',
     '에깅':'Эгинг',
-    '에서 안테나 끝까지의 실측값을 넣습니다.':' до верхушки антенны — введите измеренное значение.',
     '엔진 가동':'Наработка двигателя',
     '엔진 끔':'Двигатель выключен',
     '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 주기를 대략적인 기간으로 잡고 메모에 시간을 적어 두시면 됩니다.':'Обслуживание двигателя часто считают по моточасам (например, 250 ч). Тогда задайте примерный интервал, а часы укажите в заметке.',
@@ -4846,9 +4732,7 @@ const I18N = {
     '엔진OFF':'Двигатель ВЫКЛ',
     '엔진ON':'Двигатель ВКЛ',
     '엔진·추진':'Двигатель и движитель',
-    '엔진오일, 아연 아노드처럼':'например, масло двигателя или цинковые аноды',
     '여기까지입니다 ·':'Это всё ·',
-    '여기서':'здесь',
     '여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.':'Войдите, чтобы видеть одно и то же на нескольких устройствах или вести судно вместе с другими.',
     '여수':'Ёсу',
     '여유 부족 — 위험':'Мало запаса — опасно',
@@ -4892,10 +4776,8 @@ const I18N = {
     '오늘 물때 입력':'Ввести прилив на сегодня',
     '오류 신고':'Сообщить об ошибке',
     '오류: {msg}':'Ошибка: {msg}',
-    '오른쪽 위':'вверху справа',
     '오징어':'Кальмар',
     '오징어살':'Полоска кальмара',
-    '올려 두신 글에 달린':'Комментарии к вашим записям',
     '올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.':'После выгрузки спрашивать больше не будем — в меню всегда есть «Синхронизировать сейчас».',
     '올리지 못했습니다.\n\n':'Не удалось выгрузить.\n\n',
     '올린 분과 운영자만 고칠 수 있습니다':'Изменить может только автор или администратор',
@@ -4917,7 +4799,6 @@ const I18N = {
     '요트·보트·낚시배':'Яхты, катера, рыболовные суда',
     '욕설·비방':'Оскорбления',
     '우럭':'Морской окунь',
-    '우리 바다는 물때 차가 큽니다. 수심계 값은':'У нас большие приливы. Показание эхолота —',
     '운영자 세우기':'Назначить администратора',
     '운영자 임명':'Назначение администраторов',
     '운영자가 보고 켜 드립니다. 켜지면 뉴스 ▸ 연재에 글 올리는 단추가 생깁니다.':'Администратор рассмотрит и включит. После этого в «Новости ▸ Серии» появится кнопка публикации.',
@@ -4943,8 +4824,6 @@ const I18N = {
     '유튜브 링크':'Ссылка на YouTube',
     '유튜브 열기':'Открыть на YouTube',
     '유튜브 주소':'Адрес YouTube',
-    '은 글과 함께 사라집니다.':' исчезнут вместе с записью.',
-    '의':' — ',
     '이 거리보다 시정이 나쁘면 나가지 않는다고 정해 둔 값입니다.':'Видимость, ниже которой вы решили не выходить.',
     '이 글은 고칠 수 없습니다':'Эту запись нельзя изменить',
     '이 글은 지울 수 없습니다':'Эту запись нельзя удалить',
@@ -4969,7 +4848,6 @@ const I18N = {
     '이 등급은 지울 수 없습니다':'Эту роль удалить нельзя',
     '이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.':'{n} человек с этой ролью перейдут в низшую роль.',
     '이 등급인 사람이 각 화면에서 할 수 있는 일입니다.':'Что люди с этой ролью могут делать на каждом экране.',
-    '이 말로':'на этом языке',
     '이 물품은 아직 수납칸에 넣지 않았습니다':'Эта вещь ещё не помещена в рундук',
     '이 배':'это судно',
     '이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.':'Скрыть это судно из списка?\n\nСкрывается только на этом устройстве.\nВернуть можно в любой момент.',
@@ -4986,9 +4864,7 @@ const I18N = {
     '이 사람의 등급은 바꿀 수 없습니다':'Роль этого человека изменить нельзя',
     '이 사람의 등급을 바꿉니다.':'Изменить роль этого человека.',
     '이 신청을 거절할까요?':'Отклонить эту заявку?',
-    '이 앱의 날씨·물때·수심은':'Погода, приливы и глубины в этом приложении —',
     '이 연재 글을 지울까요?':'Удалить эту запись серии?',
-    '이 자리·이 시각은 조위 자료가 없어':'Для этого места и времени нет данных об уровне, поэтому',
     '이 파고를 넘으면 나가지 않는다고 정해 둔 값입니다.':'Высота волны, выше которой вы решили не выходить.',
     '이 풍속부터 2단으로 줄입니다.':'Скорость ветра, при которой берётся второй риф.',
     '이 풍속부터 3단으로 줄입니다. 없으면 비워 두세요.':'Скорость ветра, при которой берётся третий риф. Нет такого — оставьте пустым.',
@@ -5019,13 +4895,8 @@ const I18N = {
     '인터넷에 연결된 상태에서만 신고할 수 있습니다':'Жалоба требует подключения к интернету',
     '인터넷에 연결된 상태에서만 신청할 수 있습니다':'Заявка требует подключения к интернету',
     '인터넷에 이어지면 글판에 올라갑니다.\n\n모집 내용은 저장했습니다.':'Запись появится на доске, как только будет интернет.\n\nОбъявление о наборе сохранено.',
-    '일 남음':' дн. осталось',
     '일 년에 한 번':'Раз в год',
-    '일 지남':' дн. просрочено',
     '일반':'Обычная',
-    '입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.':' (±10–20 см). Перед реальным проходом под мостом обязательно уточните у СУДС и считайте по измеренной высоте вместе с антенной.',
-    '입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.':'. Замерите в полную воду и запишите как есть — в малую воду сядете на грунт.',
-    '입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'. Решение о выходе и о месте стоянки, как и ответственность за него, остаются за пользователем. (Условия, ст. 6)',
   
 
     // ── 3.90 · 외국어 ⑦
@@ -5045,10 +4916,7 @@ const I18N = {
     '잡담':'Разговоры',
     '잡은 것':'Улов',
     '장비':'Снаряжение',
-    '장은 넣지 못합니다.\n\n글을 올린 뒤 따로 올려 주세요.':' фото добавить нельзя.\n\nСначала опубликуйте текст, потом добавьте их отдельно.',
     '잰 값과 잰 시각을 넣으면 그 시각':'Укажите замер и время — уровень на тот момент',
-    '잰 그때':'в момент замера',
-    '잰 그때 물 높이 기준':'Относительно уровня воды в момент замера',
     '잰 시각':'Время замера',
     '저자':'Автор',
     '저자를 넣어 주세요':'Укажите автора',
@@ -5094,7 +4962,6 @@ const I18N = {
     '제목 없음':'Без заголовка',
     '제목과 올린 사람 이름에서 찾습니다. 글 내용은 찾지 않습니다.':'Ищет по заголовкам и именам авторов, а не по тексту записей.',
     '제목을 넣어 주세요':'Введите заголовок',
-    '제원 ':'Характеристики ',
     '제조 {v}':'Верфь: {v}',
     '제조사 · 모델 · 연식':'Верфь · модель · год',
     '제조사·모델·연식은 나중에 도움을 구할 때 상대가 배를 파악하는 데 쓰입니다. 지금 몰라도 되고, 나중에 채워도 됩니다.':'Верфь, модель и год помогают понять ваше судно, когда вы просите совета. Сейчас знать не обязательно — заполните позже.',
@@ -5104,17 +4971,14 @@ const I18N = {
     '조금':'Квадратурный прилив',
     '조위 {n}cm':'Уровень {n} см',
     '조위 자료가 없어 환산할 수 없습니다.\n\n수심을 손으로 적어 주세요.':'Данных об уровне нет, пересчитать нельзя.\n\nВпишите глубину вручную.',
-    '조위는 국립해양조사원 만조·간조 자료를 보간한':'Уровень интерполирован по данным гидрографической службы о полной и малой воде —',
     '조위를 빼서':'вычитает уровень и',
     '좁은 수로를 지날 때 감당할 수 있는 조류 세기입니다.':'Сила течения, с которой вы справитесь в узкости.',
-    '주기가 정해진 정비':'Обслуживание с заданной периодичностью',
     '주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.':'Повторяется по циклу — это регламент; возникло внезапно — это ремонт.',
     '주꾸미':'Осьминог-мусими',
     '주마다':'Еженедельно',
     '주마다 초기화':'Сброс каждую неделю',
     '주소는 https:// 로 시작해야 합니다':'Адрес должен начинаться с https://',
     '주소를 넣으면 눌러서 봅니다':'Добавьте адрес — и он откроется по нажатию',
-    '주소창 옆':'рядом с адресной строкой',
     '주인':'Владелец',
     '주차':'Парковка',
     '줄 수 있는 등급이 없습니다':'Нет роли, которую вы можете дать',
@@ -5155,7 +5019,6 @@ const I18N = {
     '진행 중인 항목이 없습니다':'В работе ничего нет',
     '질문':'Вопрос',
     '찜':'В избранном',
-    '참고 자료':'справочные сведения',
     '참돔':'Красный пагр',
     '참여 신청을 받습니다.':'Приём заявок открыт.',
     '참여 신청을 받을지 바꿉니다.':'Изменить, открыт ли приём заявок.',
@@ -5188,7 +5051,6 @@ const I18N = {
     '출항 전 점검처럼 나갈 때마다 하는 것':'То, что делается каждый раз перед выходом',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'Разделите по случаям — перед выходом, после прихода — и будет проще искать',
     '출항 전날까지':'За день до выхода',
-    '출항 한계 풍속·파고':'Предельные ветер и волна для выхода',
     '충남':'Южная Чхунчхондо',
     '충전':'Зарядка',
     '카드채비':'Сабики',
@@ -5197,11 +5059,8 @@ const I18N = {
     '칸 이름':'Название рундука',
     '칸 이름과 구역을 모두 넣어 주세요':'Укажите и название рундука, и зону',
     '칸에서 이름으로 찾아 세울 수도 있습니다.':'Можно также найти человека по имени в списке экипажа и назначить.',
-    '칸을 저장했습니다.':'Рундук сохранён.',
     '칸이 겹치면 도면에서 누를 때 어느 칸인지 헷갈립니다.\n그래도 이대로 둘까요?':'При наложении рундуков непонятно, по какому вы нажимаете.\nВсё равно оставить так?',
     '커뮤니티 글쓰기':'Публикации в сообществе',
-    '켜 주시려면':'Чтобы включить,',
-    '켜도 나가지 않습니다.':' не публикуются даже при включении.',
     '켬':'Вкл.',
     '크게':'Больше',
     '크기':'Размер',
@@ -5220,7 +5079,6 @@ const I18N = {
     '통과 시각':'Время прохода',
     '통영':'Тонён',
     '투망':'Постановка сети',
-    '트여 있는':'открыто для',
     '특보':'Штормовое',
     '특보 수집 대기 중':'Ожидание сбора предупреждений',
     '파고 {n}m':'Волна {n} м',
@@ -5266,7 +5124,6 @@ const I18N = {
     '항목 지우기':'Удалить пункт',
     '항목을 연 뒤 <b>핀 지정</b>을 누르고 도면에서 해당 위치를 탭하면 됩니다.':'Откройте запись, нажмите <b>Поставить метку</b> и коснитесь нужного места на чертеже.',
     '항목이 배의 어느 위치인지 도면에 표시해 둘 수 있습니다.<br><br>':'На чертеже можно отметить, к какому месту судна относится запись.<br><br>',
-    '항해 내내 엔진을 켠 것으로 보고 ':'Считая, что двигатель работал весь переход, ',
     '항해 중 있었던 일을 시각과 함께 남겨 주세요':'Отмечайте, что происходило в переходе, с указанием времени',
     '항해기':'Отчёт о походе',
     '항해기 · 정비기 · 기고':'Отчёты о походах · записки о ремонте · колонки',
@@ -5291,14 +5148,12 @@ const I18N = {
     '홈포트 위치를 지도에서 정합니다.':'Задать порт приписки на карте.',
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n내 배 > 기본 정보에서 홈포트를 고치면 함께 바뀝니다.':'Эта точка создана автоматически по порту приписки.\n\nИзмените порт приписки в «Моё судно > Основное» — изменится и она.',
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n지워도 배를 열면 다시 생깁니다.\n':'Эта точка создана автоматически по порту приписки.\n\nУдалите — и она появится снова при открытии судна.\n',
-    '화면':'экран',
     '화면이 보이지 않음':'Экран недоступен',
     '화장실':'Туалет',
     '확인 글자':'Текст подтверждения',
     '확인함':'Просмотрено',
     '환산':'Пересчитать',
     '환산값이 0보다 작습니다.\n\n잰 값이나 잰 시각을 다시 봐 주세요.':'Пересчитанное значение меньше нуля.\n\nПроверьте замер и время замера.',
-    '환산할 수 없습니다':'пересчитать нельзя',
     '회비 밀림':'Взнос просрочен',
     '회비 설정을 바꿉니다.':'Изменить настройки взносов.',
     '회비 시작일':'Дата начала взносов',
@@ -5317,7 +5172,6 @@ const I18N = {
 
     // ── 3.90 · 외국어 ⑨
     '커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n':'Судно попадает в «Сообщество › Обзор судов › Коммерческие», где его найдут клиенты.\n',
-    '를 자동으로 잡아 기준을 넘었는지 알려 드립니다.':' подставляются сами, и приложение предупредит о превышении.',
   
 
     // ── 3.90 · 외국어 ⑩
@@ -5406,6 +5260,56 @@ const I18N = {
     '해양경찰 긴급신고':'Экстренный вызов береговой охраны',
     '해양수산부 민원':'Обращения в Министерство океанов и рыболовства',
     '해치·창문 닫힘, 커버 씌우기':'Люки и окна закрыты, чехлы надеты',
+  
+
+    // ── 3.91 · 토막 문장 되돌림
+    '(엔진 {e}h · 세일 {s})':'(двигатель {e} ч · парус {s})',
+    '(오른쪽 위 <b>⋮</b> → <b>다른 브라우저로 열기</b>)':'(вверху справа <b>⋮</b> → <b>Открыть в другом браузере</b>)',
+    '(주소창 옆 <b>···</b> → <b>Safari로 열기</b>)':'(рядом с адресной строкой <b>···</b> → <b>Открыть в Safari</b>)',
+    '<b>[설치]</b> 를 누릅니다':'Нажмите <b>[Установить]</b>',
+    '<b>[앱 설치]</b> 또는 <b>[홈 화면에 추가]</b> 를 누릅니다':'Нажмите <b>[Установить приложение]</b> или <b>[На экран «Домой»]</b>',
+    '{addr} 으로 보내 주세요.':'Отправьте на {addr}.',
+    '{name} 님을 이 배에서 내보낼까요?':'Исключить {name} из экипажа этого судна?',
+    '{name} 을 구성원으로 받았습니다':'{name} принят(а) в экипаж',
+    '{name} 을 이 기기에는 받았습니다.':'{name} принят(а) на этом устройстве.',
+    '{n}일 남음':'осталось дней: {n}',
+    '{n}일 지남':'просрочено дней: {n}',
+    '{r} 해역':'акватория {r}',
+    '· 물건을 보기 전에 <b>선입금하지 마세요</b>. 계약금도 마찬가지입니다.':'· <b>Не платите вперёд</b>, пока не увидели товар — задаток тоже.',
+    '· 배·엔진은 직접 가서 <b>시운전</b>까지 보고 판단하세요.':'· Судно или двигатель осмотрите лично и проведите <b>ходовые испытания</b>, прежде чем решать.',
+    '계속 켜둔 것으로 봄':'считается, что работал непрерывно',
+    '국가 마리나 <b>계획 단계</b>로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.':'Государственная марина на <b>стадии проекта</b> — уточните перед выходом.',
+    '글을 올린 뒤 따로 올려 주세요.':'Сначала опубликуйте текст, потом добавьте их отдельно.',
+    '다음 {d}':'Следующее: {d}',
+    '로그인하시면 {terms}과 {privacy}에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.':'Входя, вы соглашаетесь с {terms} и {privacy}. Регистрация возможна с 14 лет.',
+    '메일 앱을 열지 못했습니다.':'Не удалось открыть почтовое приложение.',
+    '목록을 <b>아래로 내려</b> <b>[홈 화면에 추가]</b> 를 누릅니다':'Прокрутите список <b>вниз</b> и нажмите <b>[На экран «Домой»]</b>',
+    '물품 위치, 좌표, 회비, 개인 메모는 <b>켜도 나가지 않습니다.</b>':'Места хранения, координаты, взносы и личные заметки <b>не публикуются даже при включении.</b>',
+    '배 길이를 넣어 두시면 그에 맞는 <b>출항 한계 풍속·파고</b>를 자동으로 잡아 기준을 넘었는지 알려 드립니다.':'Укажите длину судна — подходящие <b>предельные ветер и волна</b> подставятся сами, и приложение предупредит о превышении.',
+    '배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.':'Сначала укажите высоту судна (надводный габарит). Нажмите <b>Изменить</b> ниже и введите измеренную высоту до верхушки антенны.',
+    '보안을 위해 <b>다시 로그인한 뒤</b>에 지울 수 있습니다.':'В целях безопасности удалить можно только <b>после повторного входа</b>.',
+    '사용 중':'Используется',
+    '사진이 많아 {n}장은 넣지 못합니다.':'Слишком много фотографий — {n} добавить не удалось.',
+    '수심계 값은 <b>잰 그때 물 높이 기준</b>입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.':'Показание эхолота даётся <b>от уровня воды в момент замера</b>. Замерите в полную воду, запишите как есть — и в малую воду сядете на грунт.',
+    '엔진 표시 {n}개 반영':'учтено отметок двигателя: {n}',
+    '엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.':'Здесь заводят <b>работы с заданной периодичностью</b> — например, масло двигателя или цинковые аноды.',
+    '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Отметьте направления, которым эта стоянка <b>открыта</b>. Ветер оттуда раскачивает судно или создаёт опасность.',
+    '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Серии могут публиковать <b>только одобренные авторы</b>. Это место для перепечатки чужих текстов, поэтому так.',
+    '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Нажмите <b>[Добавить]</b> вверху справа',
+    '올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.':'<b>Чужие комментарии</b> к вашим записям исчезнут вместе с записью.',
+    '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'У нас большие приливы. Показание эхолота отсчитывается от <b>момента замера</b>, поэтому, записав его как есть, в малую воду сядете на грунт.',
+    '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'Погода, приливы и глубины в этом приложении — <b>справочные сведения</b>. Решение о выходе и о месте стоянки, как и ответственность за него, остаются за пользователем. (Условия, ст. 6)',
+    '이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'Для этого места и времени нет данных об уровне, поэтому <b>пересчитать нельзя</b>.',
+    '제원 {n}칸을 저장했습니다.':'Сохранено полей характеристик: {n}.',
+    '조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.':'Уровень воды — <b>приближённая величина</b>, полученная интерполяцией данных гидрографической службы о полной и малой воде (±10–20 см). Перед реальным проходом под мостом обязательно уточните у СУДС и считайте по измеренной высоте вместе с антенной.',
+    '주소창 옆 <b>⋮</b> (점 세 개) 를 누릅니다':'Нажмите <b>⋮</b> (три точки) рядом с адресной строкой',
+    '출발·도착·중간기록에서 <b style="color:#6FD9A0">지금 여기</b> 또는 <b style="color:#8ab4d8">지도에서</b> 를 누르면 됩니다':'В записи отхода, прихода или в промежуточной записи нажмите <b style="color:#6FD9A0">Я здесь</b> или <b style="color:#8ab4d8">На карте</b>',
+    '켜 주시려면 <b>[보낸 사람]</b> → <b>연재 글 올리기</b> 를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.':'Чтобы включить, перейдите в <b>[Отправитель]</b> → <b>Публикация серий</b>. Автор колонки — не администратор, админ-экран ему не открывается.',
+    '타고 싶으시면 아래 <b>댓글</b>로 말씀해 주세요. 태우실 분이 보고 정합니다.':'Хотите пойти — напишите в <b>комментариях</b> ниже. Шкипер прочитает и решит.',
+    '항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?':'Считать, что двигатель работал весь переход, и записать {h} ч?',
+    '해상 특보':'Штормовые предупреждения',
+    '해상 특보 발효 중':'Действует штормовое предупреждение',
+    '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Нажмите кнопку <b>Поделиться</b><span class="insico">⬆︎</span> <b>внизу по центру</b> экрана (квадрат со стрелкой вверх)',
   }
 };
 
@@ -7153,7 +7057,11 @@ function openAccount(){
         </div>
       <div class="mrnone" style="text-align:left">${esc(t('로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.'))}<br>${esc(t('여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.'))}</div>
       <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="doGoogle()">${esc(t('Google 계정으로 계속하기'))}</button></div>
-      <div class="mrnone" style="text-align:left">${esc(t('로그인하시면'))} <button class="minib blu" onclick="openLegal('terms')">${esc(t('이용약관'))}</button>${esc(t('과'))}<button class="minib blu" onclick="openLegal('privacy')">${esc(t('개인정보처리방침'))}</button>${esc(t('에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.'))}</div>
+      <div class="mrnone" style="text-align:left">${
+        tsub('로그인하시면 {terms}과 {privacy}에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.', {
+          terms:   `<button class="minib blu" onclick="openLegal('terms')">${esc(t('이용약관'))}</button>`,
+          privacy: `<button class="minib blu" onclick="openLegal('privacy')">${esc(t('개인정보처리방침'))}</button>`
+        })}</div>
       <div class="mrnone" style="text-align:center;padding:6px 0">${esc(t('또는 이메일로'))}</div>
       <div class="mrrow"><span class="mrlbl">${esc(t('이메일'))}</span>
         <input id="acEm" type="email" style="flex:1" autocomplete="username" placeholder="name@example.com"></div>
@@ -7210,7 +7118,7 @@ async function openWipe(){
     + (guest.length ? `<div class="mrnone" style="text-align:left">
         <b>남의 배 ${guest.length}척</b>에 참여 중입니다 —
         ${esc(guest.map(b=>b.name).join(', '))}<br>${esc(t('그 배의 기록은 지워지지 않습니다. 다만 명부에 제 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 하시는 편이 깔끔합니다.'))}</div>` : '')
-    + `<div class="mrnone" style="text-align:left">${esc(t('올려 두신 글에 달린'))}<b>${esc(t('남의 댓글'))}</b>${esc(t('은 글과 함께 사라집니다.'))}<br>${esc(t('법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
+    + `<div class="mrnone" style="text-align:left">${t('올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.')}<br>${esc(t('법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
       <div class="mrrow" style="justify-content:center;padding:16px 12px">
         <button class="mrbtn big warn" onclick="askWipe()">${esc(t('계정 지우기'))}</button></div>`;
   showPanel(P);
@@ -7265,7 +7173,7 @@ async function doWipe(){
   if(r === 'relogin'){
     // ★ 파이어베이스는 오래된 로그인으로는 계정을 못 지우게 한다.
     //   여기서 기기 자료까지 지워 버리면 사람만 붕 뜬다. 그래서 멈추고 알린다.
-    wipeSay(`보안을 위해 <b>${esc(t('다시 로그인한 뒤'))}</b>${esc(t('에 지울 수 있습니다.'))}<br><br>`
+    wipeSay(`${t('보안을 위해 <b>다시 로그인한 뒤</b>에 지울 수 있습니다.')}<br><br>`
       + '클라우드에 올려 두었던 배 기록과 커뮤니티 글은 이미 지웠습니다.<br>'
       + '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.'
       + '<div class="mrrow" style="justify-content:center;padding:16px 0">'
@@ -8561,7 +8469,8 @@ async function recPickTake(v){
   const photos = blocks.filter(b=>b.t==='photo').map(b=>b.v);
   const bud = photoBudget(photos);
   if(!bud.ok){
-    alert(t('사진이 많아 ') + bud.dropped + t('장은 넣지 못합니다.\n\n글을 올린 뒤 따로 올려 주세요.'));
+    alert(tsub('사진이 많아 {n}장은 넣지 못합니다.', { n: bud.dropped })
+      + '\n\n' + t('글을 올린 뒤 따로 올려 주세요.'));
   }
   // 편집기 안 커서 자리에 넣는다
   setTimeout(()=>{ richInsert(rid, blocks); }, 60);
@@ -8757,16 +8666,21 @@ async function openInstall(){
 function installHowTo(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
-  const ios = `<div class="insstep"><span class="insno">1</span><span class="instx">${esc(t('화면'))}<b>${esc(t('아래쪽 가운데'))}</b>${esc(t('의'))} <b>${esc(t('공유'))}</b>${esc(t('단추'))}<span class="insico">⬆︎</span> ${esc(t('를 누릅니다 (네모에서 화살표가 위로 나온 그림)'))}</span></div>
-    <div class="insstep"><span class="insno">2</span><span class="instx">${esc(t('목록을'))}<b>${esc(t('아래로 내려'))}</b> <b>${esc(t('[홈 화면에 추가]'))}</b> ${esc(t('를 누릅니다'))}</span></div>
-    <div class="insstep"><span class="insno">3</span><span class="instx">${esc(t('오른쪽 위'))}<b>${esc(t('[추가]'))}</b> ${esc(t('를 누릅니다'))}</span></div>
-    <div class="mrnone" style="text-align:left">${esc(t('사파리에서만 됩니다. 크롬이나 카카오톡·인스타그램 안에서 열었다면 먼저 사파리로 열어 주세요.'))}<br>${esc(t('(주소창 옆'))}<b>···</b> → <b>${esc(t('Safari로 열기'))}</b>)</div>`;
-  const etc = `<div class="insstep"><span class="insno">1</span><span class="instx">${esc(t('주소창 옆'))}<b>⋮</b> ${esc(t('(점 세 개) 를 누릅니다'))}</span></div>
-    <div class="insstep"><span class="insno">2</span><span class="instx">
-      <b>${esc(t('[앱 설치]'))}</b> ${esc(t('또는'))} <b>${esc(t('[홈 화면에 추가]'))}</b> ${esc(t('를 누릅니다'))}</span></div>
-    <div class="insstep"><span class="insno">3</span><span class="instx">
-      <b>${esc(t('[설치]'))}</b> ${esc(t('를 누릅니다'))}</span></div>
-    <div class="mrnone" style="text-align:left">${esc(t('카카오톡·인스타그램 안에서 열었다면 먼저 크롬으로 열어 주세요.'))}<br>${esc(t('(오른쪽 위'))}<b>⋮</b> → <b>${esc(t('다른 브라우저로 열기'))}</b>)</div>`;
+  // ★ 한 걸음이 한 문장이다. 낱말로 쪼개면 말 차례가 다른 말에서 뒤죽박죽이 된다.
+  const ios = `<div class="insstep"><span class="insno">1</span><span class="instx">${
+      t('화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)')}</span></div>
+    <div class="insstep"><span class="insno">2</span><span class="instx">${t('목록을 <b>아래로 내려</b> <b>[홈 화면에 추가]</b> 를 누릅니다')}</span></div>
+    <div class="insstep"><span class="insno">3</span><span class="instx">${t('오른쪽 위 <b>[추가]</b> 를 누릅니다')}</span></div>
+    <div class="mrnone" style="text-align:left">${esc(t('사파리에서만 됩니다. 크롬이나 카카오톡·인스타그램 안에서 열었다면 먼저 사파리로 열어 주세요.'))}<br>${
+      t('(주소창 옆 <b>···</b> → <b>Safari로 열기</b>)')}</div>`;
+  const etc = `<div class="insstep"><span class="insno">1</span><span class="instx">${
+      t('주소창 옆 <b>⋮</b> (점 세 개) 를 누릅니다')}</span></div>
+    <div class="insstep"><span class="insno">2</span><span class="instx">${
+      t('<b>[앱 설치]</b> 또는 <b>[홈 화면에 추가]</b> 를 누릅니다')}</span></div>
+    <div class="insstep"><span class="insno">3</span><span class="instx">${
+      t('<b>[설치]</b> 를 누릅니다')}</span></div>
+    <div class="mrnone" style="text-align:left">${esc(t('카카오톡·인스타그램 안에서 열었다면 먼저 크롬으로 열어 주세요.'))}<br>${
+      t('(오른쪽 위 <b>⋮</b> → <b>다른 브라우저로 열기</b>)')}</div>`;
   P.innerHTML = `<div class="mrhead"><b>${esc(t('홈 화면에 추가하기'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('홈 화면에 두면 아이콘으로 바로 열립니다. 전체 화면으로 뜨고, 배 위에서 인터넷이 없어도 기록·도면·사진을 볼 수 있습니다.'))}</div>`
     + (isIOS() ? ios : etc);
@@ -9167,7 +9081,7 @@ async function openTalk(id){
     ${rideHead(po)}
     ${renderBlocks(tv ? trBlocks(po.blocks || [], tv.body) : (po.blocks || []), `talkPhotos('${esc(po.id)}')`)}
     ${po.kind === 'ride' ? `<div class="mrnone" style="text-align:left">
-        ${esc(t('타고 싶으시면 아래'))} <b>${esc(t('댓글'))}</b>${esc(t('로 말씀해 주세요. 태우실 분이 보고 정합니다.'))}<br>
+        ${t('타고 싶으시면 아래 <b>댓글</b>로 말씀해 주세요. 태우실 분이 보고 정합니다.')}<br>
         ${esc(RIDE_LAW)}</div>` : ''}
     <div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('talk', po.id, po.likeN)}
@@ -9907,7 +9821,8 @@ function boatPageBody(x, k){
         ${row(t('도착'), [v.to, v.timeIn].filter(Boolean).join(' · '))}
         ${row(t('도착 날씨'), v.wxIn)}
         ${row(t('거리'), v.nm ? v.nm + ' NM' : '')}
-        ${row(t('항해 시간'), v.hours ? v.hours + ' h' + (sail ? t(' (엔진 ') + (v.engineH||0) + t('h · 세일 ') + sail + ')' : '') : '')}
+        ${row(t('항해 시간'), v.hours ? v.hours + ' h'
+            + (sail ? ' ' + tsub('(엔진 {e}h · 세일 {s})', { e: v.engineH||0, s: sail }) : '') : '')}
         ${fish.length ? row(t('조과'), fish.map(f=>esc(f.name)+' '+f.n).join(' · ')) : ''}
         ${v.note ? `<div class="mrrow"><span class="mrlbl">${esc(t('메모'))}</span></div>
                     <div class="postbody">${esc(v.note).replace(/\n/g,'<br>')}</div>` : ''}
@@ -9993,7 +9908,7 @@ function openPublish(){
       <button class="tab" onclick="openBoat('info')">${esc(t('← 내 배'))}</button></div>
     <div class="mrnone" style="text-align:left">
       ${isPublic(b) ? `<b>${esc(t('지금 공개 중입니다.'))}</b> 배 이름과 선종은 항상 함께 보입니다.`
-                    : `<b>${esc(t('지금은 비공개입니다.'))}</b> 하나라도 켜면 배 둘러보기에 실립니다.`}<br>${esc(t('물품 위치, 좌표, 회비, 개인 메모는'))}<b>${esc(t('켜도 나가지 않습니다.'))}</b></div>`
+                    : `<b>${esc(t('지금은 비공개입니다.'))}</b> 하나라도 켜면 배 둘러보기에 실립니다.`}<br>${t('물품 위치, 좌표, 회비, 개인 메모는 <b>켜도 나가지 않습니다.</b>')}</div>`
     + rows
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="openIntro()">${esc(t('소개 페이지 쓰기'))}</button></div>`;
@@ -10528,7 +10443,10 @@ function openMyTasks(){
       ${t.late ? `<span class="chip late">${esc(t('기한 지남'))}</span>` : ''}
       <span class="chip">${t.kind==='maint' ? t('정기점검') : t('체크리스트')}</span></div>
       <div class="fsub">${t.kind==='maint'
-        ? (t.next ? t('다음 ') + fmtDate(t.next) + (t.days!==null ? ' · ' + (t.days<0 ? (-t.days)+t('일 지남') : t.days+t('일 남음')) : '') : t('기록 없음'))
+        ? (t.next ? tsub('다음 {d}', { d: fmtDate(t.next) })
+              + (t.days!==null ? ' · ' + (t.days<0 ? tsub('{n}일 지남', { n: -t.days })
+                                                   : tsub('{n}일 남음', { n: t.days })) : '')
+            : t('기록 없음'))
         : (t.grp || '')}</div></div></div>`;
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('내 할 일'))}</b><span style="flex:1"></span>
@@ -10779,7 +10697,7 @@ function removeMemberUI(uid){
   if(!can(b,'members','write')){ alert(t('구성원을 관리할 권한이 없습니다')); return; }
   if(guardEdit('이 사람을 배에서 내보냅니다.', () => removeMemberUI(uid))) return;
   const nm = (b.memberNames||{})[uid] || '이 사람';
-  if(!confirm(nm + t(' 님을 이 배에서 내보낼까요?\n\n')
+  if(!confirm(tsub('{name} 님을 이 배에서 내보낼까요?', { name: nm }) + '\n\n'
     + t('이 배의 기록을 더 이상 보지 못합니다.\n다시 받으려면 새로 가입 신청을 받아야 합니다.'))) return;
   if(!removeMember(b, uid)) return;
   saveLocal();
@@ -11111,8 +11029,8 @@ function approveJoin(inviteId, uid, name){
       //   안 올라갔는데 '받았습니다' 라고 하면 다음 받아오기에서 사라진다.
       saveBoatCloud(b, true).then(ok=>{
         if(window.__invites) window.__invites.close(inviteId).catch(()=>{});
-        if(ok) alert((name || t('이 분')) + t(' 을 구성원으로 받았습니다'));
-        else alert((name || t('이 분')) + t(' 을 이 기기에는 받았습니다.\n\n')
+        if(ok) alert(tsub('{name} 을 구성원으로 받았습니다', { name: name || t('이 분') }));
+        else alert(tsub('{name} 을 이 기기에는 받았습니다.', { name: name || t('이 분') }) + '\n\n'
           + t('다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n')
           + t('그때까지 다른 기기에서는 안 보일 수 있습니다.'));
         openBoat('roster');
@@ -11426,7 +11344,7 @@ function saveSpecNow(){
   saveBoatCloud(b);
   if(typeof schedulePush === 'function') schedulePush();
   if(typeof renderWeather === 'function' && curScreen() === 'weather') renderWeather();
-  alert(t('제원 ') + n + t('칸을 저장했습니다.'));
+  alert(tsub('제원 {n}칸을 저장했습니다.', { n: n }));
 }
 function setBoatSpecUI(k, v){
   setBoatSpec(k, v);
@@ -11550,7 +11468,7 @@ function boatWxCard(now, idx){
   const anyLimit = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCurrent']
     .some(k => boatSpec(k) > 0);
   if(!ws.length && rf === null && !anyLimit){
-    return `<div class="mrnone" style="text-align:left">${esc(t('배 길이를 넣어 두시면 그에 맞는'))}<b>${esc(t('출항 한계 풍속·파고'))}</b>${esc(t('를 자동으로 잡아 기준을 넘었는지 알려 드립니다.'))}<button class="minib blu" onclick="openBoat('spec')">${esc(t('배 길이 넣기'))}</button></div>`;
+    return `<div class="mrnone" style="text-align:left">${t('배 길이를 넣어 두시면 그에 맞는 <b>출항 한계 풍속·파고</b>를 자동으로 잡아 기준을 넘었는지 알려 드립니다.')}<button class="minib blu" onclick="openBoat('spec')">${esc(t('배 길이 넣기'))}</button></div>`;
   }
   const rows = ws.map(w=>`<div class="bwrow ${w.level}">
       <b>${esc(w.text)}</b>
@@ -11559,7 +11477,7 @@ function boatWxCard(now, idx){
     </div>`).join('');
   const reef = (rf === null) ? ''
     : `<div class="bwrow ${rf >= 2 ? 'mid' : 'ok'}">
-        <b>${rf === 0 ? t('리프 없이 갈 수 있는 바람입니다') : t('메인세일 ') + rf + t('단 리프')}</b>
+        <b>${rf === 0 ? t('리프 없이 갈 수 있는 바람입니다') : tsub('메인세일 {n}단 리프', { n: rf })}</b>
         <span>바람 ${Math.round(now.wind)}kt</span></div>`;
   if(!rows && !reef) return `<div class="bwcard ok">${when}<div class="bwrow ok">
       <b>${esc(t('정해 둔 기준 안에 있습니다'))}</b><span>바람 ${Math.round(now.wind||0)}kt</span></div></div>`;
@@ -12649,7 +12567,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.90';
+const APP_VER = '3.92';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14703,7 +14621,7 @@ function renderMaintList(){
   if(!maint.length){
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('정기점검'))}</b>
-      <div>${esc(t('엔진오일, 아연 아노드처럼'))} <b>${esc(t('주기가 정해진 정비'))}</b>${esc(t('를 등록해 두는 곳입니다.'))}<br>
+      <div>${t('엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.')}<br>
         마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.</div>
       <div class="emptysub">${esc(t('기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.'))}</div>
       ${true ? `<button class="mrbtn" onclick="needEdit('정비 항목을 넣습니다.', ()=>mrAdd('maint'))">${esc(t('첫 항목 추가하기'))}</button>` : ''}
@@ -14908,9 +14826,10 @@ function openMR(kind, id){
              <button class="minib blu" onclick="fillEngineHours()">${esc(t('중간 기록에서 계산'))}</button>`
           :`<b class="mrv">${it.engineH||'—'} h</b>`}</div>`
       + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">
-           ${esc(t('엔진 시간은 항해 시간 안에 들어 있습니다.'))} ${esc(isFishing() ? t('엔진을 끄고 있던 시간은') : t('세일로 간 시간은'))}
-           ${(() => { const a=Number(it.hours)||0, b=Number(it.engineH)||0;
-                      return (a>0 && b>=0 && a>=b) ? (a-b).toFixed(1)+'h' : '—'; })()} ${esc(t('입니다.'))}</div>`
+           ${esc(t('엔진 시간은 항해 시간 안에 들어 있습니다.'))}
+           ${esc(tsub(isFishing() ? '엔진을 끄고 있던 시간은 {h} 입니다.' : '세일로 간 시간은 {h} 입니다.',
+                 { h: (() => { const a=Number(it.hours)||0, b=Number(it.engineH)||0;
+                       return (a>0 && b>=0 && a>=b) ? (a-b).toFixed(1)+'h' : '—'; })() }))}</div>`
       + suggestRow(it, 'engineH')
       + tf('동승','crew',it.crew)
       + (trkPoints(it).length
@@ -14922,8 +14841,7 @@ function openMR(kind, id){
           : `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
                <span class="mrm" style="flex:1;color:#7b8794">${esc(t('저장된 위치가 없습니다'))}</span></div>`
             + `<div class="trkempty">${esc(t('위치를 남기면 이곳에 항적이 표시됩니다'))}<br>
-                 <span style="color:#7b8794">${esc(t('출발·도착·중간기록에서'))} <b style="color:#6FD9A0">${esc(t('지금 여기'))}</b> ${esc(t('또는'))}
-                 <b style="color:#8ab4d8">${esc(t('지도에서'))}</b>${esc(t('를 누르면 됩니다'))}</span>${
+                 <span style="color:#7b8794">${t('출발·도착·중간기록에서 <b style="color:#6FD9A0">지금 여기</b> 또는 <b style="color:#8ab4d8">지도에서</b> 를 누르면 됩니다')}</span>${
                  unlocked ? `<div style="margin-top:10px"><button class="mrbtn" onclick="posHere('wxOut')">${esc(t('지금 여기로 출발 위치 잡기'))}</button></div>` : ''}</div>`)
       + `<div id="pickWrap" style="display:none"></div>`
         ))
@@ -16236,7 +16154,7 @@ function openLang(){
     + langReady().map(x=>`<div class="mrrow">
         <span class="mrm" style="flex:1">${esc(x.name)}</span>
         <button class="minib ${x.v===cur?'grn':'blu'}" onclick="setLang('${x.v}')">${
-          x.v===cur ? t('쓰는 중') : t('이 말로')}</button></div>`).join('')
+          x.v===cur ? t('사용 중') : t('바꾸기')}</button></div>`).join('')
     + `<div class="mrnone" style="text-align:left">${esc(t('화면의 글자가 바뀝니다.'))}
         ${esc(t('사람들이 올린 글은 쓴 사람의 말 그대로 둡니다 — 글을 열면 번역 단추가 나옵니다.'))}</div>`;
   showPanel(P);
@@ -16411,8 +16329,17 @@ function trRepaint(coll, id){
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
 const LEGAL_VER  = '1.1';
-const LEGAL_DATE = '2026년 8월 16일';
-const LEGAL_OWNER = { name: '김명준', email: 'jaha814@gmail.com' };
+// ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
+//   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
+const LEGAL_DATES = { ko:'2026년 8월 16일', en:'16 August 2026', ru:'16 августа 2026 г.' };
+const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
+// ★ 이름은 말마다 따로 적는다. 사전에 넣으면 자동 번역이 사람 이름을 건드린다.
+//   본인이 쓰는 표기가 있으므로 여기서만 고친다.
+const LEGAL_OWNER = {
+  name: '김명준',                       // 정본(한국어). 예전 코드·검사 호환
+  names: { ko:'김명준', en:'Kim Myung Joon', ru:'Ким Мёнджун' },
+  email: 'jaha814@gmail.com'
+};
 const LEGAL_BIZ = null;   // 사업자등록하면 { name:'상호', no:'000-00-00000', addr:'주소' }
 
 const LEGAL_DOCS = {
@@ -16663,17 +16590,594 @@ location: { title: '위치정보 이용약관', body: `
 ` }
 };
 
+
+// ── 외국어판 (번역본)
+// ★ 한국어가 정본이다. 번역이 어긋나도 한국어를 따른다 — 문서 첫머리에 그렇게 적어 두었다.
+//   내용을 고치면 한국어와 함께 고치고 LEGAL_VER 을 올린다.
+const LEGAL_DOCS_EN = {
+terms: { title: 'Terms of Service', body: `
+This is a courtesy translation. The Korean text is the authoritative version;
+if the two differ, the Korean text prevails.
+
+Article 1 (Purpose)
+These Terms set out what you need to know to use Baetnil (the "App").
+
+Article 2 (Operator)
+The App is built and run by {OWNER} (contact {EMAIL}) in a personal capacity.{BIZ}
+
+Article 3 (Effect and Amendment)
+1. These Terms can be read inside the App at any time.
+2. The operator may amend these Terms. Any amendment is announced inside the App and
+   your agreement is sought again.
+3. If you do not agree to the amended Terms, you may stop using the App.
+
+Article 4 (Contract of Use)
+1. A contract of use is formed when you sign up and the operator accepts.
+2. You must be 14 or older. Processing the personal data of anyone under 14 requires
+   the consent of a legal guardian, and the App has no procedure for that.
+   Please add minors who sail with you as crew members under a guardian's account.
+3. You may not sign up using another person's name or email address.
+
+Article 5 (What the App Does)
+1. The App keeps records of a boat's gear, maintenance, repairs, voyages and fuel;
+   manages crew; shows weather and tide information for reference; and provides
+   community features including berths, a second-hand market and a message board.
+2. Every feature is currently free. Some features may become paid in future.
+   If that happens it will be announced inside the App beforehand and Article 12 applies.
+   Features you already use for free will not be made paid without notice.
+
+Article 6 (Limits of Weather, Tide and Depth Information; the Decision to Sail)
+1. The wind, waves, tide, water level, depth and marine warnings shown in the App are
+   all for reference. Weather and tide forecasts can differ from reality, and if your
+   internet connection drops you may be looking at older data.
+2. The depth, bottom and facility details of a berth are posted by other users.
+   The operator does not verify them one by one and they may be wrong.
+3. The depth conversion feature is only the value you entered minus the tide.
+   It does not replace charted depths.
+4. Whether to sail, which route to take, where to lie and when to come alongside are
+   entirely your decision and your responsibility. Do not use this App in place of
+   charts, notices to mariners, live meteorological warnings or the boat's instruments.
+5. The operator is not liable for accidents or losses arising from decisions made in
+   reliance on the App, except where the operator acted with intent or gross negligence.
+
+Article 7 (Your Obligations)
+You must not:
+ 1. impersonate another person or use another person's account;
+ 2. post abuse, threats, hate speech, or material that harasses others;
+ 3. post false information that endangers others (berths that do not exist, wrong depths and so on);
+ 4. post repeated advertising or promotion;
+ 5. post another person's personal data or photographs without their consent;
+ 6. infringe copyright or other rights of others;
+ 7. buy or sell goods that are unlawful;
+ 8. interfere with the normal operation of the App or access it by improper means.
+
+Article 8 (User Content)
+1. Rights in the text, photographs and records you post remain yours.
+2. The operator uses your content only as far as is needed to run and display the App.
+3. Content that breaches Article 7 is hidden automatically once reports accumulate,
+   and the operator may delete it.
+4. Records inside a boat (gear, maintenance, voyages and so on) can be seen only by that
+   boat's crew. Only the items you switch on in the publishing settings leave the boat.
+
+Article 9 (Second-hand Market)
+1. The operator only provides the place to trade and is not a party to any transaction.
+2. Responsibility for the condition, price, delivery, defects and refund of goods rests
+   with the seller and the buyer.
+3. The operator does not guarantee transactions and does not hold payments.
+4. Do not send money first. See the goods in person before you deal.
+5. If a dispute such as fraud arises, please report it to the authorities. On receiving
+   a report the operator will take the listing down and suspend the account.
+
+Article 10 (Interruption of Service)
+1. The service may stop because of maintenance, faults, communication failures or acts of nature.
+2. Interruptions that can be foreseen are announced inside the App.
+3. The App is run by one individual and may be discontinued without notice. In that case
+   at least 30 days' notice is given and you are able to download your own records.
+
+Article 11 (Suspension and Termination)
+1. You may leave at any time.
+2. If you breach Article 7 the operator may delete content, suspend you temporarily,
+   or restrict your use.
+3. If the breach is serious or repeated, the account may be restricted permanently.
+4. If you object to any such measure, please tell us through Support.
+
+Article 12 (Paid Services)
+1. If paid features are introduced, the price, payment method and refund terms are shown
+   on the payment screen beforehand.
+2. Refunds follow the Content Industry Promotion Act, the Act on Consumer Protection in
+   Electronic Commerce and the Criteria for Resolution of Consumer Disputes.
+3. This Article takes effect only when paid features actually exist.
+
+Article 13 (Limitation of Liability)
+1. The operator provides the App as it is and does not warrant that it is fit for any
+   particular purpose.
+2. The operator is not liable for disputes between users or for loss arising from
+   information posted by users, except where the operator acted with intent or gross negligence.
+3. The same applies to loss arising from a failure of your device, a communication fault,
+   or your own failure to look after your account.
+4. This Article is not to be construed against the consumer and does not exclude any
+   liability the law imposes on the operator.
+
+Article 14 (Governing Law and Jurisdiction)
+These Terms are governed by the law of the Republic of Korea. Disputes are brought before
+the court determined by the Civil Procedure Act.
+
+Supplementary Provision
+These Terms apply from {DATE}. (Version {VER})
+` },
+
+privacy: { title: 'Privacy Policy', body: `
+This is a courtesy translation. The Korean text is the authoritative version;
+if the two differ, the Korean text prevails.
+
+{OWNER} (the "operator") handles your personal data with care while running Baetnil
+(the "App") and complies with the Personal Information Protection Act of Korea.
+
+1. What is collected
+ a. When you sign up (used for signing in)
+   · Signing in with Google: email address, name (your Google display name), account identifier
+   · Signing up with email: email address, password (the operator cannot see it)
+   Note: the email address is used only to verify sign-in. It is held by Google Firebase
+     Authentication and is not stored in the App's user list. The operator therefore cannot
+     see your email address on any App screen, and it does not appear in crew lists or join
+     requests. People are told apart by name and the last digits of the account identifier.
+ b. What you enter while using the App
+   · Boat details (name, type, home port, specifications), gear, maintenance, repair and fuel records
+   · Logbook entries (dates, routes, coordinates), berth positions and photographs, market listings and photographs
+   · Community posts and comments, crew names and ranks, contacts
+   · The note you leave for the owner when applying to join a boat
+ c. When you contact Support (needed to reproduce the problem)
+   · Your message, the App version, browser type, screen size, the screen you were on, whether you were online
+ d. Location
+   · Current position (GPS): received only with your permission, to show weather and tides.
+     It is stored on your device only and is not sent to the server.
+   · Home port, berth and voyage coordinates: values you mark on the map yourself; these are stored on the server.
+ Note: resident registration numbers, card numbers and bank account numbers are never collected.
+
+2. How it is collected
+ You enter it in the App yourself, or it is received from your Google account when you sign in.
+ The only thing collected automatically is the device information attached to a Support enquiry.
+
+3. Why it is used
+ · to create your account and verify who you are
+ · to show the same records on several devices and let a crew manage a boat together
+ · to show weather, tides and marine warnings for where the boat is
+ · to run the community and the market, and to handle reports
+ · to fix faults and answer enquiries
+ It is not used for any other purpose. If the purpose changes, your consent is sought beforehand.
+
+4. How long it is kept
+ · Account details: until you leave
+ · Boat records and posts: until you delete them, or until you leave
+ · Support enquiries: 3 years after the reply (in case of dispute)
+ · Reports and sanctions: 3 years (to see whether the same thing recurs)
+ When you leave, data is destroyed without delay. Records the law requires us to keep are
+ held separately for that period.
+
+5. Is it given to anyone else
+ No. It is not sold either. It is disclosed only where an investigative authority requires
+ it through lawful process.
+
+6. Processing entrusted to others
+ · Google LLC (Firebase Authentication, Cloud Firestore)
+   - What they do: sign-in processing, data storage
+   - Where the data is: Seoul region, Republic of Korea
+ The processing agreement requires personal data to be handled securely.
+
+7. How it is destroyed
+ Once the retention period ends or the purpose is met, data is destroyed without delay.
+ Electronic files are deleted by a method that makes them unrecoverable.
+
+8. Your rights
+ You may at any time see, correct or delete your personal data, or ask that its processing stop.
+ · In the App: Menu › Account, My Boat › Basics, and the delete action on each record
+ · Other requests: Support, or {EMAIL}
+ Requests are handled without delay and the outcome is communicated to you.
+ A minor aged 14 or over may exercise these rights themselves.
+
+9. Children under 14
+ The App does not accept anyone under 14. If it is established that a user is under 14,
+ the account and its data are deleted.
+
+10. How it is kept safe
+ · Access control: only a boat's crew can see that boat's records, and what each person may do
+   depends on their rank. This is enforced by server rules, not merely hidden on screen.
+ · Collecting less: the email address is used only to verify sign-in and is not kept in the user
+   list. What is not held cannot leak.
+ · Encryption in transit (HTTPS)
+ · Passwords are handled by Google Firebase and cannot be seen by the operator.
+ · Access to personal data is limited to one person: the operator.
+
+11. What is stored on your device
+ The App stores the following in your device's browser:
+ · the last screen you were on, your saved spots, and a copy of your records for offline use
+ Clearing site data in your browser settings removes them too.
+
+12. Location data
+ · Current position (GPS) is received only with your permission and used only on your device.
+   You can use the App without granting it — simply choose a spot yourself.
+ · Home port, berth and voyage coordinates that you mark on the map are stored on the server.
+   Voyage coordinates can be seen only by that boat's crew, and they are never published even
+   if the boat is made public.
+ · For details, please see the Location Information Terms.
+
+13. Data protection officer
+ · Name: {OWNER}
+ · Contact: {EMAIL}
+ Please direct enquiries, complaints and requests for redress concerning personal data to the
+ address above or to Support inside the App.
+
+14. If your rights are infringed
+ You may seek help from the following bodies:
+ · Personal Information Infringement Report Centre (privacy.kisa.or.kr / 118)
+ · Personal Information Dispute Mediation Committee (kopico.go.kr / 1833-6972)
+ · Supreme Prosecutors' Office, Cybercrime Division (spo.go.kr / 1301)
+ · National Police Agency, Cyber Bureau (ecrm.police.go.kr / 182)
+
+15. When this policy changes
+ Changes are announced inside the App, and consent is sought again for material changes.
+
+This policy applies from {DATE}. (Version {VER})
+` },
+
+location: { title: 'Location Information Terms', body: `
+This is a courtesy translation. The Korean text is the authoritative version;
+if the two differ, the Korean text prevails.
+
+Article 1 (Purpose)
+These Terms set out how Baetnil (the "App") handles location information.
+
+Article 2 (What it is used for)
+ · to show wind, waves, tides and marine warnings for where you are
+ · to pick the tide station nearest the boat's home port and convert a measured depth
+   to the lowest-tide datum
+ · to show only the warnings for the waters the boat is in
+ · to post berths you mark on the map to the community
+ · to draw the routes you record in the logbook
+
+Article 3 (Current position)
+1. Your current position (GPS) is received only when you permit it on your device.
+2. The value is stored on your device only and is not sent to the server.
+3. You can use the whole App if you refuse. Simply choose a spot yourself.
+4. You may withdraw permission at any time in your device settings.
+
+Article 4 (Coordinates you mark yourself)
+1. Home port, berth and voyage coordinates are values you mark on the map yourself and
+   are stored on the server.
+2. Voyage coordinates can be seen only by that boat's crew. They are never published even
+   if the boat is made public.
+3. Berth coordinates are published to the community. You can check them on screen before
+   posting, and you can delete them afterwards.
+
+Article 5 (Retention)
+Stored coordinates are kept until you delete them, or until you leave, and are then destroyed.
+
+Article 6 (Disclosure to third parties)
+Location information is not given to anyone else. It is disclosed only where there is a
+lawful requirement to do so.
+
+Article 7 (Your rights)
+You may withdraw consent to the collection, use and provision of your location information
+at any time, and you may ask to see or delete what is stored. Contact: {EMAIL}
+
+Article 8 (Children under 14)
+The App does not accept anyone under 14, so no location information is received from them.
+
+Article 9 (Enquiries)
+Location information enquiries: {OWNER} ({EMAIL})
+
+These Terms apply from {DATE}. (Version {VER})
+` }
+};
+
+
+const LEGAL_DOCS_RU = {
+terms: { title: 'Пользовательское соглашение', body: `
+Это перевод для удобства. Оригиналом является корейский текст;
+при расхождении преимущественную силу имеет корейский текст.
+
+Статья 1 (Назначение)
+Настоящее соглашение определяет условия пользования приложением «Пэннiль» (далее — «Приложение»).
+
+Статья 2 (Оператор)
+Приложение создано и поддерживается {OWNER} (контакт {EMAIL}) в личном качестве.{BIZ}
+
+Статья 3 (Действие и изменение)
+1. Настоящее соглашение доступно для чтения внутри Приложения в любое время.
+2. Оператор вправе изменить соглашение. Об изменении сообщается внутри Приложения,
+   и согласие запрашивается заново.
+3. Если вы не согласны с изменённым соглашением, вы можете прекратить пользование.
+
+Статья 4 (Договор пользования)
+1. Договор считается заключённым, когда вы регистрируетесь и оператор принимает регистрацию.
+2. Пользователю должно быть не менее 14 лет. Обработка персональных данных лиц младше 14 лет
+   требует согласия законного представителя, а такой процедуры в Приложении нет.
+   Несовершеннолетних, выходящих с вами в море, добавляйте как членов экипажа
+   в учётной записи взрослого.
+3. Нельзя регистрироваться под чужим именем или чужим адресом электронной почты.
+
+Статья 5 (Состав услуг)
+1. Приложение ведёт учёт вещей, обслуживания, ремонта, походов и заправок судна,
+   управляет экипажем, показывает справочные сведения о погоде и приливах и предоставляет
+   функции сообщества: стоянки, барахолку и доску объявлений.
+2. Сейчас все функции бесплатны. В будущем часть функций может стать платной.
+   В этом случае об этом заранее сообщается внутри Приложения и применяется статья 12.
+   Функции, которыми вы уже пользуетесь бесплатно, не станут платными без предупреждения.
+
+Статья 6 (Пределы данных о погоде, приливах и глубинах; решение о выходе в море)
+1. Ветер, волна, уровень воды, приливы, глубины и морские предупреждения в Приложении носят
+   справочный характер. Прогнозы погоды и приливов могут расходиться с действительностью,
+   а при обрыве связи вы можете видеть устаревшие данные.
+2. Сведения о глубине, грунте и оборудовании стоянок размещают сами пользователи.
+   Оператор не проверяет их по отдельности, и они могут быть недостоверны.
+3. Пересчёт глубины — это лишь введённое вами значение за вычетом уровня воды.
+   Он не заменяет глубины по карте.
+4. Решение о выходе в море, о маршруте, о месте стоянки и о времени швартовки, равно как и
+   ответственность за него, полностью лежат на пользователе. Не используйте Приложение вместо
+   карт, извещений мореплавателям, оперативных штормовых предупреждений и судовых приборов.
+5. Оператор не несёт ответственности за происшествия и убытки, вызванные решениями,
+   принятыми в опоре на Приложение, кроме случаев умысла или грубой неосторожности оператора.
+
+Статья 7 (Обязанности пользователя)
+Пользователю запрещается:
+ 1. выдавать себя за другое лицо или пользоваться чужой учётной записью;
+ 2. размещать оскорбления, угрозы, разжигание ненависти, материалы, преследующие других;
+ 3. размещать ложные сведения, угрожающие безопасности других (несуществующие стоянки,
+    неверные глубины и т. п.);
+ 4. многократно размещать рекламу и продвижение;
+ 5. размещать персональные данные или фотографии других лиц без их согласия;
+ 6. нарушать авторские и иные права других лиц;
+ 7. покупать и продавать предметы, оборот которых запрещён законом;
+ 8. мешать нормальной работе Приложения или получать доступ к нему недобросовестными способами.
+
+Статья 8 (Материалы пользователей)
+1. Права на размещённые вами тексты, фотографии и записи остаются за вами.
+2. Оператор использует их только в объёме, необходимом для работы и отображения Приложения.
+3. Материалы, нарушающие статью 7, скрываются автоматически при накоплении жалоб,
+   и оператор вправе их удалить.
+4. Записи внутри судна (вещи, обслуживание, походы и прочее) видны только экипажу этого судна.
+   Наружу выходит лишь то, что вы включили в настройках публикации.
+
+Статья 9 (Барахолка)
+1. Оператор лишь предоставляет площадку и не является стороной сделки.
+2. Ответственность за состояние, цену, передачу, недостатки и возврат товара несут
+   продавец и покупатель.
+3. Оператор не гарантирует сделок и не хранит денежные средства.
+4. Не переводите деньги вперёд. Осматривайте товар лично.
+5. При споре, в том числе о мошенничестве, обращайтесь в правоохранительные органы.
+   Получив сообщение, оператор снимет объявление и приостановит учётную запись.
+
+Статья 10 (Приостановка услуг)
+1. Работа может прерываться из-за обслуживания, неисправностей, сбоев связи или стихийных бедствий.
+2. О предвидимых перерывах сообщается внутри Приложения.
+3. Приложение поддерживает один человек, и работа может быть прекращена без предупреждения.
+   В этом случае уведомление даётся не менее чем за 30 дней, и вы сможете выгрузить свои записи.
+
+Статья 11 (Приостановление и прекращение)
+1. Вы можете уйти в любой момент.
+2. При нарушении статьи 7 оператор вправе удалить материалы, временно приостановить
+   или ограничить пользование.
+3. При грубом или повторном нарушении учётная запись может быть ограничена бессрочно.
+4. Возражения по принятым мерам направляйте в поддержку.
+
+Статья 12 (Платные услуги)
+1. При появлении платных функций цена, способ оплаты и условия возврата заранее показываются
+   на экране оплаты.
+2. Возврат производится по Закону о развитии индустрии контента, Закону о защите потребителей
+   в электронной торговле и Критериям разрешения потребительских споров.
+3. Настоящая статья действует с момента фактического появления платных функций.
+
+Статья 13 (Ограничение ответственности)
+1. Оператор предоставляет Приложение «как есть» и не гарантирует его пригодности
+   для какой-либо конкретной цели.
+2. Оператор не отвечает за споры между пользователями и за убытки от размещённых
+   пользователями сведений, кроме случаев умысла или грубой неосторожности оператора.
+3. То же относится к убыткам от неисправности вашего устройства, сбоя связи
+   или небрежного обращения с учётной записью.
+4. Настоящая статья не толкуется во вред потребителю и не освобождает оператора
+   от ответственности, установленной законом.
+
+Статья 14 (Применимое право и подсудность)
+Настоящее соглашение регулируется правом Республики Корея. Споры рассматриваются судом,
+определяемым Гражданским процессуальным кодексом.
+
+Заключительное положение
+Настоящее соглашение применяется с {DATE}. (Редакция {VER})
+` },
+
+privacy: { title: 'Политика конфиденциальности', body: `
+Это перевод для удобства. Оригиналом является корейский текст;
+при расхождении преимущественную силу имеет корейский текст.
+
+{OWNER} (далее — «оператор») бережно обращается с персональными данными пользователей
+приложения «Пэннiль» (далее — «Приложение») и соблюдает Закон Республики Корея
+о защите персональных данных.
+
+1. Какие данные собираются
+ а. При регистрации (используется для входа)
+   · Вход через Google: адрес электронной почты, имя (отображаемое имя Google), идентификатор учётной записи
+   · Регистрация по почте: адрес электронной почты, пароль (оператор его не видит)
+   Примечание: адрес почты используется только для проверки входа. Он хранится в Google Firebase
+     Authentication и не заносится в список пользователей Приложения. Поэтому оператор не видит
+     вашу почту ни на одном экране, и она не отображается в списках экипажа и заявках на вступление.
+     Людей различают по имени и последним цифрам идентификатора учётной записи.
+ б. Что вы вводите сами при работе с Приложением
+   · Данные судна (название, тип, порт приписки, характеристики), записи о вещах, обслуживании,
+     ремонте и заправках
+   · Записи судового журнала (даты, маршруты, координаты), координаты и фотографии стоянок,
+     объявления и фотографии на барахолке
+   · Записи и комментарии в сообществе, имена и роли членов экипажа, контакты
+   · Сообщение владельцу при подаче заявки на вступление в экипаж
+ в. При обращении в поддержку (нужно для воспроизведения проблемы)
+   · Текст обращения, версия Приложения, тип браузера, размер экрана, название открытого экрана,
+     наличие подключения к сети
+ г. Местоположение
+   · Текущее местоположение (GPS): принимается только с вашего разрешения, чтобы показать погоду
+     и приливы. Хранится только на устройстве и на сервер не передаётся.
+   · Координаты порта приписки, стоянок и походов: значения, которые вы сами отмечаете на карте;
+     они хранятся на сервере.
+ Примечание: номера удостоверений личности, номера карт и банковских счетов не собираются.
+
+2. Как они собираются
+ Вы вводите их в Приложении сами либо они поступают из учётной записи Google при входе.
+ Автоматически собираются только сведения об устройстве, прилагаемые к обращению в поддержку.
+
+3. Зачем они используются
+ · для создания учётной записи и подтверждения личности
+ · чтобы показывать одни и те же записи на нескольких устройствах и вести судно совместно с экипажем
+ · чтобы показывать погоду, приливы и морские предупреждения для места, где находится судно
+ · для работы сообщества и барахолки и для рассмотрения жалоб
+ · для устранения ошибок и ответов на обращения
+ Для иных целей данные не используются; при изменении цели согласие запрашивается заранее.
+
+4. Сколько они хранятся
+ · Данные учётной записи: до выхода из сервиса
+ · Записи судна и публикации: до удаления вами либо до выхода из сервиса
+ · Обращения в поддержку: 3 года после ответа (на случай спора)
+ · Жалобы и меры: 3 года (чтобы видеть повторяющиеся случаи)
+ При выходе данные уничтожаются без промедления. Сведения, которые закон обязывает хранить,
+ хранятся отдельно установленный срок.
+
+5. Передаются ли третьим лицам
+ Нет. И не продаются. Раскрытие возможно только по законному требованию
+ правоохранительных органов.
+
+6. Обработка, поручаемая другим
+ · Google LLC (Firebase Authentication, Cloud Firestore)
+   — что делают: обработка входа, хранение данных
+   — где находятся данные: регион Сеул, Республика Корея
+ Договор поручения обязывает обеспечивать безопасность персональных данных.
+
+7. Как они уничтожаются
+ По истечении срока хранения или достижении цели данные уничтожаются без промедления.
+ Электронные файлы удаляются способом, исключающим восстановление.
+
+8. Права пользователя
+ Вы вправе в любой момент ознакомиться со своими персональными данными, исправить или удалить их,
+ а также потребовать прекратить их обработку.
+ · В Приложении: Меню › Аккаунт, Моё судно › Основное, удаление в каждой записи
+ · Иные обращения: поддержка или {EMAIL}
+ Обращения рассматриваются без промедления, о результате вам сообщают.
+ Несовершеннолетний в возрасте 14 лет и старше осуществляет эти права самостоятельно.
+
+9. Лица младше 14 лет
+ Приложение не принимает лиц младше 14 лет. При установлении такого факта учётная запись
+ и её данные удаляются.
+
+10. Что делается для безопасности
+ · Управление доступом: записи судна видит только его экипаж, а объём возможностей зависит от роли.
+   Это ограничение обеспечивается правилами на сервере, а не сокрытием на экране.
+ · Собирается меньше данных: адрес почты используется только для проверки входа и не хранится
+   в списке пользователей. То, чего не хранят, не может утечь.
+ · Шифрование при передаче (HTTPS)
+ · Пароли обрабатывает Google Firebase, оператор их не видит.
+ · Доступ к персональным данным есть только у одного человека — оператора.
+
+11. Что хранится на устройстве
+ Приложение сохраняет в браузере вашего устройства следующее:
+ · последний открытый экран, сохранённые точки и копию записей для работы без сети
+ Очистка данных сайта в настройках браузера удаляет и их.
+
+12. Данные о местоположении
+ · Текущее местоположение (GPS) принимается только с вашего разрешения и используется
+   только на устройстве. Приложением можно пользоваться и без разрешения — выберите точку вручную.
+ · Координаты порта приписки, стоянок и походов, отмеченные вами на карте, хранятся на сервере.
+   Координаты походов видит только экипаж судна; они не публикуются даже при публикации судна.
+ · Подробности — в «Условиях использования данных о местоположении».
+
+13. Ответственный за защиту персональных данных
+ · Имя: {OWNER}
+ · Контакт: {EMAIL}
+ Вопросы, жалобы и требования о защите прав направляйте по указанному адресу
+ или через поддержку в Приложении.
+
+14. Если ваши права нарушены
+ Вы можете обратиться в следующие органы:
+ · Центр приёма сообщений о нарушениях в сфере персональных данных (privacy.kisa.or.kr / 118)
+ · Комитет по разрешению споров о персональных данных (kopico.go.kr / 1833-6972)
+ · Генеральная прокуратура, отдел киберрасследований (spo.go.kr / 1301)
+ · Национальное полицейское агентство, киберуправление (ecrm.police.go.kr / 182)
+
+15. Изменение политики
+ Об изменениях сообщается внутри Приложения; при существенных изменениях согласие
+ запрашивается заново.
+
+Настоящая политика применяется с {DATE}. (Редакция {VER})
+` },
+
+location: { title: 'Условия использования данных о местоположении', body: `
+Это перевод для удобства. Оригиналом является корейский текст;
+при расхождении преимущественную силу имеет корейский текст.
+
+Статья 1 (Назначение)
+Настоящие условия определяют, как приложение «Пэннiль» (далее — «Приложение»)
+обращается с данными о местоположении.
+
+Статья 2 (Для чего используются)
+ · чтобы показывать ветер, волну, приливы и морские предупреждения для вашего места
+ · чтобы выбрать ближайший к порту приписки футшток и пересчитать измеренную глубину
+   к отсчёту от малой воды
+ · чтобы показывать предупреждения только по той акватории, где находится судно
+ · чтобы публиковать в сообществе стоянки, отмеченные вами на карте
+ · чтобы строить маршруты, записанные вами в судовом журнале
+
+Статья 3 (Текущее местоположение)
+1. Текущее местоположение (GPS) принимается только при вашем разрешении на устройстве.
+2. Полученное значение хранится только на устройстве и на сервер не передаётся.
+3. При отказе Приложением можно пользоваться полностью — выберите точку вручную.
+4. Разрешение можно отозвать в настройках устройства в любой момент.
+
+Статья 4 (Координаты, отмеченные вами)
+1. Координаты порта приписки, стоянок и походов вы отмечаете на карте сами,
+   и они хранятся на сервере.
+2. Координаты походов видит только экипаж судна. Они не публикуются даже
+   при публикации судна.
+3. Координаты стоянок публикуются в сообществе. Их можно проверить на экране до публикации,
+   а после публикации — удалить.
+
+Статья 5 (Срок хранения)
+Сохранённые координаты хранятся до их удаления вами либо до выхода из сервиса,
+после чего уничтожаются.
+
+Статья 6 (Передача третьим лицам)
+Данные о местоположении не передаются третьим лицам. Раскрытие возможно только
+по законному требованию.
+
+Статья 7 (Права пользователя)
+Вы вправе в любой момент отозвать согласие на сбор, использование и передачу данных
+о вашем местоположении, а также потребовать показать или удалить сохранённые данные.
+Контакт: {EMAIL}
+
+Статья 8 (Лица младше 14 лет)
+Приложение не принимает лиц младше 14 лет, поэтому данные об их местоположении не собираются.
+
+Статья 9 (Вопросы)
+Вопросы о данных местоположения: {OWNER} ({EMAIL})
+
+Настоящие условия применяются с {DATE}. (Редакция {VER})
+` }
+};
+
+// 고른 말의 판을 고른다. 없으면 한국어(정본)로 돌아간다.
+// ★ 번역본에는 첫머리에 '한국어가 정본' 이라고 적어 두었다. 번역이 어긋나도 한국어를 따른다.
+function legalSet(v){
+  const lang = v || langNow();
+  if(lang === 'en' && typeof LEGAL_DOCS_EN !== 'undefined') return LEGAL_DOCS_EN;
+  if(lang === 'ru' && typeof LEGAL_DOCS_RU !== 'undefined') return LEGAL_DOCS_RU;
+  return LEGAL_DOCS;
+}
 // 문서 하나를 사람 읽을 글로 만든다. 이름·연락처는 한 곳(LEGAL_OWNER)에서만 온다.
-function legalText(k){
-  const d = LEGAL_DOCS[k];
+function legalText(k, v){
+  const lang = v || langNow();
+  const d = legalSet(lang)[k] || LEGAL_DOCS[k];
   if(!d) return '';
   const biz = LEGAL_BIZ
     ? ` 상호 ${LEGAL_BIZ.name}, 사업자등록번호 ${LEGAL_BIZ.no}, 주소 ${LEGAL_BIZ.addr}.`
     : '';
   return String(d.body)
-    .split('{OWNER}').join(LEGAL_OWNER.name)
+    .split('{OWNER}').join((LEGAL_OWNER.names && LEGAL_OWNER.names[lang]) || LEGAL_OWNER.name)
     .split('{EMAIL}').join(LEGAL_OWNER.email)
-    .split('{DATE}').join(LEGAL_DATE)
+    .split('{DATE}').join(LEGAL_DATES[lang] || LEGAL_DATES.ko)
     .split('{VER}').join(LEGAL_VER)
     .split('{BIZ}').join(biz)
     .trim();
@@ -16682,10 +17186,12 @@ function openLegal(k){
   const key = LEGAL_DOCS[k] ? k : 'terms';
   const P = document.getElementById('mrPanel');
   if(!P) return;
+  const set = legalSet();
   P.innerHTML = `<div class="mrhead"><b>${esc(t('약관·방침'))}</b><span style="flex:1"></span></div>
     <div class="subrow" style="display:flex">${
-      Object.entries(LEGAL_DOCS).map(([kk,v])=>
-        `<button class="tab${kk===key?' on':''}" onclick="openLegal('${kk}')">${esc(v.title)}</button>`).join('')}</div>
+      Object.keys(LEGAL_DOCS).map(kk=>
+        `<button class="tab${kk===key?' on':''}" onclick="openLegal('${kk}')">${
+          esc((set[kk] || LEGAL_DOCS[kk]).title)}</button>`).join('')}</div>
     <div class="postbody" style="padding:12px;white-space:pre-wrap;line-height:1.65">${esc(legalText(key))}</div>
     <div style="height:24px"></div>`;
   showPanel(P);
@@ -16737,7 +17243,7 @@ function drawAgree(){
     ${row('age',t('만 14세 이상입니다'), true, '')}
     ${row('loc',t('위치정보 이용'), false, 'location')}
     <div class="mrnone" style="text-align:left">${esc(t('위치정보에 동의하지 않아도 앱을 모두 쓸 수 있습니다. 그때는 지점을 직접 골라 주세요.'))}</div>
-    <div class="mrnone" style="text-align:left;color:#F0803C">${esc(t('이 앱의 날씨·물때·수심은'))} <b>${esc(t('참고 자료'))}</b>${esc(t('입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)'))}</div>
+    <div class="mrnone" style="text-align:left;color:#F0803C">${t('이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)')}</div>
     <div class="mrrow" style="padding:14px 12px">
       <button class="mrbtn big${ok?' ok':''}" style="flex:1" onclick="doAgree()">${ok?t('동의하고 계속'):t('필수 항목에 동의해 주세요')}</button></div>
     <div style="height:24px"></div>`;
@@ -16852,7 +17358,8 @@ function supportMail(kind, text){
     + '?subject=' + encodeURIComponent(subject)
     + '&body=' + encodeURIComponent(lines.join('\n'));
   try{ location.href = url; }
-  catch(e){ alert(t('메일 앱을 열지 못했습니다.\n\n') + SUPPORT_MAIL + t(' 으로 보내 주세요.')); }
+  catch(e){ alert(t('메일 앱을 열지 못했습니다.') + '\n\n'
+    + tsub('{addr} 으로 보내 주세요.', { addr: SUPPORT_MAIL })); }
 }
 
 // ── 운영자 접수함
@@ -16875,7 +17382,7 @@ async function adminSupport(){
       <div class="fsub">${esc(s.byName||'')}${s.email?' · '+esc(s.email):''} · ${esc(String(s.ts||'').slice(0,16).replace('T',' '))}</div>
       <div class="fsub" style="color:#5a7a9a;word-break:break-all">${esc(s.info||'')}</div>
       <div class="postbody" style="padding:6px 0">${esc(s.text||'').replace(/\n/g,'<br>')}</div>
-      ${sr && s.by ? `<div class="mrnone" style="text-align:left;margin:6px 0">${esc(t('켜 주시려면'))}<b>${esc(t('[보낸 사람]'))}</b> → <b>${esc(t('연재 글 올리기'))}</b>${esc(t('를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.'))}</div>` : ''}
+      ${sr && s.by ? `<div class="mrnone" style="text-align:left;margin:6px 0">${t('켜 주시려면 <b>[보낸 사람]</b> → <b>연재 글 올리기</b> 를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.')}</div>` : ''}
       <div class="fchips" style="margin-top:6px">
         ${s.by?`<button class="tchip${sr?' on':''}" onclick="openPerson('${esc(s.by)}')">${esc(t('보낸 사람'))}</button>`:''}
         <button class="tchip${s.done?' on':''}" onclick="supportDone('${esc(s.id)}',${s.done?'false':'true'})">${s.done?t('다시 새 글로'):t('확인함')}</button>
@@ -16941,8 +17448,8 @@ function marketNotice(){
 function marketSafety(){
   return `<div class="hwarn" style="margin:10px 12px">
     <b>${esc(t('거래 전에 꼭 확인하세요'))}</b><br>
-    ${esc(t('· 물건을 보기 전에'))} <b>${esc(t('선입금하지 마세요'))}</b>${esc(t('. 계약금도 마찬가지입니다.'))}<br>
-    ${esc(t('· 배·엔진은 직접 가서'))} <b>${esc(t('시운전'))}</b>${esc(t('까지 보고 판단하세요.'))}<br>
+    ${t('· 물건을 보기 전에 <b>선입금하지 마세요</b>. 계약금도 마찬가지입니다.')}<br>
+    ${t('· 배·엔진은 직접 가서 <b>시운전</b>까지 보고 판단하세요.')}<br>
     ${esc(t('· 배는 등록·저당·압류가 남아 있을 수 있습니다. 서류를 확인하세요.'))}<br>
     ${esc(t('· 시세보다 크게 싸면 한 번 더 의심하세요.'))}</div>`;
 }
@@ -17736,7 +18243,7 @@ async function openSpot(id){
     ${s.hidden?`<div class="hwarn">${esc(t('신고가 쌓여 목록에서 내려간 자리입니다.'))}</div>`:''}
     ${s.seed ? `<div class="mrnone" style="text-align:left">
         <b>${esc(tsub('{src}입니다.', {src:t(SPOT_SEED_FROM)}))}</b> ${esc(t('이름과 자리만 들어 있습니다.'))}
-        ${s.plan ? `<br>${esc(t('국가 마리나'))} <b>${esc(t('계획 단계'))}</b>${esc(t('로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.'))}` : ''}
+        ${s.plan ? `<br>${t('국가 마리나 <b>계획 단계</b>로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.')}` : ''}
         <br>${esc(t('다녀오셨으면 수심 · 바닥 · 막힌 방향을 채워 주세요.'))}
         ${meUid() ? `<div style="margin-top:10px"><button class="mrbtn ok" onclick="writeSpot('${esc(s.id)}')">${esc(t('내용 채우기'))}</button></div>` : ''}
       </div>` : ''}
@@ -17912,7 +18419,7 @@ function spotForm(){
       SPOT_KINDS.map(k=>`<button class="tchip${(d.kind||'port')===k.v?' on':''}" onclick="spotSet('kind','${k.v}')">${k.name}</button>`).join('')}</div>
 
     <div class="ghead"><b>${esc(t('바람이 막히나'))}</b></div>
-    <div class="mrnone" style="text-align:left">${esc(t('여기서'))} <b>${esc(t('트여 있는'))}</b>${esc(t('방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.'))}</div>
+    <div class="mrnone" style="text-align:left">${t('여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.')}</div>
     <div class="fchips" style="padding:0 12px 10px">${
       SPOT_DIRS.map(x=>`<button class="tchip${d.open.includes(x)?' on':''}" onclick="spotDir('${x}')">${SPOT_DIR_KO[x]}</button>`).join('')}</div>
 
@@ -17922,7 +18429,7 @@ function spotForm(){
       <button class="tchip${d.lowTide?' on':''}" style="margin-left:8px" onclick="spotSet('lowTide',${d.lowTide?'false':'true'})">${esc(t('저조위 기준'))}</button></div>
     <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="spotDepthCalc()">${esc(t('수심계로 잰 값 넣기 — 저조위 기준으로 바꿔 드립니다'))}</button></div>
     ${ d.depthFrom ? `<div class="mrnone" style="text-align:left;color:#46B87C">잰 값 ${d.depthFrom.raw}m 에서 그때 조위 ${d.depthFrom.tide}m 를 뺐습니다 · ${esc(String(d.depthFrom.spot||''))} 조위 기준</div>`
-      : `<div class="mrnone" style="text-align:left">${esc(t('우리 바다는 물때 차가 큽니다. 수심계 값은'))} <b>${esc(t('잰 그때'))}</b> ${esc(t('기준이라 그대로 적으면 저조 때 얹힙니다.'))}<br>${esc(t('해도를 보고 저조위 수심을 이미 아시면 그 값을 적고 칩을 켜 주세요.'))}</div>` }
+      : `<div class="mrnone" style="text-align:left">${t('우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.')}<br>${esc(t('해도를 보고 저조위 수심을 이미 아시면 그 값을 적고 칩을 켜 주세요.'))}</div>` }
     <div class="mrrow"><span class="mrlbl">${esc(t('바닥'))}</span></div>
     <div class="fchips" style="padding:0 12px 8px">${
       SPOT_BOTTOM.map(x=>`<button class="tchip${d.bottom===x?' on':''}" onclick="spotSet('bottom','${x}')">${esc(t(x))}</button>`).join('')}</div>
@@ -17973,7 +18480,7 @@ async function spotDepthCalc(){
   P.innerHTML = `<div class="mrhead"><b>${esc(t('수심 환산'))}</b><span style="flex:1"></span>
       <button class="tab" onclick="spotDepthCancel()">${esc(t('취소'))}</button>
       <button class="tab${low == null ? '' : ' on'}" onclick="spotDepthApply()">${esc(t('넣기'))}</button></div>
-    <div class="mrnone" style="text-align:left">${esc(t('수심계 값은'))} <b>${esc(t('잰 그때 물 높이 기준'))}</b>${esc(t('입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.'))}<br>${esc(t('잰 값과 잰 시각을 넣으면 그 시각'))}<b>${esc(t('조위를 빼서'))}</b> ${esc(t('저조위 기준으로 바꿔 드립니다.'))}</div>
+    <div class="mrnone" style="text-align:left">${t('수심계 값은 <b>잰 그때 물 높이 기준</b>입니다. 만조에 재고 그대로 적으면 저조 때 배가 얹힙니다.')}<br>${esc(t('잰 값과 잰 시각을 넣으면 그 시각'))}<b>${esc(t('조위를 빼서'))}</b> ${esc(t('저조위 기준으로 바꿔 드립니다.'))}</div>
 
     <div class="ghead"><b>${esc(t('수심계에 나온 값'))}</b></div>
     <div class="mrrow" style="justify-content:center;gap:6px">
@@ -17995,7 +18502,7 @@ async function spotDepthCalc(){
       <div class="mrrow" style="justify-content:center">
         <b style="font-size:30px;color:${col}">저조위 기준 ${low == null ? '—' : low.toFixed(1) + 'm'}</b></div>
       ${ (low != null && low < 0) ? `<div class="mrnone" style="color:#F05B52">${esc(t('계산이 0보다 작습니다. 잰 값이나 잰 시각을 다시 봐 주세요.'))}</div>` : '' }`
-      : `<div class="mrnone" style="text-align:left;color:#F05B52">${esc(t('이 자리·이 시각은 조위 자료가 없어'))}<b>${esc(t('환산할 수 없습니다'))}</b>.<br>${esc(t('관측소 자료가 닿지 않는 바다이거나, 잰 시각이 자료 기간 밖입니다. 없는 숫자를 지어내면 배가 얹히므로 그냥 두겠습니다.'))}<br>${esc(t('수심을 손으로 적고, 기준을 아시면 \'저조위 기준\' 을 눌러 주세요.'))}</div>` }
+      : `<div class="mrnone" style="text-align:left;color:#F05B52">${t('이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.')}<br>${esc(t('관측소 자료가 닿지 않는 바다이거나, 잰 시각이 자료 기간 밖입니다. 없는 숫자를 지어내면 배가 얹히므로 그냥 두겠습니다.'))}<br>${esc(t('수심을 손으로 적고, 기준을 아시면 \'저조위 기준\' 을 눌러 주세요.'))}</div>` }
     <div style="height:24px"></div>`;
   showPanel(P);
   setHeadTitle('정박지');
@@ -18564,7 +19071,7 @@ function fillEngineHours(){
   if(h === null){ alert(t('출발 시각과 도착 시각을 먼저 넣어 주세요')); return; }
   const n = (it.logs||[]).filter(g => SAIL_ENGINE[g.kind] || g.kind==='엔진ON' || g.kind==='엔진OFF').length;
   if(!n && !confirm(t('중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n')
-    + t('항해 내내 엔진을 켠 것으로 보고 ') + h + t('시간으로 넣을까요?\n')
+    + tsub('항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?', { h: h }) + '\n'
     + t('세일로 가셨다면 중간 기록에 "세일 올림"을 먼저 넣어 주세요.'))) return;
   mrField('engineH', h);
 }
@@ -19033,7 +19540,8 @@ function suggestRow(it, kind){
   if(!e) return '';
   const v = e.h.toFixed(1);
   return `<div class="posrow"><span style="color:#7b8794">출발~도착 기준 ${v} 시간${
-      e.marks ? ` · 엔진 표시 ${e.marks}개 반영` : t(' · 계속 켜둔 것으로 봄')}</span>`
+      e.marks ? ' · ' + esc(tsub('엔진 표시 {n}개 반영', { n: e.marks }))
+              : ' · ' + esc(t('계속 켜둔 것으로 봄'))}</span>`
      + `<button class="minib grn" onclick="navFill('engineH','${v}')">${esc(t('넣기'))}</button></div>`;
 }
 function navFill(k, v){
@@ -19714,12 +20222,14 @@ function wxAlertBox(){
   const foot = `<a href="https://www.weather.go.kr/w/special-report/overall.do" target="_blank" rel="noopener">${esc(t('기상청 실시간 확인'))}</a>`;
   const when = (krCache && krCache.updated) ? String(krCache.updated).slice(5,16).replace('T',' ') : '';
   if(w && w.active && w.active.length){
-    return `<div class="wxbox warn"><b>해상 특보 발효 중${w.region?' · '+esc(w.region)+t(' 해역'):''}</b>${
+    return `<div class="wxbox warn"><b>${esc(t('해상 특보 발효 중'))}${
+        w.region ? ' · ' + esc(tsub('{r} 해역', { r: w.region })) : ''}</b>${
       w.active.map(x=>`<div>${esc(x)}</div>`).join('')}
       ${w.note?`<div class="wxfoot">${esc(w.note)}</div>`:''}
       <div class="wxfoot">수집 ${when} · ${foot}</div></div>`;
   }
-  return `<div class="wxbox"><b>해상 특보${w && w.region?' · '+esc(w.region)+t(' 해역'):''}</b>
+  return `<div class="wxbox"><b>${esc(t('해상 특보'))}${
+      w && w.region ? ' · ' + esc(tsub('{r} 해역', { r: w.region })) : ''}</b>
     <div>${w ? esc(w.summary || t('수집된 특보 없음')) : t('특보 수집 대기 중')}</div>
     ${w && w.note?`<div class="wxfoot">${esc(w.note)}</div>`:''}
     <div class="wxfoot">${foot} · 출항 판단은 실시간 페이지 기준</div></div>`;
@@ -19781,6 +20291,7 @@ async function checkNewsBadge(){
 let newsSub = (function(){ try{ return localStorage.getItem('bt_newssub') || 'kr'; }catch(_){ return 'kr'; } })();
 function setNewsSub(k){
   newsSub = k;
+  trNewsOn = false;          // 갈래를 옮기면 원어부터 보여 준다
   try{ localStorage.setItem('bt_newssub', k); }catch(_){}
   renderNews();
 }
@@ -19812,17 +20323,82 @@ function newsByDay(rows, draw){
          + days.get(d).map(draw).join('');
   }).join('');
 }
+// ── 뉴스 옮기기
+// 뉴스 한 건에서 사람이 읽는 글자는 제목과 요약 둘뿐이다.
+// 고른 말에 맞는 원문을 먼저 고르고, 그래도 못 읽는 말이면 옮긴 것을 쓴다.
+const TR_NEWS = {};        // '말' → { 원문: 옮긴 글 }
+let trNewsOn = false;      // 지금 옮겨서 보고 있나
+
+function newsTitle(n){
+  // 해외 소식은 모아 올 때 한국어 제목(t_ko)이 함께 붙는다
+  return (langNow() === 'ko' ? (n.t_ko || n.title) : (n.title || n.t_ko)) || '';
+}
+function newsSum(n){
+  return (langNow() === 'ko' ? (n.s_ko || n.summary) : (n.summary || n.s_ko)) || '';
+}
+// 화면에 낼 글자 — 옮겨서 보기를 켰고 옮긴 것이 있으면 그것을 쓴다
+function newsShow(v){
+  const got = TR_NEWS[langNow()];
+  return (trNewsOn && got && got[v]) ? got[v] : v;
+}
+// 이 목록에 내 말이 아닌 것이 하나라도 있나
+function newsNeedTr(rows){
+  return rows.some(n => !trSameLang(newsTitle(n) + ' ' + newsSum(n), langNow()));
+}
+function newsTrBar(rows){
+  if(!rows.length) return '';
+  if(trNewsOn){
+    return `<div class="trbar"><span>${esc(t('자동 번역된 글입니다'))}</span>
+      <span style="flex:1"></span>
+      <button class="minib" onclick="newsTrOff()">${esc(t('원어로 보기'))}</button></div>`;
+  }
+  if(TR_BUSY.news) return `<div class="trbar"><span>${esc(t('옮기는 중…'))}</span></div>`;
+  if(!meUid()) return '';
+  if(navigator && navigator.onLine === false) return '';
+  if(!newsNeedTr(rows)) return '';
+  return `<div class="trbar"><span style="flex:1"></span>
+    <button class="minib blu" onclick="newsTrGo()">${esc(t('번역해서 보기'))}</button></div>`;
+}
+function newsTrOff(){ trNewsOn = false; renderNews(); }
+async function newsTrGo(){
+  if(TR_BUSY.news) return;
+  const lang = langNow();
+  if(TR_NEWS[lang]){ trNewsOn = true; renderNews(); return; }
+  if(!window.__tr || !window.__tr.text){ alert(t('지금은 옮길 수 없습니다')); return; }
+  const rows = (newsSub === 'kr') ? ((krCache && krCache.gov) || [])
+                                  : ((newsCache && newsCache.items) || []);
+  // 같은 글자는 한 번만 보낸다 — 값이 그만큼 덜 든다
+  const want = [];
+  rows.forEach(n => [newsTitle(n), newsSum(n)].forEach(v => {
+    v = String(v || '').trim();
+    if(v && want.indexOf(v) < 0 && !trSameLang(v, lang)) want.push(v);
+  }));
+  if(!want.length){ trNewsOn = true; renderNews(); return; }
+  TR_BUSY.news = true; renderNews();
+  try{
+    const got = await window.__tr.text(want, lang);
+    const map = {};
+    (got && got.out || []).forEach((v, i) => { if(want[i]) map[want[i]] = v; });
+    TR_NEWS[lang] = map;
+    trNewsOn = true;
+  }catch(e){
+    alert(t('옮기지 못했습니다') + '\n\n' + ((e && e.message) || e));
+  }
+  TR_BUSY.news = false;
+  renderNews();
+}
+
 function krRow(n){
   return `<div class="mr newsr">
-    <div class="cn" style="font-size:14px">${newsIsNew(n)?`<span class="chip">${esc(t('새로'))}</span> `:''}${esc(n.title)}</div>
+    <div class="cn" style="font-size:14px">${newsIsNew(n)?`<span class="chip">${esc(t('새로'))}</span> `:''}${esc(newsShow(newsTitle(n)))}</div>
     <div class="newsm"><span>${esc(n.source||'')}${n.press?' · '+esc(n.press):''}</span>
     <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">${esc(t('원문'))}</a></div></div>`;
 }
 function wwRow(n){
   return `<div class="mr newsr">
-    <div class="ct"><div class="cn">${newsIsNew(n)?`<span class="chip">${esc(t('새로'))}</span> `:''}${esc(n.t_ko||n.title||'')}</div>
+    <div class="ct"><div class="cn">${newsIsNew(n)?`<span class="chip">${esc(t('새로'))}</span> `:''}${esc(newsShow(newsTitle(n)))}</div>
       ${n.cat?`<span class="chip nchip">${esc(n.cat)}</span>`:''}</div>
-    ${n.s_ko?`<div class="newss">${esc(n.s_ko)}</div>`:''}
+    ${newsSum(n)?`<div class="newss">${esc(newsShow(newsSum(n)))}</div>`:''}
     <div class="newsm"><span>${esc(n.source||'')}</span>
     <a class="mrbtn" href="${esc(n.link||'#')}" target="_blank" rel="noopener">${esc(t('원문 보기'))}</a></div>
   </div>`;
@@ -19878,7 +20454,7 @@ function seriesApplyHtml(){
         <button class="tchip" onclick="applySeries()">${esc(t('다시 보내기'))}</button></div></div>`;
   }
   return `<div class="mrnone" style="text-align:left">
-    ${esc(t('연재는'))} <b>${esc(t('허락받은 분만'))}</b> ${esc(t('올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.'))}<br>
+    ${t('연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.')}<br>
     ${esc(t('직접 쓰신 항해기나, 허락을 받아 옮기실 글이 있으면 신청해 주세요.'))}
     <div class="fchips" style="margin-top:8px">
       <button class="tchip" onclick="applySeries()">${esc(t('연재자 신청'))}</button></div></div>`;
@@ -20062,14 +20638,14 @@ async function renderNews(force){
     + `</div>`;
   let html = tabs;
   if(newsSub === 'kr'){
-    html += gov.length ? newsByDay(gov, krRow)
+    html += gov.length ? newsTrBar(gov) + newsByDay(gov, krRow)
       : `<div class="mrnone">${esc(t('아직 모인 소식이 없습니다.'))}</div>`;
   } else if(newsSub === 'ww'){
     const up = newsCache && newsCache.updated ? new Date(newsCache.updated) : null;
     html += ww.length
       ? `<div class="newsup">${esc(tsub('마지막 수집 {d} · {n}건',
           {d: up ? up.toLocaleDateString(langNow()==='ko'?'ko-KR':langNow()) : '—', n: ww.length}))}</div>`
-        + newsByDay(ww, wwRow)
+        + newsTrBar(ww) + newsByDay(ww, wwRow)
       : `<div class="mrnone">${esc(t('아직 수집된 뉴스가 없습니다.'))}<br>${esc(t('잠시 후 다시 확인해 주세요.'))}</div>`;
   } else {
     html += await seriesHtml();
@@ -20847,7 +21423,7 @@ async function renderWeather(){
                 +'T'+String(bd.getHours()).padStart(2,'0')+':'+String(bd.getMinutes()).padStart(2,'0');
     let bridgeResult = '';
     if(quickClr>0 && !(ad>0)){
-      bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${esc(t('배 높이(공기흘수)를 먼저 입력해 주세요. 아래'))}<b>${esc(t('변경'))}</b>${esc(t('에서 안테나 끝까지의 실측값을 넣습니다.'))}<br>${esc(t('입력하지 않으면 통과 여부를 계산할 수 없습니다.'))}</div></div>`;
+      bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${t('배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.')}<br>${esc(t('입력하지 않으면 통과 여부를 계산할 수 없습니다.'))}</div></div>`;
     }
     else if(quickClr>0 && TA){
       const tv = tideAt(bridgeT, TA.pts);
@@ -20888,7 +21464,7 @@ async function renderWeather(){
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline
       + bridgeCard
-      + `<div class="wxwarn">${esc(t('조위는 국립해양조사원 만조·간조 자료를 보간한'))} <b>${esc(t('근사값'))}</b>${esc(t('입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.'))}</div>`;
+      + `<div class="wxwarn">${t('조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.')}</div>`;
     // 초기 스크롤: 현재 시각 - 2h
     const sc = document.getElementById('wxScroll');
     if(sc) sc.scrollLeft = Math.max(0, (nowIdx-2)*COLW);
@@ -21527,6 +22103,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           if(d.exists()) return d.data();
         }catch(_){}
         const r = await httpsCallable(ffn, 'tr')({ coll:String(coll), id:String(id), lang:String(lang) });
+        return (r && r.data) || null;
+      },
+      // 파이어스토어에 없는 글(뉴스)은 글자를 그대로 넘긴다.
+      // ★ 같은 글 묶음은 서버가 해시로 한 번만 옮기고 담아 둔다 — 다음 사람은 값이 안 든다.
+      async text(texts, lang){
+        const r = await httpsCallable(ffn, 'trText')({ texts: texts, lang: String(lang) });
         return (r && r.data) || null;
       }
     };

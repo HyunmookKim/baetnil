@@ -1,6 +1,86 @@
 {
- "updated": "2026-08-16T21:10:31.273Z",
+ "updated": "2026-08-17T21:15:33.229Z",
  "gov": [
+  {
+   "title": "중국 어선 단속, 긴급 헬기 충돌 순직한 해양경찰 10명…인공지능으로 복원해 추모",
+   "press": "news.nate.com",
+   "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE5kalJfeUNvazZLT3l2OVMxSEI4aGNvcFpWV2o4d1ZnTlJVR19QU0w3N0dFTGVpbGNaVmJ4MDFDZVljRXFkRTVtVlJQUWhzLVJNYUNZ?oc=5",
+   "source": "해양정책",
+   "date": "2026-08-17T14:04:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "[해양활동 안전캠페인] 내 배의 엔진, 선외기 2편 출항 전 안전점검이 사고를 예방한다",
+   "press": "해양레저신문",
+   "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFBWQ0dQemN5S00wS0xIQ0wxZHFKaE92OHNnaTkzMmRjTTJWUmN2N3VoWWRPdnlQVlFQWm8yaDZlcmd3TXBMcDFIdjZIb0JKaXBOLTFxQmx1Yw?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-17T12:33:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "부여군, 충남도·보령해양경찰서와 내수면 수상레저 사업장 합동 안전점검",
+   "press": "pinenews.co.kr",
+   "link": "https://news.google.com/rss/articles/CBMiR0FVX3lxTFBFWDlZZ1JkaFNMUWZsRkl6ZzVrMXN4S2wycTFzWVRfSTNOc1NMRTFlNmZ3RTZkVmhoTEZuQjZWQndGd0ZJdFFR?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-17T12:17:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "홍해 위험에 원유 수송로 변경…16번째 선박 수에즈운하 통과",
+   "press": "v.daum.net",
+   "link": "https://news.google.com/rss/articles/CBMiS0FVX3lxTE95bXdSU3lEV0ZYVUZkU3JHSFdITVJDWG1haThRMFJidE1EWThCLWRPdmg2SkNMNy01MUU2MG5OMmFnX2twSzVoalZHdw?oc=5",
+   "source": "해양정책",
+   "date": "2026-08-17T09:34:29.000Z",
+   "cat": "항만"
+  },
+  {
+   "title": "반복되는 경매 어선 불법운항…통영해경-법원-KOMSA 협업 해법 찾았다",
+   "press": "경남도민신문",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBRdlJRTGFDZTlOMWw4RVZIbVN3ZUVPMV9LTVNNbzVzeU5kV2RtZkZjWUN3WlowN1VmT3NzeHd3ai1oNDNIT0l6azh2Yy01ckJnTnp4MXlfWEhTandGeUljbWZuSEFyQS1L?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-08-17T08:23:50.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "금어기 풀리자 동중국해에 중국 어선 '우르르'…영해분쟁 우려 속 중국 정부는 방관",
+   "press": "news.nate.com",
+   "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTE03VW1GWjNGYUhpcmNEdUhPd2twZVc2N09VNURLQU9RaWx3aXhmeWFVaVUtVGtZRlJjZ3RiWnozVFlQalVRV0ZVeDFqcTJENEQwZVRJ?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-08-17T07:23:00.000Z",
+   "cat": "항만"
+  },
+  {
+   "title": "충남서 연휴기간 해루질 등으로 3명 숨져… 해양 안전사고 주의보",
+   "press": "v.daum.net",
+   "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE80LW9xczliWmpqUFdOQU1RLWxNLVQzRlZvMWlBMDJ0emg0UnlKdDRXa01qQ0RaeVZjTFNydENCOE5Ta2FoNmx0eXZONGc0ZGc?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-17T06:30:43.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "기상악화 속 머리 부상 당한 외국인 LNG운반선 선원 구조",
+   "press": "뉴스1",
+   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1ZOGJBQm5MY25Qbmp5VUw4SkJqeFlHLTNTQ0xsZlRMSDVxM0M5eWFfbm5Zc3JacTRJM09GSHZiQ0N6SXdUWnpjT3NEdEF3NnRYeFdINzZ0UmZadlNGVjJpT01RS0fSAWRBVV95cUxNWThiQUJuTGNuUG5qeVVMOEpCanhZRy0zU0NMbGZUTEg1cTNDOXlhX25uWXNyWnE0STNPRkh2YkNDekl3VFp6Y09zRHRBdzZ0WHhXSDc2dFJmWnZTRlYyaU9NUUtH?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-17T02:36:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "3m 너울에 하선 두 차례 실패…부산 앞바다서 부상 선원 구조",
+   "press": "더쎈뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1yUkxQS2k2WnA3dGpwd2ltM3pwWnVwaW1jZ2JKT005YlpRcjZLeVhzSy1aR21ibGlIVHY3ZXI3cFFselZPTnFzYTFvMEhZLTJTTGM4VnJzd1pyTXFGMHBpYmp2c25XbEdF?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-17T01:03:51.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "최근 5년여간 해상 마약 4,348건! 코카인 2,347kg 적발! 마약 청정국 사수를 위해 총력을 다해야!",
+   "press": "sisakoreanews.kr",
+   "link": "https://news.google.com/rss/articles/CBMiSkFVX3lxTE1kQXlYT3hIS2lxMG1ZTTc4MWJtd1hucUREbnVZRGhrcFdpQkprdERwdU1YMlMwWjI4UUlER0thM3hKSEoxMDJpZmNn?oc=5",
+   "source": "해양정책",
+   "date": "2026-08-17T00:02:00.000Z",
+   "cat": "규정"
+  },
   {
    "title": "[오늘의 날씨] 강원(17일, 월)…최대 60㎜ 소나기, 해상 사고 주의",
    "press": "뉴스1",
@@ -11,11 +91,11 @@
   },
   {
    "title": "독일 북해 블레이드 낙하가 드러낸 해상풍력의 민낯 — 한국은 안전 체계를 갖추고 있는가",
-   "press": "koreayouthdaily.com",
+   "press": "대한청년일보",
    "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBWalpkOE4wTWxvMF81UE95MmJUX2JjRTQ0V2hSc0dJdnczWTlLQjM1N2wzSXgweEEyWkY3Q3BOZjVWdUxXTFY2ck03UGRvYnNYUUM2bFNn?oc=5",
    "source": "해양안전",
    "date": "2026-08-16T17:30:45.000Z",
-   "cat": "규정"
+   "cat": "산업"
   },
   {
    "title": "당진 도비도 해상서 해루질하던 남녀 2명 물에 빠져 심정지 상태로 구조:경찰연합신문",
@@ -61,7 +141,7 @@
    "title": "새벽 군산 앞바다서 4만 톤급 상선·어선 ‘쾅’…승선원 10명 무사",
    "press": "시사저널",
    "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5TcWhMVlo0enpiSTkyWTZodVF4Y1V1cE91R0VFX284ZzhZRG9sT0lBQlZqTmhoazcxOGVZNVU2eGI2RWV4Y2RpMmZkSU96SGZpMmI0TnBJYlRGRWdkaFRia05hVjhiZnFFRXBUbnR2MNIBc0FVX3lxTE0wUHQ5Tk1kdTJmd3o0VzBITk5EdkpmWE1reXBVQ09hNDVaQm9zRnZUUE40UmFiaHNORTRIdGZGcGJQNE00Nkt3ei0tTEJ2SzFmN1JpLV9EZnhMWW1hX0RGYlA5c1FOUDJRbzl5YUxacmJJN3M?oc=5",
-   "source": "해양안전",
+   "source": "낚시·어선",
    "date": "2026-08-15T07:57:37.000Z",
    "cat": "안전"
   },
@@ -339,13 +419,9 @@
   }
  ],
  "wx": {
-  "src": "NEWS",
-  "active": [
-   "제주 남쪽 먼바다에 풍랑주의보…남해 먼바다에 풍랑주의보 유지",
-   "제주도산지에 호우주의보 해제…남해 먼바다에 풍랑주의보 유지",
-   "남해 먼바다에 풍랑주의보 해제",
-   "제주도산지에 호우주의보 해제…남해 먼바다에 풍랑주의보 유지"
-  ],
-  "summary": "※ 언론 보도 기준 — 기상청 실시간 확인 필수"
+  "src": "KMA",
+  "zones": [],
+  "active": [],
+  "summary": "발효 중인 해상 특보 없음"
  }
 }

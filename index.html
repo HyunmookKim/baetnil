@@ -70,7 +70,7 @@
 .catchrow input{flex:0 0 58px;width:58px;min-width:0}
 .whoa{color:#8ab4d8;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
 .chip.late{background:#7A3A30;color:#FF9A8A}
-.chip.notice{background:#7a5a2a;color:#f0c98a}
+.chip.notice{background:#7a5a2a;color:#FFE0B0}
 .chip.good{background:#17453a;color:#7aefaa;border-color:#2a6a58}
 .postmeta{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#8a97a8;
   font-size:12.5px;border-bottom:1px solid #12283e}
@@ -262,7 +262,7 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .tfilt::-webkit-scrollbar{display:none}
 .tchip{flex:none;border:1px solid var(--bd,#1e4060);background:none;border-radius:14px;
   padding:5px 11px;font-size:12.5px;font-family:inherit;color:#8fa3b8;cursor:pointer}
-.tchip.on{background:var(--ac,#e8663c);border-color:var(--ac,#e8663c);color:#fff;font-weight:700}
+.tchip.on{background:var(--ac,#e8663c);border-color:var(--ac,#e8663c);color:var(--acd,#08131F);font-weight:700}
 /* 오늘 화면 */
 #homeWrap{padding:12px 14px 20px}
 .hcard{background:var(--sf,#0c1e30);border:1px solid var(--bd,#1e4060);border-radius:12px;
@@ -663,6 +663,10 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .ckchip.add{color:var(--tm);border-style:dashed}
 .ckman{display:flex;align-items:center;gap:2px}
 #errbar{display:none;position:fixed;left:10px;right:10px;bottom:74px;z-index:99;background:#3A1512;border:1px solid #7A3A30;color:#FF9A8A;font-size:12px;font-weight:600;padding:10px 13px;border-radius:11px;line-height:1.5;word-break:break-all}
+#errbar.on{display:flex;align-items:center;gap:10px}
+#errbar .errmsg{flex:1;min-width:0}
+#errbar .errsend{flex:none;background:#7A3A30;border:1px solid #A5544733;color:#FFD7CE;font-size:12px;
+  font-weight:700;padding:7px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
 .wxbar{padding:10px 16px 2px}
 .wxspots{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px}
 .wxspots .tab{white-space:nowrap;flex-shrink:0}
@@ -1443,7 +1447,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 <meta name="theme-color" content="#122a44">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="선내적재표">
+<meta name="apple-mobile-web-app-title" content="뱃일">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-180.png">
 </head>
@@ -1677,7 +1681,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1805;
+const LANG_TOTAL = 1808;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2962,7 +2966,6 @@ const I18N = {
     '오는 주기':'How often they come',
     '오늘 물때 입력':'Enter today\'s tide',
     '오류 신고':'Report a bug',
-    '오류: {msg}':'Error: {msg}',
     '오징어':'Squid',
     '오징어살':'Squid strip',
     '올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.':'We will not ask again once it is uploaded — use [Sync now] in the menu any time.',
@@ -3497,6 +3500,13 @@ const I18N = {
     '해상 특보':'Marine warnings',
     '해상 특보 발효 중':'Marine warning in force',
     '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Tap the <b>Share</b> button<span class="insico">⬆︎</span> at the <b>bottom centre</b> of the screen (a square with an arrow pointing up)',
+  
+
+    // ── 3.95 · 오류 보내기
+    '보내는 중…':'Sending…',
+    '앱이 스스로 잡은 오류입니다.':'This error was caught by the app itself.',
+    '오류':'Error',
+    '이 오류 보내기':'Send this error',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -4775,7 +4785,6 @@ const I18N = {
     '오는 주기':'Как часто приходит',
     '오늘 물때 입력':'Ввести прилив на сегодня',
     '오류 신고':'Сообщить об ошибке',
-    '오류: {msg}':'Ошибка: {msg}',
     '오징어':'Кальмар',
     '오징어살':'Полоска кальмара',
     '올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.':'После выгрузки спрашивать больше не будем — в меню всегда есть «Синхронизировать сейчас».',
@@ -5310,6 +5319,13 @@ const I18N = {
     '해상 특보':'Штормовые предупреждения',
     '해상 특보 발효 중':'Действует штормовое предупреждение',
     '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Нажмите кнопку <b>Поделиться</b><span class="insico">⬆︎</span> <b>внизу по центру</b> экрана (квадрат со стрелкой вверх)',
+  
+
+    // ── 3.95 · 오류 보내기
+    '보내는 중…':'Отправка…',
+    '앱이 스스로 잡은 오류입니다.':'Эту ошибку приложение обнаружило само.',
+    '오류':'Ошибка',
+    '이 오류 보내기':'Отправить ошибку',
   }
 };
 
@@ -12567,7 +12583,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.92';
+const APP_VER = '3.95';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -17320,7 +17336,8 @@ function openSupport(){
     }
   });
 }
-async function sendSupport(kind, text){
+// quiet — 오류줄에서 부를 때. 알림창을 띄우지 않고 됐는지만 돌려준다.
+async function sendSupport(kind, text, quiet){
   const body = {
     id: 'sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6),
     kind: kind || 'etc', text: String(text || '').trim(),
@@ -17329,18 +17346,22 @@ async function sendSupport(kind, text){
     email: (window.__user && window.__user.email) || '',
     ts: new Date().toISOString(), done: false
   };
-  if(!body.text){ alert(t('내용을 적어 주세요')); return; }
+  if(!body.text){ if(!quiet) alert(t('내용을 적어 주세요')); return false; }
   if(!window.__support || !window.__user){
     // 로그인 전이거나 인터넷이 없을 때 — 메일 길을 알려 준다
+    if(quiet) return false;
     if(confirm(t('지금은 앱으로 보낼 수 없습니다.\n\n메일로 보내시겠습니까?'))) supportMail(kind, text);
-    return;
+    return false;
   }
   try{
     await window.__support.add(body);
-    alert(t('보내 주셔서 고맙습니다.\n\n확인하고 고치겠습니다.'));
+    if(!quiet) alert(t('보내 주셔서 고맙습니다.\n\n확인하고 고치겠습니다.'));
+    return true;
   }catch(e){
+    if(quiet) return false;
     if(confirm(t('보내지 못했습니다.\n\n') + ((e && e.message) || e) + t('\n\n메일로 보내시겠습니까?')))
       supportMail(kind, text);
+    return false;
   }
 }
 // 메일로 보내기 — 제목에 [뱃일] 을 붙여 받는 쪽에서 자동으로 걸러 담을 수 있게 한다
@@ -21479,14 +21500,57 @@ async function renderWeather(){
 
 
 
+// ★ 사전이 아직 안 만들어졌을 때 터질 수도 있다. 그때도 오류줄은 떠야 한다.
+//   t() 가 죽어 있으면 한국어 원문을 그대로 쓴다.
+const errSay = k => { try{ return t(k); }catch(_){ return k; } };
+const ERR_SENT = new Set();   // 같은 오류를 두 번 보내지 않는다
+const ERR_MAX  = 5;           // 한 번 켠 동안 여기까지만 — 오류가 쏟아져도 요금이 안 샌다
+let errSentN = 0;
+let errLast  = '';
+
 function showErr(msg){
   try{
+    const one = String(msg == null ? '' : msg).slice(0, 300);
+    errLast = one;
     let d = document.getElementById('errbar');
     if(!d){ d = document.createElement('div'); d.id='errbar'; document.body.appendChild(d); }
-    d.textContent = tsub('오류: {msg}', {msg: msg});
-    d.style.display = 'block';
-    clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, 10000);
+    // 보낼 수 있나 — 처음 보는 오류이고, 이번에 너무 많이 안 보냈고, 인터넷이 있을 때
+    let can = !ERR_SENT.has(one) && errSentN < ERR_MAX;
+    try{ if(navigator && navigator.onLine === false) can = false; }catch(_){}
+    errPaint(errSay('오류') + ': ' + one, can);
+    clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, can ? 20000 : 10000);
   }catch(e){}
+}
+
+// 오류줄을 그린다. 글자는 언제나 textContent 로 넣는다 —
+// 오류 글에 무엇이 섞여 있을지 모르는데 innerHTML 로 넣으면 그게 곧 구멍이다.
+function errPaint(text, withBtn){
+  const d = document.getElementById('errbar');
+  if(!d) return;
+  d.innerHTML = '';
+  const m = document.createElement('span');
+  m.className = 'errmsg'; m.textContent = text;
+  d.appendChild(m);
+  if(withBtn){
+    const b = document.createElement('button');
+    b.className = 'errsend'; b.textContent = errSay('이 오류 보내기');
+    b.onclick = errSend;
+    d.appendChild(b);
+  }
+  d.className = 'on';
+  d.style.display = 'flex';
+}
+
+async function errSend(){
+  const one = errLast;
+  if(!one || ERR_SENT.has(one)) return;
+  ERR_SENT.add(one); errSentN++;
+  errPaint(errSay('보내는 중…'), false);
+  const ok = await sendSupport('bug',
+    errSay('앱이 스스로 잡은 오류입니다.') + '\n\n' + one, true);
+  const d = document.getElementById('errbar');
+  errPaint(errSay(ok ? '보냈습니다. 고맙습니다.' : '보내지 못했습니다.'), false);
+  if(d){ clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, 4000); }
 }
 window.addEventListener('error', e=>showErr(e.message||t('알 수 없는 오류')));
 window.addEventListener('unhandledrejection',

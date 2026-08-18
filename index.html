@@ -12593,7 +12593,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.96';
+const APP_VER = '3.97';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16354,10 +16354,10 @@ function trRepaint(coll, id){
 //
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
-const LEGAL_VER  = '1.1';
+const LEGAL_VER  = '1.2';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
-const LEGAL_DATES = { ko:'2026년 8월 16일', en:'16 August 2026', ru:'16 августа 2026 г.' };
+const LEGAL_DATES = { ko:'2026년 8월 18일', en:'18 August 2026', ru:'18 августа 2026 г.' };
 const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
 // ★ 이름은 말마다 따로 적는다. 사전에 넣으면 자동 번역이 사람 이름을 건드린다.
 //   본인이 쓰는 표기가 있으므로 여기서만 고친다.
@@ -16367,6 +16367,9 @@ const LEGAL_OWNER = {
   email: 'jaha814@gmail.com'
 };
 const LEGAL_BIZ = null;   // 사업자등록하면 { name:'상호', no:'000-00-00000', addr:'주소' }
+// 위치기반서비스사업 신고를 마치면 신고번호를 여기 적는다 (예: '제2026-00호').
+// ★ 이 앱은 GPS 좌표를 항해 기록으로 서버에 저장하므로 신고 면제 대상이 아니다.
+const LEGAL_LBS = null;
 
 const LEGAL_DOCS = {
 terms: { title: '이용약관', body: `
@@ -16586,14 +16589,18 @@ location: { title: '위치정보 이용약관', body: `
 
 제3조 (현재 위치)
 ① 현재 위치(GPS)는 이용자가 기기에서 허락한 때에만 받습니다.
-② 받은 값은 기기 안에만 저장하며 서버로 보내지 않습니다.
+② 받은 값은 쓰임에 따라 둘로 갈립니다.
+   1. 날씨 지점을 잡는 데 쓰는 값 — 기기 안에만 두고 서버로 보내지 않습니다.
+   2. 항해일지의 출발·중간기록·도착에 남기는 값 — 그 항해 기록의 일부로 서버에 저장됩니다.
 ③ 허락을 거절해도 앱은 모두 쓸 수 있습니다. 지점을 직접 고르시면 됩니다.
 ④ 허락은 기기 설정에서 언제든 거둘 수 있습니다.
 
-제4조 (직접 찍은 좌표)
-① 홈포트·정박지·항해 좌표는 이용자가 지도에서 직접 찍은 값이며 서버에 저장됩니다.
-② 항해 좌표는 그 배의 구성원만 볼 수 있습니다. 배를 공개해도 좌표는 밖으로 나가지 않습니다.
-③ 정박지 좌표는 커뮤니티에 공개됩니다. 올리기 전에 화면에서 확인하실 수 있으며,
+제4조 (서버에 저장되는 좌표)
+① 홈포트·정박지 좌표는 이용자가 지도에서 직접 찍은 값입니다.
+② 항해 좌표는 출항·중간기록·입항을 기록할 때 잡힌 현재 위치(GPS) 값입니다.
+   화면에 바로 보이며, 지도에서 고치거나 [지우기]를 눌러 지울 수 있습니다.
+③ 항해 좌표는 그 배의 구성원만 볼 수 있습니다. 배를 공개해도 좌표는 밖으로 나가지 않습니다.
+④ 정박지 좌표는 커뮤니티에 공개됩니다. 올리기 전에 화면에서 확인하실 수 있으며,
    올린 뒤에도 본인이 지울 수 있습니다.
 
 제5조 (보유 기간)
@@ -16609,8 +16616,10 @@ location: { title: '위치정보 이용약관', body: `
 제8조 (만 14세 미만)
 이 앱은 만 14세 미만의 가입을 받지 않으므로 위치정보도 받지 않습니다.
 
-제9조 (문의)
-위치정보 관련 문의: {OWNER} ({EMAIL})
+제9조 (위치정보관리책임자 및 문의)
+위치정보관리책임자: {OWNER}
+연락처: {EMAIL}
+위치정보에 관한 문의는 위 연락처로 해 주십시오.{LBS}
 
 이 약관은 {DATE}부터 적용합니다. (판 {VER})
 ` }
@@ -16863,16 +16872,21 @@ Article 2 (What it is used for)
 
 Article 3 (Current position)
 1. Your current position (GPS) is received only when you permit it on your device.
-2. The value is stored on your device only and is not sent to the server.
+2. What happens to the value depends on how it is used:
+   a. to set a weather spot - it stays on your device and is not sent to the server;
+   b. to record a departure, waypoint or arrival in the logbook - it is stored on the
+      server as part of that voyage record.
 3. You can use the whole App if you refuse. Simply choose a spot yourself.
 4. You may withdraw permission at any time in your device settings.
 
-Article 4 (Coordinates you mark yourself)
-1. Home port, berth and voyage coordinates are values you mark on the map yourself and
-   are stored on the server.
-2. Voyage coordinates can be seen only by that boat's crew. They are never published even
+Article 4 (Coordinates stored on the server)
+1. Home port and berth coordinates are values you mark on the map yourself.
+2. Voyage coordinates are current position (GPS) values captured when you record a
+   departure, waypoint or arrival. They are shown on screen, and you can correct them on
+   the map or remove them with Delete.
+3. Voyage coordinates can be seen only by that boat's crew. They are never published even
    if the boat is made public.
-3. Berth coordinates are published to the community. You can check them on screen before
+4. Berth coordinates are published to the community. You can check them on screen before
    posting, and you can delete them afterwards.
 
 Article 5 (Retention)
@@ -16889,8 +16903,10 @@ at any time, and you may ask to see or delete what is stored. Contact: {EMAIL}
 Article 8 (Children under 14)
 The App does not accept anyone under 14, so no location information is received from them.
 
-Article 9 (Enquiries)
-Location information enquiries: {OWNER} ({EMAIL})
+Article 9 (Location information manager and enquiries)
+Location information manager: {OWNER}
+Contact: {EMAIL}
+Please direct enquiries about location information to the contact above.{LBS}
 
 These Terms apply from {DATE}. (Version {VER})
 ` }
@@ -17149,16 +17165,22 @@ location: { title: 'Условия использования данных о м
 
 Статья 3 (Текущее местоположение)
 1. Текущее местоположение (GPS) принимается только при вашем разрешении на устройстве.
-2. Полученное значение хранится только на устройстве и на сервер не передаётся.
+2. Дальнейшая судьба значения зависит от того, для чего оно используется:
+   a. для выбора точки прогноза погоды — остаётся только на устройстве
+      и на сервер не передаётся;
+   b. для записи выхода, промежуточной записи или прихода в судовом журнале —
+      сохраняется на сервере как часть этой записи о походе.
 3. При отказе Приложением можно пользоваться полностью — выберите точку вручную.
 4. Разрешение можно отозвать в настройках устройства в любой момент.
 
-Статья 4 (Координаты, отмеченные вами)
-1. Координаты порта приписки, стоянок и походов вы отмечаете на карте сами,
-   и они хранятся на сервере.
-2. Координаты походов видит только экипаж судна. Они не публикуются даже
+Статья 4 (Координаты, хранящиеся на сервере)
+1. Координаты порта приписки и стоянок вы отмечаете на карте сами.
+2. Координаты походов — это значения текущего местоположения (GPS), полученные при записи
+   выхода, промежуточной записи или прихода. Они показаны на экране; их можно исправить
+   на карте или удалить кнопкой «Удалить».
+3. Координаты походов видит только экипаж судна. Они не публикуются даже
    при публикации судна.
-3. Координаты стоянок публикуются в сообществе. Их можно проверить на экране до публикации,
+4. Координаты стоянок публикуются в сообществе. Их можно проверить на экране до публикации,
    а после публикации — удалить.
 
 Статья 5 (Срок хранения)
@@ -17177,8 +17199,10 @@ location: { title: 'Условия использования данных о м
 Статья 8 (Лица младше 14 лет)
 Приложение не принимает лиц младше 14 лет, поэтому данные об их местоположении не собираются.
 
-Статья 9 (Вопросы)
-Вопросы о данных местоположения: {OWNER} ({EMAIL})
+Статья 9 (Ответственный за данные о местоположении и вопросы)
+Ответственный за данные о местоположении: {OWNER}
+Контакт: {EMAIL}
+С вопросами о данных местоположения обращайтесь по указанному контакту.{LBS}
 
 Настоящие условия применяются с {DATE}. (Редакция {VER})
 ` }
@@ -17197,15 +17221,27 @@ function legalText(k, v){
   const lang = v || langNow();
   const d = legalSet(lang)[k] || LEGAL_DOCS[k];
   if(!d) return '';
-  const biz = LEGAL_BIZ
-    ? ` 상호 ${LEGAL_BIZ.name}, 사업자등록번호 ${LEGAL_BIZ.no}, 주소 ${LEGAL_BIZ.addr}.`
-    : '';
+  // ★ 사업자·신고번호 줄도 말마다 적는 법이 다르다. 사전이 아니라 여기서 만든다 —
+  //   약관 본문은 사전을 타지 않고 말별 정본을 그대로 쓰기 때문이다.
+  const BIZ_FMT = {
+    ko: b => ` 상호 ${b.name}, 사업자등록번호 ${b.no}, 주소 ${b.addr}.`,
+    en: b => ` Business name ${b.name}, business registration number ${b.no}, address ${b.addr}.`,
+    ru: b => ` Наименование ${b.name}, регистрационный номер ${b.no}, адрес ${b.addr}.`
+  };
+  const LBS_FMT = {
+    ko: v => `\n위치기반서비스사업 신고번호: ${v}`,
+    en: v => `\nLocation-based service business filing number: ${v}`,
+    ru: v => `\nНомер уведомления о деятельности LBS: ${v}`
+  };
+  const biz = LEGAL_BIZ ? (BIZ_FMT[lang] || BIZ_FMT.ko)(LEGAL_BIZ) : '';
+  const lbs = LEGAL_LBS ? (LBS_FMT[lang] || LBS_FMT.ko)(LEGAL_LBS) : '';
   return String(d.body)
     .split('{OWNER}').join((LEGAL_OWNER.names && LEGAL_OWNER.names[lang]) || LEGAL_OWNER.name)
     .split('{EMAIL}').join(LEGAL_OWNER.email)
     .split('{DATE}').join(LEGAL_DATES[lang] || LEGAL_DATES.ko)
     .split('{VER}').join(LEGAL_VER)
     .split('{BIZ}').join(biz)
+    .split('{LBS}').join(lbs)
     .trim();
 }
 function openLegal(k){

@@ -1681,7 +1681,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1808;
+const LANG_TOTAL = 1810;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3507,6 +3507,11 @@ const I18N = {
     '앱이 스스로 잡은 오류입니다.':'This error was caught by the app itself.',
     '오류':'Error',
     '이 오류 보내기':'Send this error',
+  
+
+    // ── 3.96
+    '이 자리':'this position',
+    '{s} 예보':'forecast at {s}',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5326,6 +5331,11 @@ const I18N = {
     '앱이 스스로 잡은 오류입니다.':'Эту ошибку приложение обнаружило само.',
     '오류':'Ошибка',
     '이 오류 보내기':'Отправить ошибку',
+  
+
+    // ── 3.96
+    '이 자리':'эта точка',
+    '{s} 예보':'прогноз — {s}',
   }
 };
 
@@ -12583,7 +12593,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.95';
+const APP_VER = '3.96';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16102,8 +16112,8 @@ function planStart(){
   it.timeOut = p(now.getHours())+':'+p(now.getMinutes());
   if(it.rideOn) rideStop(it, true);      // 나갔으면 모집은 닫는다
   saveMR(); renderVoyage(); openMR('voyage', it.id);
-  wxCapture('wxOut', it.id);
-  posHere('wxOut', it.id, true);
+  // 위치를 먼저 잡고, 그 좌표로 날씨를 받는다 (위치를 못 잡으면 고른 지점으로 떨어진다)
+  posHere('wxOut', it.id, true, () => wxCapture('wxOut', it.id));
 }
 function addVoyage(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
@@ -16115,8 +16125,8 @@ function addVoyage(){
              logs:[], weather:'', note:'', photos:[], wxOut:null, wxIn:null,
              posOut:null, posIn:null};
   voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
-  wxCapture('wxOut', v.id);          // 출항 시각 기준 날씨 자동 기록
-  posHere('wxOut', v.id, true);      // 출발 위치도 지금 자리로 잡는다 (실패해도 조용히)
+  // 출발 위치를 먼저 잡고(실패해도 조용히), 그 좌표로 출항 시각 날씨를 받는다
+  posHere('wxOut', v.id, true, () => wxCapture('wxOut', v.id));
 }
 
 // ===== 고객센터 =====
@@ -19001,8 +19011,11 @@ function wxLine(w, refetch){
     ? `<button class="minib grn" onclick="${refetch}">${(w&&w.text)?t('갱신'):t('받기')}</button>` : '';
   if(!w || !w.text)
     return `<div class="posrow"><span style="color:#7b8794">${esc(t('날씨 —'))}</span>${btn}</div>`;
+  // ★ 여기에 그냥 이름만 찍어서 '배가 그 자리에 있었다' 로 읽혔다. 어디 예보인지 밝힌다.
+  const where = w.pos ? t('이 자리') : (w.spot || '');
   return `<div class="posrow"><b style="color:#dfe6ee">${esc(w.text)}</b>`
-    + `<span style="color:#7b8794">${w.at ? ' · '+esc(w.at) : ''}${w.spot ? ' · '+esc(w.spot) : ''}</span>${btn}</div>`;
+    + `<span style="color:#7b8794">${w.at ? ' · '+esc(w.at) : ''}`
+    + `${where ? ' · '+esc(tsub('{s} 예보', {s: where})) : ''}</span>${btn}</div>`;
 }
 
 // 시각을 고치면 그 시각 날씨를 다시 받는다
@@ -19026,8 +19039,7 @@ function arriveNow(){
   const now = new Date();
   it.timeIn = p(now.getHours())+':'+p(now.getMinutes());
   it.seed = false; saveMR();
-  posHere('wxIn', it.id, true);
-  wxCapture('wxIn', it.id);
+  posHere('wxIn', it.id, true, () => wxCapture('wxIn', it.id));
   renderVoyage(); openMR('voyage', it.id);
 }
 
@@ -19107,12 +19119,10 @@ function logAdd(){
                  kind: isFishing() ? '포인트' : '세일', text:'', wx:null, pos:null });
   it.seed = false; saveMR(); openMR('voyage', mrOpenId);
   const lid = it.logs[it.logs.length-1].id;
-  wxCapture('log:' + lid);
-  // ★ 위치도 같이 잡는다.
-  //   전에는 날씨만 잡고 위치는 사람이 따로 눌러야 했다.
-  //   항해 중에는 손이 바빠서 그걸 놓친다 — 나중에 어디였는지 알 수가 없다.
+  // ★ 위치를 먼저 잡고 그 좌표로 날씨를 받는다.
+  //   중간기록은 자리가 매번 다르다 — 여기서 고른 지점 날씨를 박으면 거짓말이 된다.
   //   실패해도 조용히 넘어간다 (권한을 안 줬을 수 있다).
-  posHere('log:' + lid, it.id, true);
+  posHere('log:' + lid, it.id, true, () => wxCapture('log:' + lid, it.id));
 }
 function logField(lid, k, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
@@ -19605,11 +19615,18 @@ function posLine(it, key){
     : `<span style="color:#7b8794">${esc(t('위치 —'))}</span>`;
   return `<div class="posrow">${info}${btn}</div>`;
 }
-function posHere(key, vid, quiet){
-  if(!unlocked) return;
+// done 은 위치를 잡은 뒤(또는 못 잡은 뒤) 부른다 — 날씨를 그 좌표로 받기 위해서다.
+// ★ 전에는 부르는 쪽에서 wxCapture 를 먼저 부르고 posHere 를 나중에 불렀다.
+//   위치는 비동기라 늘 늦게 들어온다 — 그래서 날씨를 받을 때는 좌표가 아직 없었다.
+function posHere(key, vid, quiet, done){
+  const fin = () => { try{ if(typeof done === 'function') done(); }catch(e){} };
+  if(!unlocked){ fin(); return; }
   const id = vid || mrOpenId;
-  const it = voyage.find(x=>String(x.id)===String(id)); if(!it) return;
-  if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
+  const it = voyage.find(x=>String(x.id)===String(id)); if(!it){ fin(); return; }
+  if(!navigator.geolocation){
+    if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.'));
+    fin(); return;
+  }
   const draw = ()=>{ if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id); };
   posPut(it, key, { lat:null, lon:null, acc:null, pending:true });
   draw();
@@ -19619,11 +19636,13 @@ function posHere(key, vid, quiet){
                         acc: (typeof p.coords.accuracy==='number' && isFinite(p.coords.accuracy))
                              ? Math.round(p.coords.accuracy) : null });
       it.seed = false; saveMR(); renderVoyage(); draw();
+      fin();
     },
     e=>{
       posPut(it, key, null); saveMR(); draw();
       // 자동 등록(quiet)일 때는 창을 띄우지 않는다 — 권한을 안 준 상태에서 매번 뜨면 성가시다
       if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'));
+      fin();
     },
     { enableHighAccuracy:true, timeout:15000, maximumAge:10000 }
   );
@@ -19647,15 +19666,20 @@ async function wxCapture(key, vid){
   const hhmm = isLog ? lg.time : (key === 'wxOut' ? it.timeOut : it.timeIn);
   const put = w => { if(isLog) lg.wx = w; else it[key] = w; };
 
-  if(!wxCur){ alert(t('날씨 지점이 설정되지 않았습니다. 날씨 탭에서 지점을 먼저 지정해 주세요.')); return; }
+  // ★ 어디 날씨인가 — 이 칸에 찍힌 좌표가 있으면 무조건 그 자리다.
+  //   좌표가 없을 때만 고른 지점으로 떨어진다.
+  const pp = posOf(it, key);
+  const src = (pp && pp.lat != null && pp.lon != null)
+    ? { lat: pp.lat, lon: pp.lon, name: '', pos: 1 }
+    : (wxCur ? { lat: wxCur.lat, lon: wxCur.lon, name: wxCur.name || '', pos: 0 } : null);
+  if(!src){ alert(t('날씨 지점이 설정되지 않았습니다. 날씨 탭에서 지점을 먼저 지정해 주세요.')); return; }
   const ts = tsOf(it.date, hhmm);
   if(ts == null){ put({ text:t('시각을 먼저 입력해 주세요'), at:'', spot:'' }); saveMR(); renderVoyage(); openMR('voyage', id); return; }
 
   put({ text:t('받는 중…'), at:'', spot:'' });
   if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id);
   try{
-    let d = (wxData && wxData.key === wxCur.lat+','+wxCur.lon) ? wxData : null;
-    if(!d){ d = { key: wxCur.lat+','+wxCur.lon, ...(await wxFetch(wxCur.lat, wxCur.lon)) }; wxData = d; }
+    const d = await wxAtPoint(src.lat, src.lon);
     const H = d.w && d.w.hourly;
     const i = H ? wxHourIndex(H.time, ts) : -1;
     if(i < 0) throw new Error(t('해당 시각의 예보 자료가 없습니다'));
@@ -19674,9 +19698,16 @@ async function wxCapture(key, vid){
     }
     let tide = null, tspot = '';
     try{
-      const src = tideSource();
-      if(src){ const txt = tideAt(ts, src.pts);
-        if(txt != null){ tide = Math.round(txt*100); tspot = src.spot && src.spot.name || ''; } }
+      // ★ 물때도 같은 문제였다 — 고른 지점 기준으로만 봤다.
+      //   찍은 좌표가 있으면 그 자리에서 가장 가까운 관측소를 쓴다.
+      if(src.pos){
+        const r = tideAtPlace(src.lat, src.lon, ts);
+        if(r && r.v != null){ tide = Math.round(r.v*100); tspot = r.spot && r.spot.name || ''; }
+      } else {
+        const ss = tideSource();
+        if(ss){ const txt = tideAt(ts, ss.pts);
+          if(txt != null){ tide = Math.round(txt*100); tspot = ss.spot && ss.spot.name || ''; } }
+      }
     }catch(e){}
     const parts = [];
     if(kt != null) parts.push((dir!=null?dirName(dir):'') + ' ' + kt + 'kt'
@@ -19684,7 +19715,10 @@ async function wxCapture(key, vid){
     if(wave != null) parts.push(tsub('파고 {n}m',{n:wave.toFixed(1)}));
     if(tide != null) parts.push(tsub('조위 {n}cm',{n:tide}));
     if(temp != null) parts.push(temp + '℃');
-    put({ text: parts.join(' · ') || t('자료 없음'), at: fmtWhen(ts), spot: wxCur.name || '',
+    // ★ spot 은 저장되는 값이다 — 한국어 원문 그대로 넣고 화면에서 옮긴다.
+    //   pos:1 이면 '이 자리' 로 그린다 (지점 이름이 없다).
+    put({ text: parts.join(' · ') || t('자료 없음'), at: fmtWhen(ts), spot: src.name,
+          pos: src.pos, lat: src.lat, lon: src.lon,
           dir, kt, gust, wave, tide, temp, tideSpot: tspot });
   }catch(e){
     put({ text: tsub('못 받음 — {why}', {why: e.message || t('인터넷 확인')}), at:'', spot:'' });
@@ -20805,6 +20839,28 @@ function fetchTimeout(url, ms){
     fetch(url, {cache:'no-store'}),
     new Promise((_,rej)=>setTimeout(()=>rej(new Error(t('시간 초과'))), ms||12000))
   ]);
+}
+// ★ 항해일지는 매 지점이 자리가 다르다.
+//   전에는 '지금 고른 날씨 지점' 한 곳에서만 받아서, 4시간 항해 네 칸이
+//   전부 같은 값으로 찍혔다. 찍어 둔 좌표를 바로 옆에 두고도 안 썼다.
+//   여기서 좌표별로 받고, 받은 것은 자리별로 담아 둔다.
+//   담는 열쇠는 소수 두 자리(약 1km) — 예보 격자보다 촘촘해서 값이 같다.
+const WX_PT = {};          // '34.74,127.68' → { w, m }
+const WX_PT_MAX = 24;      // 너무 쌓이지 않게
+const wxPtKey = (lat, lon) => Number(lat).toFixed(2) + ',' + Number(lon).toFixed(2);
+async function wxAtPoint(lat, lon){
+  const k = wxPtKey(lat, lon);
+  if(WX_PT[k]) return WX_PT[k];
+  // 날씨 탭이 이미 같은 자리를 받아 뒀으면 그것을 쓴다 (부질없이 또 받지 않는다)
+  if(wxData && wxData.w && wxCur && wxPtKey(wxCur.lat, wxCur.lon) === k){
+    WX_PT[k] = { w: wxData.w, m: wxData.m };
+    return WX_PT[k];
+  }
+  const d = await wxFetch(lat, lon);
+  const ks = Object.keys(WX_PT);
+  if(ks.length >= WX_PT_MAX) delete WX_PT[ks[0]];
+  WX_PT[k] = d;
+  return d;
 }
 async function wxFetch(lat, lon){
   const base = 'https://api.open-meteo.com/v1/forecast?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)

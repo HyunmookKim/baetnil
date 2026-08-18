@@ -1752,7 +1752,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1900;
+const LANG_TOTAL = 1901;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3697,6 +3697,10 @@ const I18N = {
     '수리 탭':'Repairs',
     '클라우드 연결 안 됨 · 눌러서 확인':'Cloud unreachable · tap for details',
     '클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.':'Could not reach the cloud.\n\nEither the internet is down, or the cloud is briefly unavailable.\n\nThe app keeps working with the records stored on this device, and it will sync again by itself once the connection is back.',
+  
+
+    // ── 4.04
+    '먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.':'Please add a diagram first.\n\nOn the diagram screen you can pick a built-in diagram or upload a photo.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5635,6 +5639,10 @@ const I18N = {
     '수리 탭':'Ремонт',
     '클라우드 연결 안 됨 · 눌러서 확인':'Облако недоступно · нажмите для подробностей',
     '클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.':'Не удалось связаться с облаком.\n\nЛибо нет интернета, либо облако временно недоступно.\n\nПриложение продолжает работать с записями на этом устройстве и синхронизируется само, как только связь вернётся.',
+  
+
+    // ── 4.04
+    '먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.':'Сначала добавьте схему.\n\nНа экране схемы можно выбрать встроенную схему или загрузить фотографию.',
   }
 };
 
@@ -13056,7 +13064,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.03';
+const APP_VER = '4.04';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14899,8 +14907,16 @@ function switchTab(t){
   show('marketWrap',   t==='community' && comSub==='market');
   show('exploreWrap',  t==='community' && comSub==='explore');
   show('newsWrap',     t==='community' && comSub==='news');
-  if(!(t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'))) show('mrMapWrap', false);
-  closeMR(); pinCancel();
+  const onMr = (t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'));
+  if(!onMr) show('mrMapWrap', false);
+  closeMR();
+  // ★ 여기서 무턱대고 pinCancel() 을 부르면 「핀 지정」이 시작하자마자 죽는다.
+  //   pinStart 는 closeMR() 로 기록 창을 닫는데, 그 class 변화를 지켜보던
+  //   MutationObserver 가 syncScreen → screenPop → switchTab(curTab) 을 부른다.
+  //   즉 사람이 아무것도 안 눌렀는데 1초쯤 뒤에 switchTab 이 저절로 돈다.
+  //   그때 pinTarget 이 지워져서 도면을 아무리 눌러도 핀이 안 찍혔다.
+  //   정비·수리 화면에 그대로 있는 경우에는 취소하지 않는다.
+  if(!onMr) pinCancel();
 
   paint([['tabHome','home'],['tabBoat','boat'],['tabVoyage','voyage'],['tabCommunity','community']], t);
 
@@ -15174,6 +15190,7 @@ function renderMR(){
   document.getElementById(cur==='maint'?'maintViewBtn':'repairViewBtn').textContent = isMap?t('목록'):t('도면');
   if(isMap) setMapKind(mrMapKind);
   else cur==='maint' ? renderMaintList() : renderRepairList();
+  if(typeof pinBannerSync === 'function') pinBannerSync();
 }
 
 // ===== 정기점검 목록 =====
@@ -15839,11 +15856,26 @@ function pinCluster(gi){
 }
 function pinStart(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
+  // ★ 도면이 한 장도 없으면 찍을 자리가 없다. 빈 화면을 띄우지 말고 말해 준다.
+  const has = k => (typeof dgShowSrc === 'function') ? !!dgShowSrc(k) : true;
+  if(!has('plan') && !has('side')){
+    alert(t('먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.'));
+    return;
+  }
+  // ★ 기본값이 측면도인데, 측면도까지 올린 사람은 드물다.
+  //   평면도만 있는 배에서 「핀 지정」을 누르면 「측면도가 아직 없습니다」 만 떴다.
+  if(!has(mrMapKind)) mrMapKind = (mrMapKind === 'side') ? 'plan' : 'side';
   pinTarget = {type:mrOpenType, id:mrOpenId};
   closeMR();
   if(pinTarget.type==='repair') repairView='map'; else maintView='map';
   renderMR();
-  document.getElementById('pinBanner').style.display='block';
+  pinBannerSync();
+}
+// 안내 띠는 pinTarget 을 그대로 따라간다.
+// ★ 손으로 켜고 끄면 화면이 다시 그려질 때마다 어긋난다. 한 곳에서 맞춘다.
+function pinBannerSync(){
+  const b = document.getElementById('pinBanner');
+  if(b) b.style.display = pinTarget ? 'block' : 'none';
 }
 function pinCancel(){ pinTarget=null; const b=document.getElementById('pinBanner'); if(b) b.style.display='none'; }
 function pinRemove(){

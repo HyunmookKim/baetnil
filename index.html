@@ -1752,7 +1752,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1901;
+const LANG_TOTAL = 1902;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3701,6 +3701,10 @@ const I18N = {
 
     // ── 4.04
     '먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.':'Please add a diagram first.\n\nOn the diagram screen you can pick a built-in diagram or upload a photo.',
+  
+
+    // ── 4.05
+    '오늘 옮길 수 있는 양을 다 썼습니다. 내일 다시 해 주세요.':'You have used up today’s translation allowance. Please try again tomorrow.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5643,6 +5647,10 @@ const I18N = {
 
     // ── 4.04
     '먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.':'Сначала добавьте схему.\n\nНа экране схемы можно выбрать встроенную схему или загрузить фотографию.',
+  
+
+    // ── 4.05
+    '오늘 옮길 수 있는 양을 다 썼습니다. 내일 다시 해 주세요.':'Дневной лимит перевода исчерпан. Попробуйте завтра.',
   }
 };
 
@@ -13064,7 +13072,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.04';
+const APP_VER = '4.06';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14910,6 +14918,7 @@ function switchTab(t){
   const onMr = (t==='boat' && (boatSubTab==='maint'||boatSubTab==='repair'));
   if(!onMr) show('mrMapWrap', false);
   closeMR();
+  if(!onMr && typeof mrDrawOff === 'function') mrDrawOff();   // 그리기 모드도 안 남긴다
   // ★ 여기서 무턱대고 pinCancel() 을 부르면 「핀 지정」이 시작하자마자 죽는다.
   //   pinStart 는 closeMR() 로 기록 창을 닫는데, 그 class 변화를 지켜보던
   //   MutationObserver 가 syncScreen → screenPop → switchTab(curTab) 을 부른다.
@@ -15169,6 +15178,10 @@ function renderHome(){
 function mrToggleView(kind){
   if(kind==='maint') maintView = maintView==='list'?'map':'list';
   else            repairView = repairView==='list'?'map':'list';
+  // ★ 도면을 떠나면 그리기도 끈다. 안 보이는 곳에 켜진 채로 남으면
+  //   나중에 도면을 눌렀을 때 엉뚱하게 도형이 그려진다.
+  const isMap = (kind==='maint') ? maintView==='map' : repairView==='map';
+  if(!isMap) mrDrawOff();
   renderMR();
 }
 // 지금 실제로 보고 있는 화면 이름.
@@ -15865,6 +15878,7 @@ function pinStart(){
   // ★ 기본값이 측면도인데, 측면도까지 올린 사람은 드물다.
   //   평면도만 있는 배에서 「핀 지정」을 누르면 「측면도가 아직 없습니다」 만 떴다.
   if(!has(mrMapKind)) mrMapKind = (mrMapKind === 'side') ? 'plan' : 'side';
+  mrDrawOff();                     // ★ 그리기가 켜져 있으면 누름이 그쪽으로 새어 핀이 안 찍힌다
   pinTarget = {type:mrOpenType, id:mrOpenId};
   closeMR();
   if(pinTarget.type==='repair') repairView='map'; else maintView='map';
@@ -15913,10 +15927,20 @@ function setMrTool(k){
   paintUndoBtns();
   paintShStyles();
 }
+// 그리기 모드를 확실히 끈다 (다른 일을 시작하기 전에 부른다)
+// ★ 이것이 없어서 「핀 지정」 이 통째로 죽어 있었다 —
+//   정비 화면에서 도면 그리기를 한 번 켜면 목록으로 돌아와도 켜진 채로 남는데,
+//   화면에는 아무 표시가 없다. 그 뒤로 핀 지정을 눌러 도면을 누르면
+//   그 누름이 '도형 그리기' 로 가 버려서 핀이 영영 안 찍혔다.
+function mrDrawOff(){
+  if(typeof mrDraw !== 'undefined' && mrDraw) toggleMrDraw();
+}
 function toggleMrDraw(){
   if(!mrDraw && !dgSrc(mrMapKind)){
     alert(t('먼저 도면을 고르거나 올려 주세요')); return;
   }
+  // 그리기를 켜면 핀 지정은 그만둔다 — 둘 다 도면을 누르는 일이라 같이 켤 수 없다
+  if(!mrDraw && pinTarget) pinCancel();
   mrDraw = !mrDraw;
   const on0 = document.getElementById('mrDrawTools');
   if(on0) on0.style.display = mrDraw ? 'flex' : 'none';
@@ -16935,7 +16959,8 @@ async function trGo(coll, id){
     TR_GOT[key + ':' + lang] = got;
     TR_ON[key] = true;
   }catch(e){
-    alert(t('옮기지 못했습니다') + '\n\n' + ((e && e.message) || e));
+    // ★ 까닭은 서버 함수가 한국어로 준다. 사전을 거치게 해야 외국 사람도 읽는다.
+    alert(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
   }
   TR_BUSY[key] = false;
   trRepaint(coll, id);
@@ -21110,7 +21135,8 @@ async function newsTrGo(){
     TR_NEWS[lang] = map;
     trNewsOn = true;
   }catch(e){
-    alert(t('옮기지 못했습니다') + '\n\n' + ((e && e.message) || e));
+    // ★ 까닭은 서버 함수가 한국어로 준다. 사전을 거치게 해야 외국 사람도 읽는다.
+    alert(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
   }
   TR_BUSY.news = false;
   renderNews();

@@ -26,7 +26,7 @@
 .mapbox .mzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
 .mapbox .mzoom button{width:32px;height:32px;border-radius:8px;border:1px solid #2A3B4C;
   background:rgba(11,16,23,.82);color:#DFE6EE;font-size:18px;line-height:1;cursor:pointer}
-.mapbox .mattr{position:absolute;left:6px;bottom:4px;font-size:9px;color:#8AA0B4;
+.mapbox .mattr{position:absolute;left:6px;bottom:4px;font-size:11px;color:#9BB0C4;
   background:rgba(255,255,255,.6);padding:1px 5px;border-radius:4px;pointer-events:none}
 /* 위치·날씨 줄 — 배 위에서 손가락으로 누를 수 있는 크기 */
 .posrow{display:flex;align-items:center;flex-wrap:wrap;gap:6px;
@@ -1000,7 +1000,7 @@ main,#views,body>div{position:relative}
    배와 물에 비친 배(그림자)만 뺐다. 해와 빛길은 그대로다.
    수평선은 맨 윗줄 바로 아래에 둔다 — 아래쪽이 어두운 바다여야 글이 읽힌다.
    그림 파일이 아니라 그림 명령(SVG)이라 어떤 화면 크기에서도 안 뭉갠다. */
-body{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.27'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.23'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.20'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.18'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.12'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.05'/></svg>") no-repeat fixed 0 0/cover, #040C15}
+body{background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.13'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.11'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.085'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.06'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.04'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.03'/></svg>") no-repeat fixed 0 0/cover, #040C15}
 body::before{display:none}
 /* ★ 맨 윗줄은 하늘 그대로의 색으로 채운다.
    비워 두면 수평선의 밝은 띠가 하위 탭 글씨를 잡아먹는다. */
@@ -1059,6 +1059,10 @@ header{background:linear-gradient(to bottom,rgba(10,24,40,.55),rgba(16,40,64,.18
 /* 도면 — 기본 도면은 바탕이 비어 있으니 바다 위에 바로 얹힌다.
    사용자가 올린 사진 도면은 색을 건드리지 않고 '물 위에 놓인 종이' 로만 보이게 한다. */
 #mapWrap{padding:10px 16px 16px}
+/* ★ 도면이 없을 때 지도의 높이를 떠받치던 것은 「평면도가 없습니다」 안내였다.
+     그 안내를 접으면 지도가 0px 로 주저앉아 그릴 수도 볼 수도 없게 된다.
+     그래서 안내와 상관없이 높이를 지켜 준다. */
+#map.nodg{min-height:205px}
 #map img{opacity:1;filter:none;border-radius:12px}
 #map img[src^="data:image/png"],#map img[src^="data:image/jpeg"],
 #map img[src^="https"],#map img[src^="blob"]{
@@ -1240,13 +1244,17 @@ body.panelfull header > *:not(.hrow){display:none!important}
 #hatPanelOv #hatPanelBody,
 #trashView .trashBox,
 #helpOv .helpbox{
-  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.27'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.23'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.20'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.18'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.12'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.05'/></svg>") no-repeat fixed 0 0/cover, #040C15;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='780' viewBox='0 0 360 780' preserveAspectRatio='xMidYMin slice'><defs><linearGradient id='s' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23122a44'/><stop offset='0.1063' stop-color='%232c5f86'/><stop offset='0.1530' stop-color='%237fa8c0'/><stop offset='0.1670' stop-color='%23e6b48f'/><stop offset='0.1706' stop-color='%2310304c'/><stop offset='0.32' stop-color='%230C2437'/><stop offset='0.56' stop-color='%2308192A'/><stop offset='0.80' stop-color='%2306121F'/><stop offset='1' stop-color='%23040C15'/></linearGradient><radialGradient id='u' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='%23ffd9a8' stop-opacity='.95'/><stop offset='.45' stop-color='%23f0a463' stop-opacity='.45'/><stop offset='1' stop-color='%23f0a463' stop-opacity='0'/></radialGradient></defs><rect width='360' height='780' fill='url(%23s)'/><ellipse cx='126' cy='131' rx='166' ry='66' fill='url(%23u)' opacity='.62'/><rect x='95' y='143' width='61' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.15'/><rect x='85' y='147' width='96' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.13'/><rect x='90' y='153' width='45' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.11'/><rect x='82' y='159' width='128' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.10'/><rect x='65' y='164' width='69' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.085'/><rect x='79' y='170' width='160' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.07'/><rect x='39' y='177' width='94' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.06'/><rect x='79' y='185' width='187' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.04'/><rect x='12' y='193' width='120' height='4' rx='2.5' fill='%23ffe0bd' opacity='0.03'/></svg>") no-repeat fixed 0 0/cover, #040C15;
 }
 
 /* 화면 이름이 머리줄에 이미 떠 있으면 화면 안에서는 감춘다 (두 번 안 보이게) */
+/* ★ .formHead > span 은 여기서 빼야 한다.
+     openForm 은 '화면' 이 아니라 그 위에 얹히는 '창' 이다. 머리줄로 옮겨 주는
+     showScreen 의 손이 닿지 않는다. 그래서 CSS 는 감추는데 옮겨 주는 사람이 없어
+     「새 수납칸」·「도형 고치기」·「고객센터」 같은 창 제목이 통째로 사라졌다.
+     화면 어디에도 무슨 창인지 적혀 있지 않았다. */
 body.panelfull #panel .ph .pl,
-body.panelfull #trashView .trashHead > span,
-body.panelfull .formHead > span{display:none}
+body.panelfull #trashView .trashHead > span{display:none}
 body.panelfull #panel .ph{padding-top:0}
 
 /* ============ 4단계 — 날씨 · 물때 ============ */
@@ -1441,6 +1449,69 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #hNav .hsubs{width:100%;padding:0}
 #hNav .htit{margin:0;font-size:19px;font-weight:500;letter-spacing:-.03em;color:var(--th);line-height:1.1}
 .hsub{padding:2px 0 5px}
+
+
+/* ============ 4.02 — 손가락으로 누를 수 있게 ============ */
+/* ★ 흔들리는 배 위에서, 젖은 손이나 장갑 낀 손으로 누른다.
+   애플·구글이 권하는 가장 작은 크기는 44px 이다.
+   재 보니 14×17px 짜리가 있었다 — 중간 기록의 '종류' 칸이다.
+   열한 가지 중 하나를 고르는 칸인데 손톱보다 작았다.
+   ('종류' 칸은 flex:1 이 여럿 겹쳐 눌려 있었다. 폭을 못 박아 고쳤다.)
+   높이를 키우면 한 화면에 들어가는 줄이 준다. 그래서 다 44px 로 밀지 않았다 —
+   글씨를 넣는 칸은 44px, 줄 안에 여럿 늘어선 그림 단추는 40px 로 뒀다. */
+
+/* 창 안의 입력칸 — 안쪽 여백이 0 이라 17px 였다 */
+#mrPanel.full input,#mrPanel.full select,#mrPanel.full textarea{min-height:44px;padding:4px 0}
+#mrPanel.full select{padding-right:18px}
+#mrPanel input,#mrPanel select,#mrPanel textarea,
+#panel input,#panel select,#panel textarea{min-height:44px}
+#mrPanel input[type=checkbox],#panel input[type=checkbox],
+#mrPanel.full input[type=checkbox]{min-height:0;width:22px;height:22px}
+#mrPanel textarea,#panel textarea,#mrPanel.full textarea{min-height:72px}
+
+/* 중간 기록 한 줄 — 시각·종류는 제 폭을 갖고, 내용은 아랫줄로 내린다 */
+#mrPanel .logtime,#mrPanel.full .logtime{flex:0 0 128px;min-width:128px}
+#mrPanel .logkind,#mrPanel.full .logkind{flex:0 0 136px;min-width:136px}
+#mrPanel .logtext,#mrPanel.full .logtext{flex:1 1 100%;min-width:0}
+
+/* 엔진 켬·끔·그대로 */
+.engb{min-height:40px;padding:0 13px}
+
+/* 점검 줄의 그림 단추 (맡기기·옮기기·고치기·지우기) — 18×22 였다.
+   넷이 한 줄에 늘어서 있어 44px 씩 주면 이름 자리가 없어진다. 36×40 으로 뒀다. */
+.ckdel{min-width:36px;min-height:40px;font-size:15px;padding:0;
+  display:inline-flex;align-items:center;justify-content:center}
+
+/* 도움말 물음표 — 18×18 였다 */
+.helpb{width:30px;height:30px;min-width:30px;font-size:14px}
+
+/* 단추 무리 */
+.tab,.minib,.mrbtn,.ckchip,.lkt,.fopt{min-height:40px}
+.lkt.undo{padding:0 15px;min-height:40px;font-size:18px;line-height:1}
+.mrbtn.big{min-height:46px}
+.catchrow .minib{min-height:36px}
+
+/* 지도 확대·축소 — 34×34 였다 */
+.mapzoom button{width:42px;height:42px}
+
+/* 머리줄 단추 (편집 중 · 메뉴) — 31px 였다 */
+.hrow .tab,#lockBtn,.tab.iconb{min-height:40px}
+.tab.iconb{min-width:44px;justify-content:center}
+
+/* 하위 탭 — 29×29 였다. '오늘' 처럼 두 글자짜리는 가로도 좁았다 */
+#hNav{height:40px}
+.hsub{padding:9px 6px 8px;margin-right:8px}
+
+/* 창 닫기 × — 12×20 였다 */
+.x,.formHead .x,.trashHead .x,#recPickHead .x{
+  min-width:44px;min-height:44px;padding:0;
+  display:inline-flex;align-items:center;justify-content:center}
+
+/* 옆으로 더 있다는 것이 보이게 —
+   도면 도구 줄은 862px 인데 화면은 390px 이다. 끊긴 자리가 안 보이면 없는 줄 안다. */
+#stowTools,#mrSub,.subrow,.ckchips{
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
 
 </style>
 <link rel="manifest" href="manifest.webmanifest">
@@ -1681,7 +1752,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1810;
+const LANG_TOTAL = 1900;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3512,6 +3583,120 @@ const I18N = {
     // ── 3.96
     '이 자리':'this position',
     '{s} 예보':'forecast at {s}',
+  
+
+    // ── 3.98
+    '숫자를 넣어 주세요.':'Please enter a number.',
+    '0보다 작은 값은 넣을 수 없습니다.':'A value below 0 is not allowed.',
+    '{n} 까지 넣을 수 있습니다.':'The maximum is {n}.',
+    '기준 {v}':'limit {v}',
+  
+
+    // ── 3.99
+    '평면도 없이 그리는 중입니다.':'Drawing without a floor plan.',
+    '도형 고치기':'Edit shape',
+    '선실 안':'Inside the cabin',
+    '2층 (갑판)':'Upper deck',
+    '라벤더로 표시':'Shown in lavender',
+    '갈래':'Kind',
+    '물건 칸':'Storage',
+    '물품이 들어갑니다':'Holds items',
+    '벽면·선반':'Wall / shelf',
+    '점선으로 표시':'Shown as a dashed line',
+    '도형 지우기':'Delete shape',
+  
+
+    // ── 4.01
+    '이메일 형식을 확인해 주세요.':'Please check the email format.',
+    '비밀번호를 입력해 주세요.':'Please enter your password.',
+    '이미 가입된 이메일입니다. 로그인을 눌러 주세요.':'This email is already registered. Please tap Sign in.',
+    '이메일 또는 비밀번호가 맞지 않습니다.':'The email or password is incorrect.',
+    '시도가 많아 잠시 제한되었습니다. 잠시 후 다시 시도해 주세요.':'Too many attempts. Please try again in a moment.',
+    '인터넷 연결을 확인해 주세요.':'Please check your internet connection.',
+    '로그인 창이 닫혔습니다.':'The sign-in window was closed.',
+    '팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해 주세요.':'Pop-ups are blocked. Please allow pop-ups in your browser settings.',
+    '이 주소에서는 로그인할 수 없도록 설정되어 있습니다.':'Sign-in is not permitted from this address.',
+    '해당 로그인 방식이 꺼져 있습니다.':'That sign-in method is turned off.',
+    '사용이 중지된 계정입니다.':'This account has been disabled.',
+    '로그인하지 못했습니다.':'Could not sign in.',
+    '로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.':'Sign-in is still loading. Please check your internet connection.',
+    '이메일을 입력해 주세요.':'Please enter your email.',
+    '처리 중…':'Working…',
+    '지도를 눌러 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.':'Tap the map to set your home port. Weather and tides are shown for that spot.',
+    '현재 위치를 홈포트로 잡았습니다. 다르면 지도를 눌러 옮겨 주세요.':'Your current position is set as the home port. Tap the map to move it.',
+    '위치를 가져오지 못했습니다. 지도를 눌러 홈포트 위치를 지정해 주세요.':'Could not get your position. Tap the map to set your home port.',
+  
+
+    // ── 4.01b
+    '사유:':'Reason:',
+    '글쓰기가 막혀 있습니다.':'Posting is blocked.',
+    '읽기는 계속 하실 수 있습니다.':'You can still read.',
+    '운영자를 세우거나 내릴 권한이 없습니다':'You do not have permission to appoint or remove operators',
+    '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.':'Could not verify your sign-in.\n\nPlease restart the app and try again.',
+    '최고 운영자는 앱에서 건드릴 수 없습니다.\n\n이 앱의 주인이라 권한을 바꾸거나 해임할 수 없습니다.':'The head operator cannot be changed from the app.\n\nThey own this app, so their permissions cannot be changed and they cannot be removed.',
+    '나 자신은 해임할 수 없습니다.\n\n아무도 운영자를 세울 수 없게 잠기는 것을 막기 위해서입니다.\n다른 분에게 임명 권한을 준 뒤 그분이 해임해 주셔야 합니다.':'You cannot remove yourself.\n\nThis prevents a state where nobody can appoint an operator.\nGive appointment rights to someone else and have them remove you.',
+    '내 임명 권한은 스스로 끌 수 없습니다.\n\n끄고 나면 아무도 운영자를 세울 수 없어 복구가 안 됩니다.\n다른 분에게 임명 권한을 준 뒤 그분이 꺼 주셔야 합니다.':'You cannot switch off your own appointment rights.\n\nOnce off, nobody could appoint an operator and it could not be undone.\nGive appointment rights to someone else and have them switch yours off.',
+    '최고 운영자는 막을 수 없습니다.\n\n이 앱의 주인입니다.':'The head operator cannot be blocked.\n\nThey own this app.',
+    '나 자신은 막을 수 없습니다.':'You cannot block yourself.',
+    '배를 감추거나 지울 권한이 없습니다':'You do not have permission to hide or delete boats',
+    '오늘 쓸 수 있는 클라우드 사용량을 다 썼습니다.\n\n· 기기에 있는 기록은 그대로 있고, 앱은 이대로 다 쓸 수 있습니다.\n· 다른 기기와 맞추는 것만 잠시 멈춥니다.\n· 매일 새벽(한국 시간 오후 4시쯤)에 저절로 풀립니다.\n\n자꾸 이러면 운영자에게 알려 주세요 — 고객센터에서 보낼 수 있습니다.':'Today\'s cloud allowance is used up.\n\n· Everything on this device is intact and the app works as normal.\n· Only syncing with your other devices pauses.\n· It resets automatically each day (around 16:00 Korean time).\n\nIf this keeps happening, please tell the operator — you can send a message from Support.',
+    '이 배의 자료를 볼 권한이 없습니다.\n\n선주에게 등급을 확인해 달라고 하세요.':'You do not have permission to view this boat\'s records.\n\nAsk the owner to check your rank.',
+    '로그인이 풀렸습니다.\n\n서랍 > 로그인 에서 다시 들어와 주세요.':'You have been signed out.\n\nPlease sign in again from Menu > Sign in.',
+    '인터넷에 닿지 못했습니다.\n\n기기에 있는 기록으로 계속 쓰실 수 있습니다.':'Could not reach the internet.\n\nYou can carry on with the records stored on this device.',
+  
+
+    // ── 4.01c
+    '셀 수 없음':'Cannot count',
+    '불러오지 못했습니다: {why}':'Could not load: {why}',
+    '막힌 자료: {what} — {why}':'Blocked records: {what} — {why}',
+    '형식이 다른 파일':'File format does not match',
+    '물품 수정 (아래에서 사진 추가 가능)':'Edit item (you can add photos below)',
+    '수정 완료':'Done',
+    '전체 {a}개 물품 · {b}개 수납칸':'{a} items · {b} lockers',
+    '미배치 {n}개':'{n} unplaced',
+    '저장: {how}':'Storage: {how}',
+    '대용량':'Large',
+    '기본(5MB 제한)':'Basic (5MB limit)',
+    '옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})':'An old app file is still cached — {old} is running (new file {now})',
+    '마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.':'Enter the last service date and the app will show the next due date and days left.',
+    '글과 사진을 섞어서 쓰시면 됩니다.':'You can mix text and photos.',
+    '{n}척':'{n} boats',
+    '— 현재 위치에서 가장 가까운 지역 (지금: {n} {v})':'— the region nearest your current position (now: {n} {v})',
+  
+
+    // ── 4.01d
+    '미기록':'No record',
+    '지남 {n}일':'{n} days overdue',
+    '남음 {n}일':'{n} days left',
+    '밀림':'Overdue',
+    '곧':'Soon',
+    '주기 {n}{u}':'Every {n}{u}',
+    '마지막 {d}':'Last {d}',
+    '핀':'Pin',
+    '풍속이 정해 둔 한계를 넘었습니다':'Wind is over your limit',
+    '돌풍이 정해 둔 한계를 넘었습니다':'Gusts are over your limit',
+    '파고가 정해 둔 한계를 넘었습니다':'Waves are over your limit',
+    '파주기가 짧아 배가 심하게 흔들립니다':'Short wave period — the boat will roll hard',
+    '시정이 정해 둔 기준보다 나쁩니다':'Visibility is worse than your limit',
+    '조류가 정해 둔 한계를 넘었습니다':'Current is over your limit',
+    '바람 {n}kt':'Wind {n}kt',
+    '오늘 클라우드 한도 다 씀 · 눌러서 확인':'Cloud allowance used up · tap for details',
+    '권한이 없습니다 · 눌러서 확인':'No permission · tap for details',
+    '로그인이 풀렸습니다 · 눌러서 확인':'Signed out · tap for details',
+  
+
+    // ── 4.01e
+    '비밀번호는 6자 이상이어야 합니다.':'The password must be at least 6 characters.',
+    '로그인하지 못했습니다. ({code})':'Could not sign in. ({code})',
+  
+
+    // ── 4.03
+    '제목 없는 항해':'Untitled voyage',
+    '출항':'departure',
+    '고쳐야 할 곳':'Needs repair',
+    '수리 탭':'Repairs',
+    '클라우드 연결 안 됨 · 눌러서 확인':'Cloud unreachable · tap for details',
+    '클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.':'Could not reach the cloud.\n\nEither the internet is down, or the cloud is briefly unavailable.\n\nThe app keeps working with the records stored on this device, and it will sync again by itself once the connection is back.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5336,6 +5521,120 @@ const I18N = {
     // ── 3.96
     '이 자리':'эта точка',
     '{s} 예보':'прогноз — {s}',
+  
+
+    // ── 3.98
+    '숫자를 넣어 주세요.':'Введите число.',
+    '0보다 작은 값은 넣을 수 없습니다.':'Значение меньше 0 недопустимо.',
+    '{n} 까지 넣을 수 있습니다.':'Максимум — {n}.',
+    '기준 {v}':'предел {v}',
+  
+
+    // ── 3.99
+    '평면도 없이 그리는 중입니다.':'Рисование без плана.',
+    '도형 고치기':'Изменить фигуру',
+    '선실 안':'Внутри каюты',
+    '2층 (갑판)':'Верхняя палуба',
+    '라벤더로 표시':'Показано лавандовым',
+    '갈래':'Вид',
+    '물건 칸':'Отсек',
+    '물품이 들어갑니다':'Хранит вещи',
+    '벽면·선반':'Стена / полка',
+    '점선으로 표시':'Показано пунктиром',
+    '도형 지우기':'Удалить фигуру',
+  
+
+    // ── 4.01
+    '이메일 형식을 확인해 주세요.':'Проверьте формат адреса эл. почты.',
+    '비밀번호를 입력해 주세요.':'Введите пароль.',
+    '이미 가입된 이메일입니다. 로그인을 눌러 주세요.':'Этот адрес уже зарегистрирован. Нажмите «Войти».',
+    '이메일 또는 비밀번호가 맞지 않습니다.':'Неверный адрес или пароль.',
+    '시도가 많아 잠시 제한되었습니다. 잠시 후 다시 시도해 주세요.':'Слишком много попыток. Повторите чуть позже.',
+    '인터넷 연결을 확인해 주세요.':'Проверьте подключение к интернету.',
+    '로그인 창이 닫혔습니다.':'Окно входа закрыто.',
+    '팝업이 차단되었습니다. 브라우저 설정에서 팝업을 허용해 주세요.':'Всплывающие окна заблокированы. Разрешите их в настройках браузера.',
+    '이 주소에서는 로그인할 수 없도록 설정되어 있습니다.':'Вход с этого адреса запрещён.',
+    '해당 로그인 방식이 꺼져 있습니다.':'Этот способ входа отключён.',
+    '사용이 중지된 계정입니다.':'Учётная запись отключена.',
+    '로그인하지 못했습니다.':'Не удалось войти.',
+    '로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.':'Вход ещё загружается. Проверьте подключение к интернету.',
+    '이메일을 입력해 주세요.':'Введите адрес эл. почты.',
+    '처리 중…':'Обработка…',
+    '지도를 눌러 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.':'Нажмите на карту, чтобы указать порт приписки. Погода и приливы показываются для этой точки.',
+    '현재 위치를 홈포트로 잡았습니다. 다르면 지도를 눌러 옮겨 주세요.':'Текущее местоположение принято за порт приписки. Нажмите на карту, чтобы изменить.',
+    '위치를 가져오지 못했습니다. 지도를 눌러 홈포트 위치를 지정해 주세요.':'Не удалось определить местоположение. Нажмите на карту, чтобы указать порт приписки.',
+  
+
+    // ── 4.01b
+    '사유:':'Причина:',
+    '글쓰기가 막혀 있습니다.':'Публикация заблокирована.',
+    '읽기는 계속 하실 수 있습니다.':'Читать по-прежнему можно.',
+    '운영자를 세우거나 내릴 권한이 없습니다':'Нет прав назначать или снимать операторов',
+    '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.':'Не удалось проверить вход.\n\nПерезапустите приложение и повторите.',
+    '최고 운영자는 앱에서 건드릴 수 없습니다.\n\n이 앱의 주인이라 권한을 바꾸거나 해임할 수 없습니다.':'Главного оператора нельзя изменить из приложения.\n\nОн владелец приложения: его права нельзя менять, и снять его нельзя.',
+    '나 자신은 해임할 수 없습니다.\n\n아무도 운영자를 세울 수 없게 잠기는 것을 막기 위해서입니다.\n다른 분에게 임명 권한을 준 뒤 그분이 해임해 주셔야 합니다.':'Нельзя снять самого себя.\n\nИначе может не остаться никого, кто мог бы назначать операторов.\nПередайте право назначения другому — и пусть он снимет вас.',
+    '내 임명 권한은 스스로 끌 수 없습니다.\n\n끄고 나면 아무도 운영자를 세울 수 없어 복구가 안 됩니다.\n다른 분에게 임명 권한을 준 뒤 그분이 꺼 주셔야 합니다.':'Нельзя отключить собственное право назначения.\n\nПосле отключения никто не сможет назначать операторов, и это не восстановить.\nПередайте право другому — и пусть он отключит ваше.',
+    '최고 운영자는 막을 수 없습니다.\n\n이 앱의 주인입니다.':'Главного оператора нельзя заблокировать.\n\nОн владелец приложения.',
+    '나 자신은 막을 수 없습니다.':'Нельзя заблокировать самого себя.',
+    '배를 감추거나 지울 권한이 없습니다':'Нет прав скрывать или удалять суда',
+    '오늘 쓸 수 있는 클라우드 사용량을 다 썼습니다.\n\n· 기기에 있는 기록은 그대로 있고, 앱은 이대로 다 쓸 수 있습니다.\n· 다른 기기와 맞추는 것만 잠시 멈춥니다.\n· 매일 새벽(한국 시간 오후 4시쯤)에 저절로 풀립니다.\n\n자꾸 이러면 운영자에게 알려 주세요 — 고객센터에서 보낼 수 있습니다.':'Дневной лимит облака исчерпан.\n\n· Все записи на устройстве целы, приложение работает как обычно.\n· Приостановлена только синхронизация с другими устройствами.\n· Лимит сбрасывается каждый день (около 16:00 по корейскому времени).\n\nЕсли это повторяется, сообщите оператору — через раздел поддержки.',
+    '이 배의 자료를 볼 권한이 없습니다.\n\n선주에게 등급을 확인해 달라고 하세요.':'Нет прав просматривать записи этого судна.\n\nПопросите владельца проверить ваш ранг.',
+    '로그인이 풀렸습니다.\n\n서랍 > 로그인 에서 다시 들어와 주세요.':'Вы вышли из аккаунта.\n\nВойдите снова: Меню > Войти.',
+    '인터넷에 닿지 못했습니다.\n\n기기에 있는 기록으로 계속 쓰실 수 있습니다.':'Нет связи с интернетом.\n\nМожно продолжать работу с записями на устройстве.',
+  
+
+    // ── 4.01c
+    '셀 수 없음':'Не поддаётся подсчёту',
+    '불러오지 못했습니다: {why}':'Не удалось загрузить: {why}',
+    '막힌 자료: {what} — {why}':'Заблокированные записи: {what} — {why}',
+    '형식이 다른 파일':'Формат файла не подходит',
+    '물품 수정 (아래에서 사진 추가 가능)':'Изменить вещь (фото можно добавить ниже)',
+    '수정 완료':'Готово',
+    '전체 {a}개 물품 · {b}개 수납칸':'Вещей: {a} · Отсеков: {b}',
+    '미배치 {n}개':'Без места: {n}',
+    '저장: {how}':'Хранилище: {how}',
+    '대용량':'Большое',
+    '기본(5MB 제한)':'Базовое (лимит 5 МБ)',
+    '옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})':'Остался старый файл приложения — работает {old} (новый файл {now})',
+    '마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.':'Укажите дату последнего обслуживания — приложение покажет следующую дату и остаток дней.',
+    '글과 사진을 섞어서 쓰시면 됩니다.':'Можно смешивать текст и фотографии.',
+    '{n}척':'Судов: {n}',
+    '— 현재 위치에서 가장 가까운 지역 (지금: {n} {v})':'— ближайший к вашему местоположению район (сейчас: {n} {v})',
+  
+
+    // ── 4.01d
+    '미기록':'Нет записи',
+    '지남 {n}일':'Просрочено на {n} дн.',
+    '남음 {n}일':'Осталось {n} дн.',
+    '밀림':'Просрочено',
+    '곧':'Скоро',
+    '주기 {n}{u}':'Каждые {n}{u}',
+    '마지막 {d}':'Последний раз {d}',
+    '핀':'Метка',
+    '풍속이 정해 둔 한계를 넘었습니다':'Ветер выше вашего предела',
+    '돌풍이 정해 둔 한계를 넘었습니다':'Порывы выше вашего предела',
+    '파고가 정해 둔 한계를 넘었습니다':'Волна выше вашего предела',
+    '파주기가 짧아 배가 심하게 흔들립니다':'Короткий период волны — судно будет сильно качать',
+    '시정이 정해 둔 기준보다 나쁩니다':'Видимость хуже вашего предела',
+    '조류가 정해 둔 한계를 넘었습니다':'Течение сильнее вашего предела',
+    '바람 {n}kt':'Ветер {n} уз',
+    '오늘 클라우드 한도 다 씀 · 눌러서 확인':'Дневной лимит облака исчерпан · нажмите',
+    '권한이 없습니다 · 눌러서 확인':'Нет прав · нажмите',
+    '로그인이 풀렸습니다 · 눌러서 확인':'Вы вышли из аккаунта · нажмите',
+  
+
+    // ── 4.01e
+    '비밀번호는 6자 이상이어야 합니다.':'Пароль должен быть не короче 6 символов.',
+    '로그인하지 못했습니다. ({code})':'Не удалось войти. ({code})',
+  
+
+    // ── 4.03
+    '제목 없는 항해':'Выход без названия',
+    '출항':'отход',
+    '고쳐야 할 곳':'Требует ремонта',
+    '수리 탭':'Ремонт',
+    '클라우드 연결 안 됨 · 눌러서 확인':'Облако недоступно · нажмите для подробностей',
+    '클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.':'Не удалось связаться с облаком.\n\nЛибо нет интернета, либо облако временно недоступно.\n\nПриложение продолжает работать с записями на этом устройстве и синхронизируется само, как только связь вернётся.',
   }
 };
 
@@ -7131,7 +7430,7 @@ async function openWipe(){
     <div class="mrsecthead">${esc(t('사라지는 것'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('내 배'))}</span>
       <span class="mrm" style="flex:1">${mine.length ? esc(mine.map(b=>b.name).join(', ')) : t('없음')}</span>
-      <b class="mrv">${mine.length}척</b></div>
+      <b class="mrv">${esc(tsub('{n}척', { n: mine.length }))}</b></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('배 기록'))}</span>
       <span class="mrm" style="flex:1">${esc(t('물품·정비·수리·항해일지·서류·도면·게시판'))}</span></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('커뮤니티'))}</span>
@@ -7156,7 +7455,7 @@ async function openWipe(){
     if(el) el.textContent = n + '개';
   }catch(_){
     const el = document.getElementById('wipeN');
-    if(el) el.textContent = '셀 수 없음';
+    if(el) el.textContent = t('셀 수 없음');
   }
 }
 // ★ 정해진 글자를 그대로 적게 한다. 확인 창 한 번으로는 잘못 눌린다.
@@ -7231,9 +7530,17 @@ async function wipeLocal(){
     }
   }catch(_){}
 }
-function acMsg(t){
+// 로그인 화면 안내줄.
+// ★ 매개변수 이름이 t 라 번역 함수를 가리고 있었다. 그래서 로그인 화면의
+//   안내 18개(authMsg 13 + 여기 5)가 전부 한국어로 나갔다 —
+//   외국 사람이 앱을 켜서 제일 먼저 만나는 화면인데.
+//   setSync 처럼 '입구에서 옮기는' 자리로 만든다. 부르는 쪽은 한국어 원문을 준다.
+function acMsg(msg){
   const el = document.getElementById('acMsg');
-  if(el){ el.innerHTML = t; el.style.display = t ? 'block' : 'none'; }
+  if(!el) return;
+  const one = String(msg == null ? '' : msg);
+  el.innerHTML = one ? esc(t(one)) : '';
+  el.style.display = one ? 'block' : 'none';
 }
 // Firebase 오류 코드를 사람이 읽을 수 있는 말로 바꾼다
 function authMsg(e){
@@ -7254,7 +7561,8 @@ function authMsg(e){
   if(c.includes('user-disabled'))          return '사용이 중지된 계정입니다.';
   // 알 수 없는 오류는 원인을 알 수 있게 코드를 함께 보여 준다.
   // 문의를 받을 때도 이 코드가 있어야 원인을 찾을 수 있다.
-  return '로그인하지 못했습니다.' + (c ? ` (${esc(c)})` : '');
+  return c ? tsub('로그인하지 못했습니다. ({code})', { code: c })
+           : '로그인하지 못했습니다.';
 }
 async function doGoogle(){
   if(!window.__auth){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
@@ -7426,7 +7734,7 @@ function openBoatSetup(){
       <input id="nbYear" type="number" min="1900" max="2100" style="width:86px" placeholder="${esc(t('연식'))}" autocomplete="off"></div>
     <div class="mrnone" style="text-align:left">${esc(t('제조사·모델·연식은 나중에 도움을 구할 때 상대가 배를 파악하는 데 쓰입니다. 지금 몰라도 되고, 나중에 채워도 됩니다.'))}</div>
     <div class="mrrow" style="justify-content:flex-end">
-      <button class="mrbtn" onclick="createBoat()">${esc(t('등록'))}</button></div>`;
+      <button class="mrbtn ok" onclick="createBoat()">${esc(t('저장'))}</button></div>`;
   showPanel(P);
   setTimeout(()=>{ const el=document.getElementById('nbName'); if(el) el.focus(); }, 100);
   // 지도를 켜고 현재 위치를 기본값으로 잡는다 — 대부분 지금 있는 곳이 홈포트다
@@ -7438,9 +7746,10 @@ function openBoatSetup(){
 // 등록 화면의 지도에서 현재 위치를 잡는다
 function setupUseGPS(){
   const hint = () => document.getElementById('setupHint');
-  const say = t => { const el = hint(); if(el) el.innerHTML = t; };
+  // ★ 여기도 매개변수 이름이 t 였다. GPS 콜백 안이라 여태 어떤 검사도 안 밟았다.
+  const say = msg => { const el = hint(); if(el) el.innerHTML = esc(t(msg)); };
   if(!navigator.geolocation){
-    say('지도를 탭해 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.');
+    say('지도를 눌러 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.');
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -7452,9 +7761,9 @@ function setupUseGPS(){
       mapS.cx = MERC.x(mapS.pick.lon, mapS.z); mapS.cy = MERC.y(mapS.pick.lat, mapS.z);
       mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
       mapPaint(true);
-      say('현재 위치를 홈포트로 잡았습니다. 다르면 지도를 탭해 옮겨 주세요.');
+      say('현재 위치를 홈포트로 잡았습니다. 다르면 지도를 눌러 옮겨 주세요.');
     },
-    ()=>{ say('위치를 가져오지 못했습니다. 지도를 탭해 홈포트 위치를 지정해 주세요.'); },
+    ()=>{ say('위치를 가져오지 못했습니다. 지도를 눌러 홈포트 위치를 지정해 주세요.'); },
     { enableHighAccuracy:false, timeout:10000, maximumAge:300000 }
   );
 }
@@ -7567,7 +7876,16 @@ function portPickSave(){
 // 홈포트를 날씨·물때 지점으로 맞춰 둔다.
 // 배를 등록하면 날씨 지점도 따로 만들어야 했던 번거로움을 없앤다.
 function syncPortSpot(b){
-  if(!b || b.lat == null || b.lon == null) return;
+  if(!b) return;
+  // ★ 홈포트 '이름' 만 적고 지도를 안 찍으면 좌표가 없어 날씨 지점이 안 생겼다.
+  //   그런데 앱 안에 항·마리나 152곳이 좌표째 들어 있다. 이름이 맞으면 그것을 쓴다.
+  if((b.lat == null || b.lon == null) && b.port && typeof SPOT_SEED !== 'undefined'){
+    const key = String(b.port).replace(/\s+/g,'');
+    const hit = SPOT_SEED.find(x => String(x.n).replace(/\s+/g,'') === key)
+             || (key.length >= 2 ? SPOT_SEED.find(x => String(x.n).replace(/\s+/g,'').indexOf(key) === 0) : null);
+    if(hit){ b.lat = hit.la; b.lon = hit.lo; }
+  }
+  if(b.lat == null || b.lon == null) return;
   if(!Array.isArray(wxSpots)) wxSpots = [];
   const sid = 'port@' + b.id;
   const name = b.port || (b.name ? b.name + ' 홈포트' : '홈포트');
@@ -7730,9 +8048,15 @@ function ownerRank(b){
 }
 // 지금 나의 등급
 function myRank(b){
+  if(!b) return null;
   const me = (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
-  if(!me || !b || !b.members) return null;
-  return rankOf(b, b.members[me]);
+  const mem = b.members || null;
+  // ★ 로그인 없이 혼자 쓰는 배에는 명부가 아예 없다.
+  //   여기서 null 이 나가는 바람에, 자기가 만든 배인데도 공개설정·명부·등급이
+  //   「권한이 없습니다」 한 마디로 막혀 있었다. 명부가 없으면 내가 선주다.
+  if(!mem || !Object.keys(mem).length) return ownerRank(b);
+  if(!me) return null;
+  return rankOf(b, mem[me]);
 }
 // 어떤 등급이 이 항목에 대해 가진 권한
 function permOf(rank, key){
@@ -8195,9 +8519,9 @@ async function loadMyBan(){
   return myBan;
 }
 function banNotice(){
-  return '글쓰기가 막혀 있습니다.'
-    + (myBan && myBan.why ? '\n\n사유: ' + myBan.why : '')
-    + '\n\n읽기는 계속 하실 수 있습니다.';
+  // 사유는 사람이 적은 글이라 옮기지 않는다. 나머지만 옮긴다.
+  const why = (myBan && myBan.why) ? '\n\n' + t('사유:') + ' ' + myBan.why : '';
+  return t('글쓰기가 막혀 있습니다.') + why + '\n\n' + t('읽기는 계속 하실 수 있습니다.');
 }
 let adminMe = null;     // { uid, name, perms:{...} } · 아니면 null
 async function loadAdmin(){
@@ -8377,7 +8701,7 @@ async function renderTalk(){
     try{
       const r = await window.__talk.list(false, talkSort);
       listSet('talk', r.rows, r.done);
-    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+    }catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
   talkList = listRows('talk');
 
@@ -8951,7 +9275,7 @@ async function toggleLike(kind, id){
       //   한 사람이 몇 번이고 누를 수 있었다.
       //   이제 누가 눌렀는지 방을 하나 남기고, 숫자는 서버가 더한다.
       const COLL = { talk:'community', spots:'spots', market:'market' }[kind];
-      if(!window.__like || !COLL) throw new Error('인터넷에 연결되어 있지 않습니다');
+      if(!window.__like || !COLL) throw new Error(t('인터넷에 연결되어 있지 않습니다'));
       await window.__like.set(COLL, id, !was);
     }
   }catch(e){
@@ -9288,16 +9612,11 @@ function adminGuard(uid, what, key, on){
   if(!isAdmin('admin')) return '운영자를 세우거나 내릴 권한이 없습니다';
   if(!adminMyUid()) return '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.';
   if(isOwnerAdmin(uid))
-    return '최고 운영자는 앱에서 건드릴 수 없습니다.\n\n'
-      + '이 앱의 주인이라 권한을 바꾸거나 해임할 수 없습니다.';
+    return '최고 운영자는 앱에서 건드릴 수 없습니다.\n\n이 앱의 주인이라 권한을 바꾸거나 해임할 수 없습니다.';
   if(what === 'remove' && adminIsMe(uid))
-    return '나 자신은 해임할 수 없습니다.\n\n'
-      + '아무도 운영자를 세울 수 없게 잠기는 것을 막기 위해서입니다.\n'
-      + '다른 분에게 임명 권한을 준 뒤 그분이 해임해 주셔야 합니다.';
+    return '나 자신은 해임할 수 없습니다.\n\n아무도 운영자를 세울 수 없게 잠기는 것을 막기 위해서입니다.\n다른 분에게 임명 권한을 준 뒤 그분이 해임해 주셔야 합니다.';
   if(what === 'perm' && key === 'admin' && !on && adminIsMe(uid))
-    return '내 임명 권한은 스스로 끌 수 없습니다.\n\n'
-      + '끄고 나면 아무도 운영자를 세울 수 없어 복구가 안 됩니다.\n'
-      + '다른 분에게 임명 권한을 준 뒤 그분이 꺼 주셔야 합니다.';
+    return '내 임명 권한은 스스로 끌 수 없습니다.\n\n끄고 나면 아무도 운영자를 세울 수 없어 복구가 안 됩니다.\n다른 분에게 임명 권한을 준 뒤 그분이 꺼 주셔야 합니다.';
   return '';
 }
 // 사람을 막기 전 검사. 위와 같은 이유로 한 곳에 모은다.
@@ -9424,7 +9743,7 @@ async function adminBoats(){
         </div></div></div>`).join('');
 }
 function adminBoatHide(id, on){
-  if(!isAdmin('boatMod')){ alert(boatModGuard()); return; }
+  if(!isAdmin('boatMod')){ alert(t(boatModGuard())); return; }
   const val = (on === true || on === 'true');
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(val && !confirm(tsub('{name} 를 둘러보기에서 감출까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
@@ -9434,7 +9753,7 @@ function adminBoatHide(id, on){
     .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function adminBoatDel(id){
-  if(!isAdmin('boatMod')){ alert(boatModGuard()); return; }
+  if(!isAdmin('boatMod')){ alert(t(boatModGuard())); return; }
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(!confirm(tsub('{name} 의 공개 자료를 지울까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
       + t('되돌릴 수 없습니다. 배 주인의 물품·정비 기록은 그대로 남습니다.\n')
@@ -9588,7 +9907,7 @@ async function openPerson(uid){
 function personPerm(uid, key, on){
   const val = (on === true || on === 'true');
   const why = adminGuard(uid, 'perm', key, val);
-  if(why){ alert(why); return; }
+  if(why){ alert(t(why)); return; }
   const a = personCur && String(personCur.uid) === String(uid) ? personCur.admin : null;
   if(!a){ personAppoint(uid, key); return; }
   const perms = Object.assign({}, a.perms || {});
@@ -9608,7 +9927,7 @@ function personPerm(uid, key, on){
 // 새로 운영자로 세운다
 function personAppoint(uid, key){
   const why = adminGuard(uid, 'add', key, true);
-  if(why){ alert(why); return; }
+  if(why){ alert(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || '';
   const pm = ADMIN_PERMS.find(x=>x.k===key);
   if(!confirm(tsub('{name} 님을 운영자로 세웁니다.', {name:nm||uid}) + '\n\n'
@@ -9621,7 +9940,7 @@ function personAppoint(uid, key){
 }
 function personRemove(uid){
   const why = adminGuard(uid, 'remove');
-  if(why){ alert(why); return; }
+  if(why){ alert(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || uid;
   if(!confirm(tsub('{name} 님을 운영자에서 내릴까요?', {name:nm}))) return;
   window.__admin.remove(uid).then(()=>openPerson(uid))
@@ -9629,7 +9948,7 @@ function personRemove(uid){
 }
 function personBan(uid){
   const why = banGuard(uid);
-  if(why){ alert(why); return; }
+  if(why){ alert(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || uid;
   openForm({
     title:'글쓰기 막기',
@@ -9674,7 +9993,7 @@ async function adminAdmins(){
 // 명부에 아직 없는 사람은 계정 번호를 받아 세운다
 function adminAdd(){
   const why = adminGuard('', 'add');
-  if(why){ alert(why); return; }
+  if(why){ alert(t(why)); return; }
   openForm({
     title:'운영자 세우기',
     sub:'그 사람의 계정 번호를 붙여넣으세요',
@@ -9724,7 +10043,7 @@ async function openExplore(biz){
   if(!listFresh(ck)){
     W.innerHTML = `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
     try{ listSet(ck, await window.__pub.list(exploreBiz), true); }
-    catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+    catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
   const list = listRows(ck);
   const hid = hiddenBoats().length;
@@ -10013,7 +10332,7 @@ function openIntro(){
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('소개 페이지'))}</b><span style="flex:1"></span>
       <button class="tab" onclick="openPublish()">${esc(t('← 공개 설정'))}</button></div>
-    <div class="mrnone" style="text-align:left">글과 사진을 섞어서 쓰시면 됩니다.
+    <div class="mrnone" style="text-align:left">${esc(t('글과 사진을 섞어서 쓰시면 됩니다.'))}
       ${pubOn(b,'intro') ? '' : `<br><b>${esc(t('지금은 소개 페이지가 꺼져 있어 밖에 보이지 않습니다.'))}</b>`}</div>`
     + (rows || `<div class="mrnone">${esc(t('아직 아무것도 없습니다'))}</div>`)
     + `<div class="mrrow" style="justify-content:center;gap:8px;padding:14px 12px">
@@ -10463,17 +10782,20 @@ function openMyTasks(){
   const seeAll = can(b,'task','write');
   const mine = myTasks(b);
   const free = seeAll ? taskCount(b, '') : [];
-  const row = t => `<div class="fleet" onclick="${t.kind==='maint'
-      ? `openMR('maint','${esc(t.id)}')` : `switchTab('check')`}">
-    <div class="fmain"><div class="fname">${esc(t.name || t('(이름 없음)'))}
-      ${t.late ? `<span class="chip late">${esc(t('기한 지남'))}</span>` : ''}
-      <span class="chip">${t.kind==='maint' ? t('정기점검') : t('체크리스트')}</span></div>
-      <div class="fsub">${t.kind==='maint'
-        ? (t.next ? tsub('다음 {d}', { d: fmtDate(t.next) })
-              + (t.days!==null ? ' · ' + (t.days<0 ? tsub('{n}일 지남', { n: -t.days })
-                                                   : tsub('{n}일 남음', { n: t.days })) : '')
+  // ★ 매개변수 이름을 t 로 지으면 번역 함수 t() 가 가려진다.
+  //   그러면 t('정기점검') 이 '할 일 객체를 함수처럼 부르는' 꼴이 되어 줄마다 터졌다.
+  //   화면이 통째로 안 그려지는데 오류창도 안 떠서 '눌러도 아무 일 없음' 으로 보였다.
+  const row = tk => `<div class="fleet" onclick="${tk.kind==='maint'
+      ? `openMR('maint','${esc(tk.id)}')` : `switchTab('check')`}">
+    <div class="fmain"><div class="fname">${esc(tk.name || t('(이름 없음)'))}
+      ${tk.late ? `<span class="chip late">${esc(t('기한 지남'))}</span>` : ''}
+      <span class="chip">${tk.kind==='maint' ? t('정기점검') : t('체크리스트')}</span></div>
+      <div class="fsub">${tk.kind==='maint'
+        ? (tk.next ? tsub('다음 {d}', { d: fmtDate(tk.next) })
+              + (tk.days!==null ? ' · ' + (tk.days<0 ? tsub('{n}일 지남', { n: -tk.days })
+                                                     : tsub('{n}일 남음', { n: tk.days })) : '')
             : t('기록 없음'))
-        : (t.grp || '')}</div></div></div>`;
+        : (tk.grp || '')}</div></div></div>`;
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('내 할 일'))}</b><span style="flex:1"></span>
       </div>`
@@ -11496,17 +11818,27 @@ function boatWxCard(now, idx){
   if(!ws.length && rf === null && !anyLimit){
     return `<div class="mrnone" style="text-align:left">${t('배 길이를 넣어 두시면 그에 맞는 <b>출항 한계 풍속·파고</b>를 자동으로 잡아 기준을 넘었는지 알려 드립니다.')}<button class="minib blu" onclick="openBoat('spec')">${esc(t('배 길이 넣기'))}</button></div>`;
   }
+  // ★ 값을 그대로 찍어 '31.099999999999998kt' 가 화면에 나왔다.
+  //   길이·파고처럼 소수가 뜻이 있는 값은 한 자리, 나머지는 정수로 맞춘다.
+  const wxNum = (v, key) => {
+    const n = Number(v);
+    if(!isFinite(n)) return '—';
+    return (key === 'maxWave' || key === 'maxCurrent') ? String(Math.round(n*10)/10)
+                                                       : String(Math.round(n));
+  };
+  const wxUnit = key => key==='maxWave' ? 'm' : key==='maxPeriod' ? t('초')
+                      : key==='minVis' ? 'km' : 'kt';
   const rows = ws.map(w=>`<div class="bwrow ${w.level}">
       <b>${esc(w.text)}</b>
-      <span>${w.value}${w.key==='maxWave'?'m':w.key==='maxPeriod'?t('초'):w.key==='minVis'?'km':'kt'}
-        · 기준 ${w.limit}${w.key==='maxWave'?'m':w.key==='maxPeriod'?t('초'):w.key==='minVis'?'km':'kt'}</span>
+      <span>${esc(wxNum(w.value, w.key))}${esc(wxUnit(w.key))}
+        · ${esc(tsub('기준 {v}', { v: wxNum(w.limit, w.key) + wxUnit(w.key) }))}</span>
     </div>`).join('');
   const reef = (rf === null) ? ''
     : `<div class="bwrow ${rf >= 2 ? 'mid' : 'ok'}">
         <b>${rf === 0 ? t('리프 없이 갈 수 있는 바람입니다') : tsub('메인세일 {n}단 리프', { n: rf })}</b>
-        <span>바람 ${Math.round(now.wind)}kt</span></div>`;
+        <span>${esc(tsub('바람 {n}kt', {n:Math.round(now.wind)}))}</span></div>`;
   if(!rows && !reef) return `<div class="bwcard ok">${when}<div class="bwrow ok">
-      <b>${esc(t('정해 둔 기준 안에 있습니다'))}</b><span>바람 ${Math.round(now.wind||0)}kt</span></div></div>`;
+      <b>${esc(t('정해 둔 기준 안에 있습니다'))}</b><span>${esc(tsub('바람 {n}kt', {n:Math.round(now.wind||0)}))}</span></div></div>`;
   return `<div class="bwcard${ws.some(w=>w.level==='high') ? ' bad' : ''}">${when}${reef}${rows}</div>`;
 }
 // 배 길이와 선종에서 날씨 한계값을 어림잡아 준다.
@@ -11583,12 +11915,13 @@ function wxWarnings(now){
     if(!isFinite(v)) return;                     // 값 없음 → 건너뜀
     if(over ? (v > lim) : (v < lim)) out.push({ key, text, level, value:v, limit:lim });
   };
-  chk('maxWind',  n.wind,   true,  '풍속이 정해 둔 한계를 넘었습니다',   'high');
-  chk('maxGust',  n.gust,   true,  '돌풍이 정해 둔 한계를 넘었습니다',   'high');
-  chk('maxWave',  n.wave,   true,  '파고가 정해 둔 한계를 넘었습니다',   'high');
-  chk('maxPeriod',n.period, false, '파주기가 짧아 배가 심하게 흔들립니다','mid');
-  chk('minVis',   n.vis,    false, '시정이 정해 둔 기준보다 나쁩니다',   'mid');
-  chk('maxCurrent',n.current,true, '조류가 정해 둔 한계를 넘었습니다',   'mid');
+  // ★ 경고 글은 화면에 그대로 나간다. 여기서 사전을 거친다.
+  chk('maxWind',  n.wind,   true,  t('풍속이 정해 둔 한계를 넘었습니다'),   'high');
+  chk('maxGust',  n.gust,   true,  t('돌풍이 정해 둔 한계를 넘었습니다'),   'high');
+  chk('maxWave',  n.wave,   true,  t('파고가 정해 둔 한계를 넘었습니다'),   'high');
+  chk('maxPeriod',n.period, false, t('파주기가 짧아 배가 심하게 흔들립니다'),'mid');
+  chk('minVis',   n.vis,    false, t('시정이 정해 둔 기준보다 나쁩니다'),   'mid');
+  chk('maxCurrent',n.current,true, t('조류가 정해 둔 한계를 넘었습니다'),   'mid');
   return out;
 }
 function boatSpec(key){
@@ -11599,12 +11932,36 @@ function boatSpec(key){
   if(isFinite(n) && n > 0) return n;
   return (BOAT_SPEC[key] && BOAT_SPEC[key].def) || 0;
 }
+// 제원 숫자의 성한 범위. 넘거나 모자라면 받지 않는다.
+// ★ <input min="0"> 은 폼을 제출할 때만 쓰이는 값이라 여기서는 아무 소용이 없었다.
+//   그래서 흘수 999999, 한계 풍속 -5 가 그대로 저장됐다.
+//   음수는 boatSpec() 이 무시하고 기본값을 쓰므로 '화면에 보이는 값과 앱이 쓰는 값' 이
+//   달라지는, 더 나쁜 어긋남이 생겼다.
+const SPEC_MAX = { loa:200, draft:20, airDraft:100, margin:20, fuelTank:100000,
+                   maxWind:100, maxGust:150, maxWave:30, maxPeriod:60, minVis:100,
+                   maxCurrent:20, reef1:100, reef2:100, reef3:100, jibDown:100,
+                   sailArea:2000, mastH:120, waterTank:100000,
+                   cruiseKt:100, burnLph:2000, planeKt:100 };
+function specNumOk(key, n){
+  if(!isFinite(n)) return '숫자를 넣어 주세요.';
+  if(n < 0) return '0보다 작은 값은 넣을 수 없습니다.';
+  const mx = SPEC_MAX[key];
+  if(mx && n > mx) return tsub('{n} 까지 넣을 수 있습니다.', { n: mx });
+  return null;
+}
 function setBoatSpec(key, v){
   const b = curBoat(); if(!b || !unlocked) return;
   if(!b.spec) b.spec = {};
-  const t = String(v==null?'':v).trim();
-  if(!t) delete b.spec[key];
-  else b.spec[key] = (BOAT_SPEC[key] && BOAT_SPEC[key].text) ? t : parseFloat(t);
+  const raw = String(v==null?'':v).trim();
+  if(!raw){ delete b.spec[key]; saveMR(); saveBoatCloud(b); return; }
+  if(BOAT_SPEC[key] && BOAT_SPEC[key].text){ b.spec[key] = raw; saveMR(); saveBoatCloud(b); return; }
+  const n = parseFloat(raw);
+  const bad = specNumOk(key, n);
+  if(bad){
+    alert(t(BOAT_SPEC[key] ? BOAT_SPEC[key].label : key) + ' — ' + t(bad));
+    return;                                    // 저장하지 않는다
+  }
+  b.spec[key] = n;
   saveMR();
   saveBoatCloud(b);
 }
@@ -11933,11 +12290,7 @@ function cloudErrText(e){
 function cloudErrHelp(e){
   const c = String((e && (e.code || e.message)) || '');
   if(/resource-exhausted|429/.test(c))
-    return '오늘 쓸 수 있는 클라우드 사용량을 다 썼습니다.\n\n'
-      + '· 기기에 있는 기록은 그대로 있고, 앱은 이대로 다 쓸 수 있습니다.\n'
-      + '· 다른 기기와 맞추는 것만 잠시 멈춥니다.\n'
-      + '· 매일 새벽(한국 시간 오후 4시쯤)에 저절로 풀립니다.\n\n'
-      + '자꾸 이러면 운영자에게 알려 주세요 — 고객센터에서 보낼 수 있습니다.';
+    return '오늘 쓸 수 있는 클라우드 사용량을 다 썼습니다.\n\n· 기기에 있는 기록은 그대로 있고, 앱은 이대로 다 쓸 수 있습니다.\n· 다른 기기와 맞추는 것만 잠시 멈춥니다.\n· 매일 새벽(한국 시간 오후 4시쯤)에 저절로 풀립니다.\n\n자꾸 이러면 운영자에게 알려 주세요 — 고객센터에서 보낼 수 있습니다.';
   if(/permission-denied/.test(c))
     return '이 배의 자료를 볼 권한이 없습니다.\n\n선주에게 등급을 확인해 달라고 하세요.';
   if(/unauthenticated/.test(c))
@@ -11951,14 +12304,21 @@ window.__initCloud = async function(api){
   await storageReady;
   setSync('연결 중…');
   try{ await cloudPull(); }
-  catch(e){ lastPushErr = cloudErrHelp(e); setSync(cloudErrText(e)); }
+  catch(e){ lastPushErr = t(cloudErrHelp(e)); setSync(cloudErrText(e)); }
   window.addEventListener('online', ()=>{ if(cloud) cloudPull().catch(()=>{}); });
   // 기능 잠금 상태를 한 번 받아 둔다 (읽기 한 번)
   loadFeat().catch(()=>{});
 };
 window.__cloudFailed = async function(){
   await storageReady;
-  setSync('오프라인 · 로컬');
+  // ★ 인터넷은 멀쩡한데 클라우드 쪽이 안 뜬 것을 「오프라인」 이라고 했다.
+  //   사람은 비행기 모드나 전파를 의심하며 엉뚱한 곳을 만진다.
+  // navigator.onLine 은 '전파가 잡히나' 만 안다 — 인터넷이 멀쩡한지는 모른다.
+  //   그래서 기기가 끊겼다고 말할 때만 「오프라인」 이라 하고,
+  //   아닐 때는 '클라우드에 못 닿았다' 까지만 말한다. 없는 말을 지어내지 않는다.
+  const off = (typeof navigator !== 'undefined') && navigator.onLine === false;
+  lastPushErr = t('클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.');
+  setSync(off ? '오프라인 · 로컬' : '클라우드 연결 안 됨 · 눌러서 확인');
 };
 
 // ── ★ 바뀐 것만 받아오기
@@ -12146,7 +12506,7 @@ async function mergeCloudBoats(){
   let list = [];
   try{ list = await window.__myBoats(); }
   catch(e){
-    lastPushErr = (e && (e.code ? e.code + ' \u2014 ' : '') + (e.message || String(e))) || '알 수 없는 오류';
+    lastPushErr = (e && (e.code ? e.code + ' \u2014 ' : '') + (e.message || String(e))) || t('알 수 없는 오류');
     setSync('배 목록을 받지 못함 · 눌러서 확인');
     return false;
   }
@@ -12268,7 +12628,7 @@ function syncDown(){
   cloudPull().then(()=>{
     alert(t('클라우드에서 받아왔습니다.'));
   }).catch(e=>{
-    lastPushErr = cloudErrHelp(e);
+    lastPushErr = t(cloudErrHelp(e));
     setSync(cloudErrText(e));
     alert(cloudErrHelp(e));
   });
@@ -12400,14 +12760,15 @@ async function pushNow(){
       cloudSeeded = true;
       if(res && res.failed && res.failed.length){
         // 어느 것이 막혔는지 이름을 말해 준다. '알 수 없는 오류' 는 아무 도움이 안 된다.
-        throw new Error('막힌 자료: ' + res.failed.map(f=>COLL_NAME[f.coll] || f.coll).join(', ')
-          + ' — ' + (res.failed[0].msg || ''));
+        throw new Error(tsub('막힌 자료: {what} — {why}', {
+          what: res.failed.map(f=>COLL_NAME[f.coll] || f.coll).join(', '),
+          why: res.failed[0].msg || '' }));
       }
     }
     setSync(skipped.size ? '동기화됨 (권한 없는 것 제외)' : '동기화됨');
   }catch(e){
     console.error(e);
-    lastPushErr = (e && (e.code ? e.code + ' — ' : '') + (e.message || String(e))) || '알 수 없는 오류';
+    lastPushErr = (e && (e.code ? e.code + ' — ' : '') + (e.message || String(e))) || t('알 수 없는 오류');
     setSync('동기화 실패 · 눌러서 확인');
     // 왜 안 되는지 한 번은 알려 준다. 조용히 실패하는 것이 가장 나쁘다.
     if(!pushErrShown){
@@ -12455,9 +12816,44 @@ function applyStowDg(){
     if(hint) hint.style.display = hintWanted() ? '' : 'none';
   } else {
     fp.removeAttribute('src'); fp.style.display = 'none';
-    none.style.display = '';
     map.classList.add('nodg');
-    if(hint) hint.style.display = 'none';
+    // ★ 도면이 없어도 칸은 그릴 수 있다. 그런데 안내가 지도 안에 그대로 있어서
+    //   그려 놓은 칸 위에 「이 배의 평면도가 아직 없습니다」 가 겹쳐 보였다.
+    //   이미 뭘 그렸으면 안내는 접고, 도면 고르는 길은 아래 한 줄로 남긴다.
+    fpNoneSync();
+  }
+}
+// 도면이 없을 때 안내를 접을지 말지. 그린 것이 생기면 접는다.
+// ★ applyStowDg 는 도면이 바뀔 때만 도는데, 이 판단은 칸을 하나 그릴 때마다 달라진다.
+//   그래서 따로 떼어 refreshBoxes 에서 함께 부른다.
+function fpNoneSync(){
+  const none = document.getElementById('fpNone');
+  const hint = document.getElementById('hint');
+  if(!none) return;
+  // ★ 이 줄은 적재표 도면 화면의 것이다.
+  //   자료를 받을 때마다 refreshBoxes 가 도는데, 그때 화면이 홈이든 항해일지든
+  //   「평면도 없이 그리는 중입니다 [도면 고르기]」 가 튀어나왔다. (4.02)
+  if(typeof hintWanted === 'function' && !hintWanted()) return;
+  // 먼저 지난번에 붙인 줄을 뗀다 — 겹쳐 붙으면 두 번 세 번 쌓인다
+  const old = document.getElementById('fpNoLine');
+  if(old && old.remove) old.remove();
+  if(dgShowSrc('plan')) return;                 // 도면이 있으면 여기서 볼 일이 없다
+  const drawn = (typeof lockers!=='undefined' && lockers.length)
+             || (typeof shOf==='function' && shOf('plan').length);
+  none.style.display = drawn ? 'none' : '';
+  if(!hint) return;
+  if(!drawn){ hint.style.display = 'none'; return; }
+  hint.style.display = '';
+  // ★ 덮어쓰지 않고 뒤에 붙인다.
+  //   덮어쓰면 그리기를 켤 때 나오는 「빈 곳을 끌면 새 수납칸…」 안내가 지워졌다.
+  const line = esc(t('평면도 없이 그리는 중입니다.')) +
+    ` <button class="minib blu" onclick="dgPickBuiltin('plan')">${esc(t('도면 고르기'))}</button>`;
+  if(hint.appendChild && document.createElement){
+    const d = document.createElement('div');
+    d.id = 'fpNoLine'; d.style.marginTop = '4px'; d.innerHTML = line;
+    hint.appendChild(d);
+  }else{
+    hint.innerHTML = line;
   }
 }
 
@@ -12493,6 +12889,7 @@ function lockerKey(){
 
 function refreshBoxes(){
   applyStowDg();
+  fpNoneSync();
   if(builtKey !== lockerKey()) buildBoxes();
   lockers.forEach(l=>{
     const d = document.getElementById('bx_'+l.id);
@@ -12564,6 +12961,71 @@ function lkRect(x0,y0,x1,y1){
   return { x:r(Math.min(ax,bx)), y:r(Math.min(ay,by)),
            w:r(Math.abs(bx-ax)), h:r(Math.abs(by-ay)) };
 }
+// ═══ 붙기(스냅) ═══
+// ★ 배 안의 칸은 거의 벽을 맞대고 나란히 있다. 그걸 손으로 맞추는 것은 불가능하다.
+//   실측해 보니 옆에 붙이려고 끌었을 때 가로 0.4% 틈, 세로 0.6% 어긋남, 높이 1.4% 차이가
+//   남았다. 화면에서 실금으로 보인다. 그래서 가까우면 딱 붙여 준다.
+//   붙이는 자리: 도면 가장자리(0·100) · 다른 칸의 네 변 · 다른 칸과 같은 크기.
+const LK_SNAP = 1.6;          // 이 안(%)에 들어오면 붙인다 — 화면에서 약 6px
+function lkSnapLines(skipId){
+  const xs = [0, 100], ys = [0, 100], ws = [], hs = [];
+  lockers.forEach(l=>{
+    if(skipId != null && String(l.id) === String(skipId)) return;
+    xs.push(l.x, l.x + l.w);
+    ys.push(l.y, l.y + l.h);
+    ws.push(l.w); hs.push(l.h);
+  });
+  return { xs, ys, ws, hs };
+}
+const lkNear = (v, list) => {
+  let best = null, bd = LK_SNAP;
+  list.forEach(x=>{ const d = Math.abs(x - v); if(d < bd){ bd = d; best = x; } });
+  return best;
+};
+// rect 를 가까운 선에 붙인다. mode: 'new'(만들 때) · 'move'(옮길 때) · 'size'(크기)
+function lkSnap(rect, skipId, mode){
+  const g = lkSnapLines(skipId);
+  const r = v => Math.round(v*10)/10;
+  let { x, y, w, h } = rect;
+  if(mode === 'move'){
+    // 왼쪽·오른쪽 중 더 가까운 쪽에 붙인다 (크기는 그대로 둔다)
+    const l = lkNear(x, g.xs), rr = lkNear(x + w, g.xs);
+    if(l != null && (rr == null || Math.abs(l - x) <= Math.abs(rr - (x + w)))) x = l;
+    else if(rr != null) x = rr - w;
+    const tp = lkNear(y, g.ys), bt = lkNear(y + h, g.ys);
+    if(tp != null && (bt == null || Math.abs(tp - y) <= Math.abs(bt - (y + h)))) y = tp;
+    else if(bt != null) y = bt - h;
+  }else{
+    // 만들 때·크기 바꿀 때 — 왼쪽 위는 그대로, 오른쪽 아래를 붙인다
+    if(mode === 'new'){
+      const l = lkNear(x, g.xs); if(l != null) { w += x - l; x = l; }
+      const tp = lkNear(y, g.ys); if(tp != null) { h += y - tp; y = tp; }
+    }
+    const rr = lkNear(x + w, g.xs); if(rr != null) w = rr - x;
+    const bt = lkNear(y + h, g.ys); if(bt != null) h = bt - y;
+    // 크기도 옆 칸과 맞춰 준다 (높이를 똑같이 만들 길이 달리 없다)
+    const sw = lkNear(w, g.ws); if(sw != null) w = sw;
+    const sh = lkNear(h, g.hs); if(sh != null) h = sh;
+  }
+  // 도면 밖으로는 안 나간다.
+  // ★ 무엇을 고정하느냐가 모드마다 다르다.
+  //   크기를 바꿀 때 왼쪽 위까지 밀면 '제자리에서 커지는 것' 이 아니게 된다.
+  //   (기존 검사 lkmovetest 가 이걸 잡아 줬다 — 500 으로 키우자 칸이 0,0 으로 밀렸다)
+  if(mode === 'size'){
+    w = Math.max(1.5, Math.min(100 - x, w));
+    h = Math.max(1.5, Math.min(100 - y, h));
+  } else if(mode === 'move'){
+    x = Math.max(0, Math.min(100 - w, x));
+    y = Math.max(0, Math.min(100 - h, y));
+  } else {
+    w = Math.max(1.5, Math.min(100, w));
+    h = Math.max(1.5, Math.min(100, h));
+    x = Math.max(0, Math.min(100 - w, x));
+    y = Math.max(0, Math.min(100 - h, y));
+  }
+  return { x:r(x), y:r(y), w:r(w), h:r(h) };
+}
+
 // 기존 칸 id 와 겹치지 않는 새 id
 function lkNewId(){
   const used = new Set(lockers.map(l=>String(l.id)));
@@ -12574,6 +13036,7 @@ function lkNewId(){
 function lkAdd(rect, zone, label){
   if(!lkCanEdit()) return null;
   if(!rect || rect.w < 1 || rect.h < 1) return null;   // 손가락으로 툭 친 것은 무시
+  rect = lkSnap(rect, null, 'new');                    // 가까운 칸·가장자리에 붙인다
   zone = String(zone||'').trim();
   label = String(label||'').trim();
   if(!zone || !label) return null;
@@ -12593,7 +13056,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '3.97';
+const APP_VER = '4.03';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -12628,6 +13091,35 @@ function lkScale(id, f){
   if(typeof refreshBoxes==='function') refreshBoxes();
   return true;
 }
+// 층·갈래를 바꾼다.
+// ★ 화면 맨 아래 범례는 「점선=벽면·선반 · 라벤더=2층(갑판)」 이라고 말하는데,
+//   정작 사용자가 그렇게 만들 길이 없었다. deck2·wall 은 읽기만 하고
+//   쓰는 곳이 앱 어디에도 없었다 (기본 도면 씨앗에만 박혀 있었다).
+function lkSetDeck(id, on){
+  if(!lkCanEdit()) return false;
+  const l = lkGet(id); if(!l) return false;
+  const v = !!on;
+  if(!!l.deck2 === v) return true;
+  undoPush();
+  if(v) l.deck2 = true; else delete l.deck2;
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  if(typeof renderList==='function') renderList();
+  return true;
+}
+function lkSetWall(id, on){
+  if(!lkCanEdit()) return false;
+  const l = lkGet(id); if(!l) return false;
+  const v = !!on;
+  if(!!l.wall === v) return true;
+  undoPush();
+  if(v) l.wall = true; else delete l.wall;
+  saveLocal();
+  if(typeof schedulePush==='function') schedulePush();
+  if(typeof refreshBoxes==='function') refreshBoxes();
+  return true;
+}
 function lkSetShape(id, shape){
   if(!lkCanEdit()) return false;
   if(!LK_SHAPES.some(x => x.id === shape)) return false;
@@ -12654,6 +13146,23 @@ const SHAPE_STYLES = [
 function shStyleOf(sh){
   const id = sh && sh.s;
   return SHAPE_STYLES.find(x => x.id === id) || SHAPE_STYLES[0];
+}
+// 그려 둔 도형을 톡 눌렀을 때 — 색·굵기를 바꾸거나 지운다.
+function shMenu(id){
+  const sh = shGet(id);
+  if(!sh) return;
+  const kindName = { line:t('선'), rect:t('네모'), tri:t('세모') }[sh.type] || t('도형');
+  openForm({
+    title: '도형 고치기',
+    sub: '도형은 그림일 뿐이라 물품이나 수납칸에는 영향이 없습니다.',
+    okText: '저장',
+    fields: [
+      { key:'style', label:'모양', type:'pick', value: shStyleOf(sh).id,
+        options: SHAPE_STYLES.map(x => ({ v:x.id, name:x.name, sub:'' })) }
+    ],
+    del: { text:'도형 지우기', run: ()=>shDelete(id) },
+    onOk: v => { if(v.style) shSetStyle(id, v.style); }
+  });
 }
 // 이미 그린 도형의 모양을 바꾼다
 function shSetStyle(id, styleId){
@@ -12868,8 +13377,8 @@ function lkMove(id, nx, ny){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
-  const px = lkRound(Math.max(0, Math.min(100 - l.w, nx)));
-  const py = lkRound(Math.max(0, Math.min(100 - l.h, ny)));
+  const sn = lkSnap({ x:nx, y:ny, w:l.w, h:l.h }, l.id, 'move');
+  const px = sn.x, py = sn.y;
   if(!lkOverlapOk({ x:px, y:py, w:l.w, h:l.h }, l.id)) return null;
   undoPush();
   l.x = px;
@@ -12885,8 +13394,8 @@ function lkResize(id, nw, nh){
   if(!lkCanEdit()) return null;
   const l = lkGet(id);
   if(!l) return null;
-  const pw = lkRound(Math.max(1, Math.min(100 - l.x, nw)));
-  const ph = lkRound(Math.max(1, Math.min(100 - l.y, nh)));
+  const sn = lkSnap({ x:l.x, y:l.y, w:nw, h:nh }, l.id, 'size');
+  const pw = sn.w, ph = sn.h;
   if(!lkOverlapOk({ x:l.x, y:l.y, w:pw, h:ph }, l.id)) return null;
   undoPush();
   l.w = pw;
@@ -12988,6 +13497,12 @@ function lkMenu(id){
       { key:'zone',  label:'구역',   value:l.zone,  placeholder:'예: 갤리', chips: zones },
       { key:'shape', label:'모양', type:'pick', value: lkShapeOf(l),
         options: LK_SHAPES.map(x => ({ v:x.id, name:x.name, sub:x.sub })) },
+      { key:'deck', label:'층', type:'pick', value: l.deck2 ? '2' : '1',
+        options:[ { v:'1', name:'1층',       sub:'선실 안' },
+                  { v:'2', name:'2층 (갑판)', sub:'라벤더로 표시' } ] },
+      { key:'kind', label:'갈래', type:'pick', value: l.wall ? 'wall' : 'box',
+        options:[ { v:'box',  name:'물건 칸',    sub:'물품이 들어갑니다' },
+                  { v:'wall', name:'벽면·선반', sub:'점선으로 표시' } ] },
       { key:'size', label:'크기', type:'pick', value:'1',
         options:[ { v:'0.8', name:'작게',   sub:'20% 줄임' },
                   { v:'1',   name:'그대로', sub:'지금 크기' },
@@ -12999,6 +13514,8 @@ function lkMenu(id){
       lkRename(id, v.label);
       lkRezone(id, v.zone);
       if(v.shape) lkSetShape(id, v.shape);
+      lkSetDeck(id, v.deck === '2');
+      lkSetWall(id, v.kind === 'wall');
       if(v.size && v.size !== '1' && !lkScale(id, parseFloat(v.size)))
         alert(t('크기를 바꾸지 못했습니다.\n\n옆 칸과 겹치거나 도면 밖으로 나갑니다.'));
     }
@@ -13139,6 +13656,7 @@ function toggleLkEdit(){
       + '<br>'
       + t('<b>수납칸을 톡 누르면</b> 이름 · 구역 · <b>모양(네모·동그라미·세모)</b> · 크기 · 지우기')
     : lkHintOrig;
+  if(typeof fpNoneSync === 'function') fpNoneSync();   // 덮어쓴 안내를 다시 붙인다
   if(!lkEdit && lkDrag){ lkDrag = null; const g=document.getElementById('lkGhost'); if(g) g.remove(); }
 }
 function lkPct(e){
@@ -13254,10 +13772,10 @@ map.addEventListener('pointerup', e=>{
     const dh = lkDrag; lkDrag = null;
     const movedH = Math.abs(p.x - dh.x0) > 0.7 || Math.abs(p.y - dh.y0) > 0.7;
     if(!movedH){
+      // ★ 전에는 톡 누르면 곧바로 「지울까요?」 였다. 색을 잘못 골라 그렸으면
+      //   지우고 다시 그리는 수밖에 없었고, 고르려다 잘못 누르면 삭제 물음이 떴다.
       drawShapes();
-      if(shGet(dh.id)
-         && confirm(t('이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 수납칸에는 영향이 없습니다.')))
-        shDelete(dh.id);
+      if(shGet(dh.id)) shMenu(dh.id);
       return;
     }
     if(dh.mode==='shMove') shMove(dh.id, p.x - dh.x0, p.y - dh.y0);
@@ -13281,8 +13799,17 @@ map.addEventListener('pointerup', e=>{
       lkMenu(d.id);
       return;
     }
-    if(d.mode==='move') lkMove(d.id, d.ox + (p.x - d.x0), d.oy + (p.y - d.y0));
-    else                lkResize(d.id, d.ow + (p.x - d.x0), d.oh + (p.y - d.y0));
+    // ★ 겹침으로 거절되면 lkMove 는 null 을 돌려주고 아무것도 안 한다.
+    //   그런데 화면은 끄는 동안 이미 옮겨 놓았다 — 되돌리지 않으면
+    //   '자료는 제자리, 화면은 옮긴 자리' 로 어긋난 채 남는다. 다시 그려도 안 돌아왔다.
+    const done = (d.mode==='move')
+      ? lkMove(d.id, d.ox + (p.x - d.x0), d.oy + (p.y - d.y0))
+      : lkResize(d.id, d.ow + (p.x - d.x0), d.oh + (p.y - d.y0));
+    if(!done){
+      if(d.el){ d.el.style.left=d.ox+'%'; d.el.style.top=d.oy+'%';
+                d.el.style.width=d.ow+'%'; d.el.style.height=d.oh+'%'; }
+      if(typeof refreshBoxes==='function') refreshBoxes();
+    }
     return;
   }
   const r = lkRect(lkDrag.x0, lkDrag.y0, p.x, p.y);
@@ -13529,7 +14056,7 @@ function resetForm(){
   document.getElementById('fBox').checked=false; document.getElementById('fBox').disabled=false;
   formPhotos = []; renderPhotoPreview();
   document.getElementById('formTitle').textContent = inBox ? '📦 내부 물품 추가' : '물품 추가';
-  document.getElementById('addBtn').textContent='+ 추가';
+  document.getElementById('addBtn').textContent = t('+ 추가');
   document.getElementById('cancelBtn').style.display='none';
 }
 
@@ -13615,8 +14142,8 @@ function startEdit(id){
   document.getElementById('fBox').checked=!!it.box;
   document.getElementById('fBox').disabled = it.box && children(it.id).length>0;
   formPhotos = (it.photos||[]).slice(); renderPhotoPreview();
-  document.getElementById('formTitle').textContent='물품 수정 (아래에서 사진 추가 가능)';
-  document.getElementById('addBtn').textContent='수정 완료';
+  document.getElementById('formTitle').textContent = t('물품 수정 (아래에서 사진 추가 가능)');
+  document.getElementById('addBtn').textContent = t('수정 완료');
   document.getElementById('cancelBtn').style.display='';
   renderPanelItems();
 }
@@ -13840,8 +14367,10 @@ function renderPanelItems(){
     </div>`;
   }).join('');
   const st = strayItems().length;
-  document.getElementById('pf').textContent = `전체 ${items.length}개 물품 · ${lockers.length}개 수납칸`
-    + (st ? ` · 미배치 ${st}개` : '') + ` · 저장: ${db?'대용량':'기본(5MB 제한)'}`;
+  document.getElementById('pf').textContent =
+      tsub('전체 {a}개 물품 · {b}개 수납칸', { a: items.length, b: lockers.length })
+    + (st ? ' · ' + tsub('미배치 {n}개', { n: st }) : '')
+    + ' · ' + tsub('저장: {how}', { how: db ? t('대용량') : t('기본(5MB 제한)') });
 }
 
 function rowHTML(it, isChild){
@@ -13925,7 +14454,9 @@ function backupData(){
   const a = document.createElement("a");
   const d = new Date(), pad = n=>String(n).padStart(2,'0');
   a.href = URL.createObjectURL(blob);
-  a.download = `뱃일백업_${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
+  // ★ 한글 파일 이름은 메일로 보내거나 다른 기기로 옮길 때 깨진다.
+  //   '________.json' 이 되면 무엇인지 알아볼 수가 없다.
+  a.download = `baetnil-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
   a.click(); URL.revokeObjectURL(a.href);
 }
 function restoreData(ev){
@@ -13939,7 +14470,7 @@ function restoreData(ev){
     try{
       const data = JSON.parse(r.result);
       const arr = Array.isArray(data) ? data : data.items;
-      if(!Array.isArray(arr)) throw new Error('형식이 다른 파일');
+      if(!Array.isArray(arr)) throw new Error(t('형식이 다른 파일'));
       // 칸을 먼저 되살린다. 칸 없이 물품만 넣으면 전부 갈 곳을 잃는다.
       const bkLockers = Array.isArray(data.lockers) ? data.lockers : null;
       const restored  = bkLockers && bkLockers.length ? bkLockers
@@ -14150,13 +14681,16 @@ function fmtDate(d){ const p=n=>String(n).padStart(2,'0'); return d.getFullYear(
 const today = () => fmtDate(new Date());
 // ★ k = 갈래. 색을 직접 들고 다니지 않고 갈래만 넘긴다.
 //   그래야 화면 결을 바꿀 때 여기를 안 건드려도 된다.
+// ★ 상태 글자를 여기서 이어 붙여 만들었다 — 사전을 거칠 자리가 없었다.
+//   이 함수는 오늘 화면의 「곧 해야 할 정비」 카드에도 쓰인다.
+//   그래서 영어로 켜도 첫 화면부터 '지남 36일' 이 나왔다.
 function mStatus(it){
-  if(!it.lastDate) return {c:'#5A5F66', t:'미기록', k:'none', next:null, days:null};
+  if(!it.lastDate) return {c:'#5A5F66', t:t('미기록'), k:'none', next:null, days:null};
   const nd = addPeriod(it.lastDate, it.months, it.unit||'m');
   const days = Math.floor((nd - new Date())/864e5);
-  if(days<0)   return {c:'#E4756A', t:'지남 '+(-days)+'일', k:'late', next:nd, days};
-  if(days<=30) return {c:'#D9AE63', t:'남음 '+days+'일',  k:'soon', next:nd, days};
-  return {c:'#5FB894', t:'남음 '+days+'일', k:'ok', next:nd, days};
+  if(days<0)   return {c:'#E4756A', t:tsub('지남 {n}일', {n:-days}), k:'late', next:nd, days};
+  if(days<=30) return {c:'#D9AE63', t:tsub('남음 {n}일', {n:days}),  k:'soon', next:nd, days};
+  return {c:'#5FB894', t:tsub('남음 {n}일', {n:days}), k:'ok', next:nd, days};
 }
 const DS = {maint:()=>maint, repair:()=>repair, voyage:()=>voyage, fuel:()=>fuel, run:()=>runs, contact:()=>contacts, vdoc:()=>vdocs};
 const getMR = (t,id) => (DS[t]?DS[t]():[]).find(x=>String(x.id)===String(id));
@@ -14341,7 +14875,7 @@ function switchTab(t){
   // ── 적재표는 배 탭 안에 있다
   const stow = (t==='boat' && boatSubTab==='stow');
   ['searchWrap','stowTools'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display = stow?'':'none'; });
-  if(stow){ toggleView(true); }
+  if(stow){ toggleView(true); if(typeof fpNoneSync === 'function') fpNoneSync(); }
   else {
     document.getElementById('mapWrap').style.display='none';
     document.getElementById('listView').style.display='none';
@@ -14539,10 +15073,17 @@ function renderHome(){
   //   그런데 첫 화면에 '0 / 11' 만 떠 있으면, 눌러 보고 나서야 못 쓴다는 것을 안다.
   try{
     const lists = (b && typeof ckLists === 'function') ? ckLists() : [];
-    const cur = lists.find(x => String(x.id) === String(typeof ckCurId!=='undefined' ? ckCurId : '')) || lists[0];
+    // ★ 두 가지가 틀려 있었다.
+    //   1) ckCurId 는 함수인데 값처럼 써서 늘 첫 목록으로 떨어졌다.
+    //   2) 체크 여부를 x.done 에서 찾았는데, 그런 값은 앱 어디서도 넣지 않는다.
+    //      진짜 체크는 ckDone(목록, 주기) 에 id 목록으로 들어간다.
+    //      그래서 열한 개를 다 체크해도 오늘 화면은 늘 0 / 11 이었다.
+    const curId = (typeof ckCurId === 'function') ? ckCurId() : null;
+    const cur = lists.find(x => String(x.id) === String(curId || '')) || lists[0];
     if(cur){
       const items2 = (checkt || []).filter(x => String(x.list) === String(cur.id));
-      const doneN = items2.filter(x => x.done).length;
+      const doneIds = (typeof ckDone === 'function') ? ckDone(cur.id, cur.cycle) : [];
+      const doneN = items2.filter(x => doneIds.indexOf(String(x.id)) >= 0).length;
       out += homeCard(esc(t('출항 전 점검')),
         `<div class="hbig">${doneN} / ${items2.length}</div>`
         + `<div class="hmute">${esc(cur.name || '')}</div>`,
@@ -14578,9 +15119,27 @@ function renderHome(){
     }
   }catch(e){}
 
+  // ── 고쳐야 할 곳
+  // ★ 오늘 화면에 정비는 있는데 수리가 없었다.
+  //   고장 난 곳은 정기점검보다 급한 일인데 첫 화면에 한 줄도 안 나왔다.
+  try{
+    const rp = (repair || []).filter(x => x && x.status !== 'done').slice(0, 4);
+    if(rp.length){
+      out += homeCard(esc(t('고쳐야 할 곳')),
+        rp.map(x=>`<div class="hrow2">${x.status==='progress'
+            ? `<b style="color:#E8B33C">${esc(t('진행중'))}</b>`
+            : `<b style="color:#F05B52">${esc(t('고장'))}</b>`}
+          ${esc(x.name || x.title || t('(이름 없음)'))}</div>`).join(''),
+        "setBoatSubTab('repair')", t('수리 탭'));
+    }
+  }catch(e){}
+
   // ── 최근 항해
   try{
-    const v = (voyage || []).slice().sort((a,c)=>String(c.date||'').localeCompare(String(a.date||'')))[0];
+    // ★ 예정 항해(plan)를 안 걸러서, 아직 가지도 않은 항해가 '마지막 항해' 로 떴다.
+    //   예정은 날짜가 미래라 늘 맨 위로 온다. 같은 앱의 buildPublic 은 제대로 거르고 있다.
+    const v = (voyage || []).filter(x => x && !x.plan)
+      .sort((a,c)=>String(c.date||'').localeCompare(String(a.date||'')))[0];
     if(v) out += homeCard(esc(t('마지막 항해')),
       `<div class="hrow2"><b>${esc(v.date||'')}</b> ${esc(v.from||'')} → ${esc(v.to||'')}</div>`,
       "switchTab('voyage')", t('항해일지'));
@@ -14591,8 +15150,8 @@ function renderHome(){
 
 
 // ===== 목록/도면 전환 =====
-function mrToggleView(t){
-  if(t==='maint') maintView = maintView==='list'?'map':'list';
+function mrToggleView(kind){
+  if(kind==='maint') maintView = maintView==='list'?'map':'list';
   else            repairView = repairView==='list'?'map':'list';
   renderMR();
 }
@@ -14648,7 +15207,7 @@ function renderMaintList(){
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('정기점검'))}</b>
       <div>${t('엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.')}<br>
-        마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.</div>
+        ${esc(t('마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.'))}</div>
       <div class="emptysub">${esc(t('기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.'))}</div>
       ${true ? `<button class="mrbtn" onclick="needEdit('정비 항목을 넣습니다.', ()=>mrAdd('maint'))">${esc(t('첫 항목 추가하기'))}</button>` : ''}
     </div>`;
@@ -14660,10 +15219,10 @@ function renderMaintList(){
   const chip = (m, label, n, cls) =>
     `<button class="tab mflt${maintMode===m?' on':''}${cls?' '+cls:''}" onclick="setMaintMode('${m}')">${label}${n!=null?' '+n:''}</button>`;
   const bar = `<div class="subrow" style="flex-wrap:wrap">
-      ${chip('all','전체',cnt.all)}
-      ${cnt.late?chip('late','밀림',cnt.late,'red'):''}
-      ${cnt.soon?chip('soon','곧',cnt.soon,'yel'):''}
-      ${cnt.none?chip('none','미기록',cnt.none):''}
+      ${chip('all',t('전체'),cnt.all)}
+      ${cnt.late?chip('late',t('밀림'),cnt.late,'red'):''}
+      ${cnt.soon?chip('soon',t('곧'),cnt.soon,'yel'):''}
+      ${cnt.none?chip('none',t('미기록'),cnt.none):''}
       ${cnt.seed?chip('real','초안 빼고',cnt.all-cnt.seed):''}
     </div>`;
   const order = allGrps().filter(g=>view.some(it=>it.grp===g));
@@ -14688,7 +15247,7 @@ function renderMaintList(){
         <div class="ct"><div class="cn">${esc(it.name || '(이름 없음)')}${it.seed?` <span class="seedb">${esc(t('초안'))}</span>`:''}</div>
           ${it.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), it.who))}</span>`:''}
           <span class="st ${s.k}">${s.t}</span></div>
-        <div class="mrm">주기 ${it.months}${UNIT_LABEL[it.unit||'m']} · 마지막 ${it.lastDate||'—'}${s.next?' · 다음 '+fmtDate(s.next):''}${it.pin?' · 핀':''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}</div>
+        <div class="mrm">${esc(tsub('주기 {n}{u}', {n:it.months, u:UNIT_LABEL[it.unit||'m']}))} · ${esc(tsub('마지막 {d}', {d:it.lastDate||'—'}))}${s.next?' · '+esc(tsub('다음 {d}', {d:fmtDate(s.next)})):''}${it.pin?' · '+esc(t('핀')):''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}</div>
       </div>`;
     }).join('');
   }).join('');
@@ -14954,8 +15513,23 @@ function mrSaveClose(){
   }, 0);
 }
 
+// 기록 칸 중에 '숫자여야 하는 것' 과 그 성한 범위.
+// ★ 검사가 없어서 엔진 가동 -5시간, 주유 999999L 가 그대로 들어갔다.
+//   가동시간이 음수면 총 가동시간이 줄어들어 정비 주기와 잔량 추정이 조용히 어긋난다.
+const NUM_FIELD = {
+  liters:{ max:100000, name:'주유량' }, cost:{ max:100000000, name:'금액' },
+  hours: { max:10000,  name:'시간'   }, engineH:{ max:10000, name:'엔진 시간' },
+  nm:    { max:100000, name:'거리'   }
+};
 function mrField(k,v){
   const it=getMR(mrOpenType,mrOpenId); if(!it) return;
+  const spec = NUM_FIELD[k];
+  if(spec && String(v||'').trim()){
+    const n = parseFloat(String(v).trim());
+    if(!isFinite(n)){ alert(t(spec.name) + ' — ' + t('숫자를 넣어 주세요.')); return; }
+    if(n < 0){ alert(t(spec.name) + ' — ' + t('0보다 작은 값은 넣을 수 없습니다.')); return; }
+    if(n > spec.max){ alert(t(spec.name) + ' — ' + tsub('{n} 까지 넣을 수 있습니다.', { n: spec.max })); return; }
+  }
   it[k]=v; it.seed=false;
 
   saveMR(); rerender(mrOpenType); openMR(mrOpenType,mrOpenId);
@@ -15697,13 +16271,14 @@ function verBanner(got){
     d.id = 'verbar';
     document.body.appendChild(d);
   }
-  d.innerHTML = `옛 앱 파일이 남아 있습니다 — 지금 ${esc(got)} 가 돌고 있습니다 (새 파일 ${APP_VER})`
+  d.innerHTML = esc(tsub('옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})',
+                          { old: got, now: APP_VER }))
     + `<button onclick="forceReload()">${esc(t('지금 새로 받기'))}</button>`;
 }
 function paintVer(){
   const el = document.getElementById('dVer');
   if(!el) return;
-  el.textContent = '뱃일 ' + APP_VER;
+  el.textContent = t('뱃일') + ' ' + APP_VER;
   if(!('caches' in window)) return;
   caches.keys().then(ks=>{
     // ★ 지도 타일(baetnil-tiles)·사진(baetnil-photos)도 같은 이름으로 시작한다.
@@ -15935,8 +16510,18 @@ function renderVoyage(){
       oninput="voyFilterUI(this.value)" autocomplete="off"></div>`;
   // ★ 목록에는 제목과 날짜만. 나머지는 눌러 들어가면 다 있다.
   //   제목을 안 쓰신 항해는 지금까지처럼 '출발 → 도착' 을 제목 자리에 쓴다.
-  const vTitle = v => (v.title && String(v.title).trim())
-    || (esc(v.from || v.timeOut || '—') + ' → ' + esc(v.to || v.timeIn || '—'));
+  // ★ 저절로 만들어진 항해는 출발·도착 항이 비어 있다. 그때 시각으로 떨어지는데
+  //   출발과 도착 시각이 같아서 「04:53 → 04:53」 이 제목 자리에 떴다. 아무 뜻이 없다.
+  const vTitle = v => {
+    const ti = (v.title && String(v.title).trim());
+    if(ti) return esc(ti);
+    const a = String(v.from||'').trim(), b = String(v.to||'').trim();
+    if(a || b) return esc(a || '—') + ' → ' + esc(b || '—');
+    const o = String(v.timeOut||'').trim(), i = String(v.timeIn||'').trim();
+    if(o && i && o !== i) return esc(o) + ' → ' + esc(i);
+    if(o) return esc(o + ' ' + t('출항'));
+    return esc(t('제목 없는 항해'));
+  };
   const row = v => `<div class="mr" onclick="openMR('voyage','${v.id}')">
       <div class="ct"><div class="cn">${isPlan(v)?`<span class="chip">${esc(t('예정'))}</span> `:''}${v.title && String(v.title).trim() ? esc(v.title) : vTitle(v)}
       ${v.rideOn ? `<span class="chip good">${esc(t('같이 타기'))} ${esc(t('{n}자리').split('{n}').join(String(Number(v.rideN)||1)))}</span>` : ''}</div>
@@ -17561,7 +18146,7 @@ async function renderMarket(){
     try{
       const r = await window.__market.list(false);
       listSet('market', r.rows, r.done);
-    }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+    }catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
   marketList = listRows('market');
 
@@ -17929,7 +18514,7 @@ const SPOT_SEED = [
 {i:'gov_m29',n:'중문 마리나(마린파크)',k:'marina',la:33.24308,lo:126.41728,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 서귀포시 중문관광로 154-17(색달동 2950-5번지)\n급유 : 일반 유류 취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 이 지역의 조류는 창조류 1kn전 후의 흐름을 보이며, 낙조류는 1kn미만의 흐름으로 조류가 제주도 다른 지역에 비해서 약한 편이다."},
 {i:'gov_m30',n:'대포항 마리나(JM그랑블루요트)',k:'marina',la:33.23826,lo:126.43943,r:'제주',f:'fuel,water',p:false,t:"제주특별자치도 서귀포시 대포로 174(대포동)\n급유 : 이동 주유 이용급수 : 자체조달수리 : 서귀포 또는 모슬포항 소재 수리시설 이용\n조류 — 창조류는 1kn전 후의 흐름을 보이며, 낙조류는 1kn미만의 흐름으로 조류가 제주도 다른 지역에 비해서 약한 편이다."},
 {i:'gov_m31',n:'목포 마리나',k:'marina',la:34.78355,lo:126.38877,r:'전남',f:'fuel,water',p:false,t:"전라남도 목포시 산정동 삼학로 88\n급유 : 이동 주유 이용급수 : 계류장 내 수도이용수리 : 선외기 종류의 소형 선박만 가능\n조류 — 목포항 부근에서 창조류 0.5kn, 낙조류 0.3kn로 조류가 약하게 나타난다."},
-{i:'gov_m32',n:'소호 마리나',k:'marina',la:34.73768,lo:127.65072,r:'전남',f:'fuel,water',p:false,t:"전라남도 여수시 소호동 소호로 392\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 소호 마리나항 남동측의 소경도 부근으로 창조류는 서측, 낙조류는 남동측으로 흐르며 각각 0.3km로 다소 약하게 나타난다.돌산도 신기선착장 부근은 왕복성 조류가 해안선 방향으로 평행하게 흐흐고 화태도 부근의 유속은 창, 낙조류가 각각 3.0kn, 2.9kn를 나타내고 있으며, 종호동 방파제부근 유속은 창, 낙조류가 각각 0.5kn, 0.8kn로 나타난다."},
+{i:'gov_m32',n:'소호 마리나',k:'marina',la:34.73768,lo:127.65072,r:'전남',f:'fuel,water',p:false,t:"전라남도 여수시 소호동 소호로 392\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 소호 마리나항 남동측의 소경도 부근으로 창조류는 서측, 낙조류는 남동측으로 흐르며 각각 0.3km로 다소 약하게 나타난다.돌산도 신기선착장 부근은 왕복성 조류가 해안선 방향으로 평행하게 흐르고 화태도 부근의 유속은 창, 낙조류가 각각 3.0kn, 2.9kn를 나타내고 있으며, 종호동 방파제부근 유속은 창, 낙조류가 각각 0.5kn, 0.8kn로 나타난다."},
 {i:'gov_m33',n:'왕산 마리나',k:'marina',la:37.4562,lo:126.35913,r:'그 밖',f:'',p:false,t:"인천시 중구 을왕동 980번지\n예정"},
 {i:'gov_m34',n:'전곡 마리나',k:'marina',la:37.18653,lo:126.65028,r:'그 밖',f:'fuel,water',p:false,t:"경기도 화성시 서신면 전곡항로 5\n급유 : 일반 유류취급소 이용급수 : 자체조달수리 : 각 항구 선박수리점 이용\n조류 — 아산만 부근의 풍도에서 평균해수면은 4.32m, 대조승은 7.9m, 소조승은 6.0m이며, 평균고조간격은 4시간 08분이다."},
 {i:'gov_m35',n:'수산 마리나',k:'marina',la:38.07716,lo:128.67522,r:'강원',f:'fuel,water',p:false,t:"강원도 양양군 손양면 수산1길 20-24\n급유 : 이동 주유 이용급수 : 자체조달수리 : 주문진, 속초항 소재 선박수리점 이용\n조류 — 수산항의 평균해수면은 0.2m이고, 대조승은 0.3m, 평균고조간격은 2시간 57분이다."},
@@ -18172,7 +18757,7 @@ async function renderSpots(){
       try{
         const r = await window.__spots.list(false);
         listSet('spots', r.rows, r.done);
-      }catch(e){ W.innerHTML = `<div class="mrnone">불러오지 못했습니다: ${esc((e&&e.message)||String(e))}</div>`; return; }
+      }catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
     }
     spotList = listRows('spots');
   }
@@ -19007,9 +19592,14 @@ function normTime(v){
   return null;
 }
 // 날짜(YYYY-MM-DD) + 시각(HH:MM) → 타임스탬프
+// 사람이 적은 날짜·시각을 '그 사람 시계' 로 읽는다.
+// ★ 전에는 무조건 한국 시각(+09:00)으로 읽고, 보여 줄 때는 기기 시각으로 썼다.
+//   한국에서는 두 시계가 같아 아무 일도 없지만, 다른 표준시에서는
+//   04:52 로 적은 출항이 화면에 19:52 로 나왔다. 러시아어 판을 낸 앱에서 이러면 안 된다.
+//   'YYYY-MM-DDTHH:MM:00' 은 표준시 표시가 없으면 기기 시각으로 읽힌다.
 function tsOf(date, hhmm){
   if(!date || !hhmm) return null;
-  const d = new Date(date+'T'+hhmm+':00+09:00');
+  const d = new Date(date+'T'+hhmm+':00');
   return isNaN(d.getTime()) ? null : d.getTime();
 }
 function fmtWhen(ts){
@@ -19022,7 +19612,8 @@ function wxHourIndex(times, ts){
   if(!times || !times.length) return -1;
   let best=-1, bd=Infinity;
   for(let i=0;i<times.length;i++){
-    const d = Math.abs(new Date(times[i]+':00+09:00').getTime() - ts);
+    const tv = (typeof wxTs === 'function') ? wxTs(times[i]) : new Date(times[i]+':00').getTime();
+    const d = Math.abs(tv - ts);
     if(d < bd){ bd=d; best=i; }
   }
   return bd <= 90*60e3 ? best : -1;
@@ -19042,6 +19633,20 @@ function legRow(label, placeKey, timeKey, wxKey, it){
 }
 
 // 날씨 한 줄 (출발·도착·중간기록 공용)
+// ★ 예전에는 완성된 문장을 통째로 저장했다. 한국어로 적은 기록을 영어로 바꿔 봐도
+//   그 줄만 한국어로 남았다. 숫자는 함께 저장돼 있으니 볼 때마다 다시 짓는다.
+function wxText(w){
+  if(!w) return '';
+  const has = (w.kt != null || w.wave != null || w.tide != null || w.temp != null);
+  if(!has) return t(String(w.text || ''));           // 옛 기록·안내 글은 있는 그대로
+  const parts = [];
+  if(w.kt != null) parts.push((w.dir!=null?dirName(w.dir):'') + ' ' + w.kt + 'kt'
+                              + (w.gust!=null?tsub('(돌풍 {n})',{n:w.gust}):''));
+  if(w.wave != null) parts.push(tsub('파고 {n}m',{n:Number(w.wave).toFixed(1)}));
+  if(w.tide != null) parts.push(tsub('조위 {n}cm',{n:w.tide}));
+  if(w.temp != null) parts.push(w.temp + '\u2103');
+  return parts.join(' \u00b7 ') || t('자료 없음');
+}
 function wxLine(w, refetch){
   const btn = (refetch && unlocked)
     ? `<button class="minib grn" onclick="${refetch}">${(w&&w.text)?t('갱신'):t('받기')}</button>` : '';
@@ -19049,7 +19654,7 @@ function wxLine(w, refetch){
     return `<div class="posrow"><span style="color:#7b8794">${esc(t('날씨 —'))}</span>${btn}</div>`;
   // ★ 여기에 그냥 이름만 찍어서 '배가 그 자리에 있었다' 로 읽혔다. 어디 예보인지 밝힌다.
   const where = w.pos ? t('이 자리') : (w.spot || '');
-  return `<div class="posrow"><b style="color:#dfe6ee">${esc(w.text)}</b>`
+  return `<div class="posrow"><b style="color:#dfe6ee">${esc(wxText(w))}</b>`
     + `<span style="color:#7b8794">${w.at ? ' · '+esc(w.at) : ''}`
     + `${where ? ' · '+esc(tsub('{s} 예보', {s: where})) : ''}</span>${btn}</div>`;
 }
@@ -19200,10 +19805,10 @@ function logRows(it){
   return head + arr.map(g=>{
     const row = unlocked
       ? `<div class="mrrow" style="gap:6px;flex-wrap:wrap">
-           <input type="time" value="${esc(hm(g.time||''))}" style="width:100px" onchange="logField('${g.id}','time',this.value)">
-           <select onchange="logField('${g.id}','kind',this.value)" style="width:100px">${
+           <input class="logtime" type="time" value="${esc(hm(g.time||''))}" onchange="logField('${g.id}','time',this.value)">
+           <select class="logkind" onchange="logField('${g.id}','kind',this.value)">${
              logKinds().map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${esc(t(x))}</option>`).join('')}</select>
-           <input value="${esc(String(g.text||''))}" placeholder="${esc(t('내용'))}" style="flex:1;min-width:60px" onchange="logField('${g.id}','text',this.value)">
+           <input class="logtext" value="${esc(String(g.text||''))}" placeholder="${esc(t('내용'))}" onchange="logField('${g.id}','text',this.value)">
            <button class="mrbtn" onclick="logDel('${g.id}')">${esc(t('삭제'))}</button>
            <div class="engsw">${esc(t('엔진'))}
              ${['on','off','keep'].map(v=>`<button class="engb${logEngine(g)===v?' on':''}"
@@ -19212,7 +19817,7 @@ function logRows(it){
          </div>`
       : `<div class="mrrow"><span class="mrlbl">${esc(g.time ? hm(g.time) : '—')}</span>
            <span class="chip">${esc(t(g.kind||''))}</span>
-           ${logEngine(g)!=='keep'?`<span class="chip ${logEngine(g)==='on'?'engon':'engoff'}">엔진 ${logEngine(g)==='on'?t('켬'):t('끔')}</span>`:''}
+           ${logEngine(g)!=='keep'?`<span class="chip ${logEngine(g)==='on'?'engon':'engoff'}">${t('엔진')} ${logEngine(g)==='on'?t('켬'):t('끔')}</span>`:''}
            <b class="mrv" style="flex:1">${esc(g.text||'')}</b></div>`;
     // 낚시배의 포인트에는 수심·수온·미끼·채비·잡은 것이 따라붙는다
     return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id)
@@ -20749,6 +21354,32 @@ async function renderNews(force){
 }
 
 // ============================================================
+// ===== 예보 시각 다루기 =====
+// ★ 예보는 timezone=auto 로 받는다 — 그 좌표가 속한 표준시로 온다.
+//   응답에 utc_offset_seconds 가 함께 오므로 그것으로 절대 시각을 만든다.
+//   기기 시계로 짐작하면 안 된다. 배가 있는 곳과 폰의 표준시가 다를 수 있다.
+function wxOffStr(sec){
+  // ★ Number(null) 은 0 이라 그냥 isFinite 로만 보면 '모름' 이 '+00:00' 이 된다.
+  if(sec == null) return 'Z';
+  const n = Number(sec);
+  if(!isFinite(n)) return 'Z';
+  const sign = n < 0 ? '-' : '+', a = Math.abs(n);
+  const p = v => String(v).padStart(2,'0');
+  return sign + p(Math.floor(a/3600)) + ':' + p(Math.floor((a%3600)/60));
+}
+// 예보 자료가 준 표준시. 없으면 기기 시각으로 읽는다 (옛 자료 대비).
+function wxOff(d){
+  const src = d || (typeof wxData !== 'undefined' ? wxData : null);
+  const v = src && src.w && src.w.utc_offset_seconds;
+  return (v === 0 || v) ? wxOffStr(v) : '';
+}
+// 예보 시각 문자열 → 절대 시각(ms)
+function wxTs(str, d){
+  const off = wxOff(d);
+  const ms = new Date(String(str) + (String(str).length === 16 ? ':00' : '') + off).getTime();
+  return isNaN(ms) ? null : ms;
+}
+
 // ===== 날씨 · 물때 · 다리 통과높이 =====
 // ============================================================
 // 지역 기준값: 약최고고조위(HAT). 해도상 다리 높이(clr)의 기준면.
@@ -20793,7 +21424,7 @@ function wxStamp(){
   try{
     const H = wxData && wxData.w && wxData.w.hourly;
     if(!H || !H.time || !H.time.length) return;
-    wxData._t0 = new Date(H.time[0] + '+09:00').getTime();
+    wxData._t0 = wxTs(H.time[0], wxData);
     wxData._n  = H.time.length;
   }catch(e){}
 }
@@ -20901,9 +21532,9 @@ async function wxAtPoint(lat, lon){
 async function wxFetch(lat, lon){
   const base = 'https://api.open-meteo.com/v1/forecast?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
     + '&hourly=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility'
-    + '&daily=sunrise,sunset&timezone=Asia%2FSeoul&forecast_days=5&wind_speed_unit=kn';
+    + '&daily=sunrise,sunset&timezone=auto&forecast_days=5&wind_speed_unit=kn';
   const mar = 'https://marine-api.open-meteo.com/v1/marine?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
-    + '&hourly=wave_height,wave_period,wave_direction&timezone=Asia%2FSeoul&forecast_days=5';
+    + '&hourly=wave_height,wave_period,wave_direction&timezone=auto&forecast_days=5';
   const [a, b] = await Promise.all([
     fetchTimeout(base).then(r=>r.ok?r.json():null).catch(()=>null),
     fetchTimeout(mar).then(r=>r.ok?r.json():null).catch(()=>null),
@@ -20968,7 +21599,7 @@ function tidePoints(){
   if(raw.date !== today()) return { stale:true, date:raw.date, pts:[] };
   const pts = raw.rows.map(r=>{
     const [hh,mm] = String(r.time).split(':').map(Number);
-    const d = new Date(raw.date+'T00:00:00+09:00');
+    const d = new Date(raw.date+'T00:00:00');
     d.setHours(hh||0, mm||0, 0, 0);
     return { t: d.getTime(), v: Number(r.cm)/100 };
   }).sort((a,b)=>a.t-b.t);
@@ -21206,7 +21837,7 @@ function hatPanel(){
     <div class="mrtop"><b>${esc(t('기준값 (약최고고조위 HAT)'))}</b><button class="mrbtn" onclick="hatClose()">${esc(t('닫기'))}</button></div>
     <div class="hexp">${esc(t('해도의 교량 높이는 이 기준면을 기준으로 표기됩니다. 통과높이 = 해도높이 + (기준값 − 조위) 지역마다 다르므로 항해하는 지역에 맞게 선택해 주세요.'))}</div>
     <div class="hrowi"><label><input type="radio" name="hatsel" ${sel.mode==='auto'?'checked':''}
-      onchange="hatPick(null)"> <b>${esc(t('자동'))}</b> — 현재 위치에서 가장 가까운 지역 (지금: ${esc(cur.name)} ${cur.hat.toFixed(2)})</label></div>
+      onchange="hatPick(null)"> <b>${esc(t('자동'))}</b> ${esc(tsub('— 현재 위치에서 가장 가까운 지역 (지금: {n} {v})', { n: cur.name, v: cur.hat.toFixed(2) }))}</label></div>
     ${rows}
     <div style="padding:10px 0"><button class="tab edt" onclick="hatAddOne()">${esc(t('+ 지역 추가'))}</button></div>`;
   document.getElementById('hatPanelOv').classList.add('open');
@@ -21301,7 +21932,7 @@ function tidePtsOf(sp){
   const pts = [];
   sp.days.forEach(day=>{
     const mk = r => { const [hh,mm]=String(r.t).split(':').map(Number);
-      const d=new Date(day.d+'T00:00:00+09:00'); d.setHours(hh,mm,0,0);
+      const d=new Date(day.d+'T00:00:00'); d.setHours(hh,mm,0,0);
       return {t:d.getTime(), v:r.v/100}; };
     (day.h||[]).forEach(r=>pts.push(mk(r)));
     (day.l||[]).forEach(r=>pts.push(mk(r)));
@@ -21373,7 +22004,7 @@ function renderWxSel(){
   const hl = document.getElementById('wxHl');
   if(!bar || wxSel==null || !wxData) return;
   const H = wxData.w.hourly, times = H.time;
-  const idx = times.findIndex(t => new Date(t+'+09:00').getTime() === wxSel);
+  const idx = times.findIndex(x => wxTs(x, wxData) === wxSel);
   paintBoatWx(idx);          // 고른 시각 기준으로 배 경고를 다시 그린다
   const TA = tideSource();
   const tide = TA ? tideAt(wxSel, TA.pts) : null;
@@ -21450,7 +22081,7 @@ async function renderWeather(){
     if(!W || !W.hourly || !W.hourly.time) throw new Error(t('날씨 응답 형식 이상'));
     const H = W.hourly, times = H.time;
     const N = times.length;
-    const t0 = new Date(times[0]+'+09:00').getTime();
+    const t0 = wxTs(times[0], wxData);
     wxStamp();
     const nowTs = Date.now();
     const nowIdx = Math.max(0, Math.min(N-1, Math.floor((nowTs - t0)/3600e3)));

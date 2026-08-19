@@ -1,7 +1,133 @@
 {
- "updated": "2026-08-16T21:08:21.637Z",
- "candidates": 70,
+ "updated": "2026-08-19T21:14:23.624Z",
+ "candidates": 83,
  "items": [
+  {
+   "title": "The Ocean Race Atlantic to recognise ocean action",
+   "t_ko": "The Ocean Race Atlantic 2026, 해양 행동 인식 결합",
+   "s_ko": "The Ocean Race Atlantic 2026의 첫 개최는 엘리트 원양 경주팀을 위한 횡단 경주와 해양 보호 미션 두 가지로 구성된다.\n같은 선원들이 해양 보존을 위한 이중 임무를 수행하게 된다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/299018/?source=rss",
+   "source": "Sail-World",
+   "date": "2026-08-19T20:47:03.000Z"
+  },
+  {
+   "title": "Retail galaxy for boaters needs rethink",
+   "t_ko": "West Marine 파산, 해양용품 소매 생태계 재검토 필요",
+   "s_ko": "West Marine은 2026년 5월 17일 챕터 11 파산을 신청했다.\n1993년 상장 후 2017년 뉴욕 기반 사모펀드에 인수되었고, 이후 경영진 및 소유권 변화를 겪었다.\n재고 부족의 대규모 매장 운영 모델이 지속 불가능했으며, 해양용품 소비자 소매 구조 전반의 재고찰이 필요하다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/19/retail-galaxy-for-boaters-needs-rethink/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-19T15:31:22.000Z"
+  },
+  {
+   "title": "What can we learn from the late Charlie Dalin? The love of the sea and sailing…",
+   "t_ko": "Charlie Dalin의 삶에서 배우는 것: 해양 사랑과 항해",
+   "s_ko": "2024 Vendée Globe 우승자 Charlie Dalin이 2025년 6월 타계했다.\n전 세계 항해 커뮤니티가 슬픔에 함께했다.",
+   "cat": "기타",
+   "link": "https://www.yachtingworld.com/comment/what-can-we-learn-from-the-late-charlie-dalin-the-love-of-the-sea-and-sailing-163809",
+   "source": "Yachting World",
+   "date": "2026-08-19T05:16:17.000Z"
+  },
+  {
+   "title": "How to protect your eyes, face, and skin at sea",
+   "t_ko": "해상에서 눈, 얼굴, 피부 보호하기",
+   "s_ko": "해상은 아름답지만 혹독한 환경으로, 시력은 필수적이나 고강도 자외선(UVB)에 노출되기 쉽다.\n선박의 물질과 움직이는 부품으로부터 눈이 물리적, 화학적 외상을 입을 수 있다.\n간단한 예방 조치로 눈을 보호하고 항해 경험을 개선할 수 있다.",
+   "cat": "안전",
+   "link": "https://www.yachtingmonthly.com/cruising/how-to-protect-your-eyes-face-and-skin-at-sea-106057",
+   "source": "Yachting Monthly",
+   "date": "2026-08-19T05:05:11.000Z"
+  },
+  {
+   "title": "Antifouling paint tips from the experts",
+   "t_ko": "방오도료 칠하기 전문가 팁",
+   "s_ko": "대형 선체에는 롤러로 방오도료를 칠하는 것이 최선이다.\n기존 방오도료 제거, 선체 준비, 적절한 방오도료 선택 및 시공이 DIY 작업자에게는 어려울 수 있다.\nAkzoNobel의 Jason Hill이 이러한 과정에서의 실무 팁을 공유한다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/antifouling-paint-tips-from-the-experts-106210",
+   "source": "PBO",
+   "date": "2026-08-19T04:51:32.000Z"
+  },
+  {
+   "title": "NoR прочитан. А что мы могли пропустить?",
+   "t_ko": "공지문 읽기: AI로 레이스 공지문 검증하기",
+   "s_ko": "Marmaris International Race Week 2026 공지문을 ChatGPT에 제출해 공식 출처, 마감일, 요구사항, 필수 장비를 자동 찾도록 요청했다.\n ChatGPT, DeepSeek, GigaChat 세 AI 도구를 같은 공지문과 프롬프트로 비교했을 때 결과가 크게 달랐으며, 특히 안전 규정 및 요구사항 검색에서 차이가 났다.\nAI를 레이스 준비에 활용할 때 인공지능의 신뢰성 한계를 인식하고 일부 항목은 수동으로 확인할 필요가 있다.",
+   "cat": "산업",
+   "link": "https://yachtrussia.com/news/2026/08/19/20260819-nor-prochitan-a-chto-my-mogli-propustit.html",
+   "source": "Yacht Russia",
+   "date": "2026-08-19T00:00:00.000Z"
+  },
+  {
+   "title": "All systems go for match racing tours",
+   "t_ko": "World Match Racing Tour 최종전, 사우디아라비아에서 개최 확정",
+   "s_ko": "2026년 11월 2-14일 사우디아라비아 홍해 북서부 AMAALA Yacht Club에서 Women's World Match Racing Tour Final(11월 2-7일)과 World Match Racing Tour Final(11월 9-14일)이 개최된다.\nJ/70을 사용해 경주하며, Women's 투어가 Open 투어와 같은 장소에서 연달아 열리는 첫 번째 경우이다.\nWorld Sailing이 우승팀을 2026 Match Racing World Champions으로 인정한다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/18/all-systems-go-for-match-racing-tours/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-18T23:35:41.000Z"
+  },
+  {
+   "title": "Stop obsessing over forecasts: My cure for sailing’s analysis paralysis – Lu Heikell",
+   "t_ko": "기상 예보 집착 벗기: Lu Heikell의 분석 마비 극복법",
+   "s_ko": "현대에는 이전보다 많은 기상 자료를 사용할 수 있지만, 예보에 집착하면 항구에 묶여 있게 된다.\n분석 과다로 항해를 미루는 경향에서 벗어나, 실제 항해로 경험을 쌓는 것이 중요하다.\n과도한 기상 분석보다 실행이 더 나은 항해자를 만든다는 조언이다.",
+   "cat": "항해술",
+   "link": "https://www.yachtingmonthly.com/blogs/stop-obsessing-over-forecasts-my-cure-for-sailings-analysis-paralysis-lu-heikell-106050",
+   "source": "Yachting Monthly",
+   "date": "2026-08-18T05:53:31.000Z"
+  },
+  {
+   "title": "Seagull outboard: the best in the world?",
+   "t_ko": "Seagull 외부 엔진: 세계 최고인가?",
+   "s_ko": "British Seagull 외부 엔진은 단순하고 가볍운 설계로 20세기 초 목재 선박 시대에 맞춰진 것이다.\n10:1의 휘발유-오일 비율로 연료를 섞어 사용하며, 견고한 구조로 망치와 렌치로 정비할 수 있다.\n오랜 역사에도 불구하고 현재까지도 충성스러운 추종자들을 유지하고 있다.",
+   "cat": "장비",
+   "link": "https://www.pbo.co.uk/gear/seagull-outboard-the-best-in-the-world-106082",
+   "source": "PBO",
+   "date": "2026-08-18T04:46:40.000Z"
+  },
+  {
+   "title": "Rocks we will remember",
+   "t_ko": "잊을 수 없는 암초들: 선주들의 좌초 경험 공유",
+   "s_ko": "요트 중개인 John Glynn은 수심 아래 숨어 있거나 수면 위로 약간 노출된 암초로 인한 좌초 위험을 알리고 있다.\n해도에 '암닭들'이나 '젖소들' 같은 이름으로 표시되고 디지털 해도 경고가 있어도 선원들은 이 수중 암초를 만난다.\n모든 항구에는 기억할 만한 암초가 적어도 하나 있으며, 경주 선수나 원양 항해자 모두 이에 면역이 아니다.",
+   "cat": "안전",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/17/rocks-we-will-remember/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-17T19:49:54.000Z"
+  },
+  {
+   "title": "When does enthusiasm become chaos?",
+   "t_ko": "축소 선원 경주의 안전성 문제",
+   "s_ko": "World Sailing은 경주 규칙 적용을 제한할 권한이 있지만, 축소 선원 경주는 계속 허용되고 있다.\n선박 충돌 방지를 위한 국제 해사기구(IMO) 국제 해상 충돌 회피 규칙이 있음에도 경주 중 선원 부족 상태가 발생한다.\n축소 선원 경주와 국제 해상 안전 규정 사이의 모순이 제기되고 있다.",
+   "cat": "안전",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/17/when-does-enthusiasm-become-chaos/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-17T18:50:23.000Z"
+  },
+  {
+   "title": "Perhaps future isn’t here quite yet",
+   "t_ko": "La Solitaire du Figaro 2026: AI 데이터 분석이 미래 항해 기술일까?",
+   "s_ko": "1970년 창설된 La Solitaire du Figaro는 1인승 원양 경주 입문 무대로, 2026년 Figaro Bénéteau 3을 사용한다.\nJoss Creswell(GBR)은 AI 회사 digiLab의 보트 성능 데이터 및 기상 영향 분석을 받아 경주했다.\n데이터 기반 분석이 개별 선수 성능 예측을 어느 정도 지원할 수 있음을 시사한다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/17/perhaps-future-isnt-here-quite-yet/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-17T13:49:12.000Z"
+  },
+  {
+   "title": "Why type of anode should I be using when regularly flushing an engine?",
+   "t_ko": "담수 헹굼 시 사용할 양극의 종류",
+   "s_ko": "담수나 기수에서는 염수와 다른 부식 방지 방법이 필요하다.\n열교환기에 담수가 있을 때는 아연 양극보다 알루미늄 양극이 더 잘 작동한다.\n아웃보드 엔진 헹굼 시에는 냉각 파이프에 포함된 염분 제거가 중요하다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/expert-answers/why-type-of-anode-should-i-be-using-when-regularly-flushing-an-engine-106050",
+   "source": "PBO",
+   "date": "2026-08-17T04:41:56.000Z"
+  },
+  {
+   "title": "From racing boats to protecting freedom",
+   "t_ko": "American Magic High Performance Center, Pensacola에서 2026년 1월 개관",
+   "s_ko": "2021 America's Cup 도전팀 American Magic은 2019년 Pensacola를 훈련 기지로 선택했다.\n정부 지원으로 American Magic High Performance Center가 2026년 1월 개관하여 세계 수준의 항해 및 성능 플랫폼을 제공한다.\nPensacola의 평수, 바람, 지역 지원이 훈련에 최적 조건을 갖춘다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/16/from-racing-boats-to-protecting-freedom/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-16T20:34:15.000Z"
+  },
   {
    "title": "Step onboard with Ancasta this September",
    "t_ko": "앙카스타, 9월 유럽 보트쇼 3곳에서 주요 전시",
@@ -127,123 +253,6 @@
    "link": "https://www.pbo.co.uk/practical-projects/laying-ground-tackle-for-swinging-moorings-105994",
    "source": "PBO",
    "date": "2026-08-13T04:43:37.000Z"
-  },
-  {
-   "title": "Women moving in the right direction",
-   "t_ko": "세일GP·미국컵 여성 의무화 규정, 학습 격차 과제 남겨",
-   "s_ko": "윙·포일 도입으로 남성들이 선행 교육을 독점해온 가운데 세일GP와 미국컵이 여성 선수 의무 참가 규정을 시행 중이다.\n세일GP는 영국 본부에서 18명 여성을 대상으로 시뮬레이터 훈련 세션을 개최해 기술 격차를 좁히려고 노력 중이다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/12/women-moving-in-the-right-direction/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-12T20:57:39.000Z"
-  },
-  {
-   "title": "Fair American: A shift to race mode",
-   "t_ko": "2026 NYYC 여성 국제 선수권, 14개국 20팀 참가",
-   "s_ko": "뉴욕요트클럽이 창설하는 여성 국제 선수권은 2026년 9월 12-19일 뉴포트에서 IC37 용골선으로 열린다.\n미국요트클럽 여성팀은 봄 2025부터 14명(경주팀과 대기팀)을 구성해 훈련 중이다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/12/fair-american-a-shift-to-race-mode/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-12T19:44:39.000Z"
-  },
-  {
-   "title": "New vision for Caribbean racing circuit",
-   "t_ko": "카리브해 레이싱 회로 개편, 4개월 집중 시즌으로 재편성",
-   "s_ko": "카리브해 세일링협회(CSA)가 5년 일정을 개정해 주요 대회를 4개월 기간으로 압축했다.\n전문 팀과 고수준 아마추어팀에 명확한 캠프 기간을 제공하면서 카리브해 레이싱의 모험 정신은 유지한다.\nSt. Maarten Heineken Regatta가 시즌 기준점, Antigua Racing Cup은 앞당겨졌고, St. Thomas International Regatta(STIR)는 4월 8-11일로 복귀한다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/12/new-vision-for-caribbean-racing-circuit/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-12T18:40:32.000Z"
-  },
-  {
-   "title": "RORC Round Britain and Ireland Race day 4",
-   "t_ko": "RORC 영국·아일랜드 일주 레이스, Pace 선두",
-   "s_ko": "2026 RORC Round Britain and Ireland Race(1,805해리)는 출발 72시간 후 Johnny Vincent의 Volvo 70 Pace가 헤브리디스 북쪽 대서양 저기압을 타고 선두 질주 중이다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/298831/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-12T17:04:00.000Z"
-  },
-  {
-   "title": "Quentin Debois on standby in New York",
-   "t_ko": "벨기에 선수 Quentin Debois, 솔로 동향 대서양 횡단 기록 세울",
-   "s_ko": "Quentin Debois는 벨기에인 최초로 동쪽에서 서쪽으로 대서양을 솔로 항해하는 기록을 세웠으며, 8월 12일 대기 기간에 돌입했다.",
-   "cat": "항해술",
-   "link": "https://www.sail-world.com/news/298823/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-12T15:25:00.000Z"
-  },
-  {
-   "title": "Ancasta strengthens European presence",
-   "t_ko": "앙카스타, 네덜란드·몬테네그로에 유럽 사무소 개설",
-   "s_ko": "요트 판매 회사 앙카스타 인터내셔널이 네덜란드와 몬테네그로에 새로운 사무소를 열었다.\n요트 소유자, 구매자, 판매자를 지원하기 위한 유럽 내 장기 확장 전략의 일환이다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/298785/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-12T08:00:00.000Z"
-  },
-  {
-   "title": "Make a big toot again by clearing seagull scum out of a boat air horn",
-   "t_ko": "에어혼 바다제비 배설물 청소법",
-   "s_ko": "선장이 예산 부족으로 저가 에어혼을 구입했는데, 바다제비 배설물이 축적되어 막혔다.\n전자음향기관이 손상되어 청소가 필요한 상황이다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/practical-projects/make-a-big-toot-again-by-clearing-seagull-scum-out-of-an-air-horn-106109",
-   "source": "PBO",
-   "date": "2026-08-12T05:30:37.000Z"
-  },
-  {
-   "title": "Siren song of a Catalina 22",
-   "t_ko": "항해자의 프로젝트 요트 도전기: Catalina 22 복원",
-   "s_ko": "미국 뉴포트의 항해자는 사용하지 않으면 계류 박탈 규정 때문에 저가 트레일러 20피트급 요트를 구입했고, 프로젝트 보트 복원을 진행 중이다.\n겨울 저장료 절감을 위해 자체 견인과 드라이브웨이 보관이 가능한 사이즈를 선택했다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/11/siren-song-of-a-catalina-22/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-11T21:07:23.000Z"
-  },
-  {
-   "title": "Inside AC: How AI is changing the game",
-   "t_ko": "미국컵 38차 대회, AI가 설계와 경주 게임 체인지",
-   "s_ko": "영국 미국컵 도전팀 GB1의 설계 담당자 Nick Holroyd는 AI가 더 빠르고 효율적인 선체 설계에 활용되고 있으며, 경주 중 탑재까지 가능할 수 있다고 설명했다.\n뉴질랜드와 영국이 38차 미국컵 프로토콜을 8월 12일 확인했다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/11/inside-ac-how-ai-is-changing-the-game/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-11T18:51:39.000Z"
-  },
-  {
-   "title": "Important milestone for Catalina Yachts",
-   "t_ko": "카탈리나 요트, 파산 위기에서 생산 재개",
-   "s_ko": "미국 최대 범선 제조사 카탈리나 요트가 CT Composites LLC에 인수되어 플로리다 라고 시설에서 생산을 재개했다.\n경험 많은 조선인 중심의 핵심 팀으로 구성되어 현재 생산 라인에서 배를 건조 중이다.\nCEO는 \"우리는 더 작은 팀이지만 배를 짓고 있다\"며 \"생산 재개는 중요한 이정표\"라고 밝혔다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/11/important-milestone-for-catalina-yachts/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-11T18:48:18.000Z"
-  },
-  {
-   "title": "3 next-generation trimarans shaking up the market",
-   "t_ko": "3세대 트리마란, 시장 판도 바꾼다",
-   "s_ko": "스마트 글래스 선실, 모듈식 평판 조립, 쌍발 엔진 등을 갖춘 신형 성능 트리마란 3종이 출시된다.\n기존 경주용·금욕적 크루징용 삼동선을 벗어나 속도, 안전, 럭셔리 거주 공간을 통합하는 설계다.",
-   "cat": "산업",
-   "link": "https://www.yachtingworld.com/yachts-and-gear/3-next-generation-trimarans-shaking-ip-the-market-163681",
-   "source": "Yachting World",
-   "date": "2026-08-11T05:22:45.000Z"
-  },
-  {
-   "title": "Game time for 470 World Championship",
-   "t_ko": "2026 470 세계선수권, 28개국 74팀 엔시마서 경쟁",
-   "s_ko": "올림픽 혼합 투인원 딩기 470 세계선수권은 8월 12-16일 도쿄올림픽 개최지 일본 엔시마에서 열린다.\n스페인 Jordi Xammar는 3연패를 노리고 있으며, 엔시마 경험(동메달)을 활용할 수 있다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/10/game-time-for-470-world-championship/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-10T21:35:51.000Z"
-  },
-  {
-   "title": "America’s Cup: Revealing ARC Team USA",
-   "t_ko": "ARC 팀 USA, 2027 아메리카 컵 진출 본격화로 초기 크루 명단 공개",
-   "s_ko": "38차 아메리카 컵의 미국 도전팀 ARC 팀 USA가 초기 5명 크루 명단을 발표했다.\n올림픽 메달리스트, 아메리카 컵 경험자, 신진 재능을 혼합 구성했다.\n2027년 매치에 향한 팀 구성 단계가 진행 중이다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/10/americas-cup-revealing-arc-team-usa/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-10T18:03:55.000Z"
   }
  ]
 }

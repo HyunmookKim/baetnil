@@ -1465,8 +1465,13 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #mrPanel.full select{padding-right:18px}
 #mrPanel input,#mrPanel select,#mrPanel textarea,
 #panel input,#panel select,#panel textarea{min-height:44px}
+/* ★ 체크칸 — 4.02 에서 크기만 주고 flex 를 안 풀어서 폭이 0 이 됐다.
+   부모가 flex 인데 위에서 input 에 flex:1; min-width:0 을 걸어 뒀기 때문이다.
+   그래서 「만탱크」 를 켰는지 껐는지 눈으로 알 수가 없었다 —
+   만탱크는 잔량 추정 전체의 기준점이다. */
 #mrPanel input[type=checkbox],#panel input[type=checkbox],
-#mrPanel.full input[type=checkbox]{min-height:0;width:22px;height:22px}
+#mrPanel.full input[type=checkbox]{
+  min-height:0;flex:0 0 auto;width:22px;height:22px;min-width:22px;margin:0}
 #mrPanel textarea,#panel textarea,#mrPanel.full textarea{min-height:72px}
 
 /* 중간 기록 한 줄 — 시각·종류는 제 폭을 갖고, 내용은 아랫줄로 내린다 */
@@ -1754,7 +1759,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1904;
+const LANG_TOTAL = 1908;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3712,6 +3717,16 @@ const I18N = {
     // ── 4.07
     '되돌리고 닫기':'Discard and close',
     '고친 것을 버리고 닫을까요?\n\n이 창을 연 뒤에 바꾼 것이 모두 처음으로 돌아갑니다.':'Discard your changes and close?\n\nEverything you changed since opening this screen goes back to how it was.',
+  
+
+    // ── 4.08
+    '안 적으면 그날 항해보다 먼저 넣은 것으로 봅니다':'Leave blank and we assume you filled up before that day’s trip',
+    '연료 소비량은 [만탱크] 주유가 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 썼는지 알 수 없습니다.':'Consumption needs at least two [Filled up] entries with engine hours logged in between. Partial fill-ups cannot tell us how much was burned.',
+    '잔량 추정은 [만탱크] 주유가 두 번 이상 쌓이면 계산됩니다.':'The range estimate starts once you have two [Filled up] entries.',
+  
+
+    // ── 4.09
+    '넣은 시각입니다. 다르면 고쳐 주세요':'The time you filled up. Change it if this is wrong',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5663,6 +5678,16 @@ const I18N = {
     // ── 4.07
     '되돌리고 닫기':'Отменить и закрыть',
     '고친 것을 버리고 닫을까요?\n\n이 창을 연 뒤에 바꾼 것이 모두 처음으로 돌아갑니다.':'Отменить изменения и закрыть?\n\nВсё, что вы изменили после открытия этого экрана, вернётся как было.',
+  
+
+    // ── 4.08
+    '안 적으면 그날 항해보다 먼저 넣은 것으로 봅니다':'Если не указать, считаем, что заправка была до выхода в этот день',
+    '연료 소비량은 [만탱크] 주유가 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 썼는지 알 수 없습니다.':'Для расхода нужны минимум две заправки с отметкой [Полный бак] и моточасы между ними. По частичным заправкам нельзя понять, сколько израсходовано.',
+    '잔량 추정은 [만탱크] 주유가 두 번 이상 쌓이면 계산됩니다.':'Оценка остатка появится, когда наберётся две заправки [Полный бак].',
+  
+
+    // ── 4.09
+    '넣은 시각입니다. 다르면 고쳐 주세요':'Время заправки. Исправьте, если неверно',
   }
 };
 
@@ -13084,7 +13109,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.07';
+const APP_VER = '4.09';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14707,6 +14732,10 @@ function addMonths(iso, m){
 }
 function fmtDate(d){ const p=n=>String(n).padStart(2,'0'); return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()); }
 const today = () => fmtDate(new Date());
+// 지금 시각 HH:MM — 기록을 만들 때 저절로 찍는다.
+// ★ 사람이 손으로 적게 하면 대개 안 적는다. 적어야 쓸모가 있는 값은 앱이 먼저 채운다.
+const nowHM = () => { const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
 // ★ k = 갈래. 색을 직접 들고 다니지 않고 갈래만 넘긴다.
 //   그래야 화면 결을 바꿀 때 여기를 안 건드려도 된다.
 // ★ 상태 글자를 여기서 이어 붙여 만들었다 — 사전을 거칠 자리가 없었다.
@@ -15525,6 +15554,9 @@ function openMR(kind, id){
       + `<div class="mrrow"><span class="mrlbl">${esc(t('가동시간'))}</span>${unlocked
           ?`<input type="number" step="0.1" value="${esc(String(it.hours||''))}" style="width:90px" onchange="mrField('hours',this.value)"> ${esc(t('시간'))}`
           :`<b class="mrv">${it.hours?it.hours+' '+esc(t('시간')):'—'}</b>`}</div>`
+      + `<div class="mrrow"><span class="mrlbl">${esc(t('시각'))}</span>${unlocked
+          ?`<input type="time" class="logtime" value="${esc(hm(it.time||''))}" onchange="mrField('time',this.value)">`
+          :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
       + `<div class="mrrow"><span class="mrlbl">${esc(t('목적'))}</span>${unlocked
           ?`<select onchange="mrField('purpose',this.value)" style="flex:1">${
               RUN_PURPOSES.map(x=>`<option value="${x}"${it.purpose===x?' selected':''}>${esc(t(x))}</option>`).join('')
@@ -15532,6 +15564,12 @@ function openMR(kind, id){
           :`<b class="mrv">${esc(it.purpose||'—')}</b>`}</div>`;
   } else if(kind==='fuel'){
     body = tf('날짜','date',it.date,'date','')
+      // ★ 시각을 적어 두면 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
+      //   비워 두면 '주유가 먼저' 로 본다 (잔량을 적게 잡는 안전한 쪽).
+      + `<div class="mrrow"><span class="mrlbl">${esc(t('시각'))}</span>${unlocked
+          ?`<input type="time" class="logtime" value="${esc(hm(it.time||''))}" onchange="mrField('time',this.value)">
+            <span class="mrm" style="flex:1;color:#7b8794">${esc(t('넣은 시각입니다. 다르면 고쳐 주세요'))}</span>`
+          :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
       + `<div class="mrrow"><span class="mrlbl">${esc(t('주유량'))}</span>${unlocked
           ?`<input type="number" step="0.1" value="${esc(String(it.liters||''))}" style="width:90px" onchange="mrField('liters',this.value)"> L`
           :`<b class="mrv">${it.liters?it.liters+' L':'—'}</b>`}</div>`
@@ -20497,27 +20535,55 @@ function engineHours(){
   return { total: fromVoyage + fromRun, voyage: fromVoyage, run: fromRun };
 }
 
-// 어떤 시각(날짜)까지의 누적 가동시간 — 주유 구간별 소비량 계산용
-function hoursUntil(dateStr){
-  if(!dateStr) return null;
-  const a = voyage.filter(v=> v.date && v.date <= dateStr)
+// 주유 기록을 줄 세우는 열쇠 (날짜 → 시각 → 만든 차례)
+const fuelKey = f => String((f && f.date) || '') + '\u0000'
+  + ((f && f.time) ? hm(f.time) : '') + '\u0000' + String((f && f.id) || '');
+
+// ★ 이 주유보다 '먼저' 돌린 엔진 시간.
+//
+//   예전에는 날짜만 보고 `v.date <= 주유날짜` 로 셌다. 그래서 8월 17일에 만탱크를 넣고
+//   같은 날 나가서 1.9시간 돌렸는데, 그 1.9시간이 '주유 전에 쓴 것' 으로 들어갔다.
+//   마지막 만탱크 이후 가동시간이 0h 가 되어 잔량이 240L 그대로였다.
+//
+//   이제 같은 날이면 시각으로 가른다. 시각을 모르면 '주유가 먼저' 로 본다 —
+//   그래야 그날 돌린 것이 주유 뒤 소비로 잡혀 잔량을 적게 본다.
+//   기름이 실제보다 많다고 믿는 것이 배에서 제일 위험하다.
+function hoursBeforeFill(f){
+  if(!f || !f.date) return 0;
+  const day = String(f.date), ft = f.time ? hm(f.time) : '';
+  const before = (d, t) => {
+    if(!d) return false;
+    if(String(d) < day) return true;
+    if(String(d) > day) return false;
+    if(!ft || !t) return false;          // 어느 한쪽 시각을 모르면 주유가 먼저
+    return hm(t) <= ft;
+  };
+  const a = voyage.filter(v => before(v.date, v.timeIn || v.timeOut))
                   .reduce((s,v)=> s + (parseFloat(v.engineH)||0), 0);
-  const b = runs.filter(r=> r.date && r.date <= dateStr)
+  const b = runs.filter(r => before(r.date, r.time))
                 .reduce((s,r)=> s + (parseFloat(r.hours)||0), 0);
   return a + b;
 }
 
-// 시간당 연료 소비량 — 직전 주유 이후 돌린 시간으로 나눈다.
-// 주유 2회 이상 + 그 사이 가동 기록이 있어야 산출된다.
+// ★ 시간당 연료 소비량 — 만탱크에서 만탱크까지만 잰다.
+//
+//   부분 주유는 '그동안 얼마나 썼는지' 를 말해 주지 않는다. 탱크가 얼마나 비어 있었는지
+//   모르기 때문이다. 예전에는 부분 주유끼리도 구간을 만들어서, 엔진을 1시간 돌리고
+//   10L 를 부으면 10 L/h 라는 값이 나왔다. 실제 값의 두 배 가까이 부풀었다.
+//   두 만탱크 사이에 넣은 기름을 모두 더하면 그것이 그 구간에 쓴 기름이다.
 function fuelRate(){
   const arr = fuel.filter(f=> f.date && parseFloat(f.liters)>0)
-                  .sort((a,b)=> String(a.date).localeCompare(String(b.date)));
-  if(arr.length < 2) return null;
+                  .sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
+  const fulls = arr.filter(f=> f.full);
+  if(fulls.length < 2) return null;      // 만탱크가 두 번은 있어야 잴 수 있다
   const segs = [];
-  for(let i=1;i<arr.length;i++){
-    const h0 = hoursUntil(arr[i-1].date), h1 = hoursUntil(arr[i].date);
-    const dh = h1 - h0, li = parseFloat(arr[i].liters)||0;
-    if(dh > 0.1 && li > 0) segs.push({ lph: li/dh, date: arr[i].date, dh, li });
+  for(let i=1;i<fulls.length;i++){
+    const a = fulls[i-1], b = fulls[i];
+    const dh = hoursBeforeFill(b) - hoursBeforeFill(a);
+    const ka = fuelKey(a), kb = fuelKey(b);
+    const li = arr.filter(x => fuelKey(x) > ka && fuelKey(x) <= kb)
+                  .reduce((s,x)=> s + (parseFloat(x.liters)||0), 0);
+    if(dh > 0.1 && li > 0) segs.push({ lph: li/dh, date: b.date, dh, li });
   }
   if(!segs.length) return null;
   const last = segs[segs.length-1];
@@ -20530,15 +20596,17 @@ function fuelRate(){
 function fuelLeft(){
   const TANK_L = boatSpec('fuelTank');
   if(!(TANK_L > 0)) return null;      // 탱크 용량을 모르면 잔량을 추정하지 않는다
-  const full = fuel.filter(f=> f.full && f.date)
-                   .sort((a,b)=> String(b.date).localeCompare(String(a.date)))[0];
+  const arr = fuel.filter(f=> f.date).sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
+  const fulls = arr.filter(f=> f.full);
+  const full = fulls[fulls.length-1];
   if(!full) return null;
   const r = fuelRate(); if(!r) return null;
-  const since = engineHours().total - hoursUntil(full.date);
+  const since = engineHours().total - hoursBeforeFill(full);
   if(since < 0) return null;
   const used = since * r.avg;
-  const after = fuel.filter(f=> f.date > full.date && !f.full)
-                    .reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
+  const kf = fuelKey(full);
+  const after = arr.filter(f=> fuelKey(f) > kf && !f.full)
+                   .reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
   const left = Math.max(0, Math.min(TANK_L, TANK_L - used + after));
   return { left, used, since, from: full.date, rate: r.avg };
 }
@@ -20572,12 +20640,12 @@ function renderFuel(){
   if(rate)
     notes.push(`평균 ${rate.avg.toFixed(1)} L/h (구간 ${rate.n}개)`);
   else
-    notes.push(esc(t('연료 소비량은 주유 2회 이상과 그 사이의 가동 기록이 있어야 계산됩니다.')));
+    notes.push(esc(t('연료 소비량은 [만탱크] 주유가 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 썼는지 알 수 없습니다.')));
   if(left)
     notes.push(`잔량은 ${left.from} 만탱크 이후 ${left.since.toFixed(1)}h 가동 기준 추정 — 소비량으로 계산한 값이므로 실제와 차이가 있을 수 있습니다`);
   else
     notes.push(boatSpec('fuelTank') > 0
-      ? t('잔량 추정은 주유 기록에서 [만탱크]를 켜면 계산됩니다.')
+      ? t('잔량 추정은 [만탱크] 주유가 두 번 이상 쌓이면 계산됩니다.')
       : t('연료 탱크 용량을 넣으면 잔량을 추정합니다.') + ' '
         + `<button class="minib blu" style="vertical-align:middle" onclick="openBoat('spec')">${esc(t('연료 탱크 넣기'))}</button>`);
   const sub = `<div class="mrnone" style="text-align:left">${notes.join('<br>')}</div>`;
@@ -20592,25 +20660,27 @@ function renderFuel(){
     ? `<div class="mr" onclick="openMR('fuel','${x.o.id}')">
         <div class="ct"><div class="cn">⛽ ${x.o.liters?fmtNum(parseFloat(x.o.liters))+' L':'—'}${x.o.full?` <span class="chip">${esc(t('만탱크'))}</span>`:''}</div>
         <span class="chip nchip">${x.o.cost?Number(x.o.cost).toLocaleString()+esc(t('원')):''}</span></div>
-        <div class="mrm">${x.o.date||'—'}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
+        <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
       </div>`
     : `<div class="mr" onclick="openMR('run','${x.o.id}')">
         <div class="ct"><div class="cn">⚙ ${x.o.hours?x.o.hours+' '+esc(t('시간')):'—'}</div>
         <span class="chip">${esc(x.o.purpose||t('기타'))}</span></div>
-        <div class="mrm">${x.o.date||'—'}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
+        <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
       </div>`
   ).join('') || `<div class="mrnone">${esc(t('기록이 없습니다. 주유와 엔진 가동을 기록하면 소비량과 잔량이 계산됩니다.'))}</div>`);
 }
 
 function addFuel(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
-  const f = {id:newId(), date:today(), liters:'', cost:'', full:false, note:''};
+  // ★ 시각은 앱이 지금으로 찍어 둔다. 다르면 창에서 고치면 된다.
+  //   이것이 있어야 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
+  const f = {id:newId(), date:today(), time:nowHM(), liters:'', cost:'', full:false, note:''};
   fuel.push(f); saveMR(); renderFuel(); openMR('fuel', f.id);
 }
 
 function addRun(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
-  const r = {id:newId(), date:today(), hours:'', purpose:'충전', note:''};
+  const r = {id:newId(), date:today(), time:nowHM(), hours:'', purpose:'충전', note:''};
   runs.push(r); saveMR(); renderFuel(); openMR('run', r.id);
 }
 

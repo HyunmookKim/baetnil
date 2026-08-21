@@ -1476,6 +1476,9 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 
 /* 중간 기록 한 줄 — 시각·종류는 제 폭을 갖고, 내용은 아랫줄로 내린다 */
 #mrPanel .logtime,#mrPanel.full .logtime{flex:0 0 128px;min-width:128px}
+/* 시각 칸 — 바늘시계를 버리고 숫자만 친다 */
+#mrPanel .tin,#mrPanel.full .tin{text-align:center;letter-spacing:.08em;
+  font-variant-numeric:tabular-nums}
 /* 날짜 칸 — 「마지막 07/14/2」 처럼 해가 잘려 나왔다 (옆에 남은 날짜까지 한 줄에 든다) */
 #mrPanel input[type=date],#mrPanel.full input[type=date]{flex:0 0 auto;min-width:142px}
 #mrPanel .logkind,#mrPanel.full .logkind{flex:0 0 136px;min-width:136px}
@@ -1520,6 +1523,12 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
   -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);
   mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
 
+/* ============ 4.11 — 내 위치정보 이용내역 ============ */
+.lgday{padding:12px 12px 4px;font-size:13px;color:var(--tm);font-weight:700;
+  letter-spacing:.02em;font-variant-numeric:tabular-nums}
+/* ★ 안내문을 그냥 얹으면 새벽 배경의 수평선 위에서 글씨가 사라진다. 상자에 담는다. */
+.lgnote{margin:10px 12px;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;
+  background:var(--sf);color:var(--tx);font-size:14px;line-height:1.65;text-align:left}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122a44">
@@ -1673,7 +1682,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()" data-t="언어 · Language">언어 · Language</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()" data-t="언어 · Language">언어 · Language</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLocLog()" data-t="내 위치정보 이용내역">내 위치정보 이용내역</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="배">배</span></button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-t="항해일지">항해일지</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 
 
@@ -1759,7 +1768,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1908;
+const LANG_TOTAL = 1928;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3727,6 +3736,32 @@ const I18N = {
 
     // ── 4.09
     '넣은 시각입니다. 다르면 고쳐 주세요':'The time you filled up. Change it if this is wrong',
+  
+
+    // ── 4.10
+    '시각을 0000~2359 사이로 넣어 주세요.':'Please enter a time between 0000 and 2359.',
+  
+
+    // ── 4.11
+    '내 위치정보 이용내역':'My location use history',
+    '앱이 위치를 쓸 때마다 저절로 남는 기록입니다.':'This record is written automatically every time the app uses your location.',
+    '언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.':'Only when and what for are recorded - never the coordinates.',
+    '6개월이 지난 것은 저절로 지워집니다.':'Records older than six months are erased automatically.',
+    '아직 위치를 쓴 적이 없습니다.':'Your location has not been used yet.',
+    '{n}개 지점':'{n} points',
+    '수집':'Collected',
+    '이용':'Used',
+    '제공':'Provided',
+    '배 등록 — 홈포트 위치':'Registering a boat - home port position',
+    '홈포트 위치 잡기':'Setting the home port position',
+    '정박지 자리 잡기':'Marking a berth position',
+    '항해일지 출발 위치':'Logbook - departure position',
+    '항해일지 도착 위치':'Logbook - arrival position',
+    '항해일지 중간 기록 위치':'Logbook - waypoint position',
+    '지금 있는 곳 날씨·물때':'Weather and tide for where you are',
+    '날씨 지점 잡기':'Setting a weather spot',
+    '정박지 자리를 커뮤니티에 올림':'Posting a berth position to the community',
+    '항해 항적 기록':'Recording a voyage track',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5688,6 +5723,32 @@ const I18N = {
 
     // ── 4.09
     '넣은 시각입니다. 다르면 고쳐 주세요':'Время заправки. Исправьте, если неверно',
+  
+
+    // ── 4.10
+    '시각을 0000~2359 사이로 넣어 주세요.':'Введите время от 0000 до 2359.',
+  
+
+    // ── 4.11
+    '내 위치정보 이용내역':'Мои записи о местоположении',
+    '앱이 위치를 쓸 때마다 저절로 남는 기록입니다.':'Эта запись создаётся автоматически каждый раз, когда приложение использует ваше местоположение.',
+    '언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.':'Фиксируются только когда и для чего — координаты не записываются.',
+    '6개월이 지난 것은 저절로 지워집니다.':'Записи старше шести месяцев стираются автоматически.',
+    '아직 위치를 쓴 적이 없습니다.':'Местоположение ещё ни разу не использовалось.',
+    '{n}개 지점':'точек: {n}',
+    '수집':'Сбор',
+    '이용':'Использование',
+    '제공':'Передача',
+    '배 등록 — 홈포트 위치':'Регистрация судна — место порта приписки',
+    '홈포트 위치 잡기':'Установка места порта приписки',
+    '정박지 자리 잡기':'Отметка места стоянки',
+    '항해일지 출발 위치':'Судовой журнал — место выхода',
+    '항해일지 도착 위치':'Судовой журнал — место прихода',
+    '항해일지 중간 기록 위치':'Судовой журнал — место промежуточной записи',
+    '지금 있는 곳 날씨·물때':'Погода и приливы там, где вы находитесь',
+    '날씨 지점 잡기':'Выбор точки прогноза погоды',
+    '정박지 자리를 커뮤니티에 올림':'Публикация места стоянки в сообществе',
+    '항해 항적 기록':'Запись трека похода',
   }
 };
 
@@ -7796,6 +7857,101 @@ function openBoatSetup(){
     setupUseGPS();
   });
 }
+
+// ===== 위치정보 이용·제공사실 확인자료 (위치정보법 제16조 제2항) =====
+//
+// ★ 법이 요구하는 것은 「썼다는 사실」 이지 위치 그 자체가 아니다.
+//   그래서 좌표는 여기 남기지 않는다 — 남기면 지켜야 할 위험한 자료가 하나 더 생길 뿐이다.
+//
+// ★ 판단을 한 곳에 모은다.
+//   앱 어디서도 navigator.geolocation 을 직접 부르지 않고 geoGet() 만 지나간다.
+//   자리를 새로 만들 때마다 기록 한 줄을 손으로 붙이는 방식은 반드시 한 곳을 빠뜨린다.
+//   loclogtest.js 가 직접 부르는 곳이 남아 있으면 이름을 대고 잡는다.
+const LG_KEY    = 'bt_loclog';
+const LG_KEEP_D = 180;      // 6개월 — 위치정보법 제16조 제2항
+const LG_MAX    = 3000;     // 기기에 쌓아 둘 최대 줄 수 (넘으면 오래된 것부터 밀린다)
+let lgRows = null;
+let lgUpTimer = null;
+
+// 오래된 것을 버리고 최근 것부터 놓는다.
+// ★ 날짜가 없는 줄은 버린다 — 언제 것인지 모르는 기록은 확인자료가 못 된다.
+function lgPrune(rows, now){
+  const arr = Array.isArray(rows) ? rows : [];
+  const cut = (now || Date.now()) - LG_KEEP_D * 864e5;
+  const left = arr.filter(x=>{
+    const ms = (x && x.ts) ? Date.parse(x.ts) : NaN;
+    return isFinite(ms) && ms >= cut;
+  });
+  left.sort((a,b)=> String(b.ts||'').localeCompare(String(a.ts||'')));
+  return left;
+}
+function lgLoad(){
+  if(lgRows) return lgRows;
+  let raw = [];
+  try{ raw = JSON.parse(localStorage.getItem(LG_KEY) || '[]'); }catch(e){ raw = []; }
+  lgRows = lgPrune(raw, Date.now()).slice(0, LG_MAX);
+  return lgRows;
+}
+function lgSave(){ try{ localStorage.setItem(LG_KEY, JSON.stringify(lgRows || [])); }catch(e){} }
+function lgReset(){ lgRows = null; }
+function lgList(){ return lgLoad().slice(); }
+
+// 한 줄 남긴다. k = 수집 · 이용 · 제공, w = 무엇에 썼는지.
+// ★ 좌표를 받을 자리가 없다. 부르는 쪽에서 넘겨도 들어가지 않는다.
+function lgAdd(k, w, extra){
+  const rows = lgLoad();
+  const row = { id: newId(), ts: new Date().toISOString(),
+                k: String(k || '수집'), w: String(w || '') };
+  if(extra && extra.n > 0) row.n = Math.round(extra.n);
+  if(extra && extra.from)  row.from = String(extra.from);
+  if(extra && extra.to)    row.to   = String(extra.to);
+  rows.unshift(row);
+  lgRows = lgPrune(rows, Date.now()).slice(0, LG_MAX);
+  lgSave();
+  lgSchedUp();
+  return row;
+}
+// ★ 항적은 몇 초마다 좌표가 들어온다. 한 점마다 한 줄을 남기면 하루에 수천 줄이다.
+//   사람이 볼 수도 없고 폰도 못 버틴다. 「켠 시각 ~ 끈 시각」 을 한 묶음으로 한 줄만 남긴다.
+//   (껍데기 앱에서 항적을 받기 시작하면 여기를 부른다.)
+function lgTrack(from, to, n){
+  return lgAdd('수집', '항해 항적 기록', { from: from, to: to, n: n });
+}
+// 클라우드에는 몰아서 올린다.
+// ★ 한 줄마다 올리면 배 위에서 없는 기지국을 찾느라 배터리를 더 먹는다.
+function lgSchedUp(){
+  if(lgUpTimer) return;
+  lgUpTimer = setTimeout(()=>{ lgUpTimer = null; lgPush(); }, 10000);
+}
+async function lgPush(){
+  if(typeof window === 'undefined' || !window.__loclog || !window.__user) return;
+  const wait = lgLoad().filter(x=> !x.up).slice(0, 200);
+  if(!wait.length) return;
+  try{
+    await window.__loclog.put(wait);
+    wait.forEach(x=>{ x.up = true; });
+    lgSave();
+  }catch(e){}
+}
+
+// ★ 위치를 읽는 단 하나의 문.
+//   why 는 「무엇에 쓰려고」 다. 확인자료에 그대로 남는다.
+function geoGet(why, ok, err, opts){
+  if(!navigator.geolocation){
+    if(typeof err === 'function') err({ code:2, message:'geolocation unavailable' });
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      // ★ 실제로 받았을 때만 남긴다. 권한을 거절했으면 수집한 것이 없다.
+      try{ lgAdd('수집', why); }catch(e){}
+      if(typeof ok === 'function') ok(p);
+    },
+    e=>{ if(typeof err === 'function') err(e); },
+    opts
+  );
+}
+
 // 등록 화면의 지도에서 현재 위치를 잡는다
 function setupUseGPS(){
   const hint = () => document.getElementById('setupHint');
@@ -7805,7 +7961,7 @@ function setupUseGPS(){
     say('지도를 눌러 홈포트 위치를 지정해 주세요. 날씨·물때가 이 자리를 기준으로 표시됩니다.');
     return;
   }
-  navigator.geolocation.getCurrentPosition(
+  geoGet('배 등록 — 홈포트 위치',
     p=>{
       if(!mapS) return;
       mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
@@ -7896,7 +8052,7 @@ function openPortPick(){
 }
 function portUseGPS(quiet){
   if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
-  navigator.geolocation.getCurrentPosition(
+  geoGet('홈포트 위치 잡기',
     p=>{
       if(!mapS) return;
       mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
@@ -12250,6 +12406,7 @@ const PAINTERS = [
   'openSpot','openTalk','openPost','openBoard','openTrash','openHelp','openPublish','openIntro',
   'openLocker','openItem','openBox','openFleet','openRoster','openRanks','openJoinReqs',
   'openMyTasks','openTasksOf','openSeries','openExplore','openHidden','openAccount','openSupport',
+  'openLocLog',
   'renderVoyage','renderFuel','renderContacts','renderCheck','renderList','renderMaintList',
   'renderRepairList','renderTalk','renderSpots','renderMarket','renderNews','renderHome',
   'renderMR','renderPanelItems','renderCurrent'
@@ -13109,7 +13266,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.09';
+const APP_VER = '4.11';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15555,7 +15712,7 @@ function openMR(kind, id){
           ?`<input type="number" step="0.1" value="${esc(String(it.hours||''))}" style="width:90px" onchange="mrField('hours',this.value)"> ${esc(t('시간'))}`
           :`<b class="mrv">${it.hours?it.hours+' '+esc(t('시간')):'—'}</b>`}</div>`
       + `<div class="mrrow"><span class="mrlbl">${esc(t('시각'))}</span>${unlocked
-          ?`<input type="time" class="logtime" value="${esc(hm(it.time||''))}" onchange="mrField('time',this.value)">`
+          ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.time||''))}" onchange="hmChange(this, v => mrField('time', v))">`
           :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
       + `<div class="mrrow"><span class="mrlbl">${esc(t('목적'))}</span>${unlocked
           ?`<select onchange="mrField('purpose',this.value)" style="flex:1">${
@@ -15567,7 +15724,7 @@ function openMR(kind, id){
       // ★ 시각을 적어 두면 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
       //   비워 두면 '주유가 먼저' 로 본다 (잔량을 적게 잡는 안전한 쪽).
       + `<div class="mrrow"><span class="mrlbl">${esc(t('시각'))}</span>${unlocked
-          ?`<input type="time" class="logtime" value="${esc(hm(it.time||''))}" onchange="mrField('time',this.value)">
+          ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.time||''))}" onchange="hmChange(this, v => mrField('time', v))">
             <span class="mrm" style="flex:1;color:#7b8794">${esc(t('넣은 시각입니다. 다르면 고쳐 주세요'))}</span>`
           :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
       + `<div class="mrrow"><span class="mrlbl">${esc(t('주유량'))}</span>${unlocked
@@ -17095,7 +17252,7 @@ function trRepaint(coll, id){
 //
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
-const LEGAL_VER  = '1.2';
+const LEGAL_VER  = '1.3';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
 const LEGAL_DATES = { ko:'2026년 8월 18일', en:'18 August 2026', ru:'18 августа 2026 г.' };
@@ -17345,19 +17502,34 @@ location: { title: '위치정보 이용약관', body: `
    올린 뒤에도 본인이 지울 수 있습니다.
 
 제5조 (보유 기간)
-저장된 좌표는 이용자가 지울 때까지, 또는 탈퇴할 때까지 보관하고 그 뒤 파기합니다.
+① 저장된 좌표는 이용자가 지울 때까지, 또는 탈퇴할 때까지 보관하고 그 뒤 파기합니다.
+② 제6조의 확인자료는 남긴 때부터 6개월 동안 보관하고 그 뒤 저절로 지워집니다.
 
-제6조 (제3자 제공)
+제6조 (이용·제공사실 확인자료)
+① 위치정보법 제16조 제2항에 따라, 이 앱은 위치정보를 수집·이용·제공할 때마다
+   그 사실을 저절로 기록합니다. 사람이 손으로 남기는 것이 아닙니다.
+② 남기는 것은 「언제 · 무엇에 쓰려고 · 수집인지 이용인지 제공인지」 이 셋뿐입니다.
+   좌표는 확인자료에 남기지 않습니다.
+   법이 요구하는 것은 「썼다는 사실」 이지 위치 그 자체가 아니기 때문입니다.
+③ 이 기록은 기기와 서버 양쪽에 둡니다. 서버의 것은 본인 말고는 아무도 볼 수 없습니다.
+   운영자도 볼 수 없습니다.
+④ 6개월이 지난 기록은 저절로 지워집니다.
+
+제7조 (확인자료 열람)
+위치정보법 제24조에 따라 이용자는 자기 확인자료를 언제든 볼 수 있습니다.
+앱의 [메뉴] → [내 위치정보 이용내역] 에서 바로 보실 수 있습니다.
+
+제8조 (제3자 제공)
 위치정보를 남에게 주지 않습니다. 법령에 따른 적법한 요구가 있을 때만 그에 따릅니다.
 
-제7조 (이용자의 권리)
+제9조 (이용자의 권리)
 이용자는 자기 위치정보의 수집·이용·제공에 대한 동의를 언제든 거둘 수 있고,
 저장된 자료를 보거나 지워 달라고 할 수 있습니다. 연락처: {EMAIL}
 
-제8조 (만 14세 미만)
+제10조 (만 14세 미만)
 이 앱은 만 14세 미만의 가입을 받지 않으므로 위치정보도 받지 않습니다.
 
-제9조 (위치정보관리책임자 및 문의)
+제11조 (위치정보관리책임자 및 문의)
 위치정보관리책임자: {OWNER}
 연락처: {EMAIL}
 위치정보에 관한 문의는 위 연락처로 해 주십시오.{LBS}
@@ -17631,20 +17803,38 @@ Article 4 (Coordinates stored on the server)
    posting, and you can delete them afterwards.
 
 Article 5 (Retention)
-Stored coordinates are kept until you delete them, or until you leave, and are then destroyed.
+1. Stored coordinates are kept until you delete them, or until you leave, and are then
+   destroyed.
+2. The confirmation data described in Article 6 is kept for six months from the time it is
+   recorded, and is then erased automatically.
 
-Article 6 (Disclosure to third parties)
+Article 6 (Confirmation data on collection, use and provision)
+1. As required by Article 16(2) of the Location Information Act, the App automatically
+   records the fact each time location information is collected, used or provided.
+   Nothing about this is done by hand.
+2. Only three things are recorded: when, what it was used for, and whether it was a
+   collection, a use or a provision. Coordinates are not recorded in the confirmation data,
+   because what the law requires is a record of when location was used, not the location.
+3. This record is kept both on your device and on the server. Nobody but you can read the
+   copy on the server - not even the operator.
+4. Records older than six months are erased automatically.
+
+Article 7 (Reading your confirmation data)
+Under Article 24 of the Location Information Act you may read your own confirmation data at
+any time. It is in the App under [Menu] - [My location use history].
+
+Article 8 (Disclosure to third parties)
 Location information is not given to anyone else. It is disclosed only where there is a
 lawful requirement to do so.
 
-Article 7 (Your rights)
+Article 9 (Your rights)
 You may withdraw consent to the collection, use and provision of your location information
 at any time, and you may ask to see or delete what is stored. Contact: {EMAIL}
 
-Article 8 (Children under 14)
+Article 10 (Children under 14)
 The App does not accept anyone under 14, so no location information is received from them.
 
-Article 9 (Location information manager and enquiries)
+Article 11 (Location information manager and enquiries)
 Location information manager: {OWNER}
 Contact: {EMAIL}
 Please direct enquiries about location information to the contact above.{LBS}
@@ -17925,22 +18115,39 @@ location: { title: 'Условия использования данных о м
    а после публикации — удалить.
 
 Статья 5 (Срок хранения)
-Сохранённые координаты хранятся до их удаления вами либо до выхода из сервиса,
-после чего уничтожаются.
+1. Сохранённые координаты хранятся до их удаления вами либо до выхода из сервиса,
+   после чего уничтожаются.
+2. Записи об использовании из статьи 6 хранятся шесть месяцев с момента записи,
+   после чего стираются автоматически.
 
-Статья 6 (Передача третьим лицам)
+Статья 6 (Записи об использовании: сбор, использование, передача)
+1. Согласно пункту 2 статьи 16 Закона о данных о местоположении, Приложение
+   автоматически фиксирует сам факт каждого сбора, использования или передачи
+   данных о местоположении. Вручную ничего не заносится.
+2. Фиксируются только три вещи: когда, для чего и что именно произошло —
+   сбор, использование или передача. Координаты в эти записи не заносятся,
+   поскольку закон требует подтверждать факт использования, а не само местоположение.
+3. Записи хранятся и на устройстве, и на сервере. Серверную копию не видит никто,
+   кроме вас, — в том числе оператор.
+4. Записи старше шести месяцев стираются автоматически.
+
+Статья 7 (Просмотр записей об использовании)
+Согласно статье 24 Закона о данных о местоположении вы вправе в любой момент
+просмотреть свои записи. Они находятся в Приложении: [Меню] - [Мои записи о местоположении].
+
+Статья 8 (Передача третьим лицам)
 Данные о местоположении не передаются третьим лицам. Раскрытие возможно только
 по законному требованию.
 
-Статья 7 (Права пользователя)
+Статья 9 (Права пользователя)
 Вы вправе в любой момент отозвать согласие на сбор, использование и передачу данных
 о вашем местоположении, а также потребовать показать или удалить сохранённые данные.
 Контакт: {EMAIL}
 
-Статья 8 (Лица младше 14 лет)
+Статья 10 (Лица младше 14 лет)
 Приложение не принимает лиц младше 14 лет, поэтому данные об их местоположении не собираются.
 
-Статья 9 (Ответственный за данные о местоположении и вопросы)
+Статья 11 (Ответственный за данные о местоположении и вопросы)
 Ответственный за данные о местоположении: {OWNER}
 Контакт: {EMAIL}
 С вопросами о данных местоположения обращайтесь по указанному контакту.{LBS}
@@ -17985,6 +18192,53 @@ function legalText(k, v){
     .split('{LBS}').join(lbs)
     .trim();
 }
+
+// ── 내 위치정보 이용내역 (위치정보법 제24조 — 본인은 언제든 볼 수 있어야 한다)
+// ★ 이 화면이 없으면 기록을 남겨 두고도 위반이다.
+function lgWhen(ts){
+  const d = new Date(ts);
+  if(!isFinite(d.getTime())) return '';
+  const p = n => String(n).padStart(2,'0');
+  return p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function lgDay(ts){
+  const d = new Date(ts);
+  if(!isFinite(d.getTime())) return '';
+  const p = n => String(n).padStart(2,'0');
+  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
+}
+function lgRowHtml(r){
+  const span  = (r.from && r.to)
+    ? ' · ' + esc(lgWhen(r.from)) + '~' + esc(lgWhen(r.to)) : '';
+  const many  = r.n > 0 ? ' · ' + esc(tsub('{n}개 지점', { n: r.n })) : '';
+  return `<div class="fleet" style="cursor:default">
+    <div class="fmain">
+      <div class="fname">${esc(t(r.w || '위치'))}</div>
+      <div class="fsub">${esc(lgWhen(r.ts))} · ${esc(t(r.k || '수집'))}${span}${many}</div>
+    </div></div>`;
+}
+function openLocLog(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  const days = [];
+  lgList().forEach(r=>{
+    const d = lgDay(r.ts);
+    if(!days.length || days[days.length-1].d !== d) days.push({ d: d, rows: [] });
+    days[days.length-1].rows.push(r);
+  });
+  const body = days.map(g =>
+    `<div class="lgday">${esc(g.d)}</div>` + g.rows.map(lgRowHtml).join('')).join('');
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('내 위치정보 이용내역'))}</b><span style="flex:1"></span></div>
+    <div class="lgnote">
+      ${esc(t('앱이 위치를 쓸 때마다 저절로 남는 기록입니다.'))}<br>
+      ${esc(t('언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.'))}<br>
+      ${esc(t('6개월이 지난 것은 저절로 지워집니다.'))}</div>
+    ${body || `<div class="mrnone">${esc(t('아직 위치를 쓴 적이 없습니다.'))}</div>`}
+    <div style="height:24px"></div>`;
+  showPanel(P);
+  setHeadTitle('내 위치정보 이용내역');
+}
+
 function openLegal(k){
   const key = LEGAL_DOCS[k] ? k : 'terms';
   const P = document.getElementById('mrPanel');
@@ -19191,7 +19445,7 @@ function spotPickPlace(){
 }
 function spotUseGPS(quiet){
   if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
-  navigator.geolocation.getCurrentPosition(
+  geoGet('정박지 자리 잡기',
     p=>{
       if(!mapS) return;
       mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
@@ -19431,6 +19685,8 @@ async function spotSave(){
   if(!st.ok){ alert(storeShortMsg(st.dropped, t('한 자리'))); return; }
   try{
     await window.__spots.put(body);
+    // ★ 좌표가 남에게 나간다 — 수집이 아니라 제공이다.
+    try{ lgAdd('제공', '정박지 자리를 커뮤니티에 올림'); }catch(e){}
     const i = spotList.findIndex(x=>String(x.id)===String(body.id));
     if(i >= 0) spotList[i] = body; else spotList.unshift(body);
     spotPickCtx = null;
@@ -19781,7 +20037,7 @@ function legRow(label, placeKey, timeKey, wxKey, it){
     ? `<input value="${esc(String(it[placeKey]||''))}" placeholder="${esc(t('지명'))}" style="flex:1;min-width:60px" onchange="mrField('${placeKey}',this.value)">`
     : `<b class="mrv" style="flex:1">${esc(it[placeKey]||'—')}</b>`;
   const time = unlocked
-    ? `<input type="time" value="${esc(hm(it[timeKey]||''))}" style="width:110px" onchange="voyTime('${timeKey}','${wxKey}',this.value)">`
+    ? `<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it[timeKey]||''))}" onchange="hmChange(this, v => voyTime('${timeKey}','${wxKey}', v))">`
     : `<b class="mrv">${esc(it[timeKey] ? hm(it[timeKey]) : '—')}</b>`;
   return `<div class="mrrow"><span class="mrlbl">${label}</span>${place}${time}</div>`
        + wxLine(it[wxKey], it[timeKey] ? `wxCapture('${wxKey}')` : '')
@@ -19842,6 +20098,31 @@ function arriveNow(){
 
 // 시각 문자열을 항상 HH:MM 으로 맞춘다.
 // 어디서 들어왔든 '13:1' 같은 모양이 화면에 나오면 안 된다.
+// ===== 시각 칸 =====
+// ★ 예전에는 <input type="time"> 을 썼다. 폰에서 이걸 열면 바늘시계가 뜬다.
+//   흔들리는 배 위에서 바늘을 돌려 시각을 맞추는 것은 고역이다.
+//   이제 숫자만 친다 — 1830 이면 18:30, 830 이면 08:30.
+//   콜론은 앱이 넣고, 폰에서는 숫자 자판이 바로 올라온다.
+function hmType(el){
+  const d = String(el.value || '').replace(/\D/g, '').slice(0, 4);
+  el.value = d.length > 2 ? d.slice(0, 2) + ':' + d.slice(2) : d;
+}
+// 사람이 친 것을 HH:MM 으로 읽는다. 못 읽으면 null (부르는 쪽이 말해 준다).
+function hmParse(v){
+  const d = String(v == null ? '' : v).replace(/\D/g, '');
+  if(!d) return '';                       // 비운 것은 '지움' 이다 — 흠이 아니다
+  const h = (d.length <= 2) ? Number(d) : Number(d.slice(0, d.length - 2));
+  const m = (d.length <= 2) ? 0          : Number(d.slice(-2));
+  if(!(h >= 0 && h <= 23) || !(m >= 0 && m <= 59)) return null;
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+// 시각 칸이 바뀌었을 때 — 읽고, 다듬어 칸에 도로 넣고, 넘긴다.
+function hmChange(el, fn){
+  const v = hmParse(el.value);
+  if(v === null){ alert(t('시각을 0000~2359 사이로 넣어 주세요.')); el.value = ''; return; }
+  el.value = v;
+  fn(v);
+}
 function hm(v){
   const m = String(v||'').trim().match(/^(\d{1,2})\s*[:시]?\s*(\d{1,2})$/);
   if(!m) return String(v||'');
@@ -19961,7 +20242,7 @@ function logRows(it){
   return head + arr.map(g=>{
     const row = unlocked
       ? `<div class="mrrow" style="gap:6px;flex-wrap:wrap">
-           <input class="logtime" type="time" value="${esc(hm(g.time||''))}" onchange="logField('${g.id}','time',this.value)">
+           <input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(g.time||''))}" onchange="hmChange(this, v => logField('${g.id}','time', v))">
            <select class="logkind" onchange="logField('${g.id}','kind',this.value)">${
              logKinds().map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${esc(t(x))}</option>`).join('')}</select>
            <input class="logtext" value="${esc(String(g.text||''))}" placeholder="${esc(t('내용'))}" onchange="logField('${g.id}','text',this.value)">
@@ -20427,7 +20708,8 @@ function posHere(key, vid, quiet, done){
   const draw = ()=>{ if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id); };
   posPut(it, key, { lat:null, lon:null, acc:null, pending:true });
   draw();
-  navigator.geolocation.getCurrentPosition(
+  geoGet(String(key).startsWith('log:') ? '항해일지 중간 기록 위치'
+         : (key === 'wxOut' ? '항해일지 출발 위치' : '항해일지 도착 위치'),
     p=>{
       posPut(it, key, { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5),
                         acc: (typeof p.coords.accuracy==='number' && isFinite(p.coords.accuracy))
@@ -21824,7 +22106,7 @@ function wxUseGPS(){
   if(!navigator.geolocation){ alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
   const st = document.getElementById('wxStatus');
   if(st) st.textContent = t('현재 위치 확인 중…');
-  navigator.geolocation.getCurrentPosition(
+  geoGet('지금 있는 곳 날씨·물때',
     p=>{
       wxCur = { id:'gps', name:t('현재 위치'), lat:p.coords.latitude, lon:p.coords.longitude, region: wxNearestRegion(p.coords.latitude, p.coords.longitude) };
       wxSet('bt_wxcur', wxCur); wxData=null; renderWeather();
@@ -21915,7 +22197,7 @@ function wxSpotPick(cur){
 }
 function wxSpotGPS(quiet){
   if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
-  navigator.geolocation.getCurrentPosition(
+  geoGet('날씨 지점 잡기',
     p=>{
       if(!mapS) return;
       mapS.pick = { lat:+p.coords.latitude.toFixed(5), lon:+p.coords.longitude.toFixed(5) };
@@ -23224,6 +23506,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         return snap.docs.map(d=>d.data());
       },
       async edit(id, patch){ await setDoc(doc(fdb,'support',String(id)), patch, { merge:true }); }
+    };
+    // ── 위치정보 이용·제공사실 확인자료 (위치정보법 제16조 제2항)
+    // ★ 사람마다 방이 갈린다. 남의 것은 규칙에서 아예 막았다.
+    //   기기가 망가져도 남아야 하므로 클라우드에도 둔다 — 대신 본인 말고는 아무도 못 본다.
+    window.__loclog = {
+      async put(rows){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid || !Array.isArray(rows) || !rows.length) return 0;
+        let n = 0;
+        for(let off=0; off<rows.length; off+=200){
+          const b = writeBatch(fdb);
+          rows.slice(off, off+200).forEach(o=>{
+            b.set(doc(fdb, 'loclog', uid, 'rows', String(o.id)),
+                  { id:String(o.id), ts:String(o.ts||''), k:String(o.k||''),
+                    w:String(o.w||''), n:(o.n||0), from:String(o.from||''), to:String(o.to||'') });
+            n++;
+          });
+          await b.commit();
+        }
+        return n;
+      },
+      // ★ 화면은 이것을 안 부른다. 기기에 있는 것을 그대로 보여 준다.
+      //   이건 폰을 바꿨을 때 되찾아 오는 길이다 — 그래서 나눠 받는다.
+      //   한 번에 통째로 받으면 열 때마다 요금이 샌다 (pagetest.js 가 잡는다).
+      async list(after){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid) return { rows: [], last: null, done: true };
+        const parts = [collection(fdb,'loclog',uid,'rows'), orderBy('ts','desc')];
+        if(after) parts.push(startAfter(after));
+        parts.push(limit(100));
+        const snap = await getDocs(query.apply(null, parts));
+        return { rows: snap.docs.map(d=>d.data()),
+                 last: snap.docs.length ? snap.docs[snap.docs.length-1] : null,
+                 done: snap.docs.length < 100 };
+      },
+      async del(ids){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid || !Array.isArray(ids) || !ids.length) return;
+        for(let off=0; off<ids.length; off+=200){
+          const b = writeBatch(fdb);
+          ids.slice(off, off+200).forEach(id=> b.delete(doc(fdb,'loclog',uid,'rows',String(id))));
+          await b.commit();
+        }
+      }
     };
     window.__initCloud(api);
   }catch(e){

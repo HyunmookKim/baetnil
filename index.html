@@ -1768,7 +1768,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1928;
+const LANG_TOTAL = 1951;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3762,6 +3762,25 @@ const I18N = {
     '날씨 지점 잡기':'Setting a weather spot',
     '정박지 자리를 커뮤니티에 올림':'Posting a berth position to the community',
     '항해 항적 기록':'Recording a voyage track',
+  
+
+    // ── 4.12
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\n\nDo you agree?\n(You can withdraw at any time under Menu - My location use history.)',
+    '위치정보 수집 동의 거두기':'Withdraw location consent',
+    '위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.':'Withdraw your consent to location collection?\n\nFeatures such as "Here now" and weather for your current position will stop working.\nCoordinates already saved stay as they are - you can delete them individually in the logbook.',
+    '내려받기':'Download',
+    '지금은 동의하신 상태입니다.':'You have currently agreed.',
+    '지금은 동의하지 않으신 상태라 위치를 받지 않습니다.':'You have not agreed, so no location is being received.',
+    '접근':'Accessed',
+    '위치정보 수집 동의를 거둠':'Withdrew location consent',
+    '클라우드에서 항해 좌표를 받음':'Received voyage coordinates from the cloud',
+    '위치정보 수집에 동의':'Agreed to location collection', '위치정보 수집에 동의하기':'Agree to location collection', '동의·철회':'Consent',
+  
+
+    // ── 4.13
+    '현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)':'Your current position is received only from signed-in members.\n\nWould you like to sign in?\n(You can still mark the spot on the map without signing in.)',
+    '현재 위치는 로그인하신 분에게만 받습니다.':'Current position is received only from signed-in members.',
+    '현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.':'Current position is received only from signed-in members. Nothing is being received right now.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5749,6 +5768,25 @@ const I18N = {
     '날씨 지점 잡기':'Выбор точки прогноза погоды',
     '정박지 자리를 커뮤니티에 올림':'Публикация места стоянки в сообществе',
     '항해 항적 기록':'Запись трека похода',
+  
+
+    // ── 4.12
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)':'Чтобы определить текущее местоположение, нужно согласие на использование данных о местоположении.\n\nСогласны?\n(Отозвать можно в любой момент: Меню — Мои записи о местоположении.)',
+    '위치정보 수집에 동의':'Согласие на сбор дано', '위치정보 수집에 동의하기':'Согласиться на сбор местоположения', '동의·철회':'Согласие',
+    '위치정보 수집 동의 거두기':'Отозвать согласие',
+    '위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.':'Отозвать согласие на сбор местоположения?\n\nПерестанут работать «Я здесь» и погода по текущему месту.\nУже сохранённые координаты останутся — их можно удалить по отдельности в судовом журнале.',
+    '내려받기':'Скачать',
+    '지금은 동의하신 상태입니다.':'Сейчас согласие дано.',
+    '지금은 동의하지 않으신 상태라 위치를 받지 않습니다.':'Согласие не дано, местоположение не принимается.',
+    '접근':'Доступ',
+    '위치정보 수집 동의를 거둠':'Согласие на сбор отозвано',
+    '클라우드에서 항해 좌표를 받음':'Получены координаты походов из облака',
+  
+
+    // ── 4.13
+    '현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)':'Текущее местоположение принимается только от вошедших в учётную запись.\n\nВойти?\n(Место можно отметить на карте и без входа.)',
+    '현재 위치는 로그인하신 분에게만 받습니다.':'Текущее местоположение принимается только от вошедших в учётную запись.',
+    '현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.':'Текущее местоположение принимается только от вошедших в учётную запись. Сейчас ничего не принимается.',
   }
 };
 
@@ -7869,6 +7907,11 @@ function openBoatSetup(){
 //   loclogtest.js 가 직접 부르는 곳이 남아 있으면 이름을 대고 잡는다.
 const LG_KEY    = 'bt_loclog';
 const LG_KEEP_D = 180;      // 6개월 — 위치정보법 제16조 제2항
+// ★ 확인자료에 좌표까지 남길 것인가.
+//   법이 요구하는 것은 「썼다는 사실」 이라고 읽어 기본은 끔으로 두었다.
+//   감독기관이 「좌표도 남기라」 고 하면 이 한 줄만 true 로 바꾸면 된다.
+//   켜면 lgAdd 가 좌표를 함께 담고, 화면과 내보내기에도 함께 나온다.
+const LG_KEEP_POS = false;
 const LG_MAX    = 3000;     // 기기에 쌓아 둘 최대 줄 수 (넘으면 오래된 것부터 밀린다)
 let lgRows = null;
 let lgUpTimer = null;
@@ -7905,6 +7948,11 @@ function lgAdd(k, w, extra){
   if(extra && extra.n > 0) row.n = Math.round(extra.n);
   if(extra && extra.from)  row.from = String(extra.from);
   if(extra && extra.to)    row.to   = String(extra.to);
+  // ★ 스위치가 꺼져 있으면 좌표를 넘겨도 들어가지 않는다.
+  if(LG_KEEP_POS && extra && extra.lat != null && extra.lon != null){
+    row.la = +Number(extra.lat).toFixed(5);
+    row.lo = +Number(extra.lon).toFixed(5);
+  }
   rows.unshift(row);
   lgRows = lgPrune(rows, Date.now()).slice(0, LG_MAX);
   lgSave();
@@ -7934,11 +7982,65 @@ async function lgPush(){
   }catch(e){}
 }
 
+
+// ── 위치정보 수집 동의 (위치정보법 제15조·제18조 — 동의 없이는 못 받는다)
+// ★ 4.11 까지 이 판정이 아무 데도 없었다.
+//   가입할 때 「위치정보 이용(선택)」 을 껐어도 「지금 여기」 를 누르면 GPS 를 읽었다.
+//   동의를 받아 두고도 안 지킨 셈이라 기록만 남기는 것보다 더 나쁜 흠이었다.
+function locOK(){
+  const a = (typeof agreeState === 'function') ? agreeState() : null;
+  return !!(a && a.loc);
+}
+// 켜고 끄기. 끄는 것이 곧 철회다 (법 제24조 제1항).
+function locSet(on){
+  let a = null;
+  try{ a = agreeState(); }catch(e){}
+  const body = Object.assign({}, a || { ver: LEGAL_VER, at: new Date().toISOString() },
+                             { loc: !!on, locAt: new Date().toISOString() });
+  try{ localStorage.setItem(AGREE_KEY, JSON.stringify(body)); }catch(e){}
+  try{ lgAdd('동의·철회', on ? '위치정보 수집에 동의' : '위치정보 수집 동의를 거둠'); }catch(e){}
+  try{ pushAgree(); }catch(e){}
+  return !!on;
+}
+// 동의를 안 했을 때 그 자리에서 묻는다.
+// ★ 「설정에 가서 켜세요」 는 배 위에서 쓸 수 있는 안내가 아니다.
+// ★ quiet 는 화면을 열자마자 저절로 부르는 자리다. 거기서 창을 띄우면 성가시다.
+function locAsk(quiet){
+  if(locOK()) return true;
+  if(quiet) return false;
+  const yes = confirm(t('위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)'));
+  if(!yes) return false;
+  locSet(true);
+  return true;
+}
+// ★ 로그인한 회원에게만 위치를 받는다.
+//   까닭 — 확인자료를 보존할 의무는 사업자에게 있는데, 로그인하지 않은 사람의 기록은
+//   그 폰에만 남아 지워지면 그만이다. 지킬 수 없는 약속을 하느니 아예 안 받는다.
+//   덕분에 「로그인 안 한 이용자의 개인위치정보」 라는 것이 이 앱에는 아예 없다.
+//   대신 홈포트·정박지·날씨 지점은 로그인 없이도 지도에서 직접 찍을 수 있다.
+function locSignedIn(){
+  return !!(typeof window !== 'undefined' && window.__user);
+}
+// 위치를 받아도 되는가 — 로그인과 동의, 둘 다 있어야 한다.
+function locMay(quiet){
+  if(!locSignedIn()){
+    if(!quiet && confirm(t('현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)'))){
+      try{ openAccount(); }catch(e){}
+    }
+    return false;
+  }
+  return locAsk(quiet);
+}
 // ★ 위치를 읽는 단 하나의 문.
 //   why 는 「무엇에 쓰려고」 다. 확인자료에 그대로 남는다.
 function geoGet(why, ok, err, opts){
   if(!navigator.geolocation){
     if(typeof err === 'function') err({ code:2, message:'geolocation unavailable' });
+    return;
+  }
+  // ★ 로그인과 동의가 먼저다. 기기 권한이 있어도 이 둘이 없으면 안 읽는다.
+  if(!locMay(!!(opts && opts.quiet))){
+    if(typeof err === 'function') err({ code:1, message:'not allowed' });
     return;
   }
   navigator.geolocation.getCurrentPosition(
@@ -7973,7 +8075,8 @@ function setupUseGPS(){
       say('현재 위치를 홈포트로 잡았습니다. 다르면 지도를 눌러 옮겨 주세요.');
     },
     ()=>{ say('위치를 가져오지 못했습니다. 지도를 눌러 홈포트 위치를 지정해 주세요.'); },
-    { enableHighAccuracy:false, timeout:10000, maximumAge:300000 }
+    // ★ 화면을 열면 저절로 불린다 — 로그인·동의를 여기서 캐묻지 않는다.
+    { enableHighAccuracy:false, timeout:10000, maximumAge:300000, quiet:true }
   );
 }
 function createBoat(){
@@ -8062,7 +8165,8 @@ function portUseGPS(quiet){
       mapPaint(true);
       const btn = document.getElementById('portSave'); if(btn) btn.disabled = false;
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); }
+    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
+    { quiet: !!quiet }
   );
 }
 function portPickCancel(){
@@ -12696,6 +12800,12 @@ async function cloudPull(){
     setSync('클라우드 비어있음');
     cloudSeedCheck();
   }
+  // ★ 접근사실을 남긴다 (시행령 제20조 제2항 제3호).
+  //   항해 기록에는 좌표가 들어 있다 — 그것을 받아 가는 것도 「접근」 이다.
+  try{
+    const withPos = (voyage || []).filter(v => v && (v.posOut || v.posIn)).length;
+    if(withPos > 0) lgAdd('접근', '클라우드에서 항해 좌표를 받음', { n: withPos });
+  }catch(e){}
   // ★ 로컬에 다 넣은 다음에 적어야 개수와 지문이 맞는다.
   //   클라우드가 비어 있으면(seeded 아님) 지난 셈은 거짓이 되므로 버린다.
   if(r.seeded) saveSyncBase(C); else clearSyncBase();
@@ -13266,7 +13376,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.11';
+const APP_VER = '4.13';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -17252,10 +17362,10 @@ function trRepaint(coll, id){
 //
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
-const LEGAL_VER  = '1.3';
+const LEGAL_VER  = '1.5';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
-const LEGAL_DATES = { ko:'2026년 8월 18일', en:'18 August 2026', ru:'18 августа 2026 г.' };
+const LEGAL_DATES = { ko:'2026년 8월 22일', en:'22 August 2026', ru:'22 августа 2026 г.' };
 const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
 // ★ 이름은 말마다 따로 적는다. 사전에 넣으면 자동 번역이 사람 이름을 건드린다.
 //   본인이 쓰는 표기가 있으므로 여기서만 고친다.
@@ -17264,7 +17374,16 @@ const LEGAL_OWNER = {
   names: { ko:'김명준', en:'Kim Myung Joon', ru:'Ким Мёнджун' },
   email: 'jaha814@gmail.com'
 };
-const LEGAL_BIZ = null;   // 사업자등록하면 { name:'상호', no:'000-00-00000', addr:'주소' }
+// ★ 2026-08-19 사업자등록을 마쳤다. 이것이 null 이면 약관에 「개인 자격으로 운영합니다」 라고
+//   나가는데, 이제 그것이 거짓말이다.
+const LEGAL_BIZ = {
+  name: '현묵', addr: '전남 여수시 선원7길 38 101호',   // 정본(한국어)·예전 코드 호환
+  names: { ko:'현묵', en:'Hyunmook', ru:'Хёнмук' },
+  addrs: { ko:'전남 여수시 선원7길 38 101호',
+           en:'101, 38 Seonwon 7-gil, Yeosu-si, Jeollanam-do, Republic of Korea',
+           ru:'Республика Корея, пров. Чолла-Намдо, г. Ёсу, Сонвон 7-гиль 38, оф. 101' },
+  no: '626-19-02739'
+};
 // 위치기반서비스사업 신고를 마치면 신고번호를 여기 적는다 (예: '제2026-00호').
 // ★ 이 앱은 GPS 좌표를 항해 기록으로 서버에 저장하므로 신고 면제 대상이 아니다.
 const LEGAL_LBS = null;
@@ -17486,12 +17605,16 @@ location: { title: '위치정보 이용약관', body: `
  · 이용자가 남긴 항해 항로를 그리기 위해
 
 제3조 (현재 위치)
-① 현재 위치(GPS)는 이용자가 기기에서 허락한 때에만 받습니다.
+① 현재 위치(GPS)는 ㉮ 로그인한 회원이고, ㉯ 위치정보 이용에 동의했으며,
+   ㉰ 기기에서 허락한 때, 이 셋이 모두 갖추어진 때에만 받습니다.
+   로그인하지 않은 분의 현재 위치는 받지 않습니다.
+   (홈포트·정박지·날씨 지점은 로그인 없이도 지도에서 직접 찍으실 수 있습니다.)
 ② 받은 값은 쓰임에 따라 둘로 갈립니다.
    1. 날씨 지점을 잡는 데 쓰는 값 — 기기 안에만 두고 서버로 보내지 않습니다.
    2. 항해일지의 출발·중간기록·도착에 남기는 값 — 그 항해 기록의 일부로 서버에 저장됩니다.
 ③ 허락을 거절해도 앱은 모두 쓸 수 있습니다. 지점을 직접 고르시면 됩니다.
-④ 허락은 기기 설정에서 언제든 거둘 수 있습니다.
+④ 위치정보 이용 동의는 [메뉴] → [내 위치정보 이용내역] 에서 언제든 거두실 수 있습니다.
+   기기 설정에서 거두셔도 됩니다.
 
 제4조 (서버에 저장되는 좌표)
 ① 홈포트·정박지 좌표는 이용자가 지도에서 직접 찍은 값입니다.
@@ -17784,13 +17907,18 @@ Article 2 (What it is used for)
  · to draw the routes you record in the logbook
 
 Article 3 (Current position)
-1. Your current position (GPS) is received only when you permit it on your device.
+1. Your current position (GPS) is received only when all three of the following hold:
+   (a) you are signed in, (b) you have agreed to the use of location information, and
+   (c) you have permitted it on your device.
+   The current position of someone who is not signed in is never received.
+   (Home port, berths and weather spots can be marked on the map without signing in.)
 2. What happens to the value depends on how it is used:
    a. to set a weather spot - it stays on your device and is not sent to the server;
    b. to record a departure, waypoint or arrival in the logbook - it is stored on the
       server as part of that voyage record.
 3. You can use the whole App if you refuse. Simply choose a spot yourself.
-4. You may withdraw permission at any time in your device settings.
+4. You may withdraw your consent at any time under [Menu] - [My location use history],
+   or in your device settings.
 
 Article 4 (Coordinates stored on the server)
 1. Home port and berth coordinates are values you mark on the map yourself.
@@ -18095,14 +18223,19 @@ location: { title: 'Условия использования данных о м
  · чтобы строить маршруты, записанные вами в судовом журнале
 
 Статья 3 (Текущее местоположение)
-1. Текущее местоположение (GPS) принимается только при вашем разрешении на устройстве.
+1. Текущее местоположение (GPS) принимается только при одновременном соблюдении трёх условий:
+   (a) вы вошли в учётную запись, (b) вы согласились на использование данных
+   о местоположении, (c) вы разрешили это на устройстве.
+   Местоположение тех, кто не вошёл в учётную запись, не принимается вовсе.
+   (Порт приписки, стоянки и точки погоды можно отметить на карте и без входа.)
 2. Дальнейшая судьба значения зависит от того, для чего оно используется:
    a. для выбора точки прогноза погоды — остаётся только на устройстве
       и на сервер не передаётся;
    b. для записи выхода, промежуточной записи или прихода в судовом журнале —
       сохраняется на сервере как часть этой записи о походе.
 3. При отказе Приложением можно пользоваться полностью — выберите точку вручную.
-4. Разрешение можно отозвать в настройках устройства в любой момент.
+4. Согласие можно отозвать в любой момент: [Меню] - [Мои записи о местоположении],
+   либо в настройках устройства.
 
 Статья 4 (Координаты, хранящиеся на сервере)
 1. Координаты порта приписки и стоянок вы отмечаете на карте сами.
@@ -18171,10 +18304,15 @@ function legalText(k, v){
   if(!d) return '';
   // ★ 사업자·신고번호 줄도 말마다 적는 법이 다르다. 사전이 아니라 여기서 만든다 —
   //   약관 본문은 사전을 타지 않고 말별 정본을 그대로 쓰기 때문이다.
+  // ★ 상호·주소도 말마다 따로 적는다. 한국어를 그대로 넣으면
+  //   영어·러시아어 약관에 한글이 섞여 나간다 (legaltest.js 가 잡는다).
+  // ★ 이 함수는 혼자 떼어내도 돌아가야 하므로 도우미도 안에 둔다.
+  const bizN = (b, lg) => (b.names && b.names[lg]) || b.name;
+  const bizA = (b, lg) => (b.addrs && b.addrs[lg]) || b.addr;
   const BIZ_FMT = {
-    ko: b => ` 상호 ${b.name}, 사업자등록번호 ${b.no}, 주소 ${b.addr}.`,
-    en: b => ` Business name ${b.name}, business registration number ${b.no}, address ${b.addr}.`,
-    ru: b => ` Наименование ${b.name}, регистрационный номер ${b.no}, адрес ${b.addr}.`
+    ko: b => ` 상호 ${bizN(b,'ko')}, 사업자등록번호 ${b.no}, 주소 ${bizA(b,'ko')}.`,
+    en: b => ` Business name ${bizN(b,'en')}, business registration number ${b.no}, address ${bizA(b,'en')}.`,
+    ru: b => ` Наименование ${bizN(b,'ru')}, регистрационный номер ${b.no}, адрес ${bizA(b,'ru')}.`
   };
   const LBS_FMT = {
     ko: v => `\n위치기반서비스사업 신고번호: ${v}`,
@@ -18217,6 +18355,36 @@ function lgRowHtml(r){
       <div class="fsub">${esc(lgWhen(r.ts))} · ${esc(t(r.k || '수집'))}${span}${many}</div>
     </div></div>`;
 }
+// ★ 법 제24조는 「열람」 만이 아니라 「고지를 요구」 할 권리다.
+//   화면으로 보여 주는 데서 그치지 않고 손에 쥐여 준다.
+function lgExport(){
+  const rows = lgList();
+  if(!rows.length){ alert(t('아직 위치를 쓴 적이 없습니다.')); return; }
+  const head = ['일시','갈래','무엇에','지점수','시작','끝']
+    .concat(LG_KEEP_POS ? ['위도','경도'] : []);
+  const esc2 = v => '"' + String(v == null ? '' : v).split('"').join('""') + '"';
+  const line = r => [ r.ts, r.k, r.w, (r.n || ''), (r.from || ''), (r.to || '') ]
+    .concat(LG_KEEP_POS ? [ (r.la == null ? '' : r.la), (r.lo == null ? '' : r.lo) ] : [])
+    .map(esc2).join(',');
+  // ★ 엑셀이 UTF-8 을 알아보게 BOM 을 앞에 붙인다. 없으면 한글이 깨진다.
+  const csv = '﻿' + head.map(esc2).join(',') + '\n' + rows.map(line).join('\n') + '\n';
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  const d = new Date(), pad = n => String(n).padStart(2,'0');
+  a.href = URL.createObjectURL(blob);
+  a.download = `baetnil-location-log-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+// 동의를 앱 안에서 거두거나 다시 준다 (법 제24조 제1항 제1호)
+function lgToggleConsent(){
+  if(locOK()){
+    if(!confirm(t('위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.'))) return;
+    locSet(false);
+  } else {
+    locSet(true);
+  }
+  openLocLog();
+}
 function openLocLog(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
@@ -18232,7 +18400,17 @@ function openLocLog(){
     <div class="lgnote">
       ${esc(t('앱이 위치를 쓸 때마다 저절로 남는 기록입니다.'))}<br>
       ${esc(t('언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.'))}<br>
+      ${esc(t('현재 위치는 로그인하신 분에게만 받습니다.'))}<br>
       ${esc(t('6개월이 지난 것은 저절로 지워집니다.'))}</div>
+    <div class="mrrow" style="padding:0 12px 4px;gap:8px">
+      ${locSignedIn() ? `<button class="mrbtn${locOK()?' warn':' ok'}" style="flex:1" onclick="lgToggleConsent()">${
+        esc(locOK() ? t('위치정보 수집 동의 거두기') : t('위치정보 수집에 동의하기'))}</button>`
+        : `<button class="mrbtn ok" style="flex:1" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button>`}
+      <button class="mrbtn" onclick="lgExport()">${esc(t('내려받기'))}</button></div>
+    <div class="mrnone" style="text-align:left;padding-top:0">${
+      esc(!locSignedIn() ? t('현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.')
+          : locOK() ? t('지금은 동의하신 상태입니다.')
+                    : t('지금은 동의하지 않으신 상태라 위치를 받지 않습니다.'))}</div>
     ${body || `<div class="mrnone">${esc(t('아직 위치를 쓴 적이 없습니다.'))}</div>`}
     <div style="height:24px"></div>`;
   showPanel(P);
@@ -18325,6 +18503,9 @@ function doAgree(){
 // 로그인한 사람의 동의 기록은 클라우드에도 남긴다.
 // 나중에 "동의받았다" 를 보여야 할 일이 생긴다. 기기에만 두면 지워진다.
 async function pushAgree(){
+  // ★ 로그인 전에 쌓인 확인자료를 여기서 올린다.
+  //   안 그러면 로그인 안 하고 쓴 동안의 기록이 그 폰에만 남아 사라진다.
+  try{ lgPush(); }catch(e){}
   const a = agreeState();
   if(!a || !window.__people || !window.__people.mark) return;
   try{ await window.__people.mark({ agreeVer: a.ver, agreeAt: a.at, agreeLoc: !!a.loc }); }catch(e){}
@@ -19455,7 +19636,8 @@ function spotUseGPS(quiet){
       mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
       mapPaint(true);
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.')); }
+    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.')); },
+    { quiet: !!quiet }
   );
 }
 function spotPlaceNext(){
@@ -20723,7 +20905,7 @@ function posHere(key, vid, quiet, done){
       if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'));
       fin();
     },
-    { enableHighAccuracy:true, timeout:15000, maximumAge:10000 }
+    { enableHighAccuracy:true, timeout:15000, maximumAge:10000, quiet: !!quiet }
   );
 }
 function posClear(key){
@@ -22207,7 +22389,8 @@ function wxSpotGPS(quiet){
       mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
       mapPaint(true);
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); }
+    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
+    { quiet: !!quiet }
   );
 }
 function wxSpotSave(){

@@ -1,7 +1,115 @@
 {
- "updated": "2026-08-19T21:14:23.624Z",
- "candidates": 83,
+ "updated": "2026-08-23T21:09:11.238Z",
+ "candidates": 69,
  "items": [
+  {
+   "title": "Musto Coastal Sailing Jackets",
+   "t_ko": "뮤스토 연안 항해용 재킷",
+   "s_ko": "연안 항해용 브리튼 자켓은 급변하는 날씨와 파도 스프레이에 대응하도록 설계되었다.\n완전 봉제 처리와 방수 기능으로 Ocean Tech™ 표준을 충족한다.",
+   "cat": "장비",
+   "link": "https://www.sail-world.com/news/299102/?source=rss",
+   "source": "Sail-World",
+   "date": "2026-08-23T15:09:00.000Z"
+  },
+  {
+   "title": "Tinker dinghy: the inflatable boat that could do it all!",
+   "t_ko": "팅커 디nghy: 다목적 항해용 보트의 원조",
+   "s_ko": "팅커는 초기 범용 풍선 디nghy 중 하나로, 베르뮤다 범선 장비를 갖췄다.\n스코틀랜드 호수에서의 항해 경험 사례를 통해 소형 요트의 실용성을 보여준다.",
+   "cat": "장비",
+   "link": "https://www.pbo.co.uk/boats/tinker-dinghy-the-inflatable-boat-that-could-do-it-all-106255",
+   "source": "PBO",
+   "date": "2026-08-21T07:37:47.000Z"
+  },
+  {
+   "title": "Veya 53 – a new paradigm for powercats",
+   "t_ko": "베야 53: 전동 쌍동선의 새로운 패러다임",
+   "s_ko": "분수펜 파조와 쿠아시 카타마란이 공동으로 창설한 프리미엄 파워 카타마란 브랜드 베야가 베야 53을 출시한다.\n9월 칸 요팅 페스티벌에서 월드 프리미어를 선보일 예정이다.",
+   "cat": "산업",
+   "link": "https://www.yachtingworld.com/promotional-feature/veya-53-a-new-paradigm-for-powercats-163768",
+   "source": "Yachting World",
+   "date": "2026-08-21T05:05:42.000Z"
+  },
+  {
+   "title": "Significant storm suspends offshore race",
+   "t_ko": "팔레르모-몬테카를로 레이스 악천후로 일시 중단",
+   "s_ko": "시칠리아에서 모나코로 향하는 437해리 팔레르모-몬테카를로 레이스에서 39척이 참가했으나, 8월 18일 출발 후 일부 선박들이 악천후 예보에 따라 경기가 일시 중단되었다.\n선주들은 기상 모델의 일관된 악천후 예보를 확인하고 항로 변경이나 정박을 고려해야 한다.",
+   "cat": "안전",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/20/significant-storm-suspends-offshore-race/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-20T21:20:17.000Z"
+  },
+  {
+   "title": "Returning to where her story began",
+   "t_ko": "자신의 항해 역사로 돌아온 머피 선수",
+   "s_ko": "아일랜드 선수 애널리즈 머피는 2026 ILCA 6·7 월드 챔피언십이 모국에서 개최되자 올림픽 준비를 마치고 복귀를 결정했다.\n ILCA는 세계 거의 모든 곳에 함대가 있어 은퇴 후에도 경주를 계속할 수 있다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/20/returning-to-where-her-story-began/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-20T19:29:47.000Z"
+  },
+  {
+   "title": "When the boat goes boom",
+   "t_ko": "좌초 사고: 선원들의 경험담",
+   "s_ko": "마마로넥 항구 입구의 선박 바위(Ship Rock)에서 조류와 조위 변화에 따른 좌초 사건들이 빈번히 발생했다.\n수심이 얕은 구간과 조류가 강한 해역에서는 해도 숙지와 조위 계산이 중요하다.",
+   "cat": "사고",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/20/when-the-boat-goes-boom/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-20T18:46:22.000Z"
+  },
+  {
+   "title": "Swanwick Yachting Showcase line-up announced",
+   "t_ko": "스완윅 요팅 쇼케이스 개최 예정",
+   "s_ko": "영국 해밀 강의 스완윅 마리나에서 30척의 신형 요트와 20척 이상의 중고 요트를 전시하는 무료 행사가 열린다.\n지난의 선 오디세이 455 UK 데뷔 모델 등 다양한 신형선이 전시된다.",
+   "cat": "산업",
+   "link": "https://www.pbo.co.uk/news/swanwick-yachting-showcase-line-up-announced-106738",
+   "source": "PBO",
+   "date": "2026-08-20T14:41:54.000Z"
+  },
+  {
+   "title": "Understanding and making the most of sea breezes",
+   "t_ko": "해풍의 발생 원리와 항해 활용법",
+   "s_ko": "시몬 로웰이 해풍의 형성 메커니즘을 설명한다. 육지가 해수보다 빨리 데워져 3~4°C 온도차가 생기면 해풍이 발생한다.\n여름 고기압 아래에서 무풍 상태일 때 해풍을 예측하고 활용하면 항해 효율을 높일 수 있다.",
+   "cat": "항해술",
+   "link": "https://www.yachtingworld.com/homepage/understanding-and-making-the-most-of-sea-breezes-163811",
+   "source": "Yachting World",
+   "date": "2026-08-20T05:39:44.000Z"
+  },
+  {
+   "title": "Suit yourself and your sailing with Visicover boat insurance",
+   "t_ko": "비시커버 요트 보험으로 마음 놓고 항해하기",
+   "s_ko": "알리안츠가 인수한 비시커버는 온라인으로 요트 보험을 맞춤형으로 관리할 수 있다.\n숨겨진 수수료 없이 필요한 보장만 선택하는 유연한 보험 상품이다.",
+   "cat": "기타",
+   "link": "https://www.yachtingmonthly.com/promotional-feature/suit-yourself-and-your-sailing-with-visicover-boat-insurance-106012",
+   "source": "Yachting Monthly",
+   "date": "2026-08-20T05:23:53.000Z"
+  },
+  {
+   "title": "10 tips for boat heads to prevent blockages and odours",
+   "t_ko": "요트 화장실 유지보수 10가지 팁",
+   "s_ko": "원양 항해자 존 캐리가 요트 헤드 시스템의 막힘과 악취 방지를 위한 정비 방법과 트러블슈팅을 제시한다.\n화장실 시트를 고정하기, 적절한 세제 사용, 정기적 세척 등 예방적 유지보수가 고장을 막는 핵심이다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/10-tips-for-boat-heads-to-prevent-blockages-and-odours-106239",
+   "source": "PBO",
+   "date": "2026-08-20T04:47:57.000Z"
+  },
+  {
+   "title": "What can we learn from Charlie Dalin?",
+   "t_ko": "찰리 달린으로부터 배우다",
+   "s_ko": "솔로 항해자 찰리 달린이 6월에 사망했으며, 세계 항해 커뮤니티가 추모했다.\n그의 글로벌 명성과 영향력에 대해 다룬다.",
+   "cat": "기타",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/19/what-can-we-learn-from-charlie-dalin/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-19T23:43:19.000Z"
+  },
+  {
+   "title": "Apple doesn’t fall far from the tree",
+   "t_ko": "아버지의 성공이 아들을 키웠다: 브라질의 셰이트 부자",
+   "s_ko": "브라질의 로베르트 셰이트는 1996년 애틀란타 올림픽 라저급 금메달리스트로 20년 이상 지배했다.\n이제 아들 에릭 셰이트가 8월 19일 덴마크 오르후스에서 열린 ILCA 6 유스 월드 챔피언십 307명 선수 중 1위를 차지했다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/19/apple-doesnt-fall-far-from-the-tree/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-19T23:22:44.000Z"
+  },
   {
    "title": "The Ocean Race Atlantic to recognise ocean action",
    "t_ko": "The Ocean Race Atlantic 2026, 해양 행동 인식 결합",
@@ -66,6 +174,15 @@
    "date": "2026-08-18T23:35:41.000Z"
   },
   {
+   "title": "How racing made me a better sailor",
+   "t_ko": "경주가 나를 더 나은 항해자로 만들다",
+   "s_ko": "1991년 코네티컷 이스트 라임 고등학교 항해팀이 플라잉 주니어로 해안 경주를 했다.\n강한 조류와 변덕스러운 바람이 많은 템즈 강에서의 경주 경험을 통해 항해 기술을 습득했다.",
+   "cat": "항해술",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/18/how-racing-made-me-a-better-sailor/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-18T21:27:51.000Z"
+  },
+  {
    "title": "Stop obsessing over forecasts: My cure for sailing’s analysis paralysis – Lu Heikell",
    "t_ko": "기상 예보 집착 벗기: Lu Heikell의 분석 마비 극복법",
    "s_ko": "현대에는 이전보다 많은 기상 자료를 사용할 수 있지만, 예보에 집착하면 항구에 묶여 있게 된다.\n분석 과다로 항해를 미루는 경향에서 벗어나, 실제 항해로 경험을 쌓는 것이 중요하다.\n과도한 기상 분석보다 실행이 더 나은 항해자를 만든다는 조언이다.",
@@ -82,6 +199,15 @@
    "link": "https://www.pbo.co.uk/gear/seagull-outboard-the-best-in-the-world-106082",
    "source": "PBO",
    "date": "2026-08-18T04:46:40.000Z"
+  },
+  {
+   "title": "200 лет праздника",
+   "t_ko": "카우스 위크 200주년 축제",
+   "s_ko": "1826년 시작된 영국 카우스 위크는 지난 200년간 계속되어 올해는 37개 클래스 600척이 참가했다.\n1851년 미국 스쿠너 아메리카 우승, 1897년 빅토리아 여왕 컵 도입 등 역사적 사건들을 거쳤다.",
+   "cat": "산업",
+   "link": "https://yachtrussia.com/news/2026/08/18/20260818-200-let-prazdnika.html",
+   "source": "Yacht Russia",
+   "date": "2026-08-18T00:00:00.000Z"
   },
   {
    "title": "Rocks we will remember",
@@ -102,6 +228,15 @@
    "date": "2026-08-17T18:50:23.000Z"
   },
   {
+   "title": "Making impact toward more inclusivity",
+   "t_ko": "월드 세일링 2025 임팩트 리포트 공개",
+   "s_ko": "세일링의 사회 포용성, 환경 책임, 사회 책임에 대한 세계 항해 연맹의 진전을 담은 2025 임팩트 리포트가 발표되었다.\n'미래를 위한 준비 2025-2029' 전략과 연계하여 포용성 강화에 중점을 두고 있다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/17/making-impact-toward-more-inclusivity/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-17T16:40:54.000Z"
+  },
+  {
    "title": "Perhaps future isn’t here quite yet",
    "t_ko": "La Solitaire du Figaro 2026: AI 데이터 분석이 미래 항해 기술일까?",
    "s_ko": "1970년 창설된 La Solitaire du Figaro는 1인승 원양 경주 입문 무대로, 2026년 Figaro Bénéteau 3을 사용한다.\nJoss Creswell(GBR)은 AI 회사 digiLab의 보트 성능 데이터 및 기상 영향 분석을 받아 경주했다.\n데이터 기반 분석이 개별 선수 성능 예측을 어느 정도 지원할 수 있음을 시사한다.",
@@ -118,141 +253,6 @@
    "link": "https://www.pbo.co.uk/expert-advice/expert-answers/why-type-of-anode-should-i-be-using-when-regularly-flushing-an-engine-106050",
    "source": "PBO",
    "date": "2026-08-17T04:41:56.000Z"
-  },
-  {
-   "title": "From racing boats to protecting freedom",
-   "t_ko": "American Magic High Performance Center, Pensacola에서 2026년 1월 개관",
-   "s_ko": "2021 America's Cup 도전팀 American Magic은 2019년 Pensacola를 훈련 기지로 선택했다.\n정부 지원으로 American Magic High Performance Center가 2026년 1월 개관하여 세계 수준의 항해 및 성능 플랫폼을 제공한다.\nPensacola의 평수, 바람, 지역 지원이 훈련에 최적 조건을 갖춘다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/16/from-racing-boats-to-protecting-freedom/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-16T20:34:15.000Z"
-  },
-  {
-   "title": "Step onboard with Ancasta this September",
-   "t_ko": "앙카스타, 9월 유럽 보트쇼 3곳에서 주요 전시",
-   "s_ko": "선박 판매사 앙카스타가 9월 유럽 주요 보트쇼 3곳에서 대규모 전시를 통해 동력선과 요트 브랜드 비교 체험 기회를 제공한다.\n잠재 구매자들은 여러 선박을 직접 비교하고 탑승해볼 수 있다.\n신선 구매나 업그레이드를 검토하는 선주에게 정보 수집 기회다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/298914/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-16T17:30:00.000Z"
-  },
-  {
-   "title": "RORC Round Britain and Ireland Race day 8",
-   "t_ko": "조니 빈센트의 볼보 70 페이스호, RORC 50주년 영국-아일랜드 일주 레이스 완주",
-   "s_ko": "페이스호는 RORC 50주년 기념 영국-아일랜드 일주 경주(Round Britain and Ireland Race)를 완주하며 모노헐 라인 어너즈상을 획득했다.\n선주에게는 속력, 항로 계획, 개인적 의미가 담긴 원양 항해 경험이었다.\n50년 전통의 대형 크루징 레이스의 지속성을 보여준다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/298917/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-16T17:26:00.000Z"
-  },
-  {
-   "title": "America's Cup: Tudor Alinghi revealed",
-   "t_ko": "튜더 팀 알링기의 AC75 재구성 공개, 이탈리아 선창에서 진행 중",
-   "s_ko": "38차 아메리카 컵에 참여하는 튜더 팀 알링기(스페인)가 AC75 요트의 대규모 개조 작업을 공개했다.\n이탈리아의 건조 현장에서 카본 셸을 완전히 벗겨내 내부 구조와 상부 데크를 재구성하고 있다.\n2027년 경기를 앞두고 성능 최적화를 위한 재설계 과정을 진행 중이다.",
-   "cat": "장비",
-   "link": "https://www.sail-world.com/news/298912/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-16T13:51:00.000Z"
-  },
-  {
-   "title": "470 World Championship in Enoshima day 5",
-   "t_ko": "470급 세계선수권 에노시마 5일차: 골드·실버 플릿 진행, 메달 시리즈 진출팀 결정",
-   "s_ko": "470급 세계선수권이 일본 에노시마에서 진행 중이며, 5일차에 골드 플릿과 실버 플릿에서 3경주씩 진행됐다.\n상위 10개 팀이 메달 시리즈 최종 단계 진출 자격을 획득했다.\n내일 최종 단계 경주가 시작될 예정이다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/298909/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-16T11:06:04.000Z"
-  },
-  {
-   "title": "Hamilton Island Race Week 2026 Day 1",
-   "t_ko": "해밀턴 아일랜드 레이스 위크 첫날, 25노트 이상의 강풍과 거친 해역",
-   "s_ko": "2026 해밀턴 아일랜드 레이스 위크 첫날 주변 무역풍이 강하게 불어와 25노트 이상의 바람과 파도가 거친 항해 조건을 만들었다.\n주변 섬을 도는 경주(Around the Islands Race)에 참가한 선원들은 심각한 도전을 맞았다.\n크루징 보트의 선주는 이 지역의 계절풍 강도와 해역 상태를 사전에 파악하는 것이 중요하다.",
-   "cat": "기타",
-   "link": "https://www.sail-world.com/news/298908/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-16T09:37:40.000Z"
-  },
-  {
-   "title": "Под прицелом",
-   "t_ko": "이베리아 범고래의 요트 공격 지속되는 가운데 포격 의심 사진 등장",
-   "s_ko": "지난 2주간 포르투갈과 미국 해역에서 범고래 공격 사건이 보도되지 않았으나, SNS와 블로거 커뮤니티에서 여전히 활발히 논의되고 있다.\n유명한 이베리아 범고래 개체 '글래디스(별명 토니)'의 등지느러미 사진이 나타났는데, 산탄총이나 대형 산탄으로 인한 손상으로 추정되는 상처가 보인다.\n사진의 진위는 불명확하나 범고래 보호와 요트 안전 문제가 해양 커뮤니티의 주요 관심사로 부상했다.",
-   "cat": "안전",
-   "link": "https://yachtrussia.com/news/2026/08/16/20260816-pod-pricelom.html",
-   "source": "Yacht Russia",
-   "date": "2026-08-16T00:00:00.000Z"
-  },
-  {
-   "title": "24th Betina Regatta Preview",
-   "t_ko": "베티나 레가타 24회, 전통 래틴 세일 복원과 국제 크루 참가",
-   "s_ko": "라틴 세일(래틴 세일) 전통이 복원되는 가운데 베티나 레가타가 국제 크루를 초청해 개최된다.\n수백 년 해양 문화를 지닌 베티나 섬의 전통 함대가 중심이 된다.\n문화 유산으로서의 세일링 공동체를 보여주는 행사다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/298918/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-15T21:37:00.000Z"
-  },
-  {
-   "title": "Why a fuel system clean was the only way to get my engine working again",
-   "t_ko": "디젤 엔진 연료 시스템 완전 세척으로 정상 작동 복구",
-   "s_ko": "노틱캣 311호의 연료 분사 문제를 해결하기 위해 디젤 시스템 전체를 세척했다.\n연료 배분 밸브 3개, 엔진 오일 필터, 펌프 하우징 등을 제거해 내부 상태를 점검하고 정리했다.\n정기적인 연료 시스템 관리가 안정적인 엔진 운영의 핵심임을 보여준다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/why-a-fuel-system-clean-was-the-only-way-to-get-my-engine-working-again-106014",
-   "source": "PBO",
-   "date": "2026-08-14T04:14:57.000Z"
-  },
-  {
-   "title": "From the hostage boaters in Tyrell Bay",
-   "t_ko": "카리브해 타이렐 베이 마리나, 법정 분쟁으로 외국 요트 수십 척 갇혀",
-   "s_ko": "그레나다 카리아쿠 섬의 타이렐 베이 마리나에서 부동산 소유권 민사 분쟁이 진행 중인 가운데, 한쪽이 물리적 울타리를 설치해 방문한 국제 요트 수십 척이 육지에 갇혔다.\n이들 요트는 대부분 선주들의 영구 거주지이자 생계 수단이며, 정기 정비를 위해 입항한 상태다.\n법원 분쟁이 해결될 때까지 선박 출항이 불가능한 상황이 지속되고 있다.",
-   "cat": "사고",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/13/from-the-hostage-boaters-in-tyrell-bay/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-13T21:21:26.000Z"
-  },
-  {
-   "title": "Nominations for World Sailing Awards",
-   "t_ko": "2026 월드 세일링 어워즈 후보 모집, 11월 칭다오에서 시상",
-   "s_ko": "월드 세일링(국제 항해연맹)이 2026년 어워즈 후보를 공개 모집하고 있으며, 수상자는 11월 18일 중국 칭다오의 연례 컨퍼런스에서 발표된다.\n롤렉스 올해의 세일러, 신진 세일러, 환경·사회 임팩트상, 올해의 팀상 등 4개 부문이 있다.\n접수 기간은 2025년 10월 1일부터 2026년 9월 30일까지다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/13/nominations-for-world-sailing-awards/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-13T18:51:41.000Z"
-  },
-  {
-   "title": "How to bankrupt a company",
-   "t_ko": "웨스트 마린 파산 이후 해양 소매 유통의 혼란과 과제",
-   "s_ko": "웨스트 마린이 11장 파산 신청 후 델라웨어 파산 판사가 재편 계획을 승인했다.\n필자는 스루-홀 플러그 같은 소형 부품을 구하려다 근처 지점에서 30분간 찾지 못하고, 온라인 주문도 어려워 경쟁사 디펜더에서 구입해야 했다.\n파산 진행 중 재고 관리와 유통 체계 붕괴로 선주들의 정비 물품 구매 경로가 불안정해지고 있다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/13/how-to-bankrupt-a-company/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-13T14:55:49.000Z"
-  },
-  {
-   "title": "Offshore racing for next generation",
-   "t_ko": "차세대 원양 레이싱 세일러의 진입 장벽: 세대 간 유대의 위기",
-   "s_ko": "1974년부터 원양 경주에 참여해온 필자는 지난 50년간 원양 세일링이 세대 간 비공식적 계약으로 존속했음을 지적한다.\n경험 많은 선주가 배와 경비를 제공하고, 숙련 선원이 기술을 전하며, 젊은 선원이 에너지와 무게를 공급하는 구조다.\n이런 멘토링 체계가 흔들리면서 신세대 원양 선원의 진입 기회가 줄어들고 있다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/13/offshore-racing-for-next-generation/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-13T14:44:38.000Z"
-  },
-  {
-   "title": "Your Southampton International Boat Show 2026 Preview",
-   "t_ko": "사우스햄턴 국제 보트쇼 2026: 신형 보트와 겨울 정비 예산 계획의 기회",
-   "s_ko": "사우스햄턴 국제 보트쇼가 여름 시즌 종료 후 영국 최대 규모 해양 산업 행사로 개최된다.\n신형 보트의 첫 선보임과 갖춰진 장비를 직접 비교할 수 있으며, 겨울 정비 예산을 계획하는 선주들에게 중요한 정보 수집 기회다.\n각종 해양 거래사와 네트워킹하며 내년 원정을 준비할 수 있다.",
-   "cat": "산업",
-   "link": "https://www.yachtingmonthly.com/sponsored/your-southampton-international-boat-show-2026-preview-105994",
-   "source": "Yachting Monthly",
-   "date": "2026-08-13T05:33:50.000Z"
-  },
-  {
-   "title": "Laying ground tackle for swinging moorings",
-   "t_ko": "스톤 세일링 클럽의 DIY 스윙 무링 설치 프로젝트",
-   "s_ko": "영국 에식스의 블랙워터 강에 위치한 스톤 세일링 클럽은 회원들이 주도적으로 무링 앵커를 설치하는 협력 체계를 구축했다.\n항구 관리자와 채들러(물품 담당자)를 선출해 벌크 구입으로 비용을 절감하고, 대형 에어백(유니크 씨플렉스 제조)을 도입해 무링 양중과 설치 작업의 안전성과 효율성을 높였다.\n개별 선주가 자신의 무링 유지 책임을 지는 구조로 지역 커뮤니티의 실질적 운영 모델을 제시한다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/practical-projects/laying-ground-tackle-for-swinging-moorings-105994",
-   "source": "PBO",
-   "date": "2026-08-13T04:43:37.000Z"
   }
  ]
 }

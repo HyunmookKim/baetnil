@@ -1079,8 +1079,10 @@ header{background:linear-gradient(to bottom,rgba(10,24,40,.55),rgba(16,40,64,.18
 /* 도면 위 안내 글 */
 #hint,.fhint{color:var(--tm)}
 
-/* 전체 화면(내 배·명부·기록…)일 때 머리줄에는 한 줄만 남긴다 */
-body.panelfull header > *:not(.hrow){display:none!important}
+/* 전체 화면(내 배·명부·기록…)일 때 머리줄에는 한 줄만 남긴다.
+   ★ 화면 이름줄(#hNav)은 남긴다 — 안 남기면 어느 화면인지 알 수가 없다.
+     아래 두 곳과 1424 줄, 세 군데가 같은 규칙이다. 하나만 고치면 안 된다. */
+body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 
 /* ============ 화면 갈아 끼우기 ============ */
 /* ★ 이 앱에는 '뒤 화면 위에 얹히는 창' 이 여섯 가지 있었다.
@@ -1120,8 +1122,8 @@ body.panelfull header > *:not(.hrow){display:none!important}
 #mrPanel.open{display:block}
 #mrPanel.full{top:auto;bottom:auto;padding:14px 20px calc(86px + env(safe-area-inset-bottom))}
 
-/* 화면이 떠 있을 때 머리줄에는 한 줄만 남긴다 */
-body.panelfull header > *:not(.hrow){display:none!important}
+/* 화면이 떠 있을 때 머리줄에는 한 줄만 남긴다 (이름줄은 남긴다) */
+body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 
 /* ============ 2단계 — 전체 화면 안쪽 결 ============ */
 /* ★ 오늘·출항 전 점검과 같은 결로 맞춘다.
@@ -1523,9 +1525,30 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
   -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);
   mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
 
-/* ============ 4.11 — 내 위치정보 이용내역 ============ */
-.lgday{padding:12px 12px 4px;font-size:13px;color:var(--tm);font-weight:700;
-  letter-spacing:.02em;font-variant-numeric:tabular-nums}
+/* ============ 4.14 — 도면에서 골라 옮기기 ============ */
+#mvBanner{display:none;background:#122A1E;border:1px solid #2E6B4C;color:#8FE0B4;
+  font-size:14px;padding:11px 12px;text-align:center;border-radius:12px;
+  margin:10px 14px 0;line-height:1.6}
+#mvBanner b{color:#D8F5E6}
+/* 고를 수 있는 칸 — 눈에 띄게 */
+#map.mvpick .box{outline:2px dashed #3E8F68;outline-offset:-2px;cursor:pointer}
+#map.mvpick .box:active{background:#2E6B4C55}
+/* 지금 들어 있는 칸 — 여기서 빼는 것이다 */
+#map.mvpick .box.mvfrom{outline:2px solid #D9AE63;background:#D9AE6322}
+#map.mvpick .box.mvfrom span::after{content:' \2190';color:#D9AE63}
+
+/* ============ 4.16 — 동의 화면 ============ */
+.agrow{display:flex;align-items:flex-start;gap:10px;padding:6px 14px}
+.agchk{flex:0 0 auto;width:44px;height:44px;min-width:44px;
+  border:2px solid var(--bd2,#132433);background:var(--sf2,#132633);
+  border-radius:10px;color:transparent;font-size:22px;font-weight:800;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.agchk.on{background:var(--ac,#9CC6E8);border-color:var(--ac,#9CC6E8);color:var(--acd,#08131F)}
+.agtxt{flex:1;min-width:0;padding-top:11px;line-height:1.45;color:var(--tx)}
+.agtxt .agmust{font-weight:700}
+.agtxt .minib{margin-top:6px}
+
+/* ============ 4.11 — 위치정보 동의 안내 상자 ============ */
 /* ★ 안내문을 그냥 얹으면 새벽 배경의 수평선 위에서 글씨가 사라진다. 상자에 담는다. */
 .lgnote{margin:10px 12px;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;
   background:var(--sf);color:var(--tx);font-size:14px;line-height:1.65;text-align:left}
@@ -1582,6 +1605,8 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
   <input type="file" id="restoreFile" accept=".json,application/json" style="display:none" onchange="restoreData(event)">
 </header>
 
+<div id="mvBanner"><span id="mvBannerText"></span>
+  <button class="mrbtn" style="margin-left:8px" onclick="mvCancel()" data-t="취소">취소</button></div>
 <div id="mapWrap" style="display:none">
   <div id="map">
     <img id="fp" alt="평면도" data-talt="평면도">
@@ -1682,7 +1707,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()" data-t="언어 · Language">언어 · Language</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLocLog()" data-t="내 위치정보 이용내역">내 위치정보 이용내역</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()" data-t="언어 · Language">언어 · Language</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="배">배</span></button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-t="항해일지">항해일지</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 
 
@@ -1768,7 +1793,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1951;
+const LANG_TOTAL = 1963;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3781,6 +3806,28 @@ const I18N = {
     '현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)':'Your current position is received only from signed-in members.\n\nWould you like to sign in?\n(You can still mark the spot on the map without signing in.)',
     '현재 위치는 로그인하신 분에게만 받습니다.':'Current position is received only from signed-in members.',
     '현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.':'Current position is received only from signed-in members. Nothing is being received right now.',
+  
+
+    // ── 4.14
+    '도면에서 고르기':'Pick on the plan',
+    '이름으로 고르기 — 구역 선택…':'Pick by name - choose a zone...',
+    '옮길 칸을 도면에서 눌러 주세요':'Tap the locker on the plan',
+    '<b>{name}</b> — 넣을 칸을 도면에서 눌러 주세요':'<b>{name}</b> - tap the locker to put it in',
+    '이미 이 칸에 있습니다 — {name}':'Already in this locker - {name}',
+    '도면에 수납칸이 아직 없습니다.\n\n[도면 그리기] 로 칸을 먼저 만들어 주세요.':'There are no lockers on the plan yet.\n\nUse [Edit plan] to draw one first.',
+    '어디에 넣을까요':'Where should it go?',
+    '{locker} 안에 상자가 있습니다.':'There are boxes inside {locker}.',
+    '칸에 그대로 둡니다':'Leave it in the locker itself',
+    '이 상자 안에 넣습니다':'Put it inside this box',
+   
+  
+
+    // ── 4.15
+    '지금은 위치정보 수집에 동의하신 상태입니다.':'You have currently agreed to location collection.',
+  
+
+    // ── 4.16
+    '나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.':'If you later tap "Here now", we will ask you again right there.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5787,6 +5834,28 @@ const I18N = {
     '현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)':'Текущее местоположение принимается только от вошедших в учётную запись.\n\nВойти?\n(Место можно отметить на карте и без входа.)',
     '현재 위치는 로그인하신 분에게만 받습니다.':'Текущее местоположение принимается только от вошедших в учётную запись.',
     '현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.':'Текущее местоположение принимается только от вошедших в учётную запись. Сейчас ничего не принимается.',
+  
+
+    // ── 4.14
+    '도면에서 고르기':'Выбрать на плане',
+    '이름으로 고르기 — 구역 선택…':'Выбрать по названию — зона...',
+    '옮길 칸을 도면에서 눌러 주세요':'Нажмите рундук на плане',
+    '<b>{name}</b> — 넣을 칸을 도면에서 눌러 주세요':'<b>{name}</b> — нажмите рундук, куда положить',
+    '이미 이 칸에 있습니다 — {name}':'Уже в этом рундуке — {name}',
+    '도면에 수납칸이 아직 없습니다.\n\n[도면 그리기] 로 칸을 먼저 만들어 주세요.':'На плане пока нет рундуков.\n\nСначала нарисуйте их через [Редактировать план].',
+    '어디에 넣을까요':'Куда положить?',
+    '{locker} 안에 상자가 있습니다.':'Внутри {locker} есть ящики.',
+    '칸에 그대로 둡니다':'Оставить в самом рундуке',
+    '이 상자 안에 넣습니다':'Положить в этот ящик',
+   
+  
+
+    // ── 4.15
+    '지금은 위치정보 수집에 동의하신 상태입니다.':'Сейчас согласие на сбор местоположения дано.',
+  
+
+    // ── 4.16
+    '나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.':'Если позже нажмёте «Я здесь», мы спросим ещё раз прямо там.',
   }
 };
 
@@ -12510,7 +12579,6 @@ const PAINTERS = [
   'openSpot','openTalk','openPost','openBoard','openTrash','openHelp','openPublish','openIntro',
   'openLocker','openItem','openBox','openFleet','openRoster','openRanks','openJoinReqs',
   'openMyTasks','openTasksOf','openSeries','openExplore','openHidden','openAccount','openSupport',
-  'openLocLog',
   'renderVoyage','renderFuel','renderContacts','renderCheck','renderList','renderMaintList',
   'renderRepairList','renderTalk','renderSpots','renderMarket','renderNews','renderHome',
   'renderMR','renderPanelItems','renderCurrent'
@@ -13196,6 +13264,8 @@ function buildBoxes(){
     d.onclick = ()=>{
       if(typeof lkEdit!=='undefined' && lkEdit) return;
       if(typeof mapPanned !== 'undefined' && mapPanned > 6){ mapPanned = 0; return; }
+      // ★ 물품을 옮길 칸을 고르는 중이면 칸을 여는 대신 그리로 옮긴다
+      if(typeof mvPick !== 'undefined' && mvPick){ mvHit(l.id); return; }
       openLocker(l.id);
     };
     map.appendChild(d);
@@ -13219,6 +13289,7 @@ function refreshBoxes(){
     d.classList.toggle('sel', selected===l.id);
     d.querySelector('span').textContent = l.label + (c>0?` (${c})`:'');
   });
+  if(typeof mvMarkFrom === 'function') mvMarkFrom();
 }
 
 // ===== 칸 그리기 (도면 편집) =====
@@ -13376,7 +13447,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.13';
+const APP_VER = '4.16';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -13957,6 +14028,8 @@ function setLkTool(k){
   }
 }
 function toggleLkEdit(){
+  // ★ 그리기를 켜면 고르기는 그만둔다. 같은 손가락 끌기를 둘이 나눠 가질 수 없다.
+  if(typeof mvPick !== 'undefined' && mvPick && typeof mvCancel === 'function') mvCancel();
   // ★ 확대한 채로 칸을 그리면 사람이 어디를 그리는지 모른다.
   //   그리기를 켤 때만 원래 크기로 돌린다 (끌 때는 보던 자리를 그대로 둔다).
   try{ if(!lkEdit) mapZReset(); }catch(_){}
@@ -14539,6 +14612,112 @@ function purgeAll(){
   save(); updateTrashTab(); openTrash();
 }
 
+
+// ===== 물품을 도면에서 골라 옮긴다 (4.14) =====
+// ★ 여태 이동은 「구역 이름 고르기 → 칸 이름 고르기」 두 번이었다.
+//   오랜만에 여는 사람은 그 이름이 배의 어디를 가리키는지 모른다.
+//   이제 도면에서 칸을 바로 누른다. 이름으로 고르는 길도 그대로 남긴다.
+//
+// ★ 정비 화면의 「핀 지정」 과 같은 구조다. 그것이 오래 고장나 있었던 까닭은
+//   「도면 그리기」 가 눈에 안 보이게 켜져 있어 같은 손가락 끌기를 둘이 나눠 가졌기 때문이다.
+//   그래서 여기서는 시작할 때 그리기를 끄고, 화면을 벗어나면 반드시 그만둔다.
+let mvPick = null;      // 고르는 중인 물품 id (아니면 null)
+
+function mvBannerSync(){
+  const b = document.getElementById('mvBanner');
+  if(!b) return;
+  if(!mvPick){ b.style.display = 'none'; return; }
+  const it = getItem(mvPick);
+  const el = document.getElementById('mvBannerText');
+  if(el) el.innerHTML = it
+    ? tsub('<b>{name}</b> — 넣을 칸을 도면에서 눌러 주세요', { name: esc(it.name || t('물품')) })
+    : esc(t('옮길 칸을 도면에서 눌러 주세요'));
+  b.style.display = 'block';
+}
+// 도면에서 고르기 시작
+function mvFromMap(id){
+  const it = getItem(id);
+  if(!it) return;
+  if(!lockers.length){
+    alert(t('도면에 수납칸이 아직 없습니다.\n\n[도면 그리기] 로 칸을 먼저 만들어 주세요.'));
+    return;
+  }
+  // ★ 그리기가 켜져 있으면 끈다. 안 그러면 칸을 눌러도 이름 고치기가 뜬다.
+  try{ if(typeof lkEdit !== 'undefined' && lkEdit) toggleLkEdit(); }catch(e){}
+  moveId = id; mergeId = null; mvPick = id;
+  view = 'map'; toggleView(true);
+  const p = document.getElementById('panel');
+  if(p) p.classList.remove('open');
+  const m = document.getElementById('map');
+  if(m) m.classList.add('mvpick');
+  mvMarkFrom();
+  mvBannerSync();
+}
+// 지금 들어 있는 칸에 표시를 단다
+function mvMarkFrom(){
+  const m = document.getElementById('map');
+  if(!m) return;
+  m.querySelectorAll('.box.mvfrom').forEach(d=>d.classList.remove('mvfrom'));
+  if(!mvPick) return;
+  const it = getItem(mvPick);
+  if(!it || !it.lockerId) return;
+  const d = document.getElementById('bx_' + it.lockerId);
+  if(d) d.classList.add('mvfrom');
+}
+function mvCancel(){
+  mvPick = null;
+  const m = document.getElementById('map');
+  if(m){ m.classList.remove('mvpick'); m.querySelectorAll('.box.mvfrom').forEach(d=>d.classList.remove('mvfrom')); }
+  mvBannerSync();
+}
+// 칸을 눌렀다
+function mvHit(lockerId){
+  const id = mvPick;
+  const it = getItem(id);
+  if(!it){ mvCancel(); return; }
+  const l = getLocker(lockerId);
+  if(!l){ mvCancel(); return; }
+  // 그 칸에 이미 들어 있으면 아무것도 안 한다
+  if(!it.parentId && String(it.lockerId) === String(lockerId)){
+    alert(tsub('이미 이 칸에 있습니다 — {name}', { name: it.name || t('물품') }));
+    return;
+  }
+  // 상자가 있는 칸이면 어디에 넣을지 묻는다
+  const boxes = it.box ? [] : items.filter(b => b.box && String(b.lockerId) === String(lockerId)
+                                                && String(b.id) !== String(it.id));
+  if(boxes.length){ mvAskBox(lockerId, boxes); return; }
+  mvDo('L:' + lockerId, lockerId);
+}
+// 칸에 그냥 둘까, 안의 상자에 넣을까
+function mvAskBox(lockerId, boxes){
+  const l = getLocker(lockerId);
+  const it = getItem(mvPick);
+  openForm({
+    title: '어디에 넣을까요',
+    sub: tsub('{locker} 안에 상자가 있습니다.', { locker: (l && l.label) || '' }),
+    okText: '넣기',
+    fields: [
+      { key:'where', type:'pick', value:'L:' + lockerId,
+        options: [{ v:'L:' + lockerId, name: (l && l.label) || '', sub: t('칸에 그대로 둡니다') }]
+          .concat(boxes.map(b => ({ v:'B:' + b.id, name: '📦 ' + b.name,
+                                    sub: t('이 상자 안에 넣습니다') }))) }
+    ],
+    onOk: v => { mvDo(v.where, lockerId); }
+  });
+}
+// 실제로 옮기고 그 칸을 보여 준다
+function mvDo(val, lockerId){
+  const id = mvPick;
+  moveId = id;              // doMove 가 보는 값
+  doMove(val);              // 옮기기는 한 곳(doMove)에서만 한다
+  mvCancel();
+  refreshBoxes();
+  try{ mapFocusLocker(lockerId, true); }catch(e){}
+  const it = getItem(id);
+  if(it) setSync(tsub('{name} → {locker}', { name: it.name || t('물품'),
+                                             locker: it.locker || '' }));
+}
+
 // ===== 물품 이동 =====
 function toggleMove(id){ moveId = (moveId===id ? null : id); mergeId=null; renderPanelItems(); }
 function listMove(id){
@@ -14656,7 +14835,7 @@ function renderPanelItems(){
   if(li.length===0){ wrap.innerHTML = `<div style="color:#2a4a6a;font-size:12px;text-align:center;margin-top:14px">${esc(t('등록된 물품 없음'))}</div>`; }
   else wrap.innerHTML = `<div class="itnote">${esc(t('물품을 누르면 도면에서 이 칸을 크게 보여 드립니다'))}</div>`
     + li.map(it=>{
-    const mv = moveId===it.id ? `<select class="mv" onchange="renderMoveSub(this.value, ${it.id})"><option value="">${esc(t('이동할 구역 선택…'))}</option>${zoneOrder().map(z=>`<option value="${z}">${z}</option>`).join('')}</select><div id="mvSubWrap_${it.id}"></div>` : '';
+    const mv = moveId===it.id ? `<div class="mrrow" style="padding:0"><button class="minib grn" style="flex:1" onclick="mvFromMap(${it.id})">${esc(t('도면에서 고르기'))}</button></div><select class="mv" onchange="renderMoveSub(this.value, ${it.id})"><option value="">${esc(t('이름으로 고르기 — 구역 선택…'))}</option>${zoneOrder().map(z=>`<option value="${z}">${z}</option>`).join('')}</select><div id="mvSubWrap_${it.id}"></div>` : '';
     const mg = mergeId===it.id ? mergePanelHTML(it) : '';
     const hl = hlId===it.id ? ' hl' : '';
     if(it.box){
@@ -14761,6 +14940,8 @@ function toggleView(force){
   document.getElementById('hint').style.display = (isMap && hintWanted())?'block':'none';
   document.getElementById('listView').style.display = isMap?'none':'block';
   document.getElementById('tabToggle').textContent = isMap ? t('목록') : t('도면');
+  // ★ 목록 보기로 가면 도면이 없으니 고르기도 그만둔다
+  if(!isMap && typeof mvCancel === 'function') mvCancel();
   if(!isMap){ if(typeof lkEdit!=='undefined' && lkEdit) toggleLkEdit(); closePanel(); renderList(); }
 }
 
@@ -15201,6 +15382,9 @@ function switchTab(t){
   ['searchWrap','stowTools'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display = stow?'':'none'; });
   if(stow){ toggleView(true); if(typeof fpNoneSync === 'function') fpNoneSync(); }
   else {
+    // ★ 적재표를 떠나면 고르기를 그만둔다. 안 그러면 눈에 안 보이는 모드가 남아
+    //   나중에 칸을 눌렀을 때 엉뚱하게 물품이 옮겨진다 (4.06 에서 겪은 함정이다).
+    if(typeof mvCancel === 'function') mvCancel();
     document.getElementById('mapWrap').style.display='none';
     document.getElementById('listView').style.display='none';
     const hh=document.getElementById('hint'); if(hh) hh.style.display='none';
@@ -17362,7 +17546,7 @@ function trRepaint(coll, id){
 //
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
-const LEGAL_VER  = '1.5';
+const LEGAL_VER  = '1.6';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
 const LEGAL_DATES = { ko:'2026년 8월 22일', en:'22 August 2026', ru:'22 августа 2026 г.' };
@@ -17638,9 +17822,10 @@ location: { title: '위치정보 이용약관', body: `
    운영자도 볼 수 없습니다.
 ④ 6개월이 지난 기록은 저절로 지워집니다.
 
-제7조 (확인자료 열람)
-위치정보법 제24조에 따라 이용자는 자기 확인자료를 언제든 볼 수 있습니다.
-앱의 [메뉴] → [내 위치정보 이용내역] 에서 바로 보실 수 있습니다.
+제7조 (확인자료 열람·고지 요구)
+위치정보법 제24조에 따라 이용자는 자기 확인자료의 열람이나 고지를 요구할 수 있습니다.
+아래 제11조의 위치정보관리책임자에게 연락하시면 확인해 정리해 드립니다.
+위치정보 수집 동의는 앱의 [메뉴] → [약관 · 개인정보] → [위치정보] 에서 직접 거두실 수 있습니다.
 
 제8조 (제3자 제공)
 위치정보를 남에게 주지 않습니다. 법령에 따른 적법한 요구가 있을 때만 그에 따릅니다.
@@ -17947,9 +18132,12 @@ Article 6 (Confirmation data on collection, use and provision)
    copy on the server - not even the operator.
 4. Records older than six months are erased automatically.
 
-Article 7 (Reading your confirmation data)
-Under Article 24 of the Location Information Act you may read your own confirmation data at
-any time. It is in the App under [Menu] - [My location use history].
+Article 7 (Requesting to read or be told your confirmation data)
+Under Article 24 of the Location Information Act you may ask to read, or to be told, your own
+confirmation data. Contact the location information manager named in Article 11 below and we
+will look it up and send it to you.
+You can withdraw your consent yourself in the App under
+[Menu] - [Terms & Privacy] - [Location].
 
 Article 8 (Disclosure to third parties)
 Location information is not given to anyone else. It is disclosed only where there is a
@@ -18264,9 +18452,12 @@ location: { title: 'Условия использования данных о м
    кроме вас, — в том числе оператор.
 4. Записи старше шести месяцев стираются автоматически.
 
-Статья 7 (Просмотр записей об использовании)
-Согласно статье 24 Закона о данных о местоположении вы вправе в любой момент
-просмотреть свои записи. Они находятся в Приложении: [Меню] - [Мои записи о местоположении].
+Статья 7 (Требование ознакомления с записями об использовании)
+Согласно статье 24 Закона о данных о местоположении вы вправе потребовать
+ознакомления с вашими записями либо их сообщения. Обратитесь к ответственному
+за данные о местоположении (статья 11), и мы их подготовим и вышлем.
+Согласие на сбор можно отозвать самостоятельно в Приложении:
+[Меню] - [Условия и конфиденциальность] - [Данные о местоположении].
 
 Статья 8 (Передача третьим лицам)
 Данные о местоположении не передаются третьим лицам. Раскрытие возможно только
@@ -18331,90 +18522,19 @@ function legalText(k, v){
     .trim();
 }
 
-// ── 내 위치정보 이용내역 (위치정보법 제24조 — 본인은 언제든 볼 수 있어야 한다)
-// ★ 이 화면이 없으면 기록을 남겨 두고도 위반이다.
-function lgWhen(ts){
-  const d = new Date(ts);
-  if(!isFinite(d.getTime())) return '';
-  const p = n => String(n).padStart(2,'0');
-  return p(d.getHours()) + ':' + p(d.getMinutes());
-}
-function lgDay(ts){
-  const d = new Date(ts);
-  if(!isFinite(d.getTime())) return '';
-  const p = n => String(n).padStart(2,'0');
-  return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate());
-}
-function lgRowHtml(r){
-  const span  = (r.from && r.to)
-    ? ' · ' + esc(lgWhen(r.from)) + '~' + esc(lgWhen(r.to)) : '';
-  const many  = r.n > 0 ? ' · ' + esc(tsub('{n}개 지점', { n: r.n })) : '';
-  return `<div class="fleet" style="cursor:default">
-    <div class="fmain">
-      <div class="fname">${esc(t(r.w || '위치'))}</div>
-      <div class="fsub">${esc(lgWhen(r.ts))} · ${esc(t(r.k || '수집'))}${span}${many}</div>
-    </div></div>`;
-}
-// ★ 법 제24조는 「열람」 만이 아니라 「고지를 요구」 할 권리다.
-//   화면으로 보여 주는 데서 그치지 않고 손에 쥐여 준다.
-function lgExport(){
-  const rows = lgList();
-  if(!rows.length){ alert(t('아직 위치를 쓴 적이 없습니다.')); return; }
-  const head = ['일시','갈래','무엇에','지점수','시작','끝']
-    .concat(LG_KEEP_POS ? ['위도','경도'] : []);
-  const esc2 = v => '"' + String(v == null ? '' : v).split('"').join('""') + '"';
-  const line = r => [ r.ts, r.k, r.w, (r.n || ''), (r.from || ''), (r.to || '') ]
-    .concat(LG_KEEP_POS ? [ (r.la == null ? '' : r.la), (r.lo == null ? '' : r.lo) ] : [])
-    .map(esc2).join(',');
-  // ★ 엑셀이 UTF-8 을 알아보게 BOM 을 앞에 붙인다. 없으면 한글이 깨진다.
-  const csv = '﻿' + head.map(esc2).join(',') + '\n' + rows.map(line).join('\n') + '\n';
-  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  const d = new Date(), pad = n => String(n).padStart(2,'0');
-  a.href = URL.createObjectURL(blob);
-  a.download = `baetnil-location-log-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.csv`;
-  a.click(); URL.revokeObjectURL(a.href);
-}
 // 동의를 앱 안에서 거두거나 다시 준다 (법 제24조 제1항 제1호)
+// ★ 이것만 남긴다. 「이용내역」 화면은 없앴다 —
+//   확인자료는 사업자가 보관하는 기록이고, 열람 요구가 오면 꺼내 주면 된다.
+//   다른 앱들도 그렇게 하지 앱 안에 목록을 보여 주지 않는다.
 function lgToggleConsent(){
   if(locOK()){
     if(!confirm(t('위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.'))) return;
     locSet(false);
   } else {
+    if(!locSignedIn()){ alert(t('현재 위치는 로그인하신 분에게만 받습니다.')); return; }
     locSet(true);
   }
-  openLocLog();
-}
-function openLocLog(){
-  const P = document.getElementById('mrPanel');
-  if(!P) return;
-  const days = [];
-  lgList().forEach(r=>{
-    const d = lgDay(r.ts);
-    if(!days.length || days[days.length-1].d !== d) days.push({ d: d, rows: [] });
-    days[days.length-1].rows.push(r);
-  });
-  const body = days.map(g =>
-    `<div class="lgday">${esc(g.d)}</div>` + g.rows.map(lgRowHtml).join('')).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('내 위치정보 이용내역'))}</b><span style="flex:1"></span></div>
-    <div class="lgnote">
-      ${esc(t('앱이 위치를 쓸 때마다 저절로 남는 기록입니다.'))}<br>
-      ${esc(t('언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.'))}<br>
-      ${esc(t('현재 위치는 로그인하신 분에게만 받습니다.'))}<br>
-      ${esc(t('6개월이 지난 것은 저절로 지워집니다.'))}</div>
-    <div class="mrrow" style="padding:0 12px 4px;gap:8px">
-      ${locSignedIn() ? `<button class="mrbtn${locOK()?' warn':' ok'}" style="flex:1" onclick="lgToggleConsent()">${
-        esc(locOK() ? t('위치정보 수집 동의 거두기') : t('위치정보 수집에 동의하기'))}</button>`
-        : `<button class="mrbtn ok" style="flex:1" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button>`}
-      <button class="mrbtn" onclick="lgExport()">${esc(t('내려받기'))}</button></div>
-    <div class="mrnone" style="text-align:left;padding-top:0">${
-      esc(!locSignedIn() ? t('현재 위치는 로그인하신 분에게만 받습니다. 지금은 아무것도 받지 않습니다.')
-          : locOK() ? t('지금은 동의하신 상태입니다.')
-                    : t('지금은 동의하지 않으신 상태라 위치를 받지 않습니다.'))}</div>
-    ${body || `<div class="mrnone">${esc(t('아직 위치를 쓴 적이 없습니다.'))}</div>`}
-    <div style="height:24px"></div>`;
-  showPanel(P);
-  setHeadTitle('내 위치정보 이용내역');
+  openLegal('location');
 }
 
 function openLegal(k){
@@ -18428,6 +18548,14 @@ function openLegal(k){
         `<button class="tab${kk===key?' on':''}" onclick="openLegal('${kk}')">${
           esc((set[kk] || LEGAL_DOCS[kk]).title)}</button>`).join('')}</div>
     <div class="postbody" style="padding:12px;white-space:pre-wrap;line-height:1.65">${esc(legalText(key))}</div>
+    ${key === 'location' ? `<div class="lgnote">
+      ${esc(!locSignedIn() ? t('현재 위치는 로그인하신 분에게만 받습니다.')
+            : locOK() ? t('지금은 위치정보 수집에 동의하신 상태입니다.')
+                      : t('지금은 동의하지 않으신 상태라 위치를 받지 않습니다.'))}
+      <div class="mrrow" style="padding:10px 0 0">
+        <button class="mrbtn${locOK()?' warn':' ok'}" style="flex:1" onclick="lgToggleConsent()">${
+          esc(locOK() ? t('위치정보 수집 동의 거두기') : t('위치정보 수집에 동의하기'))}</button></div>
+    </div>` : ''}
     <div style="height:24px"></div>`;
   showPanel(P);
   setHeadTitle('약관·방침');
@@ -18464,20 +18592,23 @@ function agreeAll(){
 function drawAgree(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
-  const row = (k, name, must, doc) => `<div class="mrrow" style="align-items:flex-start">
-      <button class="tchip${agreeChk[k]?' on':''}" style="min-width:78px" onclick="agreeToggle('${k}')">${agreeChk[k]?t('✓ 동의'):t('동의')}</button>
-      <span style="flex:1;padding-left:8px">${esc(name)} <b style="color:${must?'#F0803C':'#7b8794'}">(${must?t('필수'):t('선택')})</b>${
+  // ★ 알약 단추(「동의」/「✓ 동의」)로는 무엇을 켰는지 한눈에 안 들어온다.
+  //   네모 체크로 바꾼다. 다른 앱들이 다 그 모양이고, 눈으로 훑기가 훨씬 쉽다.
+  const row = (k, name, must, doc) => `<div class="agrow">
+      <button class="agchk${agreeChk[k]?' on':''}" onclick="agreeToggle('${k}')"
+        aria-label="${esc(name)}">${agreeChk[k]?'\u2713':''}</button>
+      <span class="agtxt"><b class="agmust" style="color:${must?'#F0803C':'#7b8794'}">(${must?t('필수'):t('선택')})</b> ${esc(name)}${
         doc?`<br><button class="minib blu" onclick="openLegal('${doc}')">${esc(t('내용 보기'))}</button>`:''}</span></div>`;
   const ok = agreeChk.terms && agreeChk.privacy && agreeChk.age;
   P.innerHTML = `<div class="mrhead"><b>${esc(t('시작하기 전에'))}</b><span style="flex:1"></span>
       <button class="tab" onclick="agreeCancel()">${esc(t('취소'))}</button></div>
-    <div class="mrnone" style="text-align:left">${esc(t('뱃일을 쓰시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.'))}</div>
-    <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="agreeAll()">${esc(t('모두 동의'))}</button></div>
+    <div class="lgnote">${esc(t('뱃일을 쓰시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.'))}</div>
+    <div class="mrrow"><button class="mrbtn${agreeChk.terms&&agreeChk.privacy&&agreeChk.age&&agreeChk.loc?' ok':''}" style="flex:1" onclick="agreeAll()">${esc(t('모두 동의'))}</button></div>
     ${row('terms',t('이용약관'), true, 'terms')}
     ${row('privacy',t('개인정보 수집·이용'), true, 'privacy')}
     ${row('age',t('만 14세 이상입니다'), true, '')}
     ${row('loc',t('위치정보 이용'), false, 'location')}
-    <div class="mrnone" style="text-align:left">${esc(t('위치정보에 동의하지 않아도 앱을 모두 쓸 수 있습니다. 그때는 지점을 직접 골라 주세요.'))}</div>
+    <div class="lgnote" style="font-size:13px">${esc(t('위치정보에 동의하지 않아도 앱을 모두 쓸 수 있습니다. 그때는 지점을 직접 골라 주세요.'))}<br>${esc(t('나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.'))}</div>
     <div class="mrnone" style="text-align:left;color:#F0803C">${t('이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)')}</div>
     <div class="mrrow" style="padding:14px 12px">
       <button class="mrbtn big${ok?' ok':''}" style="flex:1" onclick="doAgree()">${ok?t('동의하고 계속'):t('필수 항목에 동의해 주세요')}</button></div>

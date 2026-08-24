@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1973;
+const LANG_TOTAL = 1975;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3882,6 +3882,11 @@ const I18N = {
 
     // ── 4.20
     '로그인해야 하실 수 있습니다':'You need to sign in to do that.',
+  
+
+    // ── 4.21
+    '이 판에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'Google sign-in is not available in this build.\nPlease sign in with email.',
+    '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Google sign-in.\nPlease sign in with email.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5932,6 +5937,11 @@ const I18N = {
 
     // ── 4.20
     '로그인해야 하실 수 있습니다':'Для этого нужно войти в учётную запись.',
+  
+
+    // ── 4.21
+    '이 판에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'В этой сборке вход через Google недоступен.\nВойдите по электронной почте.',
+    '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Google.\nВойдите по электронной почте.',
   }
 };
 
@@ -8040,6 +8050,18 @@ const NEED_BOAT_WRAP = {
   'voyage:':     ['voyageWrap',   '항해일지'],
   'home:check':  ['checkWrap',    '출항 전 점검']
 };
+// ★ 안내를 넣기 전에 있던 것을 기억해 둔다.
+//
+//   왜 —
+//   전에는 el.innerHTML 에 안내를 그냥 덮어썼다. 그러면 그 화면 속살이 사라진다.
+//   배가 처음부터 없으면 아무 일도 안 생긴다. 문제는 배가 '늦게' 올 때다 —
+//   로그인하면 클라우드에서 배가 몇 초 뒤에 온다. 그때 화면을 그리는 함수가
+//   글을 넣을 칸(#voyageList 같은 것)을 못 찾고 터진다.
+//   4.21 에서 항해일지가 그렇게 터졌다. 탭을 나갔다 들어오면 화면이 새로 만들어져
+//   저절로 멀쩡해지는 바람에 「가끔 되고 가끔 안 되는」 것으로 보였다.
+const needBoatSaved = {};   // 화면 id → 덮기 전의 속살
+const needBoatHid   = {};   // 같이 감춘 것들 id → 감추기 전의 display
+const STOW_EXTRA = ['mapWrap','searchWrap','stowTools','hint','trashPanel'];
 function boatNeedGuard(t){
   const key = t + ':' + (t === 'boat' ? boatSubTab : t === 'home' ? homeSub : '');
   const hit = NEED_BOAT_WRAP[key];
@@ -8048,12 +8070,36 @@ function boatNeedGuard(t){
   if(!el) return false;
   if(t === 'boat' && boatSubTab === 'stow'){
     // 적재표는 지도와 도구줄이 따로 있다. 함께 감춘다.
-    ['mapWrap','searchWrap','stowTools','hint','trashPanel'].forEach(id=>{
-      const x = document.getElementById(id); if(x) x.style.display = 'none'; });
+    STOW_EXTRA.forEach(id=>{
+      const x = document.getElementById(id);
+      if(!x) return;
+      if(!(id in needBoatHid)) needBoatHid[id] = x.style.display;
+      x.style.display = 'none';
+    });
     el.style.display = 'block';
   }
   el.style.display = 'block';
+  if(!(hit[0] in needBoatSaved)) needBoatSaved[hit[0]] = el.innerHTML;
   el.innerHTML = needBoatCard(hit[1]);
+  return true;
+}
+// 배가 생기면 덮어 뒀던 것을 도로 벗긴다.
+// ★ 이것을 안 하면 그릴 칸이 없어서 터진다. 벗기는 자리는 한 곳뿐이다 (renderCurrent).
+function boatGuardOff(){
+  const ids = Object.keys(needBoatSaved);
+  const hid = Object.keys(needBoatHid);
+  if(!ids.length && !hid.length) return false;
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = needBoatSaved[id];
+    delete needBoatSaved[id];
+  });
+  // 감추기 전에 어땠는지 그대로 되돌린다 — 없애 버리면 숨어 있어야 할 것이 튀어나온다
+  hid.forEach(id=>{
+    const x = document.getElementById(id);
+    if(x) x.style.display = needBoatHid[id];
+    delete needBoatHid[id];
+  });
   return true;
 }
 // 배가 없을 때 그 화면에 대신 보여 주는 안내.
@@ -13750,7 +13796,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.20';
+const APP_VER = '4.22';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15740,6 +15786,9 @@ function renderCurrent(){
   // 막지는 않는다 — 오늘·커뮤니티는 그대로 쓸 수 있고, 탭도 다 열린다.
   // (배 없이 물품을 넣으면 어느 배의 것도 아닌 자리에 쌓여 나중에 사라진다)
   if(!curBoat() && boatNeedGuard(t)) return;
+  // ★ 배가 생겼으면(로그인해서 클라우드에서 늦게 왔으면) 덮어 뒀던 화면을 도로 벗긴다.
+  //   안 벗기면 그 아래 그리는 함수들이 글 넣을 칸을 못 찾고 터진다.
+  if(curBoat()) boatGuardOff();
 
   if(t==='home'){
     if(homeSub==='today') renderHome();
@@ -23598,7 +23647,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     const getDocs   = (...a)=> netWait(_getDocs(...a),   NET_READ);
     const getDoc    = (...a)=> netWait(_getDoc(...a),    NET_READ);
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
-            GoogleAuthProvider, signOut,
+            GoogleAuthProvider, signOut, signInWithCredential,
             createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     const firebaseConfig = {
@@ -23717,6 +23766,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     window.__auth = {
       async google(){
+        // ★ 앱에서는 바깥 브라우저로 나가면 안 된다.
+        //
+        //   왜 —
+        //   구글은 로그인을 끝내면 '원래 있던 주소' 로 돌려보낸다.
+        //   웹에서는 그게 hyunmookkim.github.io 라 멀쩡히 돌아온다.
+        //   그런데 앱 화면의 주소는 http://localhost 다 — 앱 안에만 있는 주소라
+        //   크롬에는 그런 데가 없다. 그래서 「사이트에 연결할 수 없음」만 떴다.
+        //
+        //   그래서 앱에서는 안드로이드가 직접 구글에 물어보고,
+        //   받아 온 자격(idToken)만 여기에 넘긴다. 나갔다 돌아올 일이 없다.
+        //   ★ skipNativeAuth 를 켜 둔 까닭 — 자격을 웹 쪽 파이어베이스에 넘겨야
+        //     지금까지 쓰던 파이어스토어 코드가 그대로 돈다.
+        if(isNative()){
+          const fa = (window.Capacitor && window.Capacitor.Plugins
+                      && window.Capacitor.Plugins.FirebaseAuthentication) || null;
+          // ★ 부품이 안 들어간 판이면 바깥 브라우저로 보내지 않는다 —
+          //   보내 봐야 아까 그 흰 화면이 또 뜬다. 무엇을 하면 되는지 말해 준다.
+          if(!fa) throw new Error(t('이 판에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.'));
+          const r = await fa.signInWithGoogle({ skipNativeAuth: true });
+          const idt = r && r.credential && r.credential.idToken;
+          // 자격을 못 받았는데 조용히 넘어가면 사람은 로그인된 줄 안다
+          if(!idt) throw new Error(t('구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
+          await signInWithCredential(fauth, GoogleAuthProvider.credential(idt));
+          return;
+        }
         const p = new GoogleAuthProvider();
         try{ await signInWithPopup(fauth, p); }
         catch(e){

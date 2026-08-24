@@ -782,6 +782,22 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .newss{font-size:12.5px;color:#9BA1A9;line-height:1.65;margin:7px 0 10px;white-space:pre-line}
 .newsm{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--td)}
 .newsm a{color:#C4C8CD}
+/* ── 연재 묶음. 머리줄이 '어느 연재인가' 를 말해 준다. */
+.srgrp{margin:18px 0 6px}
+/* ★ 머리줄을 글줄과 같은 자리에서 시작하게 한다 (.mr 이 margin:0 20px + padding:0 2px).
+   안 맞추면 머리줄만 화면 끝에 붙어 어긋나 보이고, 오른쪽 편 수가 잘린다. */
+.srghead{display:flex;align-items:baseline;gap:8px;margin:0 20px;padding:0 2px 6px;
+  border-bottom:1px solid rgba(255,255,255,.10);margin-bottom:4px}
+.srghead b{font-size:13.5px;font-weight:800;color:var(--tx);letter-spacing:-.01em}
+.srgn{font-size:11px;color:var(--td);margin-left:auto}
+/* ── 글 아래 '이 연재의 다른 글'. 이어 읽을 길이다. */
+.sralso{margin:26px 0 30px;padding:14px 0 4px;border-top:1px solid rgba(255,255,255,.10)}
+.sralso > b{display:block;font-size:12px;color:var(--td);font-weight:700;margin-bottom:8px}
+.srrow{display:flex;align-items:center;gap:7px;padding:10px 2px;font-size:13.5px;
+  color:var(--tx);border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.srrow:last-child{border-bottom:0}
+.srrow.srnow{color:var(--td);cursor:default}
+.srrow.srnow > span:last-child{font-weight:800;color:var(--tx)}
 #map.nodg .mark{display:none}
 
 /* ============ D테마 — 짜임 ============ */
@@ -1793,7 +1809,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1963;
+const LANG_TOTAL = 1971;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3828,6 +3844,20 @@ const I18N = {
 
     // ── 4.16
     '나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.':'If you later tap "Here now", we will ask you again right there.',
+  
+
+    // ── 4.17
+    '뱃일 — 항해 기록 중':'Baetnil - recording your voyage',
+    '항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.':'Recording your track. It stops when you log your arrival.',
+    '항적 기록을 시작했습니다':'Started recording the track',
+    '항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?':'To record your track, location permission must be set to "Always".\n\nOpen settings?',
+  
+
+    // ── 4.18
+    '묶지 않은 글':'Not in a series',
+    '인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.':'The connection was too slow to finish. Check your connection and try again.',
+    '연재 이름':'Series name',
+    '예: 요트인을 위한 인공지능':'e.g. AI for sailors',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5856,6 +5886,20 @@ const I18N = {
 
     // ── 4.16
     '나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.':'Если позже нажмёте «Я здесь», мы спросим ещё раз прямо там.',
+  
+
+    // ── 4.17
+    '뱃일 — 항해 기록 중':'Пэннiль — идёт запись похода',
+    '항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.':'Идёт запись трека. Остановится, когда вы отметите приход.',
+    '항적 기록을 시작했습니다':'Запись трека начата',
+    '항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?':'Чтобы записывать трек, разрешение на местоположение должно быть «Всегда».\n\nОткрыть настройки?',
+  
+
+    // ── 4.18
+    '묶지 않은 글':'Вне серии',
+    '인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.':'Соединение слишком медленное, не удалось завершить. Проверьте связь и повторите.',
+    '연재 이름':'Название серии',
+    '예: 요트인을 위한 인공지능':'например: ИИ для яхтсменов',
   }
 };
 
@@ -6842,6 +6886,32 @@ function makeThumb(src, cb){
 // 사진을 창고에 올리고 주소로 바꾼다.
 // ★ 이미 주소인 것(http 로 시작)은 그대로 둔다 — 고칠 때마다 또 올리면 창고가 쓰레기로 찬다.
 // ★ 창고를 못 쓰는 상황(로그인 전·오프라인)이면 예전처럼 문서에 담는다. 글은 올라가야 한다.
+// ★ 기다리는 시간에 끝을 둔다.
+//
+//   왜 —
+//   파이어베이스는 인터넷이 없거나 아주 느릴 때 오류를 내지 않는다. 그냥 기다린다.
+//   저장은 몇 분, 사진은 최대 10분까지 혼자 다시 시도한다.
+//   그동안 화면은 아무 말도 안 한다. 사람은 올라간 줄 알고 앱을 끈다 —
+//   쓴 글이 통째로 날아간다. 실제로 4.16 에서 연재 글 하나를 그렇게 잃었다.
+//
+//   그래서 끝을 두고, 넘으면 오류로 만들어 던진다.
+//   던지면 이미 있는 catch 들이 사람에게 말해 준다.
+//
+//   ★ 문은 하나다 — 저장하는 자리가 앱에 마흔 군데다.
+//     거기에 따로따로 달면 언젠가 한 곳이 빠지고, 빠진 그 한 곳에서 또 글을 잃는다.
+const NET_SEC   = 15;   // 글·기록 저장
+const NET_READ  = 20;   // 목록 받아 오기
+const NET_PHOTO = 40;   // 사진 한 장
+function netWait(p, sec){
+  const s = Number(sec) || NET_SEC;
+  let tm = null;
+  const late = new Promise((_, rej)=>{
+    tm = setTimeout(()=> rej(new Error(t('인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.'))),
+                    s * 1000);
+  });
+  return Promise.race([Promise.resolve(p), late])
+    .finally(()=>{ if(tm) clearTimeout(tm); });
+}
 async function toStored(list){
   const photos = [], thumbs = [];
   for(const p of (list || [])){
@@ -7007,6 +7077,8 @@ function closeForm(){
 // o = { title, sub, fields:[{key,label,value,placeholder,chips:[]}], okText, onOk(vals), del:{text,run} }
 function openForm(o){
   formCtx = o;
+  formLast = null;      // ★ 다른 창을 열면 들고 있던 것은 버린다 — 엉뚱한 창이 도로 열리면 안 된다
+
   document.getElementById('lkFormTitle').textContent = t(o.title || '');
   const sub = document.getElementById('formSub');
   sub.textContent = t(o.sub || '');
@@ -7198,13 +7270,29 @@ function formVals(){
   });
   return out;
 }
+let formLast = null;
 function formOk(){
   const o = formCtx;
   if(!o) return;
   const vals = formVals();
+  // ★ 방금 쓴 것을 들고 있는다. 저장이 실패하면 이것으로 창을 도로 연다.
+  formLast = { o: o, vals: vals };
   // onOk 가 false 를 돌려주면 화면을 닫지 않는다 (입력이 모자란 경우)
   if(o.onOk && o.onOk(vals) === false) return;
   closeForm();
+}
+// ★ 저장이 실패하면 쓰던 글이 날아간다 — 창은 이미 닫혔기 때문이다.
+//   4.16 에서 사진 올리다 멈춘 채 앱이 꺼져 연재 글 하나를 통째로 잃었다.
+//   그때 쓰던 그대로 창을 도로 열어 준다. 다시 누르기만 하면 된다.
+function formReopen(){
+  const L = formLast;
+  if(!L || !L.o) return false;
+  const v = L.vals || {};
+  const fields = (L.o.fields || []).map(f =>
+    Object.assign({}, f, { value: (v[f.key] !== undefined) ? v[f.key] : f.value }));
+  openForm(Object.assign({}, L.o, { fields: fields }));
+  formLast = L;         // 또 실패해도 다시 열 수 있게 도로 들고 있는다
+  return true;
 }
 function formDel(){
   const o = formCtx;
@@ -8100,6 +8188,172 @@ function locMay(quiet){
   }
   return locAsk(quiet);
 }
+
+// ===== 항적 자동 기록 =====
+//
+// ★ 이것은 껍데기(Capacitor) 앱에서만 돈다.
+//   웹에서는 화면이 뒤로 가는 순간 위치가 끊겨서 항적이 토막 난다.
+//   그래서 웹에서는 아예 시작하지 않는다 — 반쪽짜리로 그려 놓으면 믿고 쓰다가 낭패를 본다.
+//
+// ★ 왜 시간이 아니라 거리인가
+//   1분마다 받으면 25노트 모터보트는 점 사이가 770m 라 방파제 들어오는 곡선이 통째로 잘리고,
+//   정박해 있을 때도 1분마다 깨워서 배터리만 먹는다.
+//   「50m 움직였을 때 깨워라」 로 폰에 맡기면, 빠를수록 촘촘해지고 서 있으면 아예 안 깨어난다.
+//
+// ★ 배터리
+//   ① 화면이 꺼져 있어도 된다 (이게 제일 크다)  ② 거리로 깨우기
+//   ③ 클라우드 전송은 입항 때 한 번 (점마다 보내면 신호 찾느라 더 먹는다)
+//   ④ 출항~입항 동안만
+const TRK_DIST = 50;      // m — 이만큼 움직여야 폰이 깨운다
+const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가운데 점을 버린다
+const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
+const TRK_KEY  = 'bt_trk';
+
+let trkNow = null;   // { vid, from, pts:[{la,lo,t}], id }
+
+function isNative(){
+  try{ return !!(window.Capacitor && window.Capacitor.isNativePlatform
+                 && window.Capacitor.isNativePlatform()); }catch(e){ return false; }
+}
+function bgGeo(){
+  try{ return (window.Capacitor && window.Capacitor.Plugins
+               && window.Capacitor.Plugins.BackgroundGeolocation) || null; }catch(e){ return null; }
+}
+// ★ 앱이 죽어도 기록 중이던 것이 남아야 한다. 배 위에서 앱이 한 번 꺼지면
+//   그 항해 항적을 통째로 잃는다.
+function trkKeep(){
+  try{
+    if(trkNow) localStorage.setItem(TRK_KEY, JSON.stringify(trkNow));
+    else localStorage.removeItem(TRK_KEY);
+  }catch(e){}
+}
+function trkLoad(){
+  try{ trkNow = JSON.parse(localStorage.getItem(TRK_KEY) || 'null'); }catch(e){ trkNow = null; }
+  return trkNow;
+}
+const trkOn = () => !!trkNow;
+
+// ★ 직선으로 간 구간은 가운데 점을 버려도 선 모양이 같다.
+//   좌표를 그대로 재면 안 된다 — 경도 1도의 길이는 위도에 따라 좁아진다.
+//   미터로 바꿔서 잰다.
+function trkSimplify(pts, tolM){
+  const a = Array.isArray(pts) ? pts.filter(p => p && isFinite(p.la) && isFinite(p.lo)) : [];
+  if(a.length < 3) return a.slice();
+  const k = Math.cos((a[0].la) * Math.PI / 180);
+  const X = p => p.lo * k * 111320, Y = p => p.la * 110540;
+  const far = (p, u, v) => {
+    const x = X(p), y = Y(p), x1 = X(u), y1 = Y(u), x2 = X(v), y2 = Y(v);
+    const dx = x2 - x1, dy = y2 - y1, L = dx*dx + dy*dy;
+    if(L === 0) return Math.hypot(x - x1, y - y1);
+    let r = ((x - x1) * dx + (y - y1) * dy) / L;
+    r = r < 0 ? 0 : (r > 1 ? 1 : r);
+    return Math.hypot(x - (x1 + r*dx), y - (y1 + r*dy));
+  };
+  const keep = new Array(a.length).fill(false);
+  keep[0] = keep[a.length - 1] = true;
+  const st = [[0, a.length - 1]];
+  while(st.length){
+    const [i, j] = st.pop();
+    let hit = -1, hd = tolM;
+    for(let m = i + 1; m < j; m++){
+      const d = far(a[m], a[i], a[j]);
+      if(d > hd){ hd = d; hit = m; }
+    }
+    if(hit > 0){ keep[hit] = true; st.push([i, hit], [hit, j]); }
+  }
+  return a.filter((_, i) => keep[i]);
+}
+
+// 점 하나가 들어왔다
+function trkPush(pos){
+  if(!trkNow || !pos) return false;
+  const la = Number(pos.latitude), lo = Number(pos.longitude);
+  if(!isFinite(la) || !isFinite(lo)) return false;
+  const p = { la:+la.toFixed(5), lo:+lo.toFixed(5),
+              t: new Date(pos.time || Date.now()).toISOString() };
+  const last = trkNow.pts[trkNow.pts.length - 1];
+  // ★ 폰이 걸러 주기로 했지만 믿지 않는다. 기기마다 다르고, 서 있을 때
+  //   GPS 가 몇 미터씩 흔들리는 것을 다 담으면 정박 중에도 선이 자란다.
+  if(last && hav(last.la, last.lo, p.la, p.lo) * 1000 < TRK_DIST * 0.6) return false;
+  trkNow.pts.push(p);
+  if(trkNow.pts.length > TRK_MAX) trkNow.pts = trkSimplify(trkNow.pts, TRK_TOL);
+  trkKeep();
+  return true;
+}
+
+function trkErr(err){
+  if(!err) return;
+  if(String(err.code) === 'NOT_AUTHORIZED'){
+    if(confirm(t('항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?'))){
+      const G = bgGeo(); if(G) try{ G.openSettings(); }catch(e){}
+    }
+  }
+  trkStop();
+}
+
+// 폰에 「움직이면 알려 달라」 고 걸어 둔다
+async function trkAttach(){
+  const G = bgGeo();
+  if(!G || !trkNow) return false;
+  try{
+    trkNow.id = await G.addWatcher({
+      backgroundTitle:   t('뱃일 — 항해 기록 중'),
+      backgroundMessage: t('항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.'),
+      requestPermissions: true,
+      stale: false,
+      distanceFilter: TRK_DIST
+    }, (pos, err) => { if(err) trkErr(err); else trkPush(pos); });
+    trkKeep();
+    return true;
+  }catch(e){ return false; }
+}
+
+async function trkStart(vid){
+  if(!isNative()) return false;              // 웹에서는 안 한다
+  if(!bgGeo()) return false;
+  if(!locMay(false)) return false;           // 로그인·동의가 먼저다
+  if(trkNow && String(trkNow.vid) === String(vid)) return true;
+  if(trkNow) await trkStop();
+  trkNow = { vid: String(vid), from: new Date().toISOString(), pts: [], id: null };
+  trkKeep();
+  const ok = await trkAttach();
+  if(!ok){ trkNow = null; trkKeep(); return false; }
+  try{ setSync(t('항적 기록을 시작했습니다')); }catch(e){}
+  return true;
+}
+
+async function trkStop(){
+  const cur = trkNow;
+  trkNow = null; trkKeep();
+  if(!cur) return null;
+  const G = bgGeo();
+  if(G && cur.id){ try{ await G.removeWatcher({ id: cur.id }); }catch(e){} }
+  const pts = trkSimplify(cur.pts || [], TRK_TOL);
+  // ★ 클라우드로는 여기서 한 번만 올린다 (점마다 올리면 배터리를 더 먹는다)
+  if(pts.length >= 2){
+    const it = (typeof voyage !== 'undefined' ? voyage : []).find(v => String(v.id) === String(cur.vid));
+    if(it){
+      it.trk = pts;
+      try{ saveMR(); }catch(e){}
+      try{ schedulePush(); }catch(e){}
+      try{ renderVoyage(); }catch(e){}
+    }
+  }
+  // ★ 확인자료에는 「켠 시각 ~ 끈 시각 ~ 점 몇 개」 한 줄만 남긴다.
+  //   점마다 한 줄이면 하루 수천 줄이라 사람이 볼 수도 없다.
+  try{ lgTrack(cur.from, new Date().toISOString(), (cur.pts || []).length); }catch(e){}
+  return pts;
+}
+
+// 앱을 다시 켰을 때 — 기록 중이던 것이 있으면 이어 붙인다
+function trkResume(){
+  if(!isNative()) return;
+  trkLoad();
+  if(!trkNow) return;
+  trkNow.id = null;
+  trkAttach();
+}
+
 // ★ 위치를 읽는 단 하나의 문.
 //   why 는 「무엇에 쓰려고」 다. 확인자료에 그대로 남는다.
 function geoGet(why, ok, err, opts){
@@ -9763,7 +10017,10 @@ function writeTalk(id){
             await window.__talk.add(body);
             talkList.unshift(body); openTalk(body.id);
           }
-        }catch(e){ alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+        }catch(e){
+          alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
+          formReopen();          // 쓴 글을 날리지 않는다
+        }
       })();
     }
   });
@@ -13447,7 +13704,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.16';
+const APP_VER = '4.18';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16065,7 +16322,8 @@ function openMR(kind, id){
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
   if(kind === 'voyage'){
     const pts = trkPoints(it);
-    if(pts.length) requestAnimationFrame(()=> mapInit('trkMap', pts, {mode:'view'}));
+    if(pts.length) requestAnimationFrame(()=> mapInit('trkMap', pts,
+      { mode:'view', line: (typeof trkLine === 'function') ? trkLine(it) : null }));
     else mapS = null;
   }
 }
@@ -17305,6 +17563,8 @@ function planStart(){
   saveMR(); renderVoyage(); openMR('voyage', it.id);
   // 위치를 먼저 잡고, 그 좌표로 날씨를 받는다 (위치를 못 잡으면 고른 지점으로 떨어진다)
   posHere('wxOut', it.id, true, () => wxCapture('wxOut', it.id));
+  // ★ 껍데기 앱이면 여기서부터 항적을 그린다. 웹에서는 아무 일도 안 일어난다.
+  try{ trkStart(it.id); }catch(e){}
 }
 function addVoyage(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
@@ -20406,6 +20666,8 @@ function arriveNow(){
   it.timeIn = p(now.getHours())+':'+p(now.getMinutes());
   it.seed = false; saveMR();
   posHere('wxIn', it.id, true, () => wxCapture('wxIn', it.id));
+  // ★ 입항을 찍으면 항적도 끝낸다. 여기서 클라우드로 한 번에 올라간다.
+  try{ trkStop().then(()=>{ try{ openMR('voyage', it.id); }catch(e){} }); }catch(e){}
   renderVoyage(); openMR('voyage', it.id);
 }
 
@@ -20605,6 +20867,18 @@ function trkPoints(it){
   push(it.posIn, t('도착'), it.timeIn, 'wxIn');
   return out;
 }
+// ★ 지도에 그릴 「선」. 자동 항적이 있으면 그것이 선이다.
+//   이름표 점(출발·중간·도착)과 섞지 않는다 — 시각으로 줄 세우려다 보니
+//   자정을 넘긴 항해나 도착 시각을 나중에 고친 경우 선이 튀었다 (검사가 잡았다).
+//   자동 항적은 받은 차례가 곧 지나온 차례라 따로 줄 세울 것이 없다.
+function trkLine(it){
+  const a = Array.isArray(it && it.trk) ? it.trk : [];
+  const out = [];
+  a.forEach(p => {
+    if(p && isFinite(p.la) && isFinite(p.lo)) out.push({ lat:p.la, lon:p.lo });
+  });
+  return out.length > 1 ? out : null;
+}
 
 // 점들이 모두 들어오는 줌과 중심을 구한다. 멀리 갔으면 줌이 낮아진다(넓게 보인다).
 function fitView(pts, W, H){
@@ -20632,8 +20906,10 @@ function mapBox(id, h){
 function mapInit(elId, pts, opt){
   const el = document.getElementById(elId); if(!el) return;
   const W = el.clientWidth || 320, H = el.clientHeight || 260;
-  const v = fitView(pts, W, H);
-  mapS = { elId, z:v.z, cx:v.cx, cy:v.cy, pts, pick:(opt&&opt.pick)||null,
+  const line = (opt && opt.line) || null;
+  // ★ 화면에 맞출 때는 선까지 넣어서 잰다. 안 그러면 항적이 화면 밖으로 나간다.
+  const v = fitView(line ? pts.concat(line) : pts, W, H);
+  mapS = { elId, z:v.z, cx:v.cx, cy:v.cy, pts, line, pick:(opt&&opt.pick)||null,
            mode:(opt&&opt.mode)||'view', dragging:false, anchor:{cx:v.cx, cy:v.cy}, tiles:null };
   mapPaint(true);
   mapBind(el);
@@ -20725,8 +21001,12 @@ function mapPaint(full){
   // 겹침층 — 항적선·점·핀
   const sx = p => MERC.x(p.lon,z)-left, sy = p => MERC.y(p.lat,z)-top;
   let h = '';
-  if(S.pts.length > 1){
-    const dd = S.pts.map((p,i)=> (i?'L':'M')+sx(p).toFixed(1)+' '+sy(p).toFixed(1)).join(' ');
+  // ★ 선은 자동 항적이 있으면 그것으로, 없으면 이름표 점을 이어서 그린다.
+  //   점(.mdot)은 언제나 이름표 점에만 찍는다 — 항적 점을 다 찍으면 수백 개가 되어
+  //   도면이 점으로 덮인다.
+  const LINE = (S.line && S.line.length > 1) ? S.line : S.pts;
+  if(LINE.length > 1){
+    const dd = LINE.map((p,i)=> (i?'L':'M')+sx(p).toFixed(1)+' '+sy(p).toFixed(1)).join(' ');
     h += `<svg class="mov" width="${W}" height="${H}">
       <path d="${dd}" fill="none" stroke="#fff" stroke-width="5.5" opacity=".5"
             stroke-linecap="round" stroke-linejoin="round"/>
@@ -21893,8 +22173,53 @@ let seriesList = null;
 async function loadSeries(force){
   if(seriesList && !force) return seriesList;
   if(!window.__series){ seriesList = []; return seriesList; }
-  try{ seriesList = await window.__series.list(); }catch(e){ seriesList = []; }
+  // ★ 못 받아 온 것을 '없다' 로 적어 두면 안 된다.
+  //   빈 목록도 자바스크립트는 '있다' 로 친다. 그래서 한 번 끊기면
+  //   앱을 껐다 켤 때까지 다시 받아 오지 않았다 — 연재 목록이 통째로 비어 있던 원인이다.
+  try{ seriesList = await window.__series.list(); }
+  catch(e){ seriesList = null; return []; }
   return seriesList;
+}
+// ★ 이 글이 어느 연재에 속하는가 — 읽는 문은 이것 하나다.
+//   옛 글에는 이름이 없다. 그때는 빈 글자를 돌려주고 '묶지 않은 글' 로 모은다.
+function seriesName(x){
+  return String((x && x.sname) || '').trim();
+}
+// 이미 올라온 연재 이름들. 글 쓸 때 단추로 보여 준다.
+// ★ 손으로 다시 적으면 한 글자만 달라도 딴 묶음이 된다. 눌러서 넣게 한다.
+function seriesNames(){
+  const out = [];
+  (seriesList||[]).forEach(x=>{
+    const n = seriesName(x);
+    if(n && out.indexOf(n) < 0) out.push(n);
+  });
+  return out;
+}
+// 연재 이름으로 묶는다.
+//   묶음 안   — 편 번호 차례. 연재는 1편부터 읽는 것이다.
+//   묶음끼리 — 최근에 글이 올라온 연재가 위. 새 연재가 아래에 묻히면 안 된다.
+//   이름 없는 옛 글 — 맨 아래 한 묶음.
+function seriesGroups(rows){
+  const list = Array.isArray(rows) ? rows : (seriesList||[]);
+  const by = new Map();
+  list.forEach(x=>{
+    const n = seriesName(x);
+    if(!by.has(n)) by.set(n, []);
+    by.get(n).push(x);
+  });
+  const out = [];
+  by.forEach((items, name)=>{
+    items.sort((a,b)=> (Number(a.no)||0) - (Number(b.no)||0)
+                    || String(a.date||'').localeCompare(String(b.date||'')));
+    let last = '';
+    items.forEach(x=>{ const d = String(x.ts || x.date || ''); if(d > last) last = d; });
+    out.push({ name: name, items: items, last: last });
+  });
+  out.sort((a,b)=>{
+    if(!a.name !== !b.name) return a.name ? -1 : 1;   // 이름 없는 묶음은 맨 아래
+    return String(b.last).localeCompare(String(a.last));
+  });
+  return out;
 }
 async function seriesHtml(){
   const rows = await loadSeries();
@@ -21907,13 +22232,19 @@ async function seriesHtml(){
   if(!rows.length){
     return add + `<div class="mrnone" style="text-align:left">${esc(t('아직 올라온 연재가 없습니다.'))}</div>`;
   }
-  // 번호 순서로 쌓인다 — 새 글이 위로 밀지 않는다
-  const sorted = [...rows].sort((a,b)=> (Number(a.no)||0) - (Number(b.no)||0));
-  return add + sorted.map(x=>`<div class="mr" onclick="openSeries('${esc(x.id)}')">
+  // ★ 연재 이름으로 묶어서 보여 준다.
+  //   편 번호만으로 줄을 세우면 서로 다른 연재의 3편이 나란히 붙어 뒤섞인다.
+  //   묶음 안은 1편부터 — 연재는 차례대로 읽는 것이다.
+  return add + seriesGroups(rows).map(g=>
+    `<div class="srgrp"><div class="srghead">
+       <b>${esc(g.name || t('묶지 않은 글'))}</b>
+       <span class="srgn">${esc(String(g.items.length))}편</span></div>`
+    + g.items.map(x=>`<div class="mr" onclick="openSeries('${esc(x.id)}')">
       <div class="ct"><div class="cn">${x.no?`<span class="chip">${esc(String(x.no))}편</span> `:''}${esc(x.title||'')}</div></div>
       <div class="mrm">${[esc(x.author||''), esc(x.source||''),
           x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
-    </div>`).join('');
+    </div>`).join('')
+    + `</div>`).join('');
 }
 // ── 연재자 신청
 // ★ 왜 새 컬렉션을 안 만드나
@@ -22002,6 +22333,24 @@ function seriesMine(x){
   if(typeof x.mine === 'boolean') return x.mine;
   return !String(x.link || '').trim();
 }
+// ★ 글 맨 아래에 붙는 '이 연재의 다른 글'.
+//   연재는 이어 읽는 것이라, 한 편을 읽고 나면 다음 편으로 갈 길이 있어야 한다.
+//   목록으로 되돌아가 다시 찾게 하면 아무도 안 읽는다.
+function seriesAlso(x){
+  const name = seriesName(x);
+  const g = seriesGroups().find(z => z.name === name);
+  const items = (g && g.items) || [];
+  if(items.length < 2) return '';         // 혼자면 붙일 것이 없다
+  return `<div class="sralso"><b>${esc(name || t('묶지 않은 글'))}</b>`
+    + items.map(z=>{
+        const now = String(z.id) === String(x.id);
+        return `<div class="srrow${now?' srnow':''}"`
+          + (now ? '' : ` onclick="openSeries('${esc(z.id)}')"`) + `>`
+          + (z.no ? `<span class="chip">${esc(String(z.no))}편</span> ` : '')
+          + `<span>${esc(z.title||'')}</span></div>`;
+      }).join('')
+    + `</div>`;
+}
 async function openSeries(id){
   const rows = await loadSeries();
   const x = rows.find(r=>String(r.id)===String(id));
@@ -22021,7 +22370,8 @@ async function openSeries(id){
     ${renderBlocks(tv ? trBlocks(seriesBody(x), tv.body) : seriesBody(x), `seriesPhotos('${esc(x.id)}')`)}
     ${(canEditSeries(x)||canDelSeries(x))?`<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px">
         ${canEditSeries(x)?`<button class="mrbtn" onclick="writeSeries('${esc(x.id)}')">${esc(t('고치기'))}</button>`:''}
-        ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${esc(x.id)}')">${esc(t('지우기'))}</button>`:''}</div>`:''}`;
+        ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${esc(x.id)}')">${esc(t('지우기'))}</button>`:''}</div>`:''}
+    ${seriesAlso(x)}`;
   showPanel(P);
 }
 function writeSeries(id){
@@ -22039,6 +22389,10 @@ function writeSeries(id){
         value: (x ? (seriesMine(x) ? '1' : '0') : '1'),
         options:[ { v:'1', name:'직접 쓴 글', sub:'기고 · 연재' },
                   { v:'0', name:'옮긴 글',   sub:'남의 글을 허락받아 옮김' } ] },
+      // ★ 어느 연재에 속하는가. 이미 있는 이름은 단추로 준다 —
+      //   손으로 다시 적으면 한 글자만 달라도 딴 묶음이 되어 흩어진다.
+      { key:'sname',     label:'연재 이름', value: x ? (x.sname||'') : '',
+        placeholder:'예: 요트인을 위한 인공지능', chips: seriesNames() },
       { key:'no',        label:'몇 편',    value: x ? String(x.no||'') : '', placeholder:'1' },
       { key:'title',     label:'제목',     value: x ? x.title : '', placeholder:'제목' },
       { key:'author',    label:'저자',     value: x ? x.author : (meName()||''), placeholder:'글쓴이 이름' },
@@ -22072,6 +22426,7 @@ function writeSeries(id){
           const body = {
             id: x ? x.id : ('sr' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
             no: Number(v.no) || 0, mine,
+            sname: String(v.sname||'').trim(),
             title: String(v.title).trim(),
             origTitle: mine ? '' : String(v.origTitle||'').trim(),
             author: String(v.author).trim(),
@@ -22088,7 +22443,10 @@ function writeSeries(id){
           await loadSeries(true);
           newsSub = 'sr'; renderNews();
           openSeries(body.id);
-        }catch(e){ alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+        }catch(e){
+          alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
+          formReopen();          // 쓴 글을 날리지 않는다
+        }
       })();
     }
   });
@@ -23016,16 +23374,31 @@ const ERR_MAX  = 5;           // 한 번 켠 동안 여기까지만 — 오류�
 let errSentN = 0;
 let errLast  = '';
 
+// ★ 어디서 났는지가 없으면 짚을 수가 없다.
+//   실제로 'Uncaught TypeError: t is not a function' 한 줄만 받아 놓고
+//   앱 어느 자리인지 끝내 못 찾았다. 파일·줄·칸과 스택 앞머리를 같이 담는다.
+//   화면 줄에는 앞 한 줄만 보이고, 보낼 때는 전부 간다.
+function errWhere(e){
+  let m = String((e && e.message) || t('알 수 없는 오류'));
+  try{
+    const f = String((e && e.filename) || '').split('/').pop().split('?')[0];
+    if(f) m += ' @' + f + ':' + (e.lineno || 0) + ':' + (e.colno || 0);
+    const st = e && e.error && e.error.stack;
+    if(st) m += '\n' + String(st).split('\n').slice(0, 4).join('\n');
+  }catch(_){}
+  return m;
+}
 function showErr(msg){
   try{
-    const one = String(msg == null ? '' : msg).slice(0, 300);
+    const one = String(msg == null ? '' : msg).slice(0, 600);
     errLast = one;
     let d = document.getElementById('errbar');
     if(!d){ d = document.createElement('div'); d.id='errbar'; document.body.appendChild(d); }
     // 보낼 수 있나 — 처음 보는 오류이고, 이번에 너무 많이 안 보냈고, 인터넷이 있을 때
     let can = !ERR_SENT.has(one) && errSentN < ERR_MAX;
     try{ if(navigator && navigator.onLine === false) can = false; }catch(_){}
-    errPaint(errSay('오류') + ': ' + one, can);
+    // 화면에는 앞 한 줄만 — 스택까지 띄우면 화면을 덮는다. 보낼 때는 전부 간다.
+    errPaint(errSay('오류') + ': ' + one.split('\n')[0].slice(0, 200), can);
     clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, can ? 20000 : 10000);
   }catch(e){}
 }
@@ -23060,7 +23433,7 @@ async function errSend(){
   errPaint(errSay(ok ? '보냈습니다. 고맙습니다.' : '보내지 못했습니다.'), false);
   if(d){ clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, 4000); }
 }
-window.addEventListener('error', e=>showErr(e.message||t('알 수 없는 오류')));
+window.addEventListener('error', e=>showErr(errWhere(e)));
 window.addEventListener('unhandledrejection',
   e=>showErr((e.reason&&e.reason.message)||String(e.reason||t('비동기 오류'))));
 wxInit();
@@ -23161,10 +23534,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 (async ()=>{
   try{
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-    const { getFirestore, collection, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc,
+    const { getFirestore, collection, getDocs: _getDocs, getDoc: _getDoc, doc,
+            setDoc: _setDoc, updateDoc: _updateDoc, deleteDoc: _deleteDoc,
             query, where, orderBy, limit, startAfter, writeBatch, FieldPath,
             getCountFromServer, increment, deleteField } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    // ★ 저장과 읽기는 전부 이 문 하나를 지난다 (netWait 설명 참고).
+    const setDoc    = (...a)=> netWait(_setDoc(...a),    NET_SEC);
+    const updateDoc = (...a)=> netWait(_updateDoc(...a), NET_SEC);
+    const deleteDoc = (...a)=> netWait(_deleteDoc(...a), NET_SEC);
+    const getDocs   = (...a)=> netWait(_getDocs(...a),   NET_READ);
+    const getDoc    = (...a)=> netWait(_getDoc(...a),    NET_READ);
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, signOut,
             createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser } =
@@ -23177,8 +23557,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       messagingSenderId: "82328638435",
       appId: "1:82328638435:web:1ee439f2332ae62a8246d6"
     };
-    const { getStorage, ref: sref, uploadString, getDownloadURL, deleteObject } =
+    const { getStorage, ref: sref, uploadString: _uploadString,
+            getDownloadURL: _getDownloadURL, deleteObject } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js');
+    // ★ 사진 창고는 혼자 10분까지 다시 시도한다 — 글 잃은 자리가 바로 여기다.
+    const uploadString   = (...a)=> netWait(_uploadString(...a),   NET_PHOTO);
+    const getDownloadURL = (...a)=> netWait(_getDownloadURL(...a), NET_PHOTO);
     const { getFunctions, httpsCallable } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js');
     const fapp = initializeApp(firebaseConfig);
@@ -23873,7 +24257,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 })();
 </script>
 <script>
-if('serviceWorker' in navigator){
+// ★ 껍데기(Capacitor) 앱에서는 서비스워커를 켜지 않는다.
+//   앱 안의 파일은 이미 폰에 들어 있어서 캐시할 것이 없고,
+//   켜 두면 옛 화면이 남아 「고쳤는데 안 바뀐다」 가 된다.
+if('serviceWorker' in navigator
+   && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){
   window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 }
 </script>

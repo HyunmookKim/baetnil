@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>뱃일 — 배 타는 사람들</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -800,6 +800,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .srrow.srnow > span:last-child{font-weight:800;color:var(--tx)}
 #map.nodg .mark{display:none}
 
+
 /* ============ D테마 — 짜임 ============ */
 /* ★ 여기부터가 '색이 아니라 결' 을 바꾸는 부분이다.
    1. 줄마다 두르던 상자를 없앤다 — 상자가 겹치면 서식 작성 화면처럼 보인다.
@@ -1568,6 +1569,21 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 /* ★ 안내문을 그냥 얹으면 새벽 배경의 수평선 위에서 글씨가 사라진다. 상자에 담는다. */
 .lgnote{margin:10px 12px;padding:11px 12px;border:1px solid var(--bd);border-radius:10px;
   background:var(--sf);color:var(--tx);font-size:14px;line-height:1.65;text-align:left}
+/* ── 위 시계·배터리 자리 비켜 가기 ─────────────────────────────
+   ★ 앱으로 싸면 화면이 위에서 아래 끝까지 그려진다.
+     (targetSdk 35 — 안드로이드 15부터 그것이 기본이고 끌 수가 없다)
+     그래서 폰 위쪽 시계·배터리 줄 아래로 앱 글씨가 파고들어 가린다.
+     웹에서는 브라우저가 알아서 밀어 줬기 때문에 여태 몰랐다.
+   ★ env(safe-area-inset-top) 은 맨 위 viewport 줄에 viewport-fit=cover 가
+     있어야 값이 나온다. 없으면 늘 0 이라 아무 일도 안 일어난다.
+   ★ 값을 한 곳(--sat)에만 적어 둔다. 화면마다 따로 적으면
+     새 화면을 만들 때 또 빠뜨리고, 그 화면만 글씨가 가린다.
+   ★ 웹에서는 이 값이 0 이다 — 웹 화면은 아무것도 안 바뀐다. */
+:root{--sat:env(safe-area-inset-top,0px)}
+header{padding-top:var(--sat)}
+#formOv,#dgPick,#trashView,#helpOv,#hatPanelOv{padding-top:var(--sat)}
+#drawer{padding-top:calc(14px + var(--sat))}
+#panel{padding-top:calc(14px + var(--sat))}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122a44">
@@ -1809,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1971;
+const LANG_TOTAL = 1972;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3858,6 +3874,10 @@ const I18N = {
     '인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.':'The connection was too slow to finish. Check your connection and try again.',
     '연재 이름':'Series name',
     '예: 요트인을 위한 인공지능':'e.g. AI for sailors',
+  
+
+    // ── 4.19
+    '로그인하시거나, 지점을 직접 추가해 주세요.':'Sign in, or add a spot yourself.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5900,6 +5920,10 @@ const I18N = {
     '인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.':'Соединение слишком медленное, не удалось завершить. Проверьте связь и повторите.',
     '연재 이름':'Название серии',
     '예: 요트인을 위한 인공지능':'например: ИИ для яхтсменов',
+  
+
+    // ── 4.19
+    '로그인하시거나, 지점을 직접 추가해 주세요.':'Войдите или добавьте точку вручную.',
   }
 };
 
@@ -7538,11 +7562,22 @@ function migrate(arr){
 //   예전에는 옛 앱 저장소에서 받아왔다. 앱과 자료가 갈라져 있어
 //   한쪽만 고치면 어긋났고, 옛 앱을 지우는 날 이 앱이 조용히 죽는 구조였다.
 //   앱이 놓인 자리를 따라가므로 저장소 이름이 바뀌어도 따라간다.
+const DATA_SITE = 'https://hyunmookkim.github.io/baetnil/';
 const DATA_BASE = (function(){
   try{
-    if(location.protocol === 'file:') return 'https://hyunmookkim.github.io/baetnil/';
+    // ★ 앱(캐퍼시터)으로 싸면 화면 주소가 http://localhost 가 된다.
+    //   그런데 앱 안에 든 것은 화면 하나(index.html)뿐이다 —
+    //   news.json · kr.json · tide.json 은 안 들어간다. 돌 때마다 갈아 끼우는 자료라
+    //   앱에 넣으면 앱을 새로 내야 소식이 바뀐다.
+    //   그래서 앱 안에서 찾으면 아무것도 못 받는다. 첫 안드로이드 앱에서
+    //   뉴스·한국 소식·물때가 통째로 비어 있던 원인이 이것이다.
+    if(location.protocol === 'file:') return DATA_SITE;
+    if(location.protocol === 'capacitor:') return DATA_SITE;
+    if(location.hostname === 'localhost') return DATA_SITE;
+    if(window.Capacitor && window.Capacitor.isNativePlatform
+       && window.Capacitor.isNativePlatform()) return DATA_SITE;
     return new URL('./', location.href).href;
-  }catch(e){ return 'https://hyunmookkim.github.io/baetnil/'; }
+  }catch(e){ return DATA_SITE; }
 })();
 
 // ===== 도움말 =====
@@ -13704,7 +13739,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.18';
+const APP_VER = '4.19';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -23191,11 +23226,23 @@ async function renderWeather(){
       return;
     }
     // 위치를 못 받은 경우에만 대안을 보여 준다
+    // ★ 못 받은 까닭이 두 가지인데 한 가지로만 말하고 있었다.
+    //   로그인 안 하신 분에게는 우리가 아예 위치를 안 받는다 (위치정보법 때문에 그렇게 만들었다).
+    //   그런데 화면은 '설정에서 위치 권한을 허용하시거나' 라고만 했다.
+    //   그러면 사람은 설정에 들어가 권한을 켜 놓고도 안 되니 앱이 고장난 줄 안다.
+    //   까닭이 다르면 하는 말도 단추도 달라야 한다.
+    const wxNoIn = (typeof locSignedIn === 'function') && !locSignedIn();
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('날씨 · 물때'))}</b>
-      <div>${esc(t('현재 위치를 가져오지 못했습니다.'))}<br>${esc(t('설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.'))}</div>
+      <div>${wxNoIn
+        ? esc(t('현재 위치는 로그인하신 분에게만 받습니다.')) + '<br>'
+          + esc(t('로그인하시거나, 지점을 직접 추가해 주세요.'))
+        : esc(t('현재 위치를 가져오지 못했습니다.')) + '<br>'
+          + esc(t('설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.'))}</div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button class="mrbtn" onclick="wxRetryGPS()">${esc(t('현재 위치 다시 시도'))}</button>
+        ${wxNoIn
+          ? `<button class="mrbtn ok" onclick="openAccount()">${esc(t('로그인'))}</button>`
+          : `<button class="mrbtn" onclick="wxRetryGPS()">${esc(t('현재 위치 다시 시도'))}</button>`}
         <button class="mrbtn" onclick="needEdit('날씨 지점을 추가합니다.', wxAddSpot)">${esc(t('지점 직접 추가'))}</button>
       </div>
     </div>`;

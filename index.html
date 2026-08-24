@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1975;
+const LANG_TOTAL = 1976;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3887,6 +3887,10 @@ const I18N = {
     // ── 4.21
     '이 판에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'Google sign-in is not available in this build.\nPlease sign in with email.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Google sign-in.\nPlease sign in with email.',
+  
+
+    // ── 4.23
+    '한 번 더 누르면 앱이 닫힙니다':'Press back again to close the app',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5942,6 +5946,10 @@ const I18N = {
     // ── 4.21
     '이 판에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'В этой сборке вход через Google недоступен.\nВойдите по электронной почте.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Google.\nВойдите по электронной почте.',
+  
+
+    // ── 4.23
+    '한 번 더 누르면 앱이 닫힙니다':'Нажмите «назад» ещё раз, чтобы закрыть приложение',
   }
 };
 
@@ -13796,7 +13804,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.22';
+const APP_VER = '4.23';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14278,28 +14286,81 @@ let navDepth = 0;
 function navPush(kind){
   try{ history.pushState({ bt:kind || 1 }, ''); navDepth++; }catch(_){}
 }
-window.addEventListener('popstate', ()=>{
-  if(navDepth > 0) navDepth--;
+// ★ 뒤로가기로 물릴 것이 남아 있나 — 판단하는 문은 이것 하나다.
+//   브라우저 뒤로가기(popstate)와 앱의 뒤로가기 단추가 같은 것을 본다.
+//   두 곳에 따로 적으면 한쪽만 고쳐져서, 앱에서만 엉뚱하게 도는 일이 난다.
+function navBackKind(){
   // 1) 그리기 중이면 한 걸음 물린다
-  if(lkEdit && canUndo()){
-    undoRun();
-    navPush('lkEdit');
-    return;
-  }
+  if(typeof lkEdit !== 'undefined' && lkEdit && canUndo()) return 'undo';
   // 2) 덮개(사진·고르기·서랍)가 있으면 그것부터 걷는다 — 화면보다 위에 있다
-  if(typeof OVERLAY_STACK !== 'undefined' && OVERLAY_STACK.length){
-    closeTopOverlay(); return;
-  }
+  if(typeof OVERLAY_STACK !== 'undefined' && OVERLAY_STACK.length) return 'overlay';
   // 3) 배 둘러보기에서 항해 하나를 펼쳐 놨으면 목록으로 먼저 돌아간다
-  if(typeof pubVoyId !== 'undefined' && pubVoyId){ pubVoyBack(); return; }
+  if(typeof pubVoyId !== 'undefined' && pubVoyId) return 'pubvoy';
   // 4) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
   //    (내 배·물품 목록·입력·휴지통·도움말·할 일 — 쌓인 순서대로)
-  if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length){
-    closeTopScreen(); return;
-  }
-  // 4) 오늘이 아니면 오늘로 — 여기서 한 번 더 뒤로 밀면 앱이 닫힌다
-  if(curTab !== 'home'){ switchTab('home'); navPush('home'); return; }
+  if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length) return 'screen';
+  // 5) 오늘이 아니면 오늘로
+  if(curTab !== 'home') return 'tab';
+  return '';                       // 더 물릴 것이 없다
+}
+// 한 걸음 물린다.
+function navDoBack(kind){
+  const k = kind || navBackKind();
+  if(k === 'undo'){ undoRun(); navPush('lkEdit'); return true; }
+  if(k === 'overlay'){ closeTopOverlay(); return true; }
+  if(k === 'pubvoy'){ pubVoyBack(); return true; }
+  if(k === 'screen'){ closeTopScreen(); return true; }
+  if(k === 'tab'){ switchTab('home'); navPush('home'); return true; }
+  return false;
+}
+window.addEventListener('popstate', ()=>{
+  if(navDepth > 0) navDepth--;
+  navDoBack();
 });
+// ★ 앱(캐퍼시터)의 뒤로가기 단추는 브라우저 뒤로가기와 다른 길로 온다.
+//
+//   웹에서는 브라우저가 popstate 를 보내 주니 위의 것이 받았다.
+//   앱에서는 안드로이드가 앱에게 직접 알려 주는데, 받는 데를 안 붙여 두면
+//   「받는 사람이 없네」 하고 화면을 통째로 닫아 버린다 — 4.22 까지 그랬다.
+//
+//   ★ 여기서는 history.back() 을 부르지 않는다.
+//     탭만 옮긴 상태에는 쌓아 둔 뒤로가기 칸이 없어서, 불러도 아무 일이 안 일어나
+//     화면이 먹통이 된다. 그냥 위의 문을 그대로 쓴다.
+let navExitAt = 0;
+function navNativeBack(){
+  if(navDoBack()) return;
+  // 더 물릴 것이 없다. 실수로 훅 꺼지지 않게 한 번 더 눌러야 닫는다.
+  const now = Date.now();
+  if(now - navExitAt < 2000){ navExitApp(); return; }
+  navExitAt = now;
+  navSayExit();
+}
+function navExitApp(){
+  try{
+    const a = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if(a && a.exitApp){ a.exitApp(); return; }
+  }catch(_){}
+  try{ window.close(); }catch(_){}
+}
+// 「한 번 더 누르면 닫힙니다」 — 오류줄과 같은 자리에 잠깐 띄운다.
+function navSayExit(){
+  try{
+    let d = document.getElementById('errbar');
+    if(!d){ d = document.createElement('div'); d.id='errbar'; document.body.appendChild(d); }
+    errPaint(t('한 번 더 누르면 앱이 닫힙니다'), false);
+    clearTimeout(d._t); d._t = setTimeout(()=>{ d.style.display='none'; }, 2000);
+  }catch(_){}
+}
+// 앱일 때만 붙인다. 웹에서는 브라우저가 알아서 한다.
+function navAttachNative(){
+  try{
+    if(!isNative()) return false;
+    const a = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if(!a || !a.addListener) return false;
+    a.addListener('backButton', ()=>{ try{ navNativeBack(); }catch(_){} });
+    return true;
+  }catch(_){ return false; }
+}
 // 되돌리기 버튼 표시 갱신
 function paintUndoBtns(){
   ['undoBtn','mrUndoBtn'].forEach(id=>{
@@ -23537,6 +23598,14 @@ async function errSend(){
 window.addEventListener('error', e=>showErr(errWhere(e)));
 window.addEventListener('unhandledrejection',
   e=>showErr((e.reason&&e.reason.message)||String(e.reason||t('비동기 오류'))));
+// ★ 앱의 뒤로가기 단추를 받는다. 웹에서는 아무 일도 안 한다.
+//   다리(캐퍼시터)가 늦게 붙을 수 있어 몇 번 더 해 본다 — 한 번 놓치면
+//   그 뒤로 뒤로가기가 영영 앱을 닫는다.
+(function(){
+  let n = 0;
+  const go = ()=>{ if(navAttachNative() || ++n > 20) return; setTimeout(go, 250); };
+  go();
+})();
 wxInit();
 // 앱을 열면 날씨를 미리 받아 둔다 — 오늘 탭이 비어 있지 않게
 try{ ensureWx(); }catch(e){}

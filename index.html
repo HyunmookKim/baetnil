@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1972;
+const LANG_TOTAL = 1973;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3878,6 +3878,10 @@ const I18N = {
 
     // ── 4.19
     '로그인하시거나, 지점을 직접 추가해 주세요.':'Sign in, or add a spot yourself.',
+  
+
+    // ── 4.20
+    '로그인해야 하실 수 있습니다':'You need to sign in to do that.',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5924,6 +5928,10 @@ const I18N = {
 
     // ── 4.19
     '로그인하시거나, 지점을 직접 추가해 주세요.':'Войдите или добавьте точку вручную.',
+  
+
+    // ── 4.20
+    '로그인해야 하실 수 있습니다':'Для этого нужно войти в учётную запись.',
   }
 };
 
@@ -9361,11 +9369,9 @@ async function renderTalk(){
     W.innerHTML = `<div class="mrnone">${esc(t('인터넷에 연결된 상태에서만 볼 수 있습니다'))}</div>`;
     return;
   }
-  if(!window.__user){
-    W.innerHTML = `<div class="mrnone">${esc(t('글판은 로그인해야 볼 수 있습니다'))}<br><br>
-      <button class="mrbtn" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button></div>`;
-    return;
-  }
+  // ★ 4.20 — 로그인 없이도 읽는다.
+  //   처음 온 사람이 안을 하나도 못 보고 가입부터 하라고 하면 그냥 나간다.
+  //   쓰는 것(글·댓글·좋아요·신고)은 needLogin 이 막는다.
   await loadAdmin();
   if(!listFresh('talk')){
     W.innerHTML = `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
@@ -9928,7 +9934,7 @@ function likeRepaint(kind, id, n){
   el.innerHTML = (on ? '✓ ' : '') + (LIKE_LABEL[kind] || '도움됐어요') + likeCount(n);
 }
 async function toggleLike(kind, id){
-  if(kind !== 'post' && !window.__user){ alert(t('로그인해야 누를 수 있습니다')); return; }
+  if(kind !== 'post' && needLogin('로그인해야 누를 수 있습니다')) return;
   const row = likeRowOf(kind, id);
   if(!row) return;
   const was = likedOn(kind, id);
@@ -9995,9 +10001,18 @@ function setTalkSort(v){
 function setTalkKind(v){ talkKind = v; renderTalk(); }
 function setTalkRegion(v){ talkRegion = v; renderTalk(); }
 
+// ★ 로그인해야 되는 일을 눌렀을 때 지나는 문. 하나뿐이다.
+//   자리마다 따로 적으면 어떤 자리는 말만 하고 끝나 사람이 길을 못 찾는다.
+//   돌려주는 값이 true 면 '막았다' 는 뜻이다 — 부른 쪽은 그냥 돌아서면 된다.
+function needLogin(msg){
+  if(window.__user) return false;
+  alert(t(msg || '로그인해야 하실 수 있습니다'));
+  try{ openAccount(); }catch(_){}
+  return true;
+}
 function writeTalk(id){
   if(guardEdit('커뮤니티에 글을 씁니다.', ()=>writeTalk(id))) return;
-  if(!window.__user){ alert(t('로그인해야 글을 쓸 수 있습니다')); return; }
+  if(needLogin('로그인해야 글을 쓸 수 있습니다')) return;
   if(myBan){ alert(banNotice()); return; }
   const po = id ? talkList.find(x=>String(x.id)===String(id)) : null;
   if(id && !po) return;
@@ -10148,7 +10163,7 @@ function writeTalkComment(id){
   if(guardEdit('커뮤니티 글에 댓글을 답니다.', ()=>writeTalkComment(id))) return;
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
-  if(!window.__user){ alert(t('로그인해야 댓글을 쓸 수 있습니다')); return; }
+  if(needLogin('로그인해야 댓글을 쓸 수 있습니다')) return;
   if(myBan){ alert(banNotice()); return; }
   openForm({
     title:'댓글', okText:'올리기',
@@ -10707,11 +10722,7 @@ async function openExplore(biz){
   const W = document.getElementById('exploreWrap');
   if(!W) return;
   if(!window.__pub){ W.innerHTML = `<div class="mrnone">${esc(t('인터넷에 연결된 상태에서만 볼 수 있습니다'))}</div>`; return; }
-  if(!window.__user){
-    W.innerHTML = `<div class="mrnone">${esc(t('둘러보려면 로그인이 필요합니다'))}<br><br>
-      <button class="mrbtn" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button></div>`;
-    return;
-  }
+  // 4.20 — 로그인 없이도 둘러본다
   // 배 둘러보기도 탭을 오갈 때마다 다시 읽고 있었다. 전체와 영업을 따로 기억한다.
   const ck = 'explore:' + (exploreBiz ? '1' : '0');
   if(!listFresh(ck)){
@@ -13739,7 +13750,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.19';
+const APP_VER = '4.20';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -19152,10 +19163,7 @@ async function renderMarket(){
   if(!window.__market){
     W.innerHTML = `<div class="mrnone">${esc(t('인터넷에 연결된 상태에서만 볼 수 있습니다'))}</div>`; return;
   }
-  if(!window.__user){
-    W.innerHTML = `<div class="mrnone">${esc(t('장터는 로그인해야 볼 수 있습니다'))}<br><br>
-      <button class="mrbtn" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button></div>`; return;
-  }
+  // 4.20 — 로그인 없이도 읽는다
   marketFirstNotice();
   await loadAdmin();
   if(!listFresh('market')){
@@ -19760,10 +19768,7 @@ async function renderSpots(){
   if(!W) return;
   if(!featOn('spots')){ W.innerHTML = featClosedHtml('spots'); return; }
   const off = spotsOffline();
-  if(!off && !window.__user){
-    W.innerHTML = `<div class="mrnone">${esc(t('정박지는 로그인해야 볼 수 있습니다'))}<br><br>
-      <button class="mrbtn" onclick="openAccount()">${esc(t('로그인하러 가기'))}</button></div>`; return;
-  }
+  // 4.20 — 로그인 없이도 읽는다
   if(off){
     // 앞서 받아 둔 것이 남아 있으면 그것도 함께 보여 준다 (없으면 관 자료만)
     spotList = listRows('spots');

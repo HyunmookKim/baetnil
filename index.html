@@ -131,7 +131,7 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
 
   <div class="get">
     <div class="getgrid">
-      <a class="btn main on" href="/app">
+      <a class="btn main on" href="app/">
         <b data-t="g1t"></b><span data-t="g1s"></span>
       </a>
       <a class="btn off">
@@ -140,7 +140,7 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
       <a class="btn off">
         <b data-t="g3t"></b><span data-t="g3s"></span>
       </a>
-      <a class="btn on" href="/app">
+      <a class="btn on" href="app/">
         <b data-t="g4t"></b><span data-t="g4s"></span>
       </a>
     </div>
@@ -206,9 +206,9 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
 
   <footer>
     <div class="links">
-      <a href="/terms.html"    data-t="f1" data-doc="terms"></a>
-      <a href="/privacy.html"  data-t="f2" data-doc="privacy"></a>
-      <a href="/location.html" data-t="f3" data-doc="location"></a>
+      <a href="terms.html"    data-t="f1" data-doc="terms"></a>
+      <a href="privacy.html"  data-t="f2" data-doc="privacy"></a>
+      <a href="location.html" data-t="f3" data-doc="location"></a>
       <a href="mailto:help@baetnil.com" data-t="f4"></a>
     </div>
     <p data-t="f5"></p>
@@ -376,7 +376,7 @@ var I18N = {
     var docs = document.querySelectorAll('[data-doc]');
     for(var n=0;n<docs.length;n++){
       var name = docs[n].getAttribute('data-doc');
-      docs[n].href = '/' + name + (lang === 'ko' ? '' : '.' + lang) + '.html';
+      docs[n].href = name + (lang === 'ko' ? '' : '.' + lang) + '.html';
     }
     var bs = document.querySelectorAll('.langbar button');
     for(var j=0;j<bs.length;j++){

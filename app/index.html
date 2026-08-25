@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1996;
+const LANG_TOTAL = 1997;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2582,6 +2582,7 @@ const I18N = {
     '기상청 실시간 확인':'Check the weather service live',
     '기억해 둘 것':'Worth remembering',
     '기온':'Air temp',
+    '비':'Rain',
     '기준':'Datum',
     '기준값 (약최고고조위 HAT)':'Datum (highest astronomical tide, HAT)',
     '기한 지남':'Overdue',
@@ -4667,6 +4668,7 @@ const I18N = {
     '기상청 실시간 확인':'Проверить у метеослужбы',
     '기억해 둘 것':'Стоит запомнить',
     '기온':'Температура',
+    '비':'Дождь',
     '기준':'Отсчёт',
     '기준값 (약최고고조위 HAT)':'Опорный уровень (наивысший астрономический прилив, HAT)',
     '기한 지남':'Просрочено',
@@ -13956,7 +13958,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.26';
+const APP_VER = '4.27';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -22966,6 +22968,13 @@ function wxWindColor(kt){
   if(kt < 27) return '#DE9068';
   return '#E4756A';
 }
+// 비 — 안 오는 시각은 숫자를 안 찍는다. 24칸에 0.0 이 줄줄이 있으면 오는 시각이 안 보인다.
+function wxRainStyle(v){
+  if(v == null || v <= 0)  return 'color:#3A4652';
+  if(v < 1)                return 'color:#7FA8C9';
+  if(v < 5)                return 'color:#4FA3E3;font-weight:700';
+  return 'color:#2E86D4;font-weight:700;background:rgba(46,134,212,.16);border-radius:5px';
+}
 function wxWaveColor(m){
   if(m < 0.5) return '#5FB894';
   if(m < 1.0) return '#9CC08A';
@@ -23579,7 +23588,7 @@ async function renderWeather(){
     const cur = hatCurrent(), ad = airDraft(), mg = clearanceMargin();
 
     // ── 타임라인 행 구성
-    let rowDate='', rowHour='', rowArrow='', rowWind='', rowGust='', rowWave='', rowTemp='';
+    let rowDate='', rowHour='', rowArrow='', rowWind='', rowGust='', rowWave='', rowTemp='', rowRain='';
     let dateSpans = [];
     for(let i=0;i<N;i++){
       const ts = t0 + i*3600e3;
@@ -23596,6 +23605,8 @@ async function renderWeather(){
       rowGust  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${g.toFixed(0)}</div>`;
       rowWave  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="color:${wv!=null?wxWaveColor(wv):'#5A5F66'}">${wv!=null?wv.toFixed(1):'·'}</div>`;
       rowTemp  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${H.temperature_2m[i].toFixed(0)}°</div>`;
+      const rn = (H.precipitation && H.precipitation[i] != null) ? H.precipitation[i] : null;
+      rowRain  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="${wxRainStyle(rn)}">${(rn!=null && rn>0) ? rn.toFixed(1) : '·'}</div>`;
     }
     rowDate = dateSpans.map(s=>`<div class="wdate" style="width:${s.n*COLW}px">${s.label}</div>`).join('');
 
@@ -23642,6 +23653,7 @@ async function renderWeather(){
           <div class="wrow"><div class="wlbl">${esc(t('돌풍'))}</div><div class="wcells">${rowGust}</div></div>
           <div class="wrow"><div class="wlbl">${esc(t('파고'))}<i>m</i></div><div class="wcells">${rowWave}</div></div>
           <div class="wrow"><div class="wlbl">${esc(t('기온'))}</div><div class="wcells">${rowTemp}</div></div>
+          <div class="wrow"><div class="wlbl">${esc(t('비'))}<i>mm</i></div><div class="wcells">${rowRain}</div></div>
           ${TA?`<div class="wrow"><div class="wlbl">${esc(t('조위'))}</div><div class="wcells" style="height:44px">${tideRow}</div></div>
           <div class="wrow"><div class="wlbl"><i>cm</i></div><div class="wcells">${tideNumRow}</div></div>`:''}
           <div id="wxHl" style="left:0"></div>

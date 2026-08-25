@@ -217,6 +217,18 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
 </div>
 
 <script>
+// ★ 옛 주소(hyunmookkim.github.io/baetnil/)로 홈 화면에 깔아 둔 사람 보호.
+//   그 자리에 이제 소개 페이지가 있어서, 그냥 두면 아이콘을 눌렀을 때
+//   앱이 아니라 소개 페이지가 뜬다. 홈 화면 아이콘으로 연 것이면 앱으로 보낸다.
+//   주소를 치고 들어온 사람에게는 소개 페이지가 그대로 보인다.
+(function(){
+  try{
+    var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches)
+              || navigator.standalone === true;
+    if(app){ location.replace('app/'); }
+  }catch(_){}
+})();
+
 var I18N = {
  ko:{
   title:'뱃일 — 배를 타는 사람들',

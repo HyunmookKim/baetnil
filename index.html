@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1976;
+const LANG_TOTAL = 1996;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -3891,6 +3891,32 @@ const I18N = {
 
     // ── 4.23
     '한 번 더 누르면 앱이 닫힙니다':'Press back again to close the app',
+  
+
+    // ── 4.24
+    '항적을 기록하려면 두 가지가 필요합니다.':'Two things are needed to record your track.',
+    '1. 곧 위치를 물어봅니다 — 「앱을 사용하는 동안 허용」 을 누르십시오.':'1. You will be asked for location - tap "Allow While Using App".',
+    '2. 잠시 뒤 아이폰이 「항상 허용으로 바꿀까요?」 라고 다시 물어봅니다. 그때 「항상 허용」 을 누르셔야 화면을 꺼도 기록됩니다.':'2. Shortly after, iOS will ask whether to change to "Always Allow". Tap "Always Allow" so recording continues with the screen off.',
+    '1. 곧 위치를 물어봅니다 — 「앱 사용 중에만 허용」 을 누르십시오.':'1. You will be asked for location - tap "While using the app".',
+    '(그 창에 「항상 허용」 은 안 나옵니다. 안드로이드가 안 보여 줍니다. 그래도 됩니다.)':'("Allow all the time" is not offered there - Android hides it. That is fine.)',
+    '2. 「뱃일 — 항해 기록 중」 알림이 뜹니다. 그 알림이 떠 있는 동안 기록됩니다.':'2. A "Baetnil - recording your voyage" notification appears. Recording continues while it is shown.',
+    '★ 그 알림을 지우면 기록이 멈춥니다. 입항을 기록할 때까지 두십시오.':'* Dismissing that notification stops the recording. Leave it until you log your arrival.',
+    '시작할까요?':'Start now?',
+    '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Could not get your location, so the track cannot be recorded.\n\nCheck that location is turned on for your phone and allowed for Baetnil.\n\nOpen settings?',
+    '기록 중':'Recording',
+    '{n}점':'{n} points',
+    '폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.':'Do not dismiss the "recording your voyage" notification. Recording continues while it is shown.',
+    '입항을 기록하면 저절로 멈춥니다.':'It stops by itself when you log your arrival.',
+  
+
+    // ── 4.25
+    '웹에서는 항적을 기록하지 않습니다. 앱으로 여셔야 합니다.':'Tracks are not recorded on the web. Please open the app.',
+    '이 판에는 항적 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.':'This build does not include the tracking component. Please install the latest app.',
+    '로그인하고 위치 이용에 동의하셔야 항적을 기록합니다.':'Sign in and agree to location use to record a track.',
+    '위치를 받지 못했습니다. 폰의 위치 기능이 켜져 있는지 확인해 주세요.':'Could not get your location. Check that location is turned on for your phone.',
+    '아직 기록하지 않고 있습니다':'Not recording yet',
+    '항적 기록 시작':'Start recording track',
+    '멈추기':'Stop',
   },
   ru: {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
@@ -5950,6 +5976,32 @@ const I18N = {
 
     // ── 4.23
     '한 번 더 누르면 앱이 닫힙니다':'Нажмите «назад» ещё раз, чтобы закрыть приложение',
+  
+
+    // ── 4.24
+    '항적을 기록하려면 두 가지가 필요합니다.':'Для записи трека нужны две вещи.',
+    '1. 곧 위치를 물어봅니다 — 「앱을 사용하는 동안 허용」 을 누르십시오.':'1. Сейчас спросят про геопозицию — нажмите «При использовании приложения».',
+    '2. 잠시 뒤 아이폰이 「항상 허용으로 바꿀까요?」 라고 다시 물어봅니다. 그때 「항상 허용」 을 누르셔야 화면을 꺼도 기록됩니다.':'2. Чуть позже iOS спросит, переключить ли на «Всегда». Нажмите «Всегда», чтобы запись шла и с выключенным экраном.',
+    '1. 곧 위치를 물어봅니다 — 「앱 사용 중에만 허용」 을 누르십시오.':'1. Сейчас спросят про геопозицию — нажмите «Только во время использования».',
+    '(그 창에 「항상 허용」 은 안 나옵니다. 안드로이드가 안 보여 줍니다. 그래도 됩니다.)':'(«Разрешать всегда» там не появится — Android его не показывает. Это нормально.)',
+    '2. 「뱃일 — 항해 기록 중」 알림이 뜹니다. 그 알림이 떠 있는 동안 기록됩니다.':'2. Появится уведомление «Baetnil — идёт запись перехода». Запись идёт, пока оно висит.',
+    '★ 그 알림을 지우면 기록이 멈춥니다. 입항을 기록할 때까지 두십시오.':'* Если убрать это уведомление, запись остановится. Оставьте его до отметки прихода.',
+    '시작할까요?':'Начать?',
+    '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Не удалось получить геопозицию, трек записать нельзя.\n\nПроверьте, включена ли геолокация на телефоне и разрешена ли она для Baetnil.\n\nОткрыть настройки?',
+    '기록 중':'Идёт запись',
+    '{n}점':'точек: {n}',
+    '폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.':'Не убирайте уведомление «идёт запись перехода». Запись идёт, пока оно висит.',
+    '입항을 기록하면 저절로 멈춥니다.':'Она остановится сама, когда вы отметите приход.',
+  
+
+    // ── 4.25
+    '웹에서는 항적을 기록하지 않습니다. 앱으로 여셔야 합니다.':'В веб-версии трек не записывается. Откройте приложение.',
+    '이 판에는 항적 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.':'В этой сборке нет модуля записи трека. Установите свежее приложение.',
+    '로그인하고 위치 이용에 동의하셔야 항적을 기록합니다.':'Чтобы записывать трек, войдите и согласитесь на использование геопозиции.',
+    '위치를 받지 못했습니다. 폰의 위치 기능이 켜져 있는지 확인해 주세요.':'Не удалось получить геопозицию. Проверьте, включена ли геолокация на телефоне.',
+    '아직 기록하지 않고 있습니다':'Запись ещё не идёт',
+    '항적 기록 시작':'Начать запись трека',
+    '멈추기':'Остановить',
   }
 };
 
@@ -7588,7 +7640,7 @@ function migrate(arr){
 //   예전에는 옛 앱 저장소에서 받아왔다. 앱과 자료가 갈라져 있어
 //   한쪽만 고치면 어긋났고, 옛 앱을 지우는 날 이 앱이 조용히 죽는 구조였다.
 //   앱이 놓인 자리를 따라가므로 저장소 이름이 바뀌어도 따라간다.
-const DATA_SITE = 'https://hyunmookkim.github.io/baetnil/';
+const DATA_SITE = 'https://baetnil.com/app/';
 const DATA_BASE = (function(){
   try{
     // ★ 앱(캐퍼시터)으로 싸면 화면 주소가 http://localhost 가 된다.
@@ -8195,13 +8247,30 @@ function lgList(){ return lgLoad().slice(); }
 
 // 한 줄 남긴다. k = 수집 · 이용 · 제공, w = 무엇에 썼는지.
 // ★ 좌표를 받을 자리가 없다. 부르는 쪽에서 넘겨도 들어가지 않는다.
+// ★ 수집요청인 — 누가 달라고 해서 받았나.
+//   이 앱은 남의 위치를 받아 오지 않는다. 언제나 「그 사람이 자기 위치를」 받는 것이라
+//   수집요청인은 늘 본인이다. 그래도 확인자료에는 그 사실이 적혀 있어야 한다.
+//   (센터 회신: 수집요청인·수집일시·수집방법을 확인할 수 있게 하라)
+function lgWho(){
+  try{
+    const n = (typeof meName === 'function') ? String(meName() || '').trim() : '';
+    const u = (typeof meUid === 'function') ? String(meUid() || '').trim() : '';
+    if(n && u) return n + '(' + u + ')';
+    return n || u || '본인';
+  }catch(_){ return '본인'; }
+}
 function lgAdd(k, w, extra){
   const rows = lgLoad();
   const row = { id: newId(), ts: new Date().toISOString(),
                 k: String(k || '수집'), w: String(w || '') };
+  // ★ 센터가 요구한 칸 — 누가(who) · 어떻게(how). 좌표는 넣지 않는다.
+  row.who = (extra && extra.who) ? String(extra.who) : lgWho();
+  if(extra && extra.how) row.how = String(extra.how);
+  else if(String(k || '') === '수집') row.how = '단말기 GPS';
   if(extra && extra.n > 0) row.n = Math.round(extra.n);
   if(extra && extra.from)  row.from = String(extra.from);
   if(extra && extra.to)    row.to   = String(extra.to);
+  if(extra && extra.every) row.every = String(extra.every);
   // ★ 스위치가 꺼져 있으면 좌표를 넘겨도 들어가지 않는다.
   if(LG_KEEP_POS && extra && extra.lat != null && extra.lon != null){
     row.la = +Number(extra.lat).toFixed(5);
@@ -8216,8 +8285,15 @@ function lgAdd(k, w, extra){
 // ★ 항적은 몇 초마다 좌표가 들어온다. 한 점마다 한 줄을 남기면 하루에 수천 줄이다.
 //   사람이 볼 수도 없고 폰도 못 버틴다. 「켠 시각 ~ 끈 시각」 을 한 묶음으로 한 줄만 남긴다.
 //   (껍데기 앱에서 항적을 받기 시작하면 여기를 부른다.)
+// ★ 항적 한 묶음. 센터가 「이 다섯 가지가 있으면 묶어도 된다」 고 한 그대로 남긴다:
+//   시작일시(from) · 종료일시(to) · 수집주기(every) · 수집요청인(who) · 건수(n).
+//   좌표는 넣지 않는다 — 확인자료는 위치정보 자체를 담는 자료가 아니다.
 function lgTrack(from, to, n){
-  return lgAdd('수집', '항해 항적 기록', { from: from, to: to, n: n });
+  return lgAdd('수집', '항해 항적 기록', {
+    from: from, to: to, n: n,
+    how: '단말기 GPS · 이어받기',
+    every: (typeof TRK_DIST === 'number' ? TRK_DIST : 50) + 'm 이동마다'
+  });
 }
 // 클라우드에는 몰아서 올린다.
 // ★ 한 줄마다 올리면 배 위에서 없는 기지국을 찾느라 배터리를 더 먹는다.
@@ -8381,7 +8457,9 @@ function trkPush(pos){
 function trkErr(err){
   if(!err) return;
   if(String(err.code) === 'NOT_AUTHORIZED'){
-    if(confirm(t('항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?'))){
+    // ★ 여기까지 왔다는 것은 위치를 아예 안 주셨거나, 폰의 위치 기능이 꺼져 있다는 뜻이다.
+    //   「항상 허용」이 아니라서가 아니다 — 그건 이 부품이 요구하지 않는다.
+    if(confirm(t('위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?'))){
       const G = bgGeo(); if(G) try{ G.openSettings(); }catch(e){}
     }
   }
@@ -8405,18 +8483,92 @@ async function trkAttach(){
   }catch(e){ return false; }
 }
 
+// ★ 알림 허락. 안드로이드 13+ 에서 이게 없으면 「항해 기록 중」 알림을 못 띄우고,
+//   알림을 못 띄우면 화면을 끈 뒤 위치가 안 온다. 즉 항적이 반쪽이 된다.
+//   물어보기만 하고, 거절해도 막지는 않는다 — 막으면 아무것도 못 하게 된다.
+async function trkAskNoti(){
+  try{
+    const L = window.Capacitor && window.Capacitor.Plugins
+              && window.Capacitor.Plugins.LocalNotifications;
+    if(!L) return 'unknown';
+    let st = await L.checkPermissions();
+    if(st && st.display === 'granted') return 'granted';
+    st = await L.requestPermissions();
+    return (st && st.display) || 'unknown';
+  }catch(_){ return 'unknown'; }
+}
+// 이 기기에서 항적 안내를 이미 봤나
+const TRK_GUIDE_KEY = 'bt_trkguide';
+function trkGuideSeen(){
+  try{ return localStorage.getItem(TRK_GUIDE_KEY) === 'done'; }catch(_){ return false; }
+}
+function trkGuideDone(){
+  try{ localStorage.setItem(TRK_GUIDE_KEY, 'done'); }catch(_){}
+}
+// 아이폰인가 — 폰마다 눌러야 할 것이 다르다
+function trkIsIOS(){
+  try{
+    if(window.Capacitor && window.Capacitor.getPlatform) return window.Capacitor.getPlatform() === 'ios';
+  }catch(_){}
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+}
+// ★ 켜기 전에 하는 말. 폰이 무엇을 물어볼지, 무엇을 눌러야 하는지 그대로 적는다.
+//   「알아서 잘 되겠지」 로 두면 한 항해를 통째로 날린다.
+function trkGuideText(){
+  if(trkIsIOS()){
+    return t('항적을 기록하려면 두 가지가 필요합니다.') + '\n\n'
+         + t('1. 곧 위치를 물어봅니다 — 「앱을 사용하는 동안 허용」 을 누르십시오.') + '\n'
+         + t('2. 잠시 뒤 아이폰이 「항상 허용으로 바꿀까요?」 라고 다시 물어봅니다. 그때 「항상 허용」 을 누르셔야 화면을 꺼도 기록됩니다.');
+  }
+  return t('항적을 기록하려면 두 가지가 필요합니다.') + '\n\n'
+       + t('1. 곧 위치를 물어봅니다 — 「앱 사용 중에만 허용」 을 누르십시오.') + '\n'
+       + t('(그 창에 「항상 허용」 은 안 나옵니다. 안드로이드가 안 보여 줍니다. 그래도 됩니다.)') + '\n\n'
+       + t('2. 「뱃일 — 항해 기록 중」 알림이 뜹니다. 그 알림이 떠 있는 동안 기록됩니다.') + '\n'
+       + t('★ 그 알림을 지우면 기록이 멈춥니다. 입항을 기록할 때까지 두십시오.');
+}
+async function trkGuide(){
+  if(!isNative()) return true;
+  if(trkGuideSeen()) return true;
+  if(!confirm(trkGuideText() + '\n\n' + t('시작할까요?'))) return false;
+  trkGuideDone();
+  return true;
+}
+// ★ 왜 안 켜졌는지를 돌려준다.
+//
+//   전에는 여섯 군데에서 그냥 false 를 돌려주고 끝이었다.
+//   그래서 배에 나갔다 와서야 「하나도 안 그려졌네」 를 알았다. 실제로 그렇게 한 항해를 날렸다.
+//   이제 까닭을 글자로 돌려주고, 부르는 쪽이 사람에게 그대로 말해 준다.
+//   '' 를 돌려주면 잘 켜진 것이다.
 async function trkStart(vid){
-  if(!isNative()) return false;              // 웹에서는 안 한다
-  if(!bgGeo()) return false;
-  if(!locMay(false)) return false;           // 로그인·동의가 먼저다
-  if(trkNow && String(trkNow.vid) === String(vid)) return true;
+  if(!isNative())   return '웹에서는 항적을 기록하지 않습니다. 앱으로 여셔야 합니다.';
+  if(!bgGeo())      return '이 판에는 항적 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.';
+  if(!locMay(false)) return '로그인하고 위치 이용에 동의하셔야 항적을 기록합니다.';
+  if(!await trkGuide()) return '';           // 사람이 그만두겠다고 한 것 — 말 안 한다
+  await trkAskNoti();                        // 알림이 막혀 있으면 기록이 시작도 안 된다
+  if(trkNow && String(trkNow.vid) === String(vid)) return '';
   if(trkNow) await trkStop();
   trkNow = { vid: String(vid), from: new Date().toISOString(), pts: [], id: null };
   trkKeep();
   const ok = await trkAttach();
-  if(!ok){ trkNow = null; trkKeep(); return false; }
+  if(!ok){
+    trkNow = null; trkKeep();
+    return '위치를 받지 못했습니다. 폰의 위치 기능이 켜져 있는지 확인해 주세요.';
+  }
   try{ setSync(t('항적 기록을 시작했습니다')); }catch(e){}
-  return true;
+  return '';
+}
+// 켜고, 안 되면 왜 안 되는지 말한다. 부르는 자리는 전부 이것을 쓴다 — 문 하나.
+async function trkStartSay(vid, quiet){
+  let why = '';
+  try{ why = await trkStart(vid); }catch(e){ why = String((e && e.message) || e); }
+  if(why && !quiet) alert(t(why));
+  try{ if(mrOpenId && String(mrOpenId) === String(vid)) openMR('voyage', vid); }catch(_){}
+  return !why;
+}
+// 사람이 손으로 멈춘다
+async function trkStopSay(){
+  try{ const v = trkNow && trkNow.vid; await trkStop();
+       if(v) openMR('voyage', v); }catch(e){}
 }
 
 async function trkStop(){
@@ -13804,7 +13956,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.23';
+const APP_VER = '4.26';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16365,6 +16517,7 @@ function openMR(kind, id){
              <button class="permb${it.pub === false ? ' on' : ''}" onclick="mrField('pub', false)">${esc(t('이 항해는 비공개'))}</button>`
           : `<b class="mrv">${esc(it.pub === false ? t('비공개') : t('공개'))}</b>`}</div>` : '')
       + tf('날짜','date',it.date,'date','')
+      + trkBox(it)
       + rideBox(it)
       // ★ 예정 항해에는 '나간 뒤' 칸(도착·거리·시간·항적)을 안 보여 준다.
       //   아직 있지도 않은 숫자를 빈 칸으로 늘어놓으면 뭘 적어야 하나 헷갈린다.
@@ -17560,6 +17713,32 @@ function renderVoyage(){
         ? `<div class="mrnone">${esc(t('찾은 항해가 없습니다.'))}</div>`
         : `<div class="mrnone">${esc(t('기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.'))}</div>`));
 }
+// ── 항적 기록 칸 (앱에서, 이 항해를 기록하고 있을 때만 보인다)
+// ★ 켜졌는지 꺼졌는지 화면에 표시가 없으면, 배에서 몇 시간 뒤에야 안 그려진 걸 안다.
+//   그때는 이미 늦다. 그래서 지금 도는지, 몇 점 찍혔는지 보여 준다.
+//   ★ 진짜 신호등은 폰 위의 알림이다 — 그 알림이 떠 있는 동안만 안드로이드가 위치를 준다.
+//     그래서 그것을 지우지 말라고 여기에 적어 둔다.
+function trkBox(it){
+  if(!isNative() || !it) return '';
+  const on = trkOn() && String(trkNow.vid) === String(it.id);
+  if(on){
+    const n = (trkNow.pts || []).length;
+    return `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
+        <b class="mrv" style="flex:1;color:#5FB894">${esc(t('기록 중'))} · ${esc(tsub('{n}점', {n:String(n)}))}</b>
+        <button class="minib" onclick="renderVoyage(); openMR('voyage','${esc(String(it.id))}')">${esc(t('새로고침'))}</button>
+        <button class="minib warn" onclick="trkStopSay()">${esc(t('멈추기'))}</button></div>
+      <div class="mrnone" style="text-align:left">${esc(t('폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.'))}<br>${esc(t('입항을 기록하면 저절로 멈춥니다.'))}</div>`;
+  }
+  // ★ 아직 안 켜진 항해에는 켜는 단추를 둔다.
+  //   켤 길이 화면에 없으면 사람은 켤 수가 없다 — 그게 이번 사고였다.
+  //   이미 도착까지 적은 항해나 예정 항해에는 안 보인다 (켤 일이 없다).
+  if(isPlan(it)) return '';
+  if(String(it.timeIn || '').trim()) return '';
+  if(trkOn()) return '';                      // 다른 항해를 기록하는 중이다
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
+      <span class="mrm" style="flex:1">${esc(t('아직 기록하지 않고 있습니다'))}</span>
+      <button class="mrbtn ok" onclick="trkStartSay('${esc(String(it.id))}')">${esc(t('항적 기록 시작'))}</button></div>`;
+}
 // ── 같이 타기 칸 (예정 항해에서만 보인다)
 function rideBox(it){
   if(!isPlan(it)) return '';
@@ -17720,7 +17899,7 @@ function planStart(){
   // 위치를 먼저 잡고, 그 좌표로 날씨를 받는다 (위치를 못 잡으면 고른 지점으로 떨어진다)
   posHere('wxOut', it.id, true, () => wxCapture('wxOut', it.id));
   // ★ 껍데기 앱이면 여기서부터 항적을 그린다. 웹에서는 아무 일도 안 일어난다.
-  try{ trkStart(it.id); }catch(e){}
+  try{ trkStartSay(it.id); }catch(e){}
 }
 function addVoyage(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
@@ -17734,6 +17913,10 @@ function addVoyage(){
   voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
   // 출발 위치를 먼저 잡고(실패해도 조용히), 그 좌표로 출항 시각 날씨를 받는다
   posHere('wxOut', v.id, true, () => wxCapture('wxOut', v.id));
+  // ★ [+ 기록] 은 「지금 나간다」 는 뜻이다. 여기서도 항적을 켠다.
+  //   전에는 예정 항해 → [출항했습니다] 로만 켜졌다. 바로 나가는 사람은 영영 못 켰고,
+  //   화면에 아무 말도 안 떠서 까닭도 몰랐다 (2026-08-25 실제 항해에서 한 판 날렸다).
+  try{ trkStartSay(v.id); }catch(e){}
 }
 
 // ===== 고객센터 =====

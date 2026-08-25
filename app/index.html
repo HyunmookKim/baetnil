@@ -1825,7 +1825,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1997;
+const LANG_TOTAL = 1998;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2582,6 +2582,7 @@ const I18N = {
     '기상청 실시간 확인':'Check the weather service live',
     '기억해 둘 것':'Worth remembering',
     '기온':'Air temp',
+    '메일로 온 이야기':'Came in by email',
     '비':'Rain',
     '기준':'Datum',
     '기준값 (약최고고조위 HAT)':'Datum (highest astronomical tide, HAT)',
@@ -4668,6 +4669,7 @@ const I18N = {
     '기상청 실시간 확인':'Проверить у метеослужбы',
     '기억해 둘 것':'Стоит запомнить',
     '기온':'Температура',
+    '메일로 온 이야기':'Пришло по почте',
     '비':'Дождь',
     '기준':'Отсчёт',
     '기준값 (약최고고조위 HAT)':'Опорный уровень (наивысший астрономический прилив, HAT)',
@@ -13958,7 +13960,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.27';
+const APP_VER = '4.29';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -18157,7 +18159,7 @@ const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
 const LEGAL_OWNER = {
   name: '김명준',                       // 정본(한국어). 예전 코드·검사 호환
   names: { ko:'김명준', en:'Kim Myung Joon', ru:'Ким Мёнджун' },
-  email: 'jaha814@gmail.com'
+  email: 'help@baetnil.com'
 };
 // ★ 2026-08-19 사업자등록을 마쳤다. 이것이 null 이면 약관에 「개인 자격으로 운영합니다」 라고
 //   나가는데, 이제 그것이 거짓말이다.
@@ -19243,7 +19245,7 @@ async function pushAgree(){
   try{ await window.__people.mark({ agreeVer: a.ver, agreeAt: a.at, agreeLoc: !!a.loc }); }catch(e){}
 }
 
-const SUPPORT_MAIL = 'jaha814@gmail.com';
+const SUPPORT_MAIL = 'help@baetnil.com';
 const SUPPORT_KINDS = [
   { v:'bug',  name:t('오류 신고'),   sub:t('앱이 이상하게 동작합니다') },
   { v:'idea', name:t('건의'),       sub:t('이런 것이 있으면 좋겠습니다') },
@@ -19252,10 +19254,13 @@ const SUPPORT_KINDS = [
   // ★ 고객센터 화면에서는 안 고르게 한다 (SUPPORT_ASK).
   //   연재는 물어볼 것이 따로 있어서 전용 화면(applySeries)으로 받는다.
   //   여기에 두는 까닭은 접수함에서 이름이 제대로 나오게 하려는 것뿐이다.
-  { v:'series', name:t('연재자 신청'), sub:t('글을 이어서 올리고 싶습니다') }
+  { v:'series', name:t('연재자 신청'), sub:t('글을 이어서 올리고 싶습니다') },
+  // ★ 메일로 온 것 — 고객센터 주소(SUPPORT_MAIL)로 온 편지를 서버가 여기에 넣는다.
+  //   사람이 고르는 갈래가 아니다 (SUPPORT_ASK 에서 뺀다).
+  { v:'mail',   name:t('메일'),        sub:t('메일로 온 이야기') }
 ];
 // 고객센터 화면에서 고를 수 있는 갈래
-const SUPPORT_ASK = SUPPORT_KINDS.filter(k => k.v !== 'series');
+const SUPPORT_ASK = SUPPORT_KINDS.filter(k => k.v !== 'series' && k.v !== 'mail');
 let supportRows = [];
 
 // 기기 정보 — 사람이 적게 하지 않고 앱이 붙인다
@@ -19359,7 +19364,7 @@ async function adminSupport(){
       <div class="postbody" style="padding:6px 0">${esc(s.text||'').replace(/\n/g,'<br>')}</div>
       ${sr && s.by ? `<div class="mrnone" style="text-align:left;margin:6px 0">${t('켜 주시려면 <b>[보낸 사람]</b> → <b>연재 글 올리기</b> 를 켜면 됩니다. 연재자는 운영자가 아닙니다 — 운영자 화면은 안 열립니다.')}</div>` : ''}
       <div class="fchips" style="margin-top:6px">
-        ${s.by?`<button class="tchip${sr?' on':''}" onclick="openPerson('${esc(s.by)}')">${esc(t('보낸 사람'))}</button>`:''}
+        ${(s.by && s.kind !== 'mail')?`<button class="tchip${sr?' on':''}" onclick="openPerson('${esc(s.by)}')">${esc(t('보낸 사람'))}</button>`:''}
         <button class="tchip${s.done?' on':''}" onclick="supportDone('${esc(s.id)}',${s.done?'false':'true'})">${s.done?t('다시 새 글로'):t('확인함')}</button>
       </div></div></div>`;
   }).join('');

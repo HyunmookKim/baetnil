@@ -1,6 +1,22 @@
 {
- "updated": "2026-08-25T16:17:36.373Z",
+ "updated": "2026-08-25T21:16:56.129Z",
  "gov": [
+  {
+   "title": "[오늘의 날씨] 강원(26일, 수)…최대 60㎜비…해상 사고 주의",
+   "press": "뉴스1",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFB2SHQtbHZnQm9aVnh6TTVpaEV2eWhZQ2hKaEMzd0llM2xIckc2RzVaYmhvbl84S09vZEtBWEotUFJCcmhoTGJoYkYzYXRUVjRQWmtPcdIBWkFVX3lxTFBxWUZqcXkwaHdfRVNSWDVmY0FlbzVDU3ZGd0NYN3EzSVk5LU5lMUYxVzl1ZG9DVG1CN20yeGVJcE4tREV2ZWU5MlhWRlI5UjhrUkdjdU1ZVXFmQQ?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-25T20:00:00.000Z",
+   "cat": "기상"
+  },
+  {
+   "title": "목포해경, ‘2026 목포 평화광장 갈치낚시’ 참여 선박 대상 사전 안전점검 및 교육 실시",
+   "press": "호남타임즈",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9TQTI0N2FkVUcxN3JWY1RTNFJheGRCQW10VHlVTU5uZmFISmY5VENpSUpyR3FVaXliXzhqSTMwZEY3UEJNRnVYa01KTWxLb2FyaFlUUnJfNFgtT05ZUTZ4dlZ5SmpYcWk3amR3SHpR?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-08-25T15:41:51.000Z",
+   "cat": "지역"
+  },
   {
    "title": "해양레저산업 육성 종합계획 발표…창원시 3단계 로드맵 제시",
    "press": "newfilenews.com",
@@ -10,11 +26,27 @@
    "cat": "산업"
   },
   {
+   "title": "동해해경, 해상공사 동원선박 일제 점검…최근 3년간 사고 8건",
+   "press": "v.daum.net",
+   "link": "https://news.google.com/rss/articles/CBMiRkFVX3lxTE9QTGFXa1hUbXpzSndBSlVUZmU4SkZILXBvVmQwY1JXMGU0UFBpbXB0TG40V2d4dUZUZGt2RFNlTUdXTVRlNFE?oc=5",
+   "source": "해양안전",
+   "date": "2026-08-25T08:16:33.000Z",
+   "cat": "안전"
+  },
+  {
    "title": "창원 바다 확 바뀐다…진해 명동마리나 ‘글로벌 MRO 허브’로 키운다",
    "press": "코리아이글뉴스",
    "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE13WEJXdHpSckxIdFdKa1BwM1JyUVJnb0lSdXRvOEhVcGNCbEFreVJ3dEpsQm1QMGZjaThDbHVrSjBBYXY0RDZvdGE1RDZnRjdiWldicFRGTUhGbVJucndpN3VGd1Etc1BoUVprUlMyaDVrQ00?oc=5",
    "source": "요트·마리나",
    "date": "2026-08-25T06:30:00.000Z",
+   "cat": "산업"
+  },
+  {
+   "title": "창원시, 해양레저산업 육성 청사진 마련…권역별 특화 전략 이행",
+   "press": "연합뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBOMVZINlF6YVRvRy1TeGFDeHlTNjkzRzN3LXF3SVB2TGdoRm9VTWhzMW9PdG1ZTkdabThlQk5iNXBORWh5YWdFMGlSWXhJa0ZPWlAxUTgtSnM4SmdTMHE5bdIBYEFVX3lxTFBOMVZINlF6YVRvRy1TeGFDeHlTNjkzRzN3LXF3SVB2TGdoRm9VTWhzMW9PdG1ZTkdabThlQk5iNXBORWh5YWdFMGlSWXhJa0ZPWlAxUTgtSnM4SmdTMHE5bQ?oc=5",
+   "source": "요트·마리나",
+   "date": "2026-08-25T05:52:43.000Z",
    "cat": "산업"
   },
   {
@@ -499,6 +531,26 @@
    },
    {
     "kind": "ǳ������",
+    "reg": "���ص��ξ��ʸչٴ�",
+    "tmEf": "202608262358"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ؼ��μ��ʸչٴ�",
+    "tmEf": "202608262358"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ؼ��ε��ʸչٴ�",
+    "tmEf": "202608262358"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��κ��ʹٱ��չٴ�",
+    "tmEf": "202608270558"
+   },
+   {
+    "kind": "ǳ������",
     "reg": "���س��γ��ʾ��ʸչٴ�",
     "tmEf": "202608262358"
    },
@@ -524,7 +576,7 @@
    }
   ],
   "active": [
-   "ǳ������: ���ֵ������ʾ��ʸչٴ�, ���ֵ����ʹٱ��չٴ�, ���ص��ιٱ��չٴ�, ���س��γ��ʾ��ʸչٴ�, ���س��γ��ʹٱ��չٴ�, ���ֵ����ξչٴ�"
+   "ǳ������: ���ֵ������ʾ��ʸչٴ�, ���ֵ����ʹٱ��չٴ�, ���ص��ιٱ��չٴ�, ���ص��ξ��ʸչٴ�, ���ؼ��μ��ʸչٴ�, ���ؼ��ε��ʸչٴ�, ���س��κ��ʹٱ��չٴ�, ���س��γ��ʾ��ʸչٴ�, ���س��γ��ʹٱ��չٴ�, ���ֵ����ξչٴ�"
   ],
   "summary": ""
  }

@@ -14,7 +14,9 @@ jobs:
         with:
           node-version: 24
       - run: npm install rss-parser@3
-      - run: node scripts/collect_news.js
+      # 자료 파일은 app/ 안에 둔다. 앱 화면(app/index.html)이 제 자리를 기준으로 찾기 때문이다.
+      - run: node ../scripts/collect_news.js
+        working-directory: app
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       - name: commit news.json
@@ -23,7 +25,7 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           # news_seen.json 은 이미 내보낸 기사 목록이다.
           # 이것도 함께 커밋해야 다음 회차에서 읽어 같은 기사를 거를 수 있다.
-          git add news.json news_seen.json
+          git add app/news.json app/news_seen.json
           git diff --cached --quiet && exit 0
           git commit -m "요트 뉴스 자동 수집"
           git pull --rebase origin main

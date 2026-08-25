@@ -14,7 +14,9 @@ jobs:
         with:
           node-version: 24
       - run: npm install rss-parser@3
-      - run: node scripts/collect_kr.js
+      # 자료 파일은 app/ 안에 둔다. 앱 화면(app/index.html)이 제 자리를 기준으로 찾기 때문이다.
+      - run: node ../scripts/collect_kr.js
+        working-directory: app
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           KMA_HUB_KEY: ${{ secrets.KMA_HUB_KEY }}
@@ -22,7 +24,7 @@ jobs:
         run: |
           git config user.name "news-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add kr.json
+          git add app/kr.json
           git diff --cached --quiet && exit 0
           git commit -m "한국 해양 소식·특보 수집"
           git pull --rebase origin main

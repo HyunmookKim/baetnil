@@ -177,6 +177,12 @@
 .subbtn.on{background:#173A2C;border-color:#2E6B4F;color:#8FD9B4}
 .srghead .subbtn{align-self:center}
 .subbar{gap:10px;padding:4px 0 10px}
+/* 알림 안에서 고르는 작은 단추 (며칠 전 · 지나면 다시). 배 위에서 눌러야 하니 38px */
+.optrow{gap:6px;flex-wrap:wrap;padding:2px 0 10px}
+.optrow .lbl{font-size:12px;color:#7b8794;flex:0 0 74px}
+.optb{min-height:38px;padding:8px 13px;border-radius:19px;font-size:13px;cursor:pointer;
+  background:#1B2733;border:1px solid #2A3B4C;color:#C6D3DF}
+.optb.on{background:#173A2C;border-color:#2E6B4F;color:#8FD9B4;font-weight:700}
 .catwrap{display:flex;flex-wrap:wrap;gap:8px;padding:4px 20px 16px}
 .catbtn{min-height:38px;padding:9px 15px;font-size:13px;border-radius:999px;
   background:#14304a;border:1px solid #2a5a8a;color:#9ed0f5;cursor:pointer}
@@ -1872,7 +1878,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2044;
+const LANG_TOTAL = 2063;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2645,6 +2651,25 @@ const I18N = {
     '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Tap [Subscribe] on a series and you hear about each new part',
     '관심 분야 소식':'News in your topics',
     '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Tap [Pick topics] on the news screen to choose',
+    '정비 · 점검':'Service and checks',
+    '{name} · {n}일 뒤가 기한입니다':'{name} — due in {n} days',
+    '{name} · 오늘이 기한입니다':'{name} — due today',
+    '{name} · 기한이 지났습니다':'{name} — overdue',
+    '며칠 전에':'How early',
+    '지나면 다시':'If overdue',
+    '울리는 시각':'Time of day',
+    '당일에만':'On the day',
+    '{n}일 전':'{n} days early',
+    '안 함':'Off',
+    '{n}일마다':'Every {n} days',
+    '당일':'On the day',
+    '지나고 나서 {n}번까지 다시 부릅니다':'Repeats up to {n} times after the due date',
+    '걸어 둔 알람 {n}개':'{n} alarms set',
+    '걸어 둘 기한이 없습니다. 정비 항목에 마지막으로 한 날을 적으면 걸립니다.':'No due dates to set. Enter the date each item was last done and alarms will be set.',
+    '알람을 걸지 못했습니다':'Could not set the alarms',
+    '앱에서만 울립니다. 웹에서는 알람을 걸 수 없습니다.':'Alarms ring in the app only. The web version cannot set them.',
+    '다시 걸기':'Set again',
+    '정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.':'Service and check reminders really do ring in the app. Comments, subscribed series and topics are still being built.',
     '구독':'Subscribe',
     '구독 중':'Subscribed',
     '관심 분야':'Topics',
@@ -4778,6 +4803,25 @@ const I18N = {
     '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Нажмите [Подписаться] на цикле — и узнаете о каждой новой части',
     '관심 분야 소식':'Новости по моим темам',
     '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Нажмите [Выбрать темы] на экране новостей',
+    '정비 · 점검':'Обслуживание и проверки',
+    '{name} · {n}일 뒤가 기한입니다':'{name} — срок через {n} дн.',
+    '{name} · 오늘이 기한입니다':'{name} — срок сегодня',
+    '{name} · 기한이 지났습니다':'{name} — срок прошёл',
+    '며칠 전에':'За сколько дней',
+    '지나면 다시':'Если просрочено',
+    '울리는 시각':'Во сколько',
+    '당일에만':'В сам день',
+    '{n}일 전':'За {n} дн.',
+    '안 함':'Не напоминать',
+    '{n}일마다':'Каждые {n} дн.',
+    '당일':'В день',
+    '지나고 나서 {n}번까지 다시 부릅니다':'После срока напомним ещё до {n} раз',
+    '걸어 둔 알람 {n}개':'Поставлено напоминаний: {n}',
+    '걸어 둘 기한이 없습니다. 정비 항목에 마지막으로 한 날을 적으면 걸립니다.':'Нет сроков. Укажите дату последнего обслуживания — и напоминания появятся.',
+    '알람을 걸지 못했습니다':'Не удалось поставить напоминания',
+    '앱에서만 울립니다. 웹에서는 알람을 걸 수 없습니다.':'Напоминания приходят только в приложении. В браузере их поставить нельзя.',
+    '다시 걸기':'Поставить снова',
+    '정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.':'Напоминания об обслуживании и проверках уже работают в приложении. Комментарии, подписки и темы ещё в разработке.',
     '구독':'Подписаться',
     '구독 중':'Вы подписаны',
     '관심 분야':'Темы',
@@ -13096,6 +13140,8 @@ async function loadBoatData(){
     dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
   dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
   seedDgIfNeeded();
+  // ★ 배를 바꾸면 정비 목록이 통째로 바뀐다. 알람도 그 배 것으로 다시 건다.
+  try{ maintAlarmSoon(); }catch(_){}
 }
 
 async function initStorage(){
@@ -13148,6 +13194,8 @@ async function initStorage(){
 }
 
 function saveLocal(){
+  // ★ 기한이 바뀌었을 수 있다. 걸어 둔 알람도 따라와야 한다.
+  try{ maintAlarmSoon(); }catch(_){}
   if(db){
     // 기록은 배별로 나눠 저장한다. 배 목록과 현재 배는 공통이다.
     idbSet(bkey('all'), items).catch(e=>alert(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.')));
@@ -14097,7 +14145,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.31';
+const APP_VER = '4.32';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -18198,6 +18246,10 @@ const NOTI_DEF = {
   maint: true,        // 정비·점검 기한
   quiet: true,        // 밤에는 안 울리기
   from: '22:00', to: '06:00',
+  // ★ 정비 알람은 사람마다 다르다. 내가 정하지 않고 사람이 정한다 (사장님이 정하신 것)
+  maintBefore: 7,     // 며칠 전에 알릴까 (0 = 당일에만)
+  maintAgain: 3,      // 기한이 지나면 며칠마다 다시 (0 = 다시 안 알림)
+  maintAt: '09:00',   // 하루 중 몇 시에 울릴까
   series: [],         // 받고 있는 연재 이름들      (2차)
   krCats: [],         // 관심 눌러 둔 한국 소식 분야 (2차)
   wwCats: []          // 관심 눌러 둔 해외 소식 분야 (2차)
@@ -18216,7 +18268,14 @@ function notiGet(){
 function notiSet(patch){
   const d = { ...notiGet(), ...(patch || {}) };
   try{ localStorage.setItem(NOTI_KEY, JSON.stringify(d)); }catch(_){}
+  // ★ 설정이 바뀌면 걸어 둔 알람도 바뀌어야 한다. 안 하면 옛 설정대로 울린다.
+  try{ maintAlarmSoon(); }catch(_){}
   return d;
+}
+// 사람이 고른 값 하나 (며칠 전 · 지나면 다시 · 울리는 시각)
+function notiPick(k, v){
+  notiSet({ [k]: (k === 'maintAt') ? (hm(v) || '09:00') : (Number(v) || 0) });
+  openNoti();
 }
 // 지금 밤 시간인가 (알림을 참아야 하는 때인가)
 // ★ 22:00~06:00 처럼 자정을 넘는 구간이 보통이다. 그래서 from > to 인 경우를 따로 본다.
@@ -18264,6 +18323,191 @@ function notiTime(which, v){
   notiSet({ [which]: val });
   openNoti();
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 정비 · 점검 기한 알람 — 폰이 스스로 건다 (서버 없음)
+//
+// ★ 왜 서버가 없어도 되나
+//   기한 날짜는 앱이 이미 안다(mStatus). 그러니 「그날 그 시각에 울려 달라」고
+//   폰에 미리 적어 두면 된다. 인터넷도 서버도 로그인도 필요 없다.
+//   남이 한 일(댓글·새 글)은 이렇게 못 한다 — 내 폰이 알 방법이 없다. 그건 서버가 있어야 한다.
+//
+// ★ 언제 다시 거나 — 문 하나(maintAlarmSync)에서 통째로 지우고 다시 건다.
+//   기한이 바뀌거나(저장), 배를 바꾸거나, 설정을 만지면 부른다.
+//   일부만 고치면 어긋난다. 어긋난 알람은 안 울리거나 엉뚱한 때 울린다.
+//
+// ★ 조용히 실패하지 않는다
+//   알람을 못 걸었으면 왜 못 걸었는지 알림 화면에 적는다.
+//   4.25 항적 사고가 「안 됐는데 아무 말도 안 한 것」이었다.
+const MAINT_CH = 'baetnil-maint';
+const MAINT_ALARM_MAX = 60;          // 폰이 받아 주는 수에 한계가 있다
+const BEFORE_OPT = [0, 1, 3, 7, 14, 30];
+const AGAIN_OPT  = [0, 1, 3, 7];
+const AGAIN_TIMES = 3;               // 지나고 나서 몇 번까지 다시 부를까
+
+// 마지막으로 건 결과 — 화면에 그대로 보여 준다
+let maintAlarmLast = { n: 0, why: '', at: '' };
+
+function notiLocal(){
+  try{
+    return (window.Capacitor && window.Capacitor.Plugins
+            && window.Capacitor.Plugins.LocalNotifications) || null;
+  }catch(_){ return null; }
+}
+// ★ 안드로이드는 채널이 없으면 알림이 조용히 안 뜬다. 먼저 만든다.
+async function maintChannel(){
+  const L = notiLocal();
+  if(!L || !L.createChannel) return;
+  try{ await L.createChannel({ id: MAINT_CH, name: t('정비 · 점검'), importance: 4, visibility: 1 }); }
+  catch(_){}
+}
+// 알림 번호 — 같은 항목이면 늘 같은 수가 나와야 다시 걸 때 겹치지 않는다
+function maintAlarmId(itemId, slot){
+  const v = String(itemId == null ? '' : itemId);
+  let h = 0;
+  for(let i = 0; i < v.length; i++) h = (h * 31 + v.charCodeAt(i)) | 0;
+  return Math.abs(h % 200000) * 10 + (Number(slot) || 0);
+}
+// 그날 몇 시에 울릴까 — 밤 시간에 걸리면 아침(밤이 끝나는 시각)으로 민다
+function maintAlarmAt(day, d){
+  const hm2 = v => { const a = String(v || '').split(':'); return [Number(a[0])||0, Number(a[1])||0]; };
+  const [hh, mm] = hm2(d.maintAt || '09:00');
+  const x = new Date(day); x.setHours(hh, mm, 0, 0);
+  if(!notiQuietNow(x)) return x;
+  const [th, tm] = hm2(d.to || '06:00');
+  const y = new Date(x); y.setHours(th, tm, 0, 0);
+  if(y <= x) y.setDate(y.getDate() + 1);
+  return y;
+}
+// ★ 무엇을 언제 울릴지 정하는 부분만 따로 뺐다 — 폰 없이도 검사할 수 있어야 한다
+function maintAlarmPlan(now, list){
+  const d = notiGet();
+  const out = [];
+  if(!d.on || !d.maint) return out;
+  const base = now || new Date();
+  const rows = Array.isArray(list) ? list : (typeof maint !== 'undefined' && Array.isArray(maint) ? maint : []);
+  rows.forEach(it=>{
+    if(!it || !it.id) return;
+    if(!maintNotiOn(it)) return;              // 이 항목은 안 받겠다고 껐다
+    if(maintSnoozed(it, base)) return;        // 미뤄 뒀다
+    const st = mStatus(it);
+    if(!st || !st.next) return;               // 한 번도 안 한 것은 기한이 없다
+    const nd = new Date(st.next);
+    const put = (day, slot, body) => {
+      const at = maintAlarmAt(day, d);
+      if(at <= base) return;                  // 지난 시각에는 못 건다
+      out.push({ id: maintAlarmId(it.id, slot), at: at, name: String(it.name || ''), body: body });
+    };
+    const nm = String(it.name || '');
+    if(d.maintBefore > 0){
+      const b = new Date(nd); b.setDate(b.getDate() - d.maintBefore);
+      put(b, 0, tsub('{name} · {n}일 뒤가 기한입니다', { name: nm, n: d.maintBefore }));
+    }
+    put(nd, 1, tsub('{name} · 오늘이 기한입니다', { name: nm }));
+    if(d.maintAgain > 0){
+      // ★ 기한이 한참 지난 것도 잊히면 안 된다.
+      //   지난 날부터 세면 앞의 것들은 이미 지나가 하나도 안 걸린다 —
+      //   70일 지난 항목이 영영 안 울리게 된다. 그래서 「지금 뒤에 오는 것」부터 센다.
+      const step = d.maintAgain;
+      const past = Math.floor((base - nd) / 864e5);
+      const k0 = past > 0 ? Math.floor(past / step) + 1 : 1;
+      for(let j = 0; j < AGAIN_TIMES; j++){
+        const a = new Date(nd); a.setDate(a.getDate() + step * (k0 + j));
+        put(a, 2 + j, tsub('{name} · 기한이 지났습니다', { name: nm }));
+      }
+    }
+  });
+  out.sort((a, b) => a.at - b.at);
+  return out.slice(0, MAINT_ALARM_MAX);
+}
+// 전에 걸어 둔 것을 지운다 (우리가 건 것만)
+async function maintAlarmClear(){
+  const L = notiLocal();
+  if(!L || !L.getPending) return;
+  try{
+    const p = await L.getPending();
+    const mine = ((p && p.notifications) || []).filter(n => n && n.extra && n.extra.bt === 'maint');
+    if(mine.length) await L.cancel({ notifications: mine.map(n => ({ id: n.id })) });
+  }catch(_){}
+}
+async function maintAlarmSync(){
+  const L = notiLocal();
+  if(!L){ maintAlarmLast = { n:0, why:'web', at:'' }; return maintAlarmLast; }
+  try{
+    await maintChannel();
+    await maintAlarmClear();
+    const plan = maintAlarmPlan();
+    if(plan.length){
+      await L.schedule({ notifications: plan.map(p => ({
+        id: p.id,
+        title: t('정비 · 점검'),
+        body: p.body,
+        channelId: MAINT_CH,
+        schedule: { at: p.at, allowWhileIdle: true },
+        extra: { bt: 'maint' }
+      })) });
+    }
+    maintAlarmLast = { n: plan.length, why: '', at: new Date().toISOString() };
+  }catch(e){
+    maintAlarmLast = { n: 0, why: String((e && e.message) || e).slice(0, 120), at: '' };
+  }
+  return maintAlarmLast;
+}
+// 저장할 때마다 바로 걸면 한 번 저장에 여러 번 돈다. 조금 모았다가 한 번만 건다.
+let maintAlarmTimer = null;
+function maintAlarmSoon(){
+  if(maintAlarmTimer) clearTimeout(maintAlarmTimer);
+  maintAlarmTimer = setTimeout(()=>{ maintAlarmTimer = null; try{ maintAlarmSync(); }catch(_){} }, 900);
+}
+// 알림 화면에 붙는 줄 — 몇 개 걸어 뒀는지, 못 걸었으면 왜 못 걸었는지
+function maintAlarmHtml(){
+  const d = notiGet();
+  if(!d.on || !d.maint) return '';
+  const L = notiLocal();
+  let msg;
+  if(!L)                          msg = t('앱에서만 울립니다. 웹에서는 알람을 걸 수 없습니다.');
+  else if(maintAlarmLast.why)     msg = t('알람을 걸지 못했습니다') + ' — ' + maintAlarmLast.why;
+  else if(maintAlarmLast.n)       msg = tsub('걸어 둔 알람 {n}개', { n: maintAlarmLast.n });
+  else                            msg = t('걸어 둘 기한이 없습니다. 정비 항목에 마지막으로 한 날을 적으면 걸립니다.');
+  return `<div class="mrrow" style="padding-top:0;gap:8px">
+      <span class="mrm" style="flex:1;min-width:0;color:#7b8794">${esc(msg)}</span>
+      <button class="mrbtn subbtn" onclick="maintAlarmNow()">${esc(t('다시 걸기'))}</button></div>`;
+}
+async function maintAlarmNow(){
+  await maintAlarmSync();
+  openNoti();
+}
+// ★ 언제 울릴지는 사람마다 다르다. 내가 정하지 않고 사람이 고른다 (사장님이 정하신 것).
+//   숫자를 손으로 찍게 하지 않는다 — 배 위에서 못 한다. 눌러서 고른다.
+function maintBeforeName(n){
+  return n > 0 ? tsub('{n}일 전', { n: n }) : t('당일에만');
+}
+function maintAgainName(n){
+  return n > 0 ? tsub('{n}일마다', { n: n }) : t('안 함');
+}
+// 정비 줄 아래에 한 줄로 요약 — 설정을 안 열어도 언제 울리는지 보인다
+function maintWhenText(d){
+  const c = d || notiGet();
+  return [maintBeforeName(c.maintBefore), t('당일'), maintAgainName(c.maintAgain), c.maintAt]
+         .filter(Boolean).join(' · ');
+}
+function maintWhenRows(d){
+  const c = d || notiGet();
+  const pick = (lbl, key, opts, name) => `<div class="mrrow optrow">
+      <span class="lbl">${esc(lbl)}</span>`
+    + opts.map(v=>`<button class="optb${c[key] === v ? ' on' : ''}" onclick="notiPick('${key}',${v})">${
+        esc(name(v))}</button>`).join('')
+    + `</div>`;
+  return pick(t('며칠 전에'), 'maintBefore', BEFORE_OPT, maintBeforeName)
+    + pick(t('지나면 다시'), 'maintAgain', AGAIN_OPT, maintAgainName)
+    + `<div class="mrrow optrow"><span class="lbl">${esc(t('울리는 시각'))}</span>
+        <input class="tin logtime" inputmode="numeric" maxlength="5" autocomplete="off"
+          oninput="hmType(this)" value="${esc(c.maintAt)}"
+          onchange="hmChange(this, v => notiPick('maintAt', v))"></div>`
+    + (c.maintAgain > 0 ? `<div class="mrrow optrow"><span class="lbl"></span>
+        <span class="mrm" style="color:#7b8794">${esc(tsub('지나고 나서 {n}번까지 다시 부릅니다', {n:AGAIN_TIMES}))}</span></div>` : '');
+}
+
 // ── 구독 · 관심 (연재 이름 · 뉴스 분야)
 //
 // ★ 문 하나
@@ -18417,6 +18661,10 @@ async function openNotiSubs(){
 function notiSoonHtml(){
   return `<div class="mrnone" style="text-align:left">${esc(t('알림을 보내는 장치는 아직 만드는 중입니다. 여기서 고르신 것은 그대로 기억해 두었다가 다 되면 씁니다.'))}</div>`;
 }
+// ★ 정비 알람은 이제 진짜로 울린다. 나머지는 아직이다. 뭉뚱그리면 거짓말이 된다.
+function notiSoonHtml2(){
+  return `<div class="mrnone" style="text-align:left">${esc(t('정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.'))}</div>`;
+}
 
 function openNoti(){
   const P = document.getElementById('mrPanel');
@@ -18445,7 +18693,8 @@ function openNoti(){
       + row(t('내 글에 댓글'), t('글판 · 장터 · 정박지'), d.myComment, "notiToggle('myComment')")
       + row(t('내 연재에 댓글'), '', d.seriesComment, "notiToggle('seriesComment')")
       + lbl(t('내 배'))
-      + row(t('정비 · 점검 기한'), t('7일 전 · 당일 · 지났을 때'), d.maint, "notiToggle('maint')")
+      + row(t('정비 · 점검 기한'), maintWhenText(d), d.maint, "notiToggle('maint')")
+      + (d.maint ? maintWhenRows(d) + maintAlarmHtml() : '')
       + lbl(t('구독 · 관심'))
       + go(t('구독한 연재'), t('연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다'),
            d.series.length, 'openNotiSubs()')
@@ -18460,7 +18709,7 @@ function openNoti(){
            <input class="tin logtime" inputmode="numeric" maxlength="5" autocomplete="off"
              oninput="hmType(this)" value="${esc(d.to)}" onchange="hmChange(this, v => notiTime('to', v))"></div>`
     + `</div>`
-    + notiSoonHtml()
+    + notiSoonHtml2()
     + `<div class="mrnone" style="text-align:left">${esc(t('폰이 알림을 막고 있으면 여기서 켜도 오지 않습니다. 폰 설정에서도 허용해 주세요.'))}</div>`;
   showPanel(P);
   setHeadTitle('알림');

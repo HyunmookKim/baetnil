@@ -1878,7 +1878,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2073;
+const LANG_TOTAL = 2075;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2660,6 +2660,8 @@ const I18N = {
     '폰에 등록하지 못했습니다':'Could not register on this phone',
     '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'This phone is registered. Notifications will arrive when the server sends them.',
     '다시 등록':'Register again',
+    '백업 파일을 내보내지 못했습니다.':'Could not export the backup file.',
+    '{p} 에 넣었습니다.':'Saved to {p}.',
     '소식':'News',
     '정비 · 점검':'Service and checks',
     '{name} · {n}일 뒤가 기한입니다':'{name} — due in {n} days',
@@ -4822,6 +4824,8 @@ const I18N = {
     '폰에 등록하지 못했습니다':'Не удалось зарегистрировать на телефоне',
     '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'Телефон зарегистрирован. Уведомления придут, когда сервер их отправит.',
     '다시 등록':'Зарегистрировать снова',
+    '백업 파일을 내보내지 못했습니다.':'Не удалось выгрузить файл резервной копии.',
+    '{p} 에 넣었습니다.':'Сохранено в {p}.',
     '소식':'Новости',
     '정비 · 점검':'Обслуживание и проверки',
     '{name} · {n}일 뒤가 기한입니다':'{name} — срок через {n} дн.',
@@ -14168,7 +14172,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.33';
+const APP_VER = '4.34';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15719,20 +15723,87 @@ function toggleView(force){
   if(!isMap){ if(typeof lkEdit!=='undefined' && lkEdit) toggleLkEdit(); closePanel(); renderList(); }
 }
 
-function backupData(){
+// ── 파일 내보내기 (백업)
+//
+// ★ 왜 앱에서는 눌러도 아무 일이 없었나
+//   웹에서는 <a download> 하나로 받아진다. 앱의 화면은 웹뷰인데,
+//   웹뷰에는 받은 파일을 넘겨줄 곳이 없다. 눌러도 조용히 아무 일도 안 난다.
+//   사장님이 「백업 눌러도 파일이 안 받아진다」고 하신 것이 이것이다.
+//
+// ★ 다른 앱들은 어떻게 하나 (찾아본 것)
+//   안드로이드 11부터 앱이 다운로드 폴더에 마음대로 못 쓴다. 막혔다.
+//   그래서 요즘 앱들은 「공유·저장 시트」를 띄워 사람이 넣을 곳을 고르게 한다.
+//   거기서 「파일에 저장」을 고르면 다운로드 폴더로 들어가고,
+//   드라이브·카톡·메일로 바로 보낼 수도 있다.
+//
+// ★ 문 하나 — 파일을 밖으로 내보내는 일은 전부 여기를 지난다.
+//   자리마다 따로 짜면 한 군데는 앱에서 안 되는 채로 남는다. 실제로 그랬다.
+function capPlug(name){
+  try{ return (window.Capacitor && window.Capacitor.Plugins
+               && window.Capacitor.Plugins[name]) || null; }catch(_){ return null; }
+}
+// 글자를 base64 로 (파일 부품이 base64 만 받는다)
+// ★ btoa 는 한 글자가 255 를 넘으면 터진다. 한글이 바로 그렇다.
+function b64of(text){
+  const bytes = new TextEncoder().encode(String(text));
+  let bin = '';
+  const CH = 0x8000;                       // 한 번에 다 넘기면 인자 수 한계에 걸린다
+  for(let i = 0; i < bytes.length; i += CH){
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  }
+  return btoa(bin);
+}
+// 성공하면 빈 글자, 실패하면 까닭을 돌려준다.
+// ★ 조용한 실패를 만들지 않는다 — 안 되면 왜 안 되는지 말한다.
+async function saveFile(name, mime, text){
+  const F = capPlug('Filesystem'), S = capPlug('Share');
+  // ── 웹: 브라우저가 알아서 받는다
+  if(!isNative() || !F){
+    try{
+      const blob = new Blob([text], { type: mime });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      return '';
+    }catch(e){ return String((e && e.message) || e); }
+  }
+  // ── 앱: 잠깐 두는 자리에 쓴 다음 「어디에 넣을까」를 묻는다
+  try{
+    await F.writeFile({ path: name, data: b64of(text), directory: 'CACHE' });
+    const u = await F.getUri({ path: name, directory: 'CACHE' });
+    if(S){
+      try{
+        await S.share({ title: name, files: [u.uri] });
+      }catch(e){
+        // 사람이 그만둔 것은 잘못이 아니다
+        const m = String((e && e.message) || e);
+        if(/cancel|dismiss/i.test(m)) return '';
+        throw e;
+      }
+      return '';
+    }
+    // 공유 부품이 없으면 눈에 보이는 자리에라도 넣고 어디인지 말해 준다
+    await F.writeFile({ path: name, data: b64of(text), directory: 'DOCUMENTS', recursive: true });
+    alert(tsub('{p} 에 넣었습니다.', { p: '문서/' + name }));
+    return '';
+  }catch(e){
+    return String((e && e.message) || e).slice(0, 140);
+  }
+}
+async function backupData(){
   const data = {app:"baetnil", date:new Date().toISOString(),
     boat: curBoat(), boats: boats,
     items:items, trash:trash, maint:maint, repair:repair, voyage:voyage,
     fuel:fuel, runs:runs, contacts:contacts, vdocs:vdocs, checkt:checkt, mrtrash:mrTrash,
     lockers:lockers, shapes:shapes, posts:posts, dgimgs:dgArr()};
-  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
-  const a = document.createElement("a");
   const d = new Date(), pad = n=>String(n).padStart(2,'0');
-  a.href = URL.createObjectURL(blob);
   // ★ 한글 파일 이름은 메일로 보내거나 다른 기기로 옮길 때 깨진다.
   //   '________.json' 이 되면 무엇인지 알아볼 수가 없다.
-  a.download = `baetnil-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
-  a.click(); URL.revokeObjectURL(a.href);
+  const name = `baetnil-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
+  const why = await saveFile(name, 'application/json', JSON.stringify(data));
+  if(why) alert(t('백업 파일을 내보내지 못했습니다.') + '\n\n' + why);
 }
 function restoreData(ev){
   const f = ev.target.files[0]; ev.target.value='';

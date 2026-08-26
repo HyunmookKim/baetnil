@@ -1878,7 +1878,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2075;
+const LANG_TOTAL = 2087;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2662,6 +2662,17 @@ const I18N = {
     '다시 등록':'Register again',
     '백업 파일을 내보내지 못했습니다.':'Could not export the backup file.',
     '{p} 에 넣었습니다.':'Saved to {p}.',
+    '항적 보이기':'Show the track',
+    '공개 항해일지에서 지나온 길을 보여 줍니다':'Shows the route you sailed on your public log',
+    '출발·도착 둘레 {n}해리를 가리고 {k}점을 보입니다':'Hiding {n} nm around start and finish; showing {k} points',
+    '배가 매인 자리는 안 나갑니다. 가리개 넓이는 배 › 공개 설정에서 바꾸십시오.':'Where the boat is moored never leaves. Change the hidden radius in Boat > Publishing.',
+    '항적 가리개':'TRACK MASK',
+    '둘레 가림':'Hide around',
+    '{n}해리':'{n} nm',
+    '안 가림':'No mask',
+    '항적을 켠 항해에서 출발·도착 둘레 이만큼을 잘라내고 보여 줍니다. 배가 매인 자리를 가리기 위한 것입니다.':'On voyages where the track is on, this much around the start and finish is cut away before it is shown. It keeps the berth hidden.',
+    '배가 매인 자리 둘레는 가려져 있습니다.':'The area around the berth is hidden.',
+    '기록 내용과 사진 · 동승자는 나가지 않음 · 항적은 항해마다 따로 켬':'Entries and photos; crew names never leave; the track is turned on per voyage',
     '소식':'News',
     '정비 · 점검':'Service and checks',
     '{name} · {n}일 뒤가 기한입니다':'{name} — due in {n} days',
@@ -4826,6 +4837,17 @@ const I18N = {
     '다시 등록':'Зарегистрировать снова',
     '백업 파일을 내보내지 못했습니다.':'Не удалось выгрузить файл резервной копии.',
     '{p} 에 넣었습니다.':'Сохранено в {p}.',
+    '항적 보이기':'Показывать трек',
+    '공개 항해일지에서 지나온 길을 보여 줍니다':'Показывает пройденный маршрут в открытом журнале',
+    '출발·도착 둘레 {n}해리를 가리고 {k}점을 보입니다':'Скрыто {n} м. миль вокруг начала и конца; показано точек: {k}',
+    '배가 매인 자리는 안 나갑니다. 가리개 넓이는 배 › 공개 설정에서 바꾸십시오.':'Место стоянки не публикуется. Радиус скрытия меняется в «Судно › Публикация».',
+    '항적 가리개':'СКРЫТИЕ ТРЕКА',
+    '둘레 가림':'Скрывать вокруг',
+    '{n}해리':'{n} м. миль',
+    '안 가림':'Не скрывать',
+    '항적을 켠 항해에서 출발·도착 둘레 이만큼을 잘라내고 보여 줍니다. 배가 매인 자리를 가리기 위한 것입니다.':'На рейсах с включённым треком столько вокруг начала и конца вырезается перед показом. Это скрывает место стоянки.',
+    '배가 매인 자리 둘레는 가려져 있습니다.':'Область вокруг места стоянки скрыта.',
+    '기록 내용과 사진 · 동승자는 나가지 않음 · 항적은 항해마다 따로 켬':'Записи и фото; имена экипажа не публикуются; трек включается для каждого рейса отдельно',
     '소식':'Новости',
     '정비 · 점검':'Обслуживание и проверки',
     '{name} · {n}일 뒤가 기한입니다':'{name} — срок через {n} дн.',
@@ -9271,7 +9293,7 @@ const PUB_KEYS = [
   { k:'intro',  name:'소개 페이지',    sub:'글과 사진, 유튜브 링크' },
   { k:'phone',  name:'연락처',        sub:'전화번호' },
   { k:'board',  name:'게시판 공개 글', sub:'공개로 표시한 글만' },
-  { k:'voyage', name:'항해일지',      sub:'기록 내용과 사진 · 좌표와 동승자는 나가지 않음' },
+  { k:'voyage', name:'항해일지',      sub:'기록 내용과 사진 · 동승자는 나가지 않음 · 항적은 항해마다 따로 켬' },
   { k:'maint',  name:'정비 기록',      sub:'항목과 날짜만 · 메모는 나가지 않음' },
   { k:'gear',   name:'보유 장비',      sub:'물품 이름만 · 어느 칸인지는 나가지 않음' },
   { k:'roster', name:'회원 명부',      sub:'이름과 등급만 · 회비·부재는 나가지 않음' },
@@ -9292,6 +9314,83 @@ function setPub(b, key, on){
   b.pub[key] = !!on;
   return b.pub;
 }
+
+// ── 항적 공개 · 가리개
+//
+// ★ 왜 항적을 열어 주나
+//   공개 항해일지에 출발·도착 항구 이름은 이미 나간다. 그런데 그림이 없었다.
+//   「어디를 어떻게 돌아왔는지」가 항해일지를 남에게 보여 주는 까닭인데
+//   그 부분만 빠져 있었다. 사장님이 짚어 주셨다.
+//
+// ★ 그럼 무엇이 위험한가
+//   항로가 아니라 「배가 비어 있을 때 정확히 어느 자리에 매여 있는가」다.
+//   항구 이름은 넓고, 계류 자리는 좁다. 그래서 자리만 가린다.
+//
+// ★ 가리개
+//   출발·도착 지점 둘레 일정 반경 안의 점을 통째로 뺀다. 가운데만 나간다.
+//   반경은 배 주인이 고른다 — 항이 넓은 곳도 있고 좁은 곳도 있다.
+//
+// ★ 기본은 꺼짐
+//   항해마다 따로 켠다(v.pubTrk). 안 켜면 지금까지와 똑같이 아무것도 안 나간다.
+const TRK_HIDE = [0, 0.5, 1, 2];       // 가리개 반경 (해리). 0 은 안 가림
+const TRK_HIDE_DEF = 1;
+function trkHideNm(b){
+  const v = Number(b && b.trkHide);
+  return TRK_HIDE.indexOf(v) >= 0 ? v : TRK_HIDE_DEF;
+}
+// 두 점 사이 거리 (해리)
+function nmBetween(a, b){
+  if(!a || !b) return Infinity;
+  const R = 3440.065;                  // 지구 반지름 (해리)
+  const r = Math.PI / 180;
+  const dLa = (b.lat - a.lat) * r, dLo = (b.lon - a.lon) * r;
+  const s1 = Math.sin(dLa/2), s2 = Math.sin(dLo/2);
+  const h = s1*s1 + Math.cos(a.lat*r) * Math.cos(b.lat*r) * s2*s2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+// 가려야 할 자리들 — 출발·도착으로 적은 곳과 항적의 처음·끝
+function trkAnchors(v){
+  const out = [];
+  const add = p => { if(p && isFinite(p.lat) && isFinite(p.lon)) out.push({lat:p.lat, lon:p.lon}); };
+  add(v && v.posOut); add(v && v.posIn);
+  const a = Array.isArray(v && v.trk) ? v.trk : [];
+  const first = a.find(p => p && isFinite(p.la) && isFinite(p.lo));
+  let last = null;
+  for(let i = a.length - 1; i >= 0; i--){ const p = a[i];
+    if(p && isFinite(p.la) && isFinite(p.lo)){ last = p; break; } }
+  if(first) add({ lat:first.la, lon:first.lo });
+  if(last)  add({ lat:last.la,  lon:last.lo  });
+  return out;
+}
+function trkInHide(p, anchors, nm){
+  if(!(nm > 0)) return false;
+  return anchors.some(a => nmBetween(a, p) <= nm);
+}
+// ★ 밖으로 나갈 항적. 여기서 걸러진 점은 어떤 경우에도 안 나간다.
+function trkPublicLine(v, nm){
+  if(!v || v.pubTrk !== true) return null;
+  const a = Array.isArray(v.trk) ? v.trk : [];
+  if(a.length < 2) return null;
+  const anchors = trkAnchors(v);
+  const out = [];
+  a.forEach(p=>{
+    if(!p || !isFinite(p.la) || !isFinite(p.lo)) return;
+    const q = { lat:+Number(p.la).toFixed(4), lon:+Number(p.lo).toFixed(4) };
+    if(trkInHide(q, anchors, nm)) return;
+    out.push(q);
+  });
+  // 두 점이 안 되면 선이 안 그려진다. 그럴 바에는 아무것도 안 내보낸다.
+  return out.length > 1 ? out : null;
+}
+// 중간 기록 깃발도 같은 가리개를 지난다
+function trkPublicLogPos(g, v, nm){
+  if(!v || v.pubTrk !== true) return null;
+  const p = g && g.pos;
+  if(!p || !isFinite(p.lat) || !isFinite(p.lon)) return null;
+  const q = { lat:+Number(p.lat).toFixed(4), lon:+Number(p.lon).toFixed(4) };
+  return trkInHide(q, trkAnchors(v), nm) ? null : q;
+}
+
 // 밖으로 내보낼 자료를 만든다. 여기서 걸러진 것은 어떤 경우에도 나가지 않는다.
 function buildPublic(b){
   if(!b || !isPublic(b)) return null;
@@ -9327,6 +9426,7 @@ function buildPublic(b){
   //   중간 기록에도 좌표(pos)가 붙어 있으므로 거기서도 떼어 낸다.
   //   동승자 이름도 뺀다 — 남의 이름을 배 주인이 대신 공개할 수는 없다.
   if(pubOn(b,'voyage')){
+    const hideNm = trkHideNm(b);
     o.voyage = (typeof voyage!=='undefined' ? voyage : [])
       // ★ 항해마다 따로 감출 수 있다. pub 이 false 인 것은 밖으로 안 나간다.
       //   예정 항해도 안 나간다 — 아직 있지도 않은 항해다.
@@ -9338,10 +9438,17 @@ function buildPublic(b){
         from:v.from || '', to:v.to || '', note:v.note || '',
         timeOut:v.timeOut || '', timeIn:v.timeIn || '',
         nm:v.nm || '', hours:v.hours || '', engineH:v.engineH || '',
-        // 중간 기록 — 시각·구분·내용·엔진만. 좌표는 떼어 낸다.
-        logs: (Array.isArray(v.logs) ? v.logs : []).map(g => ({
-                 time:g.time || '', kind:g.kind || '',
-                 text:g.text || '', eng:g.eng || '' })),
+        // ★ 항적 — 이 항해에서 켠 것만, 그것도 가리개를 지난 뒤에만 나간다.
+        //   안 켜면 null 이다. 예전 판과 똑같다.
+        trk: trkPublicLine(v, hideNm),
+        // 중간 기록 — 시각·구분·내용·엔진. 자리는 항적을 켰을 때만, 가리개를 지나서.
+        logs: (Array.isArray(v.logs) ? v.logs : []).map(g => {
+                 const q = trkPublicLogPos(g, v, hideNm);
+                 const r = { time:g.time || '', kind:g.kind || '',
+                             text:g.text || '', eng:g.eng || '' };
+                 if(q) r.pos = q;
+                 return r;
+               }),
         // 날씨는 사람이 읽는 한 줄만 (지점 이름은 빼고)
         wxOut: (v.wxOut && v.wxOut.text) || '',
         wxIn:  (v.wxIn  && v.wxIn.text)  || '',
@@ -11214,6 +11321,30 @@ function pubVoyName(v){
   if(v && (v.from || v.to)) return (v.from || '—') + ' → ' + (v.to || '—');
   return '';
 }
+// ── 공개 항해일지의 지도
+// ★ 배 주인이 「항적 보이기」를 켠 항해에만 들어 있다. 없으면 아무것도 안 그린다.
+//   출발·도착 둘레는 배 주인이 정한 만큼 이미 잘려 온 것이다 (trkPublicLine).
+function pubTrkBox(v){
+  const line = Array.isArray(v && v.trk) ? v.trk : [];
+  if(line.length < 2) return '';
+  return mapBox('pubTrkMap', '260px')
+    + `<div class="wxfoot" style="padding:2px 2px 10px">${esc(
+        t('배가 매인 자리 둘레는 가려져 있습니다.'))}</div>`;
+}
+// 화면이 그려진 뒤에 켠다 (크기를 알아야 축척이 정해진다)
+function pubTrkPaint(){
+  const x = boatPageData; if(!x || !pubVoyId) return;
+  const v = (x.voyage||[]).find(z=>String(z.id)===String(pubVoyId));
+  const line = Array.isArray(v && v.trk) ? v.trk : [];
+  if(line.length < 2) return;
+  if(!document.getElementById('pubTrkMap')) return;
+  // 중간 기록 가운데 자리가 남아 있는 것만 점으로 찍는다
+  const pts = (v.logs||[])
+    .filter(g => g && g.pos && isFinite(g.pos.lat) && isFinite(g.pos.lon))
+    .map(g => ({ lat:g.pos.lat, lon:g.pos.lon,
+                 label: g.kind ? t(g.kind) : t('기록'), time: g.time || '' }));
+  mapInit('pubTrkMap', pts, { mode:'view', line: line });
+}
 let pubVoyId = '';
 function pubVoyOpen(id){ pubVoyId = String(id); paintBoatPage(); try{ window.scrollTo(0,0); }catch(_){} navPush('pubvoy'); }
 function pubVoyBack(){ if(!pubVoyId) return false; pubVoyId = ''; paintBoatPage(); return true; }
@@ -11261,6 +11392,7 @@ function boatPageBody(x, k){
       return `<div class="mrrow"><button class="mrbtn" onclick="pubVoyBack()">${esc(t('← 항해일지'))}</button></div>
         <div class="mrhead"><b>${esc(pubVoyName(v) || v.date || '')}</b></div>
         <div class="postmeta">${esc(v.date||'')}</div>
+        ${pubTrkBox(v)}
         ${row(t('출발'), [v.from, v.timeOut].filter(Boolean).join(' · '))}
         ${row(t('출발 날씨'), v.wxOut)}
         ${logs.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('중간 기록'))}</span></div>`
@@ -11330,6 +11462,8 @@ function paintBoatPage(){
       <button class="minib" onclick="reportBoat('${esc(x.id)}')">${esc(t('신고'))}</button>
       <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">${esc(t('안 보기'))}</button></div>`;
   showPanel(P);
+  // 지도는 화면이 붙은 뒤에 켠다
+  try{ requestAnimationFrame(()=> pubTrkPaint()); }catch(_){ pubTrkPaint(); }
 }
 async function openBoatPage(id){
   if(!window.__pub) return;
@@ -11360,9 +11494,29 @@ function openPublish(){
       ${isPublic(b) ? `<b>${esc(t('지금 공개 중입니다.'))}</b> 배 이름과 선종은 항상 함께 보입니다.`
                     : `<b>${esc(t('지금은 비공개입니다.'))}</b> 하나라도 켜면 배 둘러보기에 실립니다.`}<br>${t('물품 위치, 좌표, 회비, 개인 메모는 <b>켜도 나가지 않습니다.</b>')}</div>`
     + rows
+    + (pubOn(b,'voyage') ? trkHideRows(b) : '')
     + `<div class="mrrow" style="justify-content:center;padding:14px 12px">
         <button class="mrbtn big" onclick="openIntro()">${esc(t('소개 페이지 쓰기'))}</button></div>`;
   showPanel(P); boatKeepTabs('publish');
+}
+// 가리개 넓이 — 항이 넓은 곳도 있고 좁은 곳도 있다. 배 주인이 고른다.
+function trkHideRows(b){
+  const cur = trkHideNm(b);
+  return `<div class="notilbl">${esc(t('항적 가리개'))}</div>`
+    + `<div class="mrrow optrow"><span class="lbl">${esc(t('둘레 가림'))}</span>`
+    + TRK_HIDE.map(v=>`<button class="optb${cur===v?' on':''}" onclick="setTrkHide(${v})">${
+        esc(v > 0 ? tsub('{n}해리', {n:String(v)}) : t('안 가림'))}</button>`).join('')
+    + `</div>`
+    + `<div class="mrnone" style="text-align:left">${esc(
+        t('항적을 켠 항해에서 출발·도착 둘레 이만큼을 잘라내고 보여 줍니다. 배가 매인 자리를 가리기 위한 것입니다.'))}</div>`;
+}
+function setTrkHide(v){
+  const b = curBoat(); if(!b) return;
+  if(!can(b,'publish','write')){ alert(t('권한이 없습니다')); return; }
+  if(guardEdit('항적 가리개를 바꿉니다.', ()=>setTrkHide(v))) return;
+  b.trkHide = TRK_HIDE.indexOf(Number(v)) >= 0 ? Number(v) : TRK_HIDE_DEF;
+  saveLocal(); saveBoatCloud(b); pushPublic(b);
+  openPublish();
 }
 function setPubUI(key, on, back){
   const b = curBoat(); if(!b) return;
@@ -14172,7 +14326,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.34';
+const APP_VER = '4.35';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16871,6 +17025,7 @@ function openMR(kind, id){
           : `<b class="mrv">${esc(it.pub === false ? t('비공개') : t('공개'))}</b>`}</div>` : '')
       + tf('날짜','date',it.date,'date','')
       + trkBox(it)
+      + trkPubBox(it)
       + rideBox(it)
       // ★ 예정 항해에는 '나간 뒤' 칸(도착·거리·시간·항적)을 안 보여 준다.
       //   아직 있지도 않은 숫자를 빈 칸으로 늘어놓으면 뭘 적어야 하나 헷갈린다.
@@ -18095,6 +18250,39 @@ function trkBox(it){
   return `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
       <span class="mrm" style="flex:1">${esc(t('아직 기록하지 않고 있습니다'))}</span>
       <button class="mrbtn ok" onclick="trkStartSay('${esc(String(it.id))}')">${esc(t('항적 기록 시작'))}</button></div>`;
+}
+// ── 이 항해의 항적을 남에게 보일까
+//
+// ★ 항해마다 따로 켠다. 배 전체로 한 번에 켜면 「이 항해만은 안 보이고 싶다」를 못 한다.
+// ★ 배 공개설정에서 항해일지를 안 켜 뒀으면 아예 안 보여 준다 — 켜 봐야 나갈 데가 없다.
+function trkPubBox(it){
+  if(!it || isPlan(it)) return '';
+  const b = curBoat();
+  if(!b || !pubOn(b, 'voyage')) return '';
+  const pts = (Array.isArray(it.trk) ? it.trk : []).length;
+  if(pts < 2) return '';                     // 그릴 항적이 없다
+  const on = it.pubTrk === true;
+  const nm = trkHideNm(b);
+  const kept = on ? (trkPublicLine(it, nm) || []).length : 0;
+  const head = `<div class="mrrow notirow">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(t('항적 보이기'))}</b>
+        <span class="mrm" style="display:block;color:#7b8794">${esc(
+          on ? tsub('출발·도착 둘레 {n}해리를 가리고 {k}점을 보입니다', { n:String(nm), k:String(kept) })
+             : t('공개 항해일지에서 지나온 길을 보여 줍니다'))}</span>
+      </div>
+      <button class="notisw${on?' on':''}" onclick="trkPubToggle()" aria-pressed="${on?'true':'false'}"><span></span></button></div>`;
+  if(!on) return head;
+  return head + `<div class="mrnone" style="text-align:left">${esc(
+      t('배가 매인 자리는 안 나갑니다. 가리개 넓이는 배 › 공개 설정에서 바꾸십시오.'))}</div>`;
+}
+function trkPubToggle(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  if(guardEdit('항적을 남에게 보일지 바꿉니다.', ()=>trkPubToggle())) return;
+  it.pubTrk = !(it.pubTrk === true);
+  saveMR();
+  const b = curBoat(); if(b) pushPublic(b);
+  openMR('voyage', mrOpenId);
 }
 // ── 같이 타기 칸 (예정 항해에서만 보인다)
 function rideBox(it){

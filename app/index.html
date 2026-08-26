@@ -23,8 +23,8 @@
   text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none}
 .mapbox .mgpin{position:absolute;transform:translate(-50%,-100%);pointer-events:none;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
-.mapbox .mzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:4px}
-.mapbox .mzoom button{width:32px;height:32px;border-radius:8px;border:1px solid #2A3B4C;
+.mapbox .mzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:6}
+.mapbox .mzoom button{width:44px;height:44px;border-radius:10px;border:1px solid #2A3B4C;
   background:rgba(11,16,23,.82);color:#DFE6EE;font-size:18px;line-height:1;cursor:pointer}
 .mapbox .mattr{position:absolute;left:6px;bottom:4px;font-size:11px;color:#9BB0C4;
   background:rgba(255,255,255,.6);padding:1px 5px;border-radius:4px;pointer-events:none}
@@ -135,8 +135,44 @@
 .trkempty{border:1px dashed #2A3B4C;border-radius:10px;padding:20px 14px;margin:2px 0 6px;
   text-align:center;font-size:12px;color:#9AA8B6;line-height:1.8;background:#0E1620}
 .pickHead{display:flex;align-items:center;gap:6px;margin:8px 0 6px}
-#pickWrap{margin:6px 0}
-#pickWrap .tab[disabled]{opacity:.4}
+/* ★ 지도 위에 얹는 띠 — 지도를 하나만 두려고 만들었다.
+   전에는 「지도에서」를 누르면 지도를 하나 더 만들어 화면에 둘이 떴다.
+   게다가 지도 상태(mapS)는 하나뿐이라 나중 것이 앞 것을 죽였다. */
+.mapbar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:6px;
+  padding:8px;background:linear-gradient(180deg,rgba(8,17,26,.94),rgba(8,17,26,.72),transparent)}
+.mapbar b{flex:1;font-size:12.5px;color:#DFE6EE;line-height:1.4}
+.mapbar button{min-height:38px;padding:8px 13px;border-radius:9px;font-size:13.5px;
+  border:1px solid #2A3B4C;background:rgba(11,16,23,.9);color:#DFE6EE;cursor:pointer}
+.mapbar button.ok{background:#2C6A9B;border-color:#3E86BE;color:#fff;font-weight:700}
+.mapbar button[disabled]{opacity:.4}
+/* 중간 기록 깃발 — 항적 위에 무엇이 있었는지 그대로 보인다 */
+.mapbox .mflag{position:absolute;transform:translate(-50%,-100%);z-index:3;
+  display:flex;flex-direction:column;align-items:center;pointer-events:auto;cursor:pointer}
+.mapbox .mflag .fl{font-size:11px;font-weight:700;color:#0b1017;background:#ffd24a;
+  border-radius:6px;padding:2px 7px;white-space:nowrap;box-shadow:0 2px 5px rgba(0,0,0,.45)}
+.mapbox .mflag .st{width:2px;height:11px;background:#ffd24a}
+.mapbox .mflag.on .fl{background:#9CC6E8}
+/* 지도에서 깃발을 누르면 목록의 그 줄이 잠깐 도드라진다 (반대도 마찬가지) */
+.logrow.loghot{background:rgba(156,198,232,.14);border-radius:8px;
+  transition:background .25s}
+/* 설정·알림 — 한 줄이 통째로 눌리는 자리 */
+.setrow{cursor:pointer}
+.setrow:active{background:rgba(156,198,232,.10)}
+.notirow{min-height:56px}
+.notirow.dim{opacity:.5}
+.notilbl{font-size:12px;color:#7b8794;font-weight:600;padding:14px 12px 2px}
+/* ★ 스위치는 배 위에서 장갑 낀 손으로 눌러야 한다. 52×31 (누르는 자리는 그보다 크다) */
+.notisw{width:52px;height:31px;border-radius:999px;border:none;background:#2A3F55;
+  position:relative;flex:none;cursor:pointer;padding:0;min-height:31px}
+.notisw span{position:absolute;left:3px;top:3px;width:25px;height:25px;border-radius:50%;
+  background:#fff;transition:left .16s}
+.notisw.on{background:#5FB894}
+.notisw.on span{left:24px}
+/* 전체를 끄면 아래는 흐려지고 눌리지 않는다 — 눌러도 아무 일이 없으면 고장으로 읽힌다 */
+.notioff{opacity:.42;pointer-events:none}
+/* 「알림 끔 · 미룸」 — 왜 안 오는지 목록에서 바로 보이게. 눈에 튀면 안 된다 */
+.chip.mute{background:#1A2430;color:#7b8794;border-color:#26323F}
+.mapbox .mflag.on .st{background:#9CC6E8}
 body.locked .pform{display:none}
 body.locked .pm, body.locked .pe, body.locked .pd, body.locked .pg{display:none}
 body.locked .trestore, body.locked .tdelp{display:none}
@@ -1739,7 +1775,7 @@ header{padding-top:var(--sat)}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="langBtn" style="display:none" onclick="closeDrawer();openLang()" data-t="언어 · Language">언어 · Language</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="배">배</span></button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-t="항해일지">항해일지</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 
 
@@ -1825,7 +1861,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 1998;
+const LANG_TOTAL = 2036;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2582,6 +2618,44 @@ const I18N = {
     '기상청 실시간 확인':'Check the weather service live',
     '기억해 둘 것':'Worth remembering',
     '기온':'Air temp',
+    '설정':'Settings',
+    '알림':'Notifications',
+    '댓글 · 정비 기한 · 관심 있는 글':'Comments, service due dates, things you follow',
+    '알림 받기':'Turn notifications on',
+    '이걸 끄면 아래가 전부 멈춥니다':'Turning this off stops everything below',
+    '나에게 오는 것':'FOR ME',
+    '내 글에 댓글':'Comments on my posts',
+    '글판 · 장터 · 정박지':'Board, marketplace, moorings',
+    '내 연재에 댓글':'Comments on my series',
+    '정비 · 점검 기한':'Service and check due dates',
+    '7일 전 · 당일 · 지났을 때':'7 days before, on the day, and once overdue',
+    '골라 둔 것':'THINGS YOU FOLLOW',
+    '연재 새 편':'New parts in a series',
+    '연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다':'Tap "Follow this series" while reading and it appears here',
+    '관심 갈래 새 글':'New posts in topics you follow',
+    '뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다':'Pick topics while reading the news and get one digest each morning',
+    '준비 중':'Coming soon',
+    '밤에는':'AT NIGHT',
+    '밤에는 안 울리기':'Stay quiet at night',
+    '그 사이 것은 아침에 한 번에 보입니다':'Anything from those hours arrives together in the morning',
+    '폰이 알림을 막고 있으면 여기서 켜도 오지 않습니다. 폰 설정에서도 허용해 주세요.':'If your phone blocks notifications, turning these on here changes nothing. Allow them in your phone settings too.',
+    '폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.':'Notifications for this app are blocked on your phone.\n\nTurn them on in Settings > Apps > Baetnil > Notifications.',
+    '이 항목 알림':'Notifications for this item',
+    '안 받는 중':'Muted',
+    '{d} 까지 미뤄 둠':'Snoozed until {d}',
+    '기한이 다가오면 알려 드립니다':'You will be told when it comes due',
+    '미루기':'Snooze',
+    '3일 뒤':'3 days',
+    '1주 뒤':'1 week',
+    '2주 뒤':'2 weeks',
+    '한 달 뒤':'1 month',
+    '지금부터 받기':'Resume now',
+    '알림 끔':'Muted',
+    '미룸':'Snoozed',
+    '어디인지 지도를 눌러 주세요':'Tap the map to set the spot',
+    '지도에서 항적 선을 누르면 그 자리에 기록이 하나 생깁니다':'Tap the track on the map to drop an entry right there',
+    '지도에서 보기':'Show on map',
+    '이 기록에는 위치가 없습니다.':'This entry has no position.',
     '메일로 온 이야기':'Came in by email',
     '비':'Rain',
     '기준':'Datum',
@@ -4669,6 +4743,44 @@ const I18N = {
     '기상청 실시간 확인':'Проверить у метеослужбы',
     '기억해 둘 것':'Стоит запомнить',
     '기온':'Температура',
+    '설정':'Настройки',
+    '알림':'Уведомления',
+    '댓글 · 정비 기한 · 관심 있는 글':'Комментарии, сроки обслуживания, то, за чем вы следите',
+    '알림 받기':'Включить уведомления',
+    '이걸 끄면 아래가 전부 멈춥니다':'Если выключить, всё ниже перестанет приходить',
+    '나에게 오는 것':'ЛИЧНО МНЕ',
+    '내 글에 댓글':'Комментарии к моим записям',
+    '글판 · 장터 · 정박지':'Доска, барахолка, стоянки',
+    '내 연재에 댓글':'Комментарии к моему циклу',
+    '정비 · 점검 기한':'Сроки обслуживания и проверок',
+    '7일 전 · 당일 · 지났을 때':'За 7 дней, в день и когда просрочено',
+    '골라 둔 것':'ЗА ЧЕМ СЛЕЖУ',
+    '연재 새 편':'Новые части цикла',
+    '연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다':'Нажмите «Следить за циклом» при чтении — цикл появится здесь',
+    '관심 갈래 새 글':'Новое в выбранных темах',
+    '뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다':'Выберите темы в новостях — утром придёт одна сводка',
+    '준비 중':'Скоро',
+    '밤에는':'НОЧЬЮ',
+    '밤에는 안 울리기':'Не беспокоить ночью',
+    '그 사이 것은 아침에 한 번에 보입니다':'Всё за эти часы придёт утром одним разом',
+    '폰이 알림을 막고 있으면 여기서 켜도 오지 않습니다. 폰 설정에서도 허용해 주세요.':'Если телефон блокирует уведомления, включение здесь ничего не изменит. Разрешите их и в настройках телефона.',
+    '폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.':'Уведомления для этого приложения заблокированы на телефоне.\n\nВключите их: Настройки → Приложения → Baetnil → Уведомления.',
+    '이 항목 알림':'Уведомления по этому пункту',
+    '안 받는 중':'Отключены',
+    '{d} 까지 미뤄 둠':'Отложено до {d}',
+    '기한이 다가오면 알려 드립니다':'Сообщим, когда подойдёт срок',
+    '미루기':'Отложить',
+    '3일 뒤':'на 3 дня',
+    '1주 뒤':'на неделю',
+    '2주 뒤':'на 2 недели',
+    '한 달 뒤':'на месяц',
+    '지금부터 받기':'Получать снова',
+    '알림 끔':'Без уведомлений',
+    '미룸':'Отложено',
+    '어디인지 지도를 눌러 주세요':'Нажмите на карту, чтобы указать место',
+    '지도에서 항적 선을 누르면 그 자리에 기록이 하나 생깁니다':'Нажмите на трек на карте — там появится запись',
+    '지도에서 보기':'Показать на карте',
+    '이 기록에는 위치가 없습니다.':'У этой записи нет координат.',
     '메일로 온 이야기':'Пришло по почте',
     '비':'Дождь',
     '기준':'Отсчёт',
@@ -13159,8 +13271,6 @@ function applyLang(){
     const h0 = document.getElementById('hint');
     if(h0) lkHintOrig = h0.innerHTML;
   }catch(_){}
-  const b = document.getElementById('langBtn');
-  if(b) b.style.display = (langReady().length > 1) ? '' : 'none';
   [['tabHome','오늘'], ['tabBoat','배'], ['tabVoyage','항해일지'], ['tabCommunity','커뮤니티']]
     .forEach(([id, k])=>{
       const el = document.getElementById(id);
@@ -13960,7 +14070,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.29';
+const APP_VER = '4.30';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15737,6 +15847,72 @@ function addPeriod(iso, n, unit){
   }
   return addMonths(iso, n);
 }
+// ── 정비 알림 — 항목마다 끄고, 미루고
+//
+// ★ 왜 항목마다인가
+//   정비는 항목이 수십 개다. 다 켜 두면 매일 울린다. 그러면 사람은 알림을 통째로 꺼 버린다.
+//   그러면 정작 중요한 것도 안 온다. 그래서 「이 항목만 안 받기」가 있어야 한다.
+//
+// ★ 왜 미루기인가
+//   「알고 있는데 지금은 못 한다」가 대부분이다. 그때 할 수 있는 것이 끄기밖에 없으면
+//   사람은 꺼 버리고 잊는다. 「2주 뒤에 다시」가 있으면 끄지 않는다.
+//
+//   noti  : false 면 이 항목은 알림을 안 보낸다
+//   snooze: 이 날짜까지는 안 보낸다 (ISO 날짜)
+const SNOOZE = [
+  { d:3,  name:'3일 뒤' },
+  { d:7,  name:'1주 뒤' },
+  { d:14, name:'2주 뒤' },
+  { d:30, name:'한 달 뒤' }
+];
+function maintNotiOn(it){
+  return !(it && it.noti === false);
+}
+// 지금 이 항목의 알림을 참아야 하나 (미룬 날짜가 아직 안 지났나)
+function maintSnoozed(it, now){
+  if(!it || !it.snooze) return false;
+  const d = new Date(String(it.snooze) + 'T23:59:59');
+  if(isNaN(d)) return false;
+  return (now || new Date()) <= d;
+}
+function maintNotiToggle(){
+  const it = getMR('maint', mrOpenId); if(!it) return;
+  it.noti = !maintNotiOn(it);
+  if(it.noti) it.snooze = '';      // 다시 켜면 미뤄 둔 것도 푼다
+  it.seed = false; saveMR(); rerender('maint'); openMR('maint', mrOpenId);
+}
+function maintSnooze(days){
+  const it = getMR('maint', mrOpenId); if(!it) return;
+  const n = Number(days) || 0;
+  if(n <= 0){ it.snooze = ''; }
+  else {
+    const d = new Date(); d.setDate(d.getDate() + n);
+    it.snooze = fmtDate(d);
+    it.noti = true;               // 미룬다는 것은 받겠다는 뜻이다
+  }
+  it.seed = false; saveMR(); rerender('maint'); openMR('maint', mrOpenId);
+}
+// 상세 화면에 그리는 줄
+function maintNotiRow(it){
+  if(!it) return '';
+  const on = maintNotiOn(it);
+  const sn = maintSnoozed(it);
+  const head = `<div class="mrrow notirow">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(t('이 항목 알림'))}</b>
+        <span class="mrm" style="display:block;color:#7b8794">${
+          !on ? esc(t('안 받는 중'))
+          : sn ? esc(tsub('{d} 까지 미뤄 둠', { d: it.snooze }))
+          : esc(t('기한이 다가오면 알려 드립니다'))}</span>
+      </div>
+      <button class="notisw${on?' on':''}" onclick="maintNotiToggle()" aria-pressed="${on?'true':'false'}"><span></span></button></div>`;
+  if(!unlocked || !on) return head;
+  return head + `<div class="mrrow" style="gap:6px;flex-wrap:wrap;padding-top:0">
+      <span class="mrm" style="color:#7b8794">${esc(t('미루기'))}</span>
+      ${SNOOZE.map(x=>`<button class="minib" onclick="maintSnooze(${x.d})">${esc(t(x.name))}</button>`).join('')}
+      ${it.snooze ? `<button class="minib grn" onclick="maintSnooze(0)">${esc(t('지금부터 받기'))}</button>` : ''}</div>`;
+}
+
 function addMonths(iso, m){
   const [y,mo,d] = iso.split('-').map(Number);
   const nd = new Date(y, mo-1+(m||12), 1);
@@ -16334,9 +16510,12 @@ function renderMaintList(){
     if(closed) return head;
     return head + arr.map(it=>{
       const s=mStatus(it);
+      const nOff = !maintNotiOn(it), nSnz = maintSnoozed(it);
       return `<div class="mr gitem ${s.k}" onclick="openMR('maint','${it.id}')">
         <div class="ct"><div class="cn">${esc(it.name || '(이름 없음)')}${it.seed?` <span class="seedb">${esc(t('초안'))}</span>`:''}</div>
           ${it.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), it.who))}</span>`:''}
+          ${nOff?`<span class="chip mute">${esc(t('알림 끔'))}</span>`
+              :(nSnz?`<span class="chip mute">${esc(t('미룸'))}</span>`:'')}
           <span class="st ${s.k}">${s.t}</span></div>
         <div class="mrm">${esc(tsub('주기 {n}{u}', {n:it.months, u:UNIT_LABEL[it.unit||'m']}))} · ${esc(tsub('마지막 {d}', {d:it.lastDate||'—'}))}${s.next?' · '+esc(tsub('다음 {d}', {d:fmtDate(s.next)})):''}${it.pin?' · '+esc(t('핀')):''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}</div>
       </div>`;
@@ -16487,6 +16666,7 @@ function openMR(kind, id){
         <b class="mrv" style="flex:1">${it.who ? esc(taskOwnerName(curBoat(), it.who)) : esc(t('없음'))}</b>
         ${can(curBoat(),'task','write')
           ? `<button class="minib blu" onclick="pickAssignee('maint','${it.id}')">${esc(t('맡기기'))}</button>` : ''}</div>
+      ${maintNotiRow(it)}
       <div class="mrrow edt"><button class="mrbtn ok" onclick="mrComplete()">${esc(t('완료 처리'))}</button></div>
       ${(it.history&&it.history.length)?`<div class="mhist">${esc(t('이력'))}: ${it.history.map(x=>x.date).join(' · ')}</div>`:''}`;
   } else if(kind==='repair'){
@@ -16556,18 +16736,20 @@ function openMR(kind, id){
                        return (a>0 && b>=0 && a>=b) ? (a-b).toFixed(1)+'h' : '—'; })() }))}</div>`
       + suggestRow(it, 'engineH')
       + tf('동승','crew',it.crew)
+      // ★ 지도는 늘 하나만 둔다. 보는 곳이자 적는 곳이다.
+      //   점이 하나도 없어도 그린다 — 「지도에서」를 눌렀을 때 그릴 자리가 있어야 한다.
+      + `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
+           <span class="mrm" style="flex:1;color:#7b8794">${
+             trkPoints(it).length
+               ? esc(t('점 {n}개 · 끌어서 이동 · 두 손가락으로 확대').split('{n}').join(String(trkPoints(it).length)))
+               : esc(t('저장된 위치가 없습니다'))}</span></div>`
+      + mapBox('trkMap','44vh')
       + (trkPoints(it).length
-          ? `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
-               <span class="mrm" style="flex:1;color:#7b8794">${esc(t('점 {n}개 · 끌어서 이동 · 두 손가락으로 확대').split('{n}').join(String(trkPoints(it).length)))}</span></div>`
-            + mapBox('trkMap','44vh')
-            + `<div class="mrnone" style="text-align:left">${esc(t('기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.'))}<br>
+          ? `<div class="mrnone" style="text-align:left">${esc(t('기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.'))}<br>
                ${esc(t('지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)'))}</div>`
-          : `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
-               <span class="mrm" style="flex:1;color:#7b8794">${esc(t('저장된 위치가 없습니다'))}</span></div>`
-            + `<div class="trkempty">${esc(t('위치를 남기면 이곳에 항적이 표시됩니다'))}<br>
+          : `<div class="trkempty">${esc(t('위치를 남기면 이곳에 항적이 표시됩니다'))}<br>
                  <span style="color:#7b8794">${t('출발·도착·중간기록에서 <b style="color:#6FD9A0">지금 여기</b> 또는 <b style="color:#8ab4d8">지도에서</b> 를 누르면 됩니다')}</span>${
                  unlocked ? `<div style="margin-top:10px"><button class="mrbtn" onclick="posHere('wxOut')">${esc(t('지금 여기로 출발 위치 잡기'))}</button></div>` : ''}</div>`)
-      + `<div id="pickWrap" style="display:none"></div>`
         ))
       + (it.weather ? tf('날씨(옛기록)','weather',it.weather) : '');
   } else if(kind==='run'){
@@ -16633,11 +16815,13 @@ function openMR(kind, id){
       <button class="mrbtn warn" onclick="mrDelete()">${esc(t('삭제'))}</button></div>`;
   showPanel(P);
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
+  // ★ 점이 하나도 없어도 켠다. 지도가 보는 곳이자 적는 곳이라 늘 있어야 한다.
   if(kind === 'voyage'){
     const pts = trkPoints(it);
-    if(pts.length) requestAnimationFrame(()=> mapInit('trkMap', pts,
-      { mode:'view', line: (typeof trkLine === 'function') ? trkLine(it) : null }));
-    else mapS = null;
+    pickCtx = null;                                  // 다른 항해를 열면 고르던 것은 버린다
+    requestAnimationFrame(()=> mapInit('trkMap', pts,
+      { mode:'view', line: (typeof trkLine === 'function') ? trkLine(it) : null,
+        vid: it.id }));
   }
 }
 function closeMR(){
@@ -17966,6 +18150,156 @@ function setLang(v){
   try{ localStorage.setItem('bt_lang', v); }catch(e){}
   location.reload();
 }
+// ═══════════════════════════════════════════════════════════════
+// 알림
+//
+// ★ 왜 이렇게 나눴나 (사장님과 정한 것)
+//   1차 — 「나에게 오는 것」. 받을 사람이 딱 한 명이다. 내 글의 주인, 내 배의 주인.
+//         잘못 가도 나 하나다.
+//   2차 — 「골라 둔 것」(연재·뉴스 갈래). 「이걸 켜 둔 사람이 누구누구인가」를 찾아
+//         여러 명에게 보낸다. 여기가 틀리면 엉뚱한 알림이 무더기로 나가고,
+//         보낸 것은 못 되돌린다. 그래서 화면만 먼저 만들고 「준비 중」으로 둔다.
+//
+// ★ 허락은 「알림 받기」를 처음 켤 때만 청한다.
+//   앱을 켜자마자 물으면 대부분 거절한다. 한 번 거절당하면 안드로이드는 다시 안 물어봐 주고
+//   사람은 설정에 들어가야 한다. 항적 안내에서 쓰던 방식과 같다.
+const NOTI_KEY = 'bt_noti';
+const NOTI_DEF = {
+  on: false,          // 전체
+  myComment: true,    // 내 글에 댓글
+  seriesComment: true,// 내 연재에 댓글
+  maint: true,        // 정비·점검 기한
+  quiet: true,        // 밤에는 안 울리기
+  from: '22:00', to: '06:00',
+  series: [],         // 받고 있는 연재 이름들      (2차)
+  krCats: [],         // 받고 있는 한국 소식 갈래   (2차)
+  wwCats: []          // 받고 있는 해외 소식 갈래   (2차)
+};
+function notiGet(){
+  try{
+    const raw = localStorage.getItem(NOTI_KEY);
+    if(!raw) return { ...NOTI_DEF };
+    const d = JSON.parse(raw);
+    // ★ 없는 칸은 기본값으로 메운다. 판이 오르며 칸이 늘어도 옛 설정이 안 깨진다.
+    const out = { ...NOTI_DEF, ...(d && typeof d === 'object' ? d : {}) };
+    ['series','krCats','wwCats'].forEach(k=>{ if(!Array.isArray(out[k])) out[k] = []; });
+    return out;
+  }catch(_){ return { ...NOTI_DEF }; }
+}
+function notiSet(patch){
+  const d = { ...notiGet(), ...(patch || {}) };
+  try{ localStorage.setItem(NOTI_KEY, JSON.stringify(d)); }catch(_){}
+  return d;
+}
+// 지금 밤 시간인가 (알림을 참아야 하는 때인가)
+// ★ 22:00~06:00 처럼 자정을 넘는 구간이 보통이다. 그래서 from > to 인 경우를 따로 본다.
+function notiQuietNow(now){
+  const d = notiGet();
+  if(!d.quiet) return false;
+  const dt = now || new Date();
+  const m = dt.getHours() * 60 + dt.getMinutes();
+  const mm = v => { const a = String(v||'').split(':'); return (+a[0]||0)*60 + (+a[1]||0); };
+  const f = mm(d.from), tt = mm(d.to);
+  if(f === tt) return false;
+  return f < tt ? (m >= f && m < tt) : (m >= f || m < tt);
+}
+// 알림 허락 — 사람이 켜겠다고 한 그 순간에만 청한다
+async function notiAsk(){
+  try{
+    const P = window.Capacitor && window.Capacitor.Plugins
+              && (window.Capacitor.Plugins.PushNotifications || window.Capacitor.Plugins.LocalNotifications);
+    if(!P) return 'unknown';
+    let st = await P.checkPermissions();
+    if(st && (st.receive === 'granted' || st.display === 'granted')) return 'granted';
+    st = await P.requestPermissions();
+    return (st && (st.receive || st.display)) || 'unknown';
+  }catch(_){ return 'unknown'; }
+}
+async function notiToggleAll(){
+  const d = notiGet();
+  if(d.on){ notiSet({ on:false }); openNoti(); return; }
+  const st = await notiAsk();
+  if(st === 'denied'){
+    alert(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
+    return;
+  }
+  notiSet({ on:true });
+  openNoti();
+}
+function notiToggle(k){
+  const d = notiGet();
+  notiSet({ [k]: !d[k] });
+  openNoti();
+}
+function notiTime(which, v){
+  const val = hm(v);
+  if(!val) return;
+  notiSet({ [which]: val });
+  openNoti();
+}
+function openNoti(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  const d = notiGet();
+  const sw = (on, fn) => `<button class="notisw${on?' on':''}" onclick="${fn}" aria-pressed="${on?'true':'false'}"><span></span></button>`;
+  const row = (title, sub, on, fn, dim) => `<div class="mrrow notirow${dim?' dim':''}">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(title)}</b>
+        ${sub ? `<span class="mrm" style="display:block;color:#7b8794">${esc(sub)}</span>` : ''}
+      </div>${dim ? `<span class="chip">${esc(t('준비 중'))}</span>` : sw(on, fn)}</div>`;
+  const lbl = s => `<div class="notilbl">${esc(s)}</div>`;
+  const off = !d.on;
+
+  P.innerHTML = `<div class="mrhead"><b>${t('알림')}</b><span style="flex:1"></span></div>`
+    + row(t('알림 받기'), t('이걸 끄면 아래가 전부 멈춥니다'), d.on, 'notiToggleAll()')
+    + `<div class="${off?'notioff':''}">`
+      + lbl(t('나에게 오는 것'))
+      + row(t('내 글에 댓글'), t('글판 · 장터 · 정박지'), d.myComment, "notiToggle('myComment')")
+      + row(t('내 연재에 댓글'), '', d.seriesComment, "notiToggle('seriesComment')")
+      + lbl(t('내 배'))
+      + row(t('정비 · 점검 기한'), t('7일 전 · 당일 · 지났을 때'), d.maint, "notiToggle('maint')")
+      + lbl(t('골라 둔 것'))
+      + row(t('연재 새 편'), t('연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다'), false, '', true)
+      + row(t('관심 갈래 새 글'), t('뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다'), false, '', true)
+      + lbl(t('밤에는'))
+      + row(t('밤에는 안 울리기'), t('그 사이 것은 아침에 한 번에 보입니다'), d.quiet, "notiToggle('quiet')")
+      + `<div class="mrrow notirow"><div style="flex:1"><b class="mrv">${esc(t('시간'))}</b></div>
+           <input class="tin logtime" inputmode="numeric" maxlength="5" autocomplete="off"
+             oninput="hmType(this)" value="${esc(d.from)}" onchange="hmChange(this, v => notiTime('from', v))">
+           <span style="color:#7b8794">~</span>
+           <input class="tin logtime" inputmode="numeric" maxlength="5" autocomplete="off"
+             oninput="hmType(this)" value="${esc(d.to)}" onchange="hmChange(this, v => notiTime('to', v))"></div>`
+    + `</div>`
+    + `<div class="mrnone" style="text-align:left">${esc(t('폰이 알림을 막고 있으면 여기서 켜도 오지 않습니다. 폰 설정에서도 허용해 주세요.'))}</div>`;
+  showPanel(P);
+  setHeadTitle('알림');
+}
+
+// ── 설정
+//
+// ★ 왜 만들었나
+//   서랍에 항목이 계속 늘고 있었다. 「언어」처럼 한 번 정하고 잘 안 건드리는 것과
+//   「클라우드에 올리기」처럼 자주 누르는 것이 한 줄에 섞여 있으면 자주 쓰는 것을 찾기 어렵다.
+//   한 번 정하는 것들을 여기로 모은다.
+function openSettings(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  const row = (title, sub, fn) => `<div class="mrrow setrow" onclick="${fn}">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(title)}</b>
+        ${sub ? `<span class="mrm" style="display:block;color:#7b8794">${esc(sub)}</span>` : ''}
+      </div><span style="color:#7b8794;font-size:18px">&rsaquo;</span></div>`;
+  const langName = (langReady().find(x=>x.v===langNow()) || {}).name || '';
+  // ★ 쓸 수 있는 말이 하나뿐이면 「언어」 줄은 안 보여 준다.
+  //   전에는 서랍에서 langBtn 을 감추는 방식이었다. 그 판단이 여기로 왔다.
+  const many = langReady().length > 1;
+  P.innerHTML = `<div class="mrhead"><b>${t('설정')}</b><span style="flex:1"></span></div>`
+    + row(t('알림'), t('댓글 · 정비 기한 · 관심 있는 글'), 'openNoti()')
+    + (many ? row(t('언어 · Language'), langName, 'openLang()') : '');
+  showPanel(P);
+  setHeadTitle('설정');
+}
+
 function openLang(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
@@ -21145,7 +21479,9 @@ function logDel(lid){
 function logRows(it){
   const arr = (it.logs||[]).slice().sort((a,b)=> String(a.time||'').localeCompare(String(b.time||'')));
   const head = `<div class="mrrow"><span class="mrlbl">${esc(t('중간 기록'))}</span>
-    <span class="mrm" style="flex:1;color:#7b8794">${esc(t('출발과 도착 사이에 있었던 일'))}</span></div>`;
+    <span class="mrm" style="flex:1;color:#7b8794">${esc(t('출발과 도착 사이에 있었던 일'))}</span></div>`
+    + ((unlocked && trkLine(it)) ? `<div class="mrm" style="padding:0 12px 6px 74px;color:#7b8794">${
+        esc(t('지도에서 항적 선을 누르면 그 자리에 기록이 하나 생깁니다'))}</div>` : '');
   // 추가 버튼은 목록 아래에 둔다 — 위에 있으면 누를 때마다 화면을 위로 올려야 한다
   const foot = unlocked
     ? `<div class="mrrow" style="justify-content:center;padding:6px 12px 12px">
@@ -21155,8 +21491,9 @@ function logRows(it){
     return head + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${
       unlocked ? t('항해 중 있었던 일을 시각과 함께 남겨 주세요') : t('기록 없음')}</div>` + foot;
   return head + arr.map(g=>{
+    const hasPos = !!(g.pos && g.pos.lat != null && g.pos.lon != null);
     const row = unlocked
-      ? `<div class="mrrow" style="gap:6px;flex-wrap:wrap">
+      ? `<div class="mrrow logrow" id="log-${g.id}" style="gap:6px;flex-wrap:wrap">
            <input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(g.time||''))}" onchange="hmChange(this, v => logField('${g.id}','time', v))">
            <select class="logkind" onchange="logField('${g.id}','kind',this.value)">${
              logKinds().map(x=>`<option value="${x}"${g.kind===x?' selected':''}>${esc(t(x))}</option>`).join('')}</select>
@@ -21167,12 +21504,14 @@ function logRows(it){
                 onclick="logField('${g.id}','eng','${v}')">${v==='on'?t('켬'):v==='off'?t('끔'):t('그대로')}</button>`).join('')}
            </div>
          </div>`
-      : `<div class="mrrow"><span class="mrlbl">${esc(g.time ? hm(g.time) : '—')}</span>
+      : `<div class="mrrow logrow" id="log-${g.id}"><span class="mrlbl">${esc(g.time ? hm(g.time) : '—')}</span>
            <span class="chip">${esc(t(g.kind||''))}</span>
            ${logEngine(g)!=='keep'?`<span class="chip ${logEngine(g)==='on'?'engon':'engoff'}">${t('엔진')} ${logEngine(g)==='on'?t('켬'):t('끔')}</span>`:''}
            <b class="mrv" style="flex:1">${esc(g.text||'')}</b></div>`;
     // 낚시배의 포인트에는 수심·수온·미끼·채비·잡은 것이 따라붙는다
     return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id)
+      + (hasPos ? `<div class="posrow" style="padding-top:0"><span style="flex:1"></span>
+           <button class="minib blu" onclick="logShowOnMap('${g.id}')">${esc(t('지도에서 보기'))}</button></div>` : '')
       + ((isFishing() && g.kind === '포인트') ? fishRows(g) : '');
   }).join('') + foot;
 }
@@ -21207,6 +21546,102 @@ function trkPoints(it){
   push(it.posIn, t('도착'), it.timeIn, 'wxIn');
   return out;
 }
+// ── 항적 선 위의 한 점 찾기
+//
+// ★ 왜 필요한가
+//   사람은 「몇 시였는지」를 기억하지 못한다. 「어디쯤이었는지」를 기억한다.
+//   항적에는 시각과 좌표가 이미 다 있으니, 사람이 선 위를 짚기만 하면
+//   그 자리의 시각과 좌표를 앱이 꺼내 준다. 사람이 적을 것은 「무엇이 있었나」 하나뿐이다.
+//
+// 화면 좌표(x,y)에서 가장 가까운 선분 위 점을 찾는다. TAP 픽셀 안에 없으면 null.
+const TRK_TAP = 26;   // 손가락 굵기. 이보다 작으면 배 위에서 못 누른다.
+function trkNearOnLine(vid, x, y, W, H){
+  const S = mapS; if(!S) return null;
+  const it = voyage.find(v => String(v.id) === String(vid)); if(!it) return null;
+  const raw = Array.isArray(it.trk) ? it.trk : [];
+  if(raw.length < 2) return null;
+  const left = S.cx - W/2, top = S.cy - H/2, z = S.z;
+  const px = p => MERC.x(p.lo, z) - left, py = p => MERC.y(p.la, z) - top;
+  let best = null;
+  for(let i = 1; i < raw.length; i++){
+    const a = raw[i-1], b = raw[i];
+    if(!isFinite(a.la) || !isFinite(a.lo) || !isFinite(b.la) || !isFinite(b.lo)) continue;
+    const ax = px(a), ay = py(a), bx = px(b), by = py(b);
+    const dx = bx - ax, dy = by - ay;
+    const len2 = dx*dx + dy*dy;
+    // 두 점이 같은 자리면 나눗셈이 터진다
+    const u = len2 > 0 ? Math.max(0, Math.min(1, ((x-ax)*dx + (y-ay)*dy) / len2)) : 0;
+    const qx = ax + dx*u, qy = ay + dy*u;
+    const d = Math.hypot(x - qx, y - qy);
+    if(!best || d < best.d) best = { d, i, u };
+  }
+  if(!best || best.d > TRK_TAP) return null;
+  const a = raw[best.i-1], b = raw[best.i], u = best.u;
+  const lat = a.la + (b.la - a.la) * u;
+  const lon = a.lo + (b.lo - a.lo) * u;
+  // 시각도 두 점 사이를 그 비율로 나눈다
+  const ta = Date.parse(a.t), tb = Date.parse(b.t);
+  let time = '';
+  if(isFinite(ta) && isFinite(tb)){
+    const d = new Date(ta + (tb - ta) * u);
+    time = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+  return { lat:+lat.toFixed(5), lon:+lon.toFixed(5), time };
+}
+
+// ── 항적 선을 짚어 중간 기록 하나 꽂기
+function logAddAt(vid, hit){
+  if(!unlocked || !hit) return;
+  const it = voyage.find(v => String(v.id) === String(vid)); if(!it) return;
+  if(!Array.isArray(it.logs)) it.logs = [];
+  const g = { id:newId(), time: hit.time || '',
+              kind: isFishing() ? '포인트' : '세일', text:'', wx:null,
+              pos:{ lat:hit.lat, lon:hit.lon, acc:null, manual:true } };
+  it.logs.push(g);
+  it.seed = false; saveMR();
+  renderVoyage(); openMR('voyage', it.id);
+  // 방금 꽂은 것을 눈에 띄게 해 둔다 — 어느 것을 만들었는지 알아야 이어서 고친다
+  mapHot('log:' + g.id);
+  logFocus(g.id);
+  // 그 자리 날씨도 받아 둔다. 실패해도 조용히 넘어간다.
+  try{ wxCapture('log:' + g.id, it.id); }catch(e){}
+}
+
+// ── 깃발을 눌렀다 — 목록의 그 줄로 데려간다
+function mapFlagTap(key){
+  mapHot(key);
+  logFocus(String(key).replace(/^log:/, ''));
+}
+// 어느 깃발을 도드라지게 할지
+function mapHot(key){
+  if(!mapS) return;
+  mapS.hot = key || null;
+  mapPaint();
+}
+// 목록의 그 줄로 옮겨 가 잠깐 도드라지게 한다
+function logFocus(lid){
+  requestAnimationFrame(()=>{
+    const el = document.getElementById('log-' + lid);
+    if(!el) return;
+    el.scrollIntoView({ block:'center', behavior:'smooth' });
+    el.classList.add('loghot');
+    setTimeout(()=>{ try{ el.classList.remove('loghot'); }catch(_){} }, 1600);
+  });
+}
+// 목록의 한 줄을 눌렀다 — 지도를 그 자리로 옮긴다
+function logShowOnMap(lid){
+  const it = getMR('voyage', mrOpenId); if(!it || !mapS) return;
+  const p = posOf(it, 'log:' + lid);
+  if(!p || p.lat == null || p.lon == null){ alert(t('이 기록에는 위치가 없습니다.')); return; }
+  mapS.cx = MERC.x(p.lon, mapS.z);
+  mapS.cy = MERC.y(p.lat, mapS.z);
+  mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
+  mapHot('log:' + lid);
+  mapPaint(true);
+  const el = document.getElementById('trkMap');
+  if(el) el.scrollIntoView({ block:'center', behavior:'smooth' });
+}
+
 // ★ 지도에 그릴 「선」. 자동 항적이 있으면 그것이 선이다.
 //   이름표 점(출발·중간·도착)과 섞지 않는다 — 시각으로 줄 세우려다 보니
 //   자정을 넘긴 항해나 도착 시각을 나중에 고친 경우 선이 튀었다 (검사가 잡았다).
@@ -21250,7 +21685,8 @@ function mapInit(elId, pts, opt){
   // ★ 화면에 맞출 때는 선까지 넣어서 잰다. 안 그러면 항적이 화면 밖으로 나간다.
   const v = fitView(line ? pts.concat(line) : pts, W, H);
   mapS = { elId, z:v.z, cx:v.cx, cy:v.cy, pts, line, pick:(opt&&opt.pick)||null,
-           mode:(opt&&opt.mode)||'view', dragging:false, anchor:{cx:v.cx, cy:v.cy}, tiles:null };
+           mode:(opt&&opt.mode)||'view', dragging:false, anchor:{cx:v.cx, cy:v.cy}, tiles:null,
+           vid:(opt&&opt.vid)||null, hot:null };
   mapPaint(true);
   mapBind(el);
 }
@@ -21355,6 +21791,17 @@ function mapPaint(full){
   }
   S.pts.forEach((p,i)=>{
     const c = i===0 ? '#4ade80' : (i===S.pts.length-1 ? '#ff5a3c' : '#ffd24a');
+    // ★ 중간 기록은 깃발로 세운다 — 항적 위에 무엇이 있었는지 그대로 읽힌다.
+    //   출발·도착은 그대로 점이다. 그 둘은 이름표만 있으면 된다.
+    const isLog = String(p.key||'').indexOf('log:') === 0;
+    if(isLog){
+      const on = S.hot && S.hot === p.key ? ' on' : '';
+      const lab = [p.time || '', p.label || ''].filter(Boolean).join(' ') || t('기록');
+      h += `<div class="mflag${on}" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px"
+              onclick="mapFlagTap('${esc(p.key)}')"><div class="fl">${esc(lab)}</div><div class="st"></div></div>`;
+      h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
+      return;
+    }
     h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
     // ★ label 이 없으면 화면에 'undefined' 가 찍힌다. 없으면 아예 안 그린다.
     const lab = [p.time || '', p.label || ''].filter(Boolean).join(' ');
@@ -21427,14 +21874,25 @@ function mapBind(el){
     mapPaint();          // 손을 뗐다 — 새 위치의 타일을 채운다
     if(!wasDrag) return;
     // 거의 안 움직였으면 탭으로 본다
-    if(moved < 6 && mapS.mode === 'pick'){
-      const el2 = document.getElementById(mapS.elId);
-      const W = el2.clientWidth, H = el2.clientHeight;
-      const q = pt(e);
-      const gx = mapS.cx - W/2 + q.x, gy = mapS.cy - H/2 + q.y;
-      mapS.pick = { lat:+MERC.lat(gy, mapS.z).toFixed(5), lon:+MERC.lon(gx, mapS.z).toFixed(5) };
+    if(moved >= 6) return;
+    if(e.target && e.target.closest && e.target.closest('.mflag')) return;   // 깃발은 제 일이 있다
+    const el2 = document.getElementById(mapS.elId);
+    const W = el2.clientWidth, H = el2.clientHeight;
+    const q = pt(e);
+    const gx = mapS.cx - W/2 + q.x, gy = mapS.cy - H/2 + q.y;
+    const here = { lat:+MERC.lat(gy, mapS.z).toFixed(5), lon:+MERC.lon(gx, mapS.z).toFixed(5) };
+    if(mapS.mode === 'pick'){
+      mapS.pick = here;
       mapPaint();
       const b = document.getElementById('pickSave'); if(b) b.disabled = false;
+      return;
+    }
+    // ★ 항적 선 위를 누르면 그 자리에 중간 기록을 꽂는다.
+    //   사람은 몇 시였는지 기억 못 한다. 어디쯤이었는지를 기억한다.
+    //   그 자리의 시각·좌표는 항적이 이미 알고 있다.
+    if(mapS.mode === 'view' && mapS.vid && typeof trkNearOnLine === 'function'){
+      const hit = trkNearOnLine(mapS.vid, q.x, q.y, W, H);
+      if(hit) logAddAt(mapS.vid, hit);
     }
   };
   el.onpointercancel = ()=>{ drag=null; if(mapS){ mapS.dragging=false; mapPaint(); } };
@@ -21493,30 +21951,33 @@ function mapBind(el){
 }
 
 // ── 지도에서 위치 고르기
+//
+// ★ 지도는 하나뿐이다.
+//   전에는 여기서 지도를 하나 더 만들어(pickMap) 화면에 둘이 떴다.
+//   게다가 지도 상태(mapS)는 앱 전체에 하나뿐이라 나중 것이 앞 것을 죽였다 —
+//   위에 있던 항적 지도는 그려만 져 있고 손이 안 먹는 껍데기가 됐다.
+//   이제는 이미 떠 있는 항적 지도를 「고르는 모드」로 바꾸기만 한다.
 let pickCtx = null;   // {key, id}
 function posPick(key){
   if(!unlocked) return;
   const it = getMR('voyage', mrOpenId); if(!it) return;
+  const el = document.getElementById('trkMap');
+  if(!el || !mapS || mapS.elId !== 'trkMap') return;   // 지도가 없으면 아무 일도 안 한다
   pickCtx = { key, id: it.id };
   const cur = posOf(it, key);
   const near = trkPoints(it).filter(p=>p.key!==key);
-  const seed = cur || (near[0] ? {lat:near[0].lat, lon:near[0].lon} : null);
-  const box = document.getElementById('pickWrap');
-  box.style.display = 'block';
-  box.innerHTML = `<div class="pickHead"><b>${esc(t('위치 정하기'))}</b>
-      <span style="flex:1"></span>
-      <button class="tab" onclick="posPickCancel()">${esc(t('취소'))}</button>
-      <button class="tab on" id="pickSave" onclick="posPickSave()" ${seed?'':'disabled'}>${esc(t('저장'))}</button></div>
-    ${mapBox('pickMap','52vh')}
-    <div class="mrnone" style="text-align:left">${esc(t('지도를 탭하면 위치가 지정됩니다 · 끌어서 이동 · 두 손가락으로 확대'))}</div>`;
-  const pts = seed ? [seed] : near.slice(0,1);
-  mapInit('pickMap', near, { mode:'pick', pick: seed });
-  box.scrollIntoView({block:'center', behavior:'smooth'});
+  mapS.mode = 'pick';
+  mapS.pick = cur || (near[0] ? { lat:near[0].lat, lon:near[0].lon } : null);
+  mapBar(t('어디인지 지도를 눌러 주세요'),
+    `<button onclick="posPickCancel()">${esc(t('취소'))}</button>`
+    + `<button class="ok" id="pickSave" onclick="posPickSave()" ${mapS.pick?'':'disabled'}>${esc(t('저장'))}</button>`);
+  mapPaint(true);
+  el.scrollIntoView({ block:'center', behavior:'smooth' });
 }
 function posPickCancel(){
-  pickCtx = null; mapS = null;
-  const box = document.getElementById('pickWrap');
-  box.style.display='none'; box.innerHTML='';
+  pickCtx = null;
+  if(mapS && mapS.elId === 'trkMap'){ mapS.mode = 'view'; mapS.pick = null; mapPaint(true); }
+  mapBar(null);
 }
 function posPickSave(){
   if(!pickCtx || !mapS || !mapS.pick) return;
@@ -21525,9 +21986,19 @@ function posPickSave(){
     posPut(it, pickCtx.key, { lat:mapS.pick.lat, lon:mapS.pick.lon, acc:null, manual:true });
     it.seed = false; saveMR();
   }
-  const key = pickCtx.key;
   posPickCancel();
   renderVoyage(); openMR('voyage', mrOpenId);
+}
+
+// ── 지도 위에 얹는 띠. text 가 null 이면 걷어 낸다.
+function mapBar(text, btns){
+  const el = document.getElementById(mapS && mapS.elId ? mapS.elId : 'trkMap');
+  if(!el) return;
+  const old = el.querySelector('.mapbar');
+  if(old) old.remove();
+  if(text == null) return;
+  el.insertAdjacentHTML('beforeend',
+    `<div class="mapbar"><b>${esc(text)}</b>${btns || ''}</div>`);
 }
 
 // ── 거리·엔진시간 자동 계산

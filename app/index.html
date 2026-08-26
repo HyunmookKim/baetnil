@@ -1878,7 +1878,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2063;
+const LANG_TOTAL = 2073;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2642,8 +2642,7 @@ const I18N = {
     '이걸 끄면 아래가 전부 멈춥니다':'Turning this off stops everything below',
     '나에게 오는 것':'FOR ME',
     '내 글에 댓글':'Comments on my posts',
-    '글판 · 장터 · 정박지':'Board, marketplace, moorings',
-    '내 연재에 댓글':'Comments on my series',
+    '글판 · 정박지':'Board and moorings',
     '정비 · 점검 기한':'Service and check due dates',
     '7일 전 · 당일 · 지났을 때':'7 days before, on the day, and once overdue',
     '구독 · 관심':'SUBSCRIBED',
@@ -2651,6 +2650,17 @@ const I18N = {
     '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Tap [Subscribe] on a series and you hear about each new part',
     '관심 분야 소식':'News in your topics',
     '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Tap [Pick topics] on the news screen to choose',
+    '앱에서만 옵니다. 웹에서는 받을 수 없습니다.':'Only the app receives these. The web version cannot.',
+    '이 판에는 알림 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.':'This build has no notification component. Please install the app again.',
+    '로그인하셔야 받을 수 있습니다.':'Sign in to receive these.',
+    '맨 위 「알림 받기」가 꺼져 있습니다.':'"Receive notifications" at the top is off.',
+    '폰에서 이 앱의 알림을 막고 있습니다.':'Your phone is blocking notifications for this app.',
+    '폰이 주소를 내주지 않았습니다. 인터넷을 확인해 주세요.':'The phone did not return an address. Please check your internet.',
+    '서버에 적지 못했습니다':'Could not save it on the server',
+    '폰에 등록하지 못했습니다':'Could not register on this phone',
+    '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'This phone is registered. Notifications will arrive when the server sends them.',
+    '다시 등록':'Register again',
+    '소식':'News',
     '정비 · 점검':'Service and checks',
     '{name} · {n}일 뒤가 기한입니다':'{name} — due in {n} days',
     '{name} · 오늘이 기한입니다':'{name} — due today',
@@ -2669,7 +2679,7 @@ const I18N = {
     '알람을 걸지 못했습니다':'Could not set the alarms',
     '앱에서만 울립니다. 웹에서는 알람을 걸 수 없습니다.':'Alarms ring in the app only. The web version cannot set them.',
     '다시 걸기':'Set again',
-    '정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.':'Service and check reminders really do ring in the app. Comments, subscribed series and topics are still being built.',
+    '정비 · 점검 기한은 폰이 스스로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 로그인하고 앱으로 여셔야 옵니다.':'Service and check reminders ring on the phone itself. Comments, subscribed series and topics arrive only in the app, once you sign in.',
     '구독':'Subscribe',
     '구독 중':'Subscribed',
     '관심 분야':'Topics',
@@ -4794,8 +4804,7 @@ const I18N = {
     '이걸 끄면 아래가 전부 멈춥니다':'Если выключить, всё ниже перестанет приходить',
     '나에게 오는 것':'ЛИЧНО МНЕ',
     '내 글에 댓글':'Комментарии к моим записям',
-    '글판 · 장터 · 정박지':'Доска, барахолка, стоянки',
-    '내 연재에 댓글':'Комментарии к моему циклу',
+    '글판 · 정박지':'Доска и стоянки',
     '정비 · 점검 기한':'Сроки обслуживания и проверок',
     '7일 전 · 당일 · 지났을 때':'За 7 дней, в день и когда просрочено',
     '구독 · 관심':'ПОДПИСКИ',
@@ -4803,6 +4812,17 @@ const I18N = {
     '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Нажмите [Подписаться] на цикле — и узнаете о каждой новой части',
     '관심 분야 소식':'Новости по моим темам',
     '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Нажмите [Выбрать темы] на экране новостей',
+    '앱에서만 옵니다. 웹에서는 받을 수 없습니다.':'Их получает только приложение. В браузере — нет.',
+    '이 판에는 알림 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.':'В этой сборке нет модуля уведомлений. Установите приложение заново.',
+    '로그인하셔야 받을 수 있습니다.':'Войдите, чтобы получать их.',
+    '맨 위 「알림 받기」가 꺼져 있습니다.':'«Получать уведомления» вверху выключено.',
+    '폰에서 이 앱의 알림을 막고 있습니다.':'Телефон блокирует уведомления этого приложения.',
+    '폰이 주소를 내주지 않았습니다. 인터넷을 확인해 주세요.':'Телефон не выдал адрес. Проверьте интернет.',
+    '서버에 적지 못했습니다':'Не удалось сохранить на сервере',
+    '폰에 등록하지 못했습니다':'Не удалось зарегистрировать на телефоне',
+    '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'Телефон зарегистрирован. Уведомления придут, когда сервер их отправит.',
+    '다시 등록':'Зарегистрировать снова',
+    '소식':'Новости',
     '정비 · 점검':'Обслуживание и проверки',
     '{name} · {n}일 뒤가 기한입니다':'{name} — срок через {n} дн.',
     '{name} · 오늘이 기한입니다':'{name} — срок сегодня',
@@ -4821,7 +4841,7 @@ const I18N = {
     '알람을 걸지 못했습니다':'Не удалось поставить напоминания',
     '앱에서만 울립니다. 웹에서는 알람을 걸 수 없습니다.':'Напоминания приходят только в приложении. В браузере их поставить нельзя.',
     '다시 걸기':'Поставить снова',
-    '정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.':'Напоминания об обслуживании и проверках уже работают в приложении. Комментарии, подписки и темы ещё в разработке.',
+    '정비 · 점검 기한은 폰이 스스로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 로그인하고 앱으로 여셔야 옵니다.':'Напоминания об обслуживании и проверках телефон подаёт сам. Комментарии, подписки и темы приходят только в приложении после входа.',
     '구독':'Подписаться',
     '구독 중':'Вы подписаны',
     '관심 분야':'Темы',
@@ -7916,6 +7936,9 @@ window.__onAuth = u => {
   // 로그아웃하면 운영자 표시를 즉시 지운다
   if(!u){ adminMe = null; myBan = null; personCur = null; adminClaimTried = false;
           if(typeof paintAdminMenu==='function') paintAdminMenu(); }
+  // ★ 로그인해야 「누구에게 보낼지」가 정해진다. 로그인한 그때 이 폰을 등록한다.
+  //   알림을 이미 켜 둔 사람만 한다 — 허락을 새로 묻지 않는다.
+  try{ if(u) fcmSoon(); }catch(_){}
   if(u){
     // 로그인 전에 만든 배는 주인이 없다. 처음 로그인한 사람을 선주로 잡는다.
     let changed = false;
@@ -14145,7 +14168,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.32';
+const APP_VER = '4.33';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -18242,7 +18265,6 @@ const NOTI_KEY = 'bt_noti';
 const NOTI_DEF = {
   on: false,          // 전체
   myComment: true,    // 내 글에 댓글
-  seriesComment: true,// 내 연재에 댓글
   maint: true,        // 정비·점검 기한
   quiet: true,        // 밤에는 안 울리기
   from: '22:00', to: '06:00',
@@ -18268,8 +18290,10 @@ function notiGet(){
 function notiSet(patch){
   const d = { ...notiGet(), ...(patch || {}) };
   try{ localStorage.setItem(NOTI_KEY, JSON.stringify(d)); }catch(_){}
-  // ★ 설정이 바뀌면 걸어 둔 알람도 바뀌어야 한다. 안 하면 옛 설정대로 울린다.
+  // ★ 설정이 바뀌면 걸어 둔 알람도, 서버가 들고 있는 것도 같이 바뀌어야 한다.
+  //   한쪽만 고치면 화면과 실제가 어긋난다.
   try{ maintAlarmSoon(); }catch(_){}
+  try{ fcmSoon(); }catch(_){}
   return d;
 }
 // 사람이 고른 값 하나 (며칠 전 · 지나면 다시 · 울리는 시각)
@@ -18340,6 +18364,7 @@ function notiTime(which, v){
 //   알람을 못 걸었으면 왜 못 걸었는지 알림 화면에 적는다.
 //   4.25 항적 사고가 「안 됐는데 아무 말도 안 한 것」이었다.
 const MAINT_CH = 'baetnil-maint';
+const NEWS_CH  = 'baetnil-news';     // 서버가 보내는 것 (functions 의 channelId 와 같아야 한다)
 const MAINT_ALARM_MAX = 60;          // 폰이 받아 주는 수에 한계가 있다
 const BEFORE_OPT = [0, 1, 3, 7, 14, 30];
 const AGAIN_OPT  = [0, 1, 3, 7];
@@ -18359,6 +18384,10 @@ async function maintChannel(){
   const L = notiLocal();
   if(!L || !L.createChannel) return;
   try{ await L.createChannel({ id: MAINT_CH, name: t('정비 · 점검'), importance: 4, visibility: 1 }); }
+  catch(_){}
+  // 서버에서 오는 것(댓글·연재·소식)도 채널이 있어야 소리가 난다.
+  // ★ 서버 코드의 channelId 와 글자가 한 자라도 다르면 조용히 기본 채널로 간다.
+  try{ await L.createChannel({ id: NEWS_CH, name: t('소식'), importance: 4, visibility: 1 }); }
   catch(_){}
 }
 // 알림 번호 — 같은 항목이면 늘 같은 수가 나와야 다시 걸 때 겹치지 않는다
@@ -18506,6 +18535,176 @@ function maintWhenRows(d){
           onchange="hmChange(this, v => notiPick('maintAt', v))"></div>`
     + (c.maintAgain > 0 ? `<div class="mrrow optrow"><span class="lbl"></span>
         <span class="mrm" style="color:#7b8794">${esc(tsub('지나고 나서 {n}번까지 다시 부릅니다', {n:AGAIN_TIMES}))}</span></div>` : '');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// 서버에서 오는 알림 — 댓글 · 구독한 연재 · 관심 분야
+//
+// ★ 정비 알람과 무엇이 다른가
+//   정비 기한은 내 폰이 이미 안다. 그래서 폰이 스스로 건다(maintAlarmSync).
+//   댓글·새 글은 남의 폰에서 일어난 일이다. 내 폰은 알 방법이 없다.
+//   그래서 ① 이 폰의 주소(토큰)를 서버에 적어 두고
+//         ② 그 일이 생기면 서버가 그 주소로 보낸다.
+//
+// ★ 서버로 가는 것은 토큰과 「무엇을 받겠다」는 설정뿐이다.
+//   글 내용도, 배 정보도, 위치도 안 간다.
+//
+// ★ 어디가 막혔는지 화면에 적는다
+//   웹이라서 / 로그인을 안 해서 / 알림을 꺼 둬서 / 폰이 막아서 / 저장이 안 돼서 —
+//   다섯 가지가 전부 다르다. 「안 오는데요」 한 마디로는 아무도 못 고친다.
+//   4.25 항적 사고가 「안 됐는데 아무 말도 안 한 것」이었다.
+const FCM_TOK_KEY = 'bt_pushtok';
+let fcmState = { ok:false, why:'', tok:'' };
+let fcmWired = false;
+let fcmTimer = null;
+
+function fcmPlugin(){
+  try{
+    return (window.Capacitor && window.Capacitor.Plugins
+            && window.Capacitor.Plugins.PushNotifications) || null;
+  }catch(_){ return null; }
+}
+function fcmTokLocal(){
+  try{ return localStorage.getItem(FCM_TOK_KEY) || ''; }catch(_){ return ''; }
+}
+function fcmTokKeep(v){
+  try{ v ? localStorage.setItem(FCM_TOK_KEY, v) : localStorage.removeItem(FCM_TOK_KEY); }catch(_){}
+}
+// 서버가 보고 판단할 것만 담는다. 여기 없는 것은 서버로 안 간다.
+function fcmBody(){
+  const d = notiGet();
+  let tz = '';
+  try{ tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || ''; }catch(_){}
+  return {
+    on:        !!d.on,
+    myComment: !!d.myComment,
+    series:  (Array.isArray(d.series) ? d.series : []).slice(0, 80),
+    krCats:  (Array.isArray(d.krCats) ? d.krCats : []).slice(0, 40),
+    wwCats:  (Array.isArray(d.wwCats) ? d.wwCats : []).slice(0, 40),
+    quiet:     !!d.quiet,
+    from:      String(d.from || ''),
+    to:        String(d.to || ''),
+    tz:        tz,
+    lang:      (typeof langNow === 'function' ? langNow() : 'ko')
+  };
+}
+// ★ 왜 안 되는지 한 낱말로 들고 있는다 — 화면에서 사람 말로 바꾼다
+function fcmWhyNow(){
+  if(!isNative())      return 'web';
+  if(!fcmPlugin())    return 'noplug';
+  if(!meUid())         return 'login';
+  if(!notiGet().on)    return 'off';
+  return '';
+}
+async function fcmRegister(){
+  const why = fcmWhyNow();
+  if(why){ fcmState = { ok:false, why: why, tok:'' }; return fcmState; }
+  const P = fcmPlugin();
+  try{
+    let st = await P.checkPermissions();
+    if(!st || st.receive !== 'granted') st = await P.requestPermissions();
+    if(!st || st.receive !== 'granted'){ fcmState = { ok:false, why:'denied', tok:'' }; return fcmState; }
+    if(!fcmWired){
+      fcmWired = true;
+      // ★ 토큰은 물어봐서 받는 것이 아니라 나중에 날아온다. 그래서 귀를 먼저 연다.
+      P.addListener('registration', v => { fcmGot(v && v.value); });
+      // ★ 앱을 켜 둔 채로 오면 안드로이드는 알림을 안 그려 준다 (조용히 사라진다).
+      //   그때는 우리가 같은 내용으로 하나 띄운다.
+      P.addListener('pushNotificationReceived', n => {
+        try{
+          const L = notiLocal();
+          if(!L || !n) return;
+          L.schedule({ notifications: [{
+            id: Math.floor(Math.random() * 900000) + 3000000,
+            title: String((n.title) || t('소식')),
+            body:  String((n.body) || ''),
+            channelId: NEWS_CH
+          }] });
+        }catch(_){}
+      });
+      P.addListener('registrationError', e => {
+        fcmState = { ok:false, why: 'reg:' + String((e && (e.error || e.message)) || e).slice(0, 60), tok:'' };
+        fcmRepaint();
+      });
+    }
+    await P.register();
+    return fcmState;
+  }catch(e){
+    fcmState = { ok:false, why: String((e && e.message) || e).slice(0, 80), tok:'' };
+    return fcmState;
+  }
+}
+// 토큰이 날아왔다 — 서버에 적어 둔다
+async function fcmGot(tok){
+  const v = String(tok || '');
+  if(!v){ fcmState = { ok:false, why:'notoken', tok:'' }; fcmRepaint(); return; }
+  try{
+    if(!window.__fcm) throw new Error('offline');
+    await window.__fcm.save(fcmBody(), v);
+    fcmTokKeep(v);
+    fcmState = { ok:true, why:'', tok:v };
+  }catch(e){
+    fcmState = { ok:false, why: 'save:' + String((e && e.message) || e).slice(0, 60), tok:v };
+  }
+  fcmRepaint();
+}
+// 설정만 바뀐 것 — 다시 등록할 것 없이 서버 것만 고친다
+async function fcmSync(){
+  const why = fcmWhyNow();
+  if(why){
+    // 알림을 껐으면 서버에도 껐다고 알려야 한다. 안 그러면 계속 온다.
+    if(why === 'off' && meUid() && window.__fcm){
+      try{ await window.__fcm.save({ on:false }); }catch(_){}
+    }
+    fcmState = { ok:false, why: why, tok: fcmState.tok };
+    return fcmState;
+  }
+  if(!fcmTokLocal()) return fcmRegister();
+  try{
+    await window.__fcm.save(fcmBody(), fcmTokLocal());
+    fcmState = { ok:true, why:'', tok: fcmTokLocal() };
+  }catch(e){
+    fcmState = { ok:false, why:'save:' + String((e && e.message) || e).slice(0, 60), tok: fcmTokLocal() };
+  }
+  return fcmState;
+}
+// 저장할 때마다 바로 올리면 한 번에 여러 번 간다. 조금 모았다가 한 번만 올린다.
+function fcmSoon(){
+  if(fcmTimer) clearTimeout(fcmTimer);
+  fcmTimer = setTimeout(()=>{ fcmTimer = null; try{ fcmSync(); }catch(_){} }, 900);
+}
+// 알림 화면이 열려 있으면 다시 그린다 (토큰이 늦게 오므로)
+function fcmRepaint(){
+  try{
+    const P = document.getElementById('mrPanel');
+    if(P && /fcmline/.test(P.innerHTML)) openNoti();
+  }catch(_){}
+}
+// ★ 어디가 막혔는지 사람 말로
+function fcmWhyText(w){
+  if(w === 'web')     return t('앱에서만 옵니다. 웹에서는 받을 수 없습니다.');
+  if(w === 'noplug')  return t('이 판에는 알림 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.');
+  if(w === 'login')   return t('로그인하셔야 받을 수 있습니다.');
+  if(w === 'off')     return t('맨 위 「알림 받기」가 꺼져 있습니다.');
+  if(w === 'denied')  return t('폰에서 이 앱의 알림을 막고 있습니다.');
+  if(w === 'notoken') return t('폰이 주소를 내주지 않았습니다. 인터넷을 확인해 주세요.');
+  if(w.indexOf('save:') === 0) return t('서버에 적지 못했습니다') + ' — ' + w.slice(5);
+  if(w.indexOf('reg:')  === 0) return t('폰에 등록하지 못했습니다') + ' — ' + w.slice(4);
+  return w;
+}
+// 알림 화면에 붙는 줄 — 이 폰이 받을 수 있는 상태인가
+function fcmLineHtml(){
+  const ok = fcmState.ok && fcmState.tok;
+  const msg = ok ? t('이 폰이 등록됐습니다. 서버에서 보내면 옵니다.')
+                 : fcmWhyText(fcmState.why || fcmWhyNow());
+  return `<div class="mrrow fcmline" style="padding-top:0;gap:8px">
+      <span class="mrm" style="flex:1;min-width:0;color:${ok ? '#5FB894' : '#7b8794'}">${esc(msg)}</span>
+      <button class="mrbtn subbtn" onclick="fcmNow()">${esc(t('다시 등록'))}</button></div>`;
+}
+async function fcmNow(){
+  await fcmRegister();
+  openNoti();
 }
 
 // ── 구독 · 관심 (연재 이름 · 뉴스 분야)
@@ -18663,7 +18862,7 @@ function notiSoonHtml(){
 }
 // ★ 정비 알람은 이제 진짜로 울린다. 나머지는 아직이다. 뭉뚱그리면 거짓말이 된다.
 function notiSoonHtml2(){
-  return `<div class="mrnone" style="text-align:left">${esc(t('정비 · 점검 기한은 앱에서 진짜로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 아직 만드는 중입니다.'))}</div>`;
+  return `<div class="mrnone" style="text-align:left">${esc(t('정비 · 점검 기한은 폰이 스스로 울립니다. 댓글 · 구독한 연재 · 관심 분야는 로그인하고 앱으로 여셔야 옵니다.'))}</div>`;
 }
 
 function openNoti(){
@@ -18690,8 +18889,8 @@ function openNoti(){
     + row(t('알림 받기'), t('이걸 끄면 아래가 전부 멈춥니다'), d.on, 'notiToggleAll()')
     + `<div class="${off?'notioff':''}">`
       + lbl(t('나에게 오는 것'))
-      + row(t('내 글에 댓글'), t('글판 · 장터 · 정박지'), d.myComment, "notiToggle('myComment')")
-      + row(t('내 연재에 댓글'), '', d.seriesComment, "notiToggle('seriesComment')")
+      + row(t('내 글에 댓글'), t('글판 · 정박지'), d.myComment, "notiToggle('myComment')")
+      + fcmLineHtml()
       + lbl(t('내 배'))
       + row(t('정비 · 점검 기한'), maintWhenText(d), d.maint, "notiToggle('maint')")
       + (d.maint ? maintWhenRows(d) + maintAlarmHtml() : '')
@@ -24828,7 +25027,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     const { getFirestore, collection, getDocs: _getDocs, getDoc: _getDoc, doc,
             setDoc: _setDoc, updateDoc: _updateDoc, deleteDoc: _deleteDoc,
             query, where, orderBy, limit, startAfter, writeBatch, FieldPath,
-            getCountFromServer, increment, deleteField } =
+            getCountFromServer, increment, deleteField, arrayUnion, arrayRemove } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     // ★ 저장과 읽기는 전부 이 문 하나를 지난다 (netWait 설명 참고).
     const setDoc    = (...a)=> netWait(_setDoc(...a),    NET_SEC);
@@ -25520,6 +25719,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         return snap.docs.map(d=>d.data());
       },
       async edit(id, patch){ await setDoc(doc(fdb,'support',String(id)), patch, { merge:true }); }
+    };
+    // ── 알림 받을 주소 (푸시)
+    //
+    // ★ 왜 서버에 두나
+    //   설정이 폰에만 있으면 서버는 「누구에게 무엇을 보낼지」를 못 본다.
+    //   본인 방 하나(push/{uid})만 쓴다. 규칙에서 본인 말고는 못 읽고 못 쓴다.
+    //
+    // ★ 토큰은 배열이다 — 한 사람이 폰·태블릿을 같이 쓸 수 있다.
+    //   merge 로 배열을 쓰면 통째로 갈아치워 다른 기기가 지워진다. arrayUnion 으로 더한다.
+    window.__fcm = {
+      async save(body, tok){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid) throw new Error('login');
+        const b = Object.assign({ uid: uid, at: new Date().toISOString() }, body || {});
+        if(tok) b.tokens = arrayUnion(String(tok));
+        await setDoc(doc(fdb, 'push', uid), b, { merge:true });
+        return uid;
+      },
+      async get(){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid) return null;
+        const d = await getDoc(doc(fdb, 'push', uid));
+        return d.exists() ? d.data() : null;
+      },
+      // 이 기기에서 그만 받겠다 — 남의 기기는 그대로 둔다
+      async drop(tok){
+        const uid = fauth.currentUser && fauth.currentUser.uid;
+        if(!uid || !tok) return;
+        await setDoc(doc(fdb, 'push', uid), { tokens: arrayRemove(String(tok)) }, { merge:true });
+      }
     };
     // ── 위치정보 이용·제공사실 확인자료 (위치정보법 제16조 제2항)
     // ★ 사람마다 방이 갈린다. 남의 것은 규칙에서 아예 막았다.

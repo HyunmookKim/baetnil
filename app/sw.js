@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-4.32';
+const CACHE = 'baetnil-4.33';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 

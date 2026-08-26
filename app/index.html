@@ -170,6 +170,17 @@
 .notisw.on span{left:24px}
 /* 전체를 끄면 아래는 흐려지고 눌리지 않는다 — 눌러도 아무 일이 없으면 고장으로 읽힌다 */
 .notioff{opacity:.42;pointer-events:none}
+/* ── 구독 · 관심
+   ★ 목록에서 누르든 글 안에서 누르든 설정에서 누르든 같은 단추다.
+     배 위에서 장갑 낀 손으로 눌러야 하니 38px 아래로 내려가지 않는다. */
+.subbtn{min-height:38px;padding:9px 14px;font-size:13px;font-weight:700;flex:none}
+.subbtn.on{background:#173A2C;border-color:#2E6B4F;color:#8FD9B4}
+.srghead .subbtn{align-self:center}
+.subbar{gap:10px;padding:4px 0 10px}
+.catwrap{display:flex;flex-wrap:wrap;gap:8px;padding:4px 20px 16px}
+.catbtn{min-height:38px;padding:9px 15px;font-size:13px;border-radius:999px;
+  background:#14304a;border:1px solid #2a5a8a;color:#9ed0f5;cursor:pointer}
+.catbtn.on{background:#173A2C;border-color:#2E6B4F;color:#8FD9B4;font-weight:700}
 /* 「알림 끔 · 미룸」 — 왜 안 오는지 목록에서 바로 보이게. 눈에 튀면 안 된다 */
 .chip.mute{background:#1A2430;color:#7b8794;border-color:#26323F}
 .mapbox .mflag.on .st{background:#9CC6E8}
@@ -1861,7 +1872,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2036;
+const LANG_TOTAL = 2044;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -2629,11 +2640,19 @@ const I18N = {
     '내 연재에 댓글':'Comments on my series',
     '정비 · 점검 기한':'Service and check due dates',
     '7일 전 · 당일 · 지났을 때':'7 days before, on the day, and once overdue',
-    '골라 둔 것':'THINGS YOU FOLLOW',
-    '연재 새 편':'New parts in a series',
-    '연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다':'Tap "Follow this series" while reading and it appears here',
-    '관심 갈래 새 글':'New posts in topics you follow',
-    '뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다':'Pick topics while reading the news and get one digest each morning',
+    '구독 · 관심':'SUBSCRIBED',
+    '구독한 연재':'Series you subscribe to',
+    '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Tap [Subscribe] on a series and you hear about each new part',
+    '관심 분야 소식':'News in your topics',
+    '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Tap [Pick topics] on the news screen to choose',
+    '구독':'Subscribe',
+    '구독 중':'Subscribed',
+    '관심 분야':'Topics',
+    '관심 분야 고르기':'Pick topics',
+    '고른 분야의 소식만 아침에 한 번 묶어 알려 드립니다.':'Only the topics you pick, gathered into one message each morning.',
+    '아직 모인 소식이 없어 고를 분야가 없습니다.':'No news has come in yet, so there are no topics to pick.',
+    '알림을 함께 켰습니다.\n\n설정 → 알림 에서 언제든 끄실 수 있습니다.':'Notifications are now on.\n\nYou can turn them off any time in Settings > Notifications.',
+    '알림을 보내는 장치는 아직 만드는 중입니다. 여기서 고르신 것은 그대로 기억해 두었다가 다 되면 씁니다.':'Sending is still being built. What you pick here is kept and will be used once it is ready.',
     '준비 중':'Coming soon',
     '밤에는':'AT NIGHT',
     '밤에는 안 울리기':'Stay quiet at night',
@@ -4754,11 +4773,19 @@ const I18N = {
     '내 연재에 댓글':'Комментарии к моему циклу',
     '정비 · 점검 기한':'Сроки обслуживания и проверок',
     '7일 전 · 당일 · 지났을 때':'За 7 дней, в день и когда просрочено',
-    '골라 둔 것':'ЗА ЧЕМ СЛЕЖУ',
-    '연재 새 편':'Новые части цикла',
-    '연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다':'Нажмите «Следить за циклом» при чтении — цикл появится здесь',
-    '관심 갈래 새 글':'Новое в выбранных темах',
-    '뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다':'Выберите темы в новостях — утром придёт одна сводка',
+    '구독 · 관심':'ПОДПИСКИ',
+    '구독한 연재':'Циклы, на которые я подписан',
+    '연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다':'Нажмите [Подписаться] на цикле — и узнаете о каждой новой части',
+    '관심 분야 소식':'Новости по моим темам',
+    '뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다':'Нажмите [Выбрать темы] на экране новостей',
+    '구독':'Подписаться',
+    '구독 중':'Вы подписаны',
+    '관심 분야':'Темы',
+    '관심 분야 고르기':'Выбрать темы',
+    '고른 분야의 소식만 아침에 한 번 묶어 알려 드립니다.':'Только выбранные темы — одним сообщением каждое утро.',
+    '아직 모인 소식이 없어 고를 분야가 없습니다.':'Новостей пока нет, выбирать не из чего.',
+    '알림을 함께 켰습니다.\n\n설정 → 알림 에서 언제든 끄실 수 있습니다.':'Уведомления включены.\n\nВыключить можно в «Настройки → Уведомления».',
+    '알림을 보내는 장치는 아직 만드는 중입니다. 여기서 고르신 것은 그대로 기억해 두었다가 다 되면 씁니다.':'Отправка ещё в разработке. Выбранное здесь сохраняется и заработает, когда всё будет готово.',
     '준비 중':'Скоро',
     '밤에는':'НОЧЬЮ',
     '밤에는 안 울리기':'Не беспокоить ночью',
@@ -14070,7 +14097,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.30';
+const APP_VER = '4.31';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -18156,7 +18183,7 @@ function setLang(v){
 // ★ 왜 이렇게 나눴나 (사장님과 정한 것)
 //   1차 — 「나에게 오는 것」. 받을 사람이 딱 한 명이다. 내 글의 주인, 내 배의 주인.
 //         잘못 가도 나 하나다.
-//   2차 — 「골라 둔 것」(연재·뉴스 갈래). 「이걸 켜 둔 사람이 누구누구인가」를 찾아
+//   2차 — 「구독 · 관심」(연재 구독 · 뉴스 분야). 「이걸 켜 둔 사람이 누구누구인가」를 찾아
 //         여러 명에게 보낸다. 여기가 틀리면 엉뚱한 알림이 무더기로 나가고,
 //         보낸 것은 못 되돌린다. 그래서 화면만 먼저 만들고 「준비 중」으로 둔다.
 //
@@ -18172,8 +18199,8 @@ const NOTI_DEF = {
   quiet: true,        // 밤에는 안 울리기
   from: '22:00', to: '06:00',
   series: [],         // 받고 있는 연재 이름들      (2차)
-  krCats: [],         // 받고 있는 한국 소식 갈래   (2차)
-  wwCats: []          // 받고 있는 해외 소식 갈래   (2차)
+  krCats: [],         // 관심 눌러 둔 한국 소식 분야 (2차)
+  wwCats: []          // 관심 눌러 둔 해외 소식 분야 (2차)
 };
 function notiGet(){
   try{
@@ -18237,6 +18264,160 @@ function notiTime(which, v){
   notiSet({ [which]: val });
   openNoti();
 }
+// ── 구독 · 관심 (연재 이름 · 뉴스 분야)
+//
+// ★ 문 하나
+//   「이 연재를 구독했나」를 목록·글 안·설정 세 곳에서 따로 판단하면 서로 어긋난다.
+//   묻는 문(notiSubOn·notiCatOn)과 뒤집는 문(notiSubToggle·notiCatToggle)을 하나씩만 둔다.
+//   단추 모양도 notiSubBtn 하나에서 나온다.
+//
+// ★ 이름을 onclick 에 실어 나르는 법
+//   연재 이름에는 따옴표가 들어갈 수 있다. 그대로 붙이면 단추가 통째로 깨진다.
+//   encodeURIComponent 로 싸서 넘기고 받는 쪽에서 푼다.
+function notiCatKey(kind){ return kind === 'ww' ? 'wwCats' : 'krCats'; }
+function notiSubOn(name){
+  const n = String(name || '').trim();
+  return !!n && notiGet().series.indexOf(n) >= 0;
+}
+function notiCatOn(kind, cat){
+  const c = String(cat || '').trim();
+  return !!c && notiGet()[notiCatKey(kind)].indexOf(c) >= 0;
+}
+// ★ 전체 알림이 꺼져 있으면 구독해 봐야 아무것도 안 온다.
+//   그래서 처음 구독할 때 같이 켜 준다. 다만 말없이 켜지는 않는다.
+async function notiWakeAll(){
+  if(notiGet().on) return true;
+  const st = await notiAsk();
+  if(st === 'denied'){
+    alert(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
+    return false;
+  }
+  notiSet({ on:true });
+  alert(t('알림을 함께 켰습니다.\n\n설정 → 알림 에서 언제든 끄실 수 있습니다.'));
+  return true;
+}
+async function notiSubToggle(enc, back){
+  let n = '';
+  try{ n = decodeURIComponent(String(enc || '')).trim(); }catch(_){ n = String(enc || '').trim(); }
+  if(!n) return;
+  const list = notiGet().series.slice();
+  const i = list.indexOf(n);
+  if(i >= 0) list.splice(i, 1);
+  else { if(!await notiWakeAll()) return; list.push(n); }
+  notiSet({ series: list });
+  notiBack(back);
+}
+async function notiCatToggle(kind, enc, back){
+  let c = '';
+  try{ c = decodeURIComponent(String(enc || '')).trim(); }catch(_){ c = String(enc || '').trim(); }
+  if(!c) return;
+  const key = notiCatKey(kind);
+  const list = notiGet()[key].slice();
+  const i = list.indexOf(c);
+  if(i >= 0) list.splice(i, 1);
+  else { if(!await notiWakeAll()) return; list.push(c); }
+  notiSet({ [key]: list });
+  notiBack(back);
+}
+// 누른 뒤 어느 화면을 다시 그릴 것인가
+function notiBack(back){
+  const b = String(back || '');
+  if(b === 'news'){ if(typeof renderNews === 'function') renderNews(); return; }
+  if(b === 'cats'){ openNotiCats(); return; }
+  if(b === 'subs'){ openNotiSubs(); return; }
+  if(b === 'noti'){ openNoti(); return; }
+  if(b.indexOf('series:') === 0){ openSeries(b.slice(7)); }
+}
+// 연재 구독 단추 — 세 자리가 같은 것을 쓴다
+function notiSubBtn(name, back){
+  const n = String(name || '').trim();
+  if(!n) return '';                                  // 묶지 않은 옛 글은 구독할 것이 없다
+  const on = notiSubOn(n);
+  return `<button class="mrbtn subbtn${on?' on':''}"`
+       + ` onclick="event.stopPropagation();notiSubToggle('${encodeURIComponent(n)}','${esc(back)}')">`
+       + `${esc(on ? t('구독 중') : t('구독'))}</button>`;
+}
+// 연재 글 위쪽 — 어느 연재인지와 구독 단추
+function notiSubBar(name, back){
+  const n = String(name || '').trim();
+  if(!n) return '';
+  return `<div class="mrrow subbar"><span class="mrm" style="flex:1;min-width:0">${esc(n)}</span>`
+       + notiSubBtn(n, back) + `</div>`;
+}
+// ★ 목록에 실제로 있는 분야만 보여 준다.
+//   없는 분야를 고르게 하면 켜 놓고 아무 일도 안 일어나 고장으로 읽힌다.
+//   다만 이미 골라 둔 것은 오늘 목록에 없어도 남긴다 — 내일 다시 올라온다.
+function newsCats(kind){
+  const rows = kind === 'ww' ? ((newsCache && newsCache.items) || [])
+                             : ((krCache && krCache.gov) || []);
+  const out = [];
+  rows.forEach(n=>{
+    const c = String((n && n.cat) || '').trim();
+    if(c && out.indexOf(c) < 0) out.push(c);
+  });
+  notiGet()[notiCatKey(kind)].forEach(c=>{ if(out.indexOf(c) < 0) out.push(c); });
+  out.sort((a,b)=>String(a).localeCompare(String(b), 'ko'));
+  return out;
+}
+// 뉴스 자료가 아직 없으면 받아 온다 (설정에서 바로 들어올 수 있다)
+async function newsLoadIf(){
+  if(!krCache){ try{ await loadKr(false); }catch(_){} }
+  if(!newsCache){
+    try{
+      const r = await fetch(DATA_BASE + 'news.json?v=' + Date.now(), {cache:'no-store'});
+      newsCache = r.ok ? await r.json() : null;
+    }catch(_){}
+  }
+}
+// 관심 분야 고르기 — 한국 소식과 해외 소식을 한 화면에서
+async function openNotiCats(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  P.innerHTML = `<div class="mrhead"><b>${t('관심 분야')}</b><span style="flex:1"></span></div>`
+    + `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
+  showPanel(P);
+  setHeadTitle('관심 분야');
+  await newsLoadIf();
+  const block = (kind, title) => {
+    const cats = newsCats(kind);
+    if(!cats.length) return '';
+    return `<div class="notilbl">${esc(title)}</div><div class="catwrap">`
+      + cats.map(c=>`<button class="catbtn${notiCatOn(kind,c)?' on':''}"`
+          + ` onclick="notiCatToggle('${kind}','${encodeURIComponent(c)}','cats')">${esc(c)}</button>`).join('')
+      + `</div>`;
+  };
+  const body = block('kr', t('한국 소식')) + block('ww', t('해외 소식'));
+  P.innerHTML = `<div class="mrhead"><b>${t('관심 분야')}</b><span style="flex:1"></span></div>`
+    + `<div class="mrnone" style="text-align:left">${esc(t('고른 분야의 소식만 아침에 한 번 묶어 알려 드립니다.'))}</div>`
+    + (body || `<div class="mrnone">${esc(t('아직 모인 소식이 없어 고를 분야가 없습니다.'))}</div>`)
+    + notiSoonHtml();
+}
+// 구독한 연재 고르기
+async function openNotiSubs(){
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  P.innerHTML = `<div class="mrhead"><b>${t('구독한 연재')}</b><span style="flex:1"></span></div>`
+    + `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
+  showPanel(P);
+  setHeadTitle('구독한 연재');
+  let names = [];
+  try{ await loadSeries(); names = seriesNames(); }catch(_){}
+  // 없어진 연재라도 구독해 두었으면 보여 준다 — 끄지 못하면 갇힌다
+  notiGet().series.forEach(n=>{ if(names.indexOf(n) < 0) names.push(n); });
+  P.innerHTML = `<div class="mrhead"><b>${t('구독한 연재')}</b><span style="flex:1"></span></div>`
+    + (names.length
+        ? names.map(n=>`<div class="mrrow notirow">
+             <span class="mrv" style="flex:1;min-width:0">${esc(n)}</span>
+             ${notiSubBtn(n, 'subs')}</div>`).join('')
+        : `<div class="mrnone" style="text-align:left">${esc(t('아직 올라온 연재가 없습니다.'))}</div>`)
+    + notiSoonHtml();
+}
+// ★ 아직 알림을 보내는 장치가 없다. 고른 것은 기억해 두었다가 다 되면 그대로 쓴다.
+//   말 안 하면 켜 놓고 안 온다고 고장으로 읽는다. 조용한 실패가 가장 나쁘다.
+function notiSoonHtml(){
+  return `<div class="mrnone" style="text-align:left">${esc(t('알림을 보내는 장치는 아직 만드는 중입니다. 여기서 고르신 것은 그대로 기억해 두었다가 다 되면 씁니다.'))}</div>`;
+}
+
 function openNoti(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
@@ -18247,6 +18428,13 @@ function openNoti(){
         <b class="mrv" style="display:block">${esc(title)}</b>
         ${sub ? `<span class="mrm" style="display:block;color:#7b8794">${esc(sub)}</span>` : ''}
       </div>${dim ? `<span class="chip">${esc(t('준비 중'))}</span>` : sw(on, fn)}</div>`;
+  // 켜고 끄는 줄이 아니라 「골라 둔 것이 몇 개인가」를 보여 주고 고르러 가는 줄
+  const go = (title, sub, n, fn) => `<div class="mrrow notirow setrow" onclick="${fn}">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(title)}</b>
+        <span class="mrm" style="display:block;color:#7b8794">${esc(sub)}</span>
+      </div>${n ? `<span class="chip">${esc(tsub('{n}개', {n:n}))}</span>` : ''}
+      <span style="color:#7b8794;font-size:18px;margin-left:8px">&rsaquo;</span></div>`;
   const lbl = s => `<div class="notilbl">${esc(s)}</div>`;
   const off = !d.on;
 
@@ -18258,9 +18446,11 @@ function openNoti(){
       + row(t('내 연재에 댓글'), '', d.seriesComment, "notiToggle('seriesComment')")
       + lbl(t('내 배'))
       + row(t('정비 · 점검 기한'), t('7일 전 · 당일 · 지났을 때'), d.maint, "notiToggle('maint')")
-      + lbl(t('골라 둔 것'))
-      + row(t('연재 새 편'), t('연재를 읽다가 [이 연재 알림받기] 를 누르면 여기에 쌓입니다'), false, '', true)
-      + row(t('관심 갈래 새 글'), t('뉴스를 보다가 갈래를 골라 두면 아침에 한 번 묶어서 알립니다'), false, '', true)
+      + lbl(t('구독 · 관심'))
+      + go(t('구독한 연재'), t('연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다'),
+           d.series.length, 'openNotiSubs()')
+      + go(t('관심 분야 소식'), t('뉴스에서 [관심 분야 고르기] 를 누르면 고르실 수 있습니다'),
+           d.krCats.length + d.wwCats.length, 'openNotiCats()')
       + lbl(t('밤에는'))
       + row(t('밤에는 안 울리기'), t('그 사이 것은 아침에 한 번에 보입니다'), d.quiet, "notiToggle('quiet')")
       + `<div class="mrrow notirow"><div style="flex:1"><b class="mrv">${esc(t('시간'))}</b></div>
@@ -18270,6 +18460,7 @@ function openNoti(){
            <input class="tin logtime" inputmode="numeric" maxlength="5" autocomplete="off"
              oninput="hmType(this)" value="${esc(d.to)}" onchange="hmChange(this, v => notiTime('to', v))"></div>`
     + `</div>`
+    + notiSoonHtml()
     + `<div class="mrnone" style="text-align:left">${esc(t('폰이 알림을 막고 있으면 여기서 켜도 오지 않습니다. 폰 설정에서도 허용해 주세요.'))}</div>`;
   showPanel(P);
   setHeadTitle('알림');
@@ -23049,7 +23240,8 @@ async function seriesHtml(){
   return add + seriesGroups(rows).map(g=>
     `<div class="srgrp"><div class="srghead">
        <b>${esc(g.name || t('묶지 않은 글'))}</b>
-       <span class="srgn">${esc(String(g.items.length))}편</span></div>`
+       <span class="srgn">${esc(String(g.items.length))}편</span>
+       ${notiSubBtn(g.name, 'news')}</div>`
     + g.items.map(x=>`<div class="mr" onclick="openSeries('${esc(x.id)}')">
       <div class="ct"><div class="cn">${x.no?`<span class="chip">${esc(String(x.no))}편</span> `:''}${esc(x.title||'')}</div></div>
       <div class="mrm">${[esc(x.author||''), esc(x.source||''),
@@ -23173,6 +23365,7 @@ async function openSeries(id){
     <div class="postmeta">${x.no?`<span class="chip">${esc(String(x.no))}편</span>`:''}
       ${[esc(x.author||''), esc(x.source||''),
          x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
+    ${notiSubBar(seriesName(x), 'series:' + x.id)}
     ${trBar('series', x.id, (x.title||'') + ' ' + (x.body||''))}
     ${seriesMine(x) ? '' : `<div class="wxbox"><b>${esc(t('원문'))}</b>
       ${x.origTitle?`<div>${esc(x.origTitle)}</div>`:''}
@@ -23285,11 +23478,19 @@ async function renderNews(force){
     + [['kr', t('한국 소식'), nNew(gov)], ['ww', t('해외 소식'), nNew(ww)], ['sr', t('연재'), 0]]
         .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tcnt">${c}</span>`:''}</button>`).join('')
     + `</div>`;
+  // ★ 걸러 보는 단추가 아니다. 「알림을 어디서 켜나」를 여기 두는 것이다.
+  //   목록을 거르는 것으로 읽히지 않게 말을 「고르기」로 두고 소식 위가 아니라 오른쪽에 둔다.
+  const nCat = notiGet().krCats.length + notiGet().wwCats.length;
+  const catBar = `<div class="mrrow" style="justify-content:flex-end;padding:6px 0">
+      <button class="mrbtn subbtn" onclick="openNotiCats()">${esc(t('관심 분야 고르기'))}${
+        nCat ? ` <span class="chip">${esc(String(nCat))}</span>` : ''}</button></div>`;
   let html = tabs;
   if(newsSub === 'kr'){
+    html += catBar;
     html += gov.length ? newsTrBar(gov) + newsByDay(gov, krRow)
       : `<div class="mrnone">${esc(t('아직 모인 소식이 없습니다.'))}</div>`;
   } else if(newsSub === 'ww'){
+    html += catBar;
     const up = newsCache && newsCache.updated ? new Date(newsCache.updated) : null;
     html += ww.length
       ? `<div class="newsup">${esc(tsub('마지막 수집 {d} · {n}건',

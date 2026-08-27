@@ -660,6 +660,9 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .mrbtn.ok{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 .mrbtn.warn{background:none;border-color:#5A3030;color:#E08A8A}
 .mrbtn.phx{padding:2px 6px;font-size:10px;border-radius:6px}
+.fopt2{background:var(--sf2);border:1px solid var(--bd);border-radius:999px;color:#C4C8CD;
+  padding:8px 12px;font-size:12.5px;font-weight:700;min-height:38px;cursor:pointer}
+.fopt2.on{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 /* ── 앱 안의 알림창.
    브라우저 창은 단추 이름을 앱이 못 정한다. 한국어 앱에 CANCEL·OK 가 영어로 나온다. */
 .tellov{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
@@ -1898,7 +1901,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2087;
+const LANG_TOTAL = 2124;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -1922,6 +1925,43 @@ const I18N = {
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '출항 예정 알림':'Departure alert',
+    '알릴 사람 고르기':'Choose who to notify',
+    '우리 배 출항 예정':'Our boat\'s departure',
+    '예정을 잡은 분이 고른 사람에게만 갑니다':'Only to the people chosen by whoever set the plan',
+    '{n}시간 전':'{n}h before',
+    '아무도 안 골랐습니다':'No one chosen yet',
+    '{n}명에게 · {when}':'{n} people · {when}',
+    '출항 전에':'Before departure',
+    '지금 알리기':'Notify now',
+    '{n}명에게 지금 알릴까요?':'Notify {n} people now?',
+    '알림을 보냈습니다.':'Notification sent.',
+    '알림을 보내지 못했습니다.':'Could not send the notification.',
+    '알림 예약을 저장하지 못했습니다.':'Could not save the alert.',
+    '로그인하셔야 알림을 보낼 수 있습니다.':'You must sign in to send notifications.',
+    '알릴 사람을 먼저 골라 주세요.':'Choose who to notify first.',
+    '고른 분의 폰으로 갑니다. 받는 분이 설정에서 끄면 가지 않습니다.':'It goes to the phones of the people you chose. It will not arrive if they turn it off in settings.',
+    '같이 타기 신청한 분':'People who asked to join',
+    '모집 글에 댓글을 남긴 분들입니다':'People who commented on the crew post',
+    '한 번에 더하기':'Add all',
+    '같이 타기에 신청한 분이 없습니다.':'No one has asked to join yet.',
+    '{n}분을 더했습니다.':'Added {n} people.',
+    '이미 다 골라 두셨습니다.':'They are all chosen already.',
+    '저장해 둔 묶음':'Saved groups',
+    '더하기':'Add',
+    '배 명부':'Crew list',
+    '이 배에 다른 구성원이 없습니다.':'This boat has no other members.',
+    '전부 끄기':'Clear all',
+    '이대로 묶음으로 저장':'Save these as a group',
+    '묶음으로 저장':'Save as a group',
+    '묶음 이름':'Group name',
+    '묶음 이름을 넣어 주세요':'Enter a group name',
+    '예: 주말 크루':'e.g. Weekend crew',
+    '묶음으로 저장했습니다.':'Saved as a group.',
+    '먼저 사람을 골라 주세요.':'Choose people first.',
+    '다 골랐습니다':'Done',
+    '지금 {n}명 골랐습니다.':'{n} chosen so far.',
+    "묶음 '{name}' 을 지울까요?":'Delete the group "{name}"?',
     '더 보기':'Show more', '새로고침':'Refresh', 
     '날씨 · 물때':'Weather & Tide', '출항 전 점검':'Pre-departure check',
     '지금 나갈 수 있나':'Can I go out now?', 
@@ -4097,6 +4137,43 @@ const I18N = {
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '출항 예정 알림':'Оповещение о выходе',
+    '알릴 사람 고르기':'Кого оповестить',
+    '우리 배 출항 예정':'Выход нашей лодки',
+    '예정을 잡은 분이 고른 사람에게만 갑니다':'Только тем, кого выбрал автор плана',
+    '{n}시간 전':'за {n} ч',
+    '아무도 안 골랐습니다':'Никто не выбран',
+    '{n}명에게 · {when}':'{n} чел. · {when}',
+    '출항 전에':'Перед выходом',
+    '지금 알리기':'Оповестить сейчас',
+    '{n}명에게 지금 알릴까요?':'Оповестить {n} чел. сейчас?',
+    '알림을 보냈습니다.':'Оповещение отправлено.',
+    '알림을 보내지 못했습니다.':'Не удалось отправить оповещение.',
+    '알림 예약을 저장하지 못했습니다.':'Не удалось сохранить оповещение.',
+    '로그인하셔야 알림을 보낼 수 있습니다.':'Чтобы отправлять оповещения, войдите в аккаунт.',
+    '알릴 사람을 먼저 골라 주세요.':'Сначала выберите получателей.',
+    '고른 분의 폰으로 갑니다. 받는 분이 설정에서 끄면 가지 않습니다.':'Придёт на телефоны выбранных людей. Не придёт, если получатель отключил это в настройках.',
+    '같이 타기 신청한 분':'Желающие пойти с вами',
+    '모집 글에 댓글을 남긴 분들입니다':'Те, кто оставил комментарий к объявлению',
+    '한 번에 더하기':'Добавить всех',
+    '같이 타기에 신청한 분이 없습니다.':'Пока никто не откликнулся.',
+    '{n}분을 더했습니다.':'Добавлено: {n}.',
+    '이미 다 골라 두셨습니다.':'Все уже выбраны.',
+    '저장해 둔 묶음':'Сохранённые группы',
+    '더하기':'Добавить',
+    '배 명부':'Список экипажа',
+    '이 배에 다른 구성원이 없습니다.':'На этой лодке нет других участников.',
+    '전부 끄기':'Снять все',
+    '이대로 묶음으로 저장':'Сохранить как группу',
+    '묶음으로 저장':'Сохранение группы',
+    '묶음 이름':'Название группы',
+    '묶음 이름을 넣어 주세요':'Введите название группы',
+    '예: 주말 크루':'напр. Экипаж выходного дня',
+    '묶음으로 저장했습니다.':'Сохранено как группа.',
+    '먼저 사람을 골라 주세요.':'Сначала выберите людей.',
+    '다 골랐습니다':'Готово',
+    '지금 {n}명 골랐습니다.':'Выбрано: {n}.',
+    "묶음 '{name}' 을 지울까요?":'Удалить группу «{name}»?',
     '더 보기':'Ещё', '새로고침':'Обновить', 
     '날씨 · 물때':'Погода и прилив', '출항 전 점검':'Проверка перед выходом',
     '지금 나갈 수 있나':'Можно ли выходить?', 
@@ -14408,7 +14485,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.38';
+const APP_VER = '4.39';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -17115,6 +17192,7 @@ function openMR(kind, id){
       + trkBox(it)
       + trkPubBox(it)
       + rideBox(it)
+      + planNotiBox(it)
       // ★ 예정 항해에는 '나간 뒤' 칸(도착·거리·시간·항적)을 안 보여 준다.
       //   아직 있지도 않은 숫자를 빈 칸으로 늘어놓으면 뭘 적어야 하나 헷갈린다.
       //   출항하면 [출항했습니다] 를 눌러 진짜 항해일지가 되고, 그때 다 나온다.
@@ -18465,6 +18543,295 @@ function trkPubToggle(){
   openMR('voyage', mrOpenId);
 }
 // ── 같이 타기 칸 (예정 항해에서만 보인다)
+// ===== 출항 예정 알림 (4.39) =====
+//
+// ★ 이것은 남의 폰을 울린다. 잘못 보내면 되돌릴 수 없다. 그래서 세 겹으로 막는다.
+//   ① 예정을 잡은 사람이 「누구에게」를 직접 고른다. 기본은 아무도 아니다.
+//   ② 언제 알릴지도 사람이 고른다 — 사람마다 사정이 다르다.
+//   ③ 받는 쪽도 설정에서 끌 수 있다.
+//
+//   ★ 서버로 내보내는 문은 planNotiSync 하나다.
+//     여러 곳에서 내보내면 한 곳이 「아무도 안 골랐다」를 안 본다.
+
+const PLAN_BEFORE  = [0, 1, 3, 6, 12, 24, 48];   // 시간. 0 = 안 함
+const PLAN_WHO_MAX = 100;
+let planPick = null;        // 고르는 중인 것 { vid, who:[] }
+
+function planBeforeName(h){
+  const n = Number(h) || 0;
+  if(!n) return t('안 함');
+  if(n >= 24 && n % 24 === 0) return tsub('{n}일 전', { n:String(n / 24) });
+  return tsub('{n}시간 전', { n:String(n) });
+}
+// 이 예정의 출항 시각. 날짜나 시각이 없으면 null
+function planDepartAt(it){
+  const ds = String((it && it.date) || '').trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(ds)) return null;
+  const m = String((it && it.timeOut) || '09:00').match(/^(\d{1,2}):(\d{2})$/);
+  if(!m) return null;
+  const d = new Date(ds + 'T00:00:00');
+  d.setHours(Number(m[1]), Number(m[2]), 0, 0);
+  return isNaN(d.getTime()) ? null : d;
+}
+function planNotiGet(it){
+  const d = (it && it.pnoti) || {};
+  return { who:   Array.isArray(d.who) ? d.who.map(String) : [],
+           before: Number(d.before) || 0,
+           now:    String(d.now || '') };
+}
+function planNotiSet(it, patch){
+  if(!it) return null;
+  const d = Object.assign(planNotiGet(it), patch || {});
+  it.pnoti = d;
+  try{ saveMR(); }catch(e){}
+  return d;
+}
+// ★ 언제 서버가 보내야 하나. 못 보낼 때는 '' 를 돌려준다 — 조용히 거짓말하지 않는다.
+function planFireAt(it){
+  const d = planNotiGet(it);
+  if(!(d.before > 0)) return '';
+  const at0 = planDepartAt(it);
+  if(!at0) return '';
+  const at = new Date(at0.getTime() - d.before * 36e5);
+  if(at.getTime() <= Date.now()) return '';     // 이미 지난 때는 안 건다
+  return at.toISOString();
+}
+function planNotiId(b, it){
+  return String((b && b.id) || '') + '_' + String((it && it.id) || '');
+}
+// ★ 서버로 내보내는 단 하나의 문
+async function planNotiSync(it){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const uid = (typeof meUid === 'function') ? meUid() : '';
+  const D = window.__plannoti;
+  if(!b || !uid || !it) return 'login';
+  if(!D) return 'net';
+  const id = planNotiId(b, it);
+  const d  = planNotiGet(it);
+  // 나 자신은 뺀다 — 내가 잡은 예정이 내 폰을 울릴 까닭이 없다
+  const who = d.who.filter(x => x && String(x) !== String(uid)).slice(0, PLAN_WHO_MAX);
+  const fireAt = planFireAt(it);
+  if(!who.length || (!d.now && !fireAt)){
+    try{ await D.drop(id); }catch(e){}
+    return '';
+  }
+  try{
+    await D.save({ id:id, boatId:String(b.id), vid:String(it.id), by:uid, who:who,
+      boatName: String(b.name || ''),
+      what:     String(it.title || '').trim(),
+      date:     String(it.date || ''),
+      timeOut:  String(it.timeOut || ''),
+      now:      d.now, fireAt: fireAt });
+  }catch(e){ return String((e && e.message) || e); }
+  return '';
+}
+// 「지금 알리기」 — 누를 때마다 새 표시를 남긴다. 서버는 그 표시가 바뀌었을 때만 보낸다.
+async function planNotiNow(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const d = planNotiGet(it);
+  if(!d.who.length){ tell(t('알릴 사람을 먼저 골라 주세요.')); return; }
+  if(!await ask(tsub('{n}명에게 지금 알릴까요?', { n:String(d.who.length) }),
+                { ok: t('지금 알리기') })) return;
+  planNotiSet(it, { now: new Date().toISOString() });
+  const why = await planNotiSync(it);
+  if(why){ tell(t('알림을 보내지 못했습니다.') + '\n\n' + planWhyText(why)); return; }
+  tell(t('알림을 보냈습니다.'));
+  renderVoyage(); openMR('voyage', it.id);
+}
+function planWhyText(w){
+  if(w === 'login') return t('로그인하셔야 알림을 보낼 수 있습니다.');
+  if(w === 'net')   return t('인터넷에 연결되어 있지 않습니다');
+  return String(w || '');
+}
+async function planSetBefore(h){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  planNotiSet(it, { before: Number(h) || 0 });
+  await planNotiSync(it);
+  renderVoyage(); openMR('voyage', it.id);
+}
+
+// ── 자주 쓰는 묶음 (배 문서에 둔다 — 기기를 바꿔도 남고, 같은 배 사람이 같이 쓴다)
+//    ★ 여기에는 uid 가 들어 있다. 공개 자료로 절대 내보내지 않는다.
+function crewSetList(b){
+  const a = (b && Array.isArray(b.crewSets)) ? b.crewSets : [];
+  return a.filter(x => x && x.id).map(x => ({
+    id: String(x.id), name: String(x.name || ''),
+    who: Array.isArray(x.who) ? x.who.map(String) : [] }));
+}
+function crewSetSave(name, who){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const n = String(name || '').trim();
+  if(!b || !n) return '';
+  if(!Array.isArray(b.crewSets)) b.crewSets = [];
+  const w = (who || []).map(String).filter(Boolean).slice(0, PLAN_WHO_MAX);
+  const old = b.crewSets.filter(x => x && String(x.name).trim() === n)[0];
+  if(old) old.who = w;
+  else b.crewSets.push({ id: newId(), name: n, who: w });
+  try{ saveMR(); }catch(e){}
+  return n;
+}
+function crewSetDel(id){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b || !Array.isArray(b.crewSets)) return false;
+  const i = b.crewSets.map(x => String(x && x.id)).indexOf(String(id));
+  if(i < 0) return false;
+  b.crewSets.splice(i, 1);
+  try{ saveMR(); }catch(e){}
+  return true;
+}
+// ★ 같이 타기에는 신청자 명단이 따로 없다. 모집을 켜면 글판에 글이 하나 올라가고(ridePost),
+//   신청은 그 글의 댓글로 들어온다. 그래서 그 글에 댓글 단 사람을 묶는다.
+async function planNotiRide(it){
+  const out = [];
+  const pid = it && it.ridePost;
+  if(!pid || !window.__cmt) return out;
+  let arr = [];
+  try{ arr = (await window.__cmt.list('community', String(pid))) || []; }catch(e){ return out; }
+  const me = (typeof meUid === 'function') ? String(meUid() || '') : '';
+  arr.forEach(c => {
+    const u = String((c && c.by) || '');
+    if(u && u !== me && out.indexOf(u) < 0) out.push(u);
+  });
+  return out;
+}
+
+// ── 예정 항해에 붙는 줄
+function planNotiBox(it){
+  if(!it || !isPlan(it)) return '';
+  const d = planNotiGet(it);
+  const n = d.who.length;
+  const when = planBeforeName(d.before);
+  const rows = PLAN_BEFORE.map(h =>
+      `<button class="fopt2${h === d.before ? ' on' : ''}" onclick="planSetBefore(${h})">${
+        esc(planBeforeName(h))}</button>`).join('');
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('출항 예정 알림'))}</span>
+      <span class="mrm" style="flex:1;color:#7b8794">${
+        esc(n ? tsub('{n}명에게 · {when}', { n:String(n), when:when })
+              : t('아무도 안 골랐습니다'))}</span>
+      <button class="mrbtn" onclick="openPlanWho()">${esc(t('알릴 사람 고르기'))}</button></div>`
+    + (n ? `<div class="mrrow" style="flex-wrap:wrap;gap:6px">
+             <span class="mrlbl">${esc(t('출항 전에'))}</span>
+             <div style="flex:1;display:flex;flex-wrap:wrap;gap:6px">${rows}</div></div>
+           <div class="mrrow" style="justify-content:flex-end">
+             <button class="mrbtn ok" onclick="planNotiNow()">${esc(t('지금 알리기'))}</button></div>` : '')
+    + `<div class="mrnone" style="text-align:left">${
+         esc(t('고른 분의 폰으로 갑니다. 받는 분이 설정에서 끄면 가지 않습니다.'))}</div>`;
+}
+
+// ── 알릴 사람 고르는 화면
+function planWhoName(b, uid){
+  return String((b && b.memberNames && b.memberNames[uid]) || '') || t('이름 미등록');
+}
+function planWhoOn(uid){
+  return !!(planPick && planPick.who.indexOf(String(uid)) >= 0);
+}
+function planWhoToggle(uid){
+  if(!planPick) return;
+  const u = String(uid);
+  const i = planPick.who.indexOf(u);
+  if(i >= 0) planPick.who.splice(i, 1); else planPick.who.push(u);
+  planWhoPaint();
+}
+function planWhoAdd(list){
+  if(!planPick) return 0;
+  let n = 0;
+  (list || []).forEach(u => {
+    const v = String(u);
+    if(v && planPick.who.indexOf(v) < 0){ planPick.who.push(v); n++; }
+  });
+  planWhoPaint();
+  return n;
+}
+function planWhoClear(){ if(planPick){ planPick.who = []; planWhoPaint(); } }
+async function planWhoRide(){
+  const it = getMR('voyage', planPick && planPick.vid); if(!it) return;
+  const arr = await planNotiRide(it);
+  if(!arr.length){ tell(t('같이 타기에 신청한 분이 없습니다.')); return; }
+  const n = planWhoAdd(arr);
+  tell(n ? tsub('{n}분을 더했습니다.', { n:String(n) }) : t('이미 다 골라 두셨습니다.'));
+}
+async function planWhoSaveSet(){
+  if(!planPick || !planPick.who.length){ tell(t('먼저 사람을 골라 주세요.')); return; }
+  openForm({
+    title:'묶음으로 저장', okText:'저장',
+    fields:[{ key:'name', label:'묶음 이름', value:'', placeholder:'예: 주말 크루' }],
+    onOk: v => {
+      const n = String(v.name || '').trim();
+      if(!n){ tell(t('묶음 이름을 넣어 주세요')); return false; }
+      crewSetSave(n, planPick.who);
+      tell(t('묶음으로 저장했습니다.'));
+      planWhoPaint();
+    }
+  });
+}
+async function planWhoDelSet(id){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const one = crewSetList(b).filter(x => x.id === String(id))[0];
+  if(!one) return;
+  if(!await ask(tsub("묶음 '{name}' 을 지울까요?", { name: one.name }),
+                { ok: t('지우기'), warn: true })) return;
+  crewSetDel(id);
+  planWhoPaint();
+}
+async function planWhoDone(){
+  const it = getMR('voyage', planPick && planPick.vid);
+  if(it && planPick) planNotiSet(it, { who: planPick.who.slice() });
+  planPick = null;
+  closeTopScreen();
+  if(it){
+    const why = await planNotiSync(it);
+    if(why) tell(t('알림 예약을 저장하지 못했습니다.') + '\n\n' + planWhyText(why));
+    renderVoyage(); openMR('voyage', it.id);
+  }
+}
+function openPlanWho(){
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  planPick = { vid: String(it.id), who: planNotiGet(it).who.slice() };
+  planWhoPaint();
+}
+function planWhoPaint(){
+  const P = document.getElementById('panel');
+  if(!P || !planPick) return;
+  const b  = (typeof curBoat === 'function') ? curBoat() : null;
+  const me = (typeof meUid === 'function') ? String(meUid() || '') : '';
+  const it = getMR('voyage', planPick.vid);
+  const uids = Object.keys((b && b.members) || {}).filter(u => String(u) !== me);
+  const sets = crewSetList(b);
+  const sw = u => `<button class="notisw${planWhoOn(u) ? ' on' : ''}"
+      onclick="planWhoToggle('${esc(String(u))}')"
+      aria-pressed="${planWhoOn(u) ? 'true' : 'false'}"><span></span></button>`;
+  P.innerHTML = `<div class="mrhead"><b>${t('알릴 사람 고르기')}</b><span style="flex:1"></span>
+      <button class="mrbtn ok" onclick="planWhoDone()">${esc(t('다 골랐습니다'))}</button></div>`
+    + `<div class="mrnone" style="text-align:left">${
+         esc(tsub('지금 {n}명 골랐습니다.', { n:String(planPick.who.length) }))}</div>`
+    + ((it && it.ridePost) ? `<div class="notilbl">${esc(t('같이 타기 신청한 분'))}</div>
+        <div class="mrrow" style="gap:8px">
+          <span class="mrm" style="flex:1;color:#7b8794">${
+            esc(t('모집 글에 댓글을 남긴 분들입니다'))}</span>
+          <button class="mrbtn" onclick="planWhoRide()">${esc(t('한 번에 더하기'))}</button></div>` : '')
+    + (sets.length ? `<div class="notilbl">${esc(t('저장해 둔 묶음'))}</div>`
+        + sets.map(x => `<div class="mrrow" style="gap:8px">
+            <span class="mrv" style="flex:1;min-width:0">${esc(x.name)}
+              <span class="mrm" style="color:#7b8794"> · ${
+                esc(tsub('{n}명', { n:String(x.who.length) }))}</span></span>
+            <button class="mrbtn" onclick="planWhoAdd(${esc(JSON.stringify(x.who))})">${
+              esc(t('더하기'))}</button>
+            <button class="mrbtn warn" onclick="planWhoDelSet('${esc(x.id)}')">${
+              esc(t('지우기'))}</button></div>`).join('') : '')
+    + `<div class="notilbl">${esc(t('배 명부'))}</div>`
+    + (uids.length
+        ? uids.map(u => `<div class="mrrow notirow">
+             <span class="mrv" style="flex:1;min-width:0">${esc(planWhoName(b, u))}</span>
+             ${sw(u)}</div>`).join('')
+        : `<div class="mrnone" style="text-align:left">${
+             esc(t('이 배에 다른 구성원이 없습니다.'))}</div>`)
+    + `<div class="mrrow" style="gap:8px;justify-content:flex-end;padding-top:10px">
+         <button class="mrbtn" onclick="planWhoClear()">${esc(t('전부 끄기'))}</button>
+         <button class="mrbtn" onclick="planWhoSaveSet()">${esc(t('이대로 묶음으로 저장'))}</button></div>`;
+  showPanel(P);
+  setHeadTitle('알릴 사람 고르기');
+}
+
 function rideBox(it){
   if(!isPlan(it)) return '';
   const head = `<div class="mrrow"><span class="mrlbl">${esc(t('예정'))}</span>
@@ -18711,6 +19078,7 @@ const NOTI_DEF = {
   maintBefore: 7,     // 며칠 전에 알릴까 (0 = 당일에만)
   maintAgain: 3,      // 기한이 지나면 며칠마다 다시 (0 = 다시 안 알림)
   maintAt: '09:00',   // 하루 중 몇 시에 울릴까
+  boatPlan: true,     // 우리 배 출항 예정 (예정을 잡은 분이 고른 사람에게만 간다)
   series: [],         // 받고 있는 연재 이름들      (2차)
   krCats: [],         // 관심 눌러 둔 한국 소식 분야 (2차)
   wwCats: []          // 관심 눌러 둔 해외 소식 분야 (2차)
@@ -19018,6 +19386,7 @@ function fcmBody(){
   return {
     on:        !!d.on,
     myComment: !!d.myComment,
+    boatPlan:  d.boatPlan !== false,
     series:  (Array.isArray(d.series) ? d.series : []).slice(0, 80),
     krCats:  (Array.isArray(d.krCats) ? d.krCats : []).slice(0, 40),
     wwCats:  (Array.isArray(d.wwCats) ? d.wwCats : []).slice(0, 40),
@@ -19333,6 +19702,8 @@ function openNoti(){
       + lbl(t('내 배'))
       + row(t('정비 · 점검 기한'), maintWhenText(d), d.maint, "notiToggle('maint')")
       + (d.maint ? maintWhenRows(d) + maintAlarmHtml() : '')
+      + row(t('우리 배 출항 예정'), t('예정을 잡은 분이 고른 사람에게만 갑니다'),
+            d.boatPlan !== false, "notiToggle('boatPlan')")
       + lbl(t('구독 · 관심'))
       + go(t('구독한 연재'), t('연재에서 [구독] 을 누르면 새 글이 올라올 때 알려 드립니다'),
            d.series.length, 'openNotiSubs()')
@@ -26167,7 +26538,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     //
     // ★ 토큰은 배열이다 — 한 사람이 폰·태블릿을 같이 쓸 수 있다.
     //   merge 로 배열을 쓰면 통째로 갈아치워 다른 기기가 지워진다. arrayUnion 으로 더한다.
-    window.__fcm = {
+    // ── 출항 예정 알림
+  //   ★ 훑어보기(list)는 규칙에서 아무도 못 하게 막아 두었다.
+  //     열어 두면 남의 배 예정과 구성원 uid 가 통째로 나간다.
+  window.__plannoti = {
+    async save(body){
+      if(!fauth.currentUser || !body || !body.id) return '';
+      await setDoc(doc(fdb, 'planNoti', String(body.id)),
+                   Object.assign({}, body, { ts: new Date().toISOString() }), { merge:true });
+      return String(body.id);
+    },
+    async drop(id){
+      if(!fauth.currentUser || !id) return;
+      try{ await deleteDoc(doc(fdb, 'planNoti', String(id))); }catch(_){}
+    }
+  };
+
+  window.__fcm = {
       async save(body, tok){
         const uid = fauth.currentUser && fauth.currentUser.uid;
         if(!uid) throw new Error('login');

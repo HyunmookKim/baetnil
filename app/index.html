@@ -161,6 +161,17 @@
 .notirow{min-height:56px}
 .notirow.dim{opacity:.5}
 .notilbl{font-size:12px;color:#7b8794;font-weight:600;padding:14px 12px 2px}
+/* ── 로그인 단추 — 구글·애플이 정해 둔 모양에서 벗어나면 안 된다 ──
+   ★ 두 단추의 크기·모서리·글자 크기를 똑같이 둔다. 한쪽이 작아 보이면 양쪽 규정에 걸린다. */
+.lgbtn{display:flex;align-items:center;width:100%;height:50px;border-radius:10px;
+  cursor:pointer;font-size:15px;font-weight:600;font-family:inherit;
+  padding:0 14px;box-sizing:border-box;margin:0}
+.lgbtn svg{width:20px;height:20px;flex:0 0 20px}
+.lgbtn span{flex:1;text-align:center;margin-right:20px}
+/* 구글 어두운 테마 — 색과 테두리가 구글 문서에 정해져 있다 */
+.lg-g{background:#131314;color:#e3e3e3;border:1px solid #8e918f}
+/* 애플 검정 — 애플이 주는 색은 검정·흰색·흰색+테두리 셋뿐이다 */
+.lg-a{background:#000;color:#fff;border:1px solid #000}
 /* ★ 스위치는 배 위에서 장갑 낀 손으로 눌러야 한다. 52×31 (누르는 자리는 그보다 크다) */
 .notisw{width:52px;height:31px;border-radius:999px;border:none;background:#2A3F55;
   position:relative;flex:none;cursor:pointer;padding:0;min-height:31px}
@@ -1924,6 +1935,8 @@ const I18N = {
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    'Google로 계속하기':'Continue with Google',
+    'Apple로 계속하기':'Continue with Apple',
     '앱':'App',
     '이용약관 · 개인정보 처리방침':'Terms of service and privacy policy',
     '클라우드':'Cloud',
@@ -2440,7 +2453,6 @@ const I18N = {
     '옛 사진':'Old photos',
     '문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다':'Photos still stored inside documents move to storage a few at a time on each launch',
     '계정 지우기':'Delete my account',
-    'Google 계정으로 계속하기':'Continue with Google',
     '이용약관':'Terms of Service',
     '개인정보처리방침':'Privacy Policy',
     '또는 이메일로':'or with email',
@@ -2449,7 +2461,6 @@ const I18N = {
     '회원가입':'Sign up',
     '뱃일':'Baetnil',
     '먼저 로그인해 주세요.':'Please sign in first.',
-    'Google 계정으로 시작하기':'Start with Google',
     '이메일로 시작하기':'Start with email',
     '구글(gmail) 계정이 없어도 됩니다.':'You do not need a Google account.',
     '쓰시는 아무 이메일로 가입하시면 됩니다.':'Sign up with any email you use.',
@@ -4165,6 +4176,8 @@ const I18N = {
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    'Google로 계속하기':'Продолжить с Google',
+    'Apple로 계속하기':'Продолжить с Apple',
     '앱':'Приложение',
     '이용약관 · 개인정보 처리방침':'Условия использования и политика конфиденциальности',
     '클라우드':'Облако',
@@ -4681,7 +4694,6 @@ const I18N = {
     '옛 사진':'Старые фото',
     '문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다':'Фото внутри документов постепенно переносятся в хранилище при каждом запуске',
     '계정 지우기':'Удалить аккаунт',
-    'Google 계정으로 계속하기':'Продолжить с Google',
     '이용약관':'Условия использования',
     '개인정보처리방침':'Политику конфиденциальности',
     '또는 이메일로':'или по эл. почте',
@@ -4690,7 +4702,6 @@ const I18N = {
     '회원가입':'Регистрация',
     '뱃일':'Baetnil',
     '먼저 로그인해 주세요.':'Сначала войдите.',
-    'Google 계정으로 시작하기':'Начать с Google',
     '이메일로 시작하기':'Начать с эл. почты',
     '구글(gmail) 계정이 없어도 됩니다.':'Аккаунт Google не обязателен.',
     '쓰시는 아무 이메일로 가입하시면 됩니다.':'Регистрируйтесь на любую свою почту.',
@@ -8202,7 +8213,7 @@ function openAccount(){
     P.innerHTML = `<div class="mrhead"><b>${esc(t('로그인'))}</b><span style="flex:1"></span>
         </div>
       <div class="mrnone" style="text-align:left">${esc(t('로그인하지 않아도 이 기기에서 앱을 모두 사용할 수 있습니다.'))}<br>${esc(t('여러 기기에서 함께 보거나, 다른 사람과 배를 같이 관리하려면 로그인해 주세요.'))}</div>
-      <div class="mrrow"><button class="mrbtn" style="flex:1" onclick="doGoogle()">${esc(t('Google 계정으로 계속하기'))}</button></div>
+      ${loginBtns()}
       <div class="mrnone" style="text-align:left">${
         tsub('로그인하시면 {terms}과 {privacy}에 동의하신 것으로 봅니다. 만 14세 미만은 가입할 수 없습니다.', {
           terms:   `<button class="minib blu" onclick="openLegal('terms')">${esc(t('이용약관'))}</button>`,
@@ -8393,6 +8404,14 @@ async function doGoogle(){
   try{ await window.__auth.google(); await pushAgree(); openAccount(); }
   catch(e){ acMsg(authMsg(e)); }
 }
+// ★ 아직 한 번도 눌러 본 적이 없는 길이다. APPLE_LOGIN 이 false 인 동안은 단추가 안 나온다.
+async function doApple(){
+  if(!window.__auth || !window.__auth.apple){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
+  if(needAgree()){ openAgree(doApple); return; }
+  acMsg('');
+  try{ await window.__auth.apple(); await pushAgree(); openAccount(); }
+  catch(e){ acMsg(authMsg(e)); }
+}
 async function doEmail(isNew){
   if(!window.__auth){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
   // ★ 가입이든 로그인이든 개인정보가 서버로 간다. 동의가 그 앞에 선다.
@@ -8468,7 +8487,7 @@ function openWelcome(){
   P.innerHTML = `<div class="mrhead"><b>${esc(t('뱃일'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.'))}<br><br>
       <b>${esc(t('먼저 로그인해 주세요.'))}</b>${esc(t('로그인하면 쓰던 배와 기록을 그대로 불러오고, 휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.'))}</div>
-    <div class="mrrow"><button class="mrbtn big" style="flex:1" onclick="doGoogle()">${esc(t('Google 계정으로 시작하기'))}</button></div>
+    ${loginBtns()}
     <div class="mrnone" style="text-align:left"><button class="minib blu" onclick="openLegal('terms')">${esc(t('이용약관'))}</button>
       · <button class="minib blu" onclick="openLegal('privacy')">${esc(t('개인정보처리방침'))}</button>${esc(t('· 만 14세 미만은 가입할 수 없습니다.'))}</div>
     <div class="mrnone" style="text-align:center;padding:6px 0">${esc(t('또는'))}</div>
@@ -10385,6 +10404,36 @@ function isStandalone(){
     if(window.navigator && window.navigator.standalone === true) return true;   // 아이폰
   }catch(_){}
   return false;
+}
+// ★ 로고는 앱 안에 그려 넣는다. 파일로 받아오면 인터넷이 없을 때 안 뜬다.
+//   크기·색·비율을 바꾸면 양쪽 다 규정 위반이다. 손대지 말 것.
+const SVG_G = '<svg viewBox="0 0 48 48" aria-hidden="true">'
+ + '<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>'
+ + '<path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>'
+ + '<path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>'
+ + '<path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>';
+// ★ 한 줄로 둔다. 토막내 이어 붙였더니 숫자 두 개가 붙어 길이 깨졌다.
+const SVG_APPLE = '<svg viewBox="0 0 170 170" aria-hidden="true"><path fill="#fff" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.2-2.12-9.98-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.93.21-9.84-1.96-14.75-6.52-3.13-2.73-7.05-7.41-11.74-14.04-5.03-7.08-9.17-15.29-12.41-24.65-3.47-10.11-5.21-19.9-5.21-29.38 0-10.86 2.35-20.22 7.05-28.07 3.69-6.3 8.61-11.27 14.76-14.92 6.15-3.65 12.79-5.51 19.95-5.63 3.91 0 9.05 1.21 15.43 3.59 6.36 2.39 10.45 3.6 12.24 3.6 1.34 0 5.88-1.42 13.57-4.24 7.27-2.62 13.41-3.7 18.44-3.27 13.63 1.1 23.87 6.47 30.68 16.15-12.19 7.39-18.22 17.73-18.1 31 .11 10.34 3.86 18.94 11.23 25.77 3.34 3.17 7.07 5.62 11.22 7.36-.9 2.61-1.85 5.11-2.86 7.51zM119.11 7.24c0 8.1-2.96 15.67-8.86 22.67-7.12 8.32-15.73 13.13-25.07 12.37a25.2 25.2 0 0 1-.19-3.07c0-7.78 3.39-16.1 9.4-22.91 3-3.45 6.82-6.31 11.45-8.6 4.62-2.25 8.99-3.5 13.1-3.71.12 1.08.17 2.17.17 3.24z"/></svg>';
+// ★ 애플 로그인은 아직 안 켠다.
+//   애플 개발자 계정에서 Services ID · Key ID · Team ID · 비밀 열쇠(.p8) 를 받아
+//   파이어베이스 콘솔에 넣어야 켜진다. 그 전에 단추를 보여 주면 눌러도 아무 일이 없다 —
+//   못 하는 일을 할 수 있는 것처럼 두는 것이 이 앱에서 제일 싫어하는 조용한 거짓말이다.
+//   ★★ 아이폰 앱을 스토어에 내기 전에는 반드시 true 로 바꿔야 한다 (심사규정 4.8).
+const APPLE_LOGIN = false;
+// ★ 로그인 단추를 만드는 문 하나. 첫 화면과 계정 화면이 같이 쓴다.
+//   따로 그리면 한쪽만 고치고 다른 쪽을 잊는다 — 전에 여러 번 그랬다.
+function loginBtns(){
+  const g = '<button class="lgbtn lg-g" onclick="doGoogle()">' + SVG_G
+          + '<span>' + esc(t('Google로 계속하기')) + '</span></button>';
+  const a = APPLE_LOGIN
+    ? '<button class="lgbtn lg-a" onclick="doApple()">' + SVG_APPLE
+      + '<span>' + esc(t('Apple로 계속하기')) + '</span></button>'
+    : '';
+  // ★ 아이폰에서는 애플이 먼저, 그 밖에서는 구글이 먼저.
+  //   구글도 애플도 「내 단추가 남의 것보다 덜 눈에 띄면 안 된다」고 요구한다.
+  //   크기와 모양을 똑같이 두었으니, 차례는 그 기기 주인 쪽을 앞세운다.
+  const one = x => x ? '<div class="mrrow" style="padding-bottom:8px">' + x + '</div>' : '';
+  return isIOS() ? (one(a) + one(g)) : (one(g) + one(a));
 }
 function isIOS(){
   try{
@@ -14556,7 +14605,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.43';
+const APP_VER = '4.44';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -25937,7 +25986,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     const getDocs   = (...a)=> netWait(_getDocs(...a),   NET_READ);
     const getDoc    = (...a)=> netWait(_getDoc(...a),    NET_READ);
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
-            GoogleAuthProvider, signOut, signInWithCredential,
+            GoogleAuthProvider, OAuthProvider, signOut, signInWithCredential,
             createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     const firebaseConfig = {
@@ -26086,6 +26135,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         catch(e){
           // 팝업이 막히는 환경(일부 앱 내 브라우저)에서는 화면 이동 방식으로
           if(String(e.code||'').includes('popup')) await signInWithRedirect(fauth, p);
+          else throw e;
+        }
+      },
+      // ★ 애플 로그인 — 파이어베이스 콘솔에서 켜야 돈다 (Services ID·Key ID·Team ID·.p8).
+      //   안 켜진 상태로 부르면 auth/operation-not-allowed 가 온다.
+      async apple(){
+        const ap = new OAuthProvider('apple.com');
+        ap.addScope('email'); ap.addScope('name');
+        try{ await signInWithPopup(fauth, ap); }
+        catch(e){
+          if(String(e.code||'').includes('popup')) await signInWithRedirect(fauth, ap);
           else throw e;
         }
       },

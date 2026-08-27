@@ -1810,7 +1810,7 @@ header{padding-top:var(--sat)}
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();syncUp()" data-t="클라우드에 올리기">클라우드에 올리기</button><button class="ditem" onclick="closeDrawer();syncDown()" data-t="클라우드에서 받아오기">클라우드에서 받아오기</button><button class="ditem" onclick="closeDrawer();backupData()" data-t="데이터 백업">데이터 백업</button><button class="ditem" id="restoreBtn" onclick="drawerRestore()" data-t="백업 복원">백업 복원</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><button class="ditem" onclick="closeDrawer();openLegal('terms')" data-t="약관 · 개인정보">약관 · 개인정보</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="내 배">내 배</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="배">배</span></button><button id="tabVoyage" onclick="switchTab('voyage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-t="항해일지">항해일지</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 
 
@@ -1901,7 +1901,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2145;
+const LANG_TOTAL = 2152;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -1920,11 +1920,21 @@ const I18N = {
     '로그인':'Sign in', '로그아웃':'Sign out', '계정':'Account',
     '언어':'Language', '고객센터 · 건의하기':'Support',
     '약관 · 개인정보':'Terms & Privacy', '앱 새로 받기':'Reload app',
-    '데이터 백업':'Back up data', '백업 복원':'Restore backup',
-    '클라우드에 올리기':'Upload to cloud', '클라우드에서 받아오기':'Download from cloud',
+        '클라우드에 올리기':'Upload to cloud', '클라우드에서 받아오기':'Download from cloud',
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '앱':'App',
+    '이용약관 · 개인정보 처리방침':'Terms of service and privacy policy',
+    '클라우드':'Cloud',
+    '파일':'File',
+    '파일로 저장':'Save to a file',
+    '파일에서 불러오기':'Load from a file',
+    '이 기기의 기록을 클라우드로 보냅니다':'Sends this device\'s records to the cloud',
+    '클라우드 기록을 이 기기로 가져옵니다':'Brings the cloud records to this device',
+    '기록을 파일 하나로 만들어 어디 둘지 고릅니다':'Makes one file and lets you choose where to keep it',
+    '저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다':'Replaces this device\'s records with a saved file',
+    '파일로 먼저 저장하기':'Save to a file first',
     '공개하기':'Make public',
     '동의하기':'Agree',
     '설정 열기':'Open settings',
@@ -2741,7 +2751,7 @@ const I18N = {
     '폰에 등록하지 못했습니다':'Could not register on this phone',
     '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'This phone is registered. Notifications will arrive when the server sends them.',
     '다시 등록':'Register again',
-    '백업 파일을 내보내지 못했습니다.':'Could not export the backup file.',
+    '파일로 저장하지 못했습니다.':'Could not save the file.',
     '{p} 에 넣었습니다.':'Saved to {p}.',
     '항적 보이기':'Show the track',
     '공개 항해일지에서 지나온 길을 보여 줍니다':'Shows the route you sailed on your public log',
@@ -2887,7 +2897,6 @@ const I18N = {
     '댓글을 적어 주세요':'Please write a comment',
     '더 불러오지 못했습니다.\n\n':'Could not load more.\n\n',
     '덧붙일 말':'Anything to add',
-    '데이터 백업 먼저 받기':'Back up your data first',
     '도면 도형이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)':'The drawing shapes are locked.\n\nUnlock them now?\nAfter unlocking, try again.\n(You can also use the padlock on the toolbar.)',
     '도면 사진':'Drawing image',
     '도면 사진 바꾸기':'Replace the drawing image',
@@ -2972,7 +2981,7 @@ const I18N = {
     '먼저 감추기를 써 보시는 편이 낫습니다.':'It is better to try hiding it first.',
     '먼저 도면을 고르거나 올려 주세요':'Pick or upload a drawing first',
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Register a boat first. You can change anything you enter later.',
-    '먼저 백업을 받아 두시길 권합니다.':'We recommend taking a backup first.',
+    '먼저 파일로 저장해 두시길 권합니다.':'We recommend saving to a file first.',
     '먼저 출항 날짜를 정해 주세요':'Set the departure date first',
     '메탈지그':'Metal jig',
     '명부를 볼 권한이 없습니다':'You do not have permission to view the crew list',
@@ -3080,9 +3089,8 @@ const I18N = {
     '배와 엔진은 연식과 사용 시간이 값을 가릅니다. 아는 대로 적어 주세요.':'For boats and engines the year and hours set the price. Write what you know.',
     '배의 전체 길이입니다. 계류 자리를 알아보거나 입출항 신고를 할 때 쓰입니다.':'The boat\'s overall length. Used when arranging a berth or filing arrival and departure reports.',
     '배의 제조사와 모델, 건조 연도입니다. 예를 들어 <b>Beneteau · First 45f5 · 1991</b> 처럼 적습니다.<br><br>':'The builder, model and year of the boat — for example <b>Beneteau · First 45f5 · 1991</b>.<br><br>',
-    '백업 복원은 이 기기의 기록을 백업 파일 것으로 갈아 끼웁니다.':'Restoring replaces this device\'s records with the ones in the backup file.',
-    '백업 파일을 읽지 못했습니다. ':'Could not read the backup file. ',
-    '백업·복원':'Backup and restore',
+    '파일을 읽지 못했습니다. ':'Could not read the file. ',
+    '파일 저장·불러오기':'Save and load files',
     '뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n':'Baetnil is not a party to the deal. It only lends the space, and\n',
     '뱃일을 쓰시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.':'To use Baetnil, please agree below. You can read the documents again at any time under Menu › Terms and policies.',
     '법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).':'Records the law requires us to keep are held separately for that period (see the privacy policy).',
@@ -3479,10 +3487,10 @@ const I18N = {
     '저자':'Author',
     '저자를 넣어 주세요':'Please enter the author',
     '저작권자 허락도 미리 받으셔야 합니다.\n\n알겠습니다, 신청할까요?':'You also need the copyright holder\'s permission in advance.\n\nUnderstood — shall we apply?',
-    '저장 공간이 가득 찼습니다. 사진을 줄이거나 백업 후 정리해 주세요.':'Storage is full. Use fewer photos, or back up and clear some space.',
+    '저장 공간이 가득 찼습니다. 사진을 줄이거나 파일로 저장한 뒤 정리해 주세요.':'Storage is full. Use fewer photos, or save to a file and clear some space.',
     '저장 중…':'Saving…',
     '저장된 앱 파일을 지우고 새로 받아옵니다.\n\n':'The stored app files will be deleted and downloaded again.\n\n',
-    '저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.':'Could not save. The device may be out of space. Back up and try again.',
+    '저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 파일로 저장한 뒤 다시 시도해 주세요.':'Could not save. The device may be out of space. Save to a file and try again.',
     '저조위 기준으로 바꿔 드립니다.':'and convert it to lowest-tide datum.',
     '적어 둔 것 없음':'Nothing noted',
     '적재표 (물품)':'Stowage (items)',
@@ -4153,11 +4161,21 @@ const I18N = {
     '로그인':'Войти', '로그아웃':'Выйти', '계정':'Аккаунт',
     '언어':'Язык', '고객센터 · 건의하기':'Поддержка',
     '약관 · 개인정보':'Условия и приватность', '앱 새로 받기':'Обновить приложение',
-    '데이터 백업':'Резервная копия', '백업 복원':'Восстановить из копии',
-    '클라우드에 올리기':'Выгрузить в облако', '클라우드에서 받아오기':'Загрузить из облака',
+        '클라우드에 올리기':'Выгрузить в облако', '클라우드에서 받아오기':'Загрузить из облака',
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '앱':'Приложение',
+    '이용약관 · 개인정보 처리방침':'Условия использования и политика конфиденциальности',
+    '클라우드':'Облако',
+    '파일':'Файл',
+    '파일로 저장':'Сохранить в файл',
+    '파일에서 불러오기':'Загрузить из файла',
+    '이 기기의 기록을 클라우드로 보냅니다':'Отправляет записи с этого устройства в облако',
+    '클라우드 기록을 이 기기로 가져옵니다':'Переносит записи из облака на это устройство',
+    '기록을 파일 하나로 만들어 어디 둘지 고릅니다':'Создаёт один файл и предлагает выбрать, где его хранить',
+    '저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다':'Заменяет записи на этом устройстве сохранённым файлом',
+    '파일로 먼저 저장하기':'Сначала сохранить в файл',
     '공개하기':'Опубликовать',
     '동의하기':'Согласиться',
     '설정 열기':'Открыть настройки',
@@ -4974,7 +4992,7 @@ const I18N = {
     '폰에 등록하지 못했습니다':'Не удалось зарегистрировать на телефоне',
     '이 폰이 등록됐습니다. 서버에서 보내면 옵니다.':'Телефон зарегистрирован. Уведомления придут, когда сервер их отправит.',
     '다시 등록':'Зарегистрировать снова',
-    '백업 파일을 내보내지 못했습니다.':'Не удалось выгрузить файл резервной копии.',
+    '파일로 저장하지 못했습니다.':'Не удалось сохранить файл.',
     '{p} 에 넣었습니다.':'Сохранено в {p}.',
     '항적 보이기':'Показывать трек',
     '공개 항해일지에서 지나온 길을 보여 줍니다':'Показывает пройденный маршрут в открытом журнале',
@@ -5120,7 +5138,6 @@ const I18N = {
     '댓글을 적어 주세요':'Напишите комментарий',
     '더 불러오지 못했습니다.\n\n':'Не удалось загрузить ещё.\n\n',
     '덧붙일 말':'Что добавить',
-    '데이터 백업 먼저 받기':'Сначала сделайте резервную копию',
     '도면 도형이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)':'Фигуры на чертеже заблокированы.\n\nРазблокировать сейчас?\nПосле разблокировки повторите действие.\n(Замок на панели инструментов делает то же самое.)',
     '도면 사진':'Изображение чертежа',
     '도면 사진 바꾸기':'Заменить изображение чертежа',
@@ -5205,7 +5222,7 @@ const I18N = {
     '먼저 감추기를 써 보시는 편이 낫습니다.':'Лучше сначала попробовать «Скрыть».',
     '먼저 도면을 고르거나 올려 주세요':'Сначала выберите или загрузите чертёж',
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Сначала зарегистрируйте судно. Всё введённое можно потом изменить.',
-    '먼저 백업을 받아 두시길 권합니다.':'Советуем сначала сделать резервную копию.',
+    '먼저 파일로 저장해 두시길 권합니다.':'Советуем сначала сохранить в файл.',
     '먼저 출항 날짜를 정해 주세요':'Сначала укажите дату выхода',
     '메탈지그':'Металлический джиг',
     '명부를 볼 권한이 없습니다':'Нет прав смотреть список экипажа',
@@ -5313,9 +5330,8 @@ const I18N = {
     '배와 엔진은 연식과 사용 시간이 값을 가릅니다. 아는 대로 적어 주세요.':'Цену судна и двигателя определяют год и наработка. Укажите, что знаете.',
     '배의 전체 길이입니다. 계류 자리를 알아보거나 입출항 신고를 할 때 쓰입니다.':'Наибольшая длина судна. Нужна при поиске стоянки и при уведомлении о приходе и отходе.',
     '배의 제조사와 모델, 건조 연도입니다. 예를 들어 <b>Beneteau · First 45f5 · 1991</b> 처럼 적습니다.<br><br>':'Верфь, модель и год постройки — например, <b>Beneteau · First 45f5 · 1991</b>.<br><br>',
-    '백업 복원은 이 기기의 기록을 백업 파일 것으로 갈아 끼웁니다.':'Восстановление заменяет записи на этом устройстве содержимым файла резервной копии.',
-    '백업 파일을 읽지 못했습니다. ':'Не удалось прочитать файл резервной копии. ',
-    '백업·복원':'Резервные копии',
+    '파일을 읽지 못했습니다. ':'Не удалось прочитать файл. ',
+    '파일 저장·불러오기':'Сохранение и загрузка файлов',
     '뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n':'«Пэннiль» не является стороной сделки. Он лишь предоставляет площадку, и\n',
     '뱃일을 쓰시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.':'Чтобы пользоваться приложением, согласитесь с пунктами ниже. Тексты всегда доступны в «Меню › Условия и политики».',
     '법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).':'Записи, которые закон обязывает хранить, хранятся отдельно установленный срок (см. политику конфиденциальности).',
@@ -5712,10 +5728,10 @@ const I18N = {
     '저자':'Автор',
     '저자를 넣어 주세요':'Укажите автора',
     '저작권자 허락도 미리 받으셔야 합니다.\n\n알겠습니다, 신청할까요?':'Разрешение правообладателя тоже нужно получить заранее.\n\nПонятно — подать заявку?',
-    '저장 공간이 가득 찼습니다. 사진을 줄이거나 백업 후 정리해 주세요.':'Память заполнена. Уменьшите число фотографий или сделайте копию и освободите место.',
+    '저장 공간이 가득 찼습니다. 사진을 줄이거나 파일로 저장한 뒤 정리해 주세요.':'Память заполнена. Уменьшите число фотографий или сохраните в файл и освободите место.',
     '저장 중…':'Сохранение…',
     '저장된 앱 파일을 지우고 새로 받아옵니다.\n\n':'Сохранённые файлы приложения будут удалены и загружены заново.\n\n',
-    '저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.':'Не удалось сохранить. Возможно, не хватает памяти. Сделайте копию и повторите.',
+    '저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 파일로 저장한 뒤 다시 시도해 주세요.':'Не удалось сохранить. Возможно, не хватает памяти. Сохраните в файл и повторите.',
     '저조위 기준으로 바꿔 드립니다.':'и переведём к отсчёту от малой воды.',
     '적어 둔 것 없음':'Записей нет',
     '적재표 (물품)':'Размещение (вещи)',
@@ -8147,8 +8163,14 @@ window.__onAuth = u => {
   }
 };
 function applyAccount(){
+  // ★ 메일 주소를 메뉴 줄에 박지 않는다.
+  //   전에는 이름이 없으면 me.email 로 넘어갔다 — 구글 계정에 이름을 안 넣어 둔 분은
+  //   서랍을 열 때마다 자기 메일 주소가 통째로 떠 있었다. 줄이 넘치고,
+  //   폰을 잠깐 남에게 보여 줄 때 메뉴만 열어도 메일이 보인다.
+  //   어느 계정으로 들어와 있는지는 계정 화면에서 이미 보여 준다. 여기서 또 할 일이 아니다.
+  //   ※ 구글 로그인 규정은 「Google로 로그인」 단추만 다룬다. 이건 규정과 상관없다.
   const el = document.getElementById('acctBtn');
-  if(el) el.textContent = me ? (me.name || me.email || t('계정')) : t('로그인');
+  if(el) el.textContent = me ? (me.name || t('계정')) : t('로그인');
 }
 
 function openAccount(){
@@ -8223,9 +8245,9 @@ async function openWipe(){
   if(!P) return;
   const mine = myOwnBoats(), guest = guestBoats();
   P.innerHTML = `<div class="mrhead"><b>${esc(t('계정 지우기'))}</b><span style="flex:1"></span></div>
-    <div class="mrnone" style="text-align:left">${esc(t('지우면'))} <b>${esc(t('되돌릴 수 없습니다.'))}</b>${esc(t('먼저 백업을 받아 두시길 권합니다.'))}</div>
+    <div class="mrnone" style="text-align:left">${esc(t('지우면'))} <b>${esc(t('되돌릴 수 없습니다.'))}</b>${esc(t('먼저 파일로 저장해 두시길 권합니다.'))}</div>
     <div class="mrrow" style="justify-content:center;padding:10px 12px">
-      <button class="mrbtn big" onclick="backupData()">${esc(t('데이터 백업 먼저 받기'))}</button></div>
+      <button class="mrbtn big" onclick="backupData()">${esc(t('파일로 먼저 저장하기'))}</button></div>
     <div class="mrsecthead">${esc(t('사라지는 것'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('내 배'))}</span>
       <span class="mrm" style="flex:1">${mine.length ? esc(mine.map(b=>b.name).join(', ')) : t('없음')}</span>
@@ -9260,7 +9282,7 @@ async function askDelBoat(id){
   if(!await ask(tsub("'{name}' 을(를) 지울까요?", {name:b.name}) + '\n\n'
     + tsub('이 배의 {what} 기록이 모두 사라집니다.', {what:what}) + '\n'
     + t('되돌릴 수 없습니다.') + '\n\n'
-    + t('먼저 백업을 받아 두시길 권합니다.'), { ok: t('지우기'), warn: true })) return;
+    + t('먼저 파일로 저장해 두시길 권합니다.'), { ok: t('지우기'), warn: true })) return;
   openForm({
     title: '배 지우기 확인',
     sub: `되돌릴 수 없습니다. 지우려면 '${b.name}' 을 그대로 적어 주세요.`,
@@ -9318,7 +9340,7 @@ const PERMS = [
   { k:'boat',    name:t('배 정보·제원') },
   { k:'members', name:t('구성원 관리') },
   { k:'ranks',   name:t('등급 관리') },
-  { k:'backup',  name:t('백업·복원') },
+  { k:'backup',  name:t('파일 저장·불러오기') },
   { k:'publish', name:t('배 공개 설정') },
   { k:'report',  name:t('신고·차단') }
 ];
@@ -10450,8 +10472,15 @@ window.addEventListener('appinstalled', ()=>{
 });
 // 서랍에도 자리를 둔다 — 카드를 닫은 사람이 나중에 찾을 곳이 있어야 한다
 function paintInstallMenu(){
+  // ★ isStandalone() 은 PWA 만 알아본다. 캐퍼시터 앱은 못 알아본다 —
+  //   그래서 앱을 깔아 쓰는 사람에게도 「홈 화면에 추가」가 떠 있었다. 눌러도 쓸모가 없다.
+  const off = isStandalone() || isNative();
   const el = document.getElementById('insBtn');
-  if(el) el.style.display = isStandalone() ? 'none' : '';
+  if(el) el.style.display = off ? 'none' : '';
+  // ★ 앱에는 서비스워커가 없다. 「앱 새로 받기」를 눌러도 새로 받아올 것이 없다.
+  //   못 하는 일을 할 수 있는 것처럼 두면 그것이 조용한 거짓말이다.
+  const rl = document.getElementById('reloadBtn');
+  if(rl) rl.style.display = isNative() ? 'none' : '';
 }
 
 // ===== 지운 사진 치우기 =====
@@ -13575,7 +13604,7 @@ function saveLocal(){
   try{ maintAlarmSoon(); }catch(_){}
   if(db){
     // 기록은 배별로 나눠 저장한다. 배 목록과 현재 배는 공통이다.
-    idbSet(bkey('all'), items).catch(e=>tell(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.')));
+    idbSet(bkey('all'), items).catch(e=>tell(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 파일로 저장한 뒤 다시 시도해 주세요.')));
     idbSet(bkey('trash'), trash).catch(e=>{});
     idbSet(bkey('maint'), maint).catch(e=>{});
     idbSet(bkey('repair'), repair).catch(e=>{});
@@ -13611,7 +13640,7 @@ function saveLocal(){
       localStorage.setItem(lk('lockers'), JSON.stringify(lockers));
       localStorage.setItem('bt_dgimgs', JSON.stringify(dgArr()));
     }
-    catch(e){ tell(t('저장 공간이 가득 찼습니다. 사진을 줄이거나 백업 후 정리해 주세요.')); }
+    catch(e){ tell(t('저장 공간이 가득 찼습니다. 사진을 줄이거나 파일로 저장한 뒤 정리해 주세요.')); }
   }
 }
 function save(){
@@ -14527,7 +14556,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.40';
+const APP_VER = '4.43';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16164,7 +16193,7 @@ async function backupData(){
   //   '________.json' 이 되면 무엇인지 알아볼 수가 없다.
   const name = `baetnil-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
   const why = await saveFile(name, 'application/json', JSON.stringify(data));
-  if(why) tell(t('백업 파일을 내보내지 못했습니다.') + '\n\n' + why);
+  if(why) tell(t('파일로 저장하지 못했습니다.') + '\n\n' + why);
 }
 function restoreData(ev){
   const f = ev.target.files[0]; ev.target.value='';
@@ -16193,7 +16222,7 @@ function restoreData(ev){
       }
       const stray = useLockers ? valid.filter(i=>!findIn(useLockers, i.lockerId)).length : valid.length;
 
-      let msg = `백업에서 ${valid.length}개 물품을 불러옵니다. 현재 목록(${items.length}개)은 교체됩니다.`;
+      let msg = `파일에서 ${valid.length}개 물품을 불러옵니다. 현재 목록(${items.length}개)은 교체됩니다.`;
       if(useLockers) msg += `\n수납칸 ${useLockers.length}개도 함께 복원합니다.`;
       if(Array.isArray(data.shapes) && data.shapes.length)
         msg += `\n도면에 그린 도형 ${data.shapes.length}개도 함께 복원합니다.`;
@@ -16245,7 +16274,7 @@ function restoreData(ev){
       tell(tsub('복원 완료: {n}개 물품', {n:items.length})
             + (trash.length ? tsub(' (휴지통 {n}개)', {n:trash.length}) : '')
             + (left ? '\n\n' + tsub('수납칸을 못 찾은 물품이 {n}개 있습니다. 목록에서는 보이며, 도면을 만든 뒤 옮길 수 있습니다.', {n:left}) : ''));
-    }catch(e){ tell(t('백업 파일을 읽지 못했습니다. ')+e.message); }
+    }catch(e){ tell(t('파일을 읽지 못했습니다. ')+e.message); }
   };
   r.readAsText(f);
 }
@@ -18342,7 +18371,7 @@ async function needEdit(what, fn){
 //   감추지 말고, 눌렀을 때 무엇이 필요한지 말해 준다.
 function drawerRestore(){
   closeDrawer();
-  needEdit('백업 복원은 이 기기의 기록을 백업 파일 것으로 갈아 끼웁니다.',
+  needEdit('저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다.',
     ()=>{ document.getElementById('restoreFile').click(); });
 }
 
@@ -19784,9 +19813,29 @@ function openSettings(){
   // ★ 쓸 수 있는 말이 하나뿐이면 「언어」 줄은 안 보여 준다.
   //   전에는 서랍에서 langBtn 을 감추는 방식이었다. 그 판단이 여기로 왔다.
   const many = langReady().length > 1;
+  // ★ 누르면 그 자리에서 일이 일어나는 줄. 화살표(›)를 안 붙인다 —
+  //   화살표는 「다음 화면으로 간다」는 뜻이라 붙이면 거짓말이 된다.
+  const act = (title, sub2, fn, id) => `<div class="mrrow setrow"${id ? ` id="${id}"` : ''} onclick="${fn}">
+      <div style="flex:1;min-width:0">
+        <b class="mrv" style="display:block">${esc(title)}</b>
+        ${sub2 ? `<span class="mrm" style="display:block;color:#7b8794">${esc(sub2)}</span>` : ''}
+      </div></div>`;
+  const lbl = x => `<div class="notilbl">${esc(x)}</div>`;
   P.innerHTML = `<div class="mrhead"><b>${t('설정')}</b><span style="flex:1"></span></div>`
     + row(t('알림'), t('댓글 · 정비 기한 · 관심 있는 글'), 'openNoti()')
-    + (many ? row(t('언어 · Language'), langName, 'openLang()') : '');
+    + (many ? row(t('언어 · Language'), langName, 'openLang()') : '')
+    // ★ 클라우드와 파일은 하는 일이 다르다. 묶음을 갈라 놓지 않으면 사람이 헷갈린다.
+    //   상용 앱들이 「동기화」와 「백업」을 절대 같은 층에 안 두는 까닭이다.
+    + lbl(t('클라우드'))
+    + act(t('클라우드에 올리기'), t('이 기기의 기록을 클라우드로 보냅니다'), 'syncUp()')
+    + act(t('클라우드에서 받아오기'), t('클라우드 기록을 이 기기로 가져옵니다'), 'syncDown()')
+    + lbl(t('파일'))
+    + act(t('파일로 저장'), t('기록을 파일 하나로 만들어 어디 둘지 고릅니다'), 'backupData()')
+    + act(t('파일에서 불러오기'), t('저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다'),
+          'drawerRestore()', 'restoreBtn')
+    // ★ 자주 안 보는 것은 맨 끝에. 다만 법이 「언제든 볼 수 있게」 하라는 것이라 감추지는 않는다.
+    + lbl(t('앱'))
+    + row(t('약관 · 개인정보'), t('이용약관 · 개인정보 처리방침'), "openLegal('terms')");
   showPanel(P);
   setHeadTitle('설정');
 }

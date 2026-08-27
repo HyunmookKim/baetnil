@@ -1912,7 +1912,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2152;
+const LANG_TOTAL = 2165;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -1935,6 +1935,19 @@ const I18N = {
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '이 사람 안 보기':'Hide this person',
+    '안 보는 사람':'Hidden people',
+    '안 보는 사람이 없습니다':'You have not hidden anyone',
+    '안 보기로 한 사람의 글을 다시 봅니다':'Bring back posts from people you hid',
+    '{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?':'Hide {name}\'s posts and comments on this device?',
+    '언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람':'You can bring them back any time — Settings › Hidden people',
+    '이제 이 사람의 글이 안 보입니다.':'You will no longer see this person.',
+    '내 글은 숨길 수 없습니다':'You cannot hide your own posts',
+    '누가 올렸는지 알 수 없습니다':'We cannot tell who posted this',
+    '이 사람':'this person',
+    '(이름 모름)':'(name unknown)',
+    '「{w}」 같은 말은 올릴 수 없습니다.':'Words like "{w}" cannot be posted.',
+    '그 부분을 고쳐 주세요.':'Please change that part.',
     'Google로 계속하기':'Continue with Google',
     'Apple로 계속하기':'Continue with Apple',
     '앱':'App',
@@ -4176,6 +4189,19 @@ const I18N = {
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '이 사람 안 보기':'Скрыть этого человека',
+    '안 보는 사람':'Скрытые люди',
+    '안 보는 사람이 없습니다':'Вы никого не скрывали',
+    '안 보기로 한 사람의 글을 다시 봅니다':'Вернуть записи скрытых людей',
+    '{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?':'Скрыть записи и комментарии {name} на этом устройстве?',
+    '언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람':'Вернуть можно в любой момент — Настройки › Скрытые люди',
+    '이제 이 사람의 글이 안 보입니다.':'Записи этого человека больше не показываются.',
+    '내 글은 숨길 수 없습니다':'Свои записи скрыть нельзя',
+    '누가 올렸는지 알 수 없습니다':'Не удалось определить автора',
+    '이 사람':'этот человек',
+    '(이름 모름)':'(имя неизвестно)',
+    '「{w}」 같은 말은 올릴 수 없습니다.':'Слова вроде «{w}» публиковать нельзя.',
+    '그 부분을 고쳐 주세요.':'Измените эту часть.',
     'Google로 계속하기':'Продолжить с Google',
     'Apple로 계속하기':'Продолжить с Apple',
     '앱':'Приложение',
@@ -7781,6 +7807,9 @@ async function formOk(){
   // onOk 가 false 를 돌려주면 화면을 닫지 않는다 (입력이 모자란 경우)
   // ★ 4.38 부터 onOk 안에서 사람에게 물어볼 수 있다(ask). 그래서 답을 기다린다.
   //   안 기다리면 약속(Promise)을 받아 「참」으로 읽고, 입력이 모자란데도 창이 닫힌다.
+  // ★ 밖으로 나가는 글은 여기 한 곳에서 거른다 (openForm 에 filter:true).
+  //   여덟 군데 onOk 마다 적으면 새 화면을 만들 때 또 빠뜨린다.
+  if(o.filter && !badOk.apply(null, Object.values(vals))) return;
   if(o.onOk && (await o.onOk(vals)) === false) return;
   closeForm();
 }
@@ -9716,6 +9745,55 @@ function buildPublic(b){
   }
   return o;
 }
+// ===== 올리기 전에 거르기 =====
+// ★ 애플 심사규정 1.2 가 요구하는 「올라오기 전에 거르는 방법」이다.
+//   완벽한 거르기는 세상에 없다. 목적은 두 가지다 —
+//   ① 심한 말이 그대로 올라가지 않게 한다  ② 올리기 전에 사람에게 말해 준다.
+//   신고(사후)만 있으면 1.2 를 못 넘긴다. 이것은 사전이다.
+//
+// ★ 낱말을 고를 때의 규칙 — 배 이야기를 막으면 안 된다.
+//   'cock' 은 cockpit(조타실), 'sex' 는 sextant(육분의) 안에 들어 있다. 그래서 안 넣는다.
+//   '시발' 은 시발점·시발역에 들어 있다 — 그래서 그 말들을 먼저 덜어낸 뒤 본다.
+//   검사(badwordtest)가 이 앱의 사전 전체와 정박지 이름을 훑어 걸리는 것이 없는지 본다.
+const BAD_OK = ['시발점', '시발역', '시발지', '시발자', '시발항'];
+const BAD_WORDS = [
+  // 한국어
+  '씨발', '시발', '씨빨', '씨발놈', '개새끼', '개색기', '병신', '지랄', '좆', '썅',
+  '니미', '미친놈', '창녀', '걸레년', '개년', '개놈', '호로새끼',
+  // English
+  'fuck', 'cunt', 'nigger', 'faggot', 'whore', 'motherfucker', 'asshole',
+  // Русский
+  'блядь', 'бляд', 'хуй', 'пизда', 'ебать', 'ебан', 'сука'
+];
+// 걸린 낱말 하나를 돌려준다. 없으면 빈 글자.
+// ★ 사진과 주소는 안 본다.
+//   base64 사진 글자 안에 우연히 'fuck' 이 들어 있었다 (사장님 실제 자료에서 나왔다).
+//   그대로 두면 사진 붙인 글이 통째로 막힌다. 사람이 읽는 글만 본다.
+function badReadable(x){
+  if(typeof x !== 'string') return '';
+  if(/^\s*(data:|https?:|blob:)/i.test(x)) return '';
+  // 빈칸 하나 없이 길게 이어진 덩어리는 사람이 쓴 글이 아니다 (열쇠·주소·사진)
+  if(x.length > 200 && !/\s/.test(x)) return '';
+  return x;
+}
+function badWord(){
+  const raw = Array.from(arguments).map(badReadable).filter(Boolean).join(' ');
+  // 사이에 낀 기호로 피해 가는 것을 막는다. ★ 빈칸은 안 지운다 —
+  //   지우면 '가시 발' 이 '가시발' 이 되어 멀쩡한 말이 걸린다.
+  let one = raw.toLowerCase().replace(/[.,·~^*_\-\/\\|!?"'()\[\]{}<>@#$%&+=:;0-9]/g, '');
+  for(const ok of BAD_OK) one = one.split(ok).join(' ');
+  for(const w of BAD_WORDS) if(one.indexOf(w) >= 0) return w;
+  return '';
+}
+// 올려도 되나 — 안 되면 그 자리에서 까닭을 말해 준다
+function badOk(){
+  const w = badWord.apply(null, arguments);
+  if(!w) return true;
+  tell(tsub('「{w}」 같은 말은 올릴 수 없습니다.', { w: w })
+    + '\n\n' + t('그 부분을 고쳐 주세요.'));
+  return false;
+}
+
 // ===== 신고·차단 =====
 // 차단은 이 기기에만 저장한다 — 내가 안 보고 싶은 것이지 남에게 강요할 일이 아니다.
 // 신고는 클라우드로 보내 나중에 살펴본다.
@@ -9726,6 +9804,76 @@ const REPORT_REASONS = [
   { v:'fake',   name:t('거짓 정보'),       sub:t('사실과 다른 영업 정보') },
   { v:'etc',    name:t('그 밖의 이유'),     sub:t('아래에 적어 주세요') }
 ];
+// ★ 사람 단위로 안 보기 — 애플 심사규정 1.2 가 요구하는 「못된 이용자를 막는 기능」이다.
+//   배 숨기기와 같은 자리에 같은 방식으로 둔다 — 이 기기에만 저장한다.
+//   내가 안 보고 싶은 것이지 남에게 강요할 일이 아니다. 신고는 따로 있다.
+function hiddenPeople(){
+  try{ const v = JSON.parse(localStorage.getItem('bt_hideby') || '[]');
+       return Array.isArray(v) ? v : []; }catch(_){ return []; }
+}
+function saveHiddenPeople(list){
+  try{ localStorage.setItem('bt_hideby', JSON.stringify(list)); }catch(_){}
+}
+function isMuted(uid){
+  if(!uid) return false;
+  return hiddenPeople().includes(String(uid));
+}
+function mutePerson(uid){
+  const l = hiddenPeople();
+  if(uid && !l.includes(String(uid))) l.push(String(uid));
+  saveHiddenPeople(l);
+  return l;
+}
+function unmutePerson(uid){
+  saveHiddenPeople(hiddenPeople().filter(x => x !== String(uid)));
+}
+// ★ 글·댓글을 거르는 문 하나. 목록마다 따로 적으면 한 곳을 빠뜨린다.
+function filterMuted(list){
+  const h = hiddenPeople();
+  if(!h.length) return Array.isArray(list) ? list : [];
+  return (Array.isArray(list) ? list : []).filter(x => x && !h.includes(String(x.by)));
+}
+async function mutePersonUI(uid, name){
+  if(!uid){ tell(t('누가 올렸는지 알 수 없습니다')); return; }
+  if(String(uid) === String(meUid()||'')){ tell(t('내 글은 숨길 수 없습니다')); return; }
+  if(!await ask(tsub('{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?', { name: name || t('이 사람') })
+      + '\n\n' + t('언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람'), { ok: t('안 보기') })) return;
+  mutedNameKeep(uid, name);
+  mutePerson(uid);
+  tell(t('이제 이 사람의 글이 안 보입니다.'));
+  try{ if(typeof backToTalk === 'function') backToTalk(); else renderTalk(); }catch(_){}
+}
+// 안 보는 사람 목록 — 되돌릴 길이 없으면 막는 기능을 아무도 안 쓴다
+function openMuted(){
+  const ids = hiddenPeople();
+  const P = document.getElementById('mrPanel');
+  if(!P) return;
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('안 보는 사람'))}</b><span style="flex:1"></span></div>`
+    + (ids.length
+        ? ids.map(id => `<div class="fleet"><div class="fmain">
+            <div class="fname">${esc(mutedName(id) || t('(이름 모름)'))}</div>
+            <div class="fsub">${esc(String(id).slice(-6))}</div></div>
+            <div class="fbtns"><button class="minib blu"
+              onclick="unmutePersonUI('${esc(id)}')">${esc(t('다시 보기'))}</button></div></div>`).join('')
+        : `<div class="mrnone">${esc(t('안 보는 사람이 없습니다'))}</div>`);
+  showPanel(P);
+  setHeadTitle('안 보는 사람');
+}
+// 이름은 마지막에 본 것을 기억해 둔다 — 없으면 번호 뒷자리로 보여 준다
+function mutedName(uid){
+  try{ const m = JSON.parse(localStorage.getItem('bt_hidenm') || '{}');
+       return m[String(uid)] || ''; }catch(_){ return ''; }
+}
+function mutedNameKeep(uid, name){
+  if(!uid || !name) return;
+  try{ const m = JSON.parse(localStorage.getItem('bt_hidenm') || '{}');
+       m[String(uid)] = String(name).slice(0, 40);
+       localStorage.setItem('bt_hidenm', JSON.stringify(m)); }catch(_){}
+}
+function unmutePersonUI(uid){
+  unmutePerson(uid);
+  openMuted();
+}
 function hiddenBoats(){
   try{ const v = JSON.parse(localStorage.getItem('bt_hidden') || '[]');
        return Array.isArray(v) ? v : []; }catch(_){ return []; }
@@ -10178,7 +10326,7 @@ async function renderTalk(){
             ${po.region?' · '+esc(po.region):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
         </div></div>`;
   }
-  const rows = talkList
+  const rows = filterMuted(talkList)
     .filter(po => !po.hidden || isAdmin('postDel'))
     .filter(po => !talkKind || po.kind === talkKind)
     .filter(po => !talkRegion || po.region === talkRegion)
@@ -10822,6 +10970,7 @@ function writeTalk(id){
   openForm({
     title: po ? '글 고치기' : '새 글',
     okText: po ? '저장' : '올리기',
+    filter: true,
     fields: [
       { key:'kind', label:'말머리', type:'pick', value: po ? po.kind : 'ask',
         options: TALK_KINDS.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
@@ -10897,7 +11046,7 @@ async function openTalk(id){
   // ★ 옛 글은 댓글이 글 안에 배열로 들어 있다. 새 글은 글 밖의 방에 하나씩 들어간다.
   //   옛것을 옮기지 않고 둘 다 읽어서 시간순으로 합친다 (옮기다 잃어버릴 일이 없다).
   const all = ((po.comments||[]).map(c=>Object.assign({old:true}, c)))
-    .concat(talkCmts[String(po.id)] || [])
+    .concat(filterMuted(talkCmts[String(po.id)] || []))
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
@@ -10927,6 +11076,8 @@ async function openTalk(id){
       ${likeBtn('talk', po.id, po.likeN)}
       <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportTalk('${esc(po.id)}')">${esc(t('신고'))}</button>
+      ${po.by && String(po.by) !== String(meUid()||'')
+        ? `<button class="mrbtn" onclick="mutePersonUI('${esc(po.by)}', '${esc(po.byName||'')}')">${esc(t('이 사람 안 보기'))}</button>` : ''}
       ${canDelTalk(po)?`<button class="mrbtn warn" onclick="delTalk('${esc(po.id)}')">${esc(t('지우기'))}</button>`:''}
     </div>
     <div class="ghead"><b>${esc(t('댓글'))}</b><span class="gcnt">${all.length}</span></div>
@@ -10967,7 +11118,7 @@ function writeTalkComment(id){
   if(needLogin('로그인해야 댓글을 쓸 수 있습니다')) return;
   if(myBan){ tell(banNotice()); return; }
   openForm({
-    title:'댓글', okText:'올리기',
+    title:'댓글', okText:'올리기', filter: true,
     fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'', placeholder:'댓글을 적어 주세요' }],
     onOk: v => {
       if(!v.text){ tell(t('내용을 넣어 주세요')); return false; }
@@ -12125,6 +12276,7 @@ function writePost(id){
   if(id && !canEditPost(b, p)) return;
   const kinds = POST_KINDS.filter(k => k.v !== 'notice' || canNotice(b));
   openForm({
+    filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
     title: p ? '글 고치기' : '새 글',
     okText: p ? '저장' : '올리기',
     fields: [
@@ -12218,6 +12370,7 @@ function openPost(id){
 function writeComment(pid){
   if(guardEdit('배 게시판 글에 댓글을 답니다.', ()=>writeComment(pid))) return;
   openForm({
+    filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
     title: '댓글',
     okText: '올리기',
     fields: [ { key:'text', type:'multi', rows:3, label:'내용', value:'', placeholder:'댓글을 적어 주세요' } ],
@@ -14605,7 +14758,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.44';
+const APP_VER = '4.45';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -19883,6 +20036,8 @@ function openSettings(){
     + act(t('파일에서 불러오기'), t('저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다'),
           'drawerRestore()', 'restoreBtn')
     // ★ 자주 안 보는 것은 맨 끝에. 다만 법이 「언제든 볼 수 있게」 하라는 것이라 감추지는 않는다.
+    + lbl(t('커뮤니티'))
+    + row(t('안 보는 사람'), t('안 보기로 한 사람의 글을 다시 봅니다'), 'openMuted()')
     + lbl(t('앱'))
     + row(t('약관 · 개인정보'), t('이용약관 · 개인정보 처리방침'), "openLegal('terms')");
   showPanel(P);
@@ -21624,6 +21779,8 @@ async function itemSave(){
     tell(t('가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기] 를 눌러 주세요.'));
     return;
   }
+  // ★ 이 화면은 openForm 을 안 쓴다 — formOk 의 거르기가 안 지난다. 여기서 거른다.
+  if(!badOk(title, d.note, d.place)) return;
   const old = d.id ? itemOf(d.id) : null;
   const body = {
     id: d.id || ('mk' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
@@ -22207,6 +22364,7 @@ function writeSpotComment(id){
   // ★ 관 자료에는 아직 클라우드에 문서가 없다. 댓글만 달면 어디에도 안 붙는다.
   if(s.seed){ tell(t('아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.')); return; }
   openForm({
+    filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
     title:'다녀온 이야기', okText:'남기기',
     sub:'수심 · 바닥 · 접안 상태처럼 다음 사람에게 도움 될 말을 남겨 주세요',
     fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'',
@@ -22491,6 +22649,8 @@ async function spotSave(){
   const name = String(d.name||'').trim();
   if(!name){ tell(t('이름을 넣어 주세요')); return; }
   if(d.lat == null || d.lon == null){ tell(t('자리를 먼저 찍어 주세요')); return; }
+  // ★ 이 화면도 openForm 을 안 쓴다. 여기서 거른다.
+  if(!badOk(name, d.note, d.tip)) return;
   const me2 = meUid();
   const body = {
     id: spotPickCtx.id || ('sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
@@ -24783,6 +24943,7 @@ function writeSeries(id){
   // 남이 올린 연재는 고치지 못한다 (규칙에서도 막혀 있다)
   if(x && !canEditSeries(x)){ tell(t('남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.')); return; }
   openForm({
+    filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
     title: x ? '연재 고치기' : '연재 글 올리기',
     okText: x ? '저장' : '올리기',
     sub: '옮긴 글은 저자 · 매체 · 원문 링크가 반드시 있어야 합니다 (허락 조건). 직접 쓴 글은 저자만 있으면 됩니다.',

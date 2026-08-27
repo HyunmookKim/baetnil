@@ -1901,7 +1901,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2124;
+const LANG_TOTAL = 2145;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -1925,6 +1925,27 @@ const I18N = {
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '공개하기':'Make public',
+    '동의하기':'Agree',
+    '설정 열기':'Open settings',
+    '기록 시작':'Start recording',
+    '내리기':'Step down',
+    '켜기':'Turn on',
+    '기록하기':'Record it',
+    '거절하기':'Decline',
+    '다시 계산':'Recalculate',
+    '올려 보내기':'Upload',
+    '받아오기':'Download',
+    '완전히 지우기':'Delete for good',
+    '복원하기':'Restore',
+    '버리고 닫기':'Discard',
+    '휴지통으로':'To the bin',
+    '새로 받기':'Get the new one',
+    '편집 중으로':'Switch to editing',
+    '그만두기':'Stop it',
+    '출항 기록':'Log departure',
+    '거두기':'Withdraw',
+    '신청하기':'Apply',
     '출항 예정 알림':'Departure alert',
     '알릴 사람 고르기':'Choose who to notify',
     '우리 배 출항 예정':'Our boat\'s departure',
@@ -2458,7 +2479,7 @@ const I18N = {
     '이 배에 가입 신청':'Ask to join this boat',
     '안 보기':'Hide',
     '+ 글쓰기':'+ New post',
-    '내보내기':'Export',
+    '내보내기':'Remove',
     '회원 명부':'Crew list',
     '← 내 배':'← My boat',
     '등급 설정':'Rank settings',
@@ -4137,6 +4158,27 @@ const I18N = {
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '공개하기':'Опубликовать',
+    '동의하기':'Согласиться',
+    '설정 열기':'Открыть настройки',
+    '기록 시작':'Начать запись',
+    '내리기':'Снять',
+    '켜기':'Включить',
+    '기록하기':'Записать',
+    '거절하기':'Отклонить',
+    '다시 계산':'Пересчитать',
+    '올려 보내기':'Отправить',
+    '받아오기':'Загрузить',
+    '완전히 지우기':'Удалить навсегда',
+    '복원하기':'Восстановить',
+    '버리고 닫기':'Отменить правки',
+    '휴지통으로':'В корзину',
+    '새로 받기':'Обновить',
+    '편집 중으로':'Перейти к правке',
+    '그만두기':'Прекратить',
+    '출항 기록':'Записать выход',
+    '거두기':'Отозвать',
+    '신청하기':'Подать',
     '출항 예정 알림':'Оповещение о выходе',
     '알릴 사람 고르기':'Кого оповестить',
     '우리 배 출항 예정':'Выход нашей лодки',
@@ -4670,7 +4712,7 @@ const I18N = {
     '이 배에 가입 신청':'Подать заявку на судно',
     '안 보기':'Скрыть',
     '+ 글쓰기':'+ Написать',
-    '내보내기':'Экспорт',
+    '내보내기':'Исключить',
     '회원 명부':'Список экипажа',
     '← 내 배':'← Моё судно',
     '등급 설정':'Настройка уровней',
@@ -7877,7 +7919,7 @@ function uploadDg(k){
           + t('공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n')
           + t('공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n')
           + t('"취소"를 눌러도 도면은 내 배에 그대로 쓰입니다.\n')
-          + t('나중에 언제든 공개하거나 내릴 수 있습니다.'));
+          + t('나중에 언제든 공개하거나 내릴 수 있습니다.'), { ok: t('공개하기') });
         const b = (typeof curBoat==='function') ? curBoat() : null;
         const def = [ (b&&b.maker)||'', (b&&b.model)||'' ].filter(Boolean).join(' ');
         try{
@@ -8673,7 +8715,7 @@ function locSet(on){
 async function locAsk(quiet){
   if(locOK()) return true;
   if(quiet) return false;
-  const yes = await ask(t('위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)'));
+  const yes = await ask(t('위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)'), { ok: t('동의하기') });
   if(!yes) return false;
   locSet(true);
   return true;
@@ -8689,7 +8731,7 @@ function locSignedIn(){
 // 위치를 받아도 되는가 — 로그인과 동의, 둘 다 있어야 한다.
 async function locMay(quiet){
   if(!locSignedIn()){
-    if(!quiet && await ask(t('현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)'))){
+    if(!quiet && await ask(t('현재 위치는 로그인하신 분에게만 받습니다.\n\n로그인하시겠습니까?\n(로그인하지 않으셔도 지도에서 직접 찍으실 수 있습니다.)'), { ok: t('로그인') })){
       try{ openAccount(); }catch(e){}
     }
     return false;
@@ -8849,7 +8891,7 @@ async function trkErr(err){
   if(String(err.code) === 'NOT_AUTHORIZED'){
     // ★ 여기까지 왔다는 것은 위치를 아예 안 주셨거나, 폰의 위치 기능이 꺼져 있다는 뜻이다.
     //   「항상 허용」이 아니라서가 아니다 — 그건 이 부품이 요구하지 않는다.
-    if(await ask(t('위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?'))){
+    if(await ask(t('위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?'), { ok: t('설정 열기') })){
       const G = bgGeo(); if(G) try{ G.openSettings(); }catch(e){}
     }
   }
@@ -8919,7 +8961,7 @@ function trkGuideText(){
 async function trkGuide(){
   if(!isNative()) return true;
   if(trkGuideSeen()) return true;
-  if(!await ask(trkGuideText() + '\n\n' + t('시작할까요?'))) return false;
+  if(!await ask(trkGuideText() + '\n\n' + t('시작할까요?'), { ok: t('기록 시작') })) return false;
   trkGuideDone();
   return true;
 }
@@ -9218,7 +9260,7 @@ async function askDelBoat(id){
   if(!await ask(tsub("'{name}' 을(를) 지울까요?", {name:b.name}) + '\n\n'
     + tsub('이 배의 {what} 기록이 모두 사라집니다.', {what:what}) + '\n'
     + t('되돌릴 수 없습니다.') + '\n\n'
-    + t('먼저 백업을 받아 두시길 권합니다.'))) return;
+    + t('먼저 백업을 받아 두시길 권합니다.'), { ok: t('지우기'), warn: true })) return;
   openForm({
     title: '배 지우기 확인',
     sub: `되돌릴 수 없습니다. 지우려면 '${b.name}' 을 그대로 적어 주세요.`,
@@ -9707,7 +9749,7 @@ function reportBoat(id){
 }
 // 이 기기에서 안 보이게 하기
 async function hideBoatUI(id){
-  if(!await ask(t('이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.'))) return;
+  if(!await ask(t('이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.'), { ok: t('감추기') })) return;
   hideBoat(id);
   openExplore(exploreBiz);
 }
@@ -10870,7 +10912,7 @@ async function delTalkComment(id, cid, isOld){
   if(guardEdit('댓글을 지웁니다.', ()=>delTalkComment(id, cid, isOld))) return;
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
-  if(!await ask(t('이 댓글을 지울까요?'))) return;
+  if(!await ask(t('이 댓글을 지울까요?'), { ok: t('지우기'), warn: true })) return;
   // 옛 글에 배열로 남아 있던 댓글은 배열에서 뺀다
   if(isOld){
     const next = (po.comments||[]).filter(c=>String(c.id)!==String(cid));
@@ -10926,7 +10968,7 @@ async function delTalk(id){
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
   if(!canDelTalk(po)){ tell(t('이 글은 지울 수 없습니다')); return; }
-  if(!await ask(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'))) return;
+  if(!await ask(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'), { ok: t('지우기'), warn: true })) return;
   window.__talk.del(po.id).then(()=>{
     dropPhotosOf(po);                       // 창고에 남은 사진도 함께 치운다
     talkList = talkList.filter(x=>String(x.id)!==String(po.id));
@@ -11080,14 +11122,14 @@ async function adminReports(){
 // 신고가 잘못된 것이면 숨김을 푼다
 async function adminUnhide(id){
   if(!isAdmin('postDel')){ tell(t('글을 다룰 권한이 없습니다')); return; }
-  if(!await ask(t('이 글의 숨김을 풀까요?\n\n다시 목록에 나옵니다.'))) return;
+  if(!await ask(t('이 글의 숨김을 풀까요?\n\n다시 목록에 나옵니다.'), { ok: t('숨김 풀기') })) return;
   window.__talk.edit(id, { hidden:false, reports:{}, reportN:0 })
     .then(()=>openAdmin())
     .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 async function adminDel(id){
   if(!isAdmin('postDel')){ tell(t('글을 지울 권한이 없습니다')); return; }
-  if(!await ask(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'))) return;
+  if(!await ask(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'), { ok: t('지우기'), warn: true })) return;
   window.__talk.del(id).then(()=>openAdmin())
     .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
@@ -11117,7 +11159,7 @@ async function adminBoatHide(id, on){
   const val = (on === true || on === 'true');
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(val && !await ask(tsub('{name} 를 둘러보기에서 감출까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
-      + t('배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.'))) return;
+      + t('배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.'), { ok: t('감추기') })) return;
   window.__pub.patch(id, { adminHidden: val })
     .then(()=>openAdmin())
     .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
@@ -11127,7 +11169,7 @@ async function adminBoatDel(id){
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(!await ask(tsub('{name} 의 공개 자료를 지울까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
       + t('되돌릴 수 없습니다. 배 주인의 물품·정비 기록은 그대로 남습니다.\n')
-      + t('먼저 감추기를 써 보시는 편이 낫습니다.'))) return;
+      + t('먼저 감추기를 써 보시는 편이 낫습니다.'), { ok: t('지우기'), warn: true })) return;
   window.__pub.remove(id).then(()=>openAdmin())
     .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
@@ -11284,7 +11326,7 @@ async function personPerm(uid, key, on){
   perms[key] = val;
   // 다 꺼지면 아무것도 못 하는 운영자가 남는다. 그럴 바에는 내리는 편이 낫다.
   if(!ADMIN_PERMS.some(pm => perms[pm.k] === true)){
-    if(await ask(t('할 수 있는 일이 하나도 남지 않습니다.\n\n이 사람을 운영자에서 내릴까요?'))){
+    if(await ask(t('할 수 있는 일이 하나도 남지 않습니다.\n\n이 사람을 운영자에서 내릴까요?'), { ok: t('내리기'), warn: true })){
       personRemove(uid); return;
     }
     return;
@@ -11302,7 +11344,7 @@ async function personAppoint(uid, key){
   const pm = ADMIN_PERMS.find(x=>x.k===key);
   if(!await ask(tsub('{name} 님을 운영자로 세웁니다.', {name:nm||uid}) + '\n\n'
       + tsub('할 수 있는 일: {what}', {what:(pm&&pm.name)||key}) + '\n'
-      + t('세운 뒤에 다른 일도 켜고 끌 수 있습니다.\n계속할까요?'))) return;
+      + t('세운 뒤에 다른 일도 켜고 끌 수 있습니다.\n계속할까요?'), { ok: t('세우기') })) return;
   const perms = {}; perms[key] = true;
   window.__admin.set(uid, { name:nm, perms })
     .then(()=>openPerson(uid))
@@ -11312,7 +11354,7 @@ async function personRemove(uid){
   const why = adminGuard(uid, 'remove');
   if(why){ tell(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || uid;
-  if(!await ask(tsub('{name} 님을 운영자에서 내릴까요?', {name:nm}))) return;
+  if(!await ask(tsub('{name} 님을 운영자에서 내릴까요?', {name:nm}), { ok: t('내리기'), warn: true })) return;
   window.__admin.remove(uid).then(()=>openPerson(uid))
     .catch(e=>tell(t('내리지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
@@ -11336,7 +11378,7 @@ function personBan(uid){
 }
 async function personUnban(uid){
   if(!isAdmin('userBan')){ tell(t('사람을 막을 권한이 없습니다')); return; }
-  if(!await ask(t('막기를 풀까요?\n\n다시 글과 댓글을 쓸 수 있게 됩니다.'))) return;
+  if(!await ask(t('막기를 풀까요?\n\n다시 글과 댓글을 쓸 수 있게 됩니다.'), { ok: t('풀기') })) return;
   window.__bans.remove(uid).then(()=>openPerson(uid))
     .catch(e=>tell(t('풀지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
@@ -11693,7 +11735,7 @@ async function setBizUI(on){
   if(guardEdit('영업 배 여부를 바꿉니다.', () => setBizUI(on))) return;
   if(on && !await ask(t('영업 배로 켜면 배 이름과 선종이 밖으로 나갑니다.\n\n')
       + t('커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n')
-      + t('(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?'))) return;
+      + t('(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?'), { ok: t('켜기') })) return;
   setPubUI('biz', !!on, 'info');
 }
 // 공개 자료를 밖에 내보낸다 (비공개면 지운다)
@@ -11854,7 +11896,7 @@ function moveIntro(i, d){
 async function delIntro(i){
   const b = curBoat(); if(!b || !b.intro) return;
   if(guardEdit('배 소개에서 지웁니다.', () => delIntro(i))) return;
-  if(!await ask(t('이 부분을 지울까요?'))) return;
+  if(!await ask(t('이 부분을 지울까요?'), { ok: t('지우기'), warn: true })) return;
   const gone = b.intro[i];
   b.intro.splice(i, 1);
   saveIntro(b);
@@ -12022,7 +12064,7 @@ function writePost(id){
                   { v:'1', name:'공개', sub:'배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)' } ] }
     ],
     del: p ? { text:'글 지우기', run: async ()=>{
-      if(!await ask(t('이 글을 지울까요?'))) return;
+      if(!await ask(t('이 글을 지울까요?'), { ok: t('지우기'), warn: true })) return;
       if(delPost(p.id)) openBoard();
     }} : null,
     onOk: v => {
@@ -12110,7 +12152,7 @@ function writeComment(pid){
 }
 async function delCommentUI(pid, cid){
   if(guardEdit('댓글을 지웁니다.', ()=>delCommentUI(pid, cid))) return;
-  if(!await ask(t('이 댓글을 지울까요?'))) return;
+  if(!await ask(t('이 댓글을 지울까요?'), { ok: t('지우기'), warn: true })) return;
   if(delComment(pid, cid)) openPost(pid);
 }
 // ===== 할 일 배정 =====
@@ -12459,7 +12501,7 @@ async function removeMemberUI(uid){
   if(guardEdit('이 사람을 배에서 내보냅니다.', () => removeMemberUI(uid))) return;
   const nm = (b.memberNames||{})[uid] || '이 사람';
   if(!await ask(tsub('{name} 님을 이 배에서 내보낼까요?', { name: nm }) + '\n\n'
-    + t('이 배의 기록을 더 이상 보지 못합니다.\n다시 받으려면 새로 가입 신청을 받아야 합니다.'))) return;
+    + t('이 배의 기록을 더 이상 보지 못합니다.\n다시 받으려면 새로 가입 신청을 받아야 합니다.'), { ok: t('내보내기'), warn: true })) return;
   if(!removeMember(b, uid)) return;
   saveLocal();
   saveBoatCloud(b, true).then(()=>openRoster());
@@ -12512,7 +12554,7 @@ async function askPay(uid){
   if(!duesDue(b, uid)) return;
   const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
   if(!await ask(tsub('{name} 님의 회비 납부일이 지났습니다.', {name:m.name}) + '\n\n'
-      + t('지금 납부로 기록할까요?'))) return;
+      + t('지금 납부로 기록할까요?'), { ok: t('기록하기') })) return;
   payDues(b, uid);
   saveBoatMembers(b, 'roster');
 }
@@ -12616,7 +12658,7 @@ async function delRankUI(id){
   const r = rankOf(b, id); if(!r) return;
   const n = Object.values(b.members||{}).filter(x=>String(x)===String(id)).length;
   if(!await ask(tsub("'{name}' 등급을 지울까요?", {name:r.name})
-    + (n ? '\n\n' + tsub('이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.', {n:n}) : ''))) return;
+    + (n ? '\n\n' + tsub('이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.', {n:n}) : ''), { ok: t('지우기'), warn: true })) return;
   if(!delRank(b, id)) return;
   saveBoatMembers(b, 'ranks');
 }
@@ -12665,7 +12707,7 @@ function editMember(uid){
     ],
     del: { text:'내보내기', run: async ()=>{
       if(!await ask(tsub("'{name}' 을(를) 이 배에서 내보낼까요?", {name:r.name}) + '\n\n'
-      + t('그 사람은 더 이상 이 배의 기록을 볼 수 없습니다.'))) return;
+      + t('그 사람은 더 이상 이 배의 기록을 볼 수 없습니다.'), { ok: t('내보내기'), warn: true })) return;
       if(!removeMember(b, uid)) return;
       saveBoatMembers(b);
     }},
@@ -12800,7 +12842,7 @@ function approveJoin(inviteId, uid, name){
   });
 }
 async function rejectJoin(inviteId){
-  if(!await ask(t('이 신청을 거절할까요?'))) return;
+  if(!await ask(t('이 신청을 거절할까요?'), { ok: t('거절하기'), warn: true })) return;
   if(window.__invites) window.__invites.close(inviteId, 'rejected').catch(()=>{});
   openJoinReqs();
 }
@@ -13081,7 +13123,7 @@ async function refillWxLimits(){
   const list = Object.keys(d).map(k => (BOAT_SPEC[k] ? BOAT_SPEC[k].label + ' ' + d[k] + BOAT_SPEC[k].unit : ''))
     .filter(Boolean).join('\n');
   if(!await ask(t('배 길이와 선종으로 다시 계산합니다.\n\n') + list
-    + t('\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?'))) return;
+    + t('\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?'), { ok: t('다시 계산') })) return;
   applyWxLimits(b, true);
   saveLocal();
   saveBoatCloud(b);
@@ -14010,14 +14052,14 @@ async function cloudSeedCheck(){
   if(!n) return;
   if(!await ask(t('클라우드에 이 배의 자료가 없습니다.') + '\n\n'
     + tsub('이 기기의 기록 {n}건을 올릴까요?', {n:n}) + '\n'
-    + t('올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.'))) return;
+    + t('올리고 나면 다시 묻지 않습니다 — 메뉴의 [지금 동기화]로 언제든 올릴 수 있습니다.'), { ok: t('올려 보내기') })) return;
   lastPushErr = null;
   pushNow().then(()=>{ seedAskMark(!lastPushErr); });
 }
 // 동기화 글자를 누르면 실패 이유를 보여주고 다시 시도한다
 async function syncTap(){
   if(lastPushErr){
-    if(await ask(t('클라우드에 올리지 못했습니다.\n\n') + lastPushErr + t('\n\n다시 시도할까요?'))){
+    if(await ask(t('클라우드에 올리지 못했습니다.\n\n') + lastPushErr + t('\n\n다시 시도할까요?'), { ok: t('다시 시도') })){
       pushErrShown = false; syncNow();
     }
     return;
@@ -14040,7 +14082,7 @@ async function syncDown(){
   if(!cloud){ tell(t('로그인한 상태에서만 클라우드를 씁니다')); return; }
   if(!await ask(t('클라우드에서 받아옵니다.\n\n')
     + t('이 기기에만 있고 아직 올리지 않은 기록은\n클라우드 것으로 덮어씌워질 수 있습니다.\n\n')
-    + t('계속할까요?'))) return;
+    + t('계속할까요?'), { ok: t('받아오기'), warn: true })) return;
   // ★ 손으로 누른 것은 '전부 다시' 라는 뜻이다.
   //   평소에는 바뀐 것만 받지만, 여기서는 지난 셈을 버리고 통째로 받는다.
   //   무언가 어긋났을 때 사람이 스스로 바로잡을 수 있는 유일한 길이다.
@@ -14485,7 +14527,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.39';
+const APP_VER = '4.40';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14680,7 +14722,7 @@ async function undoRun(){
   if(!undoStack.length) return false;
   // 잠근 것을 되돌리기로 우회할 수 없게 한다
   if(lkLocked && dgLocked){
-    if(await ask(t('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?'))){ setLkLock(false); setDgLock(false); }
+    if(await ask(t('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?'), { ok: t('열기') })){ setLkLock(false); setDgLock(false); }
     return false;
   }
   redoStack.push(undoSnap());
@@ -14690,7 +14732,7 @@ async function undoRun(){
 async function redoRun(){
   if(!redoStack.length) return false;
   if(lkLocked && dgLocked){
-    if(await ask(t('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?'))){ setLkLock(false); setDgLock(false); }
+    if(await ask(t('수납칸과 도형이 모두 잠겨 있습니다.\n\n둘 다 지금 열까요?'), { ok: t('열기') })){ setLkLock(false); setDgLock(false); }
     return false;
   }
   undoStack.push(undoSnap());
@@ -14904,7 +14946,7 @@ async function lkDelete(id){
   const msg = n > 0
     ? `'${l.label}' 칸을 지울까요?\n\n안에 든 물품 ${n}개는 지워지지 않고 '미배치'로 남습니다.\n나중에 '이동'으로 다른 칸에 옮기시면 됩니다.`
     : `'${l.label}' 칸을 지울까요?`;
-  if(!await ask(msg)) return null;
+  if(!await ask(msg, { ok: t('지우기'), warn: true })) return null;
   undoPush();
   lockers = lockers.filter(x => String(x.id) !== String(id));
   if(typeof selected!=='undefined' && selected === id){
@@ -15697,14 +15739,14 @@ function restoreItem(id){
 }
 async function purgeItem(id){
   const it = trash.find(i=>i.id===id); if(!it) return;
-  if(!await ask(tsub('"{name}"을(를) 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:it.name}))) return;
+  if(!await ask(tsub('"{name}"을(를) 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:it.name}), { ok: t('완전히 지우기'), warn: true })) return;
   const dead = new Set([id, ...trash.filter(x=>x.parentId===id).map(x=>x.id)]);
   trash = trash.filter(i=>!dead.has(i.id));
   save(); updateTrashTab(); openTrash();
 }
 async function purgeAll(){
   const n = trash.length + mrTrash.length;
-  if(!await ask(tsub('휴지통의 {n}개 항목을 모두 삭제합니다. 복구할 수 없습니다. 계속할까요?', {n:n}))) return;
+  if(!await ask(tsub('휴지통의 {n}개 항목을 모두 삭제합니다. 복구할 수 없습니다. 계속할까요?', {n:n}), { ok: t('완전히 지우기'), warn: true })) return;
   trash = []; mrTrash = [];
   save(); updateTrashTab(); openTrash();
 }
@@ -16157,7 +16199,7 @@ function restoreData(ev){
         msg += `\n도면에 그린 도형 ${data.shapes.length}개도 함께 복원합니다.`;
       if(stray) msg += `\n\n이 중 ${stray}개는 해당하는 수납칸이 없습니다. 지우지 않고 그대로 두므로, 도면을 만든 뒤 옮기시면 됩니다.`;
       msg += '\n계속할까요?';
-      if(!await ask(msg)) return;
+      if(!await ask(msg, { ok: t('복원하기') })) return;
 
       if(useLockers) lockers = deepCopy(useLockers);
       // 사용자가 그린 도형(선·네모·세모). 백업에 있으면 그대로 되살린다.
@@ -17095,7 +17137,7 @@ function mrDirty(){
 async function mrRevertClose(){
   const it = getMR(mrOpenType, mrOpenId);
   if(!it || !mrDirty()){ closeMR(); return; }
-  if(!await ask(t('고친 것을 버리고 닫을까요?\n\n이 창을 연 뒤에 바꾼 것이 모두 처음으로 돌아갑니다.'))) return;
+  if(!await ask(t('고친 것을 버리고 닫을까요?\n\n이 창을 연 뒤에 바꾼 것이 모두 처음으로 돌아갑니다.'), { ok: t('버리고 닫기'), warn: true })) return;
   const back = mrClone(mrSnap), kind = mrOpenType;
   Object.keys(it).forEach(k => { delete it[k]; });
   Object.assign(it, back);
@@ -17366,7 +17408,7 @@ function mrStatus(v){
 }
 async function mrComplete(){
   const it=getMR('maint',mrOpenId); if(!it) return;
-  if(!await ask(tsub('"{name}" — 오늘({d}) 완료 처리할까?', {name:it.name, d:today()}))) return;
+  if(!await ask(tsub('"{name}" — 오늘({d}) 완료 처리할까?', {name:it.name, d:today()}), { ok: t('완료 처리') })) return;
   it.history = it.history||[];
   if(it.lastDate) it.history.unshift({date:it.lastDate});
   if(it.history.length>20) it.history.length=20;
@@ -17378,7 +17420,7 @@ async function mrDelete(){
   const i = arr.findIndex(x=>String(x.id)===mrOpenId); if(i<0) return;
   const it = arr[i];
   const nm = it.name || it.title || (row==='voyage' ? ((it.from||'')+' → '+(it.to||'')) : row==='fuel' ? (it.date+' 주유') : row==='run' ? (it.date+' 엔진가동') : '항목');
-  if(!await ask(tsub('"{name}" 휴지통으로 옮길까? (휴지통에서 복원 가능)', {name:nm}))) return;
+  if(!await ask(tsub('"{name}" 휴지통으로 옮길까? (휴지통에서 복원 가능)', {name:nm}), { ok: t('휴지통으로') })) return;
   mrTrash.push({id: row+'_'+it.id, kind:row, data:deepCopy(it), delAt:new Date().toISOString()});
   arr.splice(i,1);
   saveMR(); closeMR(); rerender(row); updateTrashTab();
@@ -17404,7 +17446,7 @@ function mrRestore(tid){
 }
 async function mrPurge(tid){
   const e = mrTrash.find(x=>x.id===tid); if(!e) return;
-  if(!await ask(tsub('"{name}" 항목을 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:mrTrashName(e)}))) return;
+  if(!await ask(tsub('"{name}" 항목을 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:mrTrashName(e)}), { ok: t('완전히 지우기'), warn: true })) return;
   mrTrash = mrTrash.filter(x=>x.id!==tid);
   saveMR(); updateTrashTab(); openTrash();
 }
@@ -17816,7 +17858,7 @@ function mrDrawBind(){
     if(!moved){
       drawShapes();
       if(shGet(d.id)
-         && await ask(t('이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.')))
+         && await ask(t('이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.'), { ok: t('지우기'), warn: true }))
         shDelete(d.id);
       return;
     }
@@ -18241,7 +18283,7 @@ function paintVer(){
 // 저장분을 지우고 서비스워커를 푼 뒤 새로 받아온다.
 async function forceReload(){
   if(!await ask(t('저장된 앱 파일을 지우고 새로 받아옵니다.\n\n')
-    + t('기록은 지워지지 않습니다.\n계속할까요?'))) return;
+    + t('기록은 지워지지 않습니다.\n계속할까요?'), { ok: t('새로 받기') })) return;
   const done = ()=>{ location.reload(true); };
   const jobs = [];
   try{
@@ -18291,7 +18333,7 @@ async function needEdit(what, fn){
   //   부르는 쪽은 한국어 그대로 넘기고, 옮기는 일은 여기서만 한다.
   if(!await ask(t(what) + '\n\n' + t('지금은 보기 전용입니다.')
     + '\n' + t('실수로 고치는 것을 막으려고 잠가 두었습니다.')
-    + '\n\n' + t('편집 중으로 바꾸고 계속할까요?'))) return;
+    + '\n\n' + t('편집 중으로 바꾸고 계속할까요?'), { ok: t('편집 중으로') })) return;
   toggleLock();
   fn();
 }
@@ -18945,7 +18987,7 @@ async function ridePush(it){
 }
 async function rideStop(it, quiet){
   const v = it || getMR('voyage', mrOpenId); if(!v) return;
-  if(!quiet && !await ask(t('모집을 그만둘까요?\n\n글판에 올린 글은 마감으로 바뀝니다.'))) return;
+  if(!quiet && !await ask(t('모집을 그만둘까요?\n\n글판에 올린 글은 마감으로 바뀝니다.'), { ok: t('그만두기'), warn: true })) return;
   v.rideOn = false; saveMR();
   if(v.ridePost && window.__talk){
     const info = rideInfo(v); info.open = false;
@@ -18981,7 +19023,7 @@ function addPlan(){
 // 예정 → 진짜 항해. 이때 비로소 시각·위치·날씨를 잡는다.
 async function planStart(){
   const it = getMR('voyage', mrOpenId); if(!it || !isPlan(it)) return;
-  if(!await ask(t('지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.'))) return;
+  if(!await ask(t('지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.'), { ok: t('출항 기록') })) return;
   const p = n => String(n).padStart(2,'0'); const now = new Date();
   it.plan = false;
   it.date = today();
@@ -20914,7 +20956,7 @@ function legalText(k, v){
 //   다른 앱들도 그렇게 하지 앱 안에 목록을 보여 주지 않는다.
 async function lgToggleConsent(){
   if(locOK()){
-    if(!await ask(t('위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.'))) return;
+    if(!await ask(t('위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.'), { ok: t('거두기'), warn: true })) return;
     locSet(false);
   } else {
     if(!locSignedIn()){ tell(t('현재 위치는 로그인하신 분에게만 받습니다.')); return; }
@@ -21092,7 +21134,7 @@ async function sendSupport(kind, text, quiet){
   if(!window.__support || !window.__user){
     // 로그인 전이거나 인터넷이 없을 때 — 메일 길을 알려 준다
     if(quiet) return false;
-    if(await ask(t('지금은 앱으로 보낼 수 없습니다.\n\n메일로 보내시겠습니까?'))) supportMail(kind, text);
+    if(await ask(t('지금은 앱으로 보낼 수 없습니다.\n\n메일로 보내시겠습니까?'), { ok: t('보내기') })) supportMail(kind, text);
     return false;
   }
   try{
@@ -21101,7 +21143,7 @@ async function sendSupport(kind, text, quiet){
     return true;
   }catch(e){
     if(quiet) return false;
-    if(await ask(t('보내지 못했습니다.\n\n') + ((e && e.message) || e) + t('\n\n메일로 보내시겠습니까?')))
+    if(await ask(t('보내지 못했습니다.\n\n') + ((e && e.message) || e) + t('\n\n메일로 보내시겠습니까?'), { ok: t('보내기') }))
       supportMail(kind, text);
     return false;
   }
@@ -21526,7 +21568,7 @@ async function delItem(id){
   if(guardEdit('장터 글을 지웁니다.', ()=>delItem(id))) return;
   const m = itemOf(id); if(!m) return;
   if(!canDelItem(m)){ tell(t('올린 분과 운영자만 지울 수 있습니다')); return; }
-  if(!await ask(tsub("'{name}' 을 지울까요?", {name:m.title}) + '\n\n' + t('되돌릴 수 없습니다.'))) return;
+  if(!await ask(tsub("'{name}' 을 지울까요?", {name:m.title}) + '\n\n' + t('되돌릴 수 없습니다.'), { ok: t('지우기'), warn: true })) return;
   window.__market.del(id)
     .then(()=>{ dropPhotosOf(m);
                 marketList = marketList.filter(x=>String(x.id)!==String(id)); backToMarket(); })
@@ -22090,7 +22132,7 @@ function writeSpotComment(id){
 async function delSpotComment(id, cid){
   if(guardEdit('다녀온 이야기를 지웁니다.', ()=>delSpotComment(id, cid))) return;
   const s = spotOf(id); if(!s) return;
-  if(!await ask(t('이 글을 지울까요?'))) return;
+  if(!await ask(t('이 글을 지울까요?'), { ok: t('지우기'), warn: true })) return;
   window.__cmt.del('spots', id, cid)
     .then(()=>{
       const k = String(id);
@@ -22403,7 +22445,7 @@ async function delSpot(id){
   if(guardEdit('정박지를 지웁니다.', ()=>delSpot(id))) return;
   const s = spotOf(id); if(!s) return;
   if(!canDelSpot(s)){ tell(t('올린 분과 운영자만 지울 수 있습니다')); return; }
-  if(!await ask(tsub("'{name}' 을 지울까요?", {name:s.name}) + '\n\n' + t('되돌릴 수 없습니다.'))) return;
+  if(!await ask(tsub("'{name}' 을 지울까요?", {name:s.name}) + '\n\n' + t('되돌릴 수 없습니다.'), { ok: t('지우기'), warn: true })) return;
   window.__spots.del(id)
     .then(()=>{ dropPhotosOf(s);
                 spotList = spotList.filter(x=>String(x.id)!==String(id)); backToSpots(); })
@@ -22881,7 +22923,7 @@ async function fillEngineHours(){
   const n = (it.logs||[]).filter(g => SAIL_ENGINE[g.kind] || g.kind==='엔진ON' || g.kind==='엔진OFF').length;
   if(!n && !await ask(t('중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n')
     + tsub('항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?', { h: h }) + '\n'
-    + t('세일로 가셨다면 중간 기록에 "세일 올림"을 먼저 넣어 주세요.'))) return;
+    + t('세일로 가셨다면 중간 기록에 "세일 올림"을 먼저 넣어 주세요.'), { ok: t('넣기') })) return;
   mrField('engineH', h);
 }
 // ── 중간 기록
@@ -24086,7 +24128,7 @@ async function delCheckList(id){
   if(ls.length < 2){ tell(t('마지막 남은 목록은 지울 수 없습니다.')); return; }
   const l = ls.find(x=>String(x.id)===String(id)); if(!l) return;
   const its = ckItems(id);
-  if(!await ask(tsub('"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?', {name:l.name, n:its.length}))) return;
+  if(!await ask(tsub('"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?', {name:l.name, n:its.length}), { ok: t('휴지통으로') })) return;
   const at = new Date().toISOString();
   mrTrash.push({id:'check_'+l.id, kind:'check', data:deepCopy(l), delAt:at});
   its.forEach(it=>mrTrash.push({id:'check_'+it.id, kind:'check', data:deepCopy(it), delAt:at}));
@@ -24158,7 +24200,7 @@ function moveCheckItem(id){
 async function delCheckItem(id){
   if(!unlocked) return;
   const it = checkt.find(c=>c && c.typ!=='list' && String(c.id)===String(id)); if(!it) return;
-  if(!await ask(tsub('"{name}" 항목을 휴지통으로 옮길까?', {name:it.label}))) return;
+  if(!await ask(tsub('"{name}" 항목을 휴지통으로 옮길까?', {name:it.label}), { ok: t('휴지통으로') })) return;
   mrTrash.push({id:'check_'+it.id, kind:'check', data:deepCopy(it), delAt:new Date().toISOString()});
   checkt = checkt.filter(c=>String(c.id)!==String(id));
   saveMR(); renderCheck(); updateTrashTab();
@@ -24557,7 +24599,7 @@ function applySeries(){
       // ★ 옮긴 글은 허락이 조건이다. 신청 단계에서 미리 알려 둔다 —
       //   켜 준 뒤에 몰랐다고 하면 그때는 이미 남의 글이 올라가 있다.
       if(!mine && !await ask(t('옮긴 글은 저자·매체·원문 링크가 모두 있어야 올라갑니다.\n')
-        + t('저작권자 허락도 미리 받으셔야 합니다.\n\n알겠습니다, 신청할까요?'))) return false;
+        + t('저작권자 허락도 미리 받으셔야 합니다.\n\n알겠습니다, 신청할까요?'), { ok: t('신청하기') })) return false;
       const lines = [
         mine ? '직접 쓴 글' : '옮긴 글 (허락 필요)',
         about,
@@ -24717,7 +24759,7 @@ async function delSeries(id){
   if(guardEdit('연재 글을 지웁니다.', ()=>delSeries(id))) return;
   const x = (seriesList||[]).find(r=>String(r.id)===String(id));
   if(!canDelSeries(x)) return;
-  if(!await ask(t('이 연재 글을 지울까요?'))) return;
+  if(!await ask(t('이 연재 글을 지울까요?'), { ok: t('지우기'), warn: true })) return;
   window.__series.del(id)
     .then(async ()=>{ await loadSeries(true); closeBoat(); newsSub='sr'; renderNews(); })
     .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
@@ -25187,7 +25229,7 @@ async function wxDelSpot(id){
     return;
   }
   if(!await ask(tsub("'{name}' 지점을 지울까요?", {name:s2.name}) + '\n\n'
-      + t('날씨 기록이 지워지는 것은 아닙니다.'))) return;
+      + t('날씨 기록이 지워지는 것은 아닙니다.'), { ok: t('지우기'), warn: true })) return;
   wxSpots = wxSpots.filter(x=>String(x.id)!==String(id));
   wxSet('bt_spots', wxSpots);
   // 보던 지점을 지웠으면 다른 곳으로 옮긴다 (빈 화면이 되면 안 된다)
@@ -25310,7 +25352,7 @@ function hatEditOne(name){
 }
 async function hatDelOne(name){
   if(!unlocked) return;
-  if(!await ask(tsub('"{name}" 기준값을 삭제할까?', {name:name}))) return;
+  if(!await ask(tsub('"{name}" 기준값을 삭제할까?', {name:name}), { ok: t('지우기'), warn: true })) return;
   wxSet('bt_hatlist', wxLS('bt_hatlist', []).filter(i=>i.name!==name));
   const sel = wxLS('bt_hatsel', {mode:'auto'});
   if(sel.mode==='manual' && sel.name===name) wxSet('bt_hatsel', {mode:'auto'});

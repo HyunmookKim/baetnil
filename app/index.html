@@ -660,6 +660,21 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .mrbtn.ok{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 .mrbtn.warn{background:none;border-color:#5A3030;color:#E08A8A}
 .mrbtn.phx{padding:2px 6px;font-size:10px;border-radius:6px}
+/* ── 앱 안의 알림창.
+   브라우저 창은 단추 이름을 앱이 못 정한다. 한국어 앱에 CANCEL·OK 가 영어로 나온다. */
+.tellov{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
+  background:rgba(3,10,17,.72);padding:22px}
+.tellov.open{display:flex}
+.tellbox{width:100%;max-width:340px;background:var(--sf);border:1px solid var(--bd);
+  border-radius:16px;padding:20px 18px 14px;box-shadow:0 18px 48px rgba(0,0,0,.55)}
+.telltit{color:var(--th);font-size:16px;font-weight:800;margin-bottom:8px;line-height:1.35}
+.tellmsg{color:var(--tx);font-size:14.5px;line-height:1.6;white-space:pre-wrap;
+  max-height:46vh;overflow:auto;overflow-wrap:anywhere}
+.tellbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+.tellbtns button{min-height:42px;padding:10px 17px;font-size:14px;font-weight:700;border-radius:999px;
+  cursor:pointer;background:var(--sf2);border:1px solid var(--bd);color:#C4C8CD}
+.tellbtns button.ok{background:var(--ac);border-color:var(--ac);color:var(--acd)}
+.tellbtns button.warn{background:none;border-color:#5A3030;color:#E08A8A}
 .mrtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .mrtop b{color:var(--tm);font-size:11px;font-weight:800;letter-spacing:.1em}
 .mrlbl{font-size:11px;color:var(--tm);width:52px;flex-shrink:0}
@@ -1851,6 +1866,11 @@ header{padding-top:var(--sat)}
   </div>
 </div>
 
+<div id="tellOv" class="tellov"><div class="tellbox">
+  <div class="telltit" id="tellTit" style="display:none"></div>
+  <div class="tellmsg" id="tellMsg"></div>
+  <div class="tellbtns" id="tellBtns"></div>
+</div></div>
 <div id="photoView" onclick="this.style.display='none'">
   <button class="pvBtn" id="pvPrev" onclick="pvNav(-1);event.stopPropagation()">‹</button>
   <img id="photoViewImg" onclick="event.stopPropagation()">
@@ -2294,7 +2314,7 @@ const I18N = {
     '중간 기록에서 계산':'from the log entries',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Engine hours are part of the time under way.',
     '항적':'Track',
-    '점 {n}개 · 끌어서 이동 · 두 손가락으로 확대':'{n} points · drag to pan · pinch to zoom',
+    '끌어서 이동 · 두 손가락으로 확대':'Drag to pan · pinch to zoom',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'This map is for reviewing records. Use official charts for navigation.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Map © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
     '저장된 위치가 없습니다':'No positions saved',
@@ -4048,8 +4068,8 @@ const I18N = {
     '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Could not get your location, so the track cannot be recorded.\n\nCheck that location is turned on for your phone and allowed for Baetnil.\n\nOpen settings?',
     '기록 중':'Recording',
     '{n}점':'{n} points',
-    '폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.':'Do not dismiss the "recording your voyage" notification. Recording continues while it is shown.',
-    '입항을 기록하면 저절로 멈춥니다.':'It stops by itself when you log your arrival.',
+    '알림이 떠 있는 동안 기록됩니다. 알림을 지우면 기록도 멈춥니다.':'Recording continues while the notification is shown. Dismissing it stops the recording.',
+    '입항을 기록하면 저절로 멈추고 저장됩니다.':'It stops and saves by itself when you log your arrival.',
   
 
     // ── 4.25
@@ -4469,7 +4489,7 @@ const I18N = {
     '중간 기록에서 계산':'по записям в журнале',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Моточасы входят во время в пути.',
     '항적':'Трек',
-    '점 {n}개 · 끌어서 이동 · 두 손가락으로 확대':'{n} точек · тяните для сдвига · щипок для масштаба',
+    '끌어서 이동 · 두 손가락으로 확대':'Тяните для сдвига · щипок для масштаба',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'Карта для просмотра записей. Для навигации используйте официальные карты.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Карта © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
     '저장된 위치가 없습니다':'Нет сохранённых позиций',
@@ -6223,8 +6243,8 @@ const I18N = {
     '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Не удалось получить геопозицию, трек записать нельзя.\n\nПроверьте, включена ли геолокация на телефоне и разрешена ли она для Baetnil.\n\nОткрыть настройки?',
     '기록 중':'Идёт запись',
     '{n}점':'точек: {n}',
-    '폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.':'Не убирайте уведомление «идёт запись перехода». Запись идёт, пока оно висит.',
-    '입항을 기록하면 저절로 멈춥니다.':'Она остановится сама, когда вы отметите приход.',
+    '알림이 떠 있는 동안 기록됩니다. 알림을 지우면 기록도 멈춥니다.':'Запись идёт, пока висит уведомление. Если его убрать, запись остановится.',
+    '입항을 기록하면 저절로 멈추고 저장됩니다.':'Запись остановится и сохранится сама, когда вы отметите приход.',
   
 
     // ── 4.25
@@ -6575,18 +6595,18 @@ async function dgStore(k, url, title, pub){
 async function dgSetPublic(k, on){
   const key = (k==='side' ? 'side' : 'plan');
   const id = dgRef[key];
-  if(!id){ alert(t('아직 앱 창고에 올라가지 않은 도면입니다')); return; }
-  if(!dgCanPublish()){ alert(t('로그인한 상태에서만 바꿀 수 있습니다')); return; }
+  if(!id){ tell(t('아직 앱 창고에 올라가지 않은 도면입니다')); return; }
+  if(!dgCanPublish()){ tell(t('로그인한 상태에서만 바꿀 수 있습니다')); return; }
   try{
     await window.__dglib.setPublic(id, on === true);
     dgPub = { ...dgPub, [key]: (on === true) };
     saveLocal();
     if(typeof schedulePush==='function') schedulePush();
-    alert(on ? t('공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.')
+    tell(on ? t('공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.')
              : t('공개를 내렸습니다.\n이미 가져간 사람의 도면은 그대로 남습니다.'));
     if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
        && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
-  }catch(e){ alert(t('바꾸지 못했습니다: ') + ((e && e.message) || e)); }
+  }catch(e){ tell(t('바꾸지 못했습니다: ') + ((e && e.message) || e)); }
 }
 // 창고 번호만 있고 그림이 없는 도면을 받아온다. 기기 복사본이 있으면 그것부터 쓴다.
 async function dgResolve(){
@@ -7028,7 +7048,7 @@ function richTap(e, fid){
 }
 function richDelImg(fid){
   const q = QL[fid]; if(!q) return;
-  if(!qlPickedImg(fid)){ alert(t('지울 사진을 먼저 한 번 눌러 주세요.')); return; }
+  if(!qlPickedImg(fid)){ tell(t('지울 사진을 먼저 한 번 눌러 주세요.')); return; }
   const r = q.getSelection();
   q.deleteText(r.index, r.length, 'user');
   qlShowDel(fid);
@@ -7528,7 +7548,7 @@ function formPhotoAdd(list, quiet){
   formPhotoList = r.kept;
   renderFormPhotos();
   if(!r.ok && !quiet){
-    alert(tsub('사진 {n}장은 넣지 못했습니다.', {n:r.dropped}) + '\n\n'
+    tell(tsub('사진 {n}장은 넣지 못했습니다.', {n:r.dropped}) + '\n\n'
       + t('한 글에 넣을 수 있는 사진 용량을 넘었습니다.') + '\n'
       + t('사진 수를 줄이거나 나눠서 올려 주세요.'));
   }
@@ -7679,9 +7699,9 @@ async function chooseDgPick(i){
   if(!d) return;
   let url = d.url;
   if(!url && typeof d.get === 'function'){
-    try{ url = await d.get(); }catch(e){ alert(t('도면을 불러오지 못했습니다')); return; }
+    try{ url = await d.get(); }catch(e){ tell(t('도면을 불러오지 못했습니다')); return; }
   }
-  if(!url){ alert(t('이 도면의 그림이 없습니다')); return; }
+  if(!url){ tell(t('이 도면의 그림이 없습니다')); return; }
   const kind = dgPickKind;
   if(d.libId){
     try{ await dgCacheSet(d.libId, url); }catch(_){}
@@ -7720,14 +7740,14 @@ async function dgPickLib(k){
   if(!lkCanEdit()) return;
   const kind = (k==='side' ? 'side' : 'plan');
   if(!(typeof window!=='undefined' && window.__dglib)){
-    alert(t('공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다')); return;
+    tell(t('공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다')); return;
   }
   if(!(window.__user)){
-    alert(t('공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.')); return;
+    tell(t('공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.')); return;
   }
   let list;
   try{ list = await window.__dglib.list(kind); }
-  catch(e){ alert(t('공개 도면 목록을 불러오지 못했습니다: ') + ((e && e.message) || e)); return; }
+  catch(e){ tell(t('공개 도면 목록을 불러오지 못했습니다: ') + ((e && e.message) || e)); return; }
   const cards = (list||[]).map(d => ({
     key: d.id, libId: d.id,
     name: d.name || d.title || '이름 없음',
@@ -7746,7 +7766,7 @@ async function dgPickLib(k){
 }
 
 function uploadDg(k){
-  if(typeof unlocked!=='undefined' && !unlocked){ alert(t('잠금 상태에서는 도면을 바꿀 수 없습니다')); return; }
+  if(typeof unlocked!=='undefined' && !unlocked){ tell(t('잠금 상태에서는 도면을 바꿀 수 없습니다')); return; }
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'image/*';
   inp.onchange = ()=>{
@@ -7791,7 +7811,7 @@ function uploadDg(k){
           }
         }catch(e){
           // 못 올려도 그림은 이미 기기에 있다 — 다음에 다시 시도한다
-          alert(t('도면은 이 기기에 저장했습니다.\n앱 창고에 올리지 못했습니다: ')
+          tell(t('도면은 이 기기에 저장했습니다.\n앱 창고에 올리지 못했습니다: ')
                 + ((e && e.message) || e));
         }
       }
@@ -7804,7 +7824,7 @@ function resizeDg(f, cb){
   img.onload = ()=>{
     const MAX = 1600;
     let w = img.naturalWidth, h = img.naturalHeight;
-    if(!w || !h){ alert(t('사진을 읽지 못했습니다')); return; }
+    if(!w || !h){ tell(t('사진을 읽지 못했습니다')); return; }
     const sc = Math.min(1, MAX/Math.max(w,h));
     w = Math.round(w*sc); h = Math.round(h*sc);
     const c = document.createElement('canvas');
@@ -7815,11 +7835,11 @@ function resizeDg(f, cb){
       q -= 0.1;
       out = c.toDataURL('image/jpeg', q);
     }
-    if(out.length > 950*1024){ alert(t('사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.')); return; }
+    if(out.length > 950*1024){ tell(t('사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.')); return; }
     URL.revokeObjectURL(img.src);
     cb(out);
   };
-  img.onerror = ()=>alert(t('사진을 불러오지 못했습니다'));
+  img.onerror = ()=>tell(t('사진을 불러오지 못했습니다'));
   img.src = URL.createObjectURL(f);
 }
 
@@ -8077,7 +8097,7 @@ function guestBoats(){
   return (Array.isArray(boats) ? boats : []).filter(b => !canDelBoat(b));
 }
 async function openWipe(){
-  if(!window.__user){ alert(t('로그인한 상태에서만 지울 수 있습니다')); return; }
+  if(!window.__user){ tell(t('로그인한 상태에서만 지울 수 있습니다')); return; }
   const P = document.getElementById('mrPanel');
   if(!P) return;
   const mine = myOwnBoats(), guest = guestBoats();
@@ -8125,7 +8145,7 @@ function askWipe(){
     fields: [ { key:'word', label:'확인 글자', value:'', placeholder: WIPE_WORD } ],
     onOk: v => {
       if(String(v.word || '').trim() !== WIPE_WORD){
-        alert(t('글자가 달라서 지우지 않았습니다.'));
+        tell(t('글자가 달라서 지우지 않았습니다.'));
         return false;
       }
       doWipe();
@@ -8616,6 +8636,7 @@ function locMay(quiet){
 const TRK_DIST = 50;      // m — 이만큼 움직여야 폰이 깨운다
 const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가운데 점을 버린다
 const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
+const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라우드는 멈출 때 한 번)
 const TRK_KEY  = 'bt_trk';
 
 let trkNow = null;   // { vid, from, pts:[{la,lo,t}], id }
@@ -8673,6 +8694,58 @@ function trkSimplify(pts, tolM){
   return a.filter((_, i) => keep[i]);
 }
 
+// ★ 지금 그려야 할 항적 — 문 하나.
+//
+//   저장은 [멈추기] 때 딱 한 번 일어난다. 그래서 이 문이 없으면 기록하는 내내
+//   지도가 비어 있다. 사장님이 배 위에서 21점을 모아 놓고도 「점은 안 찍혀 있네」
+//   하셨다. 앱은 알고 있는데 사람에게 안 보여 준 것이다.
+//   기록 중이면 아직 저장 안 된 점까지 그린다. 이미 폰에 있는 것을 보여 주기만
+//   하는 것이라 배터리를 더 먹지 않는다.
+function trkRaw(it){
+  if(it && trkOn() && trkNow && String(trkNow.vid) === String(it.id)
+     && Array.isArray(trkNow.pts) && trkNow.pts.length) return trkNow.pts;
+  return Array.isArray(it && it.trk) ? it.trk : [];
+}
+// 이 항해에 지도로 보여 줄 것이 있나 — 표시든 항적이든
+function trkHas(it){ return trkPoints(it).length > 0 || trkRaw(it).length > 1; }
+
+// ★ 멈추기 전까지 폰 하나에만 있으면, 폰을 잃을 때 그 항해가 통째로 없어진다.
+//   그래서 쌓이는 동안 기기에 넣어 둔다.
+//   ── 클라우드로는 여기서 안 올린다. 점마다 올리면 배터리를 더 먹는다.
+//      그래서 save() 가 아니라 saveLocal() 이다. 바꾸지 말 것.
+function trkFlush(){
+  if(!trkNow) return false;
+  const it = (typeof voyage !== 'undefined' ? voyage : [])
+               .find(v => String(v.id) === String(trkNow.vid));
+  if(!it) return false;
+  const pts = trkSimplify(trkNow.pts || [], TRK_TOL);
+  if(pts.length < 2) return false;
+  it.trk = pts;
+  trkNow.saved = (trkNow.pts || []).length;
+  trkKeep();
+  try{ saveLocal(); }catch(e){}
+  return true;
+}
+
+// ★ 점이 들어와도 화면이 그대로면 사람은 「안 되고 있다」고 읽는다.
+//   화면을 통째로 다시 그리지 않는다 — 그러면 보던 자리를 잃고 지도 축척이 튄다.
+//   숫자와 선만 제자리에서 고친다.
+function trkLive(){
+  if(!trkNow) return;
+  try{
+    const el = document.getElementById('trkcnt');
+    if(el) el.textContent = tsub('{n}점', { n:String((trkNow.pts || []).length) });
+  }catch(e){}
+  try{
+    const S = mapS;
+    if(S && String(S.vid || '') === String(trkNow.vid)){
+      const it = (typeof voyage !== 'undefined' ? voyage : [])
+                   .find(v => String(v.id) === String(trkNow.vid));
+      if(it){ S.line = trkLine(it); mapPaint(true); }
+    }
+  }catch(e){}
+}
+
 // 점 하나가 들어왔다
 function trkPush(pos){
   if(!trkNow || !pos) return false;
@@ -8687,6 +8760,8 @@ function trkPush(pos){
   trkNow.pts.push(p);
   if(trkNow.pts.length > TRK_MAX) trkNow.pts = trkSimplify(trkNow.pts, TRK_TOL);
   trkKeep();
+  if((trkNow.pts.length - (Number(trkNow.saved) || 0)) >= TRK_FLUSH) trkFlush();
+  trkLive();
   return true;
 }
 
@@ -8797,7 +8872,7 @@ async function trkStart(vid){
 async function trkStartSay(vid, quiet){
   let why = '';
   try{ why = await trkStart(vid); }catch(e){ why = String((e && e.message) || e); }
-  if(why && !quiet) alert(t(why));
+  if(why && !quiet) tell(t(why));
   try{ if(mrOpenId && String(mrOpenId) === String(vid)) openMR('voyage', vid); }catch(_){}
   return !why;
 }
@@ -8889,7 +8964,7 @@ function setupUseGPS(){
 }
 function createBoat(){
   const name = (document.getElementById('nbName').value||'').trim();
-  if(!name){ alert(t('배 이름을 입력해 주세요.')); return; }
+  if(!name){ tell(t('배 이름을 입력해 주세요.')); return; }
   const type = document.getElementById('nbType').value || 'sail';
   const port = (document.getElementById('nbPort').value||'').trim();
   const val = id => { const el = document.getElementById(id); return el ? (el.value||'').trim() : ''; };
@@ -8962,7 +9037,7 @@ function openPortPick(){
   if(!cur) portUseGPS(true);        // 위치가 없으면 현재 자리부터 보여 준다
 }
 function portUseGPS(quiet){
-  if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
+  if(!navigator.geolocation){ if(!quiet) tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
   geoGet('홈포트 위치 잡기',
     p=>{
       if(!mapS) return;
@@ -8973,7 +9048,7 @@ function portUseGPS(quiet){
       mapPaint(true);
       const btn = document.getElementById('portSave'); if(btn) btn.disabled = false;
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
+    ()=>{ if(!quiet) tell(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
     { quiet: !!quiet }
   );
 }
@@ -9055,7 +9130,7 @@ async function openBoatInfo(id){
 async function askDelBoat(id){
   const b = boats.find(x=>String(x.id)===String(id));
   if(!b) return;
-  if(!canDelBoat(b)){ alert(t('선주만 배를 지울 수 있습니다')); return; }
+  if(!canDelBoat(b)){ tell(t('선주만 배를 지울 수 있습니다')); return; }
   if(guardEdit('배를 지웁니다.', () => askDelBoat(id))) return;
   const mine = String(id) === String(currentBoatId);
   let n = 0;
@@ -9072,7 +9147,7 @@ async function askDelBoat(id){
     fields: [ { key:'name', label:'배 이름', value:'', placeholder:b.name } ],
     onOk: v => {
       if(String(v.name).trim() !== String(b.name).trim()){
-        alert(t('이름이 달라서 지우지 않았습니다'));
+        tell(t('이름이 달라서 지우지 않았습니다'));
         return false;
       }
       doDelBoat(id, mine);
@@ -9216,7 +9291,7 @@ function canTouchMember(b, uid){
 }
 function addRank(b, name){
   if(!b) return null;
-  if(!can(b, 'ranks', 'write')){ alert(t('등급을 만들 권한이 없습니다')); return null; }
+  if(!can(b, 'ranks', 'write')){ tell(t('등급을 만들 권한이 없습니다')); return null; }
   const nm = String(name||'').trim();
   if(!nm) return null;
   const pos = Math.max(...rankList(b).map(r=>r.pos)) + 1;
@@ -9231,21 +9306,21 @@ function editRank(b, id, patch){
   if(!r || !patch) return null;
   // 선주 등급은 이름만 바꿀 수 있다
   if(r.owner){
-    if(!can(b, 'ranks', 'write')){ alert(t('등급을 바꿀 권한이 없습니다')); return null; }
-    if(myPos(b) !== 0){ alert(t('선주 등급은 선주만 바꿀 수 있습니다')); return null; }
+    if(!can(b, 'ranks', 'write')){ tell(t('등급을 바꿀 권한이 없습니다')); return null; }
+    if(myPos(b) !== 0){ tell(t('선주 등급은 선주만 바꿀 수 있습니다')); return null; }
     if('name' in patch){ const nm = String(patch.name||'').trim(); if(nm) r.name = nm; }
     return r;
   }
-  if(!canTouchRank(b, id)){ alert(t('이 등급은 바꿀 수 없습니다')); return null; }
+  if(!canTouchRank(b, id)){ tell(t('이 등급은 바꿀 수 없습니다')); return null; }
   if('name' in patch){ const nm = String(patch.name||'').trim(); if(nm) r.name = nm; }
   return r;
 }
 function delRank(b, id){
   const r = rankOf(b, id);
   if(!r) return null;
-  if(r.owner){ alert(t('선주 등급은 지울 수 없습니다')); return null; }
-  if(!canTouchRank(b, id)){ alert(t('이 등급은 지울 수 없습니다')); return null; }
-  if(rankList(b).length <= 2){ alert(t('등급이 너무 적습니다. 하나는 남겨 두세요.')); return null; }
+  if(r.owner){ tell(t('선주 등급은 지울 수 없습니다')); return null; }
+  if(!canTouchRank(b, id)){ tell(t('이 등급은 지울 수 없습니다')); return null; }
+  if(rankList(b).length <= 2){ tell(t('등급이 너무 적습니다. 하나는 남겨 두세요.')); return null; }
   delete b.ranks[id];
   // 이 등급이던 사람은 맨 아래 등급으로 내린다 — 아무 등급도 없으면 앱이 막힌다
   const ls = rankList(b);
@@ -9260,8 +9335,8 @@ function setPerm(b, rankId, key, level){
   if(!r) return null;
   if(!PERMS.some(p => p.k === key)) return null;
   if(!(level in PERM_ORDER)) return null;
-  if(r.owner){ alert(t('선주 권한은 낮출 수 없습니다')); return null; }
-  if(!canTouchRank(b, rankId)){ alert(t('이 등급은 바꿀 수 없습니다')); return null; }
+  if(r.owner){ tell(t('선주 권한은 낮출 수 없습니다')); return null; }
+  if(!canTouchRank(b, rankId)){ tell(t('이 등급은 바꿀 수 없습니다')); return null; }
   r.perms = r.perms || {};
   r.perms[key] = level;
   return r;
@@ -9270,16 +9345,16 @@ function setPerm(b, rankId, key, level){
 function assignRank(b, uid, rankId){
   const r = rankOf(b, rankId);
   if(!r || !b.members || !(uid in b.members)) return null;
-  if(!canTouchMember(b, uid)){ alert(t('이 사람의 등급은 바꿀 수 없습니다')); return null; }
+  if(!canTouchMember(b, uid)){ tell(t('이 사람의 등급은 바꿀 수 없습니다')); return null; }
   // 나보다 높거나 같은 자리를 남에게 줄 수 없다
-  if(r.pos <= myPos(b)){ alert(t('내 등급보다 높은 자리는 줄 수 없습니다')); return null; }
+  if(r.pos <= myPos(b)){ tell(t('내 등급보다 높은 자리는 줄 수 없습니다')); return null; }
   const cur = rankOf(b, b.members[uid]);
   // 선주가 한 명뿐인데 그 사람을 내리면 아무도 관리할 수 없게 된다
   if(cur && cur.owner){
     const owners = Object.values(b.members).filter(x => {
       const rr = rankOf(b, x); return rr && rr.owner;
     }).length;
-    if(owners <= 1){ alert(t('선주가 한 명뿐입니다.\n선주 넘기기를 먼저 해 주세요.')); return null; }
+    if(owners <= 1){ tell(t('선주가 한 명뿐입니다.\n선주 넘기기를 먼저 해 주세요.')); return null; }
   }
   b.members[uid] = r.id;
   return r;
@@ -9526,7 +9601,7 @@ function reportBody(kind, target, reason, note){
 }
 // 신고하기
 function reportBoat(id){
-  if(!window.__user){ alert(t('신고하려면 로그인이 필요합니다')); return; }
+  if(!window.__user){ tell(t('신고하려면 로그인이 필요합니다')); return; }
   openForm({
     title: '신고하기',
     sub: '무엇이 문제인지 알려 주세요',
@@ -9539,13 +9614,13 @@ function reportBoat(id){
     ],
     onOk: v => {
       const body = reportBody('boat', id, v.reason, v.note);
-      if(!body){ alert(t('신고를 만들지 못했습니다')); return false; }
+      if(!body){ tell(t('신고를 만들지 못했습니다')); return false; }
       if(window.__report){
         window.__report.send(body)
-          .then(()=>alert(t('신고했습니다.\n살펴본 뒤 조치하겠습니다.')))
-          .catch(e=>alert(t('보내지 못했습니다: ') + ((e && e.message) || e)));
+          .then(()=>tell(t('신고했습니다.\n살펴본 뒤 조치하겠습니다.')))
+          .catch(e=>tell(t('보내지 못했습니다: ') + ((e && e.message) || e)));
       } else {
-        alert(t('인터넷에 연결된 상태에서만 신고할 수 있습니다'));
+        tell(t('인터넷에 연결된 상태에서만 신고할 수 있습니다'));
         return false;
       }
     }
@@ -9868,7 +9943,7 @@ async function listMore(k, api, ord){
   try{
     const r = await api.list(true, ord);
     listSet(k, listRows(k).concat(r.rows || []), r.done);
-  }catch(e){ alert(t('더 불러오지 못했습니다.\n\n') + ((e && e.message) || e)); }
+  }catch(e){ tell(t('더 불러오지 못했습니다.\n\n') + ((e && e.message) || e)); }
   listRefresh_draw(k);
 }
 function listRefresh_draw(k){
@@ -9983,7 +10058,7 @@ async function renderTalk(){
 let recPickTarget = null;
 function talkPickRecord(rid){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  if(!b){ alert(t('배를 등록하면 정비 기록을 붙일 수 있습니다')); return; }
+  if(!b){ tell(t('배를 등록하면 정비 기록을 붙일 수 있습니다')); return; }
   const rows = [];
   (Array.isArray(maint) ? maint : []).forEach(m=>{
     if(!m.lastDate) return;                      // 한 번도 안 한 것은 쓸 이야기가 없다
@@ -9998,7 +10073,7 @@ function talkPickRecord(rid){
                     + (r.pin ? ' · 도면 위치' : '')
                     + (r.photos && r.photos.length ? ' · 사진 ' + r.photos.length : '') });
   });
-  if(!rows.length){ alert(t('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.')); return; }
+  if(!rows.length){ tell(t('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.')); return; }
   recPickTarget = rid;
   const B = document.getElementById('recPickBody');
   B.innerHTML = rows.map(x=>`<div class="fleet" onclick="recPickTake('${esc(x.v)}')">
@@ -10018,12 +10093,12 @@ async function recPickTake(v){
   closeRecPick();
   if(!rid) return;
   const blocks = await talkRecordBlocks(kind === 'm' ? 'maint' : 'repair', id);
-  if(!blocks.length){ alert(t('그 기록을 찾지 못했습니다')); return; }
+  if(!blocks.length){ tell(t('그 기록을 찾지 못했습니다')); return; }
   // 사진까지 들어가므로 용량을 먼저 본다
   const photos = blocks.filter(b=>b.t==='photo').map(b=>b.v);
   const bud = photoBudget(photos);
   if(!bud.ok){
-    alert(tsub('사진이 많아 {n}장은 넣지 못합니다.', { n: bud.dropped })
+    tell(tsub('사진이 많아 {n}장은 넣지 못합니다.', { n: bud.dropped })
       + '\n\n' + t('글을 올린 뒤 따로 올려 주세요.'));
   }
   // 편집기 안 커서 자리에 넣는다
@@ -10487,7 +10562,7 @@ async function toggleLike(kind, id){
     row.likeN = before;
     likedMark(kind, id, was);
     likeRepaint(kind, id, before);
-    alert(t('누르지 못했습니다.\n\n') + ((e && e.message) || e));
+    tell(t('누르지 못했습니다.\n\n') + ((e && e.message) || e));
   }
 }
 // ★ '도움된 순' 은 파이어스토어가 그 칸으로 줄을 세운다.
@@ -10533,14 +10608,14 @@ function setTalkRegion(v){ talkRegion = v; renderTalk(); }
 //   돌려주는 값이 true 면 '막았다' 는 뜻이다 — 부른 쪽은 그냥 돌아서면 된다.
 function needLogin(msg){
   if(window.__user) return false;
-  alert(t(msg || '로그인해야 하실 수 있습니다'));
+  tell(t(msg || '로그인해야 하실 수 있습니다'));
   try{ openAccount(); }catch(_){}
   return true;
 }
 function writeTalk(id){
   if(guardEdit('커뮤니티에 글을 씁니다.', ()=>writeTalk(id))) return;
   if(needLogin('로그인해야 글을 쓸 수 있습니다')) return;
-  if(myBan){ alert(banNotice()); return; }
+  if(myBan){ tell(banNotice()); return; }
   const po = id ? talkList.find(x=>String(x.id)===String(id)) : null;
   if(id && !po) return;
   const b = (typeof curBoat === 'function') ? curBoat() : null;
@@ -10567,17 +10642,17 @@ function writeTalk(id){
     ],
     del: (po && canDelTalk(po)) ? { text:'글 지우기', run: ()=>delTalk(po.id) } : null,
     onOk: v => {
-      if(!v.title){ alert(t('제목을 넣어 주세요')); return false; }
+      if(!v.title){ tell(t('제목을 넣어 주세요')); return false; }
       const blocks = Array.isArray(v.doc) ? v.doc : [];
       const photos = blocks.filter(x=>x.t==='photo').map(x=>x.v);
-      if(!blocks.length){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!blocks.length){ tell(t('내용을 넣어 주세요')); return false; }
       try{ localStorage.setItem('bt_talkreg', v.region); }catch(_){}
       // ★ 사진을 창고로 보내고 주소만 남긴다.
       //   글 안의 사진 자리(blocks)와 사진 목록(photos)이 같은 것을 가리켜야 하므로
       //   옛 주소 → 새 주소 짝을 만들어 둘 다 바꾼다. 한쪽만 바꾸면 사진이 사라진다.
       (async ()=>{
         const st = await storePhotos(photos);
-        if(!st.ok) alert(storeShortMsg(st.dropped, t('한 글')));
+        if(!st.ok) tell(storeShortMsg(st.dropped, t('한 글')));
         const blocks2 = st.fix(blocks);
         try{
           if(po){
@@ -10595,7 +10670,7 @@ function writeTalk(id){
             talkList.unshift(body); openTalk(body.id);
           }
         }catch(e){
-          alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
+          tell(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
           formReopen();          // 쓴 글을 날리지 않는다
         }
       })();
@@ -10691,15 +10766,15 @@ function writeTalkComment(id){
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
   if(needLogin('로그인해야 댓글을 쓸 수 있습니다')) return;
-  if(myBan){ alert(banNotice()); return; }
+  if(myBan){ tell(banNotice()); return; }
   openForm({
     title:'댓글', okText:'올리기',
     fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'', placeholder:'댓글을 적어 주세요' }],
     onOk: v => {
-      if(!v.text){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!v.text){ tell(t('내용을 넣어 주세요')); return false; }
       const c = { id:newId(), by:meUid()||'', byName:meName(),
                   text:v.text, ts:new Date().toISOString() };
-      if(!window.__cmt){ alert(t('인터넷에 연결되어 있지 않습니다')); return; }
+      if(!window.__cmt){ tell(t('인터넷에 연결되어 있지 않습니다')); return; }
       window.__cmt.add('community', po.id, c)
         .then(()=>{
           const k = String(po.id);
@@ -10708,7 +10783,7 @@ function writeTalkComment(id){
           trDrop('community', po.id);   // 옮겨 둔 것에 이 댓글이 없다
           openTalk(po.id);
         })
-        .catch(e=>alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .catch(e=>tell(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -10722,10 +10797,10 @@ function delTalkComment(id, cid, isOld){
     const next = (po.comments||[]).filter(c=>String(c.id)!==String(cid));
     window.__talk.edit(po.id, { comments: next })
       .then(()=>{ po.comments = next; trDrop('community', po.id); openTalk(po.id); })
-      .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+      .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
     return;
   }
-  if(!window.__cmt){ alert(t('인터넷에 연결되어 있지 않습니다')); return; }
+  if(!window.__cmt){ tell(t('인터넷에 연결되어 있지 않습니다')); return; }
   window.__cmt.del('community', po.id, cid)
     .then(()=>{
       const k = String(po.id);
@@ -10734,7 +10809,7 @@ function delTalkComment(id, cid, isOld){
       trDrop('community', po.id);
       openTalk(po.id);
     })
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // 신고 — 한 사람이 두 번 세지 않는다. 쌓이면 스스로 내려간다.
@@ -10742,9 +10817,9 @@ function reportTalk(id){
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
   const me2 = meUid();
-  if(!me2){ alert(t('로그인해야 신고할 수 있습니다')); return; }
+  if(!me2){ tell(t('로그인해야 신고할 수 있습니다')); return; }
   const reports = po.reports || {};
-  if(reports[me2]){ alert(t('이미 신고하신 글입니다')); return; }
+  if(reports[me2]){ tell(t('이미 신고하신 글입니다')); return; }
   openForm({
     title:'글 신고', sub:'왜 신고하시는지 골라 주세요', okText:'신고',
     fields:[
@@ -10759,11 +10834,11 @@ function reportTalk(id){
       const patch = { reports: next, reportN: n, hidden: n >= TALK_HIDE_AT };
       window.__talk.edit(po.id, patch).then(()=>{
         Object.assign(po, patch);
-        alert(patch.hidden
+        tell(patch.hidden
           ? t('신고했습니다.\n\n신고가 쌓여 이 글은 목록에서 내려갔습니다.')
           : tsub('신고했습니다. ({n}/{max})', {n:n, max:TALK_HIDE_AT}));
         backToTalk();
-      }).catch(e=>alert(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
+      }).catch(e=>tell(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -10771,13 +10846,13 @@ function delTalk(id){
   if(guardEdit('커뮤니티 글을 지웁니다.', ()=>delTalk(id))) return;
   const po = talkList.find(x=>String(x.id)===String(id));
   if(!po) return;
-  if(!canDelTalk(po)){ alert(t('이 글은 지울 수 없습니다')); return; }
+  if(!canDelTalk(po)){ tell(t('이 글은 지울 수 없습니다')); return; }
   if(!confirm(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'))) return;
   window.__talk.del(po.id).then(()=>{
     dropPhotosOf(po);                       // 창고에 남은 사진도 함께 치운다
     talkList = talkList.filter(x=>String(x.id)!==String(po.id));
     backToTalk();
-  }).catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+  }).catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // ===== 운영자 =====
@@ -10792,9 +10867,9 @@ function paintAdminMenu(){
 // 내 계정 번호. 남을 운영자로 임명하려면 그 사람의 번호를 받아야 한다.
 function copyMyUid(){
   const u = meUid();
-  if(!u){ alert(t('로그인한 뒤에 쓸 수 있습니다')); return; }
-  try{ navigator.clipboard.writeText(u); alert(t('내 계정 번호를 복사했습니다.\n\n') + u); }
-  catch(e){ alert(t('내 계정 번호\n\n') + u); }
+  if(!u){ tell(t('로그인한 뒤에 쓸 수 있습니다')); return; }
+  try{ navigator.clipboard.writeText(u); tell(t('내 계정 번호를 복사했습니다.\n\n') + u); }
+  catch(e){ tell(t('내 계정 번호\n\n') + u); }
 }
 
 let adminTab  = 'reports';
@@ -10868,7 +10943,7 @@ function adminFeat(){
 }
 async function openAdmin(){
   // 운영자가 아니면 화면 자체를 열지 않는다
-  if(!isAdmin() || amSeriesOnly()){ alert(t('운영자만 볼 수 있습니다')); return; }
+  if(!isAdmin() || amSeriesOnly()){ tell(t('운영자만 볼 수 있습니다')); return; }
   const P = document.getElementById('mrPanel');
   const tabsOn = ADMIN_TABS.filter(t => !t.need || isAdmin(t.need));
   if(!tabsOn.some(t => t.k === adminTab)) adminTab = tabsOn.length ? tabsOn[0].k : 'people';
@@ -10925,17 +11000,17 @@ async function adminReports(){
 }
 // 신고가 잘못된 것이면 숨김을 푼다
 function adminUnhide(id){
-  if(!isAdmin('postDel')){ alert(t('글을 다룰 권한이 없습니다')); return; }
+  if(!isAdmin('postDel')){ tell(t('글을 다룰 권한이 없습니다')); return; }
   if(!confirm(t('이 글의 숨김을 풀까요?\n\n다시 목록에 나옵니다.'))) return;
   window.__talk.edit(id, { hidden:false, reports:{}, reportN:0 })
     .then(()=>openAdmin())
-    .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function adminDel(id){
-  if(!isAdmin('postDel')){ alert(t('글을 지울 권한이 없습니다')); return; }
+  if(!isAdmin('postDel')){ tell(t('글을 지울 권한이 없습니다')); return; }
   if(!confirm(t('이 글을 지울까요?\n\n되돌릴 수 없습니다.'))) return;
   window.__talk.del(id).then(()=>openAdmin())
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // ── 배 — 둘러보기에 올라온 공개 자료만 다룬다.
@@ -10959,23 +11034,23 @@ async function adminBoats(){
         </div></div></div>`).join('');
 }
 function adminBoatHide(id, on){
-  if(!isAdmin('boatMod')){ alert(t(boatModGuard())); return; }
+  if(!isAdmin('boatMod')){ tell(t(boatModGuard())); return; }
   const val = (on === true || on === 'true');
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(val && !confirm(tsub('{name} 를 둘러보기에서 감출까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
       + t('배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.'))) return;
   window.__pub.patch(id, { adminHidden: val })
     .then(()=>openAdmin())
-    .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function adminBoatDel(id){
-  if(!isAdmin('boatMod')){ alert(t(boatModGuard())); return; }
+  if(!isAdmin('boatMod')){ tell(t(boatModGuard())); return; }
   const x = pubRows.find(v=>String(v.id)===String(id));
   if(!confirm(tsub('{name} 의 공개 자료를 지울까요?', {name:(x&&x.name)||t('이 배')}) + '\n\n'
       + t('되돌릴 수 없습니다. 배 주인의 물품·정비 기록은 그대로 남습니다.\n')
       + t('먼저 감추기를 써 보시는 편이 낫습니다.'))) return;
   window.__pub.remove(id).then(()=>openAdmin())
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // ── 사람 명부 — 운영자만 본다 (규칙에서 막혀 있다)
@@ -11062,7 +11137,7 @@ function paintPeopleRows(){
 
 // ── 한 사람 화면 — 여기서 운영자로 세우고, 권한을 켜고 끄고, 막는다
 async function openPerson(uid){
-  if(!isAdmin() || amSeriesOnly()){ alert(t('운영자만 볼 수 있습니다')); return; }
+  if(!isAdmin() || amSeriesOnly()){ tell(t('운영자만 볼 수 있습니다')); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('사람'))}</b><span style="flex:1"></span>
       <button class="tab" onclick="openAdmin()">${esc(t('← 운영자'))}</button></div>
@@ -11123,7 +11198,7 @@ async function openPerson(uid){
 function personPerm(uid, key, on){
   const val = (on === true || on === 'true');
   const why = adminGuard(uid, 'perm', key, val);
-  if(why){ alert(t(why)); return; }
+  if(why){ tell(t(why)); return; }
   const a = personCur && String(personCur.uid) === String(uid) ? personCur.admin : null;
   if(!a){ personAppoint(uid, key); return; }
   const perms = Object.assign({}, a.perms || {});
@@ -11138,12 +11213,12 @@ function personPerm(uid, key, on){
   window.__admin.set(uid, { perms })
     .then(()=>{ if(adminIsMe(uid)) return loadAdmin().then(()=>{ paintAdminMenu(); openPerson(uid); });
                 openPerson(uid); })
-    .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 // 새로 운영자로 세운다
 function personAppoint(uid, key){
   const why = adminGuard(uid, 'add', key, true);
-  if(why){ alert(t(why)); return; }
+  if(why){ tell(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || '';
   const pm = ADMIN_PERMS.find(x=>x.k===key);
   if(!confirm(tsub('{name} 님을 운영자로 세웁니다.', {name:nm||uid}) + '\n\n'
@@ -11152,19 +11227,19 @@ function personAppoint(uid, key){
   const perms = {}; perms[key] = true;
   window.__admin.set(uid, { name:nm, perms })
     .then(()=>openPerson(uid))
-    .catch(e=>alert(t('세우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('세우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function personRemove(uid){
   const why = adminGuard(uid, 'remove');
-  if(why){ alert(t(why)); return; }
+  if(why){ tell(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || uid;
   if(!confirm(tsub('{name} 님을 운영자에서 내릴까요?', {name:nm}))) return;
   window.__admin.remove(uid).then(()=>openPerson(uid))
-    .catch(e=>alert(t('내리지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('내리지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function personBan(uid){
   const why = banGuard(uid);
-  if(why){ alert(t(why)); return; }
+  if(why){ tell(t(why)); return; }
   const nm = (personCur && String(personCur.uid) === String(uid) && personCur.name) || uid;
   openForm({
     title:'글쓰기 막기',
@@ -11176,15 +11251,15 @@ function personBan(uid){
         uid:String(uid), why:String(v.why||'').trim(),
         by: adminMyUid(), byName: meName ? meName() : '', ts: new Date().toISOString()
       }).then(()=>openPerson(uid))
-        .catch(e=>alert(t('막지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .catch(e=>tell(t('막지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
 function personUnban(uid){
-  if(!isAdmin('userBan')){ alert(t('사람을 막을 권한이 없습니다')); return; }
+  if(!isAdmin('userBan')){ tell(t('사람을 막을 권한이 없습니다')); return; }
   if(!confirm(t('막기를 풀까요?\n\n다시 글과 댓글을 쓸 수 있게 됩니다.'))) return;
   window.__bans.remove(uid).then(()=>openPerson(uid))
-    .catch(e=>alert(t('풀지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('풀지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // ── 운영자 목록
@@ -11209,7 +11284,7 @@ async function adminAdmins(){
 // 명부에 아직 없는 사람은 계정 번호를 받아 세운다
 function adminAdd(){
   const why = adminGuard('', 'add');
-  if(why){ alert(t(why)); return; }
+  if(why){ tell(t(why)); return; }
   openForm({
     title:'운영자 세우기',
     sub:'그 사람의 계정 번호를 붙여넣으세요',
@@ -11220,11 +11295,11 @@ function adminAdd(){
     ],
     onOk: v => {
       const uid = String(v.uid || '').trim();
-      if(!uid){ alert(t('계정 번호를 넣어 주세요')); return false; }
-      if(adminRows.some(a=>String(a.uid)===uid)){ alert(t('이미 운영자입니다')); return false; }
+      if(!uid){ tell(t('계정 번호를 넣어 주세요')); return false; }
+      if(adminRows.some(a=>String(a.uid)===uid)){ tell(t('이미 운영자입니다')); return false; }
       window.__admin.set(uid, { name:String(v.name||'').trim(), perms:{ postDel:true } })
         .then(()=>openPerson(uid))
-        .catch(e=>alert(t('세우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .catch(e=>tell(t('세우지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -11469,8 +11544,8 @@ async function openBoatPage(id){
   if(!window.__pub) return;
   let x;
   try{ x = await window.__pub.one(id); }
-  catch(e){ alert(t('불러오지 못했습니다')); return; }
-  if(!x){ alert(t('공개된 자료가 없습니다')); return; }
+  catch(e){ tell(t('불러오지 못했습니다')); return; }
+  if(!x){ tell(t('공개된 자료가 없습니다')); return; }
   boatPageData = x;
   boatPageTab = 'intro';
   pubVoyId = '';
@@ -11480,7 +11555,7 @@ async function openBoatPage(id){
 // 공개 설정 화면
 function openPublish(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'publish','write')){ alert(t('공개 설정을 바꿀 권한이 없습니다')); return; }
+  if(!can(b,'publish','write')){ tell(t('공개 설정을 바꿀 권한이 없습니다')); return; }
   const rows = PUB_KEYS.map(k=>`<div class="permrow">
       <div class="permname">${esc(k.name)}<div class="permsub">${esc(k.sub)}</div></div>
       <div class="permbtns">
@@ -11512,7 +11587,7 @@ function trkHideRows(b){
 }
 function setTrkHide(v){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'publish','write')){ alert(t('권한이 없습니다')); return; }
+  if(!can(b,'publish','write')){ tell(t('권한이 없습니다')); return; }
   if(guardEdit('항적 가리개를 바꿉니다.', ()=>setTrkHide(v))) return;
   b.trkHide = TRK_HIDE.indexOf(Number(v)) >= 0 ? Number(v) : TRK_HIDE_DEF;
   saveLocal(); saveBoatCloud(b); pushPublic(b);
@@ -11520,7 +11595,7 @@ function setTrkHide(v){
 }
 function setPubUI(key, on, back){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'publish','write')){ alert(t('권한이 없습니다')); return; }
+  if(!can(b,'publish','write')){ tell(t('권한이 없습니다')); return; }
   if(guardEdit('배 공개 설정을 바꿉니다.', () => setPubUI(key, on, back))) return;
   if(!setPub(b, key, on)) return;
   saveLocal();
@@ -11535,7 +11610,7 @@ function setPubUI(key, on, back){
 //   가장 먼저 보이는 기본 정보에도 둔다. 값은 pub.biz 한 곳만 쓴다.
 function setBizUI(on){
   const b = curBoat(); if(!b) return;
-  if(!can(b, 'publish', 'write')){ alert(t('공개 설정을 바꿀 권한이 없습니다')); return; }
+  if(!can(b, 'publish', 'write')){ tell(t('공개 설정을 바꿀 권한이 없습니다')); return; }
   if(guardEdit('영업 배 여부를 바꿉니다.', () => setBizUI(on))) return;
   if(on && !confirm(t('영업 배로 켜면 배 이름과 선종이 밖으로 나갑니다.\n\n')
       + t('커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n')
@@ -11575,7 +11650,7 @@ const INTRO_KINDS = [
 ];
 function openIntro(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'publish','write')){ alert(t('권한이 없습니다')); return; }
+  if(!can(b,'publish','write')){ tell(t('권한이 없습니다')); return; }
   b.intro = b.intro || [];
   const rows = b.intro.map((x,i)=>{
     // ★ 보기 전용일 때는 손대는 단추를 감춘다.
@@ -11614,7 +11689,7 @@ function saveIntro(b){
 // 글 넣기 → 사진 넣기 → 또 글 넣기 로 조립시키는 것은 게시판이 아니다.
 function editIntro(){
   const b = curBoat(); if(!b) return;
-  if(!can(b, 'publish', 'write')){ alert(t('고칠 권한이 없습니다')); return; }
+  if(!can(b, 'publish', 'write')){ tell(t('고칠 권한이 없습니다')); return; }
   if(guardEdit('배 소개글을 고칩니다.', editIntro)) return;
   b.intro = b.intro || [];
   // 유튜브 줄은 편집기가 다루지 못한다 — 따로 떼어 두고 뒤에 그대로 붙인다
@@ -11632,7 +11707,7 @@ function editIntro(){
       //   사진을 그대로 담아 두면 700KB 를 매번 주고받는다.
       (async ()=>{
         const st = await storePhotos(photos);
-        if(!st.ok) alert(storeShortMsg(st.dropped, t('소개 페이지')));
+        if(!st.ok) tell(storeShortMsg(st.dropped, t('소개 페이지')));
         b.intro = st.fix(blocks).concat(vids);
         saveIntro(b);
       })();
@@ -11670,18 +11745,18 @@ function addIntro(kind){
           { key:'photos', type:'photos', label:'사진', value:[] } ],
     onOk: v => {
       if(isV){
-        if(!v.v){ alert(t('내용을 넣어 주세요')); return false; }
-        if(!/^https?:\/\//.test(v.v)){ alert(t('주소는 https:// 로 시작해야 합니다')); return false; }
+        if(!v.v){ tell(t('내용을 넣어 주세요')); return false; }
+        if(!/^https?:\/\//.test(v.v)){ tell(t('주소는 https:// 로 시작해야 합니다')); return false; }
         b.intro.push({ t:'video', v:v.v });
         saveIntro(b);
         return;
       }
       const photos = Array.isArray(v.photos) ? v.photos : [];
-      if(!v.v && !photos.length){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!v.v && !photos.length){ tell(t('내용을 넣어 주세요')); return false; }
       // 소개 페이지는 배 문서 안에 들어간다. 문서 1MB 한계를 지켜야 한다.
       (async ()=>{
         const st = await storePhotos(photos);
-        if(!st.ok) alert(storeShortMsg(st.dropped, t('소개 페이지')));
+        if(!st.ok) tell(storeShortMsg(st.dropped, t('소개 페이지')));
         // 글 속 [사진N] 표시 자리에 그 사진이 들어간다 — 섞인 순서 그대로
         blocksFromText(String(v.v||''), st.photos).forEach(x => b.intro.push(x));
         saveIntro(b);
@@ -11732,12 +11807,12 @@ function canEditPost(b, p){
 }
 function addPost(title, body, kind, photos){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  if(!can(b, 'board', 'write')){ alert(t('글을 쓸 권한이 없습니다')); return null; }
+  if(!can(b, 'board', 'write')){ tell(t('글을 쓸 권한이 없습니다')); return null; }
   const ttl = String(title||'').trim();
   if(!ttl) return null;
   let k = POST_KINDS.some(x=>x.v===kind) ? kind : 'free';
   if(k === 'notice' && !canNotice(b)){
-    alert(t('공지는 게시판 관리 권한이 있어야 쓸 수 있습니다.\n일반 글로 올립니다.'));
+    tell(t('공지는 게시판 관리 권한이 있어야 쓸 수 있습니다.\n일반 글로 올립니다.'));
     k = 'free';
   }
   const p = { id:newId(), kind:k, title:ttl, body:String(body||''),
@@ -11760,7 +11835,7 @@ function postPhotos(id){
 function editPost(id, patch){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const p = postOf(id);
-  if(!p || !canEditPost(b, p)){ if(p) alert(t('이 글은 고칠 수 없습니다')); return null; }
+  if(!p || !canEditPost(b, p)){ if(p) tell(t('이 글은 고칠 수 없습니다')); return null; }
   if('title' in patch){ const ttl = String(patch.title||'').trim(); if(!ttl) return null; p.title = ttl; }
   if('body'  in patch) p.body = String(patch.body||'');
   if('kind'  in patch && POST_KINDS.some(x=>x.v===patch.kind)){
@@ -11773,7 +11848,7 @@ function editPost(id, patch){
 function delPost(id){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const p = postOf(id);
-  if(!p || !canEditPost(b, p)){ if(p) alert(t('이 글은 지울 수 없습니다')); return null; }
+  if(!p || !canEditPost(b, p)){ if(p) tell(t('이 글은 지울 수 없습니다')); return null; }
   dropPhotosOf(p);
   posts = posts.filter(x => String(x.id) !== String(id));
   save();
@@ -11789,7 +11864,7 @@ function postList(){
 }
 function addComment(postId, text){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  if(!can(b, 'board', 'write')){ alert(t('댓글을 쓸 권한이 없습니다')); return null; }
+  if(!can(b, 'board', 'write')){ tell(t('댓글을 쓸 권한이 없습니다')); return null; }
   const p = postOf(postId);
   if(!p) return null;
   const txt = String(text||'').trim();
@@ -11809,7 +11884,7 @@ function delComment(postId, cid){
   const me = meUid();
   const mine = String(c.by) === String(me);
   if(!(mine ? can(b,'board','write') : can(b,'board','full'))){
-    alert(t('이 댓글은 지울 수 없습니다')); return null;
+    tell(t('이 댓글은 지울 수 없습니다')); return null;
   }
   p.comments = p.comments.filter(x => String(x.id) !== String(cid));
   save();
@@ -11819,7 +11894,7 @@ function delComment(postId, cid){
 let boardOpenId = null;
 function openBoard(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'board','view')){ alert(t('게시판을 볼 권한이 없습니다')); return; }
+  if(!can(b,'board','view')){ tell(t('게시판을 볼 권한이 없습니다')); return; }
   boardOpenId = null;
   const write = can(b,'board','write');
   const rows = postList().filter(p => postHit(p, postQ)).map(p=>{
@@ -11872,19 +11947,19 @@ function writePost(id){
       if(delPost(p.id)) openBoard();
     }} : null,
     onOk: v => {
-      if(!v.title){ alert(t('제목을 넣어 주세요')); return false; }
+      if(!v.title){ tell(t('제목을 넣어 주세요')); return false; }
       const wantPub = (v.pub === '1');
       // 편집기는 블록을 그대로 돌려준다. 사진은 그 안에 섞여 있다.
       const blocks = Array.isArray(v.body) ? v.body : [];
       const photos = blocks.filter(x => x.t === 'photo').map(x => x.v);
       const plain  = blocksText(blocks);
-      if(!plain && !photos.length){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!plain && !photos.length){ tell(t('내용을 넣어 주세요')); return false; }
       // ★ 사진을 창고로 보내고 주소만 남긴다.
       //   예전에는 배 게시판 사진이 파이어스토어 문서 안에 통째로 들어갔다.
       //   글 하나에 700KB. 배를 열 때마다 그것을 다시 받았다.
       (async ()=>{
         const st = await storePhotos(photos);
-        if(!st.ok) alert(storeShortMsg(st.dropped, t('한 글')));
+        if(!st.ok) tell(storeShortMsg(st.dropped, t('한 글')));
         const blocks2 = st.fix(blocks);
         if(p){
           if(!editPost(p.id, { title:v.title, kind:v.kind, body:plain })) return;
@@ -11948,7 +12023,7 @@ function writeComment(pid){
     okText: '올리기',
     fields: [ { key:'text', type:'multi', rows:3, label:'내용', value:'', placeholder:'댓글을 적어 주세요' } ],
     onOk: v => {
-      if(!v.text){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!v.text){ tell(t('내용을 넣어 주세요')); return false; }
       if(!addComment(pid, v.text)) return false;
       openPost(pid);
     }
@@ -11973,7 +12048,7 @@ function assignTask(kind, id, uid){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   // 이 배의 구성원에게만 맡길 수 있다
   if(uid && !(b && b.members && (uid in b.members))){
-    alert(t('이 배의 구성원에게만 맡길 수 있습니다'));
+    tell(t('이 배의 구성원에게만 맡길 수 있습니다'));
     return null;
   }
   it.who = uid || '';
@@ -12017,7 +12092,7 @@ function taskCount(b, uid){
 // 담당자 고르기
 function pickAssignee(kind, id){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'task','write')){ alert(t('할 일을 맡길 권한이 없습니다')); return; }
+  if(!can(b,'task','write')){ tell(t('할 일을 맡길 권한이 없습니다')); return; }
   const it = taskItem(kind, id); if(!it) return;
   const opts = [{ v:'', name:'없음', sub:'아무에게도 맡기지 않음' }]
     .concat(memberRows(b).map(m=>({ v:m.uid, name:m.name, sub:m.rankName })));
@@ -12037,7 +12112,7 @@ function pickAssignee(kind, id){
 // 내 할 일 화면
 function openMyTasks(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'task','view')){ alert(t('할 일을 볼 권한이 없습니다')); return; }
+  if(!can(b,'task','view')){ tell(t('할 일을 볼 권한이 없습니다')); return; }
   const seeAll = can(b,'task','write');
   const mine = myTasks(b);
   const free = seeAll ? taskCount(b, '') : [];
@@ -12217,10 +12292,10 @@ function memberRows(b){
 }
 function removeMember(b, uid){
   if(!b || !b.members || !(uid in b.members)) return null;
-  if(!canTouchMember(b, uid)){ alert(t('이 사람은 내보낼 수 없습니다')); return null; }
+  if(!canTouchMember(b, uid)){ tell(t('이 사람은 내보낼 수 없습니다')); return null; }
   const r = rankOf(b, b.members[uid]);
   if(r && r.owner && ownerCount(b) <= 1){
-    alert(t('마지막 선주는 내보낼 수 없습니다.'));
+    tell(t('마지막 선주는 내보낼 수 없습니다.'));
     return null;
   }
   delete b.members[uid];
@@ -12230,7 +12305,7 @@ function removeMember(b, uid){
 // 가입 신청을 받을지 말지
 function toggleOpenJoin(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'members','write')){ alert(t('권한이 없습니다')); return; }
+  if(!can(b,'members','write')){ tell(t('권한이 없습니다')); return; }
   if(guardEdit('참여 신청을 받을지 바꿉니다.', toggleOpenJoin)) return;
   b.openJoin = (b.openJoin === false);
   saveBoatMembers(b);
@@ -12238,7 +12313,7 @@ function toggleOpenJoin(){
 // 회원 명부 화면
 function openRoster(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'roster','view')){ alert(t('명부를 볼 권한이 없습니다')); return; }
+  if(!can(b,'roster','view')){ tell(t('명부를 볼 권한이 없습니다')); return; }
   const seeDues = can(b,'dues','view');
   const editD  = can(b,'dues','write');
   // ★ 예전에는 명부에서 등급을 바꿀 길이 아예 없었다.
@@ -12279,11 +12354,11 @@ function openRoster(){
 // 사람 하나의 등급을 바꾼다. 나보다 낮은 자리만 줄 수 있다.
 function pickRank(uid){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'members','write')){ alert(t('구성원을 관리할 권한이 없습니다')); return; }
-  if(!canTouchMember(b, uid)){ alert(t('이 사람의 등급은 바꿀 수 없습니다')); return; }
+  if(!can(b,'members','write')){ tell(t('구성원을 관리할 권한이 없습니다')); return; }
+  if(!canTouchMember(b, uid)){ tell(t('이 사람의 등급은 바꿀 수 없습니다')); return; }
   const nm = (b.memberNames||{})[uid] || '이 사람';
   const opts = rankList(b).filter(x => x.pos > myPos(b));
-  if(!opts.length){ alert(t('줄 수 있는 등급이 없습니다')); return; }
+  if(!opts.length){ tell(t('줄 수 있는 등급이 없습니다')); return; }
   openForm({
     title: nm + ' 의 등급',
     sub: '내 등급보다 낮은 자리만 줄 수 있습니다',
@@ -12301,7 +12376,7 @@ function pickRank(uid){
 // 사람 하나를 배에서 내보낸다
 function removeMemberUI(uid){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'members','write')){ alert(t('구성원을 관리할 권한이 없습니다')); return; }
+  if(!can(b,'members','write')){ tell(t('구성원을 관리할 권한이 없습니다')); return; }
   if(guardEdit('이 사람을 배에서 내보냅니다.', () => removeMemberUI(uid))) return;
   const nm = (b.memberNames||{})[uid] || '이 사람';
   if(!confirm(tsub('{name} 님을 이 배에서 내보낼까요?', { name: nm }) + '\n\n'
@@ -12313,7 +12388,7 @@ function removeMemberUI(uid){
 // 한 사람의 명부 기록 고치기
 function editRoster(uid){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'dues','write')){ alert(t('기록할 권한이 없습니다')); return; }
+  if(!can(b,'dues','write')){ tell(t('기록할 권한이 없습니다')); return; }
   if(guardEdit('회비 설정을 바꿉니다.', () => editRoster(uid))) return;
   const m = memberRows(b).find(x=>x.uid===uid); if(!m) return;
   const r = rosterOf(b, uid);
@@ -12339,7 +12414,7 @@ function editRoster(uid){
     onOk: v => {
       const bad = k => v[k] && !/^\d{4}-\d{2}-\d{2}$/.test(v[k]);
       if(bad('duesFrom') || bad('awayTo')){
-        alert(t('날짜는 2026-08-20 처럼 적어 주세요')); return false;
+        tell(t('날짜는 2026-08-20 처럼 적어 주세요')); return false;
       }
       setRoster(b, uid, {
         duesAmount: 0,                       // ★ 금액은 안 담는다 (옛 값도 여기서 지워진다)
@@ -12382,7 +12457,7 @@ function rankSummary(r){
 // 등급 설정 화면
 function openRanks(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'ranks','write')){ alert(t('등급을 설정할 권한이 없습니다')); return; }
+  if(!can(b,'ranks','write')){ tell(t('등급을 설정할 권한이 없습니다')); return; }
   const P = document.getElementById('mrPanel');
   const list = rankList(b).map(r=>{
     const n = Object.values(b.members||{}).filter(x=>String(x)===String(r.id)).length;
@@ -12414,7 +12489,7 @@ function addRankUI(){
     okText: '만들기',
     fields: [ { key:'name', label:'등급 이름', value:'', placeholder:'예: 기관장' } ],
     onOk: v => {
-      if(!v.name){ alert(t('등급 이름을 넣어 주세요')); return false; }
+      if(!v.name){ tell(t('등급 이름을 넣어 주세요')); return false; }
       if(!addRank(b, v.name)) return false;
       saveBoatMembers(b, 'ranks');
     }
@@ -12489,19 +12564,19 @@ function copyJoinCode(){
   const b = curBoat(); if(!b) return;
   try{
     navigator.clipboard.writeText(b.id);
-    alert(t('참여 코드를 복사했습니다.\n\n') + b.id);
-  }catch(e){ alert(t('참여 코드\n\n') + b.id); }
+    tell(t('참여 코드를 복사했습니다.\n\n') + b.id);
+  }catch(e){ tell(t('참여 코드\n\n') + b.id); }
 }
 // 권한 바꾸기 · 내보내기
 function editMember(uid){
   const b = curBoat(); if(!b) return;
-  if(!canTouchMember(b, uid)){ alert(t('이 사람의 등급은 바꿀 수 없습니다')); return; }
+  if(!canTouchMember(b, uid)){ tell(t('이 사람의 등급은 바꿀 수 없습니다')); return; }
   if(guardEdit('이 사람의 등급을 바꿉니다.', () => editMember(uid))) return;
   const r = memberRows(b).find(x=>x.uid===uid); if(!r) return;
   // 나보다 낮은 등급만 줄 수 있다
   const opts = rankList(b).filter(x => x.pos > myPos(b))
     .map(x=>({ v:x.id, name:x.name, sub:rankSummary(x) }));
-  if(!opts.length){ alert(t('줄 수 있는 등급이 없습니다')); return; }
+  if(!opts.length){ tell(t('줄 수 있는 등급이 없습니다')); return; }
   openForm({
     title: r.name,
     sub: '이 사람의 등급',
@@ -12535,12 +12610,12 @@ function saveBoatMembers(b, back, id){
 //   예전에는 배 페이지에서 눌러도 코드를 또 물어서 아무도 못 들어왔다.
 function joinBoat(boatId, boatName){
   if(!(typeof window!=='undefined' && window.__user)){
-    alert(t('참여하려면 먼저 로그인해 주세요')); return;
+    tell(t('참여하려면 먼저 로그인해 주세요')); return;
   }
-  if(!window.__invites){ alert(t('인터넷에 연결된 상태에서만 신청할 수 있습니다')); return; }
+  if(!window.__invites){ tell(t('인터넷에 연결된 상태에서만 신청할 수 있습니다')); return; }
   const id = String(boatId || '').trim();
   if(!id){ joinByCode(); return; }            // 어느 배인지 모르면 코드로 찾는다
-  if(boats.some(x=>String(x.id)===id)){ alert(t('이미 이 배의 구성원입니다')); return; }
+  if(boats.some(x=>String(x.id)===id)){ tell(t('이미 이 배의 구성원입니다')); return; }
   askJoin(id, boatName);
 }
 // 신청서 — 선주에게 한마디를 남긴다.
@@ -12556,19 +12631,19 @@ function askJoin(boatId, boatName){
     ],
     onOk: v => {
       const msg = String(v.msg || '').trim();
-      if(!msg){ alert(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
+      if(!msg){ tell(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
       window.__invites.request(boatId, window.__user, msg)
-        .then(()=>alert(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
-        .catch(e=>alert(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
+        .then(()=>tell(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
+        .catch(e=>tell(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
     }
   });
 }
 // 참여 코드로 찾아가기 — 둘러보기에 안 올라온 배에 들어갈 때 쓴다
 function joinByCode(){
   if(!(typeof window!=='undefined' && window.__user)){
-    alert(t('참여하려면 먼저 로그인해 주세요')); return;
+    tell(t('참여하려면 먼저 로그인해 주세요')); return;
   }
-  if(!window.__invites){ alert(t('인터넷에 연결된 상태에서만 신청할 수 있습니다')); return; }
+  if(!window.__invites){ tell(t('인터넷에 연결된 상태에서만 신청할 수 있습니다')); return; }
   openForm({
     title: t('참여 코드로 신청'),
     sub: t('둘러보기에 없는 배는 선주에게 받은 코드로 들어갑니다'),
@@ -12581,24 +12656,24 @@ function joinByCode(){
     onOk: v => {
       const code = String(v.code || '').trim();
       const msg = String(v.msg || '').trim();
-      if(!code){ alert(t('참여 코드를 넣어 주세요')); return false; }
-      if(boats.some(x=>String(x.id)===code)){ alert(t('이미 이 배의 구성원입니다')); return false; }
-      if(!msg){ alert(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
+      if(!code){ tell(t('참여 코드를 넣어 주세요')); return false; }
+      if(boats.some(x=>String(x.id)===code)){ tell(t('이미 이 배의 구성원입니다')); return false; }
+      if(!msg){ tell(t('한마디 적어 주세요. 선주가 보고 판단합니다.')); return false; }
       window.__invites.request(code, window.__user, msg)
-        .then(()=>alert(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
-        .catch(e=>alert(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
+        .then(()=>tell(t('신청했습니다.') + '\n\n' + t('선주가 승인하면 배 목록에 나타납니다.')))
+        .catch(e=>tell(t('신청하지 못했습니다') + ': ' + ((e && e.message) || e)));
     }
   });
 }
 // 들어온 참여 신청 보기 (선주만)
 async function openJoinReqs(){
   const b = curBoat(); if(!b) return;
-  if(!can(b,'members','write')){ alert(t('구성원을 관리할 권한이 없습니다')); return; }
-  if(!window.__invites){ alert(t('인터넷에 연결된 상태에서만 볼 수 있습니다')); return; }
+  if(!can(b,'members','write')){ tell(t('구성원을 관리할 권한이 없습니다')); return; }
+  if(!window.__invites){ tell(t('인터넷에 연결된 상태에서만 볼 수 있습니다')); return; }
   let list;
   try{ list = await window.__invites.pending(b.id); }
-  catch(e){ alert(t('신청을 불러오지 못했습니다: ') + ((e && e.message) || e)); return; }
-  if(!list || !list.length){ alert(t('들어온 참여 신청이 없습니다')); return; }
+  catch(e){ tell(t('신청을 불러오지 못했습니다: ') + ((e && e.message) || e)); return; }
+  if(!list || !list.length){ tell(t('들어온 참여 신청이 없습니다')); return; }
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('참여 신청'))}</b><span style="flex:1"></span>
       <button class="tab" onclick="openBoat('info')">${esc(t('← 내 배'))}</button></div>`
@@ -12636,8 +12711,8 @@ function approveJoin(inviteId, uid, name){
       //   안 올라갔는데 '받았습니다' 라고 하면 다음 받아오기에서 사라진다.
       saveBoatCloud(b, true).then(ok=>{
         if(window.__invites) window.__invites.close(inviteId).catch(()=>{});
-        if(ok) alert(tsub('{name} 을 구성원으로 받았습니다', { name: name || t('이 분') }));
-        else alert(tsub('{name} 을 이 기기에는 받았습니다.', { name: name || t('이 분') }) + '\n\n'
+        if(ok) tell(tsub('{name} 을 구성원으로 받았습니다', { name: name || t('이 분') }));
+        else tell(tsub('{name} 을 이 기기에는 받았습니다.', { name: name || t('이 분') }) + '\n\n'
           + t('다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n')
           + t('그때까지 다른 기기에서는 안 보일 수 있습니다.'));
         openBoat('roster');
@@ -12751,7 +12826,7 @@ async function saveBoatCloud(b, quiet){
   } else {
     boatDirty.add(String(b.id)); saveDirtyList();
     setSync('배 정보 올리지 못함 · 눌러서 확인');
-    if(!quiet) alert(t('배 정보를 클라우드에 올리지 못했습니다.\n\n')
+    if(!quiet) tell(t('배 정보를 클라우드에 올리지 못했습니다.\n\n')
       + t('이 기기에는 저장되어 있고, 인터넷이 되면 다시 올립니다.\n')
       + t('다른 기기에서는 아직 안 보일 수 있습니다.'));
   }
@@ -12923,7 +12998,7 @@ function openBoat(tab){
 function refillWxLimits(){
   const b = curBoat(); if(!b || !unlocked) return;
   const d = suggestWxLimits(b);
-  if(!d){ alert(t('배 정보를 먼저 채워 주세요')); return; }
+  if(!d){ tell(t('배 정보를 먼저 채워 주세요')); return; }
   const list = Object.keys(d).map(k => (BOAT_SPEC[k] ? BOAT_SPEC[k].label + ' ' + d[k] + BOAT_SPEC[k].unit : ''))
     .filter(Boolean).join('\n');
   if(!confirm(t('배 길이와 선종으로 다시 계산합니다.\n\n') + list
@@ -12938,8 +13013,8 @@ function refillWxLimits(){
 // 사람마다 자기 배에 맞는 값이 있으므로 '저장' 을 눌러 확실히 남길 수 있어야 한다.
 function saveSpecNow(){
   const b = curBoat();
-  if(!b){ alert(t('배가 없습니다')); return; }
-  if(!unlocked){ alert(t('지금은 보기 전용입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.')); return; }
+  if(!b){ tell(t('배가 없습니다')); return; }
+  if(!unlocked){ tell(t('지금은 보기 전용입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.')); return; }
   let n = 0;
   Object.keys(BOAT_SPEC).forEach(k=>{
     const el = document.getElementById('sp_' + k);
@@ -12951,7 +13026,7 @@ function saveSpecNow(){
   saveBoatCloud(b);
   if(typeof schedulePush === 'function') schedulePush();
   if(typeof renderWeather === 'function' && curScreen() === 'weather') renderWeather();
-  alert(tsub('제원 {n}칸을 저장했습니다.', { n: n }));
+  tell(tsub('제원 {n}칸을 저장했습니다.', { n: n }));
 }
 function setBoatSpecUI(k, v){
   setBoatSpec(k, v);
@@ -12981,7 +13056,7 @@ function boatField(k, v){
     const grps = MAINT_GRPS_BY_TYPE[v] || MAINT_GRPS_BY_TYPE.other;
     const extra = [...new Set(maint.filter(m=>m.grp && !grps.includes(m.grp)).map(m=>m.grp))];
     if(extra.length)
-      alert(t('선종을 바꾸셨습니다.') + '\n\n'
+      tell(t('선종을 바꾸셨습니다.') + '\n\n'
           + tsub('정기점검에 「{list}」 항목이 남아 있습니다.', {list:extra.join(', ')}) + '\n'
           + t('이 배에 없는 설비라면 정비 탭에서 삭제하시면 됩니다.'));
   }
@@ -13217,7 +13292,7 @@ function setBoatSpec(key, v){
   const n = parseFloat(raw);
   const bad = specNumOk(key, n);
   if(bad){
-    alert(t(BOAT_SPEC[key] ? BOAT_SPEC[key].label : key) + ' — ' + t(bad));
+    tell(t(BOAT_SPEC[key] ? BOAT_SPEC[key].label : key) + ' — ' + t(bad));
     return;                                    // 저장하지 않는다
   }
   b.spec[key] = n;
@@ -13379,7 +13454,7 @@ function saveLocal(){
   try{ maintAlarmSoon(); }catch(_){}
   if(db){
     // 기록은 배별로 나눠 저장한다. 배 목록과 현재 배는 공통이다.
-    idbSet(bkey('all'), items).catch(e=>alert(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.')));
+    idbSet(bkey('all'), items).catch(e=>tell(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 백업 후 다시 시도해 주세요.')));
     idbSet(bkey('trash'), trash).catch(e=>{});
     idbSet(bkey('maint'), maint).catch(e=>{});
     idbSet(bkey('repair'), repair).catch(e=>{});
@@ -13415,7 +13490,7 @@ function saveLocal(){
       localStorage.setItem(lk('lockers'), JSON.stringify(lockers));
       localStorage.setItem('bt_dgimgs', JSON.stringify(dgArr()));
     }
-    catch(e){ alert(t('저장 공간이 가득 찼습니다. 사진을 줄이거나 백업 후 정리해 주세요.')); }
+    catch(e){ tell(t('저장 공간이 가득 찼습니다. 사진을 줄이거나 백업 후 정리해 주세요.')); }
   }
 }
 function save(){
@@ -13873,17 +13948,17 @@ function syncTap(){
 // '동기화' 한 단어로는 올리는 건지 받는 건지 알 수 없다. 둘로 나눈다.
 // 손으로 올리기 (실패하면 이유를 그대로 보여준다)
 function syncUp(){
-  if(!cloud){ alert(t('로그인한 상태에서만 클라우드를 씁니다')); return; }
+  if(!cloud){ tell(t('로그인한 상태에서만 클라우드를 씁니다')); return; }
   lastPushErr = null;
   pushNow().then(()=>{
-    if(lastPushErr) alert(t('올리지 못했습니다.\n\n') + lastPushErr
+    if(lastPushErr) tell(t('올리지 못했습니다.\n\n') + lastPushErr
       + t('\n\n권한 오류라면 파이어스토어 규칙을 최신으로 올렸는지 확인해 주세요.'));
-    else alert(t('이 기기의 기록을 클라우드에 올렸습니다.'));
+    else tell(t('이 기기의 기록을 클라우드에 올렸습니다.'));
   });
 }
 // 손으로 받아오기 — 이 기기 기록이 클라우드 것으로 바뀐다. 먼저 알린다.
 function syncDown(){
-  if(!cloud){ alert(t('로그인한 상태에서만 클라우드를 씁니다')); return; }
+  if(!cloud){ tell(t('로그인한 상태에서만 클라우드를 씁니다')); return; }
   if(!confirm(t('클라우드에서 받아옵니다.\n\n')
     + t('이 기기에만 있고 아직 올리지 않은 기록은\n클라우드 것으로 덮어씌워질 수 있습니다.\n\n')
     + t('계속할까요?'))) return;
@@ -13893,11 +13968,11 @@ function syncDown(){
   clearSyncBase();
   setSync('받아오는 중…');
   cloudPull().then(()=>{
-    alert(t('클라우드에서 받아왔습니다.'));
+    tell(t('클라우드에서 받아왔습니다.'));
   }).catch(e=>{
     lastPushErr = t(cloudErrHelp(e));
     setSync(cloudErrText(e));
-    alert(cloudErrHelp(e));
+    tell(cloudErrHelp(e));
   });
 }
 // 옛 이름 — 다른 곳에서 부르던 것이 있으면 올리기로 이어준다
@@ -14040,7 +14115,7 @@ async function pushNow(){
     // 왜 안 되는지 한 번은 알려 준다. 조용히 실패하는 것이 가장 나쁘다.
     if(!pushErrShown){
       pushErrShown = true;
-      setTimeout(()=>alert(t('클라우드에 올리지 못했습니다.\n\n') + lastPushErr
+      setTimeout(()=>tell(t('클라우드에 올리지 못했습니다.\n\n') + lastPushErr
         + t('\n\n권한(permission) 오류라면 파이어스토어 규칙이 옛 것일 수 있습니다.\n')
         + t('기록은 이 기기에 그대로 저장되어 있습니다.')), 400);
     }
@@ -14199,7 +14274,7 @@ function lkCanEdit(){
   // '잠겨 있습니다' 만 띄우고 여는 방법을 안 알려주면 갇힌다.
   // 어디를 눌러야 하는지 적고, 그 자리에서 열 수 있게 물어본다.
   if(typeof unlocked!=='undefined' && !unlocked){
-    alert(t('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.'));
+    tell(t('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.'));
     return false;
   }
   if(lkLocked){
@@ -14214,7 +14289,7 @@ function lkCanEdit(){
 // 도면 도형을 바꿀 수 있는가
 function shCanEdit(){
   if(typeof unlocked!=='undefined' && !unlocked){
-    alert(t('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.'));
+    tell(t('지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.'));
     return false;
   }
   if(dgLocked){
@@ -14326,7 +14401,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.35';
+const APP_VER = '4.37';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -14780,14 +14855,14 @@ function lkMenu(id){
     ],
     del: { text:'수납칸 지우기', run: ()=>lkDelete(id) },
     onOk: v => {
-      if(!v.label || !v.zone){ alert(t('칸 이름과 구역을 모두 넣어 주세요')); return false; }
+      if(!v.label || !v.zone){ tell(t('칸 이름과 구역을 모두 넣어 주세요')); return false; }
       lkRename(id, v.label);
       lkRezone(id, v.zone);
       if(v.shape) lkSetShape(id, v.shape);
       lkSetDeck(id, v.deck === '2');
       lkSetWall(id, v.kind === 'wall');
       if(v.size && v.size !== '1' && !lkScale(id, parseFloat(v.size)))
-        alert(t('크기를 바꾸지 못했습니다.\n\n옆 칸과 겹치거나 도면 밖으로 나갑니다.'));
+        tell(t('크기를 바꾸지 못했습니다.\n\n옆 칸과 겹치거나 도면 밖으로 나갑니다.'));
     }
   });
 }
@@ -15152,7 +15227,7 @@ map.addEventListener('pointerup', e=>{
         placeholder:'예: 갤리', chips: zones }
     ],
     onOk: v => {
-      if(!v.label || !v.zone){ alert(t('칸 이름과 구역을 모두 넣어 주세요')); return false; }
+      if(!v.label || !v.zone){ tell(t('칸 이름과 구역을 모두 넣어 주세요')); return false; }
       lkAdd(r, v.zone, v.label);
     }
   });
@@ -15300,7 +15375,7 @@ function mapFocusLocker(id, flash){
 function showItemOnMap(id){
   const it = getItem(id); if(!it) return;
   const lk = it.lockerId || (it.parentId ? (getItem(it.parentId)||{}).lockerId : null);
-  if(!lk){ alert(t('이 물품은 아직 수납칸에 넣지 않았습니다')); return; }
+  if(!lk){ tell(t('이 물품은 아직 수납칸에 넣지 않았습니다')); return; }
   closePanel();
   view = 'map'; toggleView(true);
   requestAnimationFrame(()=>{
@@ -15392,7 +15467,7 @@ function pickPhoto(ev){
   const files = Array.from(ev.target.files||[]); ev.target.value='';
   files.forEach(f=>{
     resizePhoto(f, url=>{
-      if(!url){ alert(t('사진을 불러오지 못했습니다')); return; }
+      if(!url){ tell(t('사진을 불러오지 못했습니다')); return; }
       formPhotos.push(url);
       renderPhotoPreview();
     });
@@ -15432,7 +15507,7 @@ function addItem(){
   const wantBox = (editId!==null && !inBox) ? document.getElementById('fBox').checked : false;
   if(editId!==null){
     const it = getItem(editId);
-    if(it.box && !wantBox && children(it.id).length>0){ alert(t('안에 물품이 들어 있는 상자는 일반 물품으로 바꿀 수 없습니다. 내부 물품을 먼저 옮겨 주세요.')); return; }
+    if(it.box && !wantBox && children(it.id).length>0){ tell(t('안에 물품이 들어 있는 상자는 일반 물품으로 바꿀 수 없습니다. 내부 물품을 먼저 옮겨 주세요.')); return; }
   }
   // ★ 사진은 창고로 보내고 주소만 남긴다.
   //   화면은 먼저 비워 준다 — 사진 올라가는 동안 손이 묶이면 다음 물품을 못 넣는다.
@@ -15444,7 +15519,7 @@ function addItem(){
   resetForm();
   (async ()=>{
     const st = await storePhotos(myPhotos);
-    if(!st.ok) alert(storeShortMsg(st.dropped, t('한 물품')));
+    if(!st.ok) tell(storeShortMsg(st.dropped, t('한 물품')));
     if(myEdit !== null){
       items = items.map(i=>i.id===myEdit?{...i,name,qty,unit,note,photos:st.photos,box:(i.parentId?false:myBox)}:i);
     } else {
@@ -15571,7 +15646,7 @@ function mvFromMap(id){
   const it = getItem(id);
   if(!it) return;
   if(!lockers.length){
-    alert(t('도면에 수납칸이 아직 없습니다.\n\n[도면 그리기] 로 칸을 먼저 만들어 주세요.'));
+    tell(t('도면에 수납칸이 아직 없습니다.\n\n[도면 그리기] 로 칸을 먼저 만들어 주세요.'));
     return;
   }
   // ★ 그리기가 켜져 있으면 끈다. 안 그러면 칸을 눌러도 이름 고치기가 뜬다.
@@ -15611,7 +15686,7 @@ function mvHit(lockerId){
   if(!l){ mvCancel(); return; }
   // 그 칸에 이미 들어 있으면 아무것도 안 한다
   if(!it.parentId && String(it.lockerId) === String(lockerId)){
-    alert(tsub('이미 이 칸에 있습니다 — {name}', { name: it.name || t('물품') }));
+    tell(tsub('이미 이 칸에 있습니다 — {name}', { name: it.name || t('물품') }));
     return;
   }
   // 상자가 있는 칸이면 어디에 넣을지 묻는다
@@ -15726,7 +15801,7 @@ function doMerge(targetId){
   items = items.map(i=>i.id===targetId?{...i,qty,unit,photos,note}:i).filter(i=>!dead.has(i.id));
   mergeId = null;
   save(); renderPanelItems(); refreshBoxes(); renderList();
-  alert(tsub('합침 완료: {n}곳 → {name} (수량 {qty}, 사진 {p}장)',
+  tell(tsub('합침 완료: {n}곳 → {name} (수량 {qty}, 사진 {p}장)',
       {n:srcs.length, name:tgt.name, qty:String(qty)+String(unit||''), p:photos.length}));
 }
 
@@ -15940,7 +16015,7 @@ async function saveFile(name, mime, text){
     }
     // 공유 부품이 없으면 눈에 보이는 자리에라도 넣고 어디인지 말해 준다
     await F.writeFile({ path: name, data: b64of(text), directory: 'DOCUMENTS', recursive: true });
-    alert(tsub('{p} 에 넣었습니다.', { p: '문서/' + name }));
+    tell(tsub('{p} 에 넣었습니다.', { p: '문서/' + name }));
     return '';
   }catch(e){
     return String((e && e.message) || e).slice(0, 140);
@@ -15957,7 +16032,7 @@ async function backupData(){
   //   '________.json' 이 되면 무엇인지 알아볼 수가 없다.
   const name = `baetnil-backup-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
   const why = await saveFile(name, 'application/json', JSON.stringify(data));
-  if(why) alert(t('백업 파일을 내보내지 못했습니다.') + '\n\n' + why);
+  if(why) tell(t('백업 파일을 내보내지 못했습니다.') + '\n\n' + why);
 }
 function restoreData(ev){
   const f = ev.target.files[0]; ev.target.value='';
@@ -16035,10 +16110,10 @@ function restoreData(ev){
       if(selected){ updateHeader(); renderPanelItems(); }
       refreshBoxes(); drawShapes(); renderList(); updateTrashTab();
       const left = strayItems().length;
-      alert(tsub('복원 완료: {n}개 물품', {n:items.length})
+      tell(tsub('복원 완료: {n}개 물품', {n:items.length})
             + (trash.length ? tsub(' (휴지통 {n}개)', {n:trash.length}) : '')
             + (left ? '\n\n' + tsub('수납칸을 못 찾은 물품이 {n}개 있습니다. 목록에서는 보이며, 도면을 만든 뒤 옮길 수 있습니다.', {n:left}) : ''));
-    }catch(e){ alert(t('백업 파일을 읽지 못했습니다. ')+e.message); }
+    }catch(e){ tell(t('백업 파일을 읽지 못했습니다. ')+e.message); }
   };
   r.readAsText(f);
 }
@@ -16371,7 +16446,7 @@ async function loadFeat(){
   paintHNav();
 }
 async function setFeat(k, on){
-  if(!isAdmin()){ alert(t('운영자만 바꿀 수 있습니다')); return; }
+  if(!isAdmin()){ tell(t('운영자만 바꿀 수 있습니다')); return; }
   const next = Object.assign({}, featOff);
   if(on) delete next[k]; else next[k] = true;
   try{
@@ -16379,7 +16454,7 @@ async function setFeat(k, on){
     featOff = next;
     paintHNav();
     if(typeof openAdmin === 'function') openAdmin();
-  }catch(e){ alert(t('바꾸지 못했습니다.\n\n') + ((e && e.message) || e)); }
+  }catch(e){ tell(t('바꾸지 못했습니다.\n\n') + ((e && e.message) || e)); }
 }
 // 꺼 둔 것은 하위 탭에서 뺀다. 운영자에게는 표시해서 보여 준다.
 function comSubList(){
@@ -17064,11 +17139,11 @@ function openMR(kind, id){
       //   점이 하나도 없어도 그린다 — 「지도에서」를 눌렀을 때 그릴 자리가 있어야 한다.
       + `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
            <span class="mrm" style="flex:1;color:#7b8794">${
-             trkPoints(it).length
-               ? esc(t('점 {n}개 · 끌어서 이동 · 두 손가락으로 확대').split('{n}').join(String(trkPoints(it).length)))
+             trkHas(it)
+               ? esc(t('끌어서 이동 · 두 손가락으로 확대'))
                : esc(t('저장된 위치가 없습니다'))}</span></div>`
       + mapBox('trkMap','44vh')
-      + (trkPoints(it).length
+      + (trkHas(it)
           ? `<div class="mrnone" style="text-align:left">${esc(t('기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.'))}<br>
                ${esc(t('지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)'))}</div>`
           : `<div class="trkempty">${esc(t('위치를 남기면 이곳에 항적이 표시됩니다'))}<br>
@@ -17185,9 +17260,9 @@ function mrField(k,v){
   const spec = NUM_FIELD[k];
   if(spec && String(v||'').trim()){
     const n = parseFloat(String(v).trim());
-    if(!isFinite(n)){ alert(t(spec.name) + ' — ' + t('숫자를 넣어 주세요.')); return; }
-    if(n < 0){ alert(t(spec.name) + ' — ' + t('0보다 작은 값은 넣을 수 없습니다.')); return; }
-    if(n > spec.max){ alert(t(spec.name) + ' — ' + tsub('{n} 까지 넣을 수 있습니다.', { n: spec.max })); return; }
+    if(!isFinite(n)){ tell(t(spec.name) + ' — ' + t('숫자를 넣어 주세요.')); return; }
+    if(n < 0){ tell(t(spec.name) + ' — ' + t('0보다 작은 값은 넣을 수 없습니다.')); return; }
+    if(n > spec.max){ tell(t(spec.name) + ' — ' + tsub('{n} 까지 넣을 수 있습니다.', { n: spec.max })); return; }
   }
   it[k]=v; it.seed=false;
 
@@ -17256,7 +17331,7 @@ function mrPickPhoto(ev){
   const ty = mrOpenType, id = mrOpenId;
   files.forEach(f=>{
     resizePhoto(f, async url=>{
-      if(!url){ alert(t('사진을 불러오지 못했습니다')); return; }
+      if(!url){ tell(t('사진을 불러오지 못했습니다')); return; }
       const st = await storePhotos([url]);
       it.photos = it.photos||[];
       it.photos.push(st.photos[0] || url);
@@ -17501,7 +17576,7 @@ function pinStart(){
   // ★ 도면이 한 장도 없으면 찍을 자리가 없다. 빈 화면을 띄우지 말고 말해 준다.
   const has = k => (typeof dgShowSrc === 'function') ? !!dgShowSrc(k) : true;
   if(!has('plan') && !has('side')){
-    alert(t('먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.'));
+    tell(t('먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.'));
     return;
   }
   // ★ 기본값이 측면도인데, 측면도까지 올린 사람은 드물다.
@@ -17566,7 +17641,7 @@ function mrDrawOff(){
 }
 function toggleMrDraw(){
   if(!mrDraw && !dgSrc(mrMapKind)){
-    alert(t('먼저 도면을 고르거나 올려 주세요')); return;
+    tell(t('먼저 도면을 고르거나 올려 주세요')); return;
   }
   // 그리기를 켜면 핀 지정은 그만둔다 — 둘 다 도면을 누르는 일이라 같이 켤 수 없다
   if(!mrDraw && pinTarget) pinCancel();
@@ -17864,7 +17939,98 @@ function syncScreen(){
 // ── 덮개 (사진·고르기·서랍)
 // 화면을 갈아 끼우지 않는다. 위에 잠깐 덮었다가 걷는다.
 // 다만 뒤로 가기로 걷을 수 있어야 한다 — 그래서 발자국은 똑같이 남긴다.
-const OVERLAY_IDS = ['photoView','recPick','dgPick','drawerOv'];
+// ★ 앱 안의 알림창 — 문 하나.
+//
+//   브라우저가 띄우는 창은 단추 이름을 앱이 못 정한다. 명세(WHATWG HTML)가
+//   버튼을 브라우저 몫으로 두고 있다. 그래서 한국어 앱인데 CANCEL·OK 가 영어로 떴다.
+//   사장님이 사진으로 잡아 주셨다.
+//   구글 Material 3 은 OK·Done·Close 를 「모호한 말」이라 쓰지 말라 하고,
+//   애플도 「OK 의 뜻은 불분명하다」고 한다. 상용 앱은 전부 동사를 쓴다.
+//
+//   tell(글)          — 알리기만 한다. 단추 하나
+//   ask(글, {ok,no})  — 물어본다. 예/아니오를 Promise 로 돌려준다
+//
+//   ★ 취소 쪽 기본은 「취소」가 아니라 「닫기」다. 「취소」는 하던 일이 취소되는 것으로
+//     읽힌다 — 토스가 같은 이유로 「취소」를 쓰지 않는다.
+const TELL_Q = [];
+let tellCur = null;
+function tellIsOpen(){ return !!tellCur; }
+function tellShow(o){
+  return new Promise(res => {
+    TELL_Q.push({ o: o || {}, res });
+    if(!tellCur) tellNext();
+  });
+}
+function tellNext(){
+  const ov = (typeof document !== 'undefined') ? document.getElementById('tellOv') : null;
+  const job = TELL_Q.shift();
+  if(!job){
+    tellCur = null;
+    if(ov) ov.classList.remove('open');
+    try{ overlayPop('tellOv'); }catch(e){}
+    return;
+  }
+  tellCur = job;
+  const o = job.o;
+  const tt = document.getElementById('tellTit');
+  const mg = document.getElementById('tellMsg');
+  const bs = document.getElementById('tellBtns');
+  if(tt){ tt.textContent = String(o.title || ''); tt.style.display = o.title ? '' : 'none'; }
+  // ★ 남이 쓴 글이 여기로 들어온다. 그대로 넣으면 남의 코드가 우리 화면에서 돈다.
+  if(mg) mg.textContent = String(o.msg == null ? '' : o.msg);
+  if(bs){
+    bs.innerHTML = '';
+    (o.btns || []).forEach(b => {
+      const el = document.createElement('button');
+      el.textContent = String(b.name || '');
+      if(b.kind) el.className = b.kind;
+      el.onclick = () => tellDone(b.v);
+      bs.appendChild(el);
+    });
+    const last = bs.lastElementChild;
+    if(last) try{ last.focus(); }catch(e){}
+  }
+  if(ov) ov.classList.add('open');
+  try{ overlayPush('tellOv'); }catch(e){}
+}
+function tellDone(v){
+  const job = tellCur;
+  tellCur = null;
+  if(job) try{ job.res(v); }catch(e){}
+  tellNext();
+}
+// 뒤로 가기로 닫으면 「아니오」로 친다 — 무른 쪽이 안전하다
+function tellClose(){
+  if(!tellCur) return false;
+  tellDone(tellCur.o && tellCur.o.esc);
+  return true;
+}
+// 알리기만 한다
+function tell(msg, o){
+  const d = o || {};
+  // ★ 창을 못 만든 때(화면이 아직 없거나 검사 중) — 그래도 말은 해야 한다.
+  //   조용히 삼키면 사람은 아무 일도 안 일어난 줄 안다. 그게 제일 나쁘다.
+  if(typeof document === 'undefined' || !document.getElementById('tellOv')){
+    const A = (typeof window !== 'undefined' && window.alert) || globalThis.alert;
+    try{ A(String(msg)); }catch(e){}
+    return Promise.resolve();
+  }
+  return tellShow({ msg: msg, title: d.title,
+    btns: [{ name: d.ok || t('확인'), v: true, kind: 'ok' }], esc: true });
+}
+// 물어본다
+function ask(msg, o){
+  const d = o || {};
+  if(typeof document === 'undefined' || !document.getElementById('tellOv')){
+    const C = (typeof window !== 'undefined' && window.confirm) || globalThis.confirm;
+    try{ return Promise.resolve(!!C(String(msg))); }catch(e){ return Promise.resolve(false); }
+  }
+  return tellShow({ msg: msg, title: d.title, esc: false, btns: [
+    { name: d.no || t('닫기'), v: false },
+    { name: d.ok || t('확인'), v: true, kind: d.warn ? 'warn' : 'ok' }
+  ]});
+}
+const OVERLAY_IDS = ['tellOv','photoView','recPick','dgPick','drawerOv'];
 const OVERLAY_STACK = [];
 window.OVERLAY_STACK = OVERLAY_STACK;
 function overlayPush(id){
@@ -17884,7 +18050,8 @@ function closeTopOverlay(){
     photoView: ()=>{ const e = document.getElementById('photoView'); if(e) e.style.display = 'none'; },
     recPick:   ()=>closeRecPick(),
     dgPick:    ()=>closeDgPick(),
-    drawerOv:  ()=>closeDrawer()
+    drawerOv:  ()=>closeDrawer(),
+    tellOv:    ()=>tellClose()
   };
   try{ if(F[id]){ F[id](); return true; } }catch(_){}
   const el = document.getElementById(id);
@@ -18236,10 +18403,10 @@ function trkBox(it){
   if(on){
     const n = (trkNow.pts || []).length;
     return `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
-        <b class="mrv" style="flex:1;color:#5FB894">${esc(t('기록 중'))} · ${esc(tsub('{n}점', {n:String(n)}))}</b>
+        <b class="mrv" style="flex:1;color:#5FB894">${esc(t('기록 중'))} · <span id="trkcnt">${esc(tsub('{n}점', {n:String(n)}))}</span></b>
         <button class="minib" onclick="renderVoyage(); openMR('voyage','${esc(String(it.id))}')">${esc(t('새로고침'))}</button>
         <button class="minib warn" onclick="trkStopSay()">${esc(t('멈추기'))}</button></div>
-      <div class="mrnone" style="text-align:left">${esc(t('폰 위의 「항해 기록 중」 알림을 지우지 마십시오. 그 알림이 떠 있는 동안 기록됩니다.'))}<br>${esc(t('입항을 기록하면 저절로 멈춥니다.'))}</div>`;
+      <div class="mrnone" style="text-align:left">${esc(t('알림이 떠 있는 동안 기록됩니다. 알림을 지우면 기록도 멈춥니다.'))}<br>${esc(t('입항을 기록하면 저절로 멈추고 저장됩니다.'))}</div>`;
   }
   // ★ 아직 안 켜진 항해에는 켜는 단추를 둔다.
   //   켤 길이 화면에 없으면 사람은 켤 수가 없다 — 그게 이번 사고였다.
@@ -18337,8 +18504,8 @@ function rideLines(it){
 }
 function rideEdit(){
   const it = getMR('voyage', mrOpenId); if(!it) return;
-  if(!meUid()){ alert(t('로그인해야 같이 탈 사람을 구할 수 있습니다')); return; }
-  if(!it.date){ alert(t('먼저 출항 날짜를 정해 주세요')); return; }
+  if(!meUid()){ tell(t('로그인해야 같이 탈 사람을 구할 수 있습니다')); return; }
+  if(!it.date){ tell(t('먼저 출항 날짜를 정해 주세요')); return; }
   openForm({
     title: it.rideOn ? '모집 고치기' : '같이 탈 사람 구하기',
     okText: it.rideOn ? '저장' : '글판에 올리기',
@@ -18358,11 +18525,11 @@ function rideEdit(){
         placeholder:'만나는 곳, 챙겨 오실 것, 그 밖에 알려 주실 말씀' }
     ],
     onOk: v => {
-      if(!(v.want||[]).length){ alert(t('어떤 분을 구하시는지 하나는 골라 주세요')); return false; }
+      if(!(v.want||[]).length){ tell(t('어떤 분을 구하시는지 하나는 골라 주세요')); return false; }
       // ★ 금액이 적히면 안 된다 — 무등록 유상 운송이 된다.
       //   비용 칸에 숫자를 못 넣게 막아도 '한마디' 로 새면 소용이 없다. 여기서도 막는다.
       if(/[0-9][0-9,.]*\s*(원|만원|천원|만 원|천 원)/.test(String(v.note||''))){
-        alert(t('금액은 적을 수 없습니다.\n\n') + RIDE_LAW); return false; }
+        tell(t('금액은 적을 수 없습니다.\n\n') + RIDE_LAW); return false; }
       it.rideOn = true;
       it.rideN = Number(v.n) || 1;
       it.rideTrip = v.trip;
@@ -18378,7 +18545,7 @@ function rideEdit(){
   });
 }
 async function ridePush(it){
-  if(!window.__talk){ alert(t('인터넷에 이어지면 글판에 올라갑니다.\n\n모집 내용은 저장했습니다.')); return; }
+  if(!window.__talk){ tell(t('인터넷에 이어지면 글판에 올라갑니다.\n\n모집 내용은 저장했습니다.')); return; }
   const blocks = [{ t:'text', v: rideLines(it).join('\n') }];
   try{
     if(it.ridePost){
@@ -18394,7 +18561,7 @@ async function ridePush(it){
     }
     try{ listDrop('talk'); }catch(_){}   // 글판 목록을 새로 받게 한다
     openMR('voyage', it.id);
-  }catch(e){ alert(t('글판에 올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+  }catch(e){ tell(t('글판에 올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
 }
 function rideStop(it, quiet){
   const v = it || getMR('voyage', mrOpenId); if(!v) return;
@@ -18589,7 +18756,7 @@ async function notiToggleAll(){
   if(d.on){ notiSet({ on:false }); openNoti(); return; }
   const st = await notiAsk();
   if(st === 'denied'){
-    alert(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
+    tell(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
     return;
   }
   notiSet({ on:true });
@@ -18991,11 +19158,11 @@ async function notiWakeAll(){
   if(notiGet().on) return true;
   const st = await notiAsk();
   if(st === 'denied'){
-    alert(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
+    tell(t('폰에서 이 앱의 알림이 막혀 있습니다.\n\n폰 설정 → 앱 → 뱃일 → 알림 에서 켜 주셔야 합니다.'));
     return false;
   }
   notiSet({ on:true });
-  alert(t('알림을 함께 켰습니다.\n\n설정 → 알림 에서 언제든 끄실 수 있습니다.'));
+  tell(t('알림을 함께 켰습니다.\n\n설정 → 알림 에서 언제든 끄실 수 있습니다.'));
   return true;
 }
 async function notiSubToggle(enc, back){
@@ -19336,7 +19503,7 @@ async function trGo(coll, id){
   const key = trKey(coll, id), lang = langNow();
   if(TR_GOT[key + ':' + lang]){ TR_ON[key] = true; trRepaint(coll, id); return; }
   if(TR_BUSY[key]) return;
-  if(!window.__tr){ alert(t('지금은 옮길 수 없습니다')); return; }
+  if(!window.__tr){ tell(t('지금은 옮길 수 없습니다')); return; }
   TR_BUSY[key] = true; trRepaint(coll, id);
   try{
     const got = await window.__tr.get(coll, id, lang);
@@ -19345,7 +19512,7 @@ async function trGo(coll, id){
     TR_ON[key] = true;
   }catch(e){
     // ★ 까닭은 서버 함수가 한국어로 준다. 사전을 거치게 해야 외국 사람도 읽는다.
-    alert(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
+    tell(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
   }
   TR_BUSY[key] = false;
   trRepaint(coll, id);
@@ -20366,7 +20533,7 @@ function lgToggleConsent(){
     if(!confirm(t('위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.'))) return;
     locSet(false);
   } else {
-    if(!locSignedIn()){ alert(t('현재 위치는 로그인하신 분에게만 받습니다.')); return; }
+    if(!locSignedIn()){ tell(t('현재 위치는 로그인하신 분에게만 받습니다.')); return; }
     locSet(true);
   }
   openLegal('location');
@@ -20457,7 +20624,7 @@ function agreeCancel(){
 }
 function doAgree(){
   if(!(agreeChk.terms && agreeChk.privacy && agreeChk.age)){
-    alert(t('필수 항목 세 개에 모두 동의해 주셔야 합니다.'));
+    tell(t('필수 항목 세 개에 모두 동의해 주셔야 합니다.'));
     return;
   }
   const body = { ver: LEGAL_VER, at: new Date().toISOString(), loc: !!agreeChk.loc };
@@ -20522,7 +20689,7 @@ function openSupport(){
     ],
     onOk: v => {
       const msg = String(v.text || '').trim();
-      if(!msg){ alert(t('내용을 적어 주세요')); return false; }
+      if(!msg){ tell(t('내용을 적어 주세요')); return false; }
       sendSupport(v.kind, msg);
     }
   });
@@ -20537,7 +20704,7 @@ async function sendSupport(kind, text, quiet){
     email: (window.__user && window.__user.email) || '',
     ts: new Date().toISOString(), done: false
   };
-  if(!body.text){ if(!quiet) alert(t('내용을 적어 주세요')); return false; }
+  if(!body.text){ if(!quiet) tell(t('내용을 적어 주세요')); return false; }
   if(!window.__support || !window.__user){
     // 로그인 전이거나 인터넷이 없을 때 — 메일 길을 알려 준다
     if(quiet) return false;
@@ -20546,7 +20713,7 @@ async function sendSupport(kind, text, quiet){
   }
   try{
     await window.__support.add(body);
-    if(!quiet) alert(t('보내 주셔서 고맙습니다.\n\n확인하고 고치겠습니다.'));
+    if(!quiet) tell(t('보내 주셔서 고맙습니다.\n\n확인하고 고치겠습니다.'));
     return true;
   }catch(e){
     if(quiet) return false;
@@ -20570,7 +20737,7 @@ function supportMail(kind, text){
     + '?subject=' + encodeURIComponent(subject)
     + '&body=' + encodeURIComponent(lines.join('\n'));
   try{ location.href = url; }
-  catch(e){ alert(t('메일 앱을 열지 못했습니다.') + '\n\n'
+  catch(e){ tell(t('메일 앱을 열지 못했습니다.') + '\n\n'
     + tsub('{addr} 으로 보내 주세요.', { addr: SUPPORT_MAIL })); }
 }
 
@@ -20602,11 +20769,11 @@ async function adminSupport(){
   }).join('');
 }
 function supportDone(id, on){
-  if(!isAdmin()){ alert(t('운영자만 할 수 있습니다')); return; }
+  if(!isAdmin()){ tell(t('운영자만 할 수 있습니다')); return; }
   const val = (on === true || on === 'true');
   window.__support.edit(id, { done: val })
     .then(()=>openAdmin())
-    .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
 // ===== 중고 장터 =====
@@ -20670,7 +20837,7 @@ function marketFirstNotice(){
   let seen = false;
   try{ seen = localStorage.getItem('bt_market_ok') === 'y'; }catch(_){}
   if(seen) return;
-  alert(t('중고 장터를 여시기 전에 알려 드립니다.\n\n')
+  tell(t('중고 장터를 여시기 전에 알려 드립니다.\n\n')
     + t('뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n')
     + t('물건과 거래에 대한 책임은 파는 분과 사는 분에게 있습니다.\n\n')
     + t('물건을 보기 전에 돈부터 보내지 마세요.\n')
@@ -20848,11 +21015,11 @@ async function openItem(id){
 // ── 올리기·고치기
 function writeItem(id){
   if(guardEdit('장터에 물건을 올리거나 고칩니다.', ()=>writeItem(id))) return;
-  if(!window.__user){ alert(t('로그인해야 올릴 수 있습니다')); return; }
-  if(myBan){ alert(banNotice()); return; }
+  if(!window.__user){ tell(t('로그인해야 올릴 수 있습니다')); return; }
+  if(myBan){ tell(banNotice()); return; }
   const m = id ? itemOf(id) : null;
   if(id && !m) return;
-  if(m && !canEditItem(m)){ alert(t('올린 분과 운영자만 고칠 수 있습니다')); return; }
+  if(m && !canEditItem(m)){ tell(t('올린 분과 운영자만 고칠 수 있습니다')); return; }
   marketDraft = m ? JSON.parse(JSON.stringify(m)) : { cat:'etc', state:'sale' };
   itemForm();
 }
@@ -20928,9 +21095,9 @@ async function itemSave(){
   itemKeep();
   const d = marketDraft || {};
   const title = String(d.title||'').trim();
-  if(!title){ alert(t('제목을 넣어 주세요')); return; }
+  if(!title){ tell(t('제목을 넣어 주세요')); return; }
   if(!d.free && !d.offer && !(Number(d.price) > 0)){
-    alert(t('가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기] 를 눌러 주세요.'));
+    tell(t('가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기] 를 눌러 주세요.'));
     return;
   }
   const old = d.id ? itemOf(d.id) : null;
@@ -20954,39 +21121,39 @@ async function itemSave(){
   // 사진은 창고로 보내고 주소만 문서에 남긴다
   const st = await storePhotos((d.photos||[]).slice(0,5));
   body.photos = st.photos; body.thumbs = st.thumbs;
-  if(!st.ok){ alert(storeShortMsg(st.dropped, t('한 글'))); return; }
+  if(!st.ok){ tell(storeShortMsg(st.dropped, t('한 글'))); return; }
   try{
     await window.__market.put(body);
     const i = marketList.findIndex(x=>String(x.id)===String(body.id));
     if(i >= 0) marketList[i] = body; else marketList.unshift(body);
     marketDraft = null;
     openItem(body.id);
-  }catch(e){ alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+  }catch(e){ tell(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
 }
 // 팔렸는지 표시 — 올린 사람만
 function setItemState(id, st){
   const m = itemOf(id); if(!m) return;
-  if(!canEditItem(m)){ alert(t('올린 분만 바꿀 수 있습니다')); return; }
+  if(!canEditItem(m)){ tell(t('올린 분만 바꿀 수 있습니다')); return; }
   window.__market.edit(id, { state: st })
     .then(()=>{ m.state = st; openItem(id); })
-    .catch(e=>alert(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function delItem(id){
   if(guardEdit('장터 글을 지웁니다.', ()=>delItem(id))) return;
   const m = itemOf(id); if(!m) return;
-  if(!canDelItem(m)){ alert(t('올린 분과 운영자만 지울 수 있습니다')); return; }
+  if(!canDelItem(m)){ tell(t('올린 분과 운영자만 지울 수 있습니다')); return; }
   if(!confirm(tsub("'{name}' 을 지울까요?", {name:m.title}) + '\n\n' + t('되돌릴 수 없습니다.'))) return;
   window.__market.del(id)
     .then(()=>{ dropPhotosOf(m);
                 marketList = marketList.filter(x=>String(x.id)!==String(id)); backToMarket(); })
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function reportItem(id){
   const m = itemOf(id); if(!m) return;
   const me2 = meUid();
-  if(!me2){ alert(t('신고하려면 로그인이 필요합니다')); return; }
+  if(!me2){ tell(t('신고하려면 로그인이 필요합니다')); return; }
   const reports = Object.assign({}, m.reports || {});
-  if(reports[me2]){ alert(t('이미 신고하신 글입니다')); return; }
+  if(reports[me2]){ tell(t('이미 신고하신 글입니다')); return; }
   openForm({
     title:'물건 신고', sub:'무엇이 잘못됐나요?', okText:'신고',
     fields:[ { key:'why', label:'사유', type:'pick', value:REPORT_REASONS[0].v,
@@ -20996,8 +21163,8 @@ function reportItem(id){
       const n = Object.keys(reports).length;
       const patch = { reports, reportN:n, hidden: n >= MARKET_HIDE_AT };
       window.__market.edit(id, patch)
-        .then(()=>{ Object.assign(m, patch); alert(t('신고했습니다')); openItem(id); })
-        .catch(e=>alert(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .then(()=>{ Object.assign(m, patch); tell(t('신고했습니다')); openItem(id); })
+        .catch(e=>tell(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -21510,18 +21677,18 @@ function spotCmtHtml(s){
 function writeSpotComment(id){
   if(guardEdit('다녀온 이야기를 남깁니다.', ()=>writeSpotComment(id))) return;
   const s = spotOf(id); if(!s) return;
-  if(!window.__user){ alert(t('로그인해야 글을 남길 수 있습니다')); return; }
-  if(myBan){ alert(banNotice()); return; }
-  if(!window.__cmt){ alert(t('인터넷에 연결되어 있지 않습니다')); return; }
+  if(!window.__user){ tell(t('로그인해야 글을 남길 수 있습니다')); return; }
+  if(myBan){ tell(banNotice()); return; }
+  if(!window.__cmt){ tell(t('인터넷에 연결되어 있지 않습니다')); return; }
   // ★ 관 자료에는 아직 클라우드에 문서가 없다. 댓글만 달면 어디에도 안 붙는다.
-  if(s.seed){ alert(t('아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.')); return; }
+  if(s.seed){ tell(t('아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.')); return; }
   openForm({
     title:'다녀온 이야기', okText:'남기기',
     sub:'수심 · 바닥 · 접안 상태처럼 다음 사람에게 도움 될 말을 남겨 주세요',
     fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'',
               placeholder:'언제 다녀오셨는지도 함께 적어 주시면 좋습니다' }],
     onOk: v => {
-      if(!v.text){ alert(t('내용을 넣어 주세요')); return false; }
+      if(!v.text){ tell(t('내용을 넣어 주세요')); return false; }
       const c = { id:newId(), by:meUid()||'', byName:meName(),
                   text:v.text, ts:new Date().toISOString() };
       window.__cmt.add('spots', s.id, c)
@@ -21532,7 +21699,7 @@ function writeSpotComment(id){
           trDrop('spots', s.id);
           openSpot(s.id);
         })
-        .catch(e=>alert(t('남기지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .catch(e=>tell(t('남기지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -21548,7 +21715,7 @@ function delSpotComment(id, cid){
       trDrop('spots', id);
       openSpot(id);
     })
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function backToSpots(){
   comSub = 'spots';
@@ -21560,11 +21727,11 @@ function backToSpots(){
 // 자리는 지도에서 찍는다. 위도·경도를 손으로 치게 하지 않는다.
 function writeSpot(id){
   if(guardEdit('정박지를 올리거나 고칩니다.', ()=>writeSpot(id))) return;
-  if(!window.__user){ alert(t('로그인해야 올릴 수 있습니다')); return; }
-  if(myBan){ alert(banNotice()); return; }
+  if(!window.__user){ tell(t('로그인해야 올릴 수 있습니다')); return; }
+  if(myBan){ tell(banNotice()); return; }
   const s = id ? spotOf(id) : null;
   if(id && !s) return;
-  if(s && !canEditSpot(s)){ alert(t('올린 분과 운영자만 고칠 수 있습니다')); return; }
+  if(s && !canEditSpot(s)){ tell(t('올린 분과 운영자만 고칠 수 있습니다')); return; }
   spotPickCtx = { id: id || null, draft: s ? JSON.parse(JSON.stringify(s)) : null };
   spotPickPlace();
 }
@@ -21588,7 +21755,7 @@ function spotPickPlace(){
   });
 }
 function spotUseGPS(quiet){
-  if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
+  if(!navigator.geolocation){ if(!quiet) tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
   geoGet('정박지 자리 잡기',
     p=>{
       if(!mapS) return;
@@ -21599,12 +21766,12 @@ function spotUseGPS(quiet){
       mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
       mapPaint(true);
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.')); },
+    ()=>{ if(!quiet) tell(t('위치를 가져오지 못했습니다.')); },
     { quiet: !!quiet }
   );
 }
 function spotPlaceNext(){
-  if(!mapS || !mapS.pick){ alert(t('지도를 탭해서 자리를 찍어 주세요')); return; }
+  if(!mapS || !mapS.pick){ tell(t('지도를 탭해서 자리를 찍어 주세요')); return; }
   const d = (spotPickCtx.draft = spotPickCtx.draft || {});
   d.lat = mapS.pick.lat; d.lon = mapS.pick.lon;
   mapS = null;
@@ -21663,7 +21830,7 @@ function spotForm(){
 async function spotDepthCalc(){
   spotKeep();
   const d = (spotPickCtx && spotPickCtx.draft) || null;
-  if(!d || d.lat == null){ alert(t('자리를 먼저 찍어 주세요')); return; }
+  if(!d || d.lat == null){ tell(t('자리를 먼저 찍어 주세요')); return; }
   if(!spotDepthCtx){
     const cur = Number(String(d.depth||'').trim());
     spotDepthCtx = { raw: (isFinite(cur) && cur > 0) ? cur : 3, ts: Date.now() };
@@ -21738,8 +21905,8 @@ function spotDepthApply(){
   if(!d || !c) return;
   const TA = tideAtPlace(d.lat, d.lon, c.ts);
   const low = TA ? lowTideDepth(c.raw, TA.v) : null;
-  if(low == null){ alert(t('조위 자료가 없어 환산할 수 없습니다.\n\n수심을 손으로 적어 주세요.')); return; }
-  if(low < 0){ alert(t('환산값이 0보다 작습니다.\n\n잰 값이나 잰 시각을 다시 봐 주세요.')); return; }
+  if(low == null){ tell(t('조위 자료가 없어 환산할 수 없습니다.\n\n수심을 손으로 적어 주세요.')); return; }
+  if(low < 0){ tell(t('환산값이 0보다 작습니다.\n\n잰 값이나 잰 시각을 다시 봐 주세요.')); return; }
   d.depth = String(low);
   d.lowTide = true;
   d.depthFrom = { raw: c.raw, tide: Math.round(TA.v * 100) / 100,
@@ -21798,8 +21965,8 @@ async function spotSave(){
   spotKeep();
   const d = spotPickCtx.draft || {};
   const name = String(d.name||'').trim();
-  if(!name){ alert(t('이름을 넣어 주세요')); return; }
-  if(d.lat == null || d.lon == null){ alert(t('자리를 먼저 찍어 주세요')); return; }
+  if(!name){ tell(t('이름을 넣어 주세요')); return; }
+  if(d.lat == null || d.lon == null){ tell(t('자리를 먼저 찍어 주세요')); return; }
   const me2 = meUid();
   const body = {
     id: spotPickCtx.id || ('sp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
@@ -21827,7 +21994,7 @@ async function spotSave(){
   body.kw = kwOf(body.name, body.byName, body.region);
   const st = await storePhotos((d.photos||[]).slice(0,4));
   body.photos = st.photos; body.thumbs = st.thumbs;
-  if(!st.ok){ alert(storeShortMsg(st.dropped, t('한 자리'))); return; }
+  if(!st.ok){ tell(storeShortMsg(st.dropped, t('한 자리'))); return; }
   try{
     await window.__spots.put(body);
     // ★ 좌표가 남에게 나간다 — 수집이 아니라 제공이다.
@@ -21836,7 +22003,7 @@ async function spotSave(){
     if(i >= 0) spotList[i] = body; else spotList.unshift(body);
     spotPickCtx = null;
     openSpot(body.id);
-  }catch(e){ alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+  }catch(e){ tell(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e)); }
 }
 // 배 홈포트가 없을 때 좌표만으로 지역을 잡는다
 function regionOfPoint(lat, lon){
@@ -21851,19 +22018,19 @@ function regionOfPoint(lat, lon){
 function delSpot(id){
   if(guardEdit('정박지를 지웁니다.', ()=>delSpot(id))) return;
   const s = spotOf(id); if(!s) return;
-  if(!canDelSpot(s)){ alert(t('올린 분과 운영자만 지울 수 있습니다')); return; }
+  if(!canDelSpot(s)){ tell(t('올린 분과 운영자만 지울 수 있습니다')); return; }
   if(!confirm(tsub("'{name}' 을 지울까요?", {name:s.name}) + '\n\n' + t('되돌릴 수 없습니다.'))) return;
   window.__spots.del(id)
     .then(()=>{ dropPhotosOf(s);
                 spotList = spotList.filter(x=>String(x.id)!==String(id)); backToSpots(); })
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 function reportSpot(id){
   const s = spotOf(id); if(!s) return;
   const me2 = meUid();
-  if(!me2){ alert(t('신고하려면 로그인이 필요합니다')); return; }
+  if(!me2){ tell(t('신고하려면 로그인이 필요합니다')); return; }
   const reports = Object.assign({}, s.reports || {});
-  if(reports[me2]){ alert(t('이미 신고하신 자리입니다')); return; }
+  if(reports[me2]){ tell(t('이미 신고하신 자리입니다')); return; }
   openForm({
     title:'정박지 신고', sub:'무엇이 잘못됐나요?', okText:'신고',
     fields:[ { key:'why', label:'사유', type:'pick', value:REPORT_REASONS[0].v,
@@ -21873,8 +22040,8 @@ function reportSpot(id){
       const n = Object.keys(reports).length;
       const patch = { reports, reportN:n, hidden: n >= SPOT_HIDE_AT };
       window.__spots.edit(id, patch)
-        .then(()=>{ Object.assign(s, patch); alert(t('신고했습니다')); openSpot(id); })
-        .catch(e=>alert(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
+        .then(()=>{ Object.assign(s, patch); tell(t('신고했습니다')); openSpot(id); })
+        .catch(e=>tell(t('신고하지 못했습니다.\n\n') + ((e&&e.message)||e)));
     }
   });
 }
@@ -22030,7 +22197,7 @@ function catchAdd(lid, sp){
     // 목록에 없는 어종 — 직접 넣는다 (prompt 는 배 위에서 못 쓴다)
     openForm({ title:'어종 직접 넣기', sub:'목록에 없는 것을 적어 주세요', okText:'넣기',
       fields:[ { key:'sp', label:'어종', value:'', placeholder:'예: 열기' } ],
-      onOk: v => { if(!String(v.sp||'').trim()){ alert(t('어종을 적어 주세요')); return false; } put(v.sp); } });
+      onOk: v => { if(!String(v.sp||'').trim()){ tell(t('어종을 적어 주세요')); return false; } put(v.sp); } });
     return;
   }
   put(sp);
@@ -22266,7 +22433,7 @@ function hmParse(v){
 // 시각 칸이 바뀌었을 때 — 읽고, 다듬어 칸에 도로 넣고, 넘긴다.
 function hmChange(el, fn){
   const v = hmParse(el.value);
-  if(v === null){ alert(t('시각을 0000~2359 사이로 넣어 주세요.')); el.value = ''; return; }
+  if(v === null){ tell(t('시각을 0000~2359 사이로 넣어 주세요.')); el.value = ''; return; }
   el.value = v;
   fn(v);
 }
@@ -22320,13 +22487,13 @@ function engineHoursFromLogs(it){
 function fillSailHours(){
   const it = getMR('voyage', mrOpenId); if(!it) return;
   const h = sailHours(it);
-  if(h === null){ alert(t('출발 시각과 도착 시각을 먼저 넣어 주세요')); return; }
+  if(h === null){ tell(t('출발 시각과 도착 시각을 먼저 넣어 주세요')); return; }
   mrField('hours', h);
 }
 function fillEngineHours(){
   const it = getMR('voyage', mrOpenId); if(!it) return;
   const h = engineHoursFromLogs(it);
-  if(h === null){ alert(t('출발 시각과 도착 시각을 먼저 넣어 주세요')); return; }
+  if(h === null){ tell(t('출발 시각과 도착 시각을 먼저 넣어 주세요')); return; }
   const n = (it.logs||[]).filter(g => SAIL_ENGINE[g.kind] || g.kind==='엔진ON' || g.kind==='엔진OFF').length;
   if(!n && !confirm(t('중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n')
     + tsub('항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?', { h: h }) + '\n'
@@ -22456,7 +22623,7 @@ const TRK_TAP = 26;   // 손가락 굵기. 이보다 작으면 배 위에서 못
 function trkNearOnLine(vid, x, y, W, H){
   const S = mapS; if(!S) return null;
   const it = voyage.find(v => String(v.id) === String(vid)); if(!it) return null;
-  const raw = Array.isArray(it.trk) ? it.trk : [];
+  const raw = trkRaw(it);
   if(raw.length < 2) return null;
   const left = S.cx - W/2, top = S.cy - H/2, z = S.z;
   const px = p => MERC.x(p.lo, z) - left, py = p => MERC.y(p.la, z) - top;
@@ -22530,7 +22697,7 @@ function logFocus(lid){
 function logShowOnMap(lid){
   const it = getMR('voyage', mrOpenId); if(!it || !mapS) return;
   const p = posOf(it, 'log:' + lid);
-  if(!p || p.lat == null || p.lon == null){ alert(t('이 기록에는 위치가 없습니다.')); return; }
+  if(!p || p.lat == null || p.lon == null){ tell(t('이 기록에는 위치가 없습니다.')); return; }
   mapS.cx = MERC.x(p.lon, mapS.z);
   mapS.cy = MERC.y(p.lat, mapS.z);
   mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
@@ -22545,7 +22712,7 @@ function logShowOnMap(lid){
 //   자정을 넘긴 항해나 도착 시각을 나중에 고친 경우 선이 튀었다 (검사가 잡았다).
 //   자동 항적은 받은 차례가 곧 지나온 차례라 따로 줄 세울 것이 없다.
 function trkLine(it){
-  const a = Array.isArray(it && it.trk) ? it.trk : [];
+  const a = trkRaw(it);
   const out = [];
   a.forEach(p => {
     if(p && isFinite(p.la) && isFinite(p.lo)) out.push({ lat:p.la, lon:p.lo });
@@ -23004,7 +23171,7 @@ function posHere(key, vid, quiet, done){
   const id = vid || mrOpenId;
   const it = voyage.find(x=>String(x.id)===String(id)); if(!it){ fin(); return; }
   if(!navigator.geolocation){
-    if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.'));
+    if(!quiet) tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.'));
     fin(); return;
   }
   const draw = ()=>{ if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id); };
@@ -23022,7 +23189,7 @@ function posHere(key, vid, quiet, done){
     e=>{
       posPut(it, key, null); saveMR(); draw();
       // 자동 등록(quiet)일 때는 창을 띄우지 않는다 — 권한을 안 준 상태에서 매번 뜨면 성가시다
-      if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'));
+      if(!quiet) tell(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.'));
       fin();
     },
     { enableHighAccuracy:true, timeout:15000, maximumAge:10000, quiet: !!quiet }
@@ -23053,7 +23220,7 @@ async function wxCapture(key, vid){
   const src = (pp && pp.lat != null && pp.lon != null)
     ? { lat: pp.lat, lon: pp.lon, name: '', pos: 1 }
     : (wxCur ? { lat: wxCur.lat, lon: wxCur.lon, name: wxCur.name || '', pos: 0 } : null);
-  if(!src){ alert(t('날씨 지점이 설정되지 않았습니다. 날씨 탭에서 지점을 먼저 지정해 주세요.')); return; }
+  if(!src){ tell(t('날씨 지점이 설정되지 않았습니다. 날씨 탭에서 지점을 먼저 지정해 주세요.')); return; }
   const ts = tsOf(it.date, hhmm);
   if(ts == null){ put({ text:t('시각을 먼저 입력해 주세요'), at:'', spot:'' }); saveMR(); renderVoyage(); openMR('voyage', id); return; }
 
@@ -23497,7 +23664,7 @@ function addCheckList(){
        {v:'n', name:'직접 초기화', sub:'내가 누를 때까지 그대로 둔다'}] }
     ],
     onOk: v => {
-      if(!v.name){ alert(t('목록 이름을 넣어 주세요')); return false; }
+      if(!v.name){ tell(t('목록 이름을 넣어 주세요')); return false; }
       const id = newId();
       checkt.push({ id, typ:'list', name:v.name, cycle:v.cycle });
       saveMR(); selectCheckList(id);
@@ -23519,7 +23686,7 @@ function renameCheckList(id){
     ],
     del: { text:'목록 지우기', run: ()=>delCheckList(id) },
     onOk: v => {
-      if(!v.name){ alert(t('목록 이름을 넣어 주세요')); return false; }
+      if(!v.name){ tell(t('목록 이름을 넣어 주세요')); return false; }
       l.name = v.name;
       l.cycle = v.cycle;
       saveMR(); renderCheck();
@@ -23532,7 +23699,7 @@ function cycleCheckList(id){
 function delCheckList(id){
   if(!unlocked) return;
   const ls = ckLists();
-  if(ls.length < 2){ alert(t('마지막 남은 목록은 지울 수 없습니다.')); return; }
+  if(ls.length < 2){ tell(t('마지막 남은 목록은 지울 수 없습니다.')); return; }
   const l = ls.find(x=>String(x.id)===String(id)); if(!l) return;
   const its = ckItems(id);
   if(!confirm(tsub('"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?', {name:l.name, n:its.length}))) return;
@@ -23558,7 +23725,7 @@ function addCheckItem(){
       { key:'url',   label:'링크 (없으면 비워 두세요)', value:'', placeholder:'https://' }
     ],
     onOk: v => {
-      if(!v.label){ alert(t('점검 항목을 넣어 주세요')); return false; }
+      if(!v.label){ tell(t('점검 항목을 넣어 주세요')); return false; }
       checkt.push({ id:newId(), label:v.label, url:v.url, list:String(cur) });
       saveMR(); renderCheck();
     }
@@ -23576,7 +23743,7 @@ function editCheckItem(id){
     ],
     del: { text:'항목 지우기', run: ()=>delCheckItem(id) },
     onOk: v => {
-      if(!v.label){ alert(t('점검 항목을 넣어 주세요')); return false; }
+      if(!v.label){ tell(t('점검 항목을 넣어 주세요')); return false; }
       it.label = v.label;
       it.url = v.url;
       saveMR(); renderCheck();
@@ -23587,7 +23754,7 @@ function moveCheckItem(id){
   if(!unlocked) return;
   const it = checkt.find(c=>c && c.typ!=='list' && String(c.id)===String(id)); if(!it) return;
   const ls = ckLists();
-  if(ls.length < 2){ alert(t('목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.')); return; }
+  if(ls.length < 2){ tell(t('목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.')); return; }
   openForm({
     title: '다른 목록으로 옮기기',
     sub: it.label,
@@ -23832,7 +23999,7 @@ async function newsTrGo(){
   if(TR_BUSY.news) return;
   const lang = langNow();
   if(TR_NEWS[lang]){ trNewsOn = true; renderNews(); return; }
-  if(!window.__tr || !window.__tr.text){ alert(t('지금은 옮길 수 없습니다')); return; }
+  if(!window.__tr || !window.__tr.text){ tell(t('지금은 옮길 수 없습니다')); return; }
   const rows = (newsSub === 'kr') ? ((krCache && krCache.gov) || [])
                                   : ((newsCache && newsCache.items) || []);
   // 같은 글자는 한 번만 보낸다 — 값이 그만큼 덜 든다
@@ -23851,7 +24018,7 @@ async function newsTrGo(){
     trNewsOn = true;
   }catch(e){
     // ★ 까닭은 서버 함수가 한국어로 준다. 사전을 거치게 해야 외국 사람도 읽는다.
-    alert(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
+    tell(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
   }
   TR_BUSY.news = false;
   renderNews();
@@ -23982,11 +24149,11 @@ function seriesApplyHtml(){
 }
 function applySeries(){
   if(!meUid() || !window.__user){
-    alert(t('연재자 신청은 로그인하고 하실 수 있습니다.'));
+    tell(t('연재자 신청은 로그인하고 하실 수 있습니다.'));
     if(typeof openAccount === 'function') openAccount();
     return;
   }
-  if(typeof myBan !== 'undefined' && myBan){ alert(banNotice()); return; }
+  if(typeof myBan !== 'undefined' && myBan){ tell(banNotice()); return; }
   openForm({
     title: '연재자 신청',
     okText: '보내기',
@@ -24001,7 +24168,7 @@ function applySeries(){
     ],
     onOk: v => {
       const about = String(v.about || '').trim();
-      if(!about){ alert(t('어떤 글인지 적어 주세요')); return false; }
+      if(!about){ tell(t('어떤 글인지 적어 주세요')); return false; }
       const mine = String(v.mine) === '1';
       // ★ 옮긴 글은 허락이 조건이다. 신청 단계에서 미리 알려 둔다 —
       //   켜 준 뒤에 몰랐다고 하면 그때는 이미 남의 글이 올라가 있다.
@@ -24087,10 +24254,10 @@ async function openSeries(id){
 }
 function writeSeries(id){
   if(guardEdit('연재 글을 올리거나 고칩니다.', ()=>writeSeries(id))) return;
-  if(!canSeries()){ alert(t('연재 글을 올릴 권한이 없습니다')); return; }
+  if(!canSeries()){ tell(t('연재 글을 올릴 권한이 없습니다')); return; }
   const x = id ? (seriesList||[]).find(r=>String(r.id)===String(id)) : null;
   // 남이 올린 연재는 고치지 못한다 (규칙에서도 막혀 있다)
-  if(x && !canEditSeries(x)){ alert(t('남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.')); return; }
+  if(x && !canEditSeries(x)){ tell(t('남이 올린 연재는 고칠 수 없습니다.\n\n올린 사람만 고칠 수 있습니다.')); return; }
   openForm({
     title: x ? '연재 고치기' : '연재 글 올리기',
     okText: x ? '저장' : '올리기',
@@ -24114,25 +24281,25 @@ function writeSeries(id){
     ],
     onOk: v => {
       const mine = String(v.mine) === '1';
-      if(!v.title){ alert(t('제목을 넣어 주세요')); return false; }
-      if(!v.author){ alert(t('저자를 넣어 주세요')); return false; }
+      if(!v.title){ tell(t('제목을 넣어 주세요')); return false; }
+      if(!v.author){ tell(t('저자를 넣어 주세요')); return false; }
       // ★ 옮긴 글일 때만 매체·원문 링크가 필수다. 그것이 허락 조건이다.
       if(!mine){
-        if(!v.source){ alert(t('매체 이름을 넣어 주세요.\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.')); return false; }
+        if(!v.source){ tell(t('매체 이름을 넣어 주세요.\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.')); return false; }
         if(!/^https?:\/\//i.test(String(v.link||'').trim())){
-          alert(t('원문 링크를 넣어 주세요 (https:// 로 시작).\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.')); return false; }
+          tell(t('원문 링크를 넣어 주세요 (https:// 로 시작).\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.')); return false; }
       }
       // 편집기는 블록을 그대로 돌려준다. 사진은 그 안에 섞여 있다.
       const blocks = Array.isArray(v.body) ? v.body : [];
       const plain  = blocksText(blocks);
       const photos = blocks.filter(z=>z.t==='photo').map(z=>z.v);
-      if(!plain.trim() && !photos.length){ alert(t('본문을 넣어 주세요')); return false; }
+      if(!plain.trim() && !photos.length){ tell(t('본문을 넣어 주세요')); return false; }
       (async ()=>{
         try{
           // ★ 사진을 창고로 보내고 주소만 남긴다. 문서 안에 담으면
           //   연재는 긴 글이라 금세 문서 한 개 크기(1MB)에 걸린다.
           const st = await storePhotos(photos);
-          if(!st.ok) alert(storeShortMsg(st.dropped, t('한 연재 글')));
+          if(!st.ok) tell(storeShortMsg(st.dropped, t('한 연재 글')));
           const blocks2 = st.fix(blocks);
           const body = {
             id: x ? x.id : ('sr' + Date.now().toString(36) + Math.random().toString(36).slice(2,6)),
@@ -24155,7 +24322,7 @@ function writeSeries(id){
           newsSub = 'sr'; renderNews();
           openSeries(body.id);
         }catch(e){
-          alert(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
+          tell(t('올리지 못했습니다.\n\n') + ((e&&e.message)||e));
           formReopen();          // 쓴 글을 날리지 않는다
         }
       })();
@@ -24169,7 +24336,7 @@ function delSeries(id){
   if(!confirm(t('이 연재 글을 지울까요?'))) return;
   window.__series.del(id)
     .then(async ()=>{ await loadSeries(true); closeBoat(); newsSub='sr'; renderNews(); })
-    .catch(e=>alert(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 async function renderNews(force){
   const L = document.getElementById('newsList');
@@ -24490,7 +24657,7 @@ function tideInput(){
         const m = x.match(/(\d{1,2})\s*[:시]\s*(\d{1,2}).*?(-?\d{2,4})/);
         return m ? { time: String(m[1]).padStart(2,'0')+':'+String(m[2]).padStart(2,'0'), cm: Number(m[3]) } : null;
       }).filter(Boolean);
-      if(rows.length < 2){ alert(t('만조와 간조를 각각 하나 이상 넣어 주세요.')); return false; }
+      if(rows.length < 2){ tell(t('만조와 간조를 각각 하나 이상 넣어 주세요.')); return false; }
       wxSet('bt_tide', { date: today(), rows });
       renderWeather();
     }
@@ -24500,7 +24667,7 @@ function tideInput(){
 // ---------- 위치 ----------
 function wxRetryGPS(){ wxGeoTried = false; wxUseGPS(); }
 function wxUseGPS(){
-  if(!navigator.geolocation){ alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
+  if(!navigator.geolocation){ tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
   const st = document.getElementById('wxStatus');
   if(st) st.textContent = t('현재 위치 확인 중…');
   geoGet('지금 있는 곳 날씨·물때',
@@ -24563,9 +24730,9 @@ function wxAddSpot(){
 }
 function wxEditSpot(id){
   const s2 = wxSpots.find(x=>String(x.id)===String(id));
-  if(!s2){ alert(t('그 지점을 찾지 못했습니다')); return; }
+  if(!s2){ tell(t('그 지점을 찾지 못했습니다')); return; }
   if(String(id).startsWith('port@')){
-    alert(t('홈포트에서 자동으로 만들어진 지점입니다.\n\n내 배 > 기본 정보에서 홈포트를 고치면 함께 바뀝니다.'));
+    tell(t('홈포트에서 자동으로 만들어진 지점입니다.\n\n내 배 > 기본 정보에서 홈포트를 고치면 함께 바뀝니다.'));
     return;
   }
   wxSpotCtx = { id };
@@ -24593,7 +24760,7 @@ function wxSpotPick(cur){
   });
 }
 function wxSpotGPS(quiet){
-  if(!navigator.geolocation){ if(!quiet) alert(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
+  if(!navigator.geolocation){ if(!quiet) tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.')); return; }
   geoGet('날씨 지점 잡기',
     p=>{
       if(!mapS) return;
@@ -24604,15 +24771,15 @@ function wxSpotGPS(quiet){
       mapS.anchor = { cx:mapS.cx, cy:mapS.cy };
       mapPaint(true);
     },
-    ()=>{ if(!quiet) alert(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
+    ()=>{ if(!quiet) tell(t('위치를 가져오지 못했습니다.\n설정에서 위치 권한을 허용해 주세요.')); },
     { quiet: !!quiet }
   );
 }
 function wxSpotSave(){
   const el = document.getElementById('wxSpotName');
   const name = String((el && el.value) || '').trim();
-  if(!name){ alert(t('지점 이름을 넣어 주세요')); return; }
-  if(!mapS || !mapS.pick){ alert(t('지도를 탭해서 자리를 찍어 주세요')); return; }
+  if(!name){ tell(t('지점 이름을 넣어 주세요')); return; }
+  if(!mapS || !mapS.pick){ tell(t('지도를 탭해서 자리를 찍어 주세요')); return; }
   const lat = mapS.pick.lat, lon = mapS.pick.lon;
   if(wxSpotCtx){
     const s2 = wxSpots.find(x=>String(x.id)===String(wxSpotCtx.id));
@@ -24631,7 +24798,7 @@ function wxDelSpot(id){
   const s2 = wxSpots.find(x=>String(x.id)===String(id));
   if(!s2) return;
   if(String(id).startsWith('port@')){
-    alert(t('홈포트에서 자동으로 만들어진 지점입니다.\n\n지워도 배를 열면 다시 생깁니다.\n')
+    tell(t('홈포트에서 자동으로 만들어진 지점입니다.\n\n지워도 배를 열면 다시 생깁니다.\n')
       + t('없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.'));
     return;
   }
@@ -24717,7 +24884,7 @@ function hatPick(name){
   hatPanel(); renderWeather();
 }
 function hatAddOne(){
-  if(!unlocked){ alert(t('편집 모드에서 추가할 수 있습니다.')); return; }
+  if(!unlocked){ tell(t('편집 모드에서 추가할 수 있습니다.')); return; }
   openForm({
     title: '약최고고조위 추가',
     sub: '다리 통과 높이를 계산할 때 쓰는 기준값입니다',
@@ -24727,10 +24894,10 @@ function hatAddOne(){
       { key:'hat',  label:'약최고고조위 (m)', value:'', placeholder:'3.62', mode:'decimal' }
     ],
     onOk: v => {
-      if(!v.name){ alert(t('지역 이름을 넣어 주세요')); return false; }
+      if(!v.name){ tell(t('지역 이름을 넣어 주세요')); return false; }
       const n = parseFloat(v.hat);
-      if(!(n > 0)){ alert(t('약최고고조위를 미터 단위 숫자로 넣어 주세요')); return false; }
-      if(hatList().some(x=>x.name===v.name)){ alert(t('이미 등록된 이름입니다.')); return false; }
+      if(!(n > 0)){ tell(t('약최고고조위를 미터 단위 숫자로 넣어 주세요')); return false; }
+      if(hatList().some(x=>x.name===v.name)){ tell(t('이미 등록된 이름입니다.')); return false; }
       const custom = wxLS('bt_hatlist', []);
       custom.push({ name:v.name, hat:n, lat: wxCur?wxCur.lat:null, lon: wxCur?wxCur.lon:null });
       wxSet('bt_hatlist', custom);
@@ -24739,7 +24906,7 @@ function hatAddOne(){
   });
 }
 function hatEditOne(name){
-  if(!unlocked){ alert(t('편집 모드에서 수정할 수 있습니다.')); return; }
+  if(!unlocked){ tell(t('편집 모드에서 수정할 수 있습니다.')); return; }
   const x = hatList().find(i=>i.name===name); if(!x) return;
   openForm({
     title: name,
@@ -24750,7 +24917,7 @@ function hatEditOne(name){
     ],
     onOk: v => {
       const n = parseFloat(v.hat);
-      if(!(n > 0)){ alert(t('미터 단위 숫자로 넣어 주세요')); return false; }
+      if(!(n > 0)){ tell(t('미터 단위 숫자로 넣어 주세요')); return false; }
       if(x.builtin){ const ov = wxLS('bt_hat', {}); ov[name]=n; wxSet('bt_hat', ov); }
       else { const c = wxLS('bt_hatlist', []); const f=c.find(i=>i.name===name); if(f){ f.hat=n; wxSet('bt_hatlist', c); } }
       hatPanel(); renderWeather();

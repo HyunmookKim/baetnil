@@ -1,7 +1,115 @@
 {
- "updated": "2026-08-23T21:09:11.238Z",
- "candidates": 69,
+ "updated": "2026-08-27T00:18:44.138Z",
+ "candidates": 82,
  "items": [
+  {
+   "title": "Need to promote big kids in sailing",
+   "t_ko": "올림픽 세일링에서 미국 경쟁력 약화: 청소년 육성 구조의 문제점",
+   "s_ko": "미국이 올림픽 세일링 종목에서 부진하는 이유 중 하나는 특정 클래스 요트의 낮은 보급률이다.\n2026년 ILCA 7 남자 세계선수권에서 5경주 후 미국 선수는 금메달 경쟁(Gold Flight)에 단 1명도 진출하지 못했고, 4명이 은메달(Silver), 6명이 동메달(Bronze) 경주에 남았다.\n미국의 청소년 세일링 육성이 학교 더블헨더 클래스에 집중되어 있는데, 이 보트는 체격이 작은 선수에게 유리해 ILCA 클래스 같은 대형 싱글핸더에서 불리하다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/26/need-to-promote-big-kids-in-sailing/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-26T19:04:52.000Z"
+  },
+  {
+   "title": "Take drudgery out of the delivery",
+   "t_ko": "말로르카-이비자 48해리 슈퍼요트 스피드 트로피",
+   "s_ko": "스페인 발레아레스 제도의 말로르카와 이비자 섬 사이 48해리 구간에서 슈퍼요트의 항해 기록 경쟁을 장려하기 위해 \"퍼페추얼 트로피\" 제도가 도입되었다.\n현재 기록은 2024년 194피트 케치 리깅 \"맥시무스\"가 세운 3시간 31분이며, 2026년 8월 15일~9월 16일 사이 유리한 날씨 창을 이용해 기록 경신을 시도할 수 있다.\n서로 다른 길이와 사양의 요트 카테고리별 기록도 함께 추적된다.",
+   "cat": "항해술",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/26/take-drudgery-out-of-the-delivery/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-26T18:14:19.000Z"
+  },
+  {
+   "title": "Newport Bermuda Race F-TCF Scoring Error report",
+   "t_ko": "뉴포트-버뮤다 레이스 F-TCF 채점 오류 조사 보고서",
+   "s_ko": "버뮤다 레이스 조직위원회(BROC)와 미국 세일링이 2026년 뉴포트-버뮤다 레이스의 F-TCF 채점 오류 검토를 완료했다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/299188/?source=rss",
+   "source": "Sail-World",
+   "date": "2026-08-26T13:51:00.000Z"
+  },
+  {
+   "title": "Sailing Uma: ‘How we built an electric sailboat to take us around the world’",
+   "t_ko": "전기 범선으로 세계 일주 항해하기: 세일링 우마의 3년 개조 프로젝트",
+   "s_ko": "1972년형 피어슨 36 범선 \"우마\"를 전기 추진으로 완전 개조해 세계 일주 항해를 계획한 댄과 기카 데커트 부부가 3년간의 개조 공사를 직접 수행했다.\n선박의 선상과 갑판을 모두 재설계·재건설했으며, 전기 항해를 위한 시스템 개선이 이루어졌다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/sailing-uma-how-we-built-an-electric-sailboat-to-take-us-around-the-world-106548",
+   "source": "PBO",
+   "date": "2026-08-26T08:17:34.000Z"
+  },
+  {
+   "title": "Why two headsails are better than one",
+   "t_ko": "복식 지브 리깅의 장단점과 개조 방법",
+   "s_ko": "대부분의 현대 생산 범선은 슬루프 리깅에 퍼롤링 지노아 장착 방식을 사용하지만, 복식 지브 리깅의 장점을 검토할 필요가 있다.\n구형 보트, 특히 IOR 규칙 초기 시대 보트들은 광대한 중첩 지노아를 장착했으며, 이를 다루기 위해 \"커피 그라인더\" 같은 대형 윈치 파워 시스템이 개발되었다.\n슬루프에서 복식 지브 구성으로의 개조 옵션이 있다.",
+   "cat": "항해술",
+   "link": "https://www.yachtingmonthly.com/sailing-skills/why-two-headsails-are-better-than-one-106134",
+   "source": "Yachting Monthly",
+   "date": "2026-08-26T05:41:15.000Z"
+  },
+  {
+   "title": "Retrofitting a boat holding tank",
+   "t_ko": "요트 황수 저장 탱크 개조 가이드",
+   "s_ko": "세계 각지에서 수질 개선을 위한 규정이 강화되면서 요트의 황수 저장 탱크 설치 의무가 증가하고 있다.\n투명 탱크를 사용하면 뒤쪽에서 빛을 비춰 수위를 확인할 수 있으며, 효율적인 폐기물 처리를 위한 다양한 탱크 옵션이 있다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/retrofitting-a-boat-holding-tank-106323",
+   "source": "PBO",
+   "date": "2026-08-26T04:25:28.000Z"
+  },
+  {
+   "title": "Review complete on Bermuda Race snafu",
+   "t_ko": "뉴포트-버뮤다 레이스 채점 오류 검토 완료",
+   "s_ko": "2026년 뉴포트-버뮤다 레이스의 채점 오류 문제에 대해 버뮤다 레이스 조직위원회(BROC)와 미국 세일링이 검토를 완료했다.\n6월 19일 경주 시작 전 발표된 F-TCF(예측 시간 보정 계수) 값이 오류였으며, 6월 23일 유사 사양 요트 간 F-TCF 불일치를 지적하며 적발되었다.\n인적 프로세스 오류와 소프트웨어 문제 두 가지 독립적 문제점이 확인되었으며, 향후 이런 오류를 방지하기 위한 개선책이 마련될 예정이다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/25/review-complete-on-bermuda-race-snafu/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-25T21:58:15.000Z"
+  },
+  {
+   "title": "Buying an electric weekender yacht",
+   "t_ko": "위켄드용 전기 범선 구매 가이드",
+   "s_ko": "전기 추진 기술이 위켄드 요트 시장에 도입되고 있으며, 실제 실용성 검증이 진행 중이다.\n전기차처럼 \"항속거리 불안\"이 문제되고 있으나, 시간 부족으로 인한 보조 엔진 수요 증가로 전기 추진 수요가 증가하는 추세다.",
+   "cat": "장비",
+   "link": "https://www.yachtingworld.com/yachts-and-gear/buying-an-electric-weekender-yacht-163819",
+   "source": "Yachting World",
+   "date": "2026-08-25T05:15:32.000Z"
+  },
+  {
+   "title": "HanseYachts и Nautitech в поисках денег",
+   "t_ko": "한세요트·나우티텍 조선소 자금난 위기",
+   "s_ko": "독일 한세요트(HanseYachts)와 프랑스 나우티텍(Nautitech) 두 조선소가 동시에 재정 문제에 직면했다.\n두 업체 모두 양질의 현대식 요트를 생산 중이며 새 모델과 딜러를 보유했지만, 코로나 이후 호황이 끝나면서 과거의 사업 구조적 약점이 노출되었다.\n이는 유럽 요트 산업이 낙관적 전망 없이 새로운 시기로 진입했음을 시사한다.",
+   "cat": "산업",
+   "link": "https://yachtrussia.com/news/2026/08/25/20260825-hanseyachts-i-nautitech-v-poiskah-deneg.html",
+   "source": "Yacht Russia",
+   "date": "2026-08-25T00:00:00.000Z"
+  },
+  {
+   "title": "Room to tack at an obstruction",
+   "t_ko": "장애물에서의 택(Tack) 공간: 레이싱 룰 케이스 32",
+   "s_ko": "2025-2028 케이스북에 수록된 레이싱 룰 해석 사항으로, 포트 택 풍하 요트가 스타보드 택 풍상 요트를 맞닥뜨렸을 때 장애물에서 택할 공간을 요청하는 상황을 다룬다.\n이 판례는 풍상 요트가 규칙 준수에 실패할 것을 풍하 요트가 미리 예상할 필요가 없음을 명확히 한다.",
+   "cat": "항해술",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/24/room-to-tack-at-an-obstruction-2/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-24T21:19:42.000Z"
+  },
+  {
+   "title": "People do love other’s failures",
+   "t_ko": "요트 좌초 사고: 에릭 몽조의 보스턴 항구 야간 출항 실패",
+   "s_ko": "에릭 몽조는 친구 존과 10세, 8세 두 아들을 데리고 보스턴 해양 박물관에서 수요일 오후 5시 메인 북부 크루징을 위해 출항했으나 좌초 사고가 발생했다.\n사고 동영상이 인스타그램에 광범위하게 공유되어 소셜 미디어 주목을 받았다.",
+   "cat": "사고",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/24/people-do-love-others-failures/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-24T19:14:57.000Z"
+  },
+  {
+   "title": "eNav in a Nutshell: Paper charts versus electronic charts",
+   "t_ko": "종이 해도 대 전자 해도: 선택 가이드",
+   "s_ko": "전자 해도로의 전환이 가속화되고 있지만, 디지털 해도 데이터 부정확으로 인한 좌초 위험이 존재한다.\n영국 요트협회(RYA) 훈련 운영 책임자는 실제 상황에서 예측 데이터와 디지털 항법 보조 도구를 효과적으로 사용하기 위한 조언을 제공한다.",
+   "cat": "항해술",
+   "link": "https://www.pbo.co.uk/gear/electronic-charts-reliability-106709",
+   "source": "PBO",
+   "date": "2026-08-24T05:37:35.000Z"
+  },
   {
    "title": "Musto Coastal Sailing Jackets",
    "t_ko": "뮤스토 연안 항해용 재킷",
@@ -10,6 +118,24 @@
    "link": "https://www.sail-world.com/news/299102/?source=rss",
    "source": "Sail-World",
    "date": "2026-08-23T15:09:00.000Z"
+  },
+  {
+   "title": "Keel damage capsizes Oyster 825",
+   "t_ko": "해밀턴 아일랜드 레이스위크 중 요트 침몰 사고",
+   "s_ko": "호주 휘선데이 제도에서 열린 해밀턴 아일랜드 레이스위크(8월 16-22)에 참가한 미국인 선주 배리·수지 파킨의 오이스터 825 \"Viva La Vida\"가 침몰했다.\n사건 발생 당시 상황과 정확한 원인은 기사에 명시되지 않았으나, 일반적으로 레이스 중 발생한 사고로 분류된다.",
+   "cat": "사고",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/21/keel-damage-capsizes-oyster-825/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-21T20:07:35.000Z"
+  },
+  {
+   "title": "What to know about sea breezes",
+   "t_ko": "해풍(Sea Breeze)의 발달과 항해 활용",
+   "s_ko": "높은 기압이 있는 무풍의 더운 여름날 해풍은 항해인의 구원자 역할을 한다.\n육지가 바다보다 더 빠르게 가열되면 정오 무렵 대기가 상승하면서 해풍이 발달하며, 지표면 온도가 해수보다 약 3-4°C 높아지면 충분히 해풍이 생성된다.",
+   "cat": "기타",
+   "link": "https://www.sailingscuttlebutt.com/2026/08/21/what-to-know-about-sea-breezes/",
+   "source": "Scuttlebutt",
+   "date": "2026-08-21T18:14:05.000Z"
   },
   {
    "title": "Tinker dinghy: the inflatable boat that could do it all!",
@@ -91,168 +217,6 @@
    "link": "https://www.pbo.co.uk/expert-advice/10-tips-for-boat-heads-to-prevent-blockages-and-odours-106239",
    "source": "PBO",
    "date": "2026-08-20T04:47:57.000Z"
-  },
-  {
-   "title": "What can we learn from Charlie Dalin?",
-   "t_ko": "찰리 달린으로부터 배우다",
-   "s_ko": "솔로 항해자 찰리 달린이 6월에 사망했으며, 세계 항해 커뮤니티가 추모했다.\n그의 글로벌 명성과 영향력에 대해 다룬다.",
-   "cat": "기타",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/19/what-can-we-learn-from-charlie-dalin/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-19T23:43:19.000Z"
-  },
-  {
-   "title": "Apple doesn’t fall far from the tree",
-   "t_ko": "아버지의 성공이 아들을 키웠다: 브라질의 셰이트 부자",
-   "s_ko": "브라질의 로베르트 셰이트는 1996년 애틀란타 올림픽 라저급 금메달리스트로 20년 이상 지배했다.\n이제 아들 에릭 셰이트가 8월 19일 덴마크 오르후스에서 열린 ILCA 6 유스 월드 챔피언십 307명 선수 중 1위를 차지했다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/19/apple-doesnt-fall-far-from-the-tree/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-19T23:22:44.000Z"
-  },
-  {
-   "title": "The Ocean Race Atlantic to recognise ocean action",
-   "t_ko": "The Ocean Race Atlantic 2026, 해양 행동 인식 결합",
-   "s_ko": "The Ocean Race Atlantic 2026의 첫 개최는 엘리트 원양 경주팀을 위한 횡단 경주와 해양 보호 미션 두 가지로 구성된다.\n같은 선원들이 해양 보존을 위한 이중 임무를 수행하게 된다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/299018/?source=rss",
-   "source": "Sail-World",
-   "date": "2026-08-19T20:47:03.000Z"
-  },
-  {
-   "title": "Retail galaxy for boaters needs rethink",
-   "t_ko": "West Marine 파산, 해양용품 소매 생태계 재검토 필요",
-   "s_ko": "West Marine은 2026년 5월 17일 챕터 11 파산을 신청했다.\n1993년 상장 후 2017년 뉴욕 기반 사모펀드에 인수되었고, 이후 경영진 및 소유권 변화를 겪었다.\n재고 부족의 대규모 매장 운영 모델이 지속 불가능했으며, 해양용품 소비자 소매 구조 전반의 재고찰이 필요하다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/19/retail-galaxy-for-boaters-needs-rethink/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-19T15:31:22.000Z"
-  },
-  {
-   "title": "What can we learn from the late Charlie Dalin? The love of the sea and sailing…",
-   "t_ko": "Charlie Dalin의 삶에서 배우는 것: 해양 사랑과 항해",
-   "s_ko": "2024 Vendée Globe 우승자 Charlie Dalin이 2025년 6월 타계했다.\n전 세계 항해 커뮤니티가 슬픔에 함께했다.",
-   "cat": "기타",
-   "link": "https://www.yachtingworld.com/comment/what-can-we-learn-from-the-late-charlie-dalin-the-love-of-the-sea-and-sailing-163809",
-   "source": "Yachting World",
-   "date": "2026-08-19T05:16:17.000Z"
-  },
-  {
-   "title": "How to protect your eyes, face, and skin at sea",
-   "t_ko": "해상에서 눈, 얼굴, 피부 보호하기",
-   "s_ko": "해상은 아름답지만 혹독한 환경으로, 시력은 필수적이나 고강도 자외선(UVB)에 노출되기 쉽다.\n선박의 물질과 움직이는 부품으로부터 눈이 물리적, 화학적 외상을 입을 수 있다.\n간단한 예방 조치로 눈을 보호하고 항해 경험을 개선할 수 있다.",
-   "cat": "안전",
-   "link": "https://www.yachtingmonthly.com/cruising/how-to-protect-your-eyes-face-and-skin-at-sea-106057",
-   "source": "Yachting Monthly",
-   "date": "2026-08-19T05:05:11.000Z"
-  },
-  {
-   "title": "Antifouling paint tips from the experts",
-   "t_ko": "방오도료 칠하기 전문가 팁",
-   "s_ko": "대형 선체에는 롤러로 방오도료를 칠하는 것이 최선이다.\n기존 방오도료 제거, 선체 준비, 적절한 방오도료 선택 및 시공이 DIY 작업자에게는 어려울 수 있다.\nAkzoNobel의 Jason Hill이 이러한 과정에서의 실무 팁을 공유한다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/antifouling-paint-tips-from-the-experts-106210",
-   "source": "PBO",
-   "date": "2026-08-19T04:51:32.000Z"
-  },
-  {
-   "title": "NoR прочитан. А что мы могли пропустить?",
-   "t_ko": "공지문 읽기: AI로 레이스 공지문 검증하기",
-   "s_ko": "Marmaris International Race Week 2026 공지문을 ChatGPT에 제출해 공식 출처, 마감일, 요구사항, 필수 장비를 자동 찾도록 요청했다.\n ChatGPT, DeepSeek, GigaChat 세 AI 도구를 같은 공지문과 프롬프트로 비교했을 때 결과가 크게 달랐으며, 특히 안전 규정 및 요구사항 검색에서 차이가 났다.\nAI를 레이스 준비에 활용할 때 인공지능의 신뢰성 한계를 인식하고 일부 항목은 수동으로 확인할 필요가 있다.",
-   "cat": "산업",
-   "link": "https://yachtrussia.com/news/2026/08/19/20260819-nor-prochitan-a-chto-my-mogli-propustit.html",
-   "source": "Yacht Russia",
-   "date": "2026-08-19T00:00:00.000Z"
-  },
-  {
-   "title": "All systems go for match racing tours",
-   "t_ko": "World Match Racing Tour 최종전, 사우디아라비아에서 개최 확정",
-   "s_ko": "2026년 11월 2-14일 사우디아라비아 홍해 북서부 AMAALA Yacht Club에서 Women's World Match Racing Tour Final(11월 2-7일)과 World Match Racing Tour Final(11월 9-14일)이 개최된다.\nJ/70을 사용해 경주하며, Women's 투어가 Open 투어와 같은 장소에서 연달아 열리는 첫 번째 경우이다.\nWorld Sailing이 우승팀을 2026 Match Racing World Champions으로 인정한다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/18/all-systems-go-for-match-racing-tours/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-18T23:35:41.000Z"
-  },
-  {
-   "title": "How racing made me a better sailor",
-   "t_ko": "경주가 나를 더 나은 항해자로 만들다",
-   "s_ko": "1991년 코네티컷 이스트 라임 고등학교 항해팀이 플라잉 주니어로 해안 경주를 했다.\n강한 조류와 변덕스러운 바람이 많은 템즈 강에서의 경주 경험을 통해 항해 기술을 습득했다.",
-   "cat": "항해술",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/18/how-racing-made-me-a-better-sailor/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-18T21:27:51.000Z"
-  },
-  {
-   "title": "Stop obsessing over forecasts: My cure for sailing’s analysis paralysis – Lu Heikell",
-   "t_ko": "기상 예보 집착 벗기: Lu Heikell의 분석 마비 극복법",
-   "s_ko": "현대에는 이전보다 많은 기상 자료를 사용할 수 있지만, 예보에 집착하면 항구에 묶여 있게 된다.\n분석 과다로 항해를 미루는 경향에서 벗어나, 실제 항해로 경험을 쌓는 것이 중요하다.\n과도한 기상 분석보다 실행이 더 나은 항해자를 만든다는 조언이다.",
-   "cat": "항해술",
-   "link": "https://www.yachtingmonthly.com/blogs/stop-obsessing-over-forecasts-my-cure-for-sailings-analysis-paralysis-lu-heikell-106050",
-   "source": "Yachting Monthly",
-   "date": "2026-08-18T05:53:31.000Z"
-  },
-  {
-   "title": "Seagull outboard: the best in the world?",
-   "t_ko": "Seagull 외부 엔진: 세계 최고인가?",
-   "s_ko": "British Seagull 외부 엔진은 단순하고 가볍운 설계로 20세기 초 목재 선박 시대에 맞춰진 것이다.\n10:1의 휘발유-오일 비율로 연료를 섞어 사용하며, 견고한 구조로 망치와 렌치로 정비할 수 있다.\n오랜 역사에도 불구하고 현재까지도 충성스러운 추종자들을 유지하고 있다.",
-   "cat": "장비",
-   "link": "https://www.pbo.co.uk/gear/seagull-outboard-the-best-in-the-world-106082",
-   "source": "PBO",
-   "date": "2026-08-18T04:46:40.000Z"
-  },
-  {
-   "title": "200 лет праздника",
-   "t_ko": "카우스 위크 200주년 축제",
-   "s_ko": "1826년 시작된 영국 카우스 위크는 지난 200년간 계속되어 올해는 37개 클래스 600척이 참가했다.\n1851년 미국 스쿠너 아메리카 우승, 1897년 빅토리아 여왕 컵 도입 등 역사적 사건들을 거쳤다.",
-   "cat": "산업",
-   "link": "https://yachtrussia.com/news/2026/08/18/20260818-200-let-prazdnika.html",
-   "source": "Yacht Russia",
-   "date": "2026-08-18T00:00:00.000Z"
-  },
-  {
-   "title": "Rocks we will remember",
-   "t_ko": "잊을 수 없는 암초들: 선주들의 좌초 경험 공유",
-   "s_ko": "요트 중개인 John Glynn은 수심 아래 숨어 있거나 수면 위로 약간 노출된 암초로 인한 좌초 위험을 알리고 있다.\n해도에 '암닭들'이나 '젖소들' 같은 이름으로 표시되고 디지털 해도 경고가 있어도 선원들은 이 수중 암초를 만난다.\n모든 항구에는 기억할 만한 암초가 적어도 하나 있으며, 경주 선수나 원양 항해자 모두 이에 면역이 아니다.",
-   "cat": "안전",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/17/rocks-we-will-remember/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-17T19:49:54.000Z"
-  },
-  {
-   "title": "When does enthusiasm become chaos?",
-   "t_ko": "축소 선원 경주의 안전성 문제",
-   "s_ko": "World Sailing은 경주 규칙 적용을 제한할 권한이 있지만, 축소 선원 경주는 계속 허용되고 있다.\n선박 충돌 방지를 위한 국제 해사기구(IMO) 국제 해상 충돌 회피 규칙이 있음에도 경주 중 선원 부족 상태가 발생한다.\n축소 선원 경주와 국제 해상 안전 규정 사이의 모순이 제기되고 있다.",
-   "cat": "안전",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/17/when-does-enthusiasm-become-chaos/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-17T18:50:23.000Z"
-  },
-  {
-   "title": "Making impact toward more inclusivity",
-   "t_ko": "월드 세일링 2025 임팩트 리포트 공개",
-   "s_ko": "세일링의 사회 포용성, 환경 책임, 사회 책임에 대한 세계 항해 연맹의 진전을 담은 2025 임팩트 리포트가 발표되었다.\n'미래를 위한 준비 2025-2029' 전략과 연계하여 포용성 강화에 중점을 두고 있다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/17/making-impact-toward-more-inclusivity/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-17T16:40:54.000Z"
-  },
-  {
-   "title": "Perhaps future isn’t here quite yet",
-   "t_ko": "La Solitaire du Figaro 2026: AI 데이터 분석이 미래 항해 기술일까?",
-   "s_ko": "1970년 창설된 La Solitaire du Figaro는 1인승 원양 경주 입문 무대로, 2026년 Figaro Bénéteau 3을 사용한다.\nJoss Creswell(GBR)은 AI 회사 digiLab의 보트 성능 데이터 및 기상 영향 분석을 받아 경주했다.\n데이터 기반 분석이 개별 선수 성능 예측을 어느 정도 지원할 수 있음을 시사한다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/08/17/perhaps-future-isnt-here-quite-yet/",
-   "source": "Scuttlebutt",
-   "date": "2026-08-17T13:49:12.000Z"
-  },
-  {
-   "title": "Why type of anode should I be using when regularly flushing an engine?",
-   "t_ko": "담수 헹굼 시 사용할 양극의 종류",
-   "s_ko": "담수나 기수에서는 염수와 다른 부식 방지 방법이 필요하다.\n열교환기에 담수가 있을 때는 아연 양극보다 알루미늄 양극이 더 잘 작동한다.\n아웃보드 엔진 헹굼 시에는 냉각 파이프에 포함된 염분 제거가 중요하다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/expert-answers/why-type-of-anode-should-i-be-using-when-regularly-flushing-an-engine-106050",
-   "source": "PBO",
-   "date": "2026-08-17T04:41:56.000Z"
   }
  ]
 }

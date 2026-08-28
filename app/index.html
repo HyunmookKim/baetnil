@@ -519,7 +519,13 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .trestore{background:#13351f;border:1px solid #2faa6a;border-radius:5px;color:#7aefaa;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap}
 .tdelp{background:none;border:1px solid #5a2a2a;border-radius:5px;color:#c87a7a;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap}
 #photoView{position:fixed;inset:0;background:#000e;display:none;align-items:center;justify-content:center;z-index:60}
-#photoView img{max-width:88vw;max-height:86vh;border-radius:6px}
+#photoView img{max-width:88vw;max-height:86vh;border-radius:6px;
+  touch-action:none;will-change:transform;transform-origin:0 0;user-select:none;-webkit-user-drag:none}
+/* 확대 배수 — 손을 떼면 사라진다 */
+#pvZoom{position:absolute;top:calc(12px + var(--sat));left:14px;color:#dfe9f2;font-size:13px;
+  font-weight:700;background:#0009;padding:4px 10px;border-radius:12px;opacity:0;
+  transition:opacity .25s;pointer-events:none}
+#pvZoom.on{opacity:1}
 .pvBtn{position:absolute;top:50%;transform:translateY(-50%);background:#ffffff14;border:1px solid #ffffff30;border-radius:50%;color:#fff;font-size:24px;width:44px;height:44px;cursor:pointer;line-height:1}
 #pvPrev{left:10px}#pvNext{right:10px}
 #pvCnt{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);color:#ccc;font-size:13px;background:#0008;padding:3px 12px;border-radius:12px}
@@ -1885,12 +1891,13 @@ header{padding-top:var(--sat)}
   <div class="tellmsg" id="tellMsg"></div>
   <div class="tellbtns" id="tellBtns"></div>
 </div></div>
-<div id="photoView" onclick="this.style.display='none'">
+<div id="photoView" onclick="pvBgTap(event)">
   <button class="pvBtn" id="pvPrev" onclick="pvNav(-1);event.stopPropagation()">‹</button>
   <img id="photoViewImg" onclick="event.stopPropagation()">
   <button class="pvBtn" id="pvNext" onclick="pvNav(1);event.stopPropagation()">›</button>
-  <button id="pvClose" onclick="document.getElementById('photoView').style.display='none'">×</button>
+  <button id="pvClose" onclick="pvClose()">×</button>
   <div id="pvCnt"></div>
+  <div id="pvZoom"></div>
 </div>
 
 <script>
@@ -1912,7 +1919,7 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08 기준 실측).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2165;
+const LANG_TOTAL = 2167;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
 
 // 열쇠는 한국어 원문 그대로 쓴다.
@@ -1935,6 +1942,10 @@ const I18N = {
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
     '취소':'Cancel', '확인':'OK', '닫기':'Close', '저장':'Save', '지우기':'Delete',
+    '{n}배':'{n}x',
+    '{n}개 목록 중':'one of {n} lists',
+    '[초안] 주기·내용 확인 필요':'[draft] Check the interval and the work',
+    '[초안] 확인 필요':'[draft] Needs checking',
     '이 사람 안 보기':'Hide this person',
     '안 보는 사람':'Hidden people',
     '안 보는 사람이 없습니다':'You have not hidden anyone',
@@ -3787,9 +3798,7 @@ const I18N = {
     '[초안] 유압·와이어 확인':'[draft] Check hydraulics and cables',
     '[초안] 자동/수동 모두':'[draft] Both automatic and manual',
     '[초안] 정원수만큼 있는지':'[draft] One for every person on board',
-    '[초안] 주기·내용 확인 필요':'[draft] Check the interval and the work',
     '[초안] 터미널·스웨이지 균열 확인':'[draft] Check terminals and swages for cracks',
-    '[초안] 확인 필요':'[draft] Needs checking',
     '[초안] 휨·부착물 확인':'[draft] Check for bends and fouling',
     '계류줄 마모·조임 상태':'Mooring line wear and tension',
     '계류줄·스프링라인 결속':'Mooring and spring lines made fast',
@@ -4189,6 +4198,10 @@ const I18N = {
     '운영자':'Администратор', '편집 중':'Редактирование', '보기 전용':'Только просмотр',
     '동기화됨':'Синхронизировано', '오프라인 · 로컬':'Офлайн · локально',
     '취소':'Отмена', '확인':'ОК', '닫기':'Закрыть', '저장':'Сохранить', '지우기':'Удалить',
+    '{n}배':'{n}x',
+    '{n}개 목록 중':'из {n} списков',
+    '[초안] 주기·내용 확인 필요':'[черновик] Уточните периодичность и объём работ',
+    '[초안] 확인 필요':'[черновик] Требует проверки',
     '이 사람 안 보기':'Скрыть этого человека',
     '안 보는 사람':'Скрытые люди',
     '안 보는 사람이 없습니다':'Вы никого не скрывали',
@@ -6041,9 +6054,7 @@ const I18N = {
     '[초안] 유압·와이어 확인':'[черновик] Проверить гидравлику и тросы',
     '[초안] 자동/수동 모두':'[черновик] И автомат, и ручной режим',
     '[초안] 정원수만큼 있는지':'[черновик] По числу людей на борту',
-    '[초안] 주기·내용 확인 필요':'[черновик] Уточните периодичность и объём работ',
     '[초안] 터미널·스웨이지 균열 확인':'[черновик] Проверить наконечники и обжимку на трещины',
-    '[초안] 확인 필요':'[черновик] Требует проверки',
     '[초안] 휨·부착물 확인':'[черновик] Проверить изгиб и обрастание',
     '계류줄 마모·조임 상태':'Износ и натяжение швартовов',
     '계류줄·스프링라인 결속':'Швартовы и шпринги закреплены',
@@ -6807,10 +6818,25 @@ async function dgResolve(){
 // 붙여넣기 자료에는 두 가지가 온다 — text/html (사진이 data: 로 박혀 있다) 과
 // text/plain (글자만). html 이 있으면 그쪽을 쓴다.
 
-// 파이어스토어 문서 한 개는 1MB 가 한계다. 사진을 그대로 넣으면 넘는다.
-// 사진 한 장이 이 크기를 넘지 않게 줄인다.
-const PHOTO_MAX_PX = 1280;
-const PHOTO_MAX_KB = 180;     // 한 장
+// ★ 사진 크기는 두 갈래다. 한동안 이 둘을 하나로 쓰고 있었다.
+//
+//   창고로 갈 때 — 파이어스토어 문서와 상관이 없다. 주소만 문서에 들어간다.
+//     그런데 인라인 시절의 180KB 를 그대로 쓰고 있어서, 1280픽셀 사진을
+//     품질 0.35 까지 눌러 담고 있었다. 정비 사진을 나중에 봐도 뭔지 알아볼 수가 없었다.
+//     사장님이 「분간이 안 된다」고 하신 것이 이것이다.
+//
+//   문서에 남을 때 — 창고에 못 올렸을 때(인터넷이 없을 때)만이다.
+//     이때는 문서 1MB 안에 들어가야 하므로 작아야 한다.
+//
+//   ★ 값을 올려도 돈은 거의 안 든다. 창고 요금에서 묶이는 것은 바이트가 아니라 건수다.
+//     사진 1,000장이 0.6GB, 한 달에 약 $0.02.
+const PHOTO_MAX_PX = 1600;    // 창고로 갈 사진
+const PHOTO_MAX_KB = 600;
+const PHOTO_Q_MIN  = 0.6;     // 여기 밑으로는 안 내린다. 내려 봐야 못 알아본다
+const PHOTO_SMALL_PX = 1280;  // 창고에 못 올려 문서에 남을 사진
+const PHOTO_SMALL_KB = 180;
+const PHOTO_SMALL_Q  = 0.35;
+const PHOTO_SMALL_MIN = 640;  // 문서에 넣을 사진은 여기까지 줄여서라도 한도를 지킨다
 const PHOTO_BUDGET_KB = 700;  // 한 글·한 소개 페이지에 들어가는 사진 전부 (문서 1MB 한계 대비 여유)
 
 // 글 안에서 사진이 있던 자리를 나타내는 표시.
@@ -7365,27 +7391,51 @@ function photoBudget(list, kb){
 }
 
 // 사진 한 장을 줄인다. 파일(File)도 그림 자료(data:)도 받는다.
-function resizePhoto(srcOrFile, cb){
+function resizePhoto(srcOrFile, cb, opt){
+  const o = opt || {};
+  const MAXPX = o.px || PHOTO_MAX_PX;
+  const MAXKB = o.kb || PHOTO_MAX_KB;
+  const QMIN  = (o.qmin != null) ? o.qmin : PHOTO_Q_MIN;
+  // MINPX 가 있으면 「한도 안에 반드시 들어가야 하는 사진」이다.
+  // 품질을 하한까지 내려도 크면 폭을 20%씩 줄여 다시 만든다. MINPX 까지만.
+  const MINPX = o.minpx || 0;
   const img = new Image();
   const isFile = (typeof File !== 'undefined') && (srcOrFile instanceof Blob);
   img.onload = ()=>{
-    let w = img.naturalWidth, h = img.naturalHeight;
-    if(!w || !h){ cb(null); return; }
-    const sc = Math.min(1, PHOTO_MAX_PX / Math.max(w, h));
-    w = Math.round(w*sc); h = Math.round(h*sc);
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    c.getContext('2d').drawImage(img, 0, 0, w, h);
-    let q = 0.82, out = c.toDataURL('image/jpeg', q);
-    while(out.length > PHOTO_MAX_KB*1024 && q > 0.35){
-      q -= 0.08;
+    const W0 = img.naturalWidth, H0 = img.naturalHeight;
+    if(!W0 || !H0){ cb(null); return; }
+    let px = MAXPX, out = null;
+    for(;;){
+      const sc = Math.min(1, px / Math.max(W0, H0));
+      const w = Math.max(1, Math.round(W0*sc)), h = Math.max(1, Math.round(H0*sc));
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      let q = 0.85;
       out = c.toDataURL('image/jpeg', q);
+      while(out.length > MAXKB*1024 && q > QMIN){
+        q -= 0.05;
+        out = c.toDataURL('image/jpeg', q);
+      }
+      if(out.length <= MAXKB*1024) break;
+      // 창고로 갈 사진(MINPX 없음)은 좀 커도 그냥 둔다 — 화질이 먼저다.
+      if(!MINPX || px <= MINPX) break;
+      px = Math.max(MINPX, Math.round(px*0.8));
     }
     if(isFile) URL.revokeObjectURL(img.src);
-    cb(out.length > PHOTO_MAX_KB*1024*1.6 ? null : out);
+    cb(out);
   };
   img.onerror = ()=>{ cb(null); };
   img.src = isFile ? URL.createObjectURL(srcOrFile) : String(srcOrFile);
+}
+// 창고에 못 올렸을 때 문서에 넣을 작은 사진. 이때만 화질을 포기한다.
+function smallInline(src){
+  return new Promise(res => {
+    try{
+      resizePhoto(src, out => res(out || src),
+        { px: PHOTO_SMALL_PX, kb: PHOTO_SMALL_KB, qmin: PHOTO_SMALL_Q, minpx: PHOTO_SMALL_MIN });
+    }catch(_){ res(src); }
+  });
 }
 
 // 여러 장을 차례로 줄인다
@@ -7452,7 +7502,9 @@ async function toStored(list){
       primePhoto(url, p);          // 기다리지 않는다 — 글 올리는 것을 늦추면 안 된다
       if(t){ turl = await window.__photos.put(t); primePhoto(turl, t); }
     }catch(e){ url = null; }
-    photos.push(url || p);
+    // ★ 창고에 못 올렸으면 문서 안에 글자로 남는다. 그때만 작게 줄인다 —
+    //   큰 사진을 그대로 넣으면 문서 1MB 를 넘겨 저장 자체가 실패한다.
+    photos.push(url || await smallInline(p));
     thumbs.push(turl);
   }
   return { photos, thumbs };
@@ -8555,7 +8607,7 @@ const NEED_BOAT_WRAP = {
   'boat:fuel':   ['fuelWrap',     '연료 기록'],
   'boat:docs':   ['contactsWrap', '문서 · 연락처'],
   'voyage:':     ['voyageWrap',   '항해일지'],
-  'home:check':  ['checkWrap',    '출항 전 점검']
+  'home:check':  ['checkWrap',    '체크리스트']
 };
 // ★ 안내를 넣기 전에 있던 것을 기억해 둔다.
 //
@@ -14758,7 +14810,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.45';
+const APP_VER = '4.50';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -15843,20 +15895,139 @@ function renderPhotoPreview(){
     : `<span style="font-size:11px;color:#2a4a6a">${esc(t('사진 없음'))}</span>`;
 }
 
-// ===== 사진 뷰어 (여러 장 넘기기) =====
+// ===== 사진 뷰어 (여러 장 넘기기 + 확대) =====
+// ★ 정비 사진은 키워 봐야 무엇인지 안다. 화면에 맞춘 크기가 끝이면 볼 이유가 없다.
+//   적재표 도면 확대와 같은 결로 만든다 — 두 손가락 · 두 번 톡 · 휠.
+const PVZ_MIN = 1, PVZ_MAX = 6;
+let pvZ = { s:1, x:0, y:0 };
+let pvMoved = 0;          // 끌다 손을 떼면 닫히면 안 된다
+function pvImg(){ return document.getElementById('photoViewImg'); }
+function pvApply(anim){
+  const im = pvImg(); if(!im) return;
+  im.style.transition = anim ? 'transform .18s' : '';
+  im.style.transform = 'translate(' + pvZ.x + 'px,' + pvZ.y + 'px) scale(' + pvZ.s + ')';
+  const z = document.getElementById('pvZoom');
+  if(z){
+    // ★ 글자를 이어 붙이지 않는다. 사전을 거쳐야 다른 말에서도 옳게 나온다.
+    z.textContent = pvZ.s > 1.02 ? tsub('{n}배', { n: Math.round(pvZ.s*10)/10 }) : '';
+    z.classList.toggle('on', pvZ.s > 1.02);
+  }
+  // 확대 중에는 넘김 단추가 사진을 가린다
+  const one = pvList.length < 2 || pvZ.s > 1.02;
+  const a = document.getElementById('pvPrev'), b2 = document.getElementById('pvNext');
+  if(a) a.style.display = one ? 'none' : '';
+  if(b2) b2.style.display = one ? 'none' : '';
+}
+// 사진이 화면 밖으로 달아나지 않게 붙잡는다
+function pvClamp(){
+  const im = pvImg(); if(!im) return;
+  const w = im.clientWidth * pvZ.s, h = im.clientHeight * pvZ.s;
+  const W = window.innerWidth, H = window.innerHeight;
+  const x0 = (W - im.clientWidth) / 2, y0 = (H - im.clientHeight) / 2;
+  // 사진이 화면보다 작으면 가운데로
+  pvZ.x = (w <= W) ? (W - w)/2 - x0 : Math.min(-x0, Math.max(W - w - x0, pvZ.x));
+  pvZ.y = (h <= H) ? (H - h)/2 - y0 : Math.min(-y0, Math.max(H - h - y0, pvZ.y));
+}
+function pvReset(){ pvZ = { s:1, x:0, y:0 }; pvApply(false); }
+function pvZoomAt(mul, cx, cy){
+  const want = Math.max(PVZ_MIN, Math.min(PVZ_MAX, pvZ.s * mul));
+  const k = want / pvZ.s;
+  pvZ.x = cx - (cx - pvZ.x) * k;
+  pvZ.y = cy - (cy - pvZ.y) * k;
+  pvZ.s = want;
+  pvClamp(); pvApply(true);
+}
 function pvOpen(list, idx){
   if(!list || !list.length) return;
-  pvList = list; pvIdx = idx||0; pvShow();
+  pvList = list; pvIdx = idx||0;
   document.getElementById('photoView').style.display = 'flex';
+  pvShow();
+  pvZoomBind();
+}
+function pvClose(){
+  document.getElementById('photoView').style.display = 'none';
+  pvReset();
+}
+// ★ 확대해서 끌고 다니다 손을 떼면 배경을 누른 것처럼 닫혀 버렸다. 움직였으면 안 닫는다.
+function pvBgTap(e){
+  if(pvMoved > 8){ pvMoved = 0; return; }
+  if(e && e.target && e.target.id !== 'photoView') return;
+  pvClose();
 }
 function pvShow(){
+  pvReset();                                   // 사진을 바꾸면 배수도 처음으로
   document.getElementById('photoViewImg').src = pvList[pvIdx];
   document.getElementById('pvCnt').textContent = (pvIdx+1) + ' / ' + pvList.length;
-  const one = pvList.length<2;
-  document.getElementById('pvPrev').style.display = one?'none':'';
-  document.getElementById('pvNext').style.display = one?'none':'';
+  pvApply(false);
 }
 function pvNav(d){ pvIdx = (pvIdx + d + pvList.length) % pvList.length; pvShow(); }
+// 두 손가락 · 두 번 톡 · 휠 · 끌기
+function pvZoomBind(){
+  const v = document.getElementById('photoView');
+  const im = pvImg();
+  if(!v || !im || v.__pz) return;
+  v.__pz = true;
+  let drag = null, pinch = null, lastTap = 0;
+  im.addEventListener('pointerdown', e=>{
+    if(pinch) return;
+    drag = { x:e.clientX, y:e.clientY, ox:pvZ.x, oy:pvZ.y };
+    pvMoved = 0;
+  });
+  im.addEventListener('pointermove', e=>{
+    if(!drag || pinch) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    pvMoved += Math.abs(dx) + Math.abs(dy);
+    if(pvZ.s <= 1.02) return;                  // 확대 전에는 끌 것이 없다
+    pvZ.x = drag.ox + dx; pvZ.y = drag.oy + dy;
+    pvClamp(); pvApply(false);
+  });
+  const up = ()=>{ drag = null; };
+  im.addEventListener('pointerup', up);
+  im.addEventListener('pointercancel', up);
+  // 두 번 톡 — 키우고, 이미 컸으면 되돌린다
+  im.addEventListener('click', e=>{
+    e.stopPropagation();
+    const now = Date.now();
+    if(now - lastTap < 300 && pvMoved < 8){
+      const r = im.getBoundingClientRect();
+      if(pvZ.s > 1.02) pvReset();
+      else pvZoomAt(2.5, e.clientX - r.left + pvZ.x, e.clientY - r.top + pvZ.y);
+      lastTap = 0;
+      return;
+    }
+    lastTap = now;
+  });
+  im.addEventListener('touchstart', e=>{
+    if(e.touches.length === 2){
+      drag = null;
+      const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                           e.touches[0].clientY-e.touches[1].clientY);
+      pinch = { d, s:pvZ.s,
+        cx:(e.touches[0].clientX+e.touches[1].clientX)/2,
+        cy:(e.touches[0].clientY+e.touches[1].clientY)/2 };
+    }
+  }, {passive:true});
+  im.addEventListener('touchmove', e=>{
+    if(!pinch || e.touches.length !== 2) return;
+    e.preventDefault();
+    const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
+                         e.touches[0].clientY-e.touches[1].clientY);
+    const want = Math.max(PVZ_MIN, Math.min(PVZ_MAX, pinch.s * (d/pinch.d)));
+    const k = want / pvZ.s;
+    pvZ.x = pinch.cx - (pinch.cx - pvZ.x) * k;
+    pvZ.y = pinch.cy - (pinch.cy - pvZ.y) * k;
+    pvZ.s = want;
+    pvMoved += 20;
+    pvClamp(); pvApply(false);
+  }, {passive:false});
+  im.addEventListener('touchend', e=>{ if(e.touches.length < 2){ pinch = null; drag = null; } });
+  // 컴퓨터에서 쓰는 사람
+  im.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const r = im.getBoundingClientRect();
+    pvZoomAt(e.deltaY < 0 ? 1.25 : 1/1.25, e.clientX - r.left + pvZ.x, e.clientY - r.top + pvZ.y);
+  }, {passive:false});
+}
 function viewPhotos(id){ const it=getItem(id); if(it && it.photos.length) pvOpen(it.photos, 0); }
 
 function addItem(){
@@ -16728,8 +16899,12 @@ function setMrSub(k){
 //   첫 화면은 '오늘 나갈 수 있나' 이지 적재표가 아니다.
 const TAB_TITLES = {home:t('오늘'), boat:t('배'), voyage:t('항해일지'), community:t('커뮤니티'),
   stow:t('적재표'), maint:t('정기점검'), repair:t('수리목록'), weather:t('날씨 · 물때'),
-  fuel:t('연료 기록'), news:t('뉴스'), contacts:t('문서 · 연락처'), check:t('출항 전 점검')};
-const HOMESUB_TITLES = {today:t('오늘'), weather:t('날씨 · 물때'), check:t('출항 전 점검')};
+  fuel:t('연료 기록'), news:t('뉴스'), contacts:t('문서 · 연락처'), check:t('체크리스트')};
+// ★ 이 탭 안에는 목록이 여럿이다 (출항 전 · 입항 후 · 정박 중 …).
+//   첫 목록 이름을 탭 이름으로 쓰면 나머지가 없는 것처럼 보인다. 갈래 이름을 쓴다.
+// ★ 「점검」이라고만 하면 배 탭의 「정기점검」과 헷갈린다 —
+//   정기점검은 주기가 있는 정비, 이쪽은 나갈 때마다 훑는 목록이다. 그래서 「체크리스트」다.
+const HOMESUB_TITLES = {today:t('오늘'), weather:t('날씨 · 물때'), check:t('체크리스트')};
 // ★ 이름이 길면 360픽셀 화면에서 마지막 칸이 [편집 중] 단추에 잘려 보인다.
 //   옆으로 밀어 볼 수는 있지만, 잘린 글자는 고장으로 읽힌다. 짧게 줄인다.
 const BOATSUB_TITLES = {stow:t('적재표'), maint:t('정기점검'), repair:t('수리'),
@@ -16776,7 +16951,7 @@ function setBoatSubTab(k){
   switchTab('boat');
 }
 // 정비 안의 하위 화면 이름 (옛 이름 — 배 탭 하위로 옮겨졌다)
-const MRSUB_TITLES = {maint:t('정기점검'), repair:t('수리목록'), fuel:t('연료 기록'), check:t('출항 전 점검')};
+const MRSUB_TITLES = {maint:t('정기점검'), repair:t('수리목록'), fuel:t('연료 기록'), check:t('체크리스트')};
 // 커뮤니티 안의 하위 화면
 let comSub = (function(){ try{ return localStorage.getItem('bt_comsub') || 'talk'; }catch(_){ return 'talk'; } })();
 // ★ '영업' 은 원래 '배 둘러보기' 의 필터다. 따로 탭일 이유가 없다.
@@ -17104,12 +17279,19 @@ function renderHome(){
     const curId = (typeof ckCurId === 'function') ? ckCurId() : null;
     const cur = lists.find(x => String(x.id) === String(curId || '')) || lists[0];
     if(cur){
-      const items2 = (checkt || []).filter(x => String(x.list) === String(cur.id));
+      // ★ 스스로 거르지 않는다. 점검 화면과 같은 문(ckItems)을 쓴다.
+      //   전에는 여기서 String(x.list) === 목록id 로 걸렀는데,
+      //   list 값이 없는 항목(옛 자료에 많다)이 통째로 빠져 늘 0 / 0 이었다.
+      //   점검 화면에서는 11개가 보이는데 오늘 화면만 0 / 0 — 사장님이 잡아 주셨다.
+      const items2 = (typeof ckItems === 'function') ? ckItems(cur.id)
+                   : (checkt || []).filter(x => String(x.list) === String(cur.id));
       const doneIds = (typeof ckDone === 'function') ? ckDone(cur.id, cur.cycle) : [];
       const doneN = items2.filter(x => doneIds.indexOf(String(x.id)) >= 0).length;
-      out += homeCard(esc(t('출항 전 점검')),
+      // ★ 이 카드는 목록 하나만 센다. 그러니 이름도 그 목록 이름을 쓴다.
+      //   전에는 늘 「출항 전 점검」이라 적어 놓고 「입항 후」를 세고 있을 수도 있었다.
+      out += homeCard(esc(cur.name || t('체크리스트')),
         `<div class="hbig">${doneN} / ${items2.length}</div>`
-        + `<div class="hmute">${esc(cur.name || '')}</div>`,
+        + `<div class="hmute">${esc(tsub('{n}개 목록 중', {n: lists.length}))}</div>`,
         "setHomeSub('check')", t('점검하기'));
     }
   }catch(e){}
@@ -18411,7 +18593,8 @@ function closeTopOverlay(){
   const id = OVERLAY_STACK[OVERLAY_STACK.length - 1];
   if(!id) return false;
   const F = {
-    photoView: ()=>{ const e = document.getElementById('photoView'); if(e) e.style.display = 'none'; },
+    photoView: ()=>{ if(typeof pvClose === 'function') pvClose();
+                     else { const e = document.getElementById('photoView'); if(e) e.style.display = 'none'; } },
     recPick:   ()=>closeRecPick(),
     dgPick:    ()=>closeDgPick(),
     drawerOv:  ()=>closeDrawer(),
@@ -26070,6 +26253,14 @@ applyLang();
 applyLock();
 initStorage().then(()=>{
   ensureBoat(); applyAccount();
+  // ★ 배가 있으면 그 배 홈포트를 날씨 지점으로 잡아 둔다.
+  //   전에는 배를 만들거나 바꿀 때만 잡았다. 앱을 다시 켜기만 하면
+  //   오늘 화면 날씨 칸이 늘 「어디 날씨를 볼지 아직 정하지 않았습니다」 였다.
+  //   기본 지점 목록(WX_SPOTS_DEFAULT)이 비어 있어 wxInit() 만으로는 안 잡힌다.
+  try{
+    const b0 = (typeof curBoat === 'function') ? curBoat() : null;
+    if(b0 && typeof syncPortSpot === 'function'){ syncPortSpot(b0); ensureWx(); }
+  }catch(_){}
   // ★ 켤 때 반드시 한 번 그린다. 안 그리면 아래 탭은 '오늘' 인데
   //   화면은 적재표가 그대로 남아 서로 어긋난다.
   switchTab(curTab);

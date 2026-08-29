@@ -2711,6 +2711,8 @@ const I18N = {
     '커뮤니티에 올라갑니다':'Shared with the community',
     '나만 봅니다':'Private',
     '일부 공개':'Unlisted',
+    '한국':'Korea',
+    '일본':'Japan',
     '기본만':'Basic only',
     '세부까지':'Full details',
     '제원이 밖으로 안 나갑니다.':'No specifications leave the boat.',
@@ -5184,6 +5186,8 @@ const I18N = {
     '커뮤니티에 올라갑니다':'Опубликовано в сообществе',
     '나만 봅니다':'Только для меня',
     '일부 공개':'Доступ по ссылке',
+    '한국':'Корея',
+    '일본':'Япония',
     '기본만':'Только основное',
     '세부까지':'Со всеми подробностями',
     '제원이 밖으로 안 나갑니다.':'Характеристики наружу не выходят.',
@@ -7711,6 +7715,8 @@ const I18N = {
     '커뮤니티에 올라갑니다':'コミュニティに公開されます',
     '나만 봅니다':'自分だけが見ます',
     '일부 공개':'限定公開',
+    '한국':'韓国',
+    '일본':'日本',
     '기본만':'基本のみ',
     '세부까지':'詳細まで',
     '제원이 밖으로 안 나갑니다.':'仕様は外に出ません。',
@@ -18602,7 +18608,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.73';
+const APP_VER = '4.74';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26484,8 +26490,39 @@ const SPOT_SEED_FROM = '해양수산부 자료';
 //   ★ 그래서 네모를 둘로 쪼개고, 본토 쪽 서쪽 끝을 대한해협 한가운데에 둔다
 //     (부산 129.04°E · 쓰시마 129.3°E — 그 사이인 129.2°E 로 긋는다).
 //   ★ 그리고 말이 일본어면 어디에 있든 받는다. 일본말로 쓰는 사람은 일본 정박지를 본다.
+// ── 나라 (4.74, 사장님이 정하신 것)
+// ★ 정박지도 기준값도 나라별로 갈라 본다. 재는 곳은 countryOf 하나다 —
+//   두 곳에서 재면 정박지에서는 일본인데 기준값에서는 한국인 자리가 생긴다.
+// ★ 좌표로 가르는 것은 마지막 수단이다. 대마도처럼 두 나라 사이에 있는 자리가 있어서
+//   좌표만으로는 못 가른다. 그래서 ① 자료에 적힌 나라 ② 꾸러미의 나라 를 먼저 본다.
+const COUNTRIES = [
+  { k:'kr', name:'한국', boxes:[ [33.0, 124.5, 38.7, 129.6] ] },
+  { k:'jp', name:'일본', boxes:[ [30.0, 129.2, 46.0, 146.5],    // 규슈·본토·홋카이도
+                                 [24.0, 122.0, 30.0, 131.5] ] } // 오키나와·사키시마
+];
+const countryName = k => (COUNTRIES.find(c => c.k === k) || {}).name || '';
+function inBoxes(boxes, la, lo){
+  if(!Array.isArray(boxes) || la == null || lo == null) return false;
+  if(!isFinite(la) || !isFinite(lo)) return false;
+  return boxes.some(b => la >= b[0] && la <= b[2] && lo >= b[1] && lo <= b[3]);
+}
+// 이 자리가 어느 나라인가. 모르면 빈 값 — 「전체」 에만 보인다.
+function countryOf(x){
+  if(!x) return '';
+  if(x.cc && COUNTRIES.some(c => c.k === x.cc)) return x.cc;   // ① 적혀 있으면 그대로
+  const la = x.lat, lo = x.lon;                                 // ② 좌표로
+  const hit = COUNTRIES.find(c => inBoxes(c.boxes, la, lo));
+  return hit ? hit.k : '';
+}
+// 지금 자료에 실제로 있는 나라만 띠에 올린다.
+// ★ 한국만 쓰는 분에게 「한국」 단추 하나만 덩그러니 보이면 그게 더 이상하다.
+function countriesIn(rows){
+  const seen = new Set((rows || []).map(countryOf).filter(Boolean));
+  return COUNTRIES.filter(c => seen.has(c.k));
+}
+
 const SPOT_PACKS = [
-  { k:'jp', name:'일본', file:'spots-jp.json', tide:'tide-jp.json', lang:'ja', from:'',
+  { k:'jp', cc:'jp', name:'일본', file:'spots-jp.json', tide:'tide-jp.json', lang:'ja', from:'',
     boxes:[ [30.0, 129.2, 46.0, 146.5],    // 규슈·본토·홋카이도
             [24.0, 122.0, 30.0, 131.5] ]   // 오키나와·사키시마
   }
@@ -26543,6 +26580,7 @@ function spotPackAll(){
     (spotPackRows[pk.k] || []).forEach(x => {
       const row = seedSpotRow(x);
       row.byName = pk.from || pk.name;
+      if(pk.cc) row.cc = pk.cc;          // ★ 꾸러미의 나라를 그대로 박는다 (좌표로 안 헤맨다)
       out.push(row);
     });
   });
@@ -26553,6 +26591,8 @@ function seedSpotRow(x){
   const fac = {};
   String(x.f||'').split(',').filter(Boolean).forEach(k=>{ fac[k] = true; });
   return { id:x.i, name:x.n, kind:x.k, lat:x.la, lon:x.lo, region:x.r,
+           cc: x.cc || 'kr',            // ★ 앱에 든 152곳은 우리나라 관 자료다
+
            fac, note:x.t || '', plan:!!x.p, seed:true,
            by:'', byName:SPOT_SEED_FROM, ts:'',
            open:[], depth:'', lowTide:false, depthFrom:null, bottom:'',
@@ -26596,6 +26636,23 @@ let spotKind = (function(){
   try{ const v = localStorage.getItem('bt_spotkind'); if(v != null) return v; }catch(_){}
   return null;   // 아직 안 골랐다 — 배 종류를 보고 정한다
 })();
+// 지금 고른 나라 ('' 이면 전체)
+let spotCc = (()=>{ try{ return localStorage.getItem('bt_spotcc') || ''; }catch(_){ return ''; } })();
+function setSpotCc(v){
+  spotCc = v || '';
+  try{ localStorage.setItem('bt_spotcc', spotCc); }catch(_){}
+  renderSpots();
+}
+// ★ 나라가 하나뿐이면 띠를 안 띄운다 — 「한국」 단추 하나만 있는 띠는 자리만 먹는다.
+function spotCcBar(){
+  const cs = countriesIn(spotsForList());
+  if(cs.length < 2){ if(spotCc) spotCc = ''; return ''; }
+  return `<div class="tfilt">`
+    + `<button class="tchip${spotCc?'':' on'}" onclick="setSpotCc('')">${esc(t('전체'))}</button>`
+    + cs.map(c=>`<button class="tchip${spotCc===c.k?' on':''}" onclick="setSpotCc('${c.k}')">${
+        esc(t(c.name))}</button>`).join('')
+    + `</div>`;
+}
 function spotKindNow(){
   if(spotKind != null) return spotKind;
   return (typeof isFishing === 'function' && isFishing()) ? 'port' : '';
@@ -26676,6 +26733,8 @@ async function renderSpots(){
   W.innerHTML = (off
       ? `<div class="spotoff">${esc(t('인터넷이 없습니다 — 관에서 낸 정박지는 그대로 보입니다. 사람들이 올린 곳과 다녀온 이야기는 연결되면 보입니다.'))}</div>`
       : '')
+    // ★ 4.74 — 나라 띠 (사장님이 정하신 것). 자료가 두 나라 이상일 때만 뜬다.
+    + spotCcBar()
     + `<div class="tfilt">`
       + `<button class="tchip${spotKindNow()?'':' on'}" onclick="setSpotKind('')">${esc(t('전체'))}</button>`
       + SPOT_KINDS.map(k=>`<button class="tchip${spotKindNow()===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
@@ -26695,6 +26754,7 @@ function spotRowsHtml(){
   const here = herePos();
   const rows = spotsForList()
     .filter(s => !s.hidden || isAdmin('postDel'))
+    .filter(s => !spotCc || countryOf(s) === spotCc)      // ★ 4.74 — 나라
     .filter(s => !spotKindNow() || s.kind === spotKindNow())
     .filter(s => spotMatch(s, spotQ))
     .sort((a,b)=>{
@@ -31182,15 +31242,6 @@ function wxTs(str, d){
 // ============================================================
 // 지역 기준값: 약최고고조위(HAT). 해도상 다리 높이(clr)의 기준면.
 // 실제 통과높이 = 해도 표기 높이 + (HAT − 현재 조위)
-const HAT_PRESETS = {
-  '여수':      { hat: 3.62, lat: 34.7470, lon: 127.7520 },
-  '부산':      { hat: 1.35, lat: 35.0960, lon: 129.0350 },
-  '목포':      { hat: 4.85, lat: 34.7800, lon: 126.3750 },
-  '통영':      { hat: 3.15, lat: 34.8270, lon: 128.4340 },
-  '완도':      { hat: 3.95, lat: 34.3160, lon: 126.7590 },
-  '제주':      { hat: 2.85, lat: 33.5270, lon: 126.5430 },
-  '인천':      { hat: 9.55, lat: 37.4510, lon: 126.5920 },
-};
 // 날씨 지점은 배마다 다르다. 처음엔 비워두고 현재 위치나 직접 추가로 채운다.
 const WX_SPOTS_DEFAULT = [];
 
@@ -31520,11 +31571,14 @@ function wxUseGPS(){
     { enableHighAccuracy:false, timeout:10000, maximumAge:300000 }
   );
 }
+// 가장 가까운 기준지역 이름. 표는 HAT_BUILTIN 하나뿐이다 (4.74).
+// ★ HAT_BUILTIN 이 이 함수보다 아래에 선언되어 있어도 된다 — 부를 때는 이미 올라와 있다.
 function wxNearestRegion(lat, lon){
   let best='여수', bd=1e9;
-  Object.entries(HAT_PRESETS).forEach(([k,v])=>{
+  (typeof HAT_BUILTIN !== 'undefined' ? HAT_BUILTIN : []).forEach(v=>{
+    if(v.lat == null) return;
     const d = (v.lat-lat)**2 + (v.lon-lon)**2;
-    if(d<bd){ bd=d; best=k; }
+    if(d<bd){ bd=d; best=v.name; }
   });
   return best;
 }
@@ -31665,14 +31719,20 @@ function marginEdit(){ openBoat('spec'); }
 // ===== 날씨탭 v2 : 윈디식 타임라인 + 조위 + 다리 + HAT 관리 =====
 // ============================================================
 // [지역 기준값 HAT] "여수 3.62" 형식 목록 저장 · 추가 · 선택
+// ★ 4.74 — 표가 두 곳(HAT_PRESETS·HAT_BUILTIN)에 있었다. 하나로 모았다.
+//   ★ 다리 통과 높이에 쓰는 값이다. 두 표가 어긋나면 배가 다리에 부딪힌다.
+//
+// ★ 일본도 계산식이 같다 — 일본 해도의 다리 높이는 「最高水面」 기준이고,
+//   그 정의가 우리 약최고고조위와 같다 (평균수면에서 4대분조 진폭의 합만큼 올린 값).
+//   숫자는 해상보안청 고시표에서 받아 채운다. **지어내지 않는다.**
 const HAT_BUILTIN = [
-  { name:'여수', hat:3.62, lat:34.7470, lon:127.7520 },
-  { name:'통영', hat:3.15, lat:34.8270, lon:128.4340 },
-  { name:'부산', hat:1.35, lat:35.0960, lon:129.0350 },
-  { name:'완도', hat:3.95, lat:34.3160, lon:126.7590 },
-  { name:'목포', hat:4.85, lat:34.7800, lon:126.3750 },
-  { name:'제주', hat:2.85, lat:33.5270, lon:126.5430 },
-  { name:'인천', hat:9.55, lat:37.4510, lon:126.5920 },
+  { cc:'kr', name:'여수', hat:3.62, lat:34.7470, lon:127.7520 },
+  { cc:'kr', name:'통영', hat:3.15, lat:34.8270, lon:128.4340 },
+  { cc:'kr', name:'부산', hat:1.35, lat:35.0960, lon:129.0350 },
+  { cc:'kr', name:'완도', hat:3.95, lat:34.3160, lon:126.7590 },
+  { cc:'kr', name:'목포', hat:4.85, lat:34.7800, lon:126.3750 },
+  { cc:'kr', name:'제주', hat:2.85, lat:33.5270, lon:126.5430 },
+  { cc:'kr', name:'인천', hat:9.55, lat:37.4510, lon:126.5920 },
 ];
 function hatList(){
   const custom = wxLS('bt_hatlist', []);
@@ -31700,15 +31760,26 @@ function hatCurrent(){
 function hatPanel(){
   const sel = wxLS('bt_hatsel', {mode:'auto'});
   const cur = hatCurrent();
-  const rows = hatList().map(x=>`
+  const one = x => `
     <div class="hrowi">
       <label><input type="radio" name="hatsel" ${sel.mode==='manual'&&sel.name===x.name?'checked':''}
-        onchange="hatPick('${esc(x.name)}')"> <b>${esc(x.name)}</b> ${x.hat.toFixed(2)}</label>
+        onchange="hatPick('${esc(x.name)}')"> <b>${esc(t(x.name))}</b> ${x.hat.toFixed(2)}</label>
       <span>
         <button class="mrbtn edt" onclick="hatEditOne('${esc(x.name)}')">${esc(t('수정'))}</button>
         ${x.builtin?'':`<button class="mrbtn warn edt" onclick="hatDelOne('${esc(x.name)}')">${esc(t('삭제'))}</button>`}
       </span>
-    </div>`).join('');
+    </div>`;
+  // ★ 4.74 — 나라별로 묶어 보여 준다 (사장님이 정하신 것).
+  //   나라를 재는 곳은 countryOf 하나다 — 정박지 띠와 같은 문을 쓴다.
+  //   나라가 하나뿐이면 묶음 이름을 안 붙인다. 「한국」 한 줄만 있는 묶음은 자리만 먹는다.
+  const all = hatList();
+  const cs = countriesIn(all);
+  const rows = (cs.length < 2)
+    ? all.map(one).join('')
+    : cs.map(c => `<div class="vsec">${esc(t(c.name))}</div>`
+                + all.filter(x => countryOf(x) === c.k).map(one).join('')).join('')
+      + (()=>{ const rest = all.filter(x => !countryOf(x));
+          return rest.length ? `<div class="vsec">${esc(t('그 밖'))}</div>` + rest.map(one).join('') : ''; })();
   const P = document.getElementById('hatPanelBody');
   P.innerHTML = `
     <div class="mrtop"><b>${esc(t('기준값 (약최고고조위 HAT)'))}</b><button class="mrbtn" onclick="hatClose()">${esc(t('닫기'))}</button></div>
@@ -31717,9 +31788,17 @@ function hatPanel(){
       onchange="hatPick(null)"> <b>${esc(t('자동'))}</b> ${esc(tsub('— 현재 위치에서 가장 가까운 지역 (지금: {n} {v})', { n: cur.name, v: cur.hat.toFixed(2) }))}</label></div>
     ${rows}
     <div style="padding:10px 0"><button class="tab edt" onclick="hatAddOne()">${esc(t('+ 지역 추가'))}</button></div>`;
-  document.getElementById('hatPanelOv').classList.add('open');
+  // ★★★ 4.74 — 여기서 class 만 붙이고 있었다. 그러면 뒤 화면이 자리에서 안 빠져
+  //   글자가 겹쳐 보인다 (사장님이 사진으로 잡아 주셨다 — 남의 배 목록 위에 기준값이 겹쳤다).
+  //   화면을 갈아 끼우는 문은 screenPush 하나다. 다른 화면 서른다섯 개가 다 그 문으로 간다.
+  const OV = document.getElementById('hatPanelOv');
+  OV.classList.add('open');
+  try{ screenPush('hatPanelOv'); }catch(_){}
 }
-function hatClose(){ document.getElementById('hatPanelOv').classList.remove('open'); }
+function hatClose(){
+  try{ screenPop('hatPanelOv'); }catch(_){}
+  document.getElementById('hatPanelOv').classList.remove('open');
+}
 function hatPick(name){
   wxSet('bt_hatsel', name ? {mode:'manual', name} : {mode:'auto'});
   hatPanel(); renderWeather();

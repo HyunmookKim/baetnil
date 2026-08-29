@@ -2710,6 +2710,11 @@ const I18N = {
     '공개':'Sharing',
     '커뮤니티에 올라갑니다':'Shared with the community',
     '나만 봅니다':'Private',
+    '일부 공개':'Unlisted',
+    '남의 배 목록에 실립니다. 아무나 찾아봅니다.':'Listed under Other boats. Anyone can find it.',
+    '목록에는 안 실립니다. 내 배를 찾아 들어온 사람은 봅니다. 가입도 필요 없습니다.':'Not listed. Anyone who opens your boat page can see it — no account needed.',
+    '밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.':'Never leaves the boat. Inside, rank permissions decide who sees it.',
+    '공개해도 메모와 산 값은 나가지 않습니다. 산 값은 따로 켜야 나갑니다.':'Notes and the price you paid stay private. Turn the price on separately.',
     '내리기':'Unshare',
     '공개하기':'Share',
     '공개해도 메모는 나가지 않습니다. 절차·사진·난이도·걸린 시간·든 돈만 나갑니다.':'Your notes are never shared. Only the steps, photos, difficulty, time and cost go out.',
@@ -5169,6 +5174,11 @@ const I18N = {
     '공개':'Публикация',
     '커뮤니티에 올라갑니다':'Опубликовано в сообществе',
     '나만 봅니다':'Только для меня',
+    '일부 공개':'Доступ по ссылке',
+    '남의 배 목록에 실립니다. 아무나 찾아봅니다.':'Появляется в списке «Другие суда». Найти может любой.',
+    '목록에는 안 실립니다. 내 배를 찾아 들어온 사람은 봅니다. 가입도 필요 없습니다.':'В списке не появляется. Видят те, кто открыл страницу вашего судна — регистрация не нужна.',
+    '밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.':'Наружу не выходит. Внутри судна видно по рангу.',
+    '공개해도 메모와 산 값은 나가지 않습니다. 산 값은 따로 켜야 나갑니다.':'Заметки и уплаченная цена не публикуются. Цену включают отдельно.',
     '내리기':'Снять',
     '공개하기':'Опубликовать',
     '공개해도 메모는 나가지 않습니다. 절차·사진·난이도·걸린 시간·든 돈만 나갑니다.':'Заметки не публикуются никогда. Выходят только шаги, фото, сложность, время и затраты.',
@@ -7682,6 +7692,11 @@ const I18N = {
     '적어 둔 절차가 없습니다':'記録した手順がありません',
     '커뮤니티에 올라갑니다':'コミュニティに公開されます',
     '나만 봅니다':'自分だけが見ます',
+    '일부 공개':'限定公開',
+    '남의 배 목록에 실립니다. 아무나 찾아봅니다.':'「ほかの船」の一覧に載ります。誰でも見つけられます。',
+    '목록에는 안 실립니다. 내 배를 찾아 들어온 사람은 봅니다. 가입도 필요 없습니다.':'一覧には載りません。船のページを開いた人には見えます。登録も要りません。',
+    '밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.':'外には出ません。船の中では等級のとおりに見えます。',
+    '공개해도 메모와 산 값은 나가지 않습니다. 산 값은 따로 켜야 나갑니다.':'メモと買った値段は出ません。値段は別に切り替えます。',
     '공개해도 메모는 나가지 않습니다. 절차·사진·난이도·걸린 시간·든 돈만 나갑니다.':'公開してもメモは公開されません。手順・写真・難易度・所要時間・かかった費用のみ公開されます。',
     '사람 빠짐':'落水（MOB）',
     '사람 빠짐 — 이 자리':'落水（MOB） — この位置',
@@ -12878,32 +12893,77 @@ const POS_DEF = 'area';      // 망설여지면 숨긴다 (Fishbrain 의 규칙)
 // ★ 옛 자료는 어떻게 되나
 //   pub === false 였던 것은 'none', 나머지는 'com' 이다. 지금 보이던 대로 그대로 보인다.
 //   ★ 판을 올렸다고 안 보이던 것이 보이면 안 된다. 그 반대도 안 된다.
-const VOY_LEVELS = [
-  { k:'com',  name:'커뮤니티에 올라갑니다',
-    sub:'남의 배 › 항해일지 목록에 실립니다. 아무나 찾아볼 수 있습니다.' },
-  { k:'boat', name:'내 배에 들어온 사람만',
-    sub:'목록에는 안 실립니다. 내 배를 찾아 들어온 사람만 볼 수 있습니다.' },
-  { k:'none', name:'나만 봅니다',
-    sub:'밖으로 아무것도 안 나갑니다.' }
+// ★ 4.72 — 단계 이름을 유튜브 것으로 맞춘다.
+//   공개 / 일부 공개 / 비공개. 유튜브가 똑같은 세 갈래에 쓰는 말이다 (Google 고객센터 157177).
+//   가운데 「일부 공개(Unlisted)」 가 사장님이 말씀하신 그것이다 —
+//   목록에는 안 뜨지만 찾아 들어온 사람은 다 본다. 가입도 필요 없다.
+//
+//   ★ 열쇠말 'boat' 는 그대로 둔다. 4.70 이 이미 그 글자로 저장해 놓았다.
+//     열쇠말을 바꾸면 이미 정해 둔 기록의 단계가 통째로 날아간다.
+//   ★ 항해일지·정비수첩·리뷰가 같은 표를 쓴다. 표가 셋이면 반드시 어긋난다.
+const PUB_LEVELS = [
+  { k:'com',  name:'공개',
+    sub:'남의 배 목록에 실립니다. 아무나 찾아봅니다.' },
+  { k:'boat', name:'일부 공개',
+    sub:'목록에는 안 실립니다. 내 배를 찾아 들어온 사람은 봅니다. 가입도 필요 없습니다.' },
+  { k:'none', name:'비공개',
+    sub:'밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.' }
 ];
-// 이 항해가 몇 단계인가. 판단하는 곳은 여기 하나다 — 두 곳에서 재면 반드시 어긋난다.
-function voyLv(v){
-  const k = v && v.pubLv;
-  if(VOY_LEVELS.some(x => x.k === k)) return k;
-  // 옛 항해 — 단계를 고른 적이 없다. pub 만 있다.
-  return (v && v.pub === false) ? 'none' : 'com';
+const VOY_LEVELS = PUB_LEVELS;          // 옛 이름 — 부르던 곳이 남아 있다
+
+// 이 기록이 몇 단계인가. 재는 곳은 여기 하나다 — 두 곳에서 재면 반드시 어긋난다.
+// ★ dflt 는 「단계를 고른 적이 없는 옛 기록」 을 어디로 볼 것인가이다.
+//   판을 올렸다고 안 보이던 것이 보이면 안 되고, 보이던 것이 사라져도 안 된다.
+//   항해일지는 여태 다 나갔으므로 'com', 정비수첩은 켠 것만 나갔으므로 'none' 이다.
+function pubLvOf(it, dflt){
+  const k = it && it.pubLv;
+  if(PUB_LEVELS.some(x => x.k === k)) return k;
+  if(it && it.pub === true)  return 'com';
+  if(it && it.pub === false) return 'none';
+  return dflt || 'none';
 }
-function voyLvOne(v){ const k = voyLv(v); return VOY_LEVELS.find(x => x.k === k) || VOY_LEVELS[0]; }
+function pubLvOne(k){ return PUB_LEVELS.find(x => x.k === k) || PUB_LEVELS[0]; }
+function voyLv(v){  return pubLvOf(v, 'com');  }   // 옛 항해 — 보이던 대로
+function mlogLv(m){ return pubLvOf(m, 'none'); }   // 옛 정비수첩 — 켠 것만
+function rvLv(r){   return pubLvOf(r, 'com');  }   // 옛 사용기 — 배 공개만 켜면 다 나갔다
+function voyLvOne(v){ return pubLvOne(voyLv(v)); }
+// 지금 열려 있는 기록의 단계. 갈래마다 옛 기본값이 다르므로 갈래를 받는다.
+function mrLv(ty, it){
+  if(ty === 'voyage') return voyLv(it);
+  if(ty === 'review') return rvLv(it);
+  return mlogLv(it);
+}
 // 단계를 바꾼다. pub 도 같이 맞춰 둔다 — 옛 판이 읽어도 뜻이 안 어긋나게.
-function voyLvSet(k){
+// ★ 저장·클라우드·밖 사본이 전부 이 문 안에 있다. 밖에서 따로 부르지 않는다.
+function pubLvSet(k){
   const it = getMR(mrOpenType, mrOpenId); if(!it || !unlocked) return;
-  if(!VOY_LEVELS.some(x => x.k === k)) return;
+  if(!PUB_LEVELS.some(x => x.k === k)) return;
   it.pubLv = k;
   it.pub = (k !== 'none');
   saveMR();
   if(typeof schedulePush === 'function') schedulePush();
   pubRefresh();
   openMR(mrOpenType, mrOpenId);
+}
+function voyLvSet(k){ return pubLvSet(k); }   // 옛 이름
+
+// ── 공개 줄. 항해일지·정비수첩·리뷰가 같은 말, 같은 자리를 쓴다.
+//   ★ 화면 맨 위다. 게시물 설정은 위에 모인다 (사장님이 정하신 것).
+//   배 쪽 공개설정이 꺼져 있으면 이 줄 대신 왜 안 되는지를 보여 준다 — 감추지 않는다.
+function pubLvRow(ty, it, gateKey, note){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const bOn = (typeof pubOn === 'function') ? pubOn(b, gateKey) : true;
+  const k = mrLv(ty, it), one = pubLvOne(k);
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('공개'))}</span>${unlocked
+      ? `<select onchange="pubLvSet(this.value)" style="flex:1">${
+          PUB_LEVELS.map(x => `<option value="${x.k}"${k === x.k ? ' selected' : ''}>${
+            esc(t(x.name))}</option>`).join('')}</select>`
+      : `<b class="mrv">${esc(t(one.name))}</b>`}</div>`
+    // ★ 배 쪽 스위치가 꺼져 있으면 아무리 골라도 안 나간다. 조용히 실패하지 않는다.
+    // ★ 「비공개」 로 둔 기록에까지 경고를 띄우지는 않는다 — 어차피 안 내보낼 것이다.
+    + (k !== 'none' && !bOn ? pubGateBox(gateKey) : '')
+    + `<div class="mrm" style="padding:0 14px 8px;color:#7b8794">${esc(t(one.sub))}${
+      note ? ' ' + esc(t(note)) : ''}</div>`;
 }
 
 function posLv(v){
@@ -13050,7 +13110,8 @@ function buildPublic(b){
   // ★ 그래서 어느 장비/부품에 붙었는지(gearId·itemId)는 안 나간다.
   //   그것이 나가면 「이 배에 무엇이 어디에 달렸나」 가 되어 장비 공개 스위치를 우회한다.
   if(pubOn(b,'review')){
-    o.review = rvRows().map(r => rvPublic(r)).filter(Boolean);
+    o.review = rvRows().filter(r => rvLv(r) !== 'none')
+                       .map(r => rvPublic(r)).filter(Boolean);
   }
   // 장비 — 이름과 수량만. 어느 칸에 있는지는 배에 뭐가 어디 있는지 알려주는 지도가 된다.
   if(pubOn(b,'gear')){
@@ -15074,7 +15135,10 @@ function expRows(){
     //   민카라가 500만 건을 모은 것은 기록이 아니라 설명서였기 때문이다.
     //   ★ 옛 판(4.54~4.62)이 올린 것은 정기점검(maint)에 붙어 있다. 둘 다 읽는다 —
     //     안 읽으면 이미 올라간 남의 기록이 하루아침에 사라진 것처럼 보인다.
-    const now = expFlat('mlog').map(o => ({ b:o.b, r:o.r }));
+    // ★★★ 4.72 — 「일부 공개」 는 목록에 안 싣는다. 배를 열어야 보인다.
+    //   lv 가 없는 옛 자료는 'com' 으로 본다 — 지금까지 보이던 대로 그대로 보인다.
+    const now = expFlat('mlog').filter(o => (o.r.lv || 'com') === 'com')
+                               .map(o => ({ b:o.b, r:o.r }));
     const old = expFlat('maint').filter(o => Array.isArray(o.r.how) && o.r.how.length)
       .map(o => ({ b:o.b, r:{ id:o.r.id, date:o.r.lastDate || '', title:o.r.name || '',
                               how:o.r.how, hard:o.r.hard, work:o.r.work, cost:o.r.cost,
@@ -15089,6 +15153,7 @@ function expRows(){
   //   배 리뷰는 「배를 사려는 사람」 이 보고, 제품 리뷰는 「이미 배가 있는 사람」 이 본다.
   const wantBoat = (kind === 'boatrv');
   return expFlat('review')
+    .filter(o => (o.r.lv || 'com') === 'com')      // ★ 4.72 — 「일부 공개」 는 목록에 안 실린다
     .filter(o => (String(o.r.typ||'') === 'boat') === wantBoat)
     .filter(o => hit([o.r.title, o.r.maker, o.r.model, o.r.kind, o.r.sys, o.r.text].join(' ')))
     .sort((a,b) => (Number(b.r.full||0) - Number(a.r.full||0))
@@ -18413,7 +18478,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.71';
+const APP_VER = '4.72';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -21535,19 +21600,8 @@ function openMR(kind, id){
         : `<b class="mrv">${esc(it.title||'—')}</b>`}</div>`
       // ★ 이 항해만 따로 감출 수 있다.
       //   손님 태운 날이나 개인 항해를 빼고 보여 주고 싶을 때 쓴다.
-      //   배 공개 설정에서 '항해일지' 를 켜 두었을 때만 뜻이 있다.
-      + (pubOn(curBoat(), 'voyage') ? `<div class="mrrow"><span class="mrlbl">${esc(t('공개'))}</span>${unlocked
-          // ★ 4.70 — 3단계다 (사장님이 정하신 것).
-          //   커뮤니티 / 내 배에 들어온 사람만 / 나만.
-          //   전에는 켬·끔 둘뿐이었다 — 가운데가 없어서 「배를 찾아온 사람에게만 보이기」 를 할 수가 없었다.
-          ? `<select onchange="voyLvSet(this.value)" style="flex:1">${
-              VOY_LEVELS.map(x=>`<option value="${x.k}"${voyLv(it)===x.k?' selected':''}>${esc(t(x.name))}</option>`).join('')
-            }</select>`
-          : `<b class="mrv">${esc(t(voyLvOne(it).name))}</b>`}</div>
-        <div class="mrm" style="padding:0 14px 8px;color:#7b8794">${esc(t(voyLvOne(it).sub))}</div>`
-        // ★ 4.70 — 배 쪽 「항해일지」 가 꺼져 있으면 이 줄이 통째로 사라지고 있었다.
-        //   그러면 「공개 설정이 어디 갔지」 가 된다. 감추지 말고 왜 안 되는지 말한다.
-        : pubGateBox('voyage'))
+      //   ★ 4.72 — 공개 줄은 항해일지·정비수첩·리뷰가 같은 문(pubLvRow)을 쓴다.
+      + pubLvRow('voyage', it, 'voyage')
       + tf('날짜','date',it.date,'date','')
       + tripKindRow(it)
       + posLvRow(it)
@@ -22887,9 +22941,10 @@ function renderVoyage(){
              「공개」인지 「아직 안 정함」인지 알 수가 없다. 둘 다 적는다. (사장님 지적) */''}
       ${pubOn(curBoat(),'voyage')
           ? (()=>{ const k = voyLv(v);
-              return k === 'com'  ? `<span class="chip good">${esc(t('공개'))}</span>`
-                   : k === 'boat' ? `<span class="chip">${esc(t('내 배에서만'))}</span>`
-                                  : `<span class="chip">${esc(t('나만'))}</span>`; })()
+              // ★ 4.72 — 딱지도 같은 표에서 가져온다. 목록의 말과 기록 안의 말이 다르면
+              //   사장님이 무엇을 고르셨는지 목록만 보고는 알 수가 없다.
+              return `<span class="chip${k === 'com' ? ' good' : ''}">${
+                esc(t(pubLvOne(k).name))}</span>`; })()
           : ''}</div>
       <div class="mrm">${v.date||'—'}${isFishing()&&catchCount(v)?' · '+esc(t('{n}마리').split('{n}').join(String(catchCount(v)))):''}</div>
     </div>`;
@@ -28997,6 +29052,8 @@ function rvBody(it){
   const mates = key ? rvForProd(key).filter(x => String(x.id) !== String(it.id)).length : 0;
   const star = n => `<button class="rvsb${(Number(it.stars)||0) >= n ? ' on' : ''}" onclick="mrField('stars',${n})">★</button>`;
   return `
+    ${pubLvRow('review', it, 'review',
+       '공개해도 메모와 산 값은 나가지 않습니다. 산 값은 따로 켜야 나갑니다.')}
     ${g ? `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>
         <b class="mrv" style="flex:1">${esc(gearLabel(g))}</b>
         <button class="minib blu" onclick="openMR('gear','${g.id}')">${esc(t('장비 보기'))}</button></div>` : ''}
@@ -29091,13 +29148,17 @@ function rvFullBar(it){
 //   안 나간다 — 메모 · 어느 장비 번호(gearId) · 어느 정기점검 번호 · 그 부품이 배 어느 칸에 있는지
 //   ★ 기본은 비공개다. 사람이 켜야 나간다 (항적을 항해마다 켜는 것과 같은 규칙).
 function mlogPublic(x){
-  if(!x || x.pub !== true) return null;
+  // ★ 4.72 — 단계로 가른다. 「비공개」 만 안 나간다.
+  //   「일부 공개」 는 나가되 커뮤니티 목록에는 안 실린다 (lv 로 가른다).
+  if(!x || mlogLv(x) === 'none') return null;
   const g = x.gearId ? gearOf(x.gearId) : null;
   const steps = howSteps(x);
   const pics = steps.map(v => v && v.p).filter(Boolean);
   const kept = (typeof photoBudget === 'function') ? photoBudget(pics, 600).kept : pics;
   const okSet = new Set(kept);
   const o = {
+    // ★ 이 한 글자가 「목록에 뜨나」 를 정한다. 빠뜨리면 감춘 기록이 목록에 뜬다.
+    lv: mlogLv(x),
     id: x.id, date: x.date || '', title: mlogTitle(x),
     how: steps.slice(0, HOW_MAX).map(v => {
       const r = { v: String(v.v || '') };
@@ -29131,6 +29192,7 @@ function mlogPublic(x){
 function rvPublic(r){
   if(!r || typeof r !== 'object') return null;
   const o = {
+    lv: rvLv(r),                        // ★ 목록에 뜨나 (4.72)
     id: r.id,
     typ:  isBoatRv(r) ? 'boat' : '',    // 배 리뷰인가 제품 리뷰인가
     key:  rvKey(r),               // 전 세계 공용 열쇠 (배도 제조사+모델이면 같은 machinery)
@@ -29656,25 +29718,13 @@ function howBlock(it){
 function howPubRow(it){
   const steps = howSteps(it);
   if(!steps.length) return '';
-  const on = it.pub === true;
-  const bOn = (typeof curBoat === 'function' && typeof pubOn === 'function')
-            ? pubOn(curBoat(), 'maint') : true;
-  return `<div class="mrrow"><span class="mrlbl">${esc(t('공개'))}</span>
-      <b class="mrv" style="flex:1;color:${(on && bOn) ? '#6FD9A0' : '#8AA0B4'}">${
-        esc(on ? (bOn ? t('커뮤니티에 올라갑니다') : t('아직 안 올라갑니다')) : t('나만 봅니다'))}</b>
-      <button class="minib edt ${on ? 'warn' : 'blu'}" onclick="needEdit('${on ? '이 정비수첩을 커뮤니티에서 내립니다.' : '이 정비수첩을 커뮤니티에 올립니다.'}', howPubToggle)">${
-        esc(on ? t('내리기') : t('공개하기'))}</button></div>`
-    + (on && !bOn ? pubGateBox('maint') : '')
-    + `<div class="mrm" style="padding:0 14px 8px;color:#7b8794">${
-        esc(t('공개해도 메모는 나가지 않습니다. 절차·사진·난이도·걸린 시간·든 돈만 나갑니다.'))}</div>`;
+  return pubLvRow('mlog', it, 'maint',
+    '공개해도 메모는 나가지 않습니다. 절차·사진·난이도·걸린 시간·든 돈만 나갑니다.');
 }
+// 옛 이름 — 켬/끔 두 갈래였을 때 쓰던 것. 이제 단계는 pubLvSet 하나가 정한다.
 function howPubToggle(){
   const it = getMR(mrOpenType, mrOpenId); if(!it || !unlocked) return;
-  it.pub = !(it.pub === true);
-  saveMR();
-  if(typeof schedulePush === 'function') schedulePush();
-  pubRefresh();                       // 밖 사본을 다시 만든다 — 안 하면 화면과 남의 배가 어긋난다
-  openMR(mrOpenType, mrOpenId);
+  pubLvSet(mlogLv(it) === 'none' ? 'com' : 'none');
 }
 
 

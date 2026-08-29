@@ -698,22 +698,30 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .howbody textarea{width:100%;margin-top:6px}
 .howtx{color:var(--tx);font-size:14.5px;line-height:1.6;margin-top:6px;white-space:pre-wrap}
 .howbtns{display:flex;gap:6px;margin-top:6px}
+/* ★ 색은 앱 팔레트(--red:#E4756A)에서 가져온다. 4.53~4.65 는 #B3261E·#4A0A0A 라는
+   생짜 빨강을 박아 두어 이 앱의 새벽 바다 위에서 혼자 튀었다. (사장님 지적) */
 .mobov{position:fixed;inset:0;z-index:9600;display:none;align-items:center;justify-content:center;
-  background:#4A0A0A;padding:20px}
+  background:linear-gradient(180deg,rgba(58,20,20,.94),rgba(30,10,12,.96));
+  backdrop-filter:blur(18px);padding:20px}
 .mobbox{width:100%;max-width:420px;text-align:center}
 .mobtit{color:#fff;font-size:22px;font-weight:900;letter-spacing:.02em;margin-bottom:14px}
 .mobbig{color:#fff;font-size:44px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
-.mobpos{color:#FFD9D6;font-size:19px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums}
+.mobpos{color:#F0B9B2;font-size:19px;font-weight:700;margin-top:8px;font-variant-numeric:tabular-nums}
 .mobdir{color:#fff;font-size:30px;font-weight:900;margin-top:12px}
-.mobhint{color:#FFC9C4;font-size:14px;line-height:1.6;margin-top:16px}
+.mobhint{color:#E8AEA7;font-size:14px;line-height:1.6;margin-top:16px}
 .mobbtns{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
 .mobbtns a,.mobbtns button{min-height:52px;padding:14px 22px;font-size:16px;font-weight:800;
   border-radius:999px;cursor:pointer;border:0;text-decoration:none}
-.mob122{background:#fff;color:#B3261E}
+.mob122{background:var(--red);color:#2A0E0C}
 .mobx{background:rgba(255,255,255,.16);color:#fff}
-/* 오늘 화면 맨 위 단추 */
-.mobbar{width:100%;min-height:54px;margin:0 0 12px;border:0;border-radius:14px;cursor:pointer;
-  background:#B3261E;color:#fff;font-size:17px;font-weight:900;letter-spacing:.02em}
+/* 항해 중에만 화면에 떠 있는 단추 (4.66). 어느 탭에 있든 한 번에 닿아야 한다. */
+.mobfab{position:fixed;right:12px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:8000;
+  display:none;align-items:center;gap:8px;min-height:54px;padding:0 20px;border:0;border-radius:999px;
+  cursor:pointer;background:rgba(228,117,106,.92);backdrop-filter:blur(14px);
+  color:#2A0E0C;font-size:16px;font-weight:900;letter-spacing:.02em;
+  box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.mobfab.on{display:flex}
+.mobfab i{width:11px;height:11px;border-radius:999px;background:#2A0E0C;flex:0 0 11px}
 .tellbox{width:100%;max-width:340px;background:var(--sf);border:1px solid var(--bd);
   border-radius:16px;padding:20px 18px 14px;box-shadow:0 18px 48px rgba(0,0,0,.55)}
 .telltit{color:var(--th);font-size:16px;font-weight:800;margin-bottom:8px;line-height:1.35}
@@ -1185,6 +1193,14 @@ header{background:linear-gradient(to bottom,#122a44 0%,#1a3c5c 100%);
 header{background:linear-gradient(to bottom,rgba(10,24,40,.55),rgba(16,40,64,.18));
   backdrop-filter:blur(10px);border-bottom:none}
 
+/* 빈 목록 안내 — 4.66. #0E1620 짜리 검은 상자라 바다 위에 판때기가 얹혀 있었다. */
+.emptybox{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);
+  border:1px dashed rgba(255,255,255,.14)}
+.emptybox > b{color:var(--th)}
+.emptybox > div{color:var(--tx)}
+.emptybox b{color:var(--tx)}
+.emptybox .emptysub{color:var(--tm)}
+
 /* 카드 — 유리 */
 .hcard{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);border:none}
 .hcard.ins{background:rgba(120,180,230,.10)}
@@ -1510,12 +1526,18 @@ body.panelfull #panel .ph{padding-top:0}
 /* ★ 단추·딱지는 흰빛으로 옅게 채워 놨더니, 수평선의 밝은 띠 위에서
    바탕과 같은 밝기가 되어 글씨가 사라졌다.
    짙게 채우고 가는 흰 선을 둘러, 밝은 데서도 어두운 데서도 읽히게 한다. */
-.tab,.mrbtn,.minib,.chip,#lockBtn{
+/* ★ 4.66 — .tchip 이 이 줄에서 빠져 있었다. 4.63 에서 하위-하위 줄(.tfilt)을
+   새로 만들면서 여기 안 넣었다. 그래서 장비 탭(.tab)만 읽히고
+   정비·문서의 하위-하위(.tchip)는 수평선 밝은 띠 위에서 글씨가 사라졌다. (사장님 지적)
+   ★ 새 단추 갈래를 만들면 반드시 이 줄에 같이 넣는다. chiptest.js 가 강제한다. */
+.tab,.mrbtn,.minib,.chip,.tchip,#lockBtn{
   background:rgba(9,24,39,.62);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
-.tab.on,.mrbtn.ok,.minib.blu{
+.tab.on,.mrbtn.ok,.minib.blu,.tchip.on{
   background:rgba(22,58,86,.82);color:#CFE6F7;
   box-shadow:inset 0 0 0 1px rgba(156,198,232,.45)}
+/* ★ .tchip 은 여기 들어오는 것으로 끝이다. 색·글씨·테두리는 .tab 이 쓰던 것을
+   그대로 물려받는다 — 새 색을 지어내지 않는다. 장비 탭과 똑같이 보이는 것이 맞다. */
 .mrbtn.warn,.minib.red{background:rgba(52,24,26,.7);color:#F0958C;
   box-shadow:inset 0 0 0 1px rgba(228,117,106,.35)}
 .minib.grn,#lockBtn.unlocked{background:rgba(16,44,34,.72);
@@ -1899,6 +1921,7 @@ header{padding-top:var(--sat)}
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
 <div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="계류장">계류장</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="내 배">내 배</span></button><button id="tabOthers" onclick="switchTab('others')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20l-2 3H4z"/><path d="M5 18v-6h9v6"/><path d="M14 12l4 6"/><path d="M9.5 12V8"/></svg><span data-t="남의 배">남의 배</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
+<button id="mobFab" class="mobfab" onclick="mobMark()" aria-label="사람 빠짐"><i></i><span data-t="사람 빠짐">사람 빠짐</span></button>
 
 
 <div id="panel">
@@ -2534,9 +2557,8 @@ const I18N = {
     '무선국 허가증':'Radio station licence',
     '등록필증':'Registration certificate',
     '안전장비 유효기간':'Safety gear expiry',
-    '안 고름':'Not set',
+    '선택 안 함':'Not selected',
     '만료일':'Expires',
-    '갈래':'Type',
     '출조':'Fishing trip',
     '연안 항해':'Coastal passage',
     '원거리 항해':'Offshore passage',
@@ -4109,7 +4131,6 @@ const I18N = {
     '선실 안':'Inside the cabin',
     '2층 (갑판)':'Upper deck',
     '라벤더로 표시':'Shown in lavender',
-    '갈래':'Kind',
     '물건 칸':'Storage',
     '물품이 들어갑니다':'Holds items',
     '벽면·선반':'Wall / shelf',
@@ -4879,9 +4900,8 @@ const I18N = {
     '무선국 허가증':'Разрешение на радиостанцию',
     '등록필증':'Свидетельство о регистрации',
     '안전장비 유효기간':'Срок годности снаряжения',
-    '안 고름':'Не выбрано',
+    '선택 안 함':'Не выбрано',
     '만료일':'Действует до',
-    '갈래':'Тип',
     '출조':'Рыбалка',
     '연안 항해':'Прибрежный переход',
     '원거리 항해':'Дальний переход',
@@ -6453,7 +6473,6 @@ const I18N = {
     '선실 안':'Внутри каюты',
     '2층 (갑판)':'Верхняя палуба',
     '라벤더로 표시':'Показано лавандовым',
-    '갈래':'Вид',
     '물건 칸':'Отсек',
     '물품이 들어갑니다':'Хранит вещи',
     '벽면·선반':'Стена / полка',
@@ -9189,6 +9208,16 @@ function trkLoad(){
 }
 const trkOn = () => !!trkNow;
 
+// ★ 사람 빠짐 단추는 항해 중에만 뜬다 (4.66). 켜고 끄는 자리는 여기 하나다 —
+//   trkNow 를 건드리는 곳마다 이것을 부른다. 안 부르면 배에서 내렸는데도
+//   빨간 단추가 남거나, 나가 있는데 안 뜬다.
+function mobFabSync(){
+  try{
+    const e = document.getElementById('mobFab');
+    if(e) e.classList.toggle('on', trkOn());
+  }catch(_){}
+}
+
 // ★ 직선으로 간 구간은 가운데 점을 버려도 선 모양이 같다.
 //   좌표를 그대로 재면 안 된다 — 경도 1도의 길이는 위도에 따라 좁아진다.
 //   미터로 바꿔서 잰다.
@@ -9525,9 +9554,10 @@ async function trkStart(vid){
   trkKeep();
   const ok = await trkAttach();
   if(!ok){
-    trkNow = null; trkKeep();
+    trkNow = null; trkKeep(); mobFabSync();
     return '위치를 받지 못했습니다. 폰의 위치 기능이 켜져 있는지 확인해 주세요.';
   }
+  mobFabSync();
   try{ setSync(t('항적 기록을 시작했습니다')); }catch(e){}
   return '';
 }
@@ -9547,7 +9577,7 @@ async function trkStopSay(){
 
 async function trkStop(){
   const cur = trkNow;
-  trkNow = null; trkKeep();
+  trkNow = null; trkKeep(); mobFabSync();
   if(!cur) return null;
   const G = bgGeo();
   if(G && cur.id){ try{ await G.removeWatcher({ id: cur.id }); }catch(e){} }
@@ -9572,6 +9602,7 @@ async function trkStop(){
 function trkResume(){
   if(!isNative()) return;
   trkLoad();
+  mobFabSync();
   if(!trkNow) return;
   trkNow.id = null;
   trkAttach();
@@ -10226,9 +10257,9 @@ function posPublic(v, p){
 function tripKindRow(it){
   const far = (typeof tripFar === 'function') ? tripFar(it) : false;
   const k = String(it.kind || '');
-  return `<div class="mrrow"><span class="mrlbl">${esc(t('갈래'))}</span>${unlocked
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('종류'))}</span>${unlocked
       ? `<select onchange="mrField('kind',this.value)" style="flex:1">
-           <option value=""${!k?' selected':''}>${esc(t('안 고름'))}</option>${
+           <option value=""${!k?' selected':''}>${esc(t('선택 안 함'))}</option>${
            TRIP_KINDS.map(x=>`<option value="${esc(x)}"${k===x?' selected':''}>${esc(t(x))}</option>`).join('')
          }</select>`
       : `<b class="mrv">${esc(k ? t(k) : '—')}</b>`}</div>`
@@ -12281,20 +12312,37 @@ function exploreFilter(list){
     [x.name, x.port, x.maker, x.model, x.typeName]
       .some(v => String(v || '').toLowerCase().includes(q)));
 }
+// ★ 4.66 — 리뷰는 「쓰는 것」이다. 항해일지·정비수첩은 제 기록에서 저절로 올라오지만
+//   리뷰는 사람이 앉아서 써야 생긴다. 그래서 목록 화면에 쓰러 가는 문이 늘 있어야 한다.
+//   (사장님 지적: 「리뷰쪽은 어디서 자료 가져오는데」)
+//   ★ 그리는 자리가 넷이라 문을 하나로 뺀다. 네 곳에 흩어 놓으면 한 곳이 빠진다.
+function expWriteBtn(){
+  const k = expKind();
+  if(k !== 'review' && k !== 'boatrv') return '';
+  return `<div class="mrrow" style="padding:10px 14px 4px">
+    <button class="mrbtn ok" style="width:100%" onclick="goWriteReview(${k === 'boatrv'})">${
+      esc(k === 'boatrv' ? t('+ 내 배 리뷰 쓰기') : t('+ 제품 리뷰 쓰기'))}</button></div>`;
+}
 async function openExplore(biz){
   exploreBiz = (biz === true);
   const W = document.getElementById('exploreWrap');
   if(!W) return;
-  if(!window.__pub){ W.innerHTML = `<div class="mrnone">${esc(t('인터넷에 연결된 상태에서만 볼 수 있습니다'))}</div>`; return; }
+  // ★ 4.66 — 리뷰 쓰는 단추는 인터넷과 상관없다. 남의 글을 못 받아왔다고
+  //   내 리뷰를 못 쓰게 할 까닭이 없다. 그래서 받아오기보다 먼저 그린다.
+  const wrBtn = expWriteBtn();
+  if(!window.__pub){
+    W.innerHTML = wrBtn + `<div class="mrnone">${esc(t('인터넷에 연결된 상태에서만 볼 수 있습니다'))}</div>`;
+    return;
+  }
   // 4.20 — 로그인 없이도 둘러본다
   // 배 둘러보기도 탭을 오갈 때마다 다시 읽고 있었다. 전체와 영업을 따로 기억한다.
   // ★ 네 갈래가 같은 자료를 쓴다. 공개 배 하나에 항해·정비·사용기가 다 들어 있다 —
   //   그래서 갈래를 바꿔도 다시 안 받는다.
   const ck = 'explore:' + (exploreBiz ? '1' : '0');
   if(!listFresh(ck)){
-    W.innerHTML = `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
+    W.innerHTML = wrBtn + `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
     try{ listSet(ck, await window.__pub.list(exploreBiz), true); }
-    catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
+    catch(e){ W.innerHTML = wrBtn + `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
   exploreAll = listRows(ck);
   const ph = { voyage: t('항구 · 배 이름으로 찾기'),
@@ -12307,8 +12355,9 @@ async function openExplore(biz){
         <button class="tchip${exploreBiz?' on':''}" onclick="setExploreBiz(true)">${esc(t('영업'))}</button></div>` : '')
     + `<div class="qbox"><input id="expQ" value="${esc(kind === 'boat' ? exploreQ : expQ)}"
         placeholder="${esc(ph[kind] || '')}"
-        oninput="exploreFilterUI(this.value)" autocomplete="off"></div>
-    <div id="exploreRows">` + exploreRowsHtml() + `</div>`;
+        oninput="exploreFilterUI(this.value)" autocomplete="off"></div>`
+    + wrBtn
+    + `<div id="exploreRows">` + exploreRowsHtml() + `</div>`;
 }
 
 // ── 여러 배의 기록을 한 줄로 펴 놓는다
@@ -12394,7 +12443,7 @@ function expRowsHtml(){
           kind === 'maint'
             ? esc(t('내 정비 기록에 「정비 절차」를 적고 공개를 켜면 여기에 실립니다.'))
             : ((kind === 'review' || kind === 'boatrv')
-                ? esc(t('내 배 › 장비 › 사용기에서 쓰고, 배 공개 설정에서 「부품 사용기」를 켜면 여기에 실립니다.'))
+                ? esc(t('위의 「쓰기」를 눌러 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「부품 사용기」를 켜면 여기에 실립니다.'))
                 : esc(t('배 공개 설정에서 「항해일지」를 켜면 여기에 실립니다.')))}</div>`);
   }
   return rows.slice(0, 200).map(o => {
@@ -15612,7 +15661,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.65';
+const APP_VER = '4.68';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -16062,7 +16111,7 @@ function lkMenu(id){
       { key:'deck', label:'층', type:'pick', value: l.deck2 ? '2' : '1',
         options:[ { v:'1', name:'1층',       sub:'선실 안' },
                   { v:'2', name:'2층 (갑판)', sub:'라벤더로 표시' } ] },
-      { key:'kind', label:'갈래', type:'pick', value: l.wall ? 'wall' : 'box',
+      { key:'kind', label:'종류', type:'pick', value: l.wall ? 'wall' : 'box',
         options:[ { v:'box',  name:'물건 칸',    sub:'물품이 들어갑니다' },
                   { v:'wall', name:'벽면·선반', sub:'점선으로 표시' } ] },
       { key:'size', label:'크기', type:'pick', value:'1',
@@ -16683,7 +16732,7 @@ function gearSelSync(cur){
   });
   const v = String(cur == null ? '' : cur);
   row.style.display = '';
-  sel.innerHTML = `<option value="">${esc(t('안 고름'))}</option>`
+  sel.innerHTML = `<option value="">${esc(t('선택 안 함'))}</option>`
     + sorted.map(g => `<option value="${esc(String(g.id))}"${v === String(g.id) ? ' selected' : ''}>${
         esc(t(gearSysOf(g))) + ' · ' + esc(gearLabel(g))}</option>`).join('');
   sel.value = sorted.some(g => String(g.id) === v) ? v : '';
@@ -18003,6 +18052,7 @@ function setComSub(k){
   switchTab('community');
 }
 function switchTab(t){
+  mobFabSync();   // 탭을 옮겨도 항해 중이면 단추가 따라온다
   // 열려 있던 화면(내 배·게시판 등)을 닫고 그 자리로 간다.
   if(typeof closeBoat === 'function') closeBoat();
   // ★ 예전에는 배가 없으면 여기서 배 등록을 띄우고 돌아섰다.
@@ -18061,7 +18111,10 @@ function switchTab(t){
   const onVoy = (t==='boat' && boatSubTab==='voyage');
   if(!onVoy){ mapS = null; pickCtx = null; }
   show('voyageWrap',   onVoy);
-  show('communityWrap',t==='community');
+  // ★ 4.66 — 「남의 배」 탭이 통째로 빈 화면이었다.
+  //   exploreWrap 은 communityWrap 안에 들어 있는데 부모를 커뮤니티에서만 켜고 있었다.
+  //   자식만 켜 봐야 부모가 꺼져 있으면 아무것도 안 보인다. 부모부터 켠다.
+  show('communityWrap',t==='community' || t==='others');
   show('talkWrap',     t==='community' && comSub==='talk');
   show('spotWrap',     t==='community' && comSub==='spots');
   show('marketWrap',   t==='community' && comSub==='market');
@@ -18184,9 +18237,10 @@ function renderHome(){
   const b = curBoat();
   let out = '';
 
-  // ★ 사람 빠짐이 제일 위다. 그보다 급한 것은 이 앱에 없다.
-  //   묻지 않고 곧바로 찍는다 — 확인창을 띄우는 몇 초가 그대로 거리가 된다.
-  out += `<button class="mobbar" onclick="mobMark()">${esc(t('사람 빠짐 — 이 자리 표시'))}</button>`;
+  // ★ 사람 빠짐(MOB)은 여기 없다. 항해 중에만 떠 있는 단추로 옮겼다 (4.66).
+  //   까닭: 앱을 여는 까닭의 대부분은 날씨·물때·정비다. 정박해 있는 배에
+  //   빨간 덩어리가 첫 화면을 잡아먹을 까닭이 없고, 잘못 누를 자리만 된다.
+  //   사람이 빠지는 것은 어느 화면을 보고 있든 일어나므로 화면에 떠 있어야 한다.
 
   // ★ 홈 화면에 추가 안내가 그다음이다. 이걸 안 하면 다음에 다시 안 온다.
   out += installCard();
@@ -18825,7 +18879,7 @@ function openMR(kind, id){
     body = tf('제목','title',it.title)
       + `<div class="mrrow"><span class="mrlbl">${esc(t('종류'))}</span>${unlocked
           ?`<select onchange="mrField('dkind',this.value)" style="flex:1">
-              <option value=""${!it.dkind?' selected':''}>${esc(t('안 고름'))}</option>${
+              <option value=""${!it.dkind?' selected':''}>${esc(t('선택 안 함'))}</option>${
               VDOC_KINDS.map(x=>`<option value="${esc(x)}"${it.dkind===x?' selected':''}>${esc(t(x))}</option>`).join('')
             }</select>`
           :`<b class="mrv">${esc(it.dkind ? t(it.dkind) : '—')}</b>`}</div>`
@@ -25756,7 +25810,7 @@ function gearPickRow(it, kind){
   const now = gearOf(cur);
   return `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>${unlocked
     ? `<select style="flex:1" onchange="mrField('gearId', this.value)">
-         <option value=""${cur ? '' : ' selected'}>${esc(t('안 고름'))}</option>${
+         <option value=""${cur ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
          sorted.map(g => `<option value="${esc(String(g.id))}"${cur === String(g.id) ? ' selected' : ''}>${
            esc(t(gearSysOf(g))) + ' · ' + esc(gearLabel(g))}</option>`).join('')}</select>`
     : `<b class="mrv">${esc(now ? gearLabel(now) : '—')}</b>`}${
@@ -25778,7 +25832,7 @@ function gearBody(it){
       : `<b class="mrv">${esc(gearLabel(it))}</b>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
       ? `<select style="flex:1" onchange="gearSetSys(this.value)">
-           <option value=""${it.sys ? '' : ' selected'}>${esc(t('안 고름'))}</option>${
+           <option value=""${it.sys ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
            GEAR_SYS.map(x => `<option value="${esc(x)}"${it.sys === x ? ' selected' : ''}>${esc(t(x))}</option>`).join('')}</select>`
       : `<b class="mrv">${esc(it.sys ? t(it.sys) : '—')}</b>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('종류'))}</span>${unlocked
@@ -26080,7 +26134,7 @@ function rvBody(it){
         esc(t('이 배 자체에 대한 리뷰입니다. 배를 사려는 사람이 제일 먼저 찾는 글입니다.'))}</div>`
       : `<div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
       ? `<select style="flex:1" onchange="mrField('sys',this.value)">
-           <option value=""${it.sys ? '' : ' selected'}>${esc(t('안 고름'))}</option>${
+           <option value=""${it.sys ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
            GEAR_SYS.map(x => `<option value="${esc(x)}"${it.sys === x ? ' selected' : ''}>${esc(t(x))}</option>`).join('')}</select>`
       : `<b class="mrv">${esc(it.sys ? t(it.sys) : '—')}</b>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('종류'))}</span>${unlocked
@@ -26115,7 +26169,7 @@ function rvBody(it){
       : `<b class="mrv">${esc(it.again === true ? t('또 사겠다') : (it.again === false ? t('다시는') : '—'))}</b>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(isB ? t('탄 기간') : t('써 본 기간'))}</span>${unlocked
       ? `<select style="flex:1" onchange="mrField('used',this.value)">
-           <option value=""${it.used ? '' : ' selected'}>${esc(t('안 고름'))}</option>${
+           <option value=""${it.used ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
            RV_USED.map(x => `<option value="${x.k}"${it.used === x.k ? ' selected' : ''}>${
              esc(t(isB && x.k === 'new' ? '갓 샀음' : x.n))}</option>`).join('')}</select>`
       : `<b class="mrv">${esc(rvUsedName(it.used) || '—')}</b>`}</div>
@@ -26339,7 +26393,7 @@ function mlogBody(it){
         <button class="minib blu" onclick="openMR('repair','${rp.id}')">${esc(t('수리 보기'))}</button></div>` : ''}
     ${gears.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>${unlocked
       ? `<select style="flex:1" onchange="mrField('gearId', this.value)">
-           <option value=""${it.gearId ? '' : ' selected'}>${esc(t('안 고름'))}</option>${
+           <option value=""${it.gearId ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
            gears.slice().sort((a,b)=>String(gearLabel(a)).localeCompare(String(gearLabel(b)),'ko'))
              .map(x => `<option value="${esc(String(x.id))}"${String(it.gearId)===String(x.id)?' selected':''}>${
                esc(t(gearSysOf(x))) + ' · ' + esc(gearLabel(x))}</option>`).join('')}</select>`
@@ -26423,6 +26477,15 @@ function renderGearWrap(){
   isR ? renderReviews() : renderGear();
 }
 function gearAdd(){ gearView === 'review' ? addReview() : addGear(); }
+// ★ 4.66 — 리뷰는 남의 자료에서 오는 것이 아니라 사람이 쓰는 것이다.
+//   항해일지·정비수첩은 제 기록에서 저절로 올라오지만 리뷰는 여기서 시작하지 않으면
+//   시작할 자리가 없다. 「남의 배 › 제품리뷰 / 배리뷰」 에서 바로 쓰러 온다.
+function goWriteReview(boatRv){
+  switchTab('boat');
+  if(typeof setBoatSubTab === 'function') setBoatSubTab('gear');
+  setGearSub('review');
+  requestAnimationFrame(()=>{ try{ boatRv ? addBoatReview() : addReview(); }catch(_){} });
+}
 // 「+ 배 리뷰」 — 사용기 갈래에서만 뜬다
 
 // 장비 카드에서 부품을 누르면 적재표의 그 자리로 간다.
@@ -26664,7 +26727,7 @@ function howBlock(it){
   // 머리 — 난이도 · 걸린 시간 · 든 돈 · 쓴 것
   h += `<div class="mrrow"><span class="mrlbl">${esc(t('난이도'))}</span>${unlocked
       ? `<select onchange="mrField('hard',parseInt(this.value,10)||0)" style="flex:1">
-           <option value="0"${!it.hard?' selected':''}>${esc(t('안 고름'))}</option>${
+           <option value="0"${!it.hard?' selected':''}>${esc(t('선택 안 함'))}</option>${
            [1,2,3,4,5].map(n=>`<option value="${n}"${Number(it.hard)===n?' selected':''}>${howHardText(n)}</option>`).join('')
          }</select>`
       : `<b class="mrv">${it.hard ? howHardText(it.hard) : '—'}</b>`}</div>`;
@@ -27052,10 +27115,16 @@ function addContact(){
   const c = {id:newId(), name:'', phone:'', email:'', site:'', note:''};
   contacts.push(c); docSub = 'contact'; saveMR(); renderContacts(); openMR('contact', c.id);
 }
+// ★ 4.67 — 문서는 「찍어서 올리는 것」이다 (사장님 지적).
+//   보험증서·선박검사증·면허는 종이를 사진으로 남기는 것이지 글로 적는 것이 아니다.
+//   그런데 지금까지는 빈 기록을 만들고 제목 칸부터 들이밀었다.
+//   그래서 기록을 열자마자 사진기를 먼저 띄운다. 제목·만료일은 찍고 나서 채운다.
+//   ★ 사람이 누른 그 순간(제스처) 안에서 열어야 한다. 한 박자 늦추면 폰이 막는다.
 function addVdoc(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const d = {id:newId(), title:'', note:'', photos:[]};
   vdocs.push(d); docSub = 'docs'; saveMR(); renderContacts(); openMR('vdoc', d.id);
+  try{ const cam = document.getElementById('mrCam'); if(cam) cam.click(); }catch(_){}
 }
 
 // ----- 체크리스트 -----

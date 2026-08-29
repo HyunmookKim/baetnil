@@ -125,6 +125,18 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid rgba(255,255,255,.0
 //
 // ★ 말은 앱 용어표를 그대로 따른다 (整備手帳 · パーツレビュー · 航海日誌 …).
 //   여기서 새 말을 지어내면 앱과 웹이 서로 다른 말을 쓰게 된다.
+// ★★★ 웹에 굽는 것은 「공개」 하나뿐이다 (4.72).
+//
+//   앱의 공개 단계는 셋이다 — 공개 / 일부 공개 / 비공개.
+//   「일부 공개」 는 *목록에 안 싣는다* 는 뜻이고, 웹 페이지는 목록보다 더 열린 자리다.
+//   구글이 긁어 가고 sitemap 에 올라가면 「목록에 없다」 가 아무 뜻이 없어진다.
+//
+//   ★ 실제로 샜다 — 사장님이 「일부 공개」 로 두신 8/13 항해가
+//     baetnil.com/v/.../ 에 페이지로 나가 있었다. 앱만 막고 웹을 안 막았기 때문이다.
+//   ★ lv 가 없는 옛 자료는 'com' 으로 본다 — 지금까지 나가던 것이 갑자기 사라지면 안 된다.
+//     (앱이 4.70 부터 항해에 lv 를 실어 보내고 있다. 정비수첩·리뷰는 4.72 부터다.)
+const openWeb = r => ((r && r.lv) || 'com') === 'com';
+
 const LANGS = ['ko', 'ja', 'en'];
 const LPATH = { ko:'', ja:'ja/', en:'en/' };
 const L10N = {
@@ -348,18 +360,21 @@ function listPage(dir, heading, blurb, items, L){
     boats.forEach(b => {
       (b.mlog || []).forEach(m => {
         if(!m || !m.id || !(m.how || []).length) return;   // 단계가 없으면 남이 볼 것이 없다
+        if(!openWeb(m)) return;                            // ★ 「일부 공개」 는 웹에 안 굽는다
         const p = mlogPage(b, m, L); pages.push(p);
         if(!b.adminHidden) idxM.push({ url:p.url, name:m.title || T(L,'정비 기록'),
           sub:[m.gear || [m.maker,m.model].filter(Boolean).join(' '), m.date, b.name].filter(Boolean).join(' · ') });
       });
       (b.voyage || []).forEach(v => {
         if(!v || !v.id) return;
+        if(!openWeb(v)) return;                            // ★ 「일부 공개」 는 웹에 안 굽는다
         const p = voyPage(b, v, L); pages.push(p);
         if(!b.adminHidden) idxV.push({ url:p.url, name:v.title || [v.from,v.to].filter(Boolean).join(' → ') || v.date,
           sub:[v.date, v.nm ? v.nm + ' NM' : '', b.name].filter(Boolean).join(' · ') });
       });
       (b.review || []).forEach(r => {
         if(!r || !r.id) return;
+        if(!openWeb(r)) return;                            // ★ 「일부 공개」 는 웹에 안 굽는다
         const p = rvPage(b, r, L); pages.push(p);
         if(!b.adminHidden) idxR.push({ url:p.url, name:r.title || [r.maker,r.model].filter(Boolean).join(' ') || r.kind || T(L,'리뷰'),
           sub:[r.stars ? '★'+r.stars : '', r.kind, b.name].filter(Boolean).join(' · ') });
@@ -372,6 +387,38 @@ function listPage(dir, heading, blurb, items, L){
   });
 
   pages.forEach(p => write(p.rel, p.html));
+
+  // ★★★ 내린 것은 실제로 사라져야 한다 (4.73)
+  //
+  //   여태 이 스크립트는 쓰기만 했다. 그래서 사람이 기록을 내리거나 지워도
+  //   웹 페이지는 그 자리에 그대로 남았다. 앱에서만 사라지고 밖에는 남는다 —
+  //   「내렸다」 고 믿게 만들어 놓고 안 내리는 것이라 가장 나쁜 흠이다.
+  //
+  //   ★ 지울 목록을 따로 들고 다니지 않는다. 그런 목록은 반드시 빠뜨린다.
+  //     이 스크립트는 「지금 있어야 할 페이지 전부」 를 알고 있다(pages).
+  //     그러니 폴더를 훑어 그 목록에 없는 것을 지운다 — 그것이 곧 내려간 것이다.
+  //   ★ 통째로 지웠다 다시 굽지 않는다. 굽다가 중간에 실패하면 사이트가 통째로 빈다.
+  //     쓸 것을 다 쓴 뒤에, 남는 것만 지운다.
+  {
+    const keep = new Set(pages.map(p => path.normalize(path.join(OUT, p.rel))));
+    let gone = 0;
+    const sweep = dir => {
+      const abs = path.join(OUT, dir);
+      if(!fs.existsSync(abs)) return;
+      for(const e of fs.readdirSync(abs, { withFileTypes:true })){
+        const rel = path.join(dir, e.name);
+        if(e.isDirectory()){ sweep(rel); 
+          try{ if(!fs.readdirSync(path.join(OUT, rel)).length) fs.rmdirSync(path.join(OUT, rel)); }catch(_){}
+        } else if(!keep.has(path.normalize(path.join(OUT, rel)))){
+          fs.unlinkSync(path.join(OUT, rel)); gone++;
+          console.log('  내려감: ' + rel.split(path.sep).join('/'));
+        }
+      }
+    };
+    ['m','v','r'].forEach(sweep);
+    LANGS.filter(L => LPATH[L]).forEach(L => ['m','v','r'].forEach(d => sweep(LPATH[L] + d)));
+    console.log(`내려간 페이지 ${gone}개`);
+  }
 
   // ── 사이트맵 · 로봇
   const urls = pages.filter(p => !/noindex/.test(p.html)).map(p => p.url);

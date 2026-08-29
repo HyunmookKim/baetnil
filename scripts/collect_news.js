@@ -2,13 +2,22 @@
 const Parser = require('rss-parser');
 const fs = require('fs');
 
+// ★ 출처마다 어느 말로 쓰인 글인지 적어 둔다 (4.68)
+//   왜 — 앱이 여러 나라 말로 나가는데 소식은 전부 영어권 것뿐이었다.
+//   말을 적어 두지 않으면 나중에 일본어·러시아어 출처를 더할 때
+//   「이 글이 무슨 말로 쓰였나」 를 알 길이 없어 골라 보여 줄 수가 없다.
 const FEEDS = [
-  { name: 'Yachting World',   url: 'https://www.yachtingworld.com/feed' },
-  { name: 'Yachting Monthly', url: 'https://www.yachtingmonthly.com/feed' },
-  { name: 'PBO',              url: 'https://www.pbo.co.uk/feed' },
-  { name: 'Scuttlebutt',      url: 'https://www.sailingscuttlebutt.com/feed' },
-  { name: 'Sail-World',       url: 'https://www.sail-world.com/rss' },
+  { name: 'Yachting World',   url: 'https://www.yachtingworld.com/feed',        lang:'en' },
+  { name: 'Yachting Monthly', url: 'https://www.yachtingmonthly.com/feed',      lang:'en' },
+  { name: 'PBO',              url: 'https://www.pbo.co.uk/feed',                lang:'en' },
+  { name: 'Scuttlebutt',      url: 'https://www.sailingscuttlebutt.com/feed',   lang:'en' },
+  { name: 'Sail-World',       url: 'https://www.sail-world.com/rss',            lang:'en' },
 ];
+// ★ 일본어 출처는 아직 없다 (2026-08-29 확인)
+//   舵オンライン(kazi-online.com) 은 robots.txt 를 못 읽어 기계가 접근할 수 없었다.
+//   気象庁 방재정보 XML(https://www.data.jma.go.jp/developer/xml/feed/)에 「海上警報」 이 실리는데,
+//   그건 소식이 아니라 특보라서 뉴스 칸이 아니라 특보 칸에 들어가야 맞다.
+//   ★ 「없어서 못 넣은 것」 이다. 아무 주소나 지어내서 채우지 않는다.
 // Yacht Russia: RSS 없음 → 정적 목록 파싱 (장비 / 선장 조언 / 주요 소식)
 const YR_PAGES = [
   'https://yachtrussia.com/news/group/4',
@@ -54,7 +63,7 @@ async function collectEN(){
       const feed = await parser.parseURL(f.url);
       (feed.items||[]).forEach(it=>{
         const d = it.isoDate || it.pubDate;
-        out.push({ title: strip(it.title), link: it.link||'', source: f.name,
+        out.push({ title: strip(it.title), link: it.link||'', source: f.name, lang: f.lang || 'en',
           date: d? new Date(d).toISOString() : '',
           desc: strip(it.contentSnippet || it.content || it.summary).slice(0,450) });
       });
@@ -246,7 +255,7 @@ ${JSON.stringify(payload)}`;
   let prev = null;
   try{ prev = JSON.parse(fs.readFileSync('news.json', 'utf8')); }catch(_){}
   const fresh2 = picked.map(x=>({ title:x.title, t_ko:x.t_ko, s_ko:x.s_ko, cat:x.cat,
-                                  link:x.link, source:x.source, date:x.date }));
+                                  link:x.link, source:x.source, lang:x.lang || 'en', date:x.date }));
   const byLink = new Map();
   for(const r of [...fresh2, ...((prev && prev.items) || [])]){
     if(!r || !r.link) continue;

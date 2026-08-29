@@ -45,16 +45,69 @@ const VISITOR = [
   { name:'直島港',   berth:'本村2号浮桟橋',       addr:'香川郡直島町本村',        fee:'1,390엔~',             fac:'',            pref:'香川' },
   { name:'丸亀港',   berth:'福島2号浮桟橋',       addr:'丸亀市福島町',            fee:'1,390엔~',             fac:'',            pref:'香川' },
   { name:'女木港',   berth:'3号浮桟橋',           addr:'高松市女木町',            fee:'문의',                 fac:'',            pref:'香川' },
-  { name:'男木港',   berth:'男木港一文字防波堤内', addr:'高松市男木町',           fee:'문의',                 fac:'',            pref:'香川' }
+  { name:'男木港',   berth:'男木港一文字防波堤内', addr:'高松市男木町',           fee:'문의',                 fac:'',            pref:'香川' },
+
+  // 広島県 — 地方港湾厳島港 宮島ビジターバース
+  //   https://www.pref.hiroshima.lg.jp/soshiki/211/miyajimabiijita-.html
+  { name:'宮島港', alt:['厳島港','宮島桟橋'], berth:'宮島ビジターバース', addr:'廿日市市宮島町',
+    fee:'24시간마다 · 25ft 미만 1,350엔 / 25~30ft 1,670엔 / 30~35ft 1,880엔 / 35~40ft 2,300엔 / 40~50ft 3,230엔 / 50~60ft 3,970엔 / 60ft 이상 5,120엔',
+    fac:'power,water', tel:'0829-44-0430', pref:'広島' },
+
+  // 広島県 — プレジャーボート係留保管施設 (현이 「이용해 달라」고 낸 목록)
+  //   https://www.pref.hiroshima.lg.jp/site/hiroshimakennkouwann/1171005139373.html
+  //   ★ 이 여덟은 「방문 계류를 받는다」고 적혀 있지 않다. 상시 보관 시설이다.
+  //     그래서 갈래를 마리나로 두고, 대기 전에 전화로 확인하라고 줄마다 적는다.
+  { name:'廿日市ボートパーク', kind:'marina', berth:'廿日市ボートパーク', addr:'廿日市市木材港北4番地先',
+    fee:'', fac:'', tel:'082-234-7710', cap:575, pref:'広島' },
+  { name:'五日市プレジャーボートスポット', kind:'marina', berth:'五日市プレジャーボートスポット',
+    addr:'広島市佐伯区五日市町1番地先', fee:'', fac:'', tel:'082-234-7710', cap:69, pref:'広島' },
+  { name:'五日市メープルマリーナ', kind:'marina', berth:'五日市メープルマリーナ',
+    addr:'広島市佐伯区海老園三丁目25番1号', fee:'', fac:'', tel:'082-943-7760', cap:703, pref:'広島' },
+  { name:'広島観音マリーナ', kind:'marina', berth:'広島観音マリーナ',
+    addr:'広島市西区観音新町四丁目14番6号', fee:'', fac:'', tel:'082-234-7710', cap:367, pref:'広島' },
+  { name:'ボートパーク広島', kind:'marina', berth:'ボートパーク広島',
+    addr:'広島市中区南吉島一丁目1番', fee:'', fac:'', tel:'082-249-2855', cap:516, pref:'広島' },
+  { name:'坂プレジャーボートスポット', kind:'marina', berth:'坂プレジャーボートスポット',
+    addr:'安芸郡坂町平成ケ浜地先', fee:'', fac:'', tel:'082-234-7710', cap:24, pref:'広島' },
+  { name:'柳津プレジャーボートスポット', kind:'marina', berth:'柳津プレジャーボートスポット',
+    addr:'福山市柳津町市場沖地先', fee:'', fac:'', tel:'084-959-3302', cap:51, pref:'広島' },
+  { name:'山根木材ボートパーク福山', kind:'marina', berth:'山根木材ボートパーク福山',
+    addr:'福山市新涯町二丁目地先', fee:'', fac:'', tel:'084-959-3302', cap:442, pref:'広島' },
+
+  // 兵庫県 — 家島港 ビジターバース
+  //   https://web.pref.hyogo.lg.jp/chk11/iesima/visitor-berth.html
+  { name:'家島港', berth:'家島港ビジターバース', addr:'姫路市家島町真浦',
+    fee:'정장 1m당 · 3시간 이내 100엔 / 3~6시간 200엔 / 6~24시간 800엔',
+    fac:'power,water', tel:'079-325-8777',
+    memo:'예약이 필요합니다. 최대 50피트, 부잔교 34.5m(2척).', pref:'兵庫' },
+
+  // 愛媛県 — いまばり・みやうら海の駅 (宮浦第一・第二桟橋)
+  //   https://www.pref.ehime.jp/page/112471.html
+  { name:'宮浦港', alt:['みやうら海の駅'], berth:'宮浦第一・第二桟橋 (みやうら海の駅)',
+    addr:'今治市宮浦5714番地先',
+    fee:'정장 1m·24시간마다 · 24m 미만 320엔 / 24m 이상 800엔 (2025-11-15부터)',
+    fac:'power,water', tel:'0897-82-0173',
+    memo:'전기 510엔/12시간(AC100·200V 50A), 물 650.3엔/㎥. 선박 길이 60m 이하, 흘수 북측 4.4m·남측 3.2m 미만.',
+    pref:'愛媛' }
 ];
-const VISITOR_SRC = '香川県 港湾課 ビジターバース情報';
+const VISITOR_SRC = '香川県·広島県·兵庫県·愛媛県 공개 자료';
+
+// ★ 왜 岡山·山口 이 없나 (2026-08-29 확인)
+//   岡山県 — 현 페이지의 ビジターバース·海の駅 표가 전부 **그림 파일**이다. 글로 못 읽는다.
+//            시설 이름만 글로 있고 주소·요금·설비가 없다. 이름만으로는 못 싣는다.
+//   山口県 — 현이 낸 「방문 계류」 목록 자체가 없다. 長田フィッシャリーナ·徳山漁港 은
+//            둘 다 「상시 이용자 모집」이지 방문 계류가 아니다.
+//   ★ 둘 다 「없어서 못 넣은 것」이지 「빠뜨린 것」이 아니다. 지어내서 채우지 않는다.
 
 // ── OSM 에서 자리를 받아 온다
 // ★ 왜 이름으로 안 찾고 테두리로 찾나
 //   이름이 똑같은 항이 여럿 있다(内海港은 여러 현에 있다). 현 테두리 안에서 찾아야 안 헷갈린다.
 const OVERPASS = process.env.OVERPASS_URL || 'https://overpass-api.de/api/interpreter';
 const PREF_BOX = {   // [남, 서, 북, 동]
-  '香川': [34.00, 133.45, 34.60, 134.45]
+  '香川': [34.00, 133.45, 34.60, 134.45],
+  '広島': [34.00, 132.00, 34.99, 133.50],
+  '兵庫': [34.15, 134.25, 35.10, 135.47],   // 세토 쪽만. 북쪽 동해 연안은 안 본다
+  '愛媛': [32.90, 132.00, 34.35, 133.75]
 };
 async function osmIn(box){
   const q = `[out:json][timeout:90];
@@ -78,11 +131,16 @@ out center tags;`.replace(/（/g,'(').replace(/）/g,')');
 }
 // 이름 맞추기 — 「高松港」 이 OSM 에 「高松港」 · 「高松港 (Takamatsu Port)」 로 들어 있다
 const norm = s => String(s||'').replace(/\s+/g,'').replace(/[（(].*?[)）]/g,'');
-function findSpot(list, name){
-  const n = norm(name);
-  return list.find(x => norm(x.name) === n)
-      || list.find(x => norm(x.name).indexOf(n) === 0)
-      || null;
+// ★ 이름 후보를 여럿 받는다. 같은 곳을 OSM 이 다른 이름으로 들고 있는 일이 잦다
+//   (宮島港 / 厳島港, 宮浦港 / みやうら海の駅). 못 찾으면 그냥 안 싣는다 — 지어내지 않는다.
+function findSpot(list, name, alts){
+  for(const cand of [name].concat(alts || [])){
+    const n = norm(cand);
+    const hit = list.find(x => norm(x.name) === n)
+             || list.find(x => norm(x.name).indexOf(n) === 0);
+    if(hit) return hit;
+  }
+  return null;
 }
 
 (async () => {
@@ -93,12 +151,12 @@ function findSpot(list, name){
     const box = PREF_BOX[v.pref];
     if(!box){ miss.push(v.berth + ' (테두리 없음)'); continue; }
     if(!cache[v.pref]){ cache[v.pref] = await osmIn(box); await new Promise(r=>setTimeout(r, 1200)); }
-    const hit = findSpot(cache[v.pref], v.name);
+    const hit = findSpot(cache[v.pref], v.name, v.alt);
     if(!hit){ miss.push(v.berth + ' — ' + v.name + ' 을(를) OSM 에서 못 찾음'); continue; }
     rows.push({
       i: 'jp_' + v.pref + '_' + rows.length,
       n: v.berth + ' (' + v.name + ')',
-      k: 'port',
+      k: v.kind || 'port',
       la: Math.round(hit.lat * 1e5) / 1e5,
       lo: Math.round(hit.lon * 1e5) / 1e5,
       r: v.pref,
@@ -106,8 +164,13 @@ function findSpot(list, name){
       p: false,
       t: [ v.addr,
            v.fee ? ('요금 — ' + v.fee) : '',
+           v.tel ? ('전화 — ' + v.tel) : '',
+           v.cap ? ('수용 ' + v.cap + '척') : '',
+           v.memo || '',
            '※ 자리는 그 항의 대표 좌표입니다. 방문 정박지(ビジターバース)의 정확한 자리는 현지에서 확인해 주세요.',
-           '※ 일본에서는 어항에 레저보트를 대는 것이 원칙적으로 제한됩니다. 여기 실린 곳은 현이 방문 계류를 받는다고 밝힌 곳입니다.'
+           v.kind === 'marina'
+             ? '※ 상시 보관 시설입니다. 방문 계류가 되는지는 대기 전에 전화로 확인해 주세요.'
+             : '※ 일본에서는 어항에 레저보트를 대는 것이 원칙적으로 제한됩니다. 여기 실린 곳은 현이 방문 계류를 받는다고 밝힌 곳입니다.'
          ].filter(Boolean).join('\n')
     });
   }

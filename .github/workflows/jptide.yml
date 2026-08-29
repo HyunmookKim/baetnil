@@ -1,0 +1,26 @@
+name: collect-jp-tide
+on:
+  schedule:
+    - cron: '0 19 * * *'   # 날마다 04:00 KST
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  jptide:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node ../scripts/collect_jp_tide.js
+        working-directory: app
+      - name: commit tide-jp.json
+        run: |
+          git config user.name "jp-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add app/tide-jp.json
+          git diff --cached --quiet && exit 0
+          git commit -m "일본 물때 자료 다시 만들기"
+          git pull --rebase origin main
+          git push

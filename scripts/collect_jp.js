@@ -223,7 +223,11 @@ async function ovAsk(q){
 //   못 찾으면 그냥 안 싣는다 — 이 원칙은 그대로다.
 async function osmIn(box){
   const B = `(${box[0]},${box[1]},${box[2]},${box[3]})`;
-  const 이름그물 = '"name"~"港$|マリーナ|ヨットハーバー|海の駅|ハーバー"';
+  // ★ 2026-08-30 2차 — 22/35 까지 왔다. 남은 것 중 7곳이 그물에 아예 안 걸리는 이름이었다:
+  //   廿日市ボートパーク · ボートパーク広島 · 五日市プレジャーボートスポット …
+  //   「ボートパーク」 「プレジャーボート」 는 내가 그물에 안 넣어 둔 말이다. 넣는다.
+  const 이름그물 = '"name"~"港$|マリーナ|ヨットハーバー|ハーバー|海の駅'
+                 + '|ボートパーク|プレジャーボート|ボートスポット|ヨットクラブ|フィッシャリーナ"';
   const 꼬리표들 = [
     '"harbour"',
     '"leisure"="marina"',
@@ -250,6 +254,11 @@ async function osmIn(box){
 const norm = s => String(s||'').replace(/\s+/g,'').replace(/[（(].*?[)）]/g,'');
 // ★ 이름 후보를 여럿 받는다. 같은 곳을 OSM 이 다른 이름으로 들고 있는 일이 잦다
 //   (宮島港 / 厳島港, 宮浦港 / みやうら海の駅). 못 찾으면 그냥 안 싣는다 — 지어내지 않는다.
+// ★ 무르게 맞춘 것은 몇 자 이상만 (2026-08-30 2차)
+//   OSM 이 「シーホースマリーナ」 처럼 앞뒤를 바꿔 들고 있는 일이 있다. 그래서 「들어 있으면」
+//   도 마지막에 한 번 본다. 다만 짧은 이름에 이걸 쓰면 엉뚱한 곳을 집는다 —
+//   「池田港」 로 「新池田港」 을 집으면 배가 딴 데로 간다. 다섯 자 이상만 무르게 본다.
+const LOOSE_MIN = 5;
 function findSpot(list, name, alts){
   for(const cand of [name].concat(alts || [])){
     const n = norm(cand);
@@ -257,12 +266,20 @@ function findSpot(list, name, alts){
              || list.find(x => norm(x.name).indexOf(n) === 0);
     if(hit) return hit;
   }
+  // ★ 여기까지 못 찾았을 때만 무르게 본다. 딱 맞는 것이 있으면 늘 그것이 이긴다.
+  for(const cand of [name].concat(alts || [])){
+    const n = norm(cand);
+    if(n.length < LOOSE_MIN) continue;
+    const hit = list.find(x => norm(x.name).includes(n));
+    if(hit){ hit.무르게 = cand; return hit; }
+  }
   return null;
 }
 
 (async () => {
   const rows = [];
   const miss = [];
+  const loose = [];
   const cache = {};
   // ★ 물어볼 현이 몇 곳인지 먼저 알린다. 「1/6」 이 보이면 멈춘 것이 아님을 안다.
   const 현들 = [...new Set(VISITOR.map(v => v.pref))].filter(p => PREF_BOX[p]);
@@ -279,6 +296,9 @@ function findSpot(list, name, alts){
     }
     const hit = findSpot(cache[v.pref], v.name, v.alt);
     if(!hit){ miss.push(v.berth + ' — ' + v.name + ' 을(를) OSM 에서 못 찾음'); continue; }
+    // ★ 무르게 맞춘 것은 따로 적어 둔다. 이름이 딱 안 맞았다는 뜻이라
+    //   사람이 한 번 눈으로 훑어야 한다 — 배가 딴 데로 가면 안 된다.
+    if(hit.무르게) loose.push(v.name + ' → OSM 「' + hit.name + '」');
     rows.push({
       i: 'jp_' + v.pref + '_' + rows.length,
       n: v.berth + ' (' + v.name + ')',
@@ -316,11 +336,14 @@ function findSpot(list, name, alts){
       실린곳: rows.length,
       // 현마다 OSM 에서 몇 개를 받아 왔나 — 그물이 좁은지 여기서 바로 보인다
       현마다받은수: Object.fromEntries(Object.entries(cache).map(([k, v]) => [k, v.length])),
-      못찾음: miss
+      못찾음: miss,
+      // ★ 이름이 딱 안 맞아 무르게 집은 것 — 한 번 눈으로 훑어 주십시오
+      무르게맞춘것: loose
     },
     rows
   };
   fs.writeFileSync('spots-jp.json', JSON.stringify(out));
   console.log(`만들었습니다: ${rows.length}곳 / 넣어 둔 ${VISITOR.length}곳`
+    + (loose.length ? `\n무르게 맞춘 것 ${loose.length}건 (눈으로 한 번 봐 주십시오):\n  ` + loose.join('\n  ') : '')
     + (miss.length ? `\n못 찾음 ${miss.length}건 (spots-jp.json 의 「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

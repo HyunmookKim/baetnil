@@ -171,6 +171,13 @@ const PREF_BOX = {   // [남, 서, 북, 동]
   '岡山': [34.30, 133.30, 34.80, 134.45],
   '山口': [33.70, 130.85, 34.50, 132.30]    // 세토 쪽만. 동해(일본해) 연안은 안 본다
 };
+// ★★★ 얼마나 걸리나 (사장님이 「이게 도는 건가 멈춘 건가」 를 물으셔야 했다 — 내 잘못)
+//   현 여섯 곳을 하나씩 물어본다. 한 번에 서버 쪽 제한이 90초라 다 하면 길게 9분쯤 걸린다.
+//   그동안 아무것도 안 찍으면 일감 화면이 빈 채로 멈춰 보인다. 그래서 한 걸음마다 찍는다.
+const 짧게 = u => String(u).replace(/^https:\/\//,'').split('/')[0];
+// ★ 한없이 기다리지 않는다. Overpass 가 답을 안 주고 물고 있으면 여섯 현이 한 시간을 넘긴다.
+//   서버 쪽 제한(90초)보다 조금 길게 잡아 우리 쪽에서도 끊는다.
+const OV_WAIT = 120000;
 // ★ 물어보기. 막히면 다음 서버로 넘어간다. 다 막히면 그때 소리 내어 실패한다 —
 //   조용히 빈 자료를 내면 앱에서 일본 정박지가 통째로 사라진 채 아무도 모른다.
 async function ovAsk(q){
@@ -178,9 +185,15 @@ async function ovAsk(q){
   for(const url of OVERPASS_LIST){
     for(let 번 = 0; 번 < 2; 번++){
       try{
+        const 시작 = Date.now();
         const r = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q),
-                                     headers: OV_HEAD });
-        if(r.ok) return await r.json();
+                                     headers: OV_HEAD,
+                                     signal: AbortSignal.timeout(OV_WAIT) });
+        if(r.ok){
+          console.log('   ' + 짧게(url) + ' 에서 받았습니다 ('
+            + Math.round((Date.now() - 시작) / 1000) + '초)');
+          return await r.json();
+        }
         탈.push(url.replace(/^https:\/\//,'').split('/')[0] + ' ' + r.status);
         // 429·504 는 「지금 바쁘다」 다 — 한 번 더 기다렸다 물어본다.
         //   406·403 은 「너는 안 받는다」 라 기다려도 소용없다. 바로 다음 서버로.
@@ -195,16 +208,37 @@ async function ovAsk(q){
   }
   throw new Error('overpass 를 다 못 썼습니다 — ' + 탈.join(' / '));
 }
+// ★★★ 왜 그물을 넓혔나 (2026-08-30 — 첫 성공 판에서 35곳 중 10곳만 실렸다)
+//   여태는 harbour · leisure=marina · seamark:type=harbour 세 가지 꼬리표만 봤다.
+//   그런데 일본의 항은 OSM 에 제각각으로 들어 있다 — 어떤 곳은 amenity=ferry_terminal,
+//   어떤 곳은 landuse=harbour, 桟橋 는 man_made=pier, 큰 항은 relation(여러 선의 묶음)이다.
+//   그래서 高松港·坂出港 같은 큰 항까지 통째로 빠졌다.
+//
+// ★ 제일 확실한 그물은 「이름」 이다.
+//   우리는 어차피 이름으로 맞춰 본다(findSpot). 그러니 그 테두리 안에서
+//   이름이 「…港」 으로 끝나거나 マリーナ·ヨットハーバー·海の駅 가 든 것을 다 받아 온다.
+//   꼬리표가 무엇이든 상관없어진다.
+//
+// ★ 넓혀도 좌표를 지어내지 않는다. 받아 온 것 중에서 **이름이 맞는 것만** 싣는다.
+//   못 찾으면 그냥 안 싣는다 — 이 원칙은 그대로다.
 async function osmIn(box){
-  const q = `[out:json][timeout:90];
-（
-  node["harbour"](${box[0]},${box[1]},${box[2]},${box[3]});
-  way["harbour"](${box[0]},${box[1]},${box[2]},${box[3]});
-  node["leisure"="marina"](${box[0]},${box[1]},${box[2]},${box[3]});
-  way["leisure"="marina"](${box[0]},${box[1]},${box[2]},${box[3]});
-  node["seamark:type"="harbour"](${box[0]},${box[1]},${box[2]},${box[3]});
-）;
-out center tags;`.replace(/（/g,'(').replace(/）/g,')');
+  const B = `(${box[0]},${box[1]},${box[2]},${box[3]})`;
+  const 이름그물 = '"name"~"港$|マリーナ|ヨットハーバー|海の駅|ハーバー"';
+  const 꼬리표들 = [
+    '"harbour"',
+    '"leisure"="marina"',
+    '"seamark:type"~"harbour|harbour_basin|marina|mooring|berth"',
+    '"landuse"="harbour"',
+    '"amenity"="ferry_terminal"',
+    '"man_made"="pier"'
+  ];
+  const 줄 = [];
+  // ★ relation 도 본다. 큰 항은 선 하나가 아니라 여러 선의 묶음으로 들어 있다.
+  ['node','way','relation'].forEach(종 => {
+    줄.push('  ' + 종 + '[' + 이름그물 + ']' + B + ';');
+    꼬리표들.forEach(꼬 => 줄.push('  ' + 종 + '[' + 꼬 + ']' + B + ';'));
+  });
+  const q = '[out:json][timeout:90];\n(\n' + 줄.join('\n') + '\n);\nout center tags;';
   const j = await ovAsk(q);
   return (j.elements || []).map(e => ({
     name: (e.tags && (e.tags['name'] || e.tags['name:ja'])) || '',
@@ -230,10 +264,19 @@ function findSpot(list, name, alts){
   const rows = [];
   const miss = [];
   const cache = {};
+  // ★ 물어볼 현이 몇 곳인지 먼저 알린다. 「1/6」 이 보이면 멈춘 것이 아님을 안다.
+  const 현들 = [...new Set(VISITOR.map(v => v.pref))].filter(p => PREF_BOX[p]);
+  console.log('현 ' + 현들.length + '곳을 OSM 에 물어봅니다. 한 곳에 길게 2분까지 걸립니다.');
+  let 몇째 = 0;
   for(const v of VISITOR){
     const box = PREF_BOX[v.pref];
     if(!box){ miss.push(v.berth + ' (테두리 없음)'); continue; }
-    if(!cache[v.pref]){ cache[v.pref] = await osmIn(box); await new Promise(r=>setTimeout(r, 1200)); }
+    if(!cache[v.pref]){
+      console.log('[' + (++몇째) + '/' + 현들.length + '] ' + v.pref + ' 물어보는 중…');
+      cache[v.pref] = await osmIn(box);
+      console.log('   ' + v.pref + ' — 자리 ' + cache[v.pref].length + '곳을 받았습니다');
+      await new Promise(r=>setTimeout(r, 1200));
+    }
     const hit = findSpot(cache[v.pref], v.name, v.alt);
     if(!hit){ miss.push(v.berth + ' — ' + v.name + ' 을(를) OSM 에서 못 찾음'); continue; }
     rows.push({
@@ -262,8 +305,22 @@ function findSpot(list, name, alts){
     license: 'ODbL-1.0',
     note: '이 파일은 OpenStreetMap 에서 뽑은 자리를 담고 있어 ODbL 을 따릅니다.',
     ts: new Date().toISOString(),
+    // ★★★ 얼마나 건졌나를 자료 안에 같이 남긴다 (2026-08-30).
+    //   첫 성공 판에서 35곳 중 10곳만 실렸다. 그런데 무엇이 왜 빠졌는지는
+    //   일감 기록을 뒤져야만 알 수 있었고, 나는 그걸 못 본 채 짐작으로 고치려 했다.
+    //   ★ 따로 파일을 만들면 일감(.github/workflows/jp.yml)에 올리는 줄을 더해야 한다.
+    //     사장님께 일을 하나 더 시키게 되므로, 이미 올라가는 이 파일 안에 넣는다.
+    //   ★ 앱은 rows 만 읽는다. 아래 것들은 사람이 보는 것이다.
+    했나: {
+      넣어둔곳: VISITOR.length,
+      실린곳: rows.length,
+      // 현마다 OSM 에서 몇 개를 받아 왔나 — 그물이 좁은지 여기서 바로 보인다
+      현마다받은수: Object.fromEntries(Object.entries(cache).map(([k, v]) => [k, v.length])),
+      못찾음: miss
+    },
     rows
   };
   fs.writeFileSync('spots-jp.json', JSON.stringify(out));
-  console.log(`만들었습니다: ${rows.length}곳` + (miss.length ? `\n못 찾음 ${miss.length}건:\n  ` + miss.join('\n  ') : ''));
+  console.log(`만들었습니다: ${rows.length}곳 / 넣어 둔 ${VISITOR.length}곳`
+    + (miss.length ? `\n못 찾음 ${miss.length}건 (spots-jp.json 의 「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

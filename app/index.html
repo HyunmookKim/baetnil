@@ -431,7 +431,12 @@ input[type=text]{width:100%;background:#0c1e30;border:1px solid #1e4060;border-r
 .pe{color:#4a8ab5}.pd{color:#7a3a3a}.pm{color:#7aaa5a}.pg{color:#c8a850}
 .thumbWrap{position:relative;margin-right:8px;flex-shrink:0;cursor:pointer}
 .thumb{width:38px;height:38px;object-fit:cover;border-radius:4px;border:1px solid #2a5a8a;display:block}
+/* ★ .tcnt 는 사진 귀퉁이에 붙는 딱지다 — 반드시 .thumbWrap(position:relative) 안에서만 쓴다.
+   position:absolute 라서, 자리 잡은 어버이가 없는 곳에 쓰면 화면 오른쪽 끝 밖(right:-4px)으로
+   날아가 창을 4px 넓힌다. 그래서 좌우 스크롤 막대가 생긴다 (4.79 — 글판에서 실제로 그랬다). */
 .tcnt{position:absolute;bottom:-4px;right:-4px;background:#1a4a7a;border:1px solid #2a6aa0;border-radius:7px;font-size:9px;color:#bfe6ff;padding:0 4px;line-height:13px}
+/* ★ 줄 안에 나란히 서는 숫자 딱지. 글판 같은 곳은 이것을 쓴다 — 날아가지 않는다. */
+.tnum{flex:none;background:#1a4a7a;border:1px solid #2a6aa0;border-radius:7px;font-size:10px;color:#bfe6ff;padding:0 5px;line-height:14px}
 .mv{width:100%;margin-top:7px;background:#0c1e30;color:#c8dff0;border:1px solid #3a7a4a;border-radius:5px;padding:7px;font-size:12px;outline:none}
 .mgp{margin-top:7px;background:#1a1610;border:1px solid #5a4a2a;border-radius:6px;padding:8px}
 .mgp .mt{font-size:11px;color:#c8a850;margin-bottom:5px}
@@ -673,7 +678,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .likeb{background:#12212e;border:1px solid #2f5a7a;color:#9ed3f5;border-radius:16px;
   padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 .likeb.on{background:#143a2a;border-color:#2f7a58;color:#8ee6b4}
-.tcnt.good{background:#143a2a;color:#8ee6b4}
+.tcnt.good,.tnum.good{background:#143a2a;color:#8ee6b4}
 .imgfail{min-width:120px;min-height:70px;border:1px dashed #4a5568;border-radius:8px;
   background:#161a1f;color:#8a97a8;font-size:11.5px;padding:8px;object-fit:contain}
 .mrnone2{font-size:11px;color:#7C93A8}
@@ -2713,8 +2718,6 @@ const I18N = {
     '일부 공개':'Unlisted',
     '한국':'Korea',
     '지도':'Map',
-    '기지국 {n}':'cell {n}',
-    '거짓 {n}':'mock {n}',
     '댓글 남기기':'Leave a comment',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Nothing yet. If you have tried it, tell others how it went.',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Tell others how it went if you have done or been there',
@@ -2759,7 +2762,6 @@ const I18N = {
     '이 아래로 떨어지면 오늘 화면에 알립니다':'You are told on the Today screen when it drops below this',
     '버림 {n}':'{n} dropped',
     '정확도 {n}m':'accuracy {n} m',
-    '위치가 GPS 가 아니라 기지국으로 잡히고 있습니다 (정확도 {n}m).\n\n항적이 엉뚱하게 그려지지 않도록 그 점들은 버리고 있습니다.\n\n폰을 하늘이 보이는 곳에 두시면 나아집니다.':'Your position is being fixed from cell towers, not GPS (accuracy {n} m).\n\nThose points are being dropped so the track does not come out wrong.\n\nIt should improve if you put the phone where it can see the sky.',
     '지금 {a}NM · 평균 {b}노트  →  다듬으면 {c}NM · 평균 {d}노트':'Now {a} NM · avg {b} kn  →  after cleanup {c} NM · avg {d} kn',
     '그래도 이 항적은 믿기 어렵습니다. 폰이 GPS 대신 기지국으로 자리를 잡은 것 같습니다. 출발·도착·중간 기록의 위치는 정확하니 그것으로 보시는 편이 낫습니다.':'The track still cannot be trusted. The phone appears to have fixed its position from cell towers rather than GPS. The departure, arrival and log positions are accurate — use those instead.',
     '미리 알림':'Remind me',
@@ -5198,8 +5200,6 @@ const I18N = {
     '일부 공개':'Доступ по ссылке',
     '한국':'Корея',
     '지도':'Карта',
-    '기지국 {n}':'вышка {n}',
-    '거짓 {n}':'фейк {n}',
     '댓글 남기기':'Оставить комментарий',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Пока пусто. Если делали сами — расскажите, как получилось.',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Расскажите, как прошло, если делали или бывали там',
@@ -5244,7 +5244,6 @@ const I18N = {
     '이 아래로 떨어지면 오늘 화면에 알립니다':'Если станет меньше, вы увидите это на экране «Сегодня»',
     '버림 {n}':'отброшено {n}',
     '정확도 {n}m':'точность {n} м',
-    '위치가 GPS 가 아니라 기지국으로 잡히고 있습니다 (정확도 {n}m).\n\n항적이 엉뚱하게 그려지지 않도록 그 점들은 버리고 있습니다.\n\n폰을 하늘이 보이는 곳에 두시면 나아집니다.':'Позиция определяется по вышкам связи, а не по GPS (точность {n} м).\n\nЭти точки отбрасываются, чтобы трек не получился неверным.\n\nСтанет лучше, если положить телефон так, чтобы было видно небо.',
     '지금 {a}NM · 평균 {b}노트  →  다듬으면 {c}NM · 평균 {d}노트':'Сейчас {a} м. миль · средняя {b} уз  →  после очистки {c} м. миль · средняя {d} уз',
     '그래도 이 항적은 믿기 어렵습니다. 폰이 GPS 대신 기지국으로 자리를 잡은 것 같습니다. 출발·도착·중간 기록의 위치는 정확하니 그것으로 보시는 편이 낫습니다.':'Треку всё равно нельзя доверять: телефон, похоже, определял место по вышкам связи, а не по GPS. Точки отхода, прихода и записей в пути точны — смотрите по ним.',
     '미리 알림':'Напомнить',
@@ -7737,8 +7736,6 @@ const I18N = {
     '일부 공개':'限定公開',
     '한국':'韓国',
     '지도':'地図',
-    '기지국 {n}':'基地局 {n}',
-    '거짓 {n}':'偽 {n}',
     '댓글 남기기':'コメントを残す',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'まだありません。やってみた方はどうだったか残してください。',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'やってみた・行ってみた感想を残してください',
@@ -7778,7 +7775,6 @@ const I18N = {
     '이 아래로 떨어지면 오늘 화면에 알립니다':'これを下回ると「今日」画面でお知らせします',
     '버림 {n}':'破棄 {n}',
     '정확도 {n}m':'精度 {n}m',
-    '위치가 GPS 가 아니라 기지국으로 잡히고 있습니다 (정확도 {n}m).\n\n항적이 엉뚱하게 그려지지 않도록 그 점들은 버리고 있습니다.\n\n폰을 하늘이 보이는 곳에 두시면 나아집니다.':'位置がGPSではなく基地局で取得されています（精度 {n}m）。\\n\\n航跡が乱れないよう、それらの点は除外しています。\\n\\nスマホを空が見える場所に置くと改善します。',
     '지금 {a}NM · 평균 {b}노트  →  다듬으면 {c}NM · 평균 {d}노트':'現在 {a}NM・平均 {b}ノット  →  補正後 {c}NM・平均 {d}ノット',
     '그래도 이 항적은 믿기 어렵습니다. 폰이 GPS 대신 기지국으로 자리를 잡은 것 같습니다. 출발·도착·중간 기록의 위치는 정확하니 그것으로 보시는 편이 낫습니다.':'それでもこの航跡は信頼できません。スマホがGPSではなく基地局で位置を取得しているようです。出発・到着・中間記録の位置は正確ですので、そちらでご確認ください。',
     '미리 알림':'リマインダー',
@@ -11868,8 +11864,20 @@ const TRK_ACC   = 60;     // m — 이보다 흐린 점은 안 받는다. GPS �
                           //     기지국·와이파이로 지어낸 자리는 1000m 를 넘는다
 const TRK_MAXKT = 20;     // 노트 — 이 배가 낼 수 없는 속도. 넘으면 튄 점이다
 const TRK_LOST  = 6;      // 연달아 이만큼 버리면 기준점을 다시 잡는다
-const TRK_BLUR_WARN = 10; // 흐린 점이 연달아 이만큼 오면 사람에게 말한다
 const TRK_KEY  = 'bt_trk';
+// ★★★ 떨림 고르개 (4.79)
+//   점을 받은 그대로 찍으면, 배가 곧게 가고 있어도 선이 지그재그로 떨린다.
+//   GPS 는 늘 몇 m 씩 흔들리기 때문이다. 버리는 것만으로는 이게 안 없어진다.
+//   다른 기록 앱들이 쓰는 방법을 그대로 쓴다 — 칼만 고르개.
+//   (RunnerUp 이 「항적이 튄다」 는 같은 문제를 이걸로 고쳤다. 사람에게 아무것도
+//    묻지 않고 조용히 고른다 — 우리도 그렇게 한다.)
+//   앞 점과 지금 점을 「지금 점이 얼마나 또렷한가」로 저울질해 섞는다.
+//   또렷하면 지금 점 쪽으로, 흐리면 앞 점 쪽으로 붙는다.
+// ★ Q 는 「이 배가 1초에 얼마나 갑자기 달라질 수 있나」다.
+//   작게 잡으면 더 매끈해지지만 선이 배보다 뒤처진다 — 바다에서는 그게 더 위험하다.
+//   20노트(=10m/s)까지 내는 배를 담으므로 넉넉히 5 로 둔다. 뒤처짐이 2m 안쪽이다.
+const TRK_Q = 5;
+let trkKal = null;        // { la, lo, v, t }   v = 지금까지의 불확실함(m²)
 
 let trkNow = null;   // { vid, from, pts:[{la,lo,t}], id }
 
@@ -11990,6 +11998,29 @@ function trkLive(){
   }catch(e){}
 }
 
+// ★ 고르개를 처음으로 되돌린다 (항해를 새로 시작할 때·오래 끊겼을 때)
+function trkSmoothReset(){ trkKal = null; }
+// ★ 떨림을 고른다. 사람이 누를 것은 없다 — 켜 두면 그냥 된다.
+function trkSmooth(la, lo, ac, tms){
+  // ★ accuracy 를 안 주는 기기가 있다. 그때는 3m 로 본다 — 안 그러면 나누다 터진다.
+  const acc = (isFinite(ac) && ac > 1) ? ac : 3;
+  const now = isFinite(tms) ? tms : Date.now();
+  if(!trkKal){ trkKal = { la, lo, v: acc * acc, t: now }; return { la, lo }; }
+  const dt = (now - trkKal.t) / 1000;
+  // ★ 2분 넘게 끊겼다 이어진 것은 앞 점을 믿을 이유가 없다 (터널·선실 안·앱이 잠깐 죽음).
+  //   그대로 섞으면 배가 있지도 않은 자리로 끌려간다. 그때는 새로 시작한다.
+  if(!isFinite(dt) || dt < 0 || dt > 120){
+    trkKal = { la, lo, v: acc * acc, t: now }; return { la, lo };
+  }
+  trkKal.v += dt * TRK_Q * TRK_Q;
+  trkKal.t = now;
+  const K = trkKal.v / (trkKal.v + acc * acc);
+  trkKal.la += K * (la - trkKal.la);
+  trkKal.lo += K * (lo - trkKal.lo);
+  trkKal.v = (1 - K) * trkKal.v;
+  return { la: trkKal.la, lo: trkKal.lo };
+}
+
 // 점 하나가 들어왔다
 function trkPush(pos){
   if(!trkNow || !pos) return false;
@@ -12027,17 +12058,18 @@ function trkPush(pos){
   const blurry  = !isFinite(ac) || ac > TRK_GPS_ACC;
   if(!hasMove && blurry){
     trkNow.net = (Number(trkNow.net) || 0) + 1;
-    trkBlurWarn();
     trkSkip(); return false;
   }
 
   if(isFinite(ac) && ac > TRK_ACC){
     trkNow.blur = (Number(trkNow.blur) || 0) + 1;
-    trkBlurWarn();
     trkSkip(); return false;
   }
   trkNow.blur = 0;
-  const p = { la:+la.toFixed(5), lo:+lo.toFixed(5),
+  // ★★★ 여기서 떨림을 고른다 (4.79). 고른 자리를 담는다 — 받은 그대로가 아니다.
+  const tms = Date.parse(pos.time || 0) || Date.now();
+  const sm  = trkSmooth(la, lo, ac, tms);
+  const p = { la:+sm.la.toFixed(5), lo:+sm.lo.toFixed(5),
               t: new Date(pos.time || Date.now()).toISOString() };
   // ★ 정확도를 점마다 남긴다. 이게 없으면 나중에 「왜 이렇게 됐나」를 물어도
   //   자료가 없어서 또 추측만 하게 된다 — 4.51 에서 실제로 그랬다.
@@ -12094,31 +12126,13 @@ function trkTooFast(a, b){
   return (m / dt) * 1.94384 > TRK_MAXKT;      // m/s → 노트
 }
 // 기록 중 한 줄로 보여 줄 말
+// ★★★ 여기에 「버림 n · 기지국 n · 정확도 n m」 을 적었었다. 4.79 에서 뺐다.
+//   사람이 알고 싶은 것은 「내가 지나온 길이 제대로 찍히고 있나」 하나다.
+//   무엇을 왜 버렸는지는 앱이 알아서 할 일이지, 배 모는 사람이 볼 일이 아니다.
+//   버린 수는 trkNow 에 그대로 쌓아 둔다 — 화면에만 안 나온다.
 function trkCountText(){
   if(!trkNow) return '';
-  const n = (trkNow.pts || []).length;
-  let s = tsub('{n}점', { n: String(n) });
-  const d = Number(trkNow.drop) || 0;
-  if(d > 0) s += ' · ' + tsub('버림 {n}', { n: String(d) });
-  // ★ 무엇을 왜 버렸는지 남긴다 (4.78). 이게 없으면 「왜 시내로 뻗쳤나」 를
-  //   다시 물어도 자료가 없어서 또 추측만 하게 된다.
-  const net = Number(trkNow.net) || 0;
-  if(net > 0) s += ' · ' + tsub('기지국 {n}', { n: String(net) });
-  const mk = Number(trkNow.mock) || 0;
-  if(mk > 0) s += ' · ' + tsub('거짓 {n}', { n: String(mk) });
-  const a = Number(trkNow.ac);
-  if(isFinite(a) && a > 0) s += ' · ' + tsub('정확도 {n}m', { n: String(a) });
-  return s;
-}
-// ★ 흐린 점만 계속 들어오면 그 자리에서 말한다.
-//   조용히 있으면 사람은 잘 되고 있는 줄 알고 내려놓는다. 그러면 항해가 통째로 날아간다.
-//   한 번만 말한다 — 배 위에서 같은 말을 되풀이하면 그게 더 방해다.
-function trkBlurWarn(){
-  if(!trkNow || trkNow.warned) return;
-  if((Number(trkNow.blur) || 0) < TRK_BLUR_WARN) return;
-  trkNow.warned = 1;
-  try{ tell(tsub('위치가 GPS 가 아니라 기지국으로 잡히고 있습니다 (정확도 {n}m).\n\n항적이 엉뚱하게 그려지지 않도록 그 점들은 버리고 있습니다.\n\n폰을 하늘이 보이는 곳에 두시면 나아집니다.',
-    { n: String(Number(trkNow.ac) || 0) })); }catch(e){}
+  return tsub('{n}점', { n: String((trkNow.pts || []).length) });
 }
 function trkSkip(){
   if(!trkNow) return;
@@ -12271,6 +12285,7 @@ async function trkStart(vid){
   await trkAskNoti();                        // 알림이 막혀 있으면 기록이 시작도 안 된다
   if(trkNow && String(trkNow.vid) === String(vid)) return '';
   if(trkNow) await trkStop();
+  trkSmoothReset();
   trkNow = { vid: String(vid), from: new Date().toISOString(), pts: [], id: null };
   trkKeep();
   const ok = await trkAttach();
@@ -12298,11 +12313,15 @@ async function trkStopSay(){
 
 async function trkStop(){
   const cur = trkNow;
-  trkNow = null; trkKeep(); mobFabSync();
+  trkNow = null; trkKeep(); mobFabSync(); trkSmoothReset();
   if(!cur) return null;
   const G = bgGeo();
   if(G && cur.id){ try{ await G.removeWatcher({ id: cur.id }); }catch(e){} }
-  const pts = trkSimplify(cur.pts || [], TRK_TOL);
+  // ★★★ 입항할 때 튄 점을 앱이 알아서 걷어낸다 (4.79).
+  //   여태는 사람이 「튄 점 다듬기」 를 눌러야 했다. 누를 줄 알아야 깨끗해지는
+  //   기록은 안 깨끗한 기록이다. 배에서 내리면 이미 다듬어져 있어야 한다.
+  //   (되돌리기가 있는 손 다듬기와 달리 여기서는 아직 저장 전이라 잃을 것이 없다)
+  const pts = trkSimplify(trkClean(cur.pts || []).pts, TRK_TOL);
   // ★ 클라우드로는 여기서 한 번만 올린다 (점마다 올리면 배터리를 더 먹는다)
   if(pts.length >= 2){
     const it = (typeof voyage !== 'undefined' ? voyage : []).find(v => String(v.id) === String(cur.vid));
@@ -12326,6 +12345,7 @@ function trkResume(){
   mobFabSync();
   if(!trkNow) return;
   trkNow.id = null;
+  trkSmoothReset();
   trkAttach();
 }
 
@@ -13898,11 +13918,11 @@ async function renderTalk(){
       const dim = rd && (rd.open === false || rideOver(rd));
       return `<div class="fleet${dim?' dim':''}" onclick="openTalk('${esc(po.id)}')">
         <div class="fmain"><div class="fname">
-          <span class="chip">${esc(kn)}</span> ${esc(po.title||t('(제목 없음)'))}
+          <span class="chip">${esc(kn)}</span> ${esc(trRow('community', po.id, 'title', po.title) || t('(제목 없음)'))}
           ${rd ? (dim ? `<span class="chip">${esc(t('마감'))}</span>`
                       : `<span class="chip good">${Number(rd.n)||1}자리</span>`) : ''}
-          ${n?`<span class="tcnt" title="${esc(t('댓글'))}">${n}</span>`:''}
-          ${(Number(po.likeN)||0) > 0 ? `<span class="tcnt good" title="${esc(t('도움됐어요'))}">${Number(po.likeN)}</span>` : ''}
+          ${n?`<span class="tnum" title="${esc(t('댓글'))}">${n}</span>`:''}
+          ${(Number(po.likeN)||0) > 0 ? `<span class="tnum good" title="${esc(t('도움됐어요'))}">${Number(po.likeN)}</span>` : ''}
           ${po.hidden?`<span class="chip notice">${esc(t('숨김'))}</span>`:''}</div>
           <div class="fsub">${(isAdmin() && po.by)
               ? `<span class="whoa" onclick="event.stopPropagation();openPerson('${esc(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
@@ -13910,11 +13930,13 @@ async function renderTalk(){
             ${po.region?' · '+esc(po.region):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
         </div></div>`;
   }
-  const rows = filterMuted(talkList)
+  const 보일것 = filterMuted(talkList)
     .filter(po => !po.hidden || isAdmin('postDel'))
     .filter(po => !talkKind || po.kind === talkKind)
-    .filter(po => !talkRegion || po.region === talkRegion)
-    .map(talkRow).join('');
+    .filter(po => !talkRegion || po.region === talkRegion);
+  // ★ 4.79 — 목록도 옮긴다. 제목만 보고 뭘 열지 고르는 것이라 여기가 먼저다.
+  trListAuto('community', 보일것, po => (po.title || '') + ' ' + (po.text || ''));
+  const rows = 보일것.map(talkRow).join('');
 
   const sorts = `<div class="tfilt">`
     + `<button class="tchip${talkSort==='ts'?' on':''}" onclick="setTalkSort('ts')">${esc(t('새 글 순'))}</button>`
@@ -18736,7 +18758,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.78';
+const APP_VER = '4.79';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -24736,6 +24758,39 @@ function trPump(){
     })();
   }
 }
+// ══════════════════════════════════════════════════════════════
+// 목록도 옮긴다 (4.79, 사장님 지적 — 일본어로 봐도 글판 제목이 한국어로 남아 있었다)
+//
+// ★ 여태는 글을 '열었을 때' 만 옮겼다 (trBar 가 trAuto 를 불렀다).
+//   그런데 사람은 목록에서 먼저 본다. 목록이 남의 말이면 뭘 열지도 못 고른다.
+//
+// ★ 돈 새는 것 막기
+//   ① 옮긴 것은 서버가 글마다 담아 둔다 (…/tr/{말}). 담긴 것을 읽는 것은 값이 안 든다.
+//   ② 그러니 「목록에서 옮긴다」 고 값이 더 드는 것이 아니다 — 어차피 열면 드는 값을
+//      먼저 낼 뿐이고, 한 글은 한 말에 딱 한 번만 든다.
+//   ③ 그래도 화면 밖까지 다 부르면 헛돈이다. 눈에 들어오는 앞쪽 몇 줄만 부른다.
+const TR_LIST_MAX = 15;
+// 목록에서 옮길 것들을 줄 세운다. src 는 「어느 말로 쓰였나」 가리는 데만 쓴다.
+function trListAuto(coll, rows, srcOf){
+  try{
+    if(!Array.isArray(rows) || !rows.length) return;
+    rows.slice(0, TR_LIST_MAX).forEach(r => {
+      if(!r || !r.id) return;
+      const key = trKey(coll, r.id);
+      if(TR_SKIP[key]) return;                       // 「원어로 보기」 를 누른 글은 그대로 둔다
+      if(TR_GOT[key + ':' + langNow()]){ TR_ON[key] = true; return; }
+      let src = '';
+      try{ src = String(srcOf ? (srcOf(r) || '') : ''); }catch(_){}
+      if(!src.trim()) return;
+      trAuto(coll, r.id, src);
+    });
+  }catch(_){}
+}
+// 목록 한 줄에 쓸 글자 — 옮긴 것이 있으면 그것을, 없으면 원문을 낸다.
+// ★ 없을 때 빈 글자를 내면 목록에 제목 없는 줄이 생긴다. 반드시 원문으로 되돌린다.
+function trRow(coll, id, field, orig){
+  return trPick(trView(coll, id), field, orig);
+}
 // 말을 바꾸면 옮겨 둔 것을 다시 고른다 (다른 말로 옮긴 것을 그대로 두면 엉뚱하다)
 function trLangChanged(){
   Object.keys(TR_ON).forEach(k=>{ if(!TR_GOT[k + ':' + langNow()]) TR_ON[k] = false; });
@@ -24747,10 +24802,23 @@ function trLangChanged(){
 //   제목·본문·단추가 늘 같은 곳에서 만들어져 어긋날 자리가 없다.
 function trRepaint(coll, id){
   try{
-    if(coll === 'community') openTalk(id);
+    // ★★★ 4.79 — 열려 있는 글만 다시 연다.
+    //   여태는 무조건 openTalk(id) 를 불렀다. 글을 '열었을 때' 만 옮겼으니 그래도 됐다.
+    //   이제 목록에서도 옮기므로, 그대로 두면 목록을 보고 있는데 글이 저 혼자 열린다.
+    //   열려 있지 않으면 목록만 제자리에서 다시 그린다.
+    if(coll === 'community'){
+      if(String(talkOpenId || '') === String(id)) openTalk(id);
+      else if(typeof renderTalk === 'function' && curScreen() === 'talk') renderTalk();
+    }
     else if(coll === 'series') openSeries(id);
-    else if(coll === 'market') openItem(id);
-    else if(coll === 'spots')  openSpot(id);
+    else if(coll === 'market'){
+      if(String(marketOpenId || '') === String(id)) openItem(id);
+      else if(typeof renderMarket === 'function' && curScreen() === 'market') renderMarket();
+    }
+    else if(coll === 'spots'){
+      if(String(spotOpenId || '') === String(id)) openSpot(id);
+      else if(typeof renderSpots === 'function' && curScreen() === 'spots') renderSpots();
+    }
     else if(coll === 'boatPublic'){
       // 배 페이지를 보고 있으면 그 페이지를, 목록을 보고 있으면 목록을 다시 그린다.
       // ★ 4.70 — 목록 제목도 옮기므로 여기서 목록을 안 그리면 제목이 원문으로 남는다.
@@ -26117,7 +26185,7 @@ async function renderMarket(){
     <div id="marketRows">` + marketRowsHtml() + `</div>`;
 }
 function marketRowsHtml(){
-  const rows = marketForList()
+  const 보일것 = marketForList()
     .filter(m => !m.hidden || isAdmin('postDel'))
     .filter(m => !marketCat || m.cat === marketCat)
     .filter(m => itemMatch(m, marketQ))
@@ -26126,7 +26194,10 @@ function marketRowsHtml(){
       const da = a.state === 'done' ? 1 : 0, db = b.state === 'done' ? 1 : 0;
       if(da !== db) return da - db;
       return String(b.ts||'').localeCompare(String(a.ts||''));
-    })
+    });
+  // ★ 4.79 — 목록도 옮긴다 (사장님 지적). 물건 이름이 남의 말이면 고를 수가 없다.
+  trListAuto('market', 보일것, m => (m.title || '') + ' ' + (m.text || ''));
+  const rows = 보일것
     .map(m=>{
       // ★ 56픽셀 자리에 원본을 내려받지 않는다
       const tsrc = thumbOf(m, 0);
@@ -26137,7 +26208,7 @@ function marketRowsHtml(){
         <div class="fmain">
           <div class="fname">${m.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}
             ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span> `:''}
-            ${esc(m.title||t('제목 없음'))}</div>
+            ${esc(trRow('market', m.id, 'title', m.title) || t('제목 없음'))}</div>
           <div class="fsub"><b style="color:#dfe8f2">${esc(priceText(m) || t('가격 미정'))}</b>
             · ${esc(catName(m.cat))}${m.region?' · '+esc(m.region):''}
             · ${esc(String(m.ts||'').slice(0,10))}</div>
@@ -27062,22 +27133,27 @@ function spotRowsHtml(){
         if(y != null) return 1;
       }
       return String(a.name||'').localeCompare(String(b.name||''));
-    })
+    });
+  // ★ 4.79 — 목록도 옮긴다. 정박지는 이름과 한 줄 소개가 남의 말이면 고를 수가 없다.
+  //   ★ 앱에 든 것·꾸러미(일본 자료)는 서버에 글이 없다(seed). 부르면 헛돈만 든다.
+  //     그것들은 자료를 만들 때 이미 그 나라 말로 되어 있다.
+  trListAuto('spots', rows.filter(s => !s.seed), s => (s.name || '') + ' ' + (s.note || ''));
+  const out = rows
     .map(s=>{
       const sh = spotShelterText(s);
       const nm = spotNm(s);
       return `<div class="fleet" onclick="openSpot('${esc(s.id)}')"><div class="fmain">
-        <div class="fname">${s.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}${esc(s.name||t('이름 없음'))}
+        <div class="fname">${s.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}${esc(trRow('spots', s.id, 'name', s.name) || t('이름 없음'))}
           <span class="chip">${esc(spotKindName(s.kind))}</span>
           ${s.plan?`<span class="chip notice">${esc(t('계획'))}</span>`:''}
-          ${(Number(s.cmtN)||0) ? `<span class="tcnt" title="${esc(t('다녀온 이야기'))}">${Number(s.cmtN)}</span>` : ''}</div>
+          ${(Number(s.cmtN)||0) ? `<span class="tnum" title="${esc(t('다녀온 이야기'))}">${Number(s.cmtN)}</span>` : ''}</div>
         <div class="fsub">${esc([nm != null ? (nm < 10 ? nm.toFixed(1) : Math.round(nm)) + ' NM' : '',
             s.region, spotDepthText(s), sh].filter(Boolean).join(' · '))}</div>
       </div></div>`;
     }).join('');
   const busy = spotQ.trim() && spotFinding
     ? `<div class="mrnone">${esc(t('서버에서도 찾는 중…'))}</div>` : '';
-  return busy + (rows || `<div class="mrnone" style="text-align:left">${spotQ
+  return busy + (out || `<div class="mrnone" style="text-align:left">${spotQ
       ? (spotFinding ? '' : esc(t('찾은 정박지가 없습니다. 이름과 올린 사람에서 찾습니다.')))
       : `<b>${esc(t('아직 올라온 정박지가 없습니다.'))}</b><br><br>
          ${esc(t('다녀오신 마리나·항구·묘박지를 하나만 올려 주세요.'))}<br>
@@ -31485,7 +31561,7 @@ async function renderNews(force){
   const nNew = (rows, f) => rows.filter(f || newsIsNew).length;
   const tabs = `<div class="subrow">`
     + [['kr', t('한국 소식'), nNew(gov)], ['ww', t('해외 소식'), nNew(ww)], ['sr', t('연재'), 0]]
-        .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tcnt">${c}</span>`:''}</button>`).join('')
+        .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tnum">${c}</span>`:''}</button>`).join('')
     + `</div>`;
   // ★ 걸러 보는 단추가 아니다. 「알림을 어디서 켜나」를 여기 두는 것이다.
   //   목록을 거르는 것으로 읽히지 않게 말을 「고르기」로 두고 소식 위가 아니라 오른쪽에 둔다.

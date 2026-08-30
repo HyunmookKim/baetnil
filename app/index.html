@@ -15354,7 +15354,8 @@ function expRows(){
       // ★★★ 4.70 — 「내 배에 들어온 사람만」 은 목록에 안 싣는다. 배를 열어야 보인다.
       //   lv 가 없는 옛 자료는 'com' 으로 본다 — 지금까지 보이던 대로 그대로 보인다.
       .filter(o => (o.r.lv || 'com') === 'com')
-      .filter(o => hit([o.r.title, o.r.from, o.r.to, o.r.note, o.b.name, o.b.port].join(' ')))
+      .filter(o => hit([o.r.title, o.r.from, o.r.to, o.r.note,
+                        o.b.name, o.b.port, boatShowName(o.b), boatShowPort(o.b)].join(' ')))
       .sort((a,b) => String(b.r.date||'').localeCompare(String(a.r.date||'')));
   }
   if(kind === 'maint'){
@@ -15371,7 +15372,8 @@ function expRows(){
                               how:o.r.how, hard:o.r.hard, work:o.r.work, cost:o.r.cost,
                               used:o.r.used, sys:o.r.grp || '', _old:true } }));
     return now.concat(old)
-      .filter(o => hit([o.r.title, o.r.gear, o.r.maker, o.r.model, o.r.kind, o.r.sys, o.b.name].join(' ')))
+      .filter(o => hit([o.r.title, o.r.gear, o.r.maker, o.r.model, o.r.kind, o.r.sys,
+                        o.b.name, boatShowName(o.b)].join(' ')))
       .sort((a,b) => ((b.r.how||[]).length - (a.r.how||[]).length)
                   || String(b.r.date||'').localeCompare(String(a.r.date||'')));
   }
@@ -15388,18 +15390,29 @@ function expRows(){
 }
 let expQ = '';
 // 운영자가 감춘 배는 목록에서 뺀다. 운영자에게는 표시해서 보여 준다.
+// ★ 배 이름·매어 둔 곳을 고르는 문 하나 (4.81).
+//   여러 군데서 고르면 반드시 한 곳이 남의 말로 남는다 — 정박지에서 그랬다.
+function boatShowName(b){ return b ? trRow('boatPublic', b.id, 'name', b.name) : ''; }
+function boatShowPort(b){ return b ? trRow('boatPublic', b.id, 'port', b.port) : ''; }
 function exploreRowsHtml(){
   if(expKind() !== 'boat') return expRowsHtml();
   const list = exploreAll || [];
   const hid = hiddenBoats().length;
-  const rows = exploreFilter(filterHidden(list)
-    .filter(x => !x.adminHidden || isAdmin('boatMod')))
+  const 보일것 = exploreFilter(filterHidden(list)
+    .filter(x => !x.adminHidden || isAdmin('boatMod')));
+  // ★ 4.81 — 배 이름·매어 둔 곳도 보는 사람 말로 낸다.
+  //   ★ 배도 파이어스토어에 문서가 있다 → 문서 길로 간다. 배 하나를 통째로 한 번에
+  //     옮기므로, 배 페이지에 들어갔을 때와 같은 것을 쓴다 (값이 두 번 안 든다).
+  //   ★ 제조사·모델은 옮기지 않는다 — Beneteau · Yanmar 는 나라마다 같은 이름이다.
+  //     그것을 옮기면 오히려 못 알아본다. 이건 내 편의가 아니라 그 글자의 성질이다.
+  trListAuto('boatPublic', 보일것, x => (x.name || '') + ' ' + (x.port || ''));
+  const rows = 보일것
     .map(x=>`<div class="fleet" onclick="openBoatPage('${esc(x.id)}')">
-      <div class="fmain"><div class="fname">${esc(x.name||t('이름 없음'))}
+      <div class="fmain"><div class="fname">${esc(boatShowName(x) || t('이름 없음'))}
         <span class="chip">${esc(t(x.typeName||''))}</span>
         ${x.adminHidden?`<span class="chip notice">${esc(t('감춤'))}</span>`:''}
         ${x.biz?`<span class="chip notice">${esc(t('영업'))}</span>`:''}</div>
-        <div class="fsub">${esc([x.port, x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
+        <div class="fsub">${esc([boatShowPort(x), x.maker, x.model].filter(Boolean).join(' · ') || '')}</div>
       </div></div>`).join('');
   return (rows || `<div class="mrnone">${exploreQ ? t('찾는 배가 없습니다') : (exploreBiz?t('영업 배가 아직 없습니다'):t('공개된 배가 아직 없습니다'))}</div>`)
     + (hid ? `<div class="mrrow" style="justify-content:center;padding:12px">
@@ -15436,7 +15449,7 @@ function expRowsHtml(){
   }catch(_){}
   return rows.slice(0, 200).map(o => {
     const b = o.b, r = o.r;
-    const by = `<div class="fsub">${esc([b.name, b.port].filter(Boolean).join(' · '))}</div>`;
+    const by = `<div class="fsub">${esc([boatShowName(b), boatShowPort(b)].filter(Boolean).join(' · '))}</div>`;
     if(kind === 'voyage'){
       const nm = trIn('voyage', r.id, 'title', pubVoyName(r) || r.date || '', b.id);
       const sub = [r.date, r.nm ? r.nm + ' NM' : '', r.kind ? t(r.kind) : ''].filter(Boolean).join(' · ');
@@ -15784,10 +15797,10 @@ function paintBoatPage(){
   if(!secs.some(([k])=>k===boatPageTab)) boatPageTab = secs.length ? secs[0][0] : 'intro';
   const mine = boats.some(b=>String(b.id)===String(x.id));
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(x.name||'')}</b><span style="flex:1"></span>
+  P.innerHTML = `<div class="mrhead"><b>${esc(boatShowName(x) || '')}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToExplore()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(t(x.typeName||''))}</span>
-      ${x.biz?`<span class="chip notice">${esc(t('영업'))}</span>`:''}${esc(x.port||'')}</div>
+      ${x.biz?`<span class="chip notice">${esc(t('영업'))}</span>`:''}${esc(boatShowPort(x) || '')}</div>
     ${(boatPageTab === 'intro' && (x.intro||[]).length)
       ? trBar('boatPublic', x.id, pubBoatText(x)) : ''}
     ${mine ? `<div class="mrnone">${esc(t('이미 이 배의 구성원입니다'))}</div>`
@@ -18758,7 +18771,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.80';
+const APP_VER = '4.81';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -24786,6 +24799,68 @@ function trListAuto(coll, rows, srcOf){
     });
   }catch(_){}
 }
+// ══════════════════════════════════════════════════════════════
+// 글자를 옮기는 문 — 목록·이름·어디든 (4.81)
+//
+// ★★★ 사장님이 정하신 것: **보이는 모든 글자는 보는 사람 말로 자동으로 나온다.**
+//   사람이 누를 것은 「원어로 보기」 하나뿐이다. 예외는 내가 정하지 않는다.
+//
+// ★ 내가 저지른 잘못 (이 자리에 적어 둔다 — 또 하지 않으려고)
+//   4.79 에서 목록 번역을 넣으면서 내 손으로 예외를 만들었다:
+//     · 「앱에 든 자료는 서버에 문서가 없으니 안 옮긴다」  → 일본 정박지가 일본어로 남음
+//     · 「뉴스는 값이 드니 누르게 하자」                  → 뉴스가 남의 말로 남음
+//     · 「연재·배 목록은 이름뿐이니 그냥 두자」            → 그것도 남의 말로 남음
+//   전부 **내 사정**이었지 사장님 사정이 아니었다. 사장님은 계속 같은 말씀을 하셨다.
+//
+// ★ 길이 둘인 것은 사실이다 — 그러나 그건 앱 속 사정이지 사람이 알 바가 아니다.
+//   ① 파이어스토어에 문서가 있는 글(글판·장터·정박지 글·연재 글·배)
+//      → __tr.get(coll, id, 말). 문서째로 옮긴다.
+//   ② 문서가 없고 글자만 있는 것(앱에 든 정박지·나라 꾸러미·뉴스·이름표)
+//      → __tr.text(글자들, 말). 서버가 해시로 한 번만 옮기고 담아 둔다.
+//   ★ 값은 「한 문구당 한 말에 딱 한 번」 이다. 백 명이 봐도 한 번이다.
+const TR_WORD = {};            // '말' → { 원문: 옮긴 글 }
+let trWordBusy = false;
+const TR_WORD_MAX = 80;        // 한 번에 보낼 글자 수 (한 화면에 보이는 만큼)
+
+// 글자 하나를 낸다 — 옮긴 것이 있으면 그것을, 없으면 원문을.
+// ★ 없을 때 빈 글자를 내면 목록에 이름 없는 줄이 생긴다. 반드시 원문으로 되돌린다.
+function trWord(v){
+  const got = TR_WORD[langNow()];
+  const k = String(v == null ? '' : v);
+  return (got && got[k]) ? got[k] : k;
+}
+// 글자 여럿을 한 번에 옮긴다. 사람이 누르지 않는다 — 그리면 알아서 간다.
+// ★ 다시 그리는 것은 부른 쪽이 정한다(again). 화면마다 그리는 함수가 다르기 때문이다.
+async function trWordsAuto(words, again){
+  try{
+    if(trWordBusy) return;
+    if(!window.__tr || !window.__tr.text || !meUid()) return;
+    if(navigator && navigator.onLine === false) return;
+    const lang = langNow();
+    const got = TR_WORD[lang] || (TR_WORD[lang] = {});
+    const want = [];
+    (words || []).forEach(v => {
+      if(want.length >= TR_WORD_MAX) return;
+      const k = String(v == null ? '' : v).trim();
+      if(!k) return;
+      if(got[k] !== undefined) return;                  // 이미 봤다 (옮겼거나 옮길 필요가 없었다)
+      if(trSameLang(k, lang)){ got[k] = k; return; }     // 내 말이면 그대로 둔다
+      if(want.indexOf(k) < 0) want.push(k);
+    });
+    if(!want.length) return;
+    trWordBusy = true;
+    try{
+      const r = await window.__tr.text(want, lang);
+      ((r && r.out) || []).forEach((v, i) => { if(want[i]) got[want[i]] = v || want[i]; });
+    }catch(_){ /* 못 옮겼다고 화면을 막지 않는다 */ }
+    // ★ 못 옮긴 것도 원문으로 못 박는다. 안 그러면 그릴 때마다 또 부른다 (돈이 샌다).
+    want.forEach(k => { if(got[k] === undefined) got[k] = k; });
+    trWordBusy = false;
+    try{ if(typeof again === 'function') again(); }catch(_){}
+  }catch(_){ trWordBusy = false; }
+}
+// 말을 바꾸면 옮겨 둔 글자는 그대로 둔다 — 말마다 따로 담아 두므로 섞이지 않는다.
+
 // 목록 한 줄에 쓸 글자 — 옮긴 것이 있으면 그것을, 없으면 원문을 낸다.
 // ★ 없을 때 빈 글자를 내면 목록에 제목 없는 줄이 생긴다. 반드시 원문으로 되돌린다.
 function trRow(coll, id, field, orig){
@@ -27119,11 +27194,22 @@ function spotMapDraw(){
   const rows = spotMapRows();
   if(!rows.length) return;
   try{
-    mapInit('spotsMap', rows.map(s => ({ lat:s.lat, lon:s.lon, label:s.name || '', key:'spot:' + s.id })),
+    mapInit('spotsMap', rows.map(s => ({ lat:s.lat, lon:s.lon, label:spotShowName(s) || '', key:'spot:' + s.id })),
             { mode:'view' });
   }catch(_){}
 }
 // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
+// ★ 정박지 이름을 고르는 곳은 여기 하나다 (문 하나).
+//   사람이 올린 것과 앱에 든 것이 옮기는 길이 다르므로, 두 군데서 고르면
+//   반드시 한 곳이 원문으로 남는다 — 4.79 에서 실제로 그랬다.
+function spotShowName(s){
+  if(!s) return '';
+  return s.seed ? trWord(s.name) : trRow('spots', s.id, 'name', s.name);
+}
+function spotShowNote(s){
+  if(!s) return '';
+  return s.seed ? trWord(s.note) : trRow('spots', s.id, 'note', s.note);
+}
 function spotRowsHtml(){
   // ★ 가까운 순이 먼저다. 이름 순으로 놓으면 전국 천 곳에서 내 앞바다를 못 찾는다.
   //   내 자리를 모를 때만 이름 순으로 놓는다.
@@ -27143,15 +27229,19 @@ function spotRowsHtml(){
       return String(a.name||'').localeCompare(String(b.name||''));
     });
   // ★ 4.79 — 목록도 옮긴다. 정박지는 이름과 한 줄 소개가 남의 말이면 고를 수가 없다.
-  //   ★ 앱에 든 것·꾸러미(일본 자료)는 서버에 글이 없다(seed). 부르면 헛돈만 든다.
-  //     그것들은 자료를 만들 때 이미 그 나라 말로 되어 있다.
+  //   ★ 사람이 올린 정박지는 파이어스토어에 문서가 있다 — 문서째로 옮긴다.
   trListAuto('spots', rows.filter(s => !s.seed), s => (s.name || '') + ' ' + (s.note || ''));
+  //   ★★★ 앱에 든 152곳과 나라 꾸러미(일본)는 문서가 없고 글자만 있다.
+  //     4.79 에서 이것들을 「서버에 글이 없으니」 라며 빼놨다 — 그래서 한국어로 켜도
+  //     일본 정박지가 일본어로 남았다(사장님 지적). 글자를 옮기는 길로 따로 옮긴다.
+  trWordsAuto(rows.filter(s => s.seed).flatMap(s => [s.name, s.note]),
+              () => { if(curScreen() === 'spots') renderSpots(); });
   const out = rows
     .map(s=>{
       const sh = spotShelterText(s);
       const nm = spotNm(s);
       return `<div class="fleet" onclick="openSpot('${esc(s.id)}')"><div class="fmain">
-        <div class="fname">${s.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}${esc(trRow('spots', s.id, 'name', s.name) || t('이름 없음'))}
+        <div class="fname">${s.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}${esc(spotShowName(s) || t('이름 없음'))}
           <span class="chip">${esc(spotKindName(s.kind))}</span>
           ${s.plan?`<span class="chip notice">${esc(t('계획'))}</span>`:''}
           ${(Number(s.cmtN)||0) ? `<span class="tnum" title="${esc(t('다녀온 이야기'))}">${Number(s.cmtN)}</span>` : ''}</div>
@@ -27216,7 +27306,9 @@ function spotsForList(){
 function spotMatch(s, q){
   const t = String(q||'').trim().toLowerCase();
   if(!t) return true;
-  return [s.name, s.region, s.note, spotKindName(s.kind)]
+  // ★ 옮긴 이름으로도 찾힌다 (4.81). 화면에 「소호マリーナ」 로 보이는데
+  //   그 글자로 못 찾으면 사람은 없는 줄 안다.
+  return [s.name, spotShowName(s), s.region, s.note, spotShowNote(s), spotKindName(s.kind)]
     .some(v => String(v||'').toLowerCase().includes(t));
 }
 function setSpotKind(v){
@@ -27239,7 +27331,9 @@ async function openSpot(id){
       <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
   // ★ 이 자리가 어느 꾸러미에서 왔나 — 출처를 적어야 한다 (ODbL). 13번.
   const fromPk = SPOT_PACKS.find(pk => (spotPackRows[pk.k] || []).some(x => String(x.i) === String(s.id)));
-  P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'name',s.name))}</b><span style="flex:1"></span>
+  // ★ 이름은 목록과 같은 문에서 고른다 (4.81). 여기서 따로 고르면 목록과 어긋난다.
+  try{ if(s.seed) trWordsAuto([s.name, s.note], () => openSpot(s.id)); }catch(_){}
+  P.innerHTML = `<div class="mrhead"><b>${esc(spotShowName(s))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToSpots()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
       ${s.region?`<span class="chip">${esc(s.region)}</span>`:''}
@@ -27278,7 +27372,7 @@ async function openSpot(id){
   showPanel(P);
   if(s.lat != null && s.lon != null){
     requestAnimationFrame(()=>{
-      mapInit('spotMap', [{ lat:s.lat, lon:s.lon, label:s.name || '' }], { mode:'view' });
+      mapInit('spotMap', [{ lat:s.lat, lon:s.lon, label:spotShowName(s) || '' }], { mode:'view' });
     });
   }
 }
@@ -31192,53 +31286,55 @@ function newsSum(n){
 // 화면에 낼 글자 — 옮겨서 보기를 켰고 옮긴 것이 있으면 그것을 쓴다
 function newsShow(v){
   const got = TR_NEWS[langNow()];
-  return (trNewsOn && got && got[v]) ? got[v] : v;
+  const k = String(v == null ? '' : v);
+  return (trNewsOn && got && got[k]) ? got[k] : k;
 }
 // 이 목록에 내 말이 아닌 것이 하나라도 있나
 function newsNeedTr(rows){
   return rows.some(n => !trSameLang(newsTitle(n) + ' ' + newsSum(n), langNow()));
 }
+// ★★★ 4.81 — 여기에 「번역해서 보기」 단추가 있었다. 없앴다.
+//   사장님이 정하신 것: 보이는 글자는 누르지 않아도 제 말로 나온다.
+//   「값이 드니 누르게 하자」 는 내 사정이었다. 게다가 값도 한 문구당 한 말에 한 번뿐이다.
+//   남는 단추는 「원어로 보기」 하나다 — 원문이 보고 싶은 사람은 있어도,
+//   남의 말로 보고 싶은 사람은 없다.
 function newsTrBar(rows){
   if(!rows.length) return '';
-  if(trNewsOn){
-    return `<div class="trbar"><span>${esc(t('자동 번역된 글입니다'))}</span>
-      <span style="flex:1"></span>
-      <button class="minib" onclick="newsTrOff()">${esc(t('원어로 보기'))}</button></div>`;
-  }
   if(TR_BUSY.news) return `<div class="trbar"><span>${esc(t('옮기는 중…'))}</span></div>`;
-  if(!meUid()) return '';
-  if(navigator && navigator.onLine === false) return '';
-  if(!newsNeedTr(rows)) return '';
-  return `<div class="trbar"><span style="flex:1"></span>
-    <button class="minib blu" onclick="newsTrGo()">${esc(t('번역해서 보기'))}</button></div>`;
+  if(!trNewsOn) return '';
+  if(!newsNeedTr(rows)) return '';            // 원래 내 말이면 아무 말도 안 낸다
+  return `<div class="trbar"><span>${esc(t('자동 번역된 글입니다'))}</span>
+    <span style="flex:1"></span>
+    <button class="minib" onclick="newsTrOff()">${esc(t('원어로 보기'))}</button></div>`;
 }
-function newsTrOff(){ trNewsOn = false; renderNews(); }
-async function newsTrGo(){
-  if(TR_BUSY.news) return;
+// 「원어로 보기」 를 누른 사람에게는 다시 안 옮긴다 (그 화면에 있는 동안)
+let newsTrSkip = false;
+function newsTrOff(){ trNewsOn = false; newsTrSkip = true; renderNews(); }
+// 목록을 그릴 때 저절로 부른다. 사람이 누를 것이 없다.
+async function newsTrAuto(rows){
+  if(newsTrSkip || TR_BUSY.news) return;
   const lang = langNow();
-  if(TR_NEWS[lang]){ trNewsOn = true; renderNews(); return; }
-  if(!window.__tr || !window.__tr.text){ tell(t('지금은 옮길 수 없습니다')); return; }
-  const rows = (newsSub === 'kr') ? ((krCache && krCache.gov) || [])
-                                  : ((newsCache && newsCache.items) || []);
+  if(!window.__tr || !window.__tr.text || !meUid()) return;
+  if(navigator && navigator.onLine === false) return;
+  const got = TR_NEWS[lang] || (TR_NEWS[lang] = {});
   // 같은 글자는 한 번만 보낸다 — 값이 그만큼 덜 든다
   const want = [];
-  rows.forEach(n => [newsTitle(n), newsSum(n)].forEach(v => {
+  (rows || []).forEach(n => [newsTitle(n), newsSum(n)].forEach(v => {
     v = String(v || '').trim();
-    if(v && want.indexOf(v) < 0 && !trSameLang(v, lang)) want.push(v);
+    if(!v || got[v] !== undefined) return;
+    if(trSameLang(v, lang)){ got[v] = v; return; }
+    if(want.indexOf(v) < 0) want.push(v);
   }));
-  if(!want.length){ trNewsOn = true; renderNews(); return; }
+  if(!want.length){ if(!trNewsOn){ trNewsOn = true; renderNews(); } return; }
   TR_BUSY.news = true; renderNews();
   try{
-    const got = await window.__tr.text(want, lang);
-    const map = {};
-    (got && got.out || []).forEach((v, i) => { if(want[i]) map[want[i]] = v; });
-    TR_NEWS[lang] = map;
-    trNewsOn = true;
-  }catch(e){
-    // ★ 까닭은 서버 함수가 한국어로 준다. 사전을 거치게 해야 외국 사람도 읽는다.
-    tell(t('옮기지 못했습니다') + '\n\n' + t(String((e && e.message) || e)));
-  }
+    const r = await window.__tr.text(want, lang);
+    ((r && r.out) || []).forEach((v, i) => { if(want[i]) got[want[i]] = v || want[i]; });
+  }catch(_){ /* 못 옮겼다고 뉴스를 막지 않는다 */ }
+  // ★ 못 옮긴 것도 원문으로 못 박는다 — 안 그러면 그릴 때마다 또 부른다
+  want.forEach(k => { if(got[k] === undefined) got[k] = k; });
   TR_BUSY.news = false;
+  trNewsOn = true;
   renderNews();
 }
 
@@ -31315,6 +31411,13 @@ function seriesGroups(rows){
   });
   return out;
 }
+// ★ 묶음 이름을 고르는 문 하나. 묶음 안 아무 글의 옮긴 sname 을 쓴다 —
+//   같은 묶음이면 sname 이 같으므로 어느 것을 봐도 결과가 같다.
+function seriesShowName(g){
+  const one = (g && g.items || [])[0];
+  if(!one) return (g && g.name) || '';
+  return trRow('series', one.id, 'sname', g.name);
+}
 async function seriesHtml(){
   const rows = await loadSeries();
   const can = canSeries();
@@ -31326,16 +31429,20 @@ async function seriesHtml(){
   if(!rows.length){
     return add + `<div class="mrnone" style="text-align:left">${esc(t('아직 올라온 연재가 없습니다.'))}</div>`;
   }
+  // ★ 4.81 — 연재 목록도 보는 사람 말로 낸다. 여태 여기만 빠져 있었다.
+  //   ★ 연재는 파이어스토어에 문서가 있다 → 문서 길(trListAuto)로 간다.
+  //     글자 길로 가면 같은 글을 두 번 옮겨 값이 두 배로 든다.
+  trListAuto('series', rows, x => (x.title || '') + ' ' + (x.sname || ''));
   // ★ 연재 이름으로 묶어서 보여 준다.
   //   편 번호만으로 줄을 세우면 서로 다른 연재의 3편이 나란히 붙어 뒤섞인다.
   //   묶음 안은 1편부터 — 연재는 차례대로 읽는 것이다.
   return add + seriesGroups(rows).map(g=>
     `<div class="srgrp"><div class="srghead">
-       <b>${esc(g.name || t('묶지 않은 글'))}</b>
+       <b>${esc(seriesShowName(g) || t('묶지 않은 글'))}</b>
        <span class="srgn">${esc(String(g.items.length))}편</span>
        ${notiSubBtn(g.name, 'news')}</div>`
     + g.items.map(x=>`<div class="mr" onclick="openSeries('${esc(x.id)}')">
-      <div class="ct"><div class="cn">${x.no?`<span class="chip">${esc(String(x.no))}편</span> `:''}${esc(x.title||'')}</div></div>
+      <div class="ct"><div class="cn">${x.no?`<span class="chip">${esc(String(x.no))}편</span> `:''}${esc(trRow('series', x.id, 'title', x.title))}</div></div>
       <div class="mrm">${[esc(x.author||''), esc(x.source||''),
           x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
     </div>`).join('')
@@ -31580,6 +31687,7 @@ async function renderNews(force){
   let html = tabs;
   if(newsSub === 'kr'){
     html += catBar;
+    newsTrAuto(gov);
     html += gov.length ? newsTrBar(gov) + newsByDay(gov, krRow)
       : `<div class="mrnone">${esc(t('아직 모인 소식이 없습니다.'))}</div>`;
   } else if(newsSub === 'ww'){
@@ -31588,7 +31696,7 @@ async function renderNews(force){
     html += ww.length
       ? `<div class="newsup">${esc(tsub('마지막 수집 {d} · {n}건',
           {d: up ? up.toLocaleDateString(langNow()==='ko'?'ko-KR':langNow()) : '—', n: ww.length}))}</div>`
-        + newsTrBar(ww) + newsByDay(ww, wwRow)
+        + (newsTrAuto(ww), newsTrBar(ww)) + newsByDay(ww, wwRow)
       : `<div class="mrnone">${esc(t('아직 수집된 뉴스가 없습니다.'))}<br>${esc(t('잠시 후 다시 확인해 주세요.'))}</div>`;
   } else {
     html += await seriesHtml();

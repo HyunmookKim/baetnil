@@ -125,7 +125,32 @@ const VISITOR_SRC = '香川県·広島県·兵庫県·愛媛県·岡山県 공�
 // ── OSM 에서 자리를 받아 온다
 // ★ 왜 이름으로 안 찾고 테두리로 찾나
 //   이름이 똑같은 항이 여럿 있다(内海港은 여러 현에 있다). 현 테두리 안에서 찾아야 안 헷갈린다.
-const OVERPASS = process.env.OVERPASS_URL || 'https://overpass-api.de/api/interpreter';
+// ★★★ 2026-08 — 본 서버가 406(Not Acceptable) 을 내면서 일감이 통째로 실패했다.
+//   까닭: overpass-api.de 가 「사람이 아니라 프로그램이 부른 것 같은」 요청을 막기
+//   시작했다. IP 문제가 아니라 **머리글(headers) 문제**다. 고치는 법 두 가지를 다 쓴다.
+//
+//   ① 누가 부르는지 밝힌다 — User-Agent 를 제대로 적는다. 이것만으로 풀린 사례가 많다.
+//      (OSM 커뮤니티 143198 「setting the user-agent in the header solved the problem」)
+//   ② 그래도 막히면 거울 서버로 넘어간다. 거울들은 이 검사를 세게 안 한다.
+//
+//   ★ 한 곳만 믿지 않는다. 남의 서버라 언제든 또 막힐 수 있고, 그때마다 일본 정박지가
+//     통째로 비는 것은 안 된다.
+const OVERPASS_LIST = (process.env.OVERPASS_URL
+  ? [process.env.OVERPASS_URL]
+  : [ 'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+      'https://overpass.private.coffee/api/interpreter',
+      'https://lz4.overpass-api.de/api/interpreter',
+      'https://z.overpass-api.de/api/interpreter' ]);
+// ★ 누가 왜 부르는지 밝힌다. 남의 서버를 쓰는 쪽의 예의이자, 막히지 않는 길이다.
+const OV_HEAD = {
+  'Content-Type': 'application/x-www-form-urlencoded',
+  'User-Agent': 'baetnil/1.0 (+https://baetnil.com) 일본 정박지 자료 만들기',
+  'Accept': 'application/json',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'Referer': 'https://baetnil.com/'
+};
+const 잠깐 = ms => new Promise(r => setTimeout(r, ms));
 const PREF_BOX = {   // [남, 서, 북, 동]
   '香川': [34.00, 133.45, 34.60, 134.45],
   '広島': [34.00, 132.00, 34.99, 133.50],
@@ -134,6 +159,30 @@ const PREF_BOX = {   // [남, 서, 북, 동]
   '岡山': [34.30, 133.30, 34.80, 134.45],
   '山口': [33.70, 130.85, 34.50, 132.30]    // 세토 쪽만. 동해(일본해) 연안은 안 본다
 };
+// ★ 물어보기. 막히면 다음 서버로 넘어간다. 다 막히면 그때 소리 내어 실패한다 —
+//   조용히 빈 자료를 내면 앱에서 일본 정박지가 통째로 사라진 채 아무도 모른다.
+async function ovAsk(q){
+  const 탈 = [];
+  for(const url of OVERPASS_LIST){
+    for(let 번 = 0; 번 < 2; 번++){
+      try{
+        const r = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q),
+                                     headers: OV_HEAD });
+        if(r.ok) return await r.json();
+        탈.push(url.replace(/^https:\/\//,'').split('/')[0] + ' ' + r.status);
+        // 429·504 는 「지금 바쁘다」 다 — 한 번 더 기다렸다 물어본다.
+        //   406·403 은 「너는 안 받는다」 라 기다려도 소용없다. 바로 다음 서버로.
+        if(r.status !== 429 && r.status !== 504 && r.status !== 503) break;
+        await 잠깐(20000);
+      }catch(e){
+        탈.push(url.replace(/^https:\/\//,'').split('/')[0] + ' ' + (e.message || '터짐'));
+        break;
+      }
+    }
+    await 잠깐(2000);
+  }
+  throw new Error('overpass 를 다 못 썼습니다 — ' + 탈.join(' / '));
+}
 async function osmIn(box){
   const q = `[out:json][timeout:90];
 （
@@ -144,10 +193,7 @@ async function osmIn(box){
   node["seamark:type"="harbour"](${box[0]},${box[1]},${box[2]},${box[3]});
 ）;
 out center tags;`.replace(/（/g,'(').replace(/）/g,')');
-  const r = await fetch(OVERPASS, { method:'POST', body:'data=' + encodeURIComponent(q),
-    headers:{ 'Content-Type':'application/x-www-form-urlencoded' } });
-  if(!r.ok) throw new Error('overpass ' + r.status);
-  const j = await r.json();
+  const j = await ovAsk(q);
   return (j.elements || []).map(e => ({
     name: (e.tags && (e.tags['name'] || e.tags['name:ja'])) || '',
     lat: e.lat != null ? e.lat : (e.center && e.center.lat),

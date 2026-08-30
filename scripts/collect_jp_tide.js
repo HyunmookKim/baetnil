@@ -157,6 +157,43 @@ function sunTimes(y, m, day, lat, lon){
 }
 
 const sleep = ms => new Promise(r=>setTimeout(r, ms));
+// ── 최고수면(略最高高潮面) — 다리 통과 높이의 기준면
+//
+// ★ 왜 여기서 뽑나
+//   일본 해도의 다리 높이(桁下高)는 「最高水面」 기준이고, 그 정의는 우리 약최고고조위와 같다 —
+//   「平均水面から主要四分潮(M2·S2·K1·O1)の振幅の和だけ上げて決定している」 (해상보안청).
+//   ★ 손으로 적으면 틀린다. 틀리면 배가 다리에 부딪힌다. 그래서 기상청 지점표에서 계산한다.
+//
+//   지점표 한 줄: 번호 기호 지점 위도 경도 [평균수면(기준면 위, cm)] [평균수면 T.P.] [기준면 T.P.]
+//                 M2진폭 M2지각 S2진폭 S2지각 K1진폭 K1지각 O1진폭 O1지각
+//   최고수면(기준면 위, m) = (평균수면 + M2+S2+K1+O1) / 100
+const ST_URL = process.env.JMA_STATION_URL
+  || 'https://www.data.jma.go.jp/kaiyou/db/tide/suisan/station.php';
+async function hatMap(){
+  const out = {};
+  try{
+    const r = await fetch(ST_URL);
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const html = await r.text();
+    // 표 한 줄씩 — 칸 안의 태그를 걷어내고 글자만 본다
+    const rows = html.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+    rows.forEach(tr => {
+      const c = (tr.match(/<t[dh][\s\S]*?<\/t[dh]>/gi) || [])
+        .map(x => x.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
+      if(c.length < 16) return;
+      const code = (c[1] || '').trim();
+      if(!/^[A-Z]{2}$/.test(code)) return;
+      const num = i => { const v = parseFloat(String(c[i]).replace(/[^\d.+-]/g, '')); return isFinite(v) ? v : null; };
+      const msl = num(5), m2 = num(8), s2 = num(10), k1 = num(12), o1 = num(14);
+      if([msl, m2, s2, k1, o1].some(v => v == null)) return;
+      const hat = (msl + m2 + s2 + k1 + o1) / 100;
+      if(!(hat > 0) || hat > 12) return;          // 말이 안 되는 값은 버린다
+      out[code] = Math.round(hat * 100) / 100;
+    });
+  }catch(e){ console.error('최고수면 표를 못 받았습니다 —', e && e.message || e); }
+  return out;
+}
+
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 
 (async () => {
@@ -167,6 +204,10 @@ const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
   const want = new Set();
   for(let i = 0; i < DAYS; i++){ const d = new Date(now); d.setDate(d.getDate() + i); want.add(ymd(d)); }
   const years = [...new Set([...want].map(s => s.slice(0,4)))];
+
+  // ★ 최고수면은 한 번만 받아 온다 (지점마다 부르면 표를 154번 받는다)
+  const HAT = await hatMap();
+  console.log(`최고수면 ${Object.keys(HAT).length}지점`);
 
   const spots = [], miss = [];
   for(const [code, name, lat, lon] of ST){
@@ -189,7 +230,10 @@ const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
     }catch(e){ miss.push(code + ' ' + name + ' — ' + (e && e.message || e)); await sleep(GAP_MS); continue; }
     if(!days.length){ miss.push(code + ' ' + name + ' — 받은 날이 없음'); await sleep(GAP_MS); continue; }
     days.sort((a,b)=> a.d.localeCompare(b.d));
-    spots.push({ id: 'jp_' + code, name, lat, lon, days });
+    const row = { id: 'jp_' + code, name, lat, lon, days };
+    // ★ 못 구한 지점은 아예 안 싣는다. 「없음」 이 「0」 으로 읽히면 안 된다.
+    if(HAT[code] != null) row.hat = HAT[code];
+    spots.push(row);
     await sleep(GAP_MS);
   }
 
@@ -197,7 +241,9 @@ const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
   const data = {
     updated: new Date().toISOString(),
     source: SRC,
-    note: '기상청(気象庁) 潮位表 자료입니다. 해뜸·해짐은 앱이 계산한 값입니다.',
+    note: '기상청(気象庁) 潮位表 자료입니다. 해뜸·해짐은 앱이 계산한 값입니다. '
+        + 'hat 은 最高水面(略最高高潮面) — 평균수면 + M2·S2·K1·O1 진폭의 합. 다리 통과 높이의 기준면입니다.',
+    hatCount: spots.filter(x => x.hat != null).length,
     count: spots.length,
     spots
   };

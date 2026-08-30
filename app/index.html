@@ -2712,6 +2712,14 @@ const I18N = {
     '나만 봅니다':'Private',
     '일부 공개':'Unlisted',
     '한국':'Korea',
+    '지도':'Map',
+    '댓글 남기기':'Leave a comment',
+    '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Nothing yet. If you have tried it, tell others how it went.',
+    '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Tell others how it went if you have done or been there',
+    '이 댓글을 지웁니다.':'Delete this comment.',
+    '지도에 찍을 자리가 없습니다.':'No places with a position to show.',
+    '가까운 {n}곳만 찍었습니다 (모두 {a}곳). 찾기 칸이나 위 띠로 좁히면 그 자리들이 나옵니다.':'Showing the {n} nearest ({a} in total). Narrow it with the search box or the chips above.',
+    '{n}곳. 핀을 누르면 그 자리가 열립니다.':'{n} places. Tap a pin to open it.',
     '일본':'Japan',
     '기본만':'Basic only',
     '세부까지':'Full details',
@@ -5187,6 +5195,14 @@ const I18N = {
     '나만 봅니다':'Только для меня',
     '일부 공개':'Доступ по ссылке',
     '한국':'Корея',
+    '지도':'Карта',
+    '댓글 남기기':'Оставить комментарий',
+    '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Пока пусто. Если делали сами — расскажите, как получилось.',
+    '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Расскажите, как прошло, если делали или бывали там',
+    '이 댓글을 지웁니다.':'Удалить этот комментарий.',
+    '지도에 찍을 자리가 없습니다.':'Нет мест с координатами.',
+    '가까운 {n}곳만 찍었습니다 (모두 {a}곳). 찾기 칸이나 위 띠로 좁히면 그 자리들이 나옵니다.':'Показаны ближайшие {n} из {a}. Сузьте поиском или фильтрами выше.',
+    '{n}곳. 핀을 누르면 그 자리가 열립니다.':'{n} мест. Нажмите на метку, чтобы открыть.',
     '일본':'Япония',
     '기본만':'Только основное',
     '세부까지':'Со всеми подробностями',
@@ -7716,6 +7732,14 @@ const I18N = {
     '나만 봅니다':'自分だけが見ます',
     '일부 공개':'限定公開',
     '한국':'韓国',
+    '지도':'地図',
+    '댓글 남기기':'コメントを残す',
+    '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'まだありません。やってみた方はどうだったか残してください。',
+    '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'やってみた・行ってみた感想を残してください',
+    '이 댓글을 지웁니다.':'このコメントを削除します。',
+    '지도에 찍을 자리가 없습니다.':'地図に出せる場所がありません。',
+    '가까운 {n}곳만 찍었습니다 (모두 {a}곳). 찾기 칸이나 위 띠로 좁히면 그 자리들이 나옵니다.':'近い{n}か所だけ出しています（全{a}か所）。検索や上の帯で絞ると出ます。',
+    '{n}곳. 핀을 누르면 그 자리가 열립니다.':'{n}か所。ピンを押すとその場所が開きます。',
     '일본':'日本',
     '기본만':'基本のみ',
     '세부까지':'詳細まで',
@@ -13101,6 +13125,49 @@ function posLvRow(it){
 }
 
 // 밖으로 내보낼 자료를 만든다. 여기서 걸러진 것은 어떤 경우에도 나가지 않는다.
+// ══════════════════════════════════════════════════════════════
+// 밖으로 나가는 칸 — **한 곳에 적는다** (4.74, 사장님이 정하신 것)
+//
+// ★ 왜 이 표가 있나
+//   여태 buildPublic 안에 「이 칸은 나간다」 를 손으로 열여섯 번 적어 놓았다.
+//   손으로 적으면 하나씩 빠진다. 실제로 하루에 다섯 번 났다 —
+//   제원은 없는 칸(b.loa)을 보고 있었고, 메모는 세 군데에서 각각 막혀 있었고,
+//   연락처는 스위치만 있고 적는 칸이 없었고, 웹은 공개 단계를 아예 안 봤다.
+//
+// ★ 규칙
+//   plain — 그대로 실어 보낸다
+//   via   — 문을 하나 지나야 나간다 (좌표 가리개·사진 용량 따위). 코드가 따로 있다
+//   never — 어떤 경우에도 안 나간다
+//   ★ 셋 중 어디에도 안 적힌 칸이 기록에 생기면 **검사가 그 이름을 대며 걸린다.**
+//     그래야 「적었는데 안 나감」 이 구조적으로 안 생긴다.
+const PUB_OUT = {
+  voyage: {
+    plain: ['id','date','title','from','to','note','timeOut','timeIn','nm','hours','engineH','kind'],
+    via:   ['lv','trk','logs','posOut','posIn','wxOut','wxIn','fish','photos'],
+    never: ['crew','plan','pub','pubLv','posLv','trkOn','trkPub','rideOn','rideN','trkPts','weather']
+  },
+  mlog: {
+    plain: ['id','date','title','hard','work','cost','used','note'],
+    via:   ['lv','how','maker','model','kind','sys','gear','key'],
+    never: ['gearId','maintId','repairId','typ','photos','pub','pubLv']
+  },
+  review: {
+    plain: ['id','title','maker','model','kind','sys','stars','again','used','text','bad','note','date','year'],
+    via:   ['lv','typ','key','full','photos','price','cur','bought'],
+    never: ['gearId','itemId','pub','pubLv','pubPrice']
+  }
+};
+// 표에 적힌 대로 그대로 담는다. 빈 값은 안 담는다 — 빈 칸이 밖에서 「—」 로 보이면 안 된다.
+function pubPlain(r, type){
+  const o = {};
+  ((PUB_OUT[type] || {}).plain || []).forEach(k => {
+    const v = r ? r[k] : undefined;
+    if(v === undefined || v === null || v === '') return;
+    o[k] = v;
+  });
+  return o;
+}
+
 function buildPublic(b){
   if(!b || !isPublic(b)) return null;
   // 배 이름과 선종은 공개하면 항상 함께 나간다 — 무슨 배인지 모르면 볼 이유가 없다
@@ -13159,12 +13226,10 @@ function buildPublic(b){
       // 최근 것이 맨 위. 목록을 보는 사람은 늘 마지막 항해부터 궁금해한다.
       .sort((a,c)=> String(c.date||'').localeCompare(String(a.date||'')))
       .map(v => ({
+        // ★ 그대로 나가는 칸은 표(PUB_OUT.voyage.plain)에서 가져온다 — 손으로 또 적지 않는다 (4.74)
+        ...pubPlain(v, 'voyage'),
         // ★ 이 한 글자가 「목록에 뜨나」 를 정한다. 빠뜨리면 감춘 항해가 목록에 뜬다.
         lv: voyLv(v),
-        id:v.id, date:v.date || '', title:v.title || '',
-        from:v.from || '', to:v.to || '', note:v.note || '',
-        timeOut:v.timeOut || '', timeIn:v.timeIn || '',
-        nm:v.nm || '', hours:v.hours || '', engineH:v.engineH || '',
         // ★ 항적 — 이 항해에서 켠 것만, 그것도 가리개를 지난 뒤에만 나간다.
         //   안 켜면 null 이다. 예전 판과 똑같다.
         trk: trkPublicLine(v, hideNm),
@@ -13181,7 +13246,6 @@ function buildPublic(b){
         // ★ 출발·도착 자리 — 단계에 맞게. 「해역까지만」이면 이름만 나간다.
         posOut: legPublic(v, v.posOut, hideNm),
         posIn:  legPublic(v, v.posIn,  hideNm),
-        kind: v.kind || '',
         wxOut: (v.wxOut && v.wxOut.text) || '',
         wxIn:  (v.wxIn  && v.wxIn.text)  || '',
         fish: (typeof catchTotal === 'function')
@@ -14315,7 +14379,8 @@ async function fixOldQuietly(){
 // ★ 이름을 곳마다 다르게 둔다.
 //   글판·게시판은 재미가 아니라 쓸모다 — '좋아요' 보다 '도움됐어요' 가 맞다.
 //   정박지는 '가봤어요', 장터는 '찜' 이 그 자리에서 하는 말이다.
-const LIKE_LABEL = { talk:t('도움됐어요'), post:t('도움됐어요'), spots:t('가봤어요'), market:t('찜') };
+const LIKE_LABEL = { talk:t('도움됐어요'), post:t('도움됐어요'), spots:t('가봤어요'), market:t('찜'),
+                     bp:t('도움됐어요') };   // bp — 남의 배 게시물 (4.77)
 //
 // ★ 누가 눌렀는지는 문서에 적지 않는다.
 //   1,000명이 누른 글 하나에 계정 번호를 다 적으면 그 글이 30KB 가 되고,
@@ -14349,6 +14414,12 @@ function likeRowOf(kind, id){
   if(kind === 'spots')  return (spotList   || []).find(eq) || null;
   if(kind === 'market') return (marketList || []).find(eq) || null;
   if(kind === 'post')   return (typeof postOf === 'function') ? postOf(id) : null;
+  // ★ 4.77 — 남의 배 게시물. 줄이 배 문서 안의 배열이라 따로 든다 (bpMeta).
+  if(kind === 'bp'){
+    const key = String(id);
+    if(!bpMeta[key]) bpMeta[key] = { id:key, likeN:0, cmtN:0 };
+    return bpMeta[key];
+  }
   return null;
 }
 // 단추 하나만 다시 그린다 — 화면을 통째로 다시 그리면 보던 자리를 잃는다
@@ -14377,7 +14448,7 @@ async function toggleLike(kind, id){
       // ★ 전에는 '읽고 → 1 더해 → 쓰기' 였다. 둘이 동시에 누르면 하나가 사라지고,
       //   한 사람이 몇 번이고 누를 수 있었다.
       //   이제 누가 눌렀는지 방을 하나 남기고, 숫자는 서버가 더한다.
-      const COLL = { talk:'community', spots:'spots', market:'market' }[kind];
+      const COLL = { talk:'community', spots:'spots', market:'market', bp:BP_COLL }[kind];
       if(!window.__like || !COLL) throw new Error(t('인터넷에 연결되어 있지 않습니다'));
       await window.__like.set(COLL, id, !was);
     }
@@ -15347,7 +15418,10 @@ function exploreFilterUI(v){
 }
 // 남의 배 소개 페이지// 남의 배 소개 페이지
 let pubHowId = '';
-function pubHowOpen(id){ pubHowId = String(id); paintBoatPage(); }
+function pubHowOpen(id){
+  pubHowId = String(id); paintBoatPage();
+  try{ loadBpCmts((boatPageData||{}).id, id).then(()=>paintBoatPage()); }catch(_){}
+}
 function pubHowBack(){ pubHowId = ''; paintBoatPage(); }
 // 단계 화면 — 정비수첩과 옛 정비 기록이 같은 것을 그린다. 두 벌로 만들면 한쪽만 고쳐진다.
 function pubHowBody(m, backName){
@@ -15375,7 +15449,8 @@ function pubHowBody(m, backName){
        <div class="howbody">${st2.p?`<img src="${esc(st2.p)}" onclick="pubHowPhoto(${i})">`:''}
          ${st2.v?`<div class="howtx">${esc(trIn('mlog', m.id, 'h'+i, st2.v))}</div>`:''}</div></div>`).join('')}
     ${m.note ? `<div class="secl" style="margin-top:16px">${esc(t('메모'))}</div>
-      <div class="postbody" style="white-space:pre-wrap">${esc(trIn('mlog', m.id, 'note', m.note))}</div>` : ''}`;
+      <div class="postbody" style="white-space:pre-wrap">${esc(trIn('mlog', m.id, 'note', m.note))}</div>` : ''}
+    ${bpSocial((boatPageData && boatPageData.id) || '', m.id)}`;
 }
 function pubHowPhoto(i){
   const x = boatPageData; if(!x) return;
@@ -15461,7 +15536,12 @@ function pubTrkPaint(){
   mapInit('pubTrkMap', pts, { mode:'view', line: line });
 }
 let pubVoyId = '';
-function pubVoyOpen(id){ pubVoyId = String(id); paintBoatPage(); try{ window.scrollTo(0,0); }catch(_){} navPush('pubvoy'); }
+function pubVoyOpen(id){
+  pubVoyId = String(id); paintBoatPage();
+  try{ window.scrollTo(0,0); }catch(_){} navPush('pubvoy');
+  // ★ 댓글은 열 때 받는다. 목록에서 다 받으면 안 볼 것까지 받는다.
+  try{ loadBpCmts((boatPageData||{}).id, id).then(()=>paintBoatPage()); }catch(_){}
+}
 function pubVoyBack(){ if(!pubVoyId) return false; pubVoyId = ''; paintBoatPage(); return true; }
 function pubVoyPhoto(i){
   const x = boatPageData; if(!x) return;
@@ -15535,7 +15615,8 @@ function boatPageBody(x, k){
                     <div class="postbody">${esc(trIn('voyage', v.id, 'note', v.note)).replace(/\n/g,'<br>')}</div>` : ''}
         ${(v.photos||[]).length ? `<div class="mrrow"><span class="mrlbl">${esc(t('사진'))}</span></div>
             <div class="mrph" style="padding:0 14px 14px">${(v.photos||[]).map((u,i)=>
-              `<img src="${esc(u)}" onclick="pubVoyPhoto(${i})">`).join('')}</div>` : ''}`;
+              `<img src="${esc(u)}" onclick="pubVoyPhoto(${i})">`).join('')}</div>` : ''}
+        ${bpSocial(x.id, v.id)}`;
     }
     // 목록 — 이름과 날짜만. 최근 것이 맨 위.
     return (x.voyage||[]).slice()
@@ -15620,6 +15701,7 @@ function boatPageBody(x, k){
              <div class="postbody">${esc(trIn('review', r.id, 'note', r.note)).replace(/\n/g,'<br>')}</div>`:''}
           ${(r.photos||[]).length?`<div class="mrph" style="padding:6px 14px 10px">${
              (r.photos||[]).map((u,i)=>`<img src="${esc(u)}" onclick="pubRvPhoto('${esc(String(r.id))}',${i})">`).join('')}</div>`:''}
+          ${bpSocial(x.id, r.id)}
         </div>`;
       }).join('');
   if(k === 'gear')   return `<div class="postbody">${(x.gear||[]).map(g=>esc(g.name)).join(' · ')}</div>`;
@@ -15667,6 +15749,9 @@ async function openBoatPage(id){
   boatPageData = x;
   boatPageTab = 'intro';
   pubVoyId = ''; pubHowId = '';
+  // ★ 4.77 — 이 배 기록들의 댓글 수·추천 수를 한 번에 받아 둔다.
+  //   기록마다 따로 부르면 정비수첩 50건인 배에서 50번 부른다.
+  try{ await loadBpMeta(x); }catch(_){}
   // ★ 목록에서 기록 한 줄을 눌러 들어왔으면 그 자리로 바로 간다.
   //   배 소개부터 보여 주고 「알아서 찾아라」 하면 아무도 못 찾는다.
   if(expJump){
@@ -18608,7 +18693,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.74';
+const APP_VER = '4.77';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26653,6 +26738,119 @@ function spotCcBar(){
         esc(t(c.name))}</button>`).join('')
     + `</div>`;
 }
+// ══════════════════════════════════════════════════════════════
+// 남의 배 게시물의 댓글·추천 (4.77, 사장님이 정하신 것)
+//
+// ★ 왜 따로 자리를 파나
+//   항해일지·정비수첩·리뷰는 글이 아니라 **배 문서 안의 배열**이다 (boatPublic/{배번호}).
+//   댓글은 글 밖의 방에 붙고(coll/{글}/comments/{댓글}), 추천 숫자도 글 문서에 더한다.
+//   배열 한 칸에는 방을 팔 수도, 숫자를 더할 수도 없다 — 배 문서를 통째로 다시 만들기 때문이다.
+//
+//   ★ 그래서 기록 하나마다 작은 문서를 하나 둔다: bpMeta/{배번호}_{기록번호}
+//     거기에 cmtN · likeN 만 두고, 댓글과 추천은 지금 쓰던 __cmt · __like 를 **그대로** 쓴다.
+//     새 코드를 만들지 않는다 — 만들면 두 벌이 되고 반드시 어긋난다.
+//
+// ★ 말 — 추천은 이미 쓰던 「도움됐어요」 그대로. 댓글은 「댓글」.
+//   자리마다 새 이름을 지으면 말만 는다 (민카라도 整備手帳에 イイね·コメント 하나씩만 쓴다).
+const BP_COLL = 'bpMeta';
+// 열쇠를 만드는 곳은 여기 하나다. 두 곳에서 만들면 댓글이 딴 자리에 붙는다.
+function bpKey(boatId, recId){ return String(boatId || '') + '_' + String(recId || ''); }
+let bpCmts = {}, bpMeta = {};
+function bpN(key, k){ return Number((bpMeta[key] || {})[k]) || 0; }
+// 이 배 기록들의 댓글·추천 숫자를 한 번에 받는다 (4.77)
+// ★ 기록마다 부르면 부르는 횟수가 기록 수만큼 는다. 한 번에 받아 둔다.
+async function loadBpMeta(x){
+  if(!x || !window.__bp) return;
+  const ids = [].concat((x.voyage||[]), (x.mlog||[]), (x.review||[]))
+    .map(r => r && r.id).filter(Boolean).map(id => bpKey(x.id, id));
+  if(!ids.length) return;
+  try{
+    const rows = await window.__bp.many(ids);
+    (rows || []).forEach(r => { if(r && r.id) bpMeta[String(r.id)] = r; });
+  }catch(_){}
+}
+async function loadBpCmts(boatId, recId){
+  if(!window.__cmt) return;
+  const key = bpKey(boatId, recId);
+  try{ bpCmts[key] = await window.__cmt.list(BP_COLL, key); }
+  catch(_){ bpCmts[key] = bpCmts[key] || []; }
+}
+// 댓글·추천 한 덩어리. 항해일지·정비수첩·리뷰가 같은 것을 쓴다.
+function bpSocial(boatId, recId){
+  const key = bpKey(boatId, recId);
+  if(!boatId || !recId) return '';
+  const all = (bpCmts[key] || []).slice()
+    .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
+  const cs = all.map(c=>{
+    const mine = String(c.by) === String(meUid());
+    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+        <span>${esc(String(c.ts||'').slice(0,10))}</span>
+        ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="bpDelComment('${esc(boatId)}','${esc(recId)}','${esc(c.id)}')">&#10005;</button>`:''}</div>
+      <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
+  }).join('');
+  return `<div class="mrrow" style="padding:10px 14px">${likeBtn('bp', key, bpN(key,'likeN'))}</div>
+    <div class="ghead"><b>${esc(t('댓글'))}</b><span class="gcnt">${all.length}</span></div>
+    ${cs || `<div class="mrnone" style="text-align:left">${esc(t('아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.'))}</div>`}
+    <div class="mrrow" style="padding:12px">
+      <button class="mrbtn big" style="width:100%" onclick="bpWriteComment('${esc(boatId)}','${esc(recId)}')">${esc(t('댓글 남기기'))}</button></div>`;
+}
+function bpWriteComment(boatId, recId){
+  if(guardEdit('댓글을 남깁니다.', ()=>bpWriteComment(boatId, recId))) return;
+  if(!window.__user){ tell(t('로그인해야 글을 남길 수 있습니다')); return; }
+  if(myBan){ tell(banNotice()); return; }
+  if(!window.__cmt){ tell(t('인터넷에 연결되어 있지 않습니다')); return; }
+  const key = bpKey(boatId, recId);
+  openForm({
+    filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
+    title:'댓글', okText:'남기기',
+    sub:'해 보셨거나 가 보셨으면 어땠는지 남겨 주세요',
+    fields:[{ key:'text', type:'multi', rows:4, label:'내용', value:'' }],
+    onOk: v => {
+      if(!v.text){ tell(t('내용을 넣어 주세요')); return false; }
+      const c = { id:newId(), by:meUid()||'', byName:meName(),
+                  boat:String(boatId), rec:String(recId),
+                  text:v.text, ts:new Date().toISOString() };
+      window.__cmt.add(BP_COLL, key, c)
+        .then(()=>{
+          bpCmts[key] = (bpCmts[key] || []).concat([c]);
+          bpMeta[key] = Object.assign({}, bpMeta[key], { cmtN: bpN(key,'cmtN') + 1 });
+          try{ paintBoatPage(); }catch(_){}
+        })
+        .catch(e=>tell(t('남기지 못했습니다.\n\n') + ((e&&e.message)||e)));
+    }
+  });
+}
+async function bpDelComment(boatId, recId, cid){
+  if(guardEdit('댓글을 지웁니다.', ()=>bpDelComment(boatId, recId, cid))) return;
+  if(!await ask(t('이 댓글을 지웁니다.'), { ok: t('지우기') })) return;
+  const key = bpKey(boatId, recId);
+  try{
+    await window.__cmt.del(BP_COLL, key, cid);
+    bpCmts[key] = (bpCmts[key] || []).filter(c => String(c.id) !== String(cid));
+    bpMeta[key] = Object.assign({}, bpMeta[key], { cmtN: Math.max(0, bpN(key,'cmtN') - 1) });
+    try{ paintBoatPage(); }catch(_){}
+  }catch(e){ tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)); }
+}
+
+// ── 자료 출처 한 줄 (13번)
+// ★ 라이선스 의무다. 지우지 마십시오.
+//   일본 정박지 자리는 OpenStreetMap 에서 뽑았고, ODbL 은 「출처를 밝힐 것」 을 조건으로 건다.
+//   자료 파일(spots-jp.json)의 from 에 그 문구가 담겨 오고, 화면에는 여기서 한 번만 적는다.
+// ★ 지금 보고 있는 나라의 것만 적는다 — 한국만 보는 사람에게 일본 출처를 적을 까닭이 없다.
+function spotFromLine(){
+  try{
+    const lines = [];
+    SPOT_PACKS.forEach(pk=>{
+      if(!(spotPackRows[pk.k] || []).length) return;
+      if(spotCc && pk.cc && pk.cc !== spotCc) return;
+      const f = String(pk.from || '').trim();
+      if(f) lines.push(f);
+    });
+    if(!lines.length) return '';
+    return `<div class="mrnone" style="text-align:left;font-size:11.5px;line-height:1.6">${
+      lines.map(x=>esc(x)).join('<br>')}</div>`;
+  }catch(_){ return ''; }
+}
 function spotKindNow(){
   if(spotKind != null) return spotKind;
   return (typeof isFishing === 'function' && isFishing()) ? 'port' : '';
@@ -26745,7 +26943,63 @@ async function renderSpots(){
     // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 감춘다.
     + (off ? '' : `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
       <button class="mrbtn ok" onclick="writeSpot()">${esc(t('+ 정박지 올리기'))}</button></div>`)
-    + `<div id="spotRows">` + spotRowsHtml() + `</div>`;
+    + spotViewBar()
+    + (spotView === 'map'
+        ? mapBox('spotsMap','58vh') + spotMapFoot()
+        : `<div id="spotRows">` + spotRowsHtml() + `</div>`);
+  if(spotView === 'map') spotMapDraw();
+}
+// ── 목록으로 볼까 지도로 볼까 (4.76, 사장님이 정하신 것)
+// ★ 정박지는 「어디 있나」 가 먼저인 자료다. 목록만으로는 내 앞바다인지 알 수가 없다.
+let spotView = (()=>{ try{ return localStorage.getItem('bt_spotview') || 'list'; }catch(_){ return 'list'; } })();
+function setSpotView(v){
+  spotView = (v === 'map') ? 'map' : 'list';
+  try{ localStorage.setItem('bt_spotview', spotView); }catch(_){}
+  renderSpots();
+}
+function spotViewBar(){
+  return `<div class="tfilt" style="justify-content:flex-end">
+      <button class="tchip${spotView==='list'?' on':''}" onclick="setSpotView('list')">${esc(t('목록'))}</button>
+      <button class="tchip${spotView==='map'?' on':''}" onclick="setSpotView('map')">${esc(t('지도'))}</button>
+    </div>`;
+}
+// ★ 지도에 찍는 수를 묶어 둔다. 천 곳을 한 번에 찍으면 배 위 폰에서 멎는다.
+const SPOT_MAP_MAX = 300;
+function spotMapRows(){
+  const rows = spotsForList()
+    .filter(s => !s.hidden || isAdmin('postDel'))
+    .filter(s => !spotCc || countryOf(s) === spotCc)
+    .filter(s => !spotKindNow() || s.kind === spotKindNow())
+    .filter(s => spotMatch(s, spotQ))
+    .filter(s => s.lat != null && s.lon != null);
+  const here = herePos();
+  if(here) rows.sort((a,b)=>{ const x=spotNm(a), y=spotNm(b);
+    return (x==null?1e9:x) - (y==null?1e9:y); });
+  return rows.slice(0, SPOT_MAP_MAX);
+}
+// 지도 아래 한 줄 — 몇 곳을 찍었는지, 묶였으면 묶였다고 말해 준다
+function spotMapFoot(){
+  const all = spotsForList()
+    .filter(s => !s.hidden || isAdmin('postDel'))
+    .filter(s => !spotCc || countryOf(s) === spotCc)
+    .filter(s => !spotKindNow() || s.kind === spotKindNow())
+    .filter(s => spotMatch(s, spotQ))
+    .filter(s => s.lat != null && s.lon != null).length;
+  const n = Math.min(all, SPOT_MAP_MAX);
+  if(!all) return `<div class="mrnone">${esc(t('지도에 찍을 자리가 없습니다.'))}</div>`;
+  return `<div class="mrnone" style="text-align:left">${
+    esc(all > n
+      ? tsub('가까운 {n}곳만 찍었습니다 (모두 {a}곳). 찾기 칸이나 위 띠로 좁히면 그 자리들이 나옵니다.', { n:String(n), a:String(all) })
+      : tsub('{n}곳. 핀을 누르면 그 자리가 열립니다.', { n:String(n) }))}</div>`
+    + spotFromLine();
+}
+function spotMapDraw(){
+  const rows = spotMapRows();
+  if(!rows.length) return;
+  try{
+    mapInit('spotsMap', rows.map(s => ({ lat:s.lat, lon:s.lon, label:s.name || '', key:'spot:' + s.id })),
+            { mode:'view' });
+  }catch(_){}
 }
 // 신고가 쌓여 내려간 것은 안 보인다. 운영자에게는 표시해서 보여 준다.
 function spotRowsHtml(){
@@ -26786,7 +27040,8 @@ function spotRowsHtml(){
          ${esc(t('다녀오신 마리나·항구·묘박지를 하나만 올려 주세요.'))}<br>
          ${esc(t('이름과 자리만 찍어도 됩니다. 수심·요금·연락처는 아는 만큼만.'))}<br><br>
          뒤에 오는 사람이 그걸 보고 댑니다.`}</div>`)
-    + listFoot('spots', 'spotMore');
+    + listFoot('spots', 'spotMore')
+    + spotFromLine();     // ★ 출처 표기 (ODbL). 지우지 마십시오. (지도 쪽은 spotMapFoot 이 붙인다)
 }
 // ★ 글자 한 자에 화면을 통째로 다시 그리면 찾기 칸이 새로 생긴다.
 //   그러면 커서가 빠져서 두 번째 글자부터 아예 안 들어간다 — 실제로 그랬다.
@@ -26855,6 +27110,8 @@ async function openSpot(id){
   const tv = s.seed ? null : trView('spots', s.id);
   const row = (label, v) => v ? `<div class="mrrow"><span class="mrlbl">${label}</span>
       <b class="mrv" style="flex:1">${esc(String(v))}</b></div>` : '';
+  // ★ 이 자리가 어느 꾸러미에서 왔나 — 출처를 적어야 한다 (ODbL). 13번.
+  const fromPk = SPOT_PACKS.find(pk => (spotPackRows[pk.k] || []).some(x => String(x.i) === String(s.id)));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'name',s.name))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToSpots()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
@@ -26889,6 +27146,7 @@ async function openSpot(id){
       ${canDelSpot(s)?`<button class="mrbtn warn" onclick="delSpot('${esc(s.id)}')">${esc(t('지우기'))}</button>`:''}
     </div>`}
     <div class="mrnone" style="text-align:left">${esc(t('여기 적힌 것은 관에서 받은 자료와 다녀온 사람이 올린 내용입니다. 실제 항해에는 공식 해도와 VTS 확인이 먼저입니다.'))}</div>
+    ${fromPk && fromPk.from ? `<div class="mrnone" style="text-align:left;font-size:11.5px">${esc(fromPk.from)}</div>` : ''}
     ${s.seed ? '' : spotCmtHtml(s)}`;
   showPanel(P);
   if(s.lat != null && s.lon != null){
@@ -27931,6 +28189,13 @@ function mapFlagTap(key){
   mapHot(key);
   logFocus(String(key).replace(/^log:/, ''));
 }
+// 지도에서 정박지 핀을 누르면 그 자리를 연다 (4.76)
+function mapSpotTap(key){
+  const id = String(key || '').replace(/^spot:/, '');
+  if(!id) return;
+  try{ mapHot(key); }catch(_){}
+  try{ openSpot(id); }catch(_){}
+}
 // 어느 깃발을 도드라지게 할지
 function mapHot(key){
   if(!mapS) return;
@@ -28119,6 +28384,15 @@ function mapPaint(full){
       h += `<div class="mflag${on}" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px"
               onclick="mapFlagTap('${esc(p.key)}')"><div class="fl">${esc(lab)}</div><div class="st"></div></div>`;
       h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
+      return;
+    }
+    // ★ 4.76 — 정박지 핀. 누르면 그 자리를 연다.
+    //   항해일지 점과 달리 출발·도착이 없다. 다 같은 자리라 색도 하나다.
+    if(String(p.key||'').indexOf('spot:') === 0){
+      h += `<div class="mpin${S.hot === p.key ? ' sel' : ''}"
+              style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px"
+              onclick="mapSpotTap('${esc(p.key)}')">⚓</div>`;
+      if(p.label) h += `<div class="mlbl" style="left:${(sx(p)+14).toFixed(1)}px;top:${(sy(p)-9).toFixed(1)}px">${esc(p.label)}</div>`;
       return;
     }
     h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
@@ -29342,23 +29616,18 @@ function mlogPublic(x){
   const kept = (typeof photoBudget === 'function') ? photoBudget(pics, 600).kept : pics;
   const okSet = new Set(kept);
   const o = {
+    // ★ 그대로 나가는 칸은 표(PUB_OUT.mlog.plain)에서 (4.74)
+    //   ★ 메모도 그 표에 들어 있다 — 남 보라고 쓴 것이다 (사장님이 정하신 것).
+    ...pubPlain(x, 'mlog'),
     // ★ 이 한 글자가 「목록에 뜨나」 를 정한다. 빠뜨리면 감춘 기록이 목록에 뜬다.
     lv: mlogLv(x),
-    // ★★ 4.73 — 메모도 나간다 (사장님 지적 — 「사람들 보라고 메모 쓰는 건데」).
-    //   여태 막고 있었다. 「연락처가 섞여 있을 수 있다」 는 제 걱정이었지 사람의 뜻이 아니었다.
-    //   무엇을 적을지는 쓰는 사람이 정한다. 대신 화면에서 나간다고 미리 말한다.
-    note: x.note || '',
-    id: x.id, date: x.date || '', title: mlogTitle(x),
+    title: mlogTitle(x),
     how: steps.slice(0, HOW_MAX).map(v => {
       const r = { v: String(v.v || '') };
       if(v.p && okSet.has(v.p)) r.p = v.p;
       return r;
     })
   };
-  if(x.hard) o.hard = x.hard;
-  if(x.work) o.work = x.work;
-  if(x.cost) o.cost = x.cost;
-  if(x.used) o.used = x.used;
   // 어느 제품에 한 일인가 — 이것이 있어야 「Yanmar 4JH4E 정비」 로 찾아 들어온다
   if(g){
     o.maker = g.maker || ''; o.model = g.model || '';
@@ -29382,21 +29651,14 @@ function mlogPublic(x){
 function rvPublic(r){
   if(!r || typeof r !== 'object') return null;
   const o = {
+    // ★ 그대로 나가는 칸은 표(PUB_OUT.review.plain)에서 (4.74)
+    ...pubPlain(r, 'review'),
     lv: rvLv(r),                        // ★ 목록에 뜨나 (4.72)
-    id: r.id,
     typ:  isBoatRv(r) ? 'boat' : '',    // 배 리뷰인가 제품 리뷰인가
     key:  rvKey(r),               // 전 세계 공용 열쇠 (배도 제조사+모델이면 같은 machinery)
     title: rvTitle(r),
-    maker: r.maker || '', model: r.model || '',
-    kind:  r.kind  || '', sys:   r.sys   || '',
     stars: Number(r.stars) || 0,
     again: (r.again === true || r.again === false) ? r.again : null,
-    used:  r.used || '',
-    text:  r.text || '',
-    bad:   r.bad  || '',
-    note:  r.note || '',
-    date:  r.date || '',
-    year:  r.year || '',
     full:  rvFull(r),             // 얼마나 채웠나 — 밖에서 줄 세울 때 쓴다
     photos: (typeof photoBudget === 'function') ? photoBudget(r.photos || [], 300).kept
                                                 : (r.photos || [])
@@ -31738,6 +32000,20 @@ function hatList(){
   const custom = wxLS('bt_hatlist', []);
   const over = wxLS('bt_hat', {});   // 기존 값수정 호환
   const merged = HAT_BUILTIN.map(b => ({...b, hat: over[b.name]!=null ? over[b.name] : b.hat, builtin:true}));
+  // ★ 4.74 — 나라 자료에 실려 온 기준값을 얹는다 (일본 最高水面).
+  //   ★ 손으로 안 적는다. 기상청 지점표에서 계산해 자료 파일에 담아 온 값이다 —
+  //     다리 통과 높이에 쓰는 값이라 사람이 옮겨 적으면 틀린다.
+  //   ★ hat 이 없는 지점은 안 싣는다. 「없음」 이 「0」 으로 읽히면 배가 다리에 부딪힌다.
+  try{
+    SPOT_PACKS.forEach(pk=>{
+      (tidePackSpots[pk.k] || []).forEach(sp=>{
+        if(!sp || sp.hat == null || !(sp.hat > 0)) return;
+        if(merged.some(m => m.name === sp.name)) return;
+        merged.push({ cc: pk.cc || '', name: sp.name, lat: sp.lat, lon: sp.lon,
+                      hat: (over[sp.name] != null ? over[sp.name] : sp.hat), builtin:true, pack:pk.k });
+      });
+    });
+  }catch(_){}
   custom.forEach(c => { if(!merged.some(m=>m.name===c.name)) merged.push({...c, builtin:false}); });
   return merged;
 }
@@ -32735,6 +33011,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     // ── 배 공개 자료
     // 배 문서와 따로 둔다. boats 안에는 정비·물품 기록이 있어서
     // 거기를 공개로 열면 전부 새어 나간다.
+    // ── 남의 배 게시물의 댓글 수·추천 수 (4.77)
+    // ★ 기록마다 작은 문서 하나. 댓글과 추천 자체는 __cmt · __like 가 그대로 맡는다.
+    //   ★ 한 번에 여러 개를 읽는다 — 기록 50건인 배에서 50번 부르면 안 된다.
+    //     파이어스토어 in 질의는 한 번에 30개까지라 나눠 부른다.
+    window.__bp = {
+      async many(ids){
+        const out = [];
+        const all = (ids || []).map(String).filter(Boolean);
+        for(let i = 0; i < all.length; i += 30){
+          const part = all.slice(i, i + 30);
+          try{
+            const snap = await getDocs(query(collection(fdb, 'bpMeta'),
+              where(FieldPath.documentId(), 'in', part)));
+            snap.docs.forEach(d => out.push(Object.assign({ id:d.id }, d.data())));
+          }catch(_){}
+        }
+        return out;
+      }
+    };
     window.__pub = {
       async put(boatId, data){
         await setDoc(doc(fdb, 'boatPublic', String(boatId)),

@@ -15693,7 +15693,7 @@ function boatPageBody(x, k){
                     <div class="postbody">${esc(trIn('voyage', v.id, 'note', v.note)).replace(/\n/g,'<br>')}</div>` : ''}
         ${(v.photos||[]).length ? `<div class="mrrow"><span class="mrlbl">${esc(t('사진'))}</span></div>
             <div class="mrph" style="padding:0 14px 14px">${(v.photos||[]).map((u,i)=>
-              `<img src="${esc(u)}" onclick="pubVoyPhoto(${i})">`).join('')}</div>` : ''}
+              `<img loading="lazy" src="${esc(u)}" onclick="pubVoyPhoto(${i})">`).join('')}</div>` : ''}
         ${bpSocial(x.id, v.id)}`;
     }
     // 목록 — 이름과 날짜만. 최근 것이 맨 위.
@@ -15778,7 +15778,7 @@ function boatPageBody(x, k){
           ${r.note?`<div class="mrrow"><span class="mrlbl">${esc(t('메모'))}</span></div>
              <div class="postbody">${esc(trIn('review', r.id, 'note', r.note)).replace(/\n/g,'<br>')}</div>`:''}
           ${(r.photos||[]).length?`<div class="mrph" style="padding:6px 14px 10px">${
-             (r.photos||[]).map((u,i)=>`<img src="${esc(u)}" onclick="pubRvPhoto('${esc(String(r.id))}',${i})">`).join('')}</div>`:''}
+             (r.photos||[]).map((u,i)=>`<img loading="lazy" src="${esc(u)}" onclick="pubRvPhoto('${esc(String(r.id))}',${i})">`).join('')}</div>`:''}
           ${bpSocial(x.id, r.id)}
         </div>`;
       }).join('');
@@ -16339,7 +16339,7 @@ function openPost(id){
       ? renderBlocks(p.blocks, `postPhotos('${esc(p.id)}')`)
       : `<div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>`
         + (p.photos||[]).map((u,i)=>
-            `<img class="postimg" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
+            `<img class="postimg" loading="lazy" src="${esc(u)}" onclick="pvOpen(postOf('${esc(p.id)}').photos,${i})">`).join('')}
     <div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('post', p.id, p.likeN)}</div>
     <div class="ghead"><b>${esc(t('댓글'))}</b><span class="gcnt">${(p.comments||[]).length}</span></div>
@@ -18771,7 +18771,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.81';
+const APP_VER = '4.82';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -19624,7 +19624,7 @@ function doSearch(q){
   if(!hits.length){ sRes.innerHTML = `<div class="srnone">${esc(t('검색 결과 없음'))}</div>`; sRes.style.display='block'; return; }
   sRes.innerHTML = hits.map(i=>`
     <div class="sr" onclick="goToItem(${i.id})">
-      ${i.photos.length?`<img src="${i.photos[0]}">`:''}
+      ${i.photos.length?`<img loading="lazy" src="${thumbOf(i, 0)}">`:''}
       <div><div class="sn">${i.box?'📦 ':''}${esc(i.name)}</div><div class="sp">${esc(locPath(i))}</div></div>
       <div class="sq">×${esc(i.qty)}${esc(i.unit||'')}</div>
     </div>`).join('');
@@ -20111,7 +20111,7 @@ function openTrash(){
       const loc = getLocker(it.lockerId);
       let path = loc ? (loc.zone + ' · ' + loc.label) : '(삭제된 칸)';
       if(it.parentId){ const b = trash.find(x=>x.id===it.parentId)||items.find(x=>x.id===it.parentId); if(b) path += ' › 📦 '+b.name; }
-      const thumb = it.photos&&it.photos.length?`<img src="${it.photos[0]}" style="width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #2a5a8a;margin-right:8px">`:'';
+      const thumb = it.photos&&it.photos.length?`<img loading="lazy" src="${thumbOf(it, 0)}" style="width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #2a5a8a;margin-right:8px">`:'';
       return `<div class="trow">${thumb}<div style="flex:1"><div style="font-size:13px;color:#c8dff0;font-weight:600">${it.box?'📦 ':''}${esc(it.name || t('(이름 없음)'))} <span style="color:#7aefaa">×${esc(it.qty)}${esc(it.unit||'')}</span></div><div style="font-size:11px;color:#5a7a9a">${esc(path)}</div></div>
         <div style="display:flex;gap:8px"><button class="trestore" onclick="restoreItem(${it.id})">${esc(t('복원'))}</button><button class="tdelp" onclick="purgeItem(${it.id})">${esc(t('완전삭제'))}</button></div></div>`;
     }).join('') + mrHtml + ((trash.length+mrTrash.length)>1?`<button class="bs" style="width:100%;margin-top:10px;border-color:#7a3a3a;color:#c87a7a" onclick="purgeAll()">${esc(t('휴지통 비우기 (전체 완전삭제)'))}</button>`:'');
@@ -20358,10 +20358,16 @@ function cycleSort(){
   renderPanelItems(); renderList();
 }
 
+// ★★★ 사진이 느렸던 까닭 ② — 38픽셀 자리에 원본을 내려받고 있었다 (4.82).
+//   올릴 때 작은 사본(240px·26KB 이하)을 같이 만들어 두는데(makeThumb),
+//   정작 목록에서는 그것을 안 쓰고 원본을 그대로 걸었다. 실제로 잰 것 —
+//   38×38 자리에 1077×801 · 78KB 짜리를 받고 있었다. 한 장에 1.3~2.3초다.
+//   ★ thumbOf 는 작은 사본이 없으면(옛 기록) 원본으로 되돌린다. 빈칸이 되지 않는다.
+//   ★ loading="lazy" — 화면 밖의 사진은 아예 안 받는다. 스무 장짜리 목록이 즉시 뜬다.
 function thumbHTML(it){
   if(!it.photos.length) return '';
   const extra = it.photos.length>1 ? `<span class="tcnt">+${it.photos.length-1}</span>` : '';
-  return `<span class="thumbWrap" onclick="viewPhotos(${it.id})"><img class="thumb" src="${it.photos[0]}">${extra}</span>`;
+  return `<span class="thumbWrap" onclick="viewPhotos(${it.id})"><img class="thumb" loading="lazy" src="${thumbOf(it, 0)}">${extra}</span>`;
 }
 
 function renderPanelItems(){
@@ -26372,7 +26378,7 @@ async function openItem(id){
     ${row(t('사용 시간'), m.hours ? m.hours + t('시간') : '')}
     ${row(t('있는 곳'), m.place)}
     ${row(t('연락'), m.contact)}
-    ${(m.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
+    ${(m.photos||[]).map(u=>`<div class="introrow"><img loading="lazy" src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
     ${m.note ? `<div class="ghead"><b>${esc(t('설명'))}</b></div><div class="postbody">${esc(trPick(tv,'note',m.note)).replace(/\n/g,'<br>')}</div>` : ''}
     ${mine ? `<div class="mrrow" style="gap:6px;padding:10px 12px"><span class="mrlbl">${esc(t('상태'))}</span>`
         + MARKET_STATES.map(s2=>`<button class="tchip${(m.state||'sale')===s2.v?' on':''}"
@@ -27358,7 +27364,7 @@ async function openSpot(id){
     ${row(t('요금'), s.fee)}
     ${row(t('연락처'), s.tel)}
     ${s.note ? `<div class="ghead"><b>${esc(t('한마디'))}</b></div><div class="postbody">${esc(trPick(tv,'note',s.note)).replace(/\n/g,'<br>')}</div>` : ''}
-    ${(s.photos||[]).map(u=>`<div class="introrow"><img src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
+    ${(s.photos||[]).map(u=>`<div class="introrow"><img loading="lazy" src="${esc(u)}" style="max-width:100%;border-radius:8px;display:block"></div>`).join('')}
     ${(s.lat!=null && s.lon!=null) ? mapBox('spotMap','40vh') : ''}
     ${s.seed ? '' : `<div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('spots', s.id, s.likeN)}
@@ -32939,12 +32945,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     //   창고에 올리면 주소가 고정되어 브라우저가 알아서 기억한다.
     //   경로를 photos/{내 계정번호}/ 로 잡아 남의 자리에는 못 쓰게 막는다.
     window.__photos = {
+      // ★★★ 사진이 느렸던 까닭 ① — 창고가 「들고 있지 말라」 고 말하고 있었다 (4.82).
+      //   파이어베이스 창고는 아무 말도 안 하면 cache-control: private, max-age=0 을 붙여 보낸다.
+      //   즉 브라우저에게 「이 사진은 저장해 두지 마라」 다. 그래서 앱을 열 때마다,
+      //   화면을 돌아올 때마다 같은 사진을 처음부터 다시 받았다.
+      //   실제로 재 봤다 — 한 장에 1.3~2.3초, 78KB. 그것이 매번이었다.
+      //
+      //   ★ 사진 주소는 올릴 때마다 새로 짓는다(시각+난수). 같은 주소가 다른 사진이 되는
+      //     일이 없으므로 immutable(안 바뀜) 로 못 박아도 안전하다. 1년으로 둔다.
+      //   ★ 고칠 때 사진을 다시 안 올리므로(http 로 시작하면 그대로 둔다) 주소도 안 바뀐다.
       async put(dataUrl){
         const u = fauth.currentUser;
         if(!u) throw new Error(t('로그인해야 사진을 올릴 수 있습니다'));
         const name = Date.now().toString(36) + Math.random().toString(36).slice(2,8) + '.jpg';
         const r = sref(fst, 'photos/' + u.uid + '/' + name);
-        await uploadString(r, dataUrl, 'data_url');
+        await uploadString(r, dataUrl, 'data_url',
+          { cacheControl: 'public, max-age=31536000, immutable', contentType: 'image/jpeg' });
         return await getDownloadURL(r);
       },
       // 지우기는 되면 좋고 안 되면 그만이다 — 사진이 남는 것보다 글이 안 지워지는 게 나쁘다

@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-4.81';
+const CACHE = 'baetnil-4.82';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -9,6 +9,22 @@ const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려�
 //   앱 버전을 올려도 지우지 않는다 — 지우면 배에 나갈 때마다 처음부터 다시 받아야 한다.
 const PHOTO_HOSTS = ['firebasestorage.googleapis.com'];
 const PHOTO_KEEP = 400;          // 이보다 많아지면 오래된 것부터 버린다
+
+// ★★★ 사진이 느렸던 까닭 ③ — 이미 올라간 사진은 창고가 여전히 「들고 있지 말라」 고 한다 (4.82).
+//
+//   여태 여기 주석에 「여기 없는 사진도 브라우저가 한 시간쯤은 들고 있으므로
+//   같은 화면을 다시 봐도 인터넷을 다시 쓰지 않는다」 고 적어 두었다. **틀렸다.**
+//   실제로 재 보니 창고가 cache-control: private, max-age=0 을 붙여 보내고 있었다 —
+//   브라우저에게 「저장하지 마라」 다. 그래서 화면을 돌아올 때마다 다시 받았다.
+//
+//   4.82 부터 올리는 사진에는 「1년 들고 있어도 된다」 를 붙인다. 그런데 **이미 올라간
+//   사진은 그대로다.** 그것들까지 빨라지게 하려면 우리가 들고 있는 수밖에 없다.
+//
+//   ★ 창고 사진(PHOTOS) 400장을 건드리지 않는다. 그 자리는 배에 나갔을 때
+//     인터넷 없이 봐야 하는 내 물품·정비·도면 사진 몫이다. 남의 사진이 그 자리를
+//     차지하면 정작 바다에서 못 본다. 그래서 **자리를 따로 판다.**
+const SEEN = 'baetnil-seen';     // 한 번 본 사진 (글판·장터·정박지·남의 배)
+const SEEN_KEEP = 200;
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./font.woff2','./icon-192.png','./icon-512.png','./icon-180.png'];
 const TILE_HOSTS = ['tile.openstreetmap.org','tiles.openseamap.org'];
 
@@ -37,7 +53,7 @@ self.addEventListener('install', e=>{
 
 self.addEventListener('activate', e=>{
   e.waitUntil(caches.keys()
-    .then(ks=>Promise.all(ks.filter(k=>k!==CACHE && k!==TILES && k!==PHOTOS).map(k=>caches.delete(k))))
+    .then(ks=>Promise.all(ks.filter(k=>k!==CACHE && k!==TILES && k!==PHOTOS && k!==SEEN).map(k=>caches.delete(k))))
     .then(()=>self.clients.claim()));
 });
 
@@ -66,22 +82,49 @@ async function trimPhotos(){
   }catch(_){}
 }
 
-// 창고 사진 — 담아 둔 것이 있으면 그것부터. 없으면 그냥 받아온다.
+// 오래된 것부터 버린다 — 본 사진 자리도 같은 방식이다
+async function trimSeen(){
+  try{
+    const c = await caches.open(SEEN);
+    const ks = await c.keys();
+    if(ks.length <= SEEN_KEEP) return;
+    for(const k of ks.slice(0, ks.length - SEEN_KEEP)) await c.delete(k);
+  }catch(_){}
+}
+
+// 창고 사진 — 담아 둔 것이 있으면 그것부터. 없으면 받아 오고, 받은 것은 남긴다.
 //
-// ★ 여기서 '아무 사진이나' 담으면 안 된다.
-//   글판·장터·정박지 사진까지 담으면 400장이 남의 사진으로 차 버리고,
-//   정작 배에 나갔을 때 내 물품·정비·도면 사진이 없다.
-//   그래서 서비스워커는 스스로 담지 않는다.
-//   무엇을 남길지는 앱이 고른다 (primePhoto · keepPhoto).
-//   여기 없는 사진도 브라우저가 한 시간쯤은 자기 저장분에 들고 있으므로
-//   같은 화면을 다시 봐도 인터넷을 다시 쓰지 않는다.
+// ★ 자리가 둘인 까닭
+//   ① PHOTOS(400장) — 배에 나갔을 때 인터넷 없이 봐야 하는 것.
+//     무엇을 남길지는 **앱이 고른다**(primePhoto · keepPhoto). 여기 담긴 것은
+//     오래돼도 안 버린다. 배에서 못 보면 그때는 방법이 없기 때문이다.
+//   ② SEEN(200장) — 그냥 한 번 본 것. 글판·장터·정박지·남의 배 사진.
+//     4.82 에서 새로 팠다. 이것이 없으면 화면을 돌아올 때마다 다시 받는다
+//     (창고가 「저장하지 마라」 를 붙여 보내기 때문이다 — 위 주석 참고).
+//     ★ 오래된 것부터 버린다. ①의 400장은 건드리지 않는다.
 async function photoFetch(req){
   try{
     const c = await caches.open(PHOTOS);
     const hit = await c.match(req, { ignoreVary:true });
     if(hit) return hit;
   }catch(_){}
-  try{ return await fetch(req); }catch(_){ return new Response('', { status:504 }); }
+  try{
+    const c2 = await caches.open(SEEN);
+    const hit2 = await c2.match(req, { ignoreVary:true });
+    if(hit2) return hit2;
+  }catch(_){}
+  try{
+    const res = await fetch(req);
+    // ★ 200 만 담는다. 오류 화면을 담아 두면 그 사진이 영영 안 보인다.
+    if(res && res.status === 200){
+      const copy = res.clone();
+      caches.open(SEEN)
+        .then(c => c.put(req, copy))
+        .then(() => trimSeen())
+        .catch(()=>{});
+    }
+    return res;
+  }catch(_){ return new Response('', { status:504 }); }
 }
 
 self.addEventListener('fetch', e=>{

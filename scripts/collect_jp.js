@@ -143,13 +143,25 @@ const OVERPASS_LIST = (process.env.OVERPASS_URL
       'https://lz4.overpass-api.de/api/interpreter',
       'https://z.overpass-api.de/api/interpreter' ]);
 // ★ 누가 왜 부르는지 밝힌다. 남의 서버를 쓰는 쪽의 예의이자, 막히지 않는 길이다.
+//
+// ★★★ 머리글 값에는 한글을 쓰면 안 된다 (2026-08-30 — 여기서 한 번 터졌다).
+//   HTTP 머리글은 한 글자가 한 바이트(0~255)여야 한다. 한글은 그 범위를 넘는다.
+//   'baetnil/1.0 (…) 일본 정박지 자료 만들기' 로 적었다가
+//   「Cannot convert argument to a ByteString … index 35」 로 다섯 서버가 다 죽었다.
+//   설명은 주석에 적고, 머리글 값은 영문·숫자·기호만 쓴다.
 const OV_HEAD = {
   'Content-Type': 'application/x-www-form-urlencoded',
-  'User-Agent': 'baetnil/1.0 (+https://baetnil.com) 일본 정박지 자료 만들기',
+  'User-Agent': 'baetnil/1.0 (+https://baetnil.com) japan-mooring-data',
   'Accept': 'application/json',
   'Accept-Language': 'en-US,en;q=0.9',
   'Referer': 'https://baetnil.com/'
 };
+// ★ 못을 박는다. 머리글에 한 바이트를 넘는 글자가 들어가면 부르기도 전에 잡는다 —
+//   남의 서버 탓으로 헤매지 않도록, 우리 잘못은 우리 자리에서 터뜨린다.
+for(const [k, v] of Object.entries(OV_HEAD)){
+  if(!/^[\x20-\x7e]*$/.test(String(v)))
+    throw new Error('머리글 ' + k + ' 에 ASCII 아닌 글자가 있습니다: ' + v);
+}
 const 잠깐 = ms => new Promise(r => setTimeout(r, ms));
 const PREF_BOX = {   // [남, 서, 북, 동]
   '香川': [34.00, 133.45, 34.60, 134.45],

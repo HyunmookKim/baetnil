@@ -18758,7 +18758,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.79';
+const APP_VER = '4.80';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26767,10 +26767,18 @@ async function spotPackGet(pk){
   }catch(_){}
 }
 // 화면을 열 때 부른다. 기다리지 않는다 — 한국 자료는 이미 있으니 화면은 바로 뜬다.
+//
+// ★★★ 4.80 — 정박지 자료는 **늘** 받는다 (사장님 지적: 「왜 여전히 일본꺼 안나오냐?」)
+//   여태는 「지금 일본에 있거나 일본어를 쓸 때만」 받았다. 그래서 여수에 계신 사장님께는
+//   일본 정박지가 영영 안 보였고, 나라 띠(한국/일본)도 나라가 하나뿐이라 안 떴다.
+//
+//   ★ 그건 사람 사정이 아니라 내 사정이었다. 여수에 있어도 일본 갈 계획은 세운다 —
+//     오히려 **가기 전에** 봐야 하는 자료다. 도착해서 받으면 늦다.
+//   ★ 아낄 것도 없었다. spots-jp.json 은 20KB 다. 사진 한 장보다 작다.
+//   ★ 멀리 있는 곳은 거리순 정렬에서 저절로 맨 아래로 간다. 목록이 어지러워지지 않는다.
 function spotPackSync(){
   spotPackLoadLocal();
-  const p = (typeof herePos === 'function') ? herePos() : null;
-  spotPacksFor(p && p.lat, p && p.lon).forEach(pk => { spotPackGet(pk); });
+  SPOT_PACKS.forEach(pk => { spotPackGet(pk); });
 }
 // 받아 둔 나라 것을 관 자료와 같은 모양으로
 function spotPackAll(){
@@ -31845,6 +31853,10 @@ async function tidePackGet(pk){
     try{ if(typeof renderCurrent === 'function') renderCurrent(); }catch(_){}
   }catch(_){}
 }
+// ★ 물때는 정박지와 다르다. 여기서는 문을 그대로 둔다 (4.80).
+//   tide-jp.json 은 325KB — 정박지 자료의 열여섯 배다. 그리고 물때는 「거기 갔을 때」
+//   보는 것이라, 안 갈 사람에게 미리 받게 하면 자료값만 축낸다.
+//   그래서 물때만 「지금 그 나라에 있거나 그 말을 쓸 때」 받는다.
 function tidePackSync(){
   tidePackLoadLocal();
   const p = (typeof herePos === 'function') ? herePos() : null;

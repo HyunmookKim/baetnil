@@ -4128,6 +4128,11 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ⑪
+    '세계 소식':'World news',
+    '일본 소식':'Japan news',
+    '러시아 소식':'Russia news',
+    '영어권 소식':'English-language news',
+    '이 말로 된 소식은 아직 모으는 곳이 적습니다. 「세계 소식」 을 보시면 그쪽은 자동으로 옮겨 드립니다.':'There are still few sources in this language. Open “World news” — those are translated for you automatically.',
     '한국 소식':'Korean news',
     '해외 소식':'World news',
     '연재':'Series',
@@ -6610,6 +6615,11 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ⑪
+    '세계 소식':'Мировые новости',
+    '일본 소식':'Новости Японии',
+    '러시아 소식':'Новости России',
+    '영어권 소식':'Новости на английском',
+    '이 말로 된 소식은 아직 모으는 곳이 적습니다. 「세계 소식」 을 보시면 그쪽은 자동으로 옮겨 드립니다.':'Источников на этом языке пока немного. Откройте «Мировые новости» — они переводятся автоматически.',
     '한국 소식':'Новости Кореи',
     '해외 소식':'Мировые новости',
     '연재':'Серии',
@@ -9103,6 +9113,11 @@ const I18N = {
     '📦 상자/공구함 (안에 물품 추가 가능)':'📦 箱・工具箱（中に品物を追加できます）',
     '커뮤니티 배 둘러보기 › 영업 에 실려 손님이 찾아볼 수 있습니다.\n':'コミュニティの船を見る › 営業 に掲載され、ゲストが探せるようになります。\\n',
     '도면을 탭하면 핀 위치가 지정됩니다':'図面をタップするとピンの位置が指定されます',
+    '세계 소식':'世界のニュース',
+    '일본 소식':'日本のニュース',
+    '러시아 소식':'ロシアのニュース',
+    '영어권 소식':'英語圏のニュース',
+    '이 말로 된 소식은 아직 모으는 곳이 적습니다. 「세계 소식」 을 보시면 그쪽은 자동으로 옮겨 드립니다.':'この言語の情報源はまだ多くありません。「世界のニュース」は自動で翻訳されます。',
     '한국 소식':'韓国のニュース',
     '해외 소식':'海外のニュース',
     '연재':'連載',
@@ -18778,7 +18793,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.83';
+const APP_VER = '4.84';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -31753,6 +31768,11 @@ async function delSeries(id){
     .then(async ()=>{ await loadSeries(true); closeBoat(); newsSub='sr'; renderNews(); })
     .catch(e=>tell(t('지우지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
+// ★ 첫 칸 이름 — 보는 사람 말이 곧 그 나라다. 이름을 고르는 곳은 여기 하나다.
+//   ★ 「내 나라 소식」 처럼 두루뭉술하게 적지 않는다. 어느 나라 것인지 그대로 적는다 —
+//     사람은 「일본 소식」 이라고 적혀 있어야 무엇이 들어 있는지 안다.
+const NEWS_HOME = { ko:'한국 소식', ja:'일본 소식', ru:'러시아 소식', en:'영어권 소식' };
+function newsHomeName(){ return t(NEWS_HOME[langNow()] || '한국 소식'); }
 async function renderNews(force){
   const L = document.getElementById('newsList');
   if(!newsCache || !krCache || force){
@@ -31761,10 +31781,21 @@ async function renderNews(force){
     try{ const r = await fetch(DATA_BASE+'news.json?v='+Date.now(), {cache:'no-store'}); newsCache = r.ok ? await r.json() : null; }catch(e){ newsCache = null; }
   }
   const gov = (krCache && krCache.gov) || [];
-  const ww  = (newsCache && newsCache.items) || [];
+  const 온것 = (newsCache && newsCache.items) || [];
+  // ★★★ 「내 말로 된 소식」 과 「세계 소식」 으로 가른다 (4.84, 사장님이 정하신 것)
+  //
+  //   여태는 「한국 소식 / 해외 소식」 이었다. 그래서 러시아어로 켠 사람에게도
+  //   러시아 기사가 「해외」 칸에 영어 것과 섞여 있었다 — 그 사람에게는 제 나라 소식인데.
+  //   일본 사람은 한국 소식을 첫 칸에서 봤다.
+  //
+  //   ★ 값도 이쪽이 싸다. 제 말로 된 소식은 옮길 것이 아예 없다.
+  //     남의 말 소식을 보여 주고 옮기는 것이 제일 비싸다 (사장님 지적).
+  const 내말 = langNow();
+  const 내소식 = (내말 === 'ko') ? gov : 온것.filter(x => (x.lang || 'en') === 내말);
+  const 세계   = (내말 === 'ko') ? 온것 : 온것.filter(x => (x.lang || 'en') !== 내말);
   const nNew = (rows, f) => rows.filter(f || newsIsNew).length;
   const tabs = `<div class="subrow">`
-    + [['kr', t('한국 소식'), nNew(gov)], ['ww', t('해외 소식'), nNew(ww)], ['sr', t('연재'), 0]]
+    + [['kr', newsHomeName(), nNew(내소식)], ['ww', t('세계 소식'), nNew(세계)], ['sr', t('연재'), 0]]
         .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tnum">${c}</span>`:''}</button>`).join('')
     + `</div>`;
   // ★ 걸러 보는 단추가 아니다. 「알림을 어디서 켜나」를 여기 두는 것이다.
@@ -31776,16 +31807,19 @@ async function renderNews(force){
   let html = tabs;
   if(newsSub === 'kr'){
     html += catBar;
-    newsTrAuto(gov);
-    html += gov.length ? newsTrBar(gov) + newsByDay(gov, krRow)
-      : `<div class="mrnone">${esc(t('아직 모인 소식이 없습니다.'))}</div>`;
+    newsTrAuto(내소식);
+    // ★ 한국어일 때만 관 자료(krRow) 모양이고, 그 밖은 세계 소식과 같은 모양이다.
+    const 줄 = (내말 === 'ko') ? krRow : wwRow;
+    html += 내소식.length ? newsTrBar(내소식) + newsByDay(내소식, 줄)
+      : `<div class="mrnone" style="text-align:left">${esc(t('아직 모인 소식이 없습니다.'))}<br><br>${
+          esc(t('이 말로 된 소식은 아직 모으는 곳이 적습니다. 「세계 소식」 을 보시면 그쪽은 자동으로 옮겨 드립니다.'))}</div>`;
   } else if(newsSub === 'ww'){
     html += catBar;
     const up = newsCache && newsCache.updated ? new Date(newsCache.updated) : null;
-    html += ww.length
+    html += 세계.length
       ? `<div class="newsup">${esc(tsub('마지막 수집 {d} · {n}건',
-          {d: up ? up.toLocaleDateString(langNow()==='ko'?'ko-KR':langNow()) : '—', n: ww.length}))}</div>`
-        + (newsTrAuto(ww), newsTrBar(ww)) + newsByDay(ww, wwRow)
+          {d: up ? up.toLocaleDateString(langNow()==='ko'?'ko-KR':langNow()) : '—', n: 세계.length}))}</div>`
+        + (newsTrAuto(세계), newsTrBar(세계)) + newsByDay(세계, wwRow)
       : `<div class="mrnone">${esc(t('아직 수집된 뉴스가 없습니다.'))}<br>${esc(t('잠시 후 다시 확인해 주세요.'))}</div>`;
   } else {
     html += await seriesHtml();

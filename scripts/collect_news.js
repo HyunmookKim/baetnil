@@ -12,12 +12,16 @@ const FEEDS = [
   { name: 'PBO',              url: 'https://www.pbo.co.uk/feed',                lang:'en' },
   { name: 'Scuttlebutt',      url: 'https://www.sailingscuttlebutt.com/feed',   lang:'en' },
   { name: 'Sail-World',       url: 'https://www.sail-world.com/rss',            lang:'en' },
+  // ★★★ 일본어 출처 (2026-08-31 에 넣음)
+  //   전에 「일본어 출처가 없다」 고 적어 두었는데, 한 번 보고 접은 것이었다.
+  //   다시 찾아보니 BULKHEAD Magazine JAPAN 이 RSS 를 낸다 —
+  //   세계 요트 레이스·세일링 소식을 일본어로 꾸준히 싣는다(주 여러 건).
+  //   확인: https://bulkhead.jp/feed/ · RSS 2.0 · 16건 · 최신 2026-08-30
+  { name: 'BULKHEAD JAPAN',   url: 'https://bulkhead.jp/feed/',                 lang:'ja' },
 ];
-// ★ 일본어 출처는 아직 없다 (2026-08-29 확인)
-//   舵オンライン(kazi-online.com) 은 robots.txt 를 못 읽어 기계가 접근할 수 없었다.
-//   気象庁 방재정보 XML(https://www.data.jma.go.jp/developer/xml/feed/)에 「海上警報」 이 실리는데,
-//   그건 소식이 아니라 특보라서 뉴스 칸이 아니라 특보 칸에 들어가야 맞다.
-//   ★ 「없어서 못 넣은 것」 이다. 아무 주소나 지어내서 채우지 않는다.
+// ★ 아직 못 넣은 일본 출처 — 지어내지 않는다
+//   舵オンライン(kazi-online.com) 은 robots.txt 를 못 읽어 기계가 접근할 수 없다 (다시 확인함).
+//   気象庁 방재정보 XML 의 「海上警報」 은 소식이 아니라 특보다 — 뉴스 칸이 아니라 특보 칸이다.
 // Yacht Russia: RSS 없음 → 정적 목록 파싱 (장비 / 선장 조언 / 주요 소식)
 const YR_PAGES = [
   'https://yachtrussia.com/news/group/4',
@@ -25,7 +29,15 @@ const YR_PAGES = [
   'https://yachtrussia.com/news/group/13',
 ];
 const MAX_AGE_DAYS = 10;
-const PICK = 15;
+// ★★★ 말마다 따로 고른다 (2026-08-31, 사장님이 정하신 것)
+//
+//   여태는 다 합쳐서 15건을 골랐다. 그러면 영어 기사가 수가 많아 늘 이기고,
+//   러시아어·일본어 기사는 거의 안 남는다.
+//   ★ 그런데 앱은 이제 「내 말로 된 소식」 을 따로 보여 준다. 그 칸이 비면 안 된다.
+//   ★ 그리고 이렇게 하는 것이 **값도 싸다.** 일본 사람에게 일본 기사를 보여 주면
+//     옮길 것이 아예 없다. 지금처럼 한국 기사를 보여 주고 일본어로 옮기는 것이 제일 비싸다.
+const PICK_BY_LANG = { en: 15, ru: 8, ja: 8 };
+const PICK = 15;                     // 한 말 안에서 고를 때의 기본값
 const UA = { 'User-Agent': 'Mozilla/5.0 (Baetnil news reader)' };
 
 // 분류 — 이름만 나열하면 제목 속 단어에 반응해 엉뚱하게 붙는다.
@@ -163,7 +175,8 @@ function normCat(v){
   return hit || '기타';
 }
 
-async function selectAndTranslate(items, seen){
+async function selectAndTranslate(items, seen, pick){
+  const PICK = Number(pick) || 15;
   const key = process.env.ANTHROPIC_API_KEY;
   const fallback = () => items.slice(0, PICK).map(x=>({ ...x, t_ko:x.title, s_ko:'', cat:'' }));
   // items 는 이미 '새 기사 먼저' 순서로 들어온다 — 폴백도 자연히 새 기사 우선이 된다.
@@ -244,9 +257,20 @@ ${JSON.stringify(payload)}`;
   const fresh = all.filter(x=> !seen.includes(x.link));
   const olds  = all.filter(x=>  seen.includes(x.link));
   console.log('새 기사', fresh.length, '건 · 이미 본 것', olds.length, '건');
-  const shortlist = [...fresh, ...olds].slice(0, 45);
-  await enrich(shortlist);
-  const picked = await selectAndTranslate(shortlist, seen);
+  // ★★★ 말마다 따로 줄 세우고 따로 고른다 (2026-08-31).
+  //   합쳐서 고르면 수가 많은 영어가 늘 이기고, 러시아어·일본어 칸이 빈다.
+  const 말들 = [...new Set(all.map(x => x.lang || 'en'))];
+  let picked = [];
+  for(const L of 말들){
+    const 이말 = x => (x.lang || 'en') === L;
+    const 몫 = PICK_BY_LANG[L] || 8;
+    const 후보 = [...fresh.filter(이말), ...olds.filter(이말)].slice(0, 30);
+    if(!후보.length) continue;
+    await enrich(후보);
+    const got = await selectAndTranslate(후보, seen, 몫);
+    console.log('  ' + L + ' — 후보 ' + 후보.length + '건 중 ' + got.length + '건 골랐습니다');
+    picked = picked.concat(got);
+  }
   // ★ 이레치를 쌓아 둔다 (한국 소식과 같은 까닭)
   //   전에는 돌 때마다 통째로 덮어써서 지난번 것이 사라졌다.
   //   해외 소식은 월·목 두 번만 도니까 더 잘 사라졌다.

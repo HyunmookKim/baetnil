@@ -2713,6 +2713,8 @@ const I18N = {
     '일부 공개':'Unlisted',
     '한국':'Korea',
     '지도':'Map',
+    '기지국 {n}':'cell {n}',
+    '거짓 {n}':'mock {n}',
     '댓글 남기기':'Leave a comment',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Nothing yet. If you have tried it, tell others how it went.',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Tell others how it went if you have done or been there',
@@ -5196,6 +5198,8 @@ const I18N = {
     '일부 공개':'Доступ по ссылке',
     '한국':'Корея',
     '지도':'Карта',
+    '기지국 {n}':'вышка {n}',
+    '거짓 {n}':'фейк {n}',
     '댓글 남기기':'Оставить комментарий',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'Пока пусто. Если делали сами — расскажите, как получилось.',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'Расскажите, как прошло, если делали или бывали там',
@@ -7733,6 +7737,8 @@ const I18N = {
     '일부 공개':'限定公開',
     '한국':'韓国',
     '지도':'地図',
+    '기지국 {n}':'基地局 {n}',
+    '거짓 {n}':'偽 {n}',
     '댓글 남기기':'コメントを残す',
     '아직 없습니다. 해 보셨으면 어땠는지 남겨 주세요.':'まだありません。やってみた方はどうだったか残してください。',
     '해 보셨거나 가 보셨으면 어땠는지 남겨 주세요':'やってみた・行ってみた感想を残してください',
@@ -11855,6 +11861,9 @@ const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가�
 const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
 const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라우드는 멈출 때 한 번)
 // ★ 엉뚱한 점 거르기 (4.51 — 여수 항적이 시내와 산으로 뻗쳤다)
+// ★ 위성 자리라고 볼 수 있는 또렷함. 이보다 흐리면서 speed·bearing 도 없으면
+//   기지국·와이파이로 지어낸 자리로 본다 (4.78).
+const TRK_GPS_ACC = 30;
 const TRK_ACC   = 60;     // m — 이보다 흐린 점은 안 받는다. GPS 는 보통 5~20m,
                           //     기지국·와이파이로 지어낸 자리는 1000m 를 넘는다
 const TRK_MAXKT = 20;     // 노트 — 이 배가 낼 수 없는 속도. 넘으면 튄 점이다
@@ -11994,6 +12003,34 @@ function trkPush(pos){
   const ac = Number(pos.accuracy);
   trkNow.got = (Number(trkNow.got) || 0) + 1;
   if(isFinite(ac)) trkNow.ac = Math.round(ac);
+
+  // ★★★ ①-가 지어낸 자리는 버린다 (4.78)
+  //   플러그인이 simulated 를 준다. 거짓 위치 앱이 켜져 있으면 여기로 온다.
+  if(pos.simulated === true){
+    trkNow.mock = (Number(trkNow.mock) || 0) + 1;
+    trkSkip(); return false;
+  }
+
+  // ★★★ ①-나 기지국·와이파이로 지어낸 자리는 버린다 (4.78)
+  //
+  //   ★ 여태 accuracy 하나만 보고 있었다. 그런데 accuracy 는 68% 신뢰구간이라
+  //     기지국 자리인데도 작게 나오는 일이 있고, 아예 안 주는 기기도 있다.
+  //     그래서 「흐리면 버린다」 만으로는 시내로 뻗친 선을 못 막았다 (사장님 사진).
+  //
+  //   ★ 다른 신호가 있다 — **위성으로 잡은 자리는 speed 나 bearing 을 함께 준다.**
+  //     기지국·와이파이로 지어낸 자리는 둘 다 null 이다. 플러그인이 그대로 넘겨준다.
+  //     그래서 「둘 다 없고 흐리기까지 하면」 위성 자리가 아니라고 본다.
+  //
+  //   ★ 둘 다 없다고 무조건 버리지는 않는다 — 배가 멈춰 있으면 speed 0, bearing null
+  //     인 기기가 있다. 그때는 accuracy 가 또렷하므로(보통 5~20m) 통과한다.
+  const hasMove = (pos.speed != null) || (pos.bearing != null);
+  const blurry  = !isFinite(ac) || ac > TRK_GPS_ACC;
+  if(!hasMove && blurry){
+    trkNow.net = (Number(trkNow.net) || 0) + 1;
+    trkBlurWarn();
+    trkSkip(); return false;
+  }
+
   if(isFinite(ac) && ac > TRK_ACC){
     trkNow.blur = (Number(trkNow.blur) || 0) + 1;
     trkBlurWarn();
@@ -12063,6 +12100,12 @@ function trkCountText(){
   let s = tsub('{n}점', { n: String(n) });
   const d = Number(trkNow.drop) || 0;
   if(d > 0) s += ' · ' + tsub('버림 {n}', { n: String(d) });
+  // ★ 무엇을 왜 버렸는지 남긴다 (4.78). 이게 없으면 「왜 시내로 뻗쳤나」 를
+  //   다시 물어도 자료가 없어서 또 추측만 하게 된다.
+  const net = Number(trkNow.net) || 0;
+  if(net > 0) s += ' · ' + tsub('기지국 {n}', { n: String(net) });
+  const mk = Number(trkNow.mock) || 0;
+  if(mk > 0) s += ' · ' + tsub('거짓 {n}', { n: String(mk) });
   const a = Number(trkNow.ac);
   if(isFinite(a) && a > 0) s += ' · ' + tsub('정확도 {n}m', { n: String(a) });
   return s;
@@ -18693,7 +18736,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.77';
+const APP_VER = '4.78';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

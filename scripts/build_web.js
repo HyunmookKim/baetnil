@@ -125,8 +125,16 @@ function sweep(dir){
   write('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`);
 
   // ── 옛 사본 걷어내기
+  //
+  // ★ 일감(web.yml)의 마지막 줄이 `git add m v r sitemap.xml robots.txt` 다.
+  //   폴더를 통째로 지워 버리면 그 줄이 「pathspec 'm' did not match any files」 로 죽는다.
+  //   실제로 build-web #3 이 그렇게 실패했다.
+  //   ★ .github 는 내 도구가 못 쓰는 자리라 그 줄을 고칠 수 없다. 그러니 여기서 맞춘다 —
+  //     폴더는 남기고 그 안에 표식 파일 하나만 둔다. 페이지는 워커가 만든다.
   let gone = 0;
   ['m','v','r'].forEach(d => { gone += sweep(d); });
+  ['m','v','r'].forEach(d => write(d + '/.keep',
+    '이 폴더는 비어 있습니다. 기록 페이지는 클라우드플레어 워커가 볼 때 만듭니다.\n'));
   const LDIRS = LANGS.filter(L => LPATH[L]).map(L => LPATH[L].replace(/\/$/,''));
   LDIRS.forEach(d => { gone += sweep(d); });
 
@@ -138,7 +146,7 @@ function sweep(dir){
   if(gone){
     try{
       const { execFileSync } = require('child_process');
-      LDIRS.forEach(d => {
+      LDIRS.concat(['m','v','r']).forEach(d => {
         try{ execFileSync('git', ['add', '-A', '--', d], { cwd: OUT, stdio:'ignore' }); }catch(_){}
       });
     }catch(_){}

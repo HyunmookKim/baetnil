@@ -1431,13 +1431,13 @@ body.locked .qadj .qn{border:1px solid rgba(255,255,255,.14);border-radius:9px}
   border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}
 .itrow .thumbWrap{order:3;margin-right:0}
 .itrow .thumb{width:40px;height:40px}
-/* 고르기 모드 */
+/* 선택 모드 */
 .pickdot{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);
   flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
 .it.picked .pickdot{background:#7FD1AC;border-color:#7FD1AC;color:#0E1B24}
 .it.picked{background:rgba(127,209,172,.14)}
 /* ★ 아래 탭 띠 위에 붙여 둔다. 목록 끝에 두면 스무 줄을 내려야 보인다 —
-   고르기는 위에서 시작하는데 처리 단추가 저 아래 있으면 아무도 못 찾는다. */
+   선택은 위에서 시작하는데 처리 단추가 저 아래 있으면 아무도 못 찾는다. */
 .pickbar{position:fixed;left:0;right:0;bottom:64px;display:flex;gap:6px;padding:9px 10px;
   background:var(--sf);border-top:1px solid var(--bd);z-index:61}
 body.picking #pitems{padding-bottom:96px}
@@ -1916,8 +1916,9 @@ header{padding-top:var(--sat)}
   <div id="mntBar3"></div>
   <div class="mrhead">
     <button class="tab" id="repairViewBtn" onclick="mrToggleView('repair')" data-t="도면">도면</button>
+    <button class="tab" id="repairDoneBtn" onclick="toggleDone()" style="display:none" data-t="완료된 수리">완료된 수리</button>
     <span style="flex:1"></span>
-    <button class="tab edt" onclick="mrAdd('repair')" data-t="+ 등록">+ 등록</button>
+    <button class="tab edt" id="repairAddBtn" onclick="mrAdd('repair')" data-t="+ 등록">+ 등록</button>
   </div>
   <div id="repairList"></div>
 </div>
@@ -2586,18 +2587,16 @@ const I18N = {
     '메뉴':'Menu',
     '목록':'List',
     '도면':'Plan',
+    '도면 보기':'Show on plan',
+    '{n}개 선택':'{n} selected',
+    '옮길 물품을 먼저 선택해 주세요.':'Select the items to move first.',
+    '합치려면 두 개 이상 선택해 주세요.':'Select two or more to merge.',
+    '구역 선택':'Choose an area',
     '{name} 을(를) 휴지통으로 보냅니다.':'Move {name} to the bin.',
-    '{n}개 골랐습니다':'{n} selected',
     '{n}개를 {name} 으로 옮겼습니다.':'Moved {n} items to {name}.',
     '{n}개를 「{name}」 하나로 합칩니다.':'Merge {n} items into "{name}".',
-    '고르기':'Select',
-    '먼저 옮길 물품을 골라 주세요.':'Select the items to move first.',
     '수량은 더해지고 사진은 모두 남습니다.':'Quantities are added up and all photos are kept.',
     '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'Edit non-numeric quantities from Edit.',
-    '안에 {n}개':'{n} inside',
-    '어느 구역으로':'Which area',
-    '이 칸 보기':'Show this locker',
-    '합치려면 두 개 이상 골라 주세요.':'Select two or more to merge.',
     '휴지통에서 되살릴 수 있습니다.':'You can restore it from the bin.',
     '차단한 사람':'Blocked people',
     '차단하기':'Block',
@@ -5112,18 +5111,16 @@ const I18N = {
     '메뉴':'Меню',
     '목록':'Список',
     '도면':'План',
+    '도면 보기':'Показать на плане',
+    '{n}개 선택':'Выбрано: {n}',
+    '옮길 물품을 먼저 선택해 주세요.':'Сначала выберите, что перенести.',
+    '합치려면 두 개 이상 선택해 주세요.':'Выберите два или больше.',
+    '구역 선택':'Выбор зоны',
     '{name} 을(를) 휴지통으로 보냅니다.':'Отправить «{name}» в корзину.',
-    '{n}개 골랐습니다':'Выбрано: {n}',
     '{n}개를 {name} 으로 옮겼습니다.':'Перенесено {n} в «{name}».',
     '{n}개를 「{name}」 하나로 합칩니다.':'Объединить {n} в «{name}».',
-    '고르기':'Выбрать',
-    '먼저 옮길 물품을 골라 주세요.':'Сначала выберите, что перенести.',
     '수량은 더해지고 사진은 모두 남습니다.':'Количество складывается, все фотографии сохраняются.',
     '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'Нечисловое количество измените через «Изменить».',
-    '안에 {n}개':'Внутри: {n}',
-    '어느 구역으로':'В какую зону',
-    '이 칸 보기':'Показать этот отсек',
-    '합치려면 두 개 이상 골라 주세요.':'Выберите два или больше.',
     '휴지통에서 되살릴 수 있습니다.':'Можно восстановить из корзины.',
     '차단한 사람':'Заблокированные',
     '차단하기':'Заблокировать',
@@ -7692,18 +7689,16 @@ const I18N = {
     '메뉴':'メニュー',
     '목록':'一覧',
     '도면':'図面',
+    '도면 보기':'図面で見る',
+    '{n}개 선택':'{n} 個選択',
+    '옮길 물품을 먼저 선택해 주세요.':'先に移すものを選択してください。',
+    '합치려면 두 개 이상 선택해 주세요.':'まとめるには 2 つ以上選択してください。',
+    '구역 선택':'区域を選択',
     '{name} 을(를) 휴지통으로 보냅니다.':'{name} をごみ箱に入れます。',
-    '{n}개 골랐습니다':'{n} 個選びました',
     '{n}개를 {name} 으로 옮겼습니다.':'{n} 個を {name} に移しました。',
     '{n}개를 「{name}」 하나로 합칩니다.':'{n} 個を「{name}」ひとつにまとめます。',
-    '고르기':'選ぶ',
-    '먼저 옮길 물품을 골라 주세요.':'先に移すものを選んでください。',
     '수량은 더해지고 사진은 모두 남습니다.':'数量は合算され、写真はすべて残ります。',
     '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'数字でない数量は「修正」から直してください。',
-    '안에 {n}개':'中に {n} 個',
-    '어느 구역으로':'どの区域へ',
-    '이 칸 보기':'この収納を見る',
-    '합치려면 두 개 이상 골라 주세요.':'まとめるには 2 つ以上選んでください。',
     '휴지통에서 되살릴 수 있습니다.':'ごみ箱から戻せます。',
     '차단한 사람':'ブロックした人',
     '차단하기':'ブロックする',
@@ -19169,7 +19164,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.85';
+const APP_VER = '4.86';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -20786,11 +20781,11 @@ function thumbHTML(it){
 //  누르기        → 그 물품이 열린다        (예전에는 도면이 확대됐다. 그래서 안내 문구가 필요했다)
 //  − +           → 수량을 그 자리에서      (제일 자주 하는 일이 제일 가까이)
 //  길게 누르기   → 차림표 (이동·합침·수정·지우기)
-//  빈 곳 길게    → 고르기 모드 — 여러 개를 한 번에 옮기고 합치고 지운다
+//  빈 곳 길게    → 선택 모드 — 여러 개를 한 번에 옮기고 합치고 지운다
 //  사진          → 오른쪽. 없으면 자리를 안 만든다
 let openItemId = null;            // 열어 둔 물품
-let pickOn = false;               // 고르기 모드
-let pickSet = new Set();          // 고른 물품
+let pickOn = false;               // 선택 모드
+let pickSet = new Set();          // 선택한 물품
 function itemTap(id){
   if(pickOn){ pickToggle(id); return; }
   openItemId = (openItemId === id) ? null : id;
@@ -20824,7 +20819,7 @@ async function itemMenu(id){
     { name: t('이동'),   v: 'move' },
     { name: t('합침'),   v: 'merge' },
     { name: t('수정'),   v: 'edit' },
-    { name: t('고르기'), v: 'pick' },
+    { name: t('선택'), v: 'pick' },
     { name: t('지우기'), v: 'del', kind: 'warn' },
     { name: t('닫기'),   v: null }
   ]});
@@ -20887,7 +20882,7 @@ function itemCardHTML(it){
     ${(it.photos && it.photos.length)
       ? `<img loading="lazy" src="${thumbOf(it, 0)}" onclick="viewPhotos(${it.id})">` : ''}
     <div class="cardrow">
-      <button class="pbtn" onclick="showItemOnMap(${it.id})">${esc(t('이 칸 보기'))}</button>
+      <button class="pbtn" onclick="showItemOnMap(${it.id})">${esc(t('도면 보기'))}</button>
       <button class="pbtn edt" onclick="startEdit(${it.id})">${esc(t('수정'))}</button>
       <button class="pbtn edt" onclick="itemMenu(${it.id})">${esc(t('더 보기'))}</button>
     </div></div>`;
@@ -20901,14 +20896,14 @@ function renderPanelItems(){
       esc(t('등록된 물품 없음'))}</div>`;
   }
   else wrap.innerHTML =
-    (pickOn ? `<div class="picktop">${esc(tsub('{n}개 골랐습니다', { n: pickSet.size }))}</div>` : '')
+    (pickOn ? `<div class="picktop">${esc(tsub('{n}개 선택', { n: pickSet.size }))}</div>` : '')
     + li.map(it=>{
     const mv = moveId===it.id ? `<div class="mrrow" style="padding:0"><button class="minib grn" style="flex:1" onclick="mvFromMap(${it.id})">${esc(t('도면에서 고르기'))}</button></div><select class="mv" onchange="renderMoveSub(this.value, ${it.id})"><option value="">${esc(t('이름으로 고르기 — 구역 선택…'))}</option>${zoneOrder().map(z=>`<option value="${z}">${z}</option>`).join('')}</select><div id="mvSubWrap_${it.id}"></div>` : '';
     const mg = mergeId===it.id ? mergePanelHTML(it) : '';
     const hl = hlId===it.id ? ' hl' : '';
     const on = pickSet.has(it.id) ? ' picked' : '';
     const dot = pickOn ? `<span class="pickdot">${pickSet.has(it.id) ? '✓' : ''}</span>` : '';
-    // 수량 고치는 자리. 고르기 중에는 안 보인다 — 그때 할 일이 아니다.
+    // 수량 고치는 자리. 선택 중에는 안 보인다 — 그때 할 일이 아니다.
     // ★ 앱 규칙 ② — 이미 있는 것을 고치는 단추는 보기 전용에서 감춘다(edt).
     //   눌러도 안 되는 단추가 널려 있으면 화면이 거짓말을 한다. 수는 그대로 보인다.
     const qadj = pickOn ? ''
@@ -20920,8 +20915,8 @@ function renderPanelItems(){
       const cnt = children(it.id).length;
       return `<div class="it isbox${on}${editId===it.id?' editing':''}${hl}" data-id="${it.id}">
         <div class="itrow" onclick="${pickOn?`pickToggle(${it.id})`:`openBox(${it.id})`}">${dot}
-          <div class="itx"><div class="nm">📦 ${esc(it.name || t('(이름 없음)'))}</div>
-            <div class="meta">${esc(tsub('안에 {n}개', { n: cnt }))}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
+          <div class="itx"><div class="nm">📦 ${esc(it.name || t('(이름 없음)'))} <span style="font-size:11px;color:#b58a3a">(${cnt}개)</span></div>
+            <div class="meta">${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
           ${qadj}${thumbHTML(it)}</div>${mv}
       </div>`;
     }
@@ -20948,9 +20943,9 @@ function renderPanelItems(){
 // 여러 개를 한 칸으로 옮긴다 — 「이 다섯 개를 앞창고로」 가 실제로 하는 일이다
 async function pickMove(){
   const ids = [...pickSet];
-  if(!ids.length){ tell(t('먼저 옮길 물품을 골라 주세요.')); return; }
+  if(!ids.length){ tell(t('옮길 물품을 먼저 선택해 주세요.')); return; }
   const 구역 = zoneOrder();
-  const z = await tellShow({ title: t('어느 구역으로'), msg: '', esc: null,
+  const z = await tellShow({ title: t('구역 선택'), msg: '', esc: null,
     btns: 구역.map(x => ({ name: x, v: x })).concat([{ name: t('취소'), v: null }]) });
   if(z == null) return;
   const 칸 = lockers.filter(l => l.zone === z);
@@ -20968,10 +20963,10 @@ async function pickMove(){
   save(); pickEnd(); refreshBoxes(); renderList();
   tell(tsub('{n}개를 {name} 으로 옮겼습니다.', { n: ids.length, name: l.label }));
 }
-// 고른 것을 하나로 합친다. 남는 것은 맨 처음 고른 것이다 — 어느 것이 남는지 먼저 말한다.
+// 선택한 것을 하나로 합친다. 남는 것은 맨 처음 선택한 것이다 — 어느 것이 남는지 먼저 말한다.
 async function pickMerge(){
   const list = [...pickSet].map(getItem).filter(x => x && !x.box);
-  if(list.length < 2){ tell(t('합치려면 두 개 이상 골라 주세요.')); return; }
+  if(list.length < 2){ tell(t('합치려면 두 개 이상 선택해 주세요.')); return; }
   const tgt = list[0], srcs = list.slice(1);
   if(!await ask(tsub('{n}개를 「{name}」 하나로 합칩니다.', { n: list.length, name: tgt.name || t('(이름 없음)') })
       + '\n\n' + t('수량은 더해지고 사진은 모두 남습니다.'), { ok: t('합침') })) return;
@@ -22209,6 +22204,12 @@ function renderMR(){
   document.getElementById('mrMapWrap').style.display = isMap?'':'none';
   document.getElementById('repairList').style.display = !isMap?'':'none';
   document.getElementById('repairViewBtn').textContent = isMap?t('목록'):t('도면');
+  // 「완료된 수리」 스위치는 도면을 보고 있을 때만 나온다 —
+  // 목록에는 이미 접히는 묶음으로 그 자리가 있다.
+  const db = document.getElementById('repairDoneBtn');
+  if(db){ db.style.display = isMap ? '' : 'none'; db.classList.toggle('on', !!showDone); }
+  const rb = document.getElementById('repairAddBtn');
+  if(rb) rb.setAttribute('onclick', isMap ? "pinAddStart('repair')" : "mrAdd('repair')");
   if(isMap) setMapKind(mrMapKind);
   else renderRepairList();
   if(typeof pinBannerSync === 'function') pinBannerSync();
@@ -22297,7 +22298,8 @@ const RP_LABEL = {open:t('고장'), progress:t('진행중'), done:t('완료')};
 const RP_COLOR = {open:'#E4756A', progress:'#D9AE63', done:'#5FB894'};
 const RP_K = {open:'late', progress:'soon', done:'ok'};
 let showDone = false;
-function toggleDone(){ showDone = !showDone; renderRepairList(); }
+// ★ 목록과 도면이 같은 스위치를 쓴다. 따로 두면 한쪽이 옛 값을 든다.
+function toggleDone(){ showDone = !showDone; renderMR(); }
 function renderRepairList(){
   const L = document.getElementById('repairList');
   const open_ = repair.filter(it=>it.status!=='done')
@@ -22824,7 +22826,11 @@ function setMapKind(k, keepView){
   dgTabsPaint();
   const cur = mrPinKind();
   const items = mrPinRows();
-  const pins = items.filter(i=>i.pin && i.pin.map===k);
+  // ★ 사장님이 정하신 것 — 도면에는 **아직 안 고친 것만** 보인다.
+  //   다 고친 것까지 다 찍히면 도면이 지난 일로 뒤덮여서, 지금 손봐야 할 곳이 안 보인다.
+  //   보고 싶으면 「완료된 수리」 를 누른다 — 목록과 같은 스위치(showDone)를 쓴다.
+  const pins = items.filter(i => i.pin && i.pin.map === k
+    && !(cur === 'repair' && !showDone && i.status === 'done'));
   const src = dgShowSrc(k);
   if(!src){
     document.getElementById('mrMap').innerHTML =
@@ -23095,11 +23101,26 @@ function pinStart(){
   mrDrawOff();                     // ★ 그리기가 켜져 있으면 누름이 그쪽으로 새어 핀이 안 찍힌다
   pinTarget = {type:mrOpenType, id:mrOpenId};
   closeMR();
-  if(pinTarget.type==='repair') repairView='map'; else maintView='map';
-  // ★ 장비 화면에는 도면이 없다. 정비 도면으로 옮겨 놓고 찍게 한다.
-  const scr = (pinTarget.type==='repair') ? 'repair' : 'maint';
-  if(curScreen() !== scr) goMaint(scr); else renderMR();
+  pinGoMap(pinTarget.type);
   pinBannerSync();
+}
+// ★★★ 그 갈래의 도면 화면으로 데려간다 (4.85 에서 고침 — 사장님 지적)
+//   4.85 에서 정기점검이 장비 안으로 들어가고 장비에 제 도면이 생겼는데,
+//   핀 지정은 옛 구조를 그대로 보고 있었다 — 「장비」 에서 핀을 찍으려 하면
+//   정기점검 목록 화면으로 튀었다. 갈래마다 제 화면이 있다. 그리로 간다.
+function pinGoMap(kind){
+  if(kind === 'repair'){
+    repairView = 'map';
+    if(curScreen() !== 'repair') goMaint('repair'); else renderMR();
+    return;
+  }
+  // 장비와 정기점검은 「장비」 통 안에 있다
+  const sub = (kind === 'maint') ? 'maint' : 'gear';
+  mrViewSet(sub, 'map');
+  gearView = sub;
+  try{ localStorage.setItem('bt_gearsub', gearView); }catch(_){}
+  if(curScreen() !== sub || boatSubTab !== 'gear') setBoatSubTab('gear');
+  else renderGearWrap();
 }
 // 안내 띠는 pinTarget 을 그대로 따라간다.
 // ★ 손으로 켜고 끄면 화면이 다시 그려질 때마다 어긋난다. 한 곳에서 맞춘다.
@@ -23117,14 +23138,10 @@ function pinShow(){
   const ty = mrOpenType, id = mrOpenId;
   const px = it.pin.x, py = it.pin.y;
   mrMapKind = it.pin.map;
-  if(ty==='repair') repairView='map'; else maintView='map';
   closeMR();
   pinSel = String(id);          // 어느 핀인지 이름표로 알려준다
   pinOpenClu = null;
-  // ★ 장비는 제 도면이 따로 없다. 정비 도면에 함께 찍힌다.
-  const scr = (ty==='repair') ? 'repair' : 'maint';
-  if(curScreen() !== scr) goMaint(scr);
-  else renderMR();
+  pinGoMap(ty);                 // 갈래마다 제 도면 화면이 있다 (pinStart 와 같은 문)
   // 화면이 그려진 뒤에 그 자리로 확대한다
   requestAnimationFrame(()=>{ dgBind(); dgFocus(px, py); });
 }
@@ -23252,6 +23269,33 @@ function mrDrawBind(){
     const g = document.getElementById('mrGhost'); if(g) g.remove();
   }, true);
 }
+// ★★★ 도면에서 바로 새로 넣기 (4.85 — 사장님이 정하신 것)
+//   「도면상에서 추가하는 거면 먼저 핀을 도면에서 찍고 나서 그다음에 내용을 넣도록 해라」
+//   여태는 목록에서 만들고 → 창을 열고 → 「핀 지정」 을 눌러 도면으로 건너가야 했다.
+//   도면을 보고 있는 사람은 이미 「여기」 를 알고 있다. 그 자리를 먼저 받는다.
+function pinAddStart(kind){
+  if(!unlocked) return;               // 잠그면 이 단추가 화면에 없다 (edt)
+  if(typeof dgShowSrc === 'function' && !dgShowSrc(mrMapKind)){
+    tell(t('먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.'));
+    return;
+  }
+  mrDrawOff();
+  pinTarget = { type: kind, id: null, 새로: true };
+  pinBannerSync();
+}
+// 새로 넣기로 시작한 핀 — 그 갈래의 빈 기록을 만들고 번호를 돌려준다
+function pinNewRec(kind){
+  const id = newId();
+  if(kind === 'gear'){ const g = gearNew(); maint.push(g); return g.id; }
+  if(kind === 'maint'){
+    maint.push({id, grp:'기타', name:'', months:12, unit:'m', lastDate:'',
+                note:'', photos:[], pin:null, history:[], seed:false});
+    return id;
+  }
+  repair.push({id, grp:'', title:'', status:'open', note:'',
+               photos:[], pin:null, created:today(), doneDate:''});
+  return id;
+}
 function mrMapClick(e){
   if(mrDraw) return;        // 그리는 중에는 핀을 찍지 않는다
   if(!pinTarget) return;
@@ -23260,11 +23304,13 @@ function mrMapClick(e){
   const x = Math.round((e.clientX-r.left)/r.width*1000)/10;
   const y = Math.round((e.clientY-r.top)/r.height*1000)/10;
   if(x<0||x>100||y<0||y>100) return;
-  const it = getMR(pinTarget.type, pinTarget.id); if(!it){ pinCancel(); return; }
+  // 새로 넣기로 시작했으면 이 자리에서 기록을 만든다 — 자리가 먼저다
+  const ty = pinTarget.type;
+  const id = pinTarget.새로 ? pinNewRec(ty) : pinTarget.id;
+  const it = getMR(ty, id); if(!it){ pinCancel(); return; }
   it.pin = {map:mrMapKind, x, y};
-  const t=pinTarget.type, id=pinTarget.id;
   pinCancel(); saveMR(); setMapKind(mrMapKind, true);
-  openMR(t,id);
+  openMR(ty, id);
 }
 
 // ============================================================
@@ -30867,10 +30913,12 @@ function renderGearWrap(){
   if(vb){ vb.style.display = isR ? 'none' : '';
           vb.textContent = isMap ? t('목록') : t('도면'); }
   const ab = document.getElementById('gearAddBtn');
-  if(ab){ ab.style.display = isMap ? 'none' : '';
+  if(ab){ ab.style.display = '';
           // ★ 「+ 정기점검」 은 길어서 머리띠가 두 줄로 접힌다. 지금 보고 있는 갈래가
           //   바로 위 단추에 켜져 있으므로 「+ 추가」 로 충분하다.
-          ab.textContent = isR ? t('+ 제품 리뷰') : t('+ 추가'); }
+          ab.textContent = isR ? t('+ 제품 리뷰') : t('+ 추가');
+          // 도면을 보고 있으면 자리부터 찍게 한다
+          ab.setAttribute('onclick', isMap ? "pinAddStart('" + k + "')" : 'gearAdd()'); }
   // 배 리뷰는 사용기 갈래에서만 뜬다. 배 하나에 하나면 충분하므로 이미 썼으면 감춘다.
   const ab2 = document.getElementById('gearAddBtn2');
   if(ab2) ab2.style.display = (isR && unlocked && !brRows().length) ? '' : 'none';

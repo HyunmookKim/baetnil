@@ -2465,6 +2465,16 @@ const I18N = {
     '보기':'Open',
     // ── 3.85 · 내 배 화면
     '배 목록':'Boats',
+    '교체':'Replace',
+    '교체 이력':'Replacement history',
+    '정기점검 이력':'Check history',
+    '"{name}" 을(를) 새것으로 교체합니다.':'Replace "{name}" with a new one.',
+    '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'The old one is not deleted — it stays in Replacement history.',
+    '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Moves to the new one — {a} checks, {b} parts, system, type, plan pin',
+    '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'Stays with the old one — {n} repairs, maker, model, serial number, photos',
+    '{a} ~ {b} 에 달려 있던 장비입니다.':'This was fitted from {a} to {b}.',
+    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'The one fitted now is above, in Replacement history.',
+    '이상 없음':'No faults',
     '{n}장':'{n} photos',
     '{a}MB / {b}MB':'{a} MB of {b} MB',
     '이 기기에 저장한 사진':'Photos kept on this device',
@@ -4996,6 +5006,16 @@ const I18N = {
     '보기':'Открыть',
     // ── 3.85 · 내 배 화면
     '배 목록':'Суда',
+    '교체':'Заменить',
+    '교체 이력':'История замен',
+    '정기점검 이력':'История ТО',
+    '"{name}" 을(를) 새것으로 교체합니다.':'Заменить «{name}» на новое.',
+    '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'Старое не удаляется — оно останется в истории замен.',
+    '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Переходит к новому — ТО: {a}, деталей: {b}, система, тип, метка на плане',
+    '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'Остаётся у старого — ремонтов: {n}, производитель, модель, серийный номер, фото',
+    '{a} ~ {b} 에 달려 있던 장비입니다.':'Было установлено с {a} по {b}.',
+    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'Установленное сейчас — выше, в истории замен.',
+    '이상 없음':'Неисправностей нет',
     '{n}장':'{n} фото',
     '{a}MB / {b}MB':'{a} МБ из {b} МБ',
     '이 기기에 저장한 사진':'Фото на этом устройстве',
@@ -7583,6 +7603,16 @@ const I18N = {
     '배를 등록하면 오늘 상태가 여기에 나옵니다':'船を登録すると、今日の状態がここに表示されます',
     '보기':'表示',
     '배 목록':'船の一覧',
+    '교체':'交換',
+    '교체 이력':'交換履歴',
+    '정기점검 이력':'定期点検の履歴',
+    '"{name}" 을(를) 새것으로 교체합니다.':'「{name}」を新しいものに交換します。',
+    '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'前の装備は削除されず、「交換履歴」に残ります。',
+    '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'新しい装備へ移るもの — 定期点検 {a}件 · 部品 {b}個 · 系統 · 種類 · 図面のピン',
+    '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'前の装備に残るもの — 修理 {n}件 · メーカー · モデル · シリアル番号 · 写真',
+    '{a} ~ {b} 에 달려 있던 장비입니다.':'{a} ~ {b} に取り付けられていた装備です。',
+    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'今取り付けられているものは、交換履歴の上にあります。',
+    '이상 없음':'異常なし',
     '{n}장':'{n}枚',
     '{a}MB / {b}MB':'{a}MB / {b}MB',
     '이 기기에 저장한 사진':'この端末に保存した写真',
@@ -19476,7 +19506,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.90';
+const APP_VER = '4.92';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -19995,6 +20025,24 @@ function navPush(kind){
 //     · 지금 탭 안에서 하위 갈래를 옮긴 것 → 한 걸음씩 물린다
 //     · 그 탭의 첫 자리까지 왔으면 → 오늘로
 //     · 탭을 옮긴 것 자체는 안 물린다. 대신 각 탭은 보던 자리를 그대로 갖고 있다
+// ★★★ 4.91 — 「목록이냐 도면이냐」 도 한 자리다 (사장님 지적)
+//
+//   「뒤로가기 누르면 그냥 뒤로가는 게 아니라 그 탭이 닫힌다」
+//
+//   까닭 — 자리를 셀 때 목록/도면을 안 세고 있었다.
+//   장비 목록에서 도면으로 옮기는 것은 사람에게는 분명한 한 걸음인데
+//   앱에는 자국이 안 남았다. 그래서 뒤로 가면 「이 탭에서 움직인 적이 없다」 로 보고
+//   그 탭을 나가 버렸다. 실제로 걸어 보고 잡았다 —
+//     장비 목록 → 도면 → 뒤로  ⇒  자국 1개 ⇒ 오늘로 튐
+function navView(){
+  try{
+    return [ (typeof view      !== 'undefined') ? view      : '',   // 적재표
+             (typeof gearView2 !== 'undefined') ? gearView2 : '',   // 장비
+             (typeof maintView !== 'undefined') ? maintView : '',   // 정기점검
+             (typeof repairView!== 'undefined') ? repairView: ''    // 수리
+           ].join('.');
+  }catch(_){ return ''; }
+}
 function navSpot(){
   return [curTab,
           typeof boatSubTab !== 'undefined' ? boatSubTab : '',
@@ -20002,7 +20050,8 @@ function navSpot(){
           typeof gearView   !== 'undefined' ? gearView   : '',
           typeof homeSub    !== 'undefined' ? homeSub    : '',
           typeof comSub     !== 'undefined' ? comSub     : '',
-          typeof expSub     !== 'undefined' ? expSub     : ''].join('|');
+          typeof expSub     !== 'undefined' ? expSub     : '',
+          navView()].join('|');
 }
 const navTrails = {};          // { 탭: [자리, 자리, …] }
 let navBusy = false;
@@ -20027,6 +20076,12 @@ function navApplySpot(sp){
     if(typeof homeSub    !== 'undefined') homeSub    = a[4];
     if(typeof comSub     !== 'undefined') comSub     = a[5];
     if(typeof expSub     !== 'undefined') expSub     = a[6];
+    // 목록/도면도 되돌린다 — 안 되돌리면 뒤로 갔는데 화면이 그대로다
+    const v = String(a[7] || '').split('.');
+    if(v[0] && typeof view       !== 'undefined') view       = v[0];
+    if(v[1] && typeof gearView2  !== 'undefined') gearView2  = v[1];
+    if(v[2] && typeof maintView  !== 'undefined') maintView  = v[2];
+    if(v[3] && typeof repairView !== 'undefined') repairView = v[3];
     switchTab(a[0]);
   } finally { navBusy = false; }
 }
@@ -21491,6 +21546,9 @@ function toggleView(force){
   // ★ 목록 보기로 가면 도면이 없으니 고르기도 그만둔다
   if(!isMap && typeof mvCancel === 'function') mvCancel();
   if(!isMap){ if(typeof lkEdit!=='undefined' && lkEdit) toggleLkEdit(); closePanel(); renderList(); }
+  // ★ 적재표도 목록↔도면이 한 걸음이다 (4.91). 자국을 남겨야 뒤로가 제자리로 온다.
+  //   ★ force===true 는 다른 곳에서 화면을 맞추려고 부르는 것이라 걸음이 아니다.
+  if(force !== true){ try{ navMark(); }catch(_){} }
 }
 
 // ── 파일 내보내기 (백업)
@@ -22594,6 +22652,7 @@ function renderHome(){
 // ===== 목록/도면 전환 =====
 function mrToggleView(kind){
   mrViewSet(kind, mrViewOf(kind) === 'list' ? 'map' : 'list');
+  try{ navMark(); }catch(_){}          // 사람에게는 한 걸음이다. 자국을 남긴다.
   // ★ 도면을 떠나면 그리기도 끈다. 안 보이는 곳에 켜진 채로 남으면
   //   나중에 도면을 눌렀을 때 엉뚱하게 도형이 그려진다.
   if(mrViewOf(kind) !== 'map') mrDrawOff();
@@ -23257,16 +23316,19 @@ function mrPinKind(){
 //   「전기 점검은 장비랑 공유되는 거라서 여기서는 도면이 장비가 나와야 되는 거 아닌가?」
 //   맞다. 4.85 에서 정기점검을 장비 안으로 넣었고 도면 단추도 하나다.
 //   그런데 그리는 것은 지금 보고 있는 갈래 것만이라, 장비 도면인데 장비가 안 보였다.
-//   ★ 장비 통에서는 **장비와 정기점검을 함께** 그린다. 그림도 다르다 — ⚙ 장비 · 🔧 정기점검.
-//     장비에 매인 정기점검은 그 장비 자리를 따르므로(pinAt) 한자리에 겹쳐 뜬다.
-//     장비에 안 매인 정기점검(사장님이 예전에 만드신 것)도 제 핀 자리에 그대로 보인다.
+//   ★ 4.91 — 사장님이 두 번 말씀하셨다: 「장비 안에 들어간 정비는 도면에서
+//     **그냥 장비만 나오게** 하라」. 4.87 에서 제가 둘을 함께 그렸다. 잘못이다.
+//
+//     왜 장비만인가 —
+//     정기점검은 장비에 딸린 일이다. 「빌지펌프 작동 점검」의 자리는 빌지펌프 자리다.
+//     둘을 같이 찍으면 한자리에 핀이 겹쳐 서고, 누를 때마다 어느 것이 잡힐지 모른다.
+//     장비 하나에 점검이 셋이면 같은 자리에 핀이 넷이다. 도면이 못 쓰게 된다.
+//     장비를 누르면 그 안에 점검이 다 들어 있으므로 잃는 것도 없다.
 //   ★ 수리는 제 탭이 따로 있다. 거기서는 수리만 그린다.
 function mrPinRows(){
   const c = mrPinKind();
   if(c === 'repair') return Array.isArray(repair) ? repair : [];
-  const 장비 = (typeof gearRows === 'function') ? gearRows() : [];
-  const 점검 = (typeof maintRows === 'function') ? maintRows() : [];
-  return 장비.concat(점검);
+  return (typeof gearRows === 'function') ? gearRows() : [];   // 장비만
 }
 function setMapKind(k, keepView){
   if(!keepView){ dgTouched = false; dgV = { s:1, x:0, y:0 }; }
@@ -23484,6 +23546,29 @@ function dgBind(){
 
 // 도면 핀 — 가까운 것끼리 묶고, 라벨은 누른 것만 띄운다
 const PIN_ICON = { open:'!', progress:'⋯', done:'✓' };
+// ★★ 도면 위 장비 그림 (4.91 — 사장님 지적)
+//   「도면에 모든 장비가 같은 아이콘인 것 같은데 최소한 계통에 따라 좀 달라야 하지 않을까」
+//   맞다. 예순 개가 전부 ⚙ 이면 도면이 톱니바퀴 밭이 된다.
+//   ★ 계통은 이미 정해져 있다(GEAR_SYS). 거기에 하나씩 붙인다 — 새로 나누지 않는다.
+//   ★ 모르는 계통이면 ⚙ 로 돌아간다. 빈칸이 되지 않는다.
+const GEAR_ICON = {
+  '선체·의장':'⛵', '추진':'⚙',   '조타':'🧭',  '연료':'⛽',
+  '전기':'⚡',      '항해장비':'📡', '돛·삭구':'🪢', '갑판장비':'🔩',
+  '계류·묘박':'⚓', '배관·위생':'🚿', '주거설비':'🛏', '안전장비':'🦺',
+  '기타':'⚙'
+};
+// ★ 고장 난 장비는 한눈에 달라 보여야 한다. 그림도 색도 바꾼다.
+//   ★ 상태를 따로 적어 두지 않는다 — 매달린 수리를 본다. 목록이 쓰는 셈과 같다.
+function gearBroken(g){
+  try{
+    if(!g || g.id == null) return false;
+    return gearRepair(g.id).some(r => r && r.status !== 'done');
+  }catch(_){ return false; }
+}
+function gearIcon(g){
+  if(gearBroken(g)) return '❗';
+  try{ return GEAR_ICON[gearSysOf(g)] || '⚙'; }catch(_){ return '⚙'; }
+}
 let pinSel = null;      // 선택한 핀 id
 let pinOpenClu = null;  // 펼쳐 놓은 묶음
 
@@ -23500,7 +23585,9 @@ function pinGroups(pins){
   return gs;
 }
 function pinColor(i, t){
-  if(isGear(i)) return '#8ab4d8';          // 장비는 상태가 없다 — 한 가지 색
+  // ★ 4.91 — 장비도 상태가 생겼다. 고장 난 것은 수리와 같은 빨강을 쓴다
+  //   (색을 새로 만들지 않는다 — 같은 뜻이면 같은 색이어야 사람이 안 헷갈린다)
+  if(isGear(i)) return gearBroken(i) ? RP_COLOR.open : '#8ab4d8';
   // ★ 통 이름이 아니라 줄 스스로를 본다 — 장비 도면에 정기점검이 함께 있다.
   if(t === 'repair') return RP_COLOR[i.status] || '#8a97a8';
   return mStatus(i).c;
@@ -23539,7 +23626,7 @@ function pinLayer(pins, kind){
       const dx = n>1 ? Math.cos(a)*4.5 : 0, dy = n>1 ? Math.sin(a)*4.5 : 0;
       const sel = pinSel === String(i.id);
       const ty  = pinKindOf(i, kind);
-      const ico = ty==='gear' ? '⚙' : (ty==='maint' ? '🔧' : (PIN_ICON[i.status] || '!'));
+      const ico = ty==='gear' ? gearIcon(i) : (ty==='maint' ? '🔧' : (PIN_ICON[i.status] || '!'));
       const st  = ty==='repair' ? (RP_LABEL[i.status]||'') : '';
       const pp = pinAt(i); if(!pp) return '';
       return `<div class="mpin${sel?' sel':''}" style="left:${(pp.x+dx).toFixed(2)}%;top:${(pp.y+dy).toFixed(2)}%;background:${pinColor(i,kind)}"
@@ -23572,7 +23659,11 @@ function pinStart(){
   //   평면도만 있는 배에서 「핀 지정」을 누르면 「측면도가 아직 없습니다」 만 떴다.
   if(!has(mrMapKind)) mrMapKind = (mrMapKind === 'side') ? 'plan' : 'side';
   mrDrawOff();                     // ★ 그리기가 켜져 있으면 누름이 그쪽으로 새어 핀이 안 찍힌다
-  pinTarget = {type:mrOpenType, id:mrOpenId};
+  // ★ 4.91 — 원래 보던 자리를 적어 둔다. 핀을 찍고 나면 그리로 돌려놓는다.
+  //   사장님 지적 — 「장비 등록하는데 자꾸 자동으로 도면으로 돌아간다」.
+  //   까닭 — 핀 지정이 화면을 도면으로 바꿔 놓고 **되돌리지 않았다.**
+  //   한 번 핀을 찍으면 그 뒤로 장비를 열 때마다 목록이 아니라 도면이 떴다.
+  pinTarget = {type:mrOpenType, id:mrOpenId, 온자리:pinViewNow(mrOpenType)};
   closeMR();
   pinGoMap(pinTarget.type);
   pinBannerSync();
@@ -23601,7 +23692,25 @@ function pinBannerSync(){
   const b = document.getElementById('pinBanner');
   if(b) b.style.display = pinTarget ? 'block' : 'none';
 }
-function pinCancel(){ pinTarget=null; const b=document.getElementById('pinBanner'); if(b) b.style.display='none'; }
+// ★ 지금 그 갈래를 어느 자리(목록/도면)로 보고 있나
+function pinViewNow(kind){
+  const sub = (kind === 'repair') ? 'repair' : (kind === 'maint') ? 'maint' : 'gear';
+  try{ return mrViewOf(sub) || 'list'; }catch(_){ return 'list'; }
+}
+// ★ 핀 일이 끝나면 원래 보던 자리로 돌려놓는다.
+//   이것을 안 하면 화면이 도면에 눌러앉아 「자꾸 도면으로 돌아간다」 가 된다.
+function pinViewBack(){
+  try{
+    if(!pinTarget || !pinTarget.온자리) return;
+    const kind = pinTarget.type;
+    const sub = (kind === 'repair') ? 'repair' : (kind === 'maint') ? 'maint' : 'gear';
+    mrViewSet(sub, pinTarget.온자리);
+  }catch(_){}
+}
+function pinCancel(){
+  pinViewBack();                 // 그만두어도 원래 자리로
+  pinTarget=null; const b=document.getElementById('pinBanner'); if(b) b.style.display='none';
+}
 function pinRemove(){
   const it=getMR(mrOpenType,mrOpenId); if(!it) return;
   it.pin=null; saveMR(); openMR(mrOpenType,mrOpenId);
@@ -23753,7 +23862,8 @@ function pinAddStart(kind){
     return;
   }
   mrDrawOff();
-  pinTarget = { type: kind, id: null, 새로: true };
+  // 도면에서 시작한 것이라 돌아갈 자리는 도면이다 — 그대로 적어 둔다
+  pinTarget = { type: kind, id: null, 새로: true, 온자리: pinViewNow(kind) };
   pinBannerSync();
 }
 // 새로 넣기로 시작한 핀 — 그 갈래의 빈 기록을 만들고 번호를 돌려준다
@@ -23782,7 +23892,10 @@ function mrMapClick(e){
   const id = pinTarget.새로 ? pinNewRec(ty) : pinTarget.id;
   const it = getMR(ty, id); if(!it){ pinCancel(); return; }
   it.pin = {map:mrMapKind, x, y};
-  pinCancel(); saveMR(); setMapKind(mrMapKind, true);
+  const 돌아갈자리 = pinTarget.온자리;        // pinCancel 이 pinTarget 을 비우기 전에 챙긴다
+  pinCancel(); saveMR();
+  // 도면에서 시작했으면 도면에 남고, 목록에서 왔으면 목록으로 돌아간다
+  if(돌아갈자리 === 'map') setMapKind(mrMapKind, true);
   openMR(ty, id);
 }
 
@@ -24153,9 +24266,34 @@ function watchScreens(){
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchScreens);
 else watchScreens();
 
+// ★ 기록 칸이 열려 있는 동안 도면을 감춘다 (4.91 — 사장님 지적)
+//
+//   무슨 일이었나 —
+//   「도면에서 추가」로 핀을 찍으면 기록 칸이 열리는데, 그 **위에 도면이 그대로**
+//   남아 화면 절반을 잡아먹었다. 이름·계통 칸이 아래로 밀려 안 보였다.
+//
+//   까닭 —
+//   기록 칸을 화면 가득 채우는 규칙(#mrPanel.full)이 통째로
+//   @media(max-width:700px) 안에만 있었다. 폰에서는 덮는데 **컴퓨터에서는 안 덮는다.**
+//   그러면 기록 칸이 그냥 글의 흐름대로 도면 아래에 붙는다.
+//
+//   ★ CSS 를 화면 너비마다 또 나누지 않는다. 그러면 규칙이 둘이 되고 또 어긋난다.
+//     기록을 보는 동안 도면이 보일 까닭이 없다 — 한 곳에서 감추고 한 곳에서 되돌린다.
+function panelMapHide(on){
+  const w = document.getElementById('mrMapWrap');
+  if(!w) return;
+  if(on){
+    if(w.dataset.pmh == null) w.dataset.pmh = w.style.display || '';
+    w.style.display = 'none';
+  }else if(w.dataset.pmh != null){
+    w.style.display = w.dataset.pmh;
+    delete w.dataset.pmh;
+  }
+}
 function showPanel(P){
   P = P || document.getElementById('mrPanel');
   if(!P) return;
+  panelMapHide(true);
   measureHeader();
   // (발자국은 screenPush 한 군데에서 남긴다. 여기서 또 남기면 두 칸이 쌓인다.)
   P.classList.add('open', 'full');
@@ -24167,6 +24305,7 @@ function showPanel(P){
 }
 // 화면을 닫으면 원래 탭으로 되돌린다
 function restorePanel(){
+  panelMapHide(false);
   paintHNav();
   [['tabHome','home'],['tabBoat','boat'],['tabOthers','others'],['tabCommunity','community']]
     .forEach(([id,k])=>{ const el=document.getElementById(id); if(el) el.classList.toggle('on', curTab===k); });
@@ -30535,8 +30674,60 @@ function maintRows(){
   return (typeof maint !== 'undefined' && Array.isArray(maint) ? maint : [])
            .filter(x => !isGear(x) && !isMlog(x));
 }
-function gearRows(){
+// ══════════════════════════════════════════════════════════════
+// ★★ 장비 교체 (4.91 — 사장님이 정하신 것)
+//
+//   「기존에 있던 장비를 교체하는 경우도 있잖아. 이럼 그냥 장비를 삭제하는 게 아니라
+//    교체 버튼 같은 거 만들어서, 교체하면 앞으로는 그 교체 장비로 바뀐 게 기본으로 나오고
+//    장비 이력 보기 하면 거기에 교체된 과거 장비 나오게 하고」
+//
+//   ★ 지난 장비를 지우지 않는다. 배를 팔 때 이력이 값이 된다.
+//   ★ 이름을 새로 짓지 않았다 — 남들이 뭐라 부르는지 찾아봤는데(마린소프트·CMMS·
+//     민카라·국토부 자동차이력) **교체된 옛 장비를 한 낱말로 부르는 말이 없었다.**
+//     대신 「교체 이력」 은 널리 쓰는 말이다. 그리고 줄에 기간이 함께 뜨므로
+//     (2019-03 ~ 2026-08) 「지난 것」 이라는 딱지가 따로 필요 없다.
+//
+//   무엇이 새 장비로 따라가나 (사장님이 정하심)
+//     따라간다  — 정기점검(주기가 이어져야 한다) · 적재표 부품 · 계통 · 종류 · 도면 핀
+//     안 따라간다 — 수리(지난 고장은 지난 장비 것이다) · 제조사 · 모델 · 일련번호 · 사진
+//
+//   ★ 정기점검 「이력」 은 어떻게 가르나 — 자료를 두 벌 만들지 않는다.
+//     점검 항목은 하나 그대로 두고, 지나간 날짜를 **교체한 날로 잘라서** 보여 준다.
+//     두 벌을 만들면 한쪽만 고쳐져 어긋난다.
+const isRetired = g => !!(g && g.retired);
+function gearRows(){   // 지금 달려 있는 것만. 교체된 것은 목록에 안 나온다.
+  return (typeof maint !== 'undefined' && Array.isArray(maint) ? maint : [])
+    .filter(x => isGear(x) && !isRetired(x));
+}
+function gearAll(){    // 교체된 것까지 (이력·거슬러 오르기가 쓴다)
   return (typeof maint !== 'undefined' && Array.isArray(maint) ? maint : []).filter(isGear);
+}
+// 이 장비에서 거슬러 올라간 줄 — [바로 앞것, 그 앞것 …]
+function gearPast(g){
+  const out = []; const 본것 = new Set();
+  let cur = g;
+  while(cur && cur.oldId && !본것.has(String(cur.oldId))){
+    본것.add(String(cur.oldId));
+    const prev = gearOf(cur.oldId); if(!prev) break;
+    out.push(prev); cur = prev;
+    if(out.length > 30) break;            // 자료가 꼬여도 영영 돌지 않는다
+  }
+  return out;
+}
+// 이 장비가 배에 달려 있던 기간 [시작, 끝] — 끝이 없으면 지금 것이다
+function gearSpan(g){
+  if(!g) return { a:'', b:'' };
+  const prev = g.oldId ? gearOf(g.oldId) : null;
+  return { a: g.since || (prev && prev.retired) || '', b: g.retired || '' };
+}
+// 그 점검 항목의 지나간 날짜 중 **이 장비 몫**만
+function gearHist(g, item){
+  const sp = gearSpan(g);
+  const all = [];
+  if(item && item.lastDate) all.push(String(item.lastDate));
+  ((item && item.history) || []).forEach(h => { if(h && h.date) all.push(String(h.date)); });
+  return all.filter(d => (!sp.a || d >= sp.a) && (!sp.b || d < sp.b))
+            .sort().reverse();
 }
 function mlogRows(){
   return (typeof maint !== 'undefined' && Array.isArray(maint) ? maint : []).filter(isMlog);
@@ -30565,7 +30756,9 @@ function mlogTitle(x){
   return t('(제목 없음)');
 }
 function gearOf(id){
-  return gearRows().find(x => String(x.id) === String(id)) || null;
+  // ★ 4.91 — 목록(gearRows)이 아니라 전부(gearAll)에서 찾는다.
+  //   번호로 하나를 집는 일이라, 교체된 장비도 찾을 수 있어야 이력이 열린다.
+  return gearAll().find(x => String(x.id) === String(id)) || null;
 }
 // 이 장비에 매달린 정비·수리·물품
 function gearMaint(id){
@@ -30633,6 +30826,41 @@ function toggleGearGrp(g){
   const f = gearFold(); f[g] = !f[g];
   try{ localStorage.setItem('bt_gfold_gear', JSON.stringify(f)); }catch(e){}
   renderGear();
+}
+// ★★ 장비를 교체한다 — 지우지 않고 새것으로 갈아 끼운다 (4.91)
+//   ★ 사장님 자료를 옮기는 일이다. 무엇이 옮겨 가는지 먼저 말하고, 눌러야 한다.
+async function gearReplace(){
+  if(!unlocked) return;
+  const old = getMR('gear', mrOpenId); if(!old) return;
+  if(isRetired(old)) return;                       // 이미 교체된 것은 또 교체 안 한다
+  const 날 = today();
+  const 점검 = gearMaint(old.id).length;
+  const 부품 = gearParts(old.id).length;
+  const 수리 = gearRepair(old.id).length;
+  if(!await ask(
+      tsub('"{name}" 을(를) 새것으로 교체합니다.', { name: gearLabel(old) }) + '\n\n'
+    + t('지난 장비는 지우지 않고 「교체 이력」에 남습니다.') + '\n\n'
+    + tsub('새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀',
+           { a: 점검, b: 부품 }) + '\n'
+    + tsub('지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진', { n: 수리 }),
+      { ok: t('교체') })) return;
+
+  // ① 새것을 만든다 — 자리를 물려받는다(계통·종류·핀), 물건은 안 물려받는다
+  const g = gearNew();
+  g.sys = old.sys || ''; g.kind = old.kind || '';
+  g.pin = old.pin ? { map: old.pin.map, x: old.pin.x, y: old.pin.y } : null;
+  g.since = 날;
+  g.oldId = String(old.id);
+  maint.push(g);
+  // ② 지난것에 표를 남긴다
+  old.retired = 날;
+  old.newId = String(g.id);
+  // ③ 정기점검과 부품만 새것으로 옮긴다 — 수리는 안 옮긴다
+  gearMaint(old.id).forEach(m => { m.gearId = String(g.id); });
+  gearParts(old.id).forEach(x => { x.gearId = String(g.id); });
+  saveMR(); if(typeof save === 'function') save();
+  renderGearWrap();
+  openMR('gear', g.id);
 }
 function addGear(){
   if(!unlocked) return;    // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
@@ -30745,10 +30973,21 @@ function gearBody(it){
     ? `<div class="ghead" style="cursor:default"><b>${esc(t(title))}</b><span class="gcnt">${arr.length}</span></div>`
       + arr.map(draw).join('')
     : '';
+  // ★ 4.91 — 「상태」 줄 (사장님 지적)
+  //   「그냥 고장 목록만 추가하는 게 아니라 고장으로 표시되게도 해 놔라」
+  //   ★ 상태를 따로 적어 두지 않는다. 매달린 수리·정기점검에서 셈한다 —
+  //     목록이 쓰는 것과 같은 셈(gearState)이다. 두 곳에 적으면 어긋난다.
+  const 상태 = gearState(it.id);
+  const 상태줄 = `<div class="mrrow"><span class="mrlbl">${esc(t('상태'))}</span>`
+    + (상태.k === 'none'
+        ? `<b class="mrv" style="color:var(--grn)">${esc(t('이상 없음'))}</b>`
+        : `<span class="st ${상태.k}">${esc(상태.label)}</span>`)
+    + `</div>`;
   return `
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>${unlocked
       ? `<input value="${esc(it.name||'')}" placeholder="${esc(t('안 쓰면 종류나 모델이 대신 들어갑니다'))}" style="flex:1" onchange="mrField('name',this.value)">`
-      : `<b class="mrv">${esc(gearLabel(it))}</b>`}</div>
+      : `<b class="mrv">${esc(gearLabel(it))}</b>`}</div>`
+    + 상태줄 + `
     <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
       ? `<select style="flex:1" onchange="gearSetSys(this.value)">
            <option value=""${it.sys ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
@@ -30799,7 +31038,9 @@ function gearBody(it){
         <button class="mrbtn" onclick="addMlogForGear('${it.id}')">${esc(t('+ 정비수첩'))}</button>
         <button class="mrbtn" onclick="addMaintForGear('${it.id}')">${esc(t('+ 정기점검'))}</button>
         <button class="mrbtn warn" onclick="addRepairForGear('${it.id}')">${esc(t('+ 고장'))}</button>
-        <button class="mrbtn" onclick="addReviewForGear('${it.id}')">${esc(t('+ 제품 리뷰'))}</button></div>`
+        <button class="mrbtn" onclick="addReviewForGear('${it.id}')">${esc(t('+ 제품 리뷰'))}</button>
+        ${isRetired(it) ? '' : `<button class="mrbtn" onclick="gearReplace()">${esc(t('교체'))}</button>`}</div>`
+    + gearHistBlock(it)
     + hung('이 장비의 부품', pts, x => `<div class="mr gitem" onclick="gearGoItem(${x.id})">
           <div class="ct"><div class="cn">${esc(x.name||'')}</div>${
             (typeof stockLow === 'function' && stockLow([x]).length)
@@ -30809,6 +31050,65 @@ function gearBody(it){
         `<div class="mrnone" style="text-align:left">${
           esc(t('정비·수리 기록에서 이 장비를 고르면 여기 모입니다.'))}</div>`);
 }
+// ★★ 「교체 이력」 과 「정기점검 이력」 (4.91 — 사장님이 정하신 것)
+//
+//   ★ 정기점검 이력은 **접어 둔다.** 사장님 말씀 —
+//     「정기점검도 이력으로 나와야 하는데 이건 존나 의미 없는 게 반복적으로 나오는 거잖아.
+//      그러니까 굳이 정기점검 이력 보겠다면 보게, 보통은 접어놓고 단추 누르면 볼 수 있도록」
+//     맞다. 열두 번 반복된 「임펠러 교체」 날짜가 펼쳐져 있으면 화면만 잡아먹는다.
+//   ★ 수리는 안 접는다 — 몇 건 안 되고, 그것이 이 배에 무슨 일이 있었나다.
+let gearHistOpen = {};      // 장비 번호 → 점검 이력을 펼쳐 놨나
+function gearHistToggle(id){
+  gearHistOpen[String(id)] = !gearHistOpen[String(id)];
+  const it = getMR('gear', id); if(it) openMR('gear', id);
+}
+function gearHistBlock(it){
+  if(!it) return '';
+  const 지난것 = gearPast(it);
+  const sp = gearSpan(it);
+  let out = '';
+
+  // ① 이 장비가 언제부터 언제까지인가 — 교체된 것이면 기간을 머리에 밝힌다
+  if(isRetired(it)){
+    out += `<div class="mrnone" style="text-align:left">${
+      esc(tsub('{a} ~ {b} 에 달려 있던 장비입니다.', { a: sp.a || '?', b: sp.b || '?' }))}<br>${
+      esc(t('지금 달려 있는 것은 교체 이력 위쪽에 있습니다.'))}</div>`;
+  }
+
+  // ② 교체 이력 — 거슬러 올라간 줄. 누르면 그 장비가 열린다.
+  if(지난것.length){
+    out += `<div class="ghead" style="cursor:default"><b>${esc(t('교체 이력'))}</b>`
+         + `<span class="gcnt">${지난것.length}</span></div>`
+         + 지난것.map(g => {
+             const s2 = gearSpan(g);
+             return `<button class="mrbtn gbtn" onclick="openMR('gear','${g.id}')">${
+               esc(gearLabel(g))}<span class="st">${esc((s2.a || '?') + ' ~ ' + (s2.b || '?'))}</span></button>`;
+           }).join('');
+  }
+
+  // ③ 정기점검 이력 — 이 장비 몫만. 접어 둔다.
+  const 줄 = [];
+  gearMaint(it.id).forEach(m => gearHist(it, m).forEach(d => 줄.push({ d, name: m.name || '' })));
+  // 교체된 장비는 점검이 새것으로 옮겨 갔다 — 새것 쪽에서 이 장비 몫을 가져온다
+  if(isRetired(it) && it.newId){
+    let cur = gearOf(it.newId), 안전 = 0;
+    while(cur && 안전++ < 30){
+      gearMaint(cur.id).forEach(m => gearHist(it, m).forEach(d => 줄.push({ d, name: m.name || '' })));
+      cur = cur.newId ? gearOf(cur.newId) : null;
+    }
+  }
+  줄.sort((a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : 0));
+  if(줄.length){
+    const 펼 = !!gearHistOpen[String(it.id)];
+    out += `<div class="ghead" onclick="gearHistToggle('${it.id}')"><b>${
+        esc(t('정기점검 이력'))}</b><span class="gcnt">${줄.length}</span>`
+      + `<span style="margin-left:auto;color:#7b8794">${펼 ? '▾' : '▸'}</span></div>`
+      + (펼 ? 줄.map(x => `<div class="mrrow"><span class="mrlbl">${esc(x.d)}</span>`
+                 + `<b class="mrv" style="flex:1">${esc(x.name)}</b></div>`).join('') : '');
+  }
+  return out;
+}
+
 // ============================================================
 // ===== 부품 사용기 — 「이 물건을 써 보니 어떻더라」 =====
 // ============================================================

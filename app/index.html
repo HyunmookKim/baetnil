@@ -732,11 +732,19 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .telltit{color:var(--th);font-size:16px;font-weight:800;margin-bottom:8px;line-height:1.35}
 .tellmsg{color:var(--tx);font-size:14.5px;line-height:1.6;white-space:pre-wrap;
   max-height:46vh;overflow:auto;overflow-wrap:anywhere}
+.gbtn{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;margin:0 0 6px;
+  text-align:left;justify-content:space-between}
+.gbtn>.st{flex:none;font-size:11px}
+.tellinp{display:none;width:100%;margin-top:12px;min-height:44px;padding:10px 12px;
+  font-size:15px;border-radius:10px;background:var(--sf2);border:1px solid var(--bd);color:var(--tx)}
+.tellinp.on{display:block}
 .tellbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
 .tellbtns button{min-height:42px;padding:10px 17px;font-size:14px;font-weight:700;border-radius:999px;
   cursor:pointer;background:var(--sf2);border:1px solid var(--bd);color:#C4C8CD}
 .tellbtns button.ok{background:var(--ac);border-color:var(--ac);color:var(--acd)}
 .tellbtns button.warn{background:none;border-color:#5A3030;color:#E08A8A}
+.tellbtns.col{flex-direction:column;align-items:stretch}
+.tellbtns.col button{width:100%;min-height:46px}
 .mrtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .mrtop b{color:var(--tm);font-size:11px;font-weight:800;letter-spacing:.1em}
 .mrlbl{font-size:11px;color:var(--tm);width:52px;flex-shrink:0}
@@ -1359,7 +1367,7 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #panel .bs{background:rgba(255,255,255,.06);border:none;border-radius:12px;color:var(--tm)}
 #panel .chk{color:var(--tm);font-size:12.5px}
 /* 통 안의 갈래 띠 — 정비·문서가 같은 결을 쓴다 */
-#mntBar1,#mntBar2,#mntBar3,#mntBar4{padding:0}
+#mntBar1,#mntBar3,#mntBar4{padding:0}
 /* 「문서」 갈래 이름 옆의 기한 수 */
 .dcnt{display:inline-block;min-width:16px;padding:0 4px;border-radius:999px;
   font-size:10.5px;font-weight:800;line-height:16px;text-align:center}
@@ -1384,6 +1392,9 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 /* 물품 한 줄 — 유리 카드 */
 .it{background:rgba(255,255,255,.045);border:none;border-radius:13px;
   padding:12px 14px;margin-bottom:8px}
+/* 물품 줄은 .itrow 가 높이를 정한다 (60px). 카드 여백까지 더하면 한 줄이 84px 이 된다. */
+#pitems .it{padding:0 14px;margin-bottom:6px}
+#pitems .it .itcard{padding-bottom:12px}
 .it .nm{font-size:14.5px;font-weight:450;color:var(--th)}
 .it .meta{font-size:11.5px;color:var(--tm);margin-top:4px}
 .it .meta b{color:#7FD1AC;font-weight:500}
@@ -1396,6 +1407,50 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 .openb{background:rgba(217,174,99,.16)!important;border:none!important;border-radius:9px;
   color:#E4C58E!important;font-size:11px!important;padding:4px 10px!important;font-weight:500}
 .pe{color:#9CC6E8}.pd{color:#DD8078}.pm{color:#7FD1AC}.pg{color:#D9AE63}
+/* ── 물품 줄 다시 짜기 (4.85)
+   ★ 사장님 지적 — 「물품 관리하는 버튼들이나 물품을 누르면 작동되는 방식이
+     굉장히 아마추어적인 느낌이 난다」. 실제로 재 보니 —
+     서랍1 칸 하나에 물품 25개 = 늘 떠 있는 단추 100개. 단추 크기 26×18,
+     지우기 ✕ 는 11×15 였다. 애플은 44×44, 머티리얼은 48×48 아래로 만들지 말라고 한다.
+     앱에 이미 min-height:40 규칙이 있는데 적재표만 그 줄에서 빠져 있었다.
+   고친 것 — 누르면 열린다 · 수량은 줄에서 바로 · 나머지는 길게 눌러 차림표 ·
+     지우기는 차림표 안에만 · 사진은 오른쪽, 없으면 아예 안 넣는다. */
+.itrow{display:flex;align-items:center;gap:10px;min-height:60px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;user-select:none}
+.itx{flex:1;min-width:0}
+.itx .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qadj{display:flex;align-items:center;flex:none;order:2}
+.qadj button{width:38px;height:42px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);color:var(--th);font-size:18px;line-height:1;
+  padding:0;cursor:pointer;font-family:inherit}
+.qadj button:first-child{border-radius:9px 0 0 9px}
+.qadj button:last-child{border-radius:0 9px 9px 0;border-left:0}
+body.locked .qadj .qn{border:1px solid rgba(255,255,255,.14);border-radius:9px}
+.qadj .qn{min-width:46px;height:42px;line-height:40px;text-align:center;font-size:13.5px;
+  font-weight:600;color:var(--th);background:rgba(0,0,0,.18);
+  border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}
+.itrow .thumbWrap{order:3;margin-right:0}
+.itrow .thumb{width:40px;height:40px}
+/* 고르기 모드 */
+.pickdot{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);
+  flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.it.picked .pickdot{background:#7FD1AC;border-color:#7FD1AC;color:#0E1B24}
+.it.picked{background:rgba(127,209,172,.14)}
+/* ★ 아래 탭 띠 위에 붙여 둔다. 목록 끝에 두면 스무 줄을 내려야 보인다 —
+   고르기는 위에서 시작하는데 처리 단추가 저 아래 있으면 아무도 못 찾는다. */
+.pickbar{position:fixed;left:0;right:0;bottom:64px;display:flex;gap:6px;padding:9px 10px;
+  background:var(--sf);border-top:1px solid var(--bd);z-index:61}
+body.picking #pitems{padding-bottom:96px}
+.pickbar button{flex:1;min-height:44px;border:1px solid var(--bd);background:var(--sf2);
+  color:var(--tx);border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer}
+.pickbar button.warn{color:#E58C82;border-color:#5A3030}
+.picktop{padding:8px 4px 2px;color:var(--tm);font-size:12px;text-align:center}
+/* 물품 카드 — 줄을 누르면 그 자리에서 열린다 */
+.itcard{padding:10px 2px 2px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px}
+.itcard .cardrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.itcard .cardrow button{flex:1 1 auto;min-height:44px;min-width:92px}
+.itcard .cardline{font-size:12.5px;color:var(--tm);margin-top:4px}
+.itcard img{max-width:100%;border-radius:9px;margin-top:8px}
 .pbtn{background:rgba(255,255,255,.06);border:none;border-radius:10px;color:var(--tx);
   padding:8px 12px;font-size:12.5px;font-weight:450}
 .fp1 img{border:1px solid rgba(255,255,255,.12);border-radius:8px}
@@ -1844,24 +1899,18 @@ header{padding-top:var(--sat)}
   <div id="mlogList"></div>
 </div>
 <div id="gearWrap" style="display:none">
-  <div class="mrhead">
+  <div class="mrhead" style="flex-wrap:wrap">
     <button class="tab on" id="gearTabG" onclick="setGearSub('gear')" data-t="장비">장비</button>
+    <button class="tab" id="gearTabM" onclick="setGearSub('maint')" data-t="정기점검">정기점검</button>
     <button class="tab" id="gearTabR" onclick="setGearSub('review')" data-t="사용기">사용기</button>
     <span style="flex:1"></span>
+    <button class="tab" id="gearViewBtn" onclick="mrToggleView(gearScreenKind())" data-t="도면">도면</button>
     <button class="tab edt" id="gearAddBtn2" onclick="addBoatReview()" style="display:none" data-t="+ 배 리뷰">+ 배 리뷰</button>
     <button class="tab edt" id="gearAddBtn" onclick="gearAdd()" data-t="+ 추가">+ 추가</button>
   </div>
   <div id="gearList"></div>
+  <div id="maintList" style="display:none"></div>
   <div id="rvList" style="display:none"></div>
-</div>
-<div id="maintWrap" style="display:none">
-  <div id="mntBar2"></div>
-  <div class="mrhead">
-    <button class="tab" id="maintViewBtn" onclick="mrToggleView('maint')" data-t="도면">도면</button>
-    <span style="flex:1"></span>
-    <button class="tab edt" onclick="mrAdd('maint')" data-t="+ 추가">+ 추가</button>
-  </div>
-  <div id="maintList"></div>
 </div>
 <div id="repairWrap" style="display:none">
   <div id="mntBar3"></div>
@@ -1889,11 +1938,7 @@ header{padding-top:var(--sat)}
 <div id="contactsWrap" style="display:none"><div id="contactsList"></div></div>
 <div id="checkWrap" style="display:none"><div id="checkList"></div></div>
 <div id="mrMapWrap" style="display:none;padding:6px 14px 10px">
-  <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px">
-    <button class="tab" id="kindSide" onclick="setMapKind('side')" data-t="측면도">측면도</button>
-    <button class="tab" id="kindPlan" onclick="setMapKind('plan')" data-t="평면도">평면도</button>
-    <button class="tab" id="mrDrawTab" onclick="toggleMrDraw()" data-t="도면 그리기">도면 그리기</button>
-  </div>
+  <div id="dgTabs" style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap"></div>
   <div id="mrDrawTools" style="display:none;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap">
     <button class="tab lkt undo" id="mrUndoBtn" onclick="undoRun()" title="되돌리기" data-tt="되돌리기">↶</button>
     <button class="tab lkt undo" id="mrRedoBtn" onclick="redoRun()" title="다시하기" data-tt="다시하기">↷</button>
@@ -1992,6 +2037,7 @@ header{padding-top:var(--sat)}
 <div id="tellOv" class="tellov"><div class="tellbox">
   <div class="telltit" id="tellTit" style="display:none"></div>
   <div class="tellmsg" id="tellMsg"></div>
+  <input class="tellinp" id="tellInp" autocomplete="off">
   <div class="tellbtns" id="tellBtns"></div>
 </div></div>
 <input type="file" id="howPhotoFile" accept="image/*" style="display:none" onchange="howPhotoPick(event)">
@@ -2184,11 +2230,8 @@ const I18N = {
     '[초안] 주기·내용 확인 필요':'[draft] Check the interval and the work',
     '[초안] 확인 필요':'[draft] Needs checking',
     '이 사람 안 보기':'Hide this person',
-    '안 보는 사람':'Hidden people',
-    '안 보는 사람이 없습니다':'You have not hidden anyone',
     '안 보기로 한 사람의 글을 다시 봅니다':'Bring back posts from people you hid',
     '{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?':'Hide {name}\'s posts and comments on this device?',
-    '언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람':'You can bring them back any time — Settings › Hidden people',
     '이제 이 사람의 글이 안 보입니다.':'You will no longer see this person.',
     '내 글은 숨길 수 없습니다':'You cannot hide your own posts',
     '누가 올렸는지 알 수 없습니다':'We cannot tell who posted this',
@@ -2543,6 +2586,48 @@ const I18N = {
     '메뉴':'Menu',
     '목록':'List',
     '도면':'Plan',
+    '{name} 을(를) 휴지통으로 보냅니다.':'Move {name} to the bin.',
+    '{n}개 골랐습니다':'{n} selected',
+    '{n}개를 {name} 으로 옮겼습니다.':'Moved {n} items to {name}.',
+    '{n}개를 「{name}」 하나로 합칩니다.':'Merge {n} items into "{name}".',
+    '고르기':'Select',
+    '먼저 옮길 물품을 골라 주세요.':'Select the items to move first.',
+    '수량은 더해지고 사진은 모두 남습니다.':'Quantities are added up and all photos are kept.',
+    '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'Edit non-numeric quantities from Edit.',
+    '안에 {n}개':'{n} inside',
+    '어느 구역으로':'Which area',
+    '이 칸 보기':'Show this locker',
+    '합치려면 두 개 이상 골라 주세요.':'Select two or more to merge.',
+    '휴지통에서 되살릴 수 있습니다.':'You can restore it from the bin.',
+    '차단한 사람':'Blocked people',
+    '차단하기':'Block',
+    '이 사람 차단':'Block this person',
+    '차단한 사람이 없습니다':'You have not blocked anyone',
+    '차단한 사람의 글을 다시 봅니다':'Unblock people to see their posts again',
+    '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'You can undo this any time — Settings › Blocked people',
+    '+ 배 리뷰':'+ Boat review',
+    '사용기':'Reviews',
+    '어느 장비 것':'Which gear',
+    '「{name}」 도면을 지웁니다.':'Delete the plan "{name}".',
+    '「{name}」 도면을 지웠습니다.':'Deleted the plan "{name}".',
+    '도면 이름':'Plan name',
+    '도면 이름 바꾸기':'Rename this plan',
+    '도면 추가':'Add a plan',
+    '되돌리기로 되살릴 수 있습니다.':'You can bring it back with Undo.',
+    '보기 전용일 때는 도면을 바꿀 수 없습니다.':'Plans cannot be changed in view-only mode.',
+    '아직 못 올린 기록 {n}건은 다음에 닿으면 저절로 올라갑니다.':'{n} records have not gone up yet; they will upload by themselves next time you connect.',
+    '예: 전기 배선도':'e.g. Wiring diagram',
+    '이 도면 지우기':'Delete this plan',
+    '이 도면에 찍은 핀 {n}개도 함께 안 보이게 됩니다.':'The {n} pins placed on this plan will stop showing too.',
+    '이름을 적어 주세요.':'Please write a name.',
+    '장비 추가':'Add gear',
+    '평면도와 측면도는 이름을 바꿀 수 없습니다.':'The deck plan and side view cannot be renamed.',
+    '평면도와 측면도는 지울 수 없습니다.':'The deck plan and side view cannot be deleted.',
+    '이 장비의 정기점검':'This gear\'s service',
+    '이 장비의 수리':'This gear\'s repairs',
+    '이 장비의 정비수첩':'This gear\'s service log',
+    '이 장비의 사용기':'This gear\'s reviews',
+    '이 장비의 부품':'This gear\'s parts',
     '가나다순':'By name',
     '추가순':'By added',
     '사진순':'With photos',
@@ -3409,7 +3494,6 @@ const I18N = {
     '물때 자료를 받는 중…':'Fetching tide data…',
     '물어보기':'Ask a question',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Items, maintenance, repairs, logbook, documents, drawings, board',
-    '물품을 누르면 도면에서 이 칸을 크게 보여 드립니다':'Tap an item to zoom to its locker on the drawing',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'This is a locker for items. Draw walls and partitions with Line, Rectangle or Triangle.',
     '미꾸라지':'Loach',
     '미끼':'Bait',
@@ -4672,11 +4756,8 @@ const I18N = {
     '[초안] 주기·내용 확인 필요':'[черновик] Уточните периодичность и объём работ',
     '[초안] 확인 필요':'[черновик] Требует проверки',
     '이 사람 안 보기':'Скрыть этого человека',
-    '안 보는 사람':'Скрытые люди',
-    '안 보는 사람이 없습니다':'Вы никого не скрывали',
     '안 보기로 한 사람의 글을 다시 봅니다':'Вернуть записи скрытых людей',
     '{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?':'Скрыть записи и комментарии {name} на этом устройстве?',
-    '언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람':'Вернуть можно в любой момент — Настройки › Скрытые люди',
     '이제 이 사람의 글이 안 보입니다.':'Записи этого человека больше не показываются.',
     '내 글은 숨길 수 없습니다':'Свои записи скрыть нельзя',
     '누가 올렸는지 알 수 없습니다':'Не удалось определить автора',
@@ -5031,6 +5112,48 @@ const I18N = {
     '메뉴':'Меню',
     '목록':'Список',
     '도면':'План',
+    '{name} 을(를) 휴지통으로 보냅니다.':'Отправить «{name}» в корзину.',
+    '{n}개 골랐습니다':'Выбрано: {n}',
+    '{n}개를 {name} 으로 옮겼습니다.':'Перенесено {n} в «{name}».',
+    '{n}개를 「{name}」 하나로 합칩니다.':'Объединить {n} в «{name}».',
+    '고르기':'Выбрать',
+    '먼저 옮길 물품을 골라 주세요.':'Сначала выберите, что перенести.',
+    '수량은 더해지고 사진은 모두 남습니다.':'Количество складывается, все фотографии сохраняются.',
+    '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'Нечисловое количество измените через «Изменить».',
+    '안에 {n}개':'Внутри: {n}',
+    '어느 구역으로':'В какую зону',
+    '이 칸 보기':'Показать этот отсек',
+    '합치려면 두 개 이상 골라 주세요.':'Выберите два или больше.',
+    '휴지통에서 되살릴 수 있습니다.':'Можно восстановить из корзины.',
+    '차단한 사람':'Заблокированные',
+    '차단하기':'Заблокировать',
+    '이 사람 차단':'Заблокировать этого человека',
+    '차단한 사람이 없습니다':'Вы никого не заблокировали',
+    '차단한 사람의 글을 다시 봅니다':'Разблокируйте, чтобы снова видеть их записи',
+    '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'Вернуть можно в любой момент — Настройки › Заблокированные',
+    '+ 배 리뷰':'+ Отзыв о судне',
+    '사용기':'Отзывы',
+    '어느 장비 것':'Какое снаряжение',
+    '「{name}」 도면을 지웁니다.':'Удалить план «{name}».',
+    '「{name}」 도면을 지웠습니다.':'План «{name}» удалён.',
+    '도면 이름':'Название плана',
+    '도면 이름 바꾸기':'Переименовать план',
+    '도면 추가':'Добавить план',
+    '되돌리기로 되살릴 수 있습니다.':'Вернуть можно кнопкой «Отменить».',
+    '보기 전용일 때는 도면을 바꿀 수 없습니다.':'В режиме «Только просмотр» план изменить нельзя.',
+    '아직 못 올린 기록 {n}건은 다음에 닿으면 저절로 올라갑니다.':'Ещё не выгружено записей: {n}. Они уйдут сами при следующем подключении.',
+    '예: 전기 배선도':'напр. электрическая схема',
+    '이 도면 지우기':'Удалить этот план',
+    '이 도면에 찍은 핀 {n}개도 함께 안 보이게 됩니다.':'Метки на этом плане ({n}) тоже перестанут отображаться.',
+    '이름을 적어 주세요.':'Введите название.',
+    '장비 추가':'Добавить снаряжение',
+    '평면도와 측면도는 이름을 바꿀 수 없습니다.':'План палубы и вид сбоку переименовать нельзя.',
+    '평면도와 측면도는 지울 수 없습니다.':'План палубы и вид сбоку удалить нельзя.',
+    '이 장비의 정기점검':'Регламент этого снаряжения',
+    '이 장비의 수리':'Ремонт этого снаряжения',
+    '이 장비의 정비수첩':'Журнал обслуживания этого снаряжения',
+    '이 장비의 사용기':'Отзывы об этом снаряжении',
+    '이 장비의 부품':'Запчасти этого снаряжения',
     '가나다순':'По имени',
     '추가순':'По добавлению',
     '사진순':'С фото',
@@ -5896,7 +6019,6 @@ const I18N = {
     '물때 자료를 받는 중…':'Получение данных о приливе…',
     '물어보기':'Задать вопрос',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Вещи, регламент, ремонт, судовой журнал, документы, чертежи, доска',
-    '물품을 누르면 도면에서 이 칸을 크게 보여 드립니다':'Нажмите на вещь — рундук приблизится на чертеже',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'Это рундук для вещей. Стены и переборки рисуйте линией, прямоугольником или треугольником.',
     '미꾸라지':'Вьюн',
     '미끼':'Наживка',
@@ -7232,11 +7354,8 @@ const I18N = {
     '[초안] 주기·내용 확인 필요':'[下書き] 周期・内容の確認が必要',
     '[초안] 확인 필요':'[下書き] 確認が必要',
     '이 사람 안 보기':'この人を非表示',
-    '안 보는 사람':'非表示にした人',
-    '안 보는 사람이 없습니다':'非表示にした人はいません',
     '안 보기로 한 사람의 글을 다시 봅니다':'非表示にした人の投稿を再び表示します',
     '{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?':'{name} さんの投稿とコメントをこの端末で非表示にしますか？',
-    '언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람':'いつでも元に戻せます。設定 › 非表示にした人',
     '이제 이 사람의 글이 안 보입니다.':'この人の投稿は表示されなくなりました。',
     '내 글은 숨길 수 없습니다':'自分の投稿は非表示にできません',
     '누가 올렸는지 알 수 없습니다':'投稿した人が分かりません',
@@ -7573,6 +7692,48 @@ const I18N = {
     '메뉴':'メニュー',
     '목록':'一覧',
     '도면':'図面',
+    '{name} 을(를) 휴지통으로 보냅니다.':'{name} をごみ箱に入れます。',
+    '{n}개 골랐습니다':'{n} 個選びました',
+    '{n}개를 {name} 으로 옮겼습니다.':'{n} 個を {name} に移しました。',
+    '{n}개를 「{name}」 하나로 합칩니다.':'{n} 個を「{name}」ひとつにまとめます。',
+    '고르기':'選ぶ',
+    '먼저 옮길 물품을 골라 주세요.':'先に移すものを選んでください。',
+    '수량은 더해지고 사진은 모두 남습니다.':'数量は合算され、写真はすべて残ります。',
+    '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'数字でない数量は「修正」から直してください。',
+    '안에 {n}개':'中に {n} 個',
+    '어느 구역으로':'どの区域へ',
+    '이 칸 보기':'この収納を見る',
+    '합치려면 두 개 이상 골라 주세요.':'まとめるには 2 つ以上選んでください。',
+    '휴지통에서 되살릴 수 있습니다.':'ごみ箱から戻せます。',
+    '차단한 사람':'ブロックした人',
+    '차단하기':'ブロックする',
+    '이 사람 차단':'この人をブロック',
+    '차단한 사람이 없습니다':'ブロックした人はいません',
+    '차단한 사람의 글을 다시 봅니다':'ブロックを解除して投稿をまた見ます',
+    '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'いつでも元に戻せます。設定 › ブロックした人',
+    '+ 배 리뷰':'+ 船レビュー',
+    '사용기':'レビュー',
+    '어느 장비 것':'どの装備のもの',
+    '「{name}」 도면을 지웁니다.':'「{name}」の図面を削除します。',
+    '「{name}」 도면을 지웠습니다.':'「{name}」の図面を削除しました。',
+    '도면 이름':'図面の名前',
+    '도면 이름 바꾸기':'図面の名前を変える',
+    '도면 추가':'図面を追加',
+    '되돌리기로 되살릴 수 있습니다.':'「元に戻す」で戻せます。',
+    '보기 전용일 때는 도면을 바꿀 수 없습니다.':'閲覧のみのときは図面を変えられません。',
+    '아직 못 올린 기록 {n}건은 다음에 닿으면 저절로 올라갑니다.':'まだ送れていない記録が {n} 件あります。次につながったときに自動で送られます。',
+    '예: 전기 배선도':'例: 配線図',
+    '이 도면 지우기':'この図面を削除',
+    '이 도면에 찍은 핀 {n}개도 함께 안 보이게 됩니다.':'この図面に打ったピン {n} 個も表示されなくなります。',
+    '이름을 적어 주세요.':'名前を書いてください。',
+    '장비 추가':'装備を追加',
+    '평면도와 측면도는 이름을 바꿀 수 없습니다.':'平面図と側面図は名前を変えられません。',
+    '평면도와 측면도는 지울 수 없습니다.':'平面図と側面図は削除できません。',
+    '이 장비의 정기점검':'この装備の定期点検',
+    '이 장비의 수리':'この装備の修理',
+    '이 장비의 정비수첩':'この装備の整備手帳',
+    '이 장비의 사용기':'この装備のパーツレビュー',
+    '이 장비의 부품':'この装備の部品',
     '가나다순':'五十音順',
     '추가순':'追加順',
     '사진순':'写真順',
@@ -8418,7 +8579,6 @@ const I18N = {
     '물때 자료를 받는 중…':'潮汐データを取得中…',
     '물어보기':'質問する',
     '물품·정비·수리·항해일지·서류·도면·게시판':'備品・整備・修理・航海日誌・書類・図面・掲示板',
-    '물품을 누르면 도면에서 이 칸을 크게 보여 드립니다':'備品をタップすると、図面でこのスペースを大きく表示します',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'備品を入れるスペースです。壁や仕切り線は「線・四角・三角」で描いてください。',
     '미꾸라지':'ドジョウ',
     '미끼':'エサ',
@@ -9574,22 +9734,58 @@ function dgShrink(src, cb){
   }catch(e){ cb(null); }
 }
 // 화면에 쓸 도면. 창고 주소가 있으면 그것, 없으면 작은 사본.
+// ══════════════════════════════════════════════════════════════
+// 도면 목록 — 이 배가 가진 그림들 (4.85, 사장님이 정하신 것)
+//
+// ★ 「측면도·평면도는 기본으로 두고, 잘 다루는 사람은 자기가 더 넣을 수 있게.
+//    전기 배선도든 뭐든 이름을 자기 마음대로 정해서」
+//
+// ★ 여태 두 장으로 굳어 있었다. 그런데 배는 그렇지 않다 —
+//   전기 배선도·배관도·연료 계통도·삭구도는 선체 평면도와 다른 그림이다.
+//   전기 장비를 선체 평면도에 찍게 해 놓은 것이 사장님 지적이었고, 맞는 말씀이다.
+//
+// ★ 다행히 저장 모양은 처음부터 [{id, …}] 배열이었다. 두 장으로 좁힌 것은
+//   읽고 쓰는 자리 쉰 군데였다. 그 쉰 군데를 **이 문 하나**로 모은다.
+//
+// ★ 적재표(수납칸)는 평면도 한 장에 그대로 붙는다 — 거기는 손대지 않는다.
+const DG_FIXED = ['plan', 'side'];          // 기본 둘. 이름을 못 바꾸고 못 지운다.
+let dgNames = {};                            // 더 넣은 것 { d_xxx: '전기 배선도' }
+
+function dgFixed(k){ return DG_FIXED.indexOf(k) >= 0; }
+// ★ 차례가 정해져 있어야 한다 — 기본 둘이 먼저, 더 넣은 것은 넣은 차례대로.
+function dgKeys(){
+  return DG_FIXED.concat(Object.keys(dgNames).filter(k => !dgFixed(k)));
+}
+function dgName(k){
+  if(k === 'plan') return t('평면도');
+  if(k === 'side') return t('측면도');
+  return dgNames[k] || t('도면');
+}
+// ★ 열쇠는 겹치면 안 된다. 시각+난수로 짓는다 (사진 주소와 같은 방식).
+function dgNewKey(){
+  return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+}
+// 도면마다 담아 두는 그릇을 만든다 — 기본값을 손으로 적으면 새 도면이 늘 때마다 빠뜨린다
+function dgBlank(v){
+  const o = {};
+  dgKeys().forEach(k => { o[k] = v; });
+  return o;
+}
+
 function dgShowSrc(k){
-  const key = (k === 'side') ? 'side' : 'plan';
-  return dgImgs[key] || dgSmall[key] || null;
+  return dgImgs[k] || dgSmall[k] || null;
 }
 // 창고에서 못 받았을 때 작은 사본으로 갈아 끼운다 (배 위에서 인터넷이 없다)
 function dgFallback(el, k){
-  const key = (k === 'side') ? 'side' : 'plan';
   if(!el || el.dataset.fell === '1') return;
   el.dataset.fell = '1';
-  if(dgSmall[key]) el.src = dgSmall[key];
+  if(dgSmall[k]) el.src = dgSmall[k];
 }
 // 앱 도면 창고에 올라간 도면이면 그 번호. 백업에는 이 번호만 들어간다.
-let dgRef = { plan: null, side: null };
+let dgRef = { plan: null, side: null };   // dgFromArr 가 도면 수에 맞춰 다시 만든다
 // 공개 목록에 띄울지 여부. 창고 저장과는 별개다 — 안 띄워도 창고에는 남는다.
 let dgPub = { plan: false, side: false };
-function dgSrc(k){ return dgImgs[k==='side' ? 'side' : 'plan']; }
+function dgSrc(k){ return dgImgs[k] || null; }
 // 저장·동기화용: id 붙은 문서 배열 <-> 객체 변환
 
 // ===== 선종별 기본 도면 =====
@@ -9640,7 +9836,7 @@ function dgSeedKeyOf(kind, url){
 // 사용자가 올린 도면은 백업이 자급자족해야 하므로 그대로 인라인으로 넣는다.
 function dgArr(){
   const a = [];
-  for(const k of ['plan','side']){
+  for(const k of dgKeys()){
     const v = dgImgs[k];
     if(!v) continue;
     let d;
@@ -9654,15 +9850,28 @@ function dgArr(){
     // 작은 사본은 어느 경우든 함께 남긴다 — 인터넷이 없을 때와 핀 그림을 만들 때 쓴다
     if(dgSmall[k] && !d.img) d.small = dgSmall[k];
     if(dgPub[k] === true) d.pub = true;
+    // ★ 더 넣은 도면은 이름을 같이 남긴다. 이것이 없으면 다음에 켤 때 이름을 잃는다.
+    if(!dgFixed(k)) d.name = dgName(k);
     a.push(d);
   }
   return a;
 }
 // 그림을 되살린다. 창고 번호만 있는 것은 여기서 null 이고, 나중에 따로 받아온다.
-function dgFromArr(a){
-  const o = { plan:null, side:null };
+// ★ 이름부터 되살린다. 이름을 모르면 dgKeys() 가 그 도면을 모른다.
+function dgNamesFromArr(a){
+  const o = {};
   (Array.isArray(a)?a:[]).forEach(d=>{
-    if(!d || (d.id!=='plan' && d.id!=='side')) return;
+    if(!d || typeof d.id !== 'string' || dgFixed(d.id)) return;
+    o[d.id] = String(d.name || '').trim() || '도면';
+  });
+  return o;
+}
+function dgFromArr(a){
+  dgNames = dgNamesFromArr(a);            // ★ 이것이 먼저다 — 아래가 dgKeys() 를 쓴다
+  const o = dgBlank(null);
+  (Array.isArray(a)?a:[]).forEach(d=>{
+    if(!d || typeof d.id !== 'string' || !d.id) return;
+    if(o[d.id] === undefined) return;     // 이름 없는 낯선 것은 버린다
     if(typeof d.url==='string' && d.url) o[d.id] = d.url;   // 창고에 올린 도면 — 주소
     else if(typeof d.img==='string' && d.img) o[d.id] = d.img;   // 인라인 (창고에 못 올린 것·옛 백업)
     else if(d.ref==='seed') o[d.id] = dgSeedUrl(d.id, 'first45');
@@ -9676,16 +9885,17 @@ function dgFromArr(a){
 // 창고 번호만 따로 읽는다
 // 작은 사본만 따로 읽는다
 function dgSmallFromArr(a){
-  const o = { plan:null, side:null };
+  const o = dgBlank(null);
   (Array.isArray(a)?a:[]).forEach(d=>{
-    if(d && (d.id==='plan'||d.id==='side') && typeof d.small==='string' && d.small) o[d.id] = d.small;
+    if(d && typeof d.id==='string' && o[d.id] !== undefined
+       && typeof d.small==='string' && d.small) o[d.id] = d.small;
   });
   return o;
 }
 function dgRefFromArr(a){
-  const o = { plan:null, side:null };
+  const o = dgBlank(null);
   (Array.isArray(a)?a:[]).forEach(d=>{
-    if(!d || (d.id!=='plan' && d.id!=='side')) return;
+    if(!d || typeof d.id!=='string' || o[d.id] === undefined) return;
     if(typeof d.ref==='string' && d.ref.startsWith('lib:')){
       const id = d.ref.slice(4).trim();
       if(id) o[d.id] = id;
@@ -9695,9 +9905,9 @@ function dgRefFromArr(a){
 }
 // 공개 여부만 따로 읽는다
 function dgPubFromArr(a){
-  const o = { plan:false, side:false };
+  const o = dgBlank(false);
   (Array.isArray(a)?a:[]).forEach(d=>{
-    if(d && (d.id==='plan'||d.id==='side') && d.pub===true) o[d.id]=true;
+    if(d && typeof d.id==='string' && o[d.id] !== undefined && d.pub===true) o[d.id]=true;
   });
   return o;
 }
@@ -9724,7 +9934,7 @@ function dgLibId(){
 function dgLibRec(k, b, title){
   return {
     id: dgLibId(),
-    kind: (k==='side' ? 'side' : 'plan'),
+    kind: k,
     title: String(title||'').trim(),
     maker: String((b && b.maker) || ''),
     model: String((b && b.model) || ''),
@@ -9758,7 +9968,7 @@ async function dgStore(k, url, title, pub){
 }
 // 공개 목록에 띄울지 여부만 바꾼다 (창고에서 빼는 것이 아니다)
 async function dgSetPublic(k, on){
-  const key = (k==='side' ? 'side' : 'plan');
+  const key = k;
   const id = dgRef[key];
   if(!id){ tell(t('아직 앱 창고에 올라가지 않은 도면입니다')); return; }
   if(!dgCanPublish()){ tell(t('로그인한 상태에서만 바꿀 수 있습니다')); return; }
@@ -9776,7 +9986,7 @@ async function dgSetPublic(k, on){
 // 창고 번호만 있고 그림이 없는 도면을 받아온다. 기기 복사본이 있으면 그것부터 쓴다.
 async function dgResolve(){
   let changed = false;
-  for(const k of ['plan','side']){
+  for(const k of dgKeys()){
     if(dgImgs[k] || !dgRef[k]) continue;
     let url = await dgCacheGet(dgRef[k]);
     if(!url && typeof window!=='undefined' && window.__dglib){
@@ -10941,7 +11151,7 @@ async function chooseDgPick(i){
 // 앱에 들어 있는 기본 도면 고르기 — 내 배 선종을 맨 앞에 놓는다
 function dgPickBuiltin(k){
   if(!lkCanEdit()) return;
-  const kind = (k==='side' ? 'side' : 'plan');
+  const kind = k;
   const b = (typeof curBoat==='function') ? curBoat() : null;
   const myType = (b && b.type) || '';
   const list = Object.keys(DG_BUILTIN)
@@ -10956,7 +11166,7 @@ function dgPickBuiltin(k){
 // 공개 도면 고르기 — 남들이 올린 도면을 그림으로 보고 고른다
 async function dgPickLib(k){
   if(!lkCanEdit()) return;
-  const kind = (k==='side' ? 'side' : 'plan');
+  const kind = k;
   if(!(typeof window!=='undefined' && window.__dglib)){
     tell(t('공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다')); return;
   }
@@ -10983,6 +11193,71 @@ async function dgPickLib(k){
     '다른 사용자가 공개한 도면입니다 · 칸은 함께 오지 않습니다', cards);
 }
 
+// ══════════════════════════════════════════════════════════════
+// 도면 더하기 · 이름 바꾸기 · 지우기 (4.85, 사장님이 정하신 것)
+//
+// ★ 「측면도·평면도는 기본으로 두고, 잘 다루는 사람은 자기가 더 넣을 수 있게.
+//    전기 배선도든 뭐든 이름을 자기 마음대로 정해서」
+// 도면을 고쳤을 때 저장하는 문 하나. 여기 말고 다른 데서 따로 저장하지 않는다.
+function saveDg(){
+  saveLocal();
+  if(typeof schedulePush === 'function') schedulePush();
+  if(typeof applyStowDg === 'function') applyStowDg();
+  dgTabsPaint();
+}
+async function dgAdd(){
+  if(typeof unlocked !== 'undefined' && !unlocked){ tell(t('보기 전용일 때는 도면을 바꿀 수 없습니다.')); return; }
+  const 답 = await askText(t('도면 이름'), '', t('예: 전기 배선도'));
+  if(답 === null) return;                       // 취소 — 아무 일도 안 한다
+  const n = String(답).trim();
+  if(!n){ tell(t('이름을 적어 주세요.')); return; }
+  const k = dgNewKey();
+  undoPush();
+  dgNames = { ...dgNames, [k]: n };
+  dgImgs  = { ...dgImgs,  [k]: null };
+  dgSmall = { ...dgSmall, [k]: null };
+  dgRef   = { ...dgRef,   [k]: null };
+  dgPub   = { ...dgPub,   [k]: false };
+  saveDg();
+  setMapKind(k);                                // 바로 그 도면으로 간다 — 그림을 올리라고
+}
+async function dgRename(k){
+  if(typeof unlocked !== 'undefined' && !unlocked){ tell(t('보기 전용일 때는 도면을 바꿀 수 없습니다.')); return; }
+  if(dgFixed(k)){ tell(t('평면도와 측면도는 이름을 바꿀 수 없습니다.')); return; }
+  const 답 = await askText(t('도면 이름'), dgName(k), '');
+  if(답 === null) return;
+  const n = String(답).trim();
+  if(!n){ tell(t('이름을 적어 주세요.')); return; }
+  undoPush();
+  dgNames = { ...dgNames, [k]: n };
+  saveDg();
+  setMapKind(k, true);
+}
+// ★ 지우기 전에 그 도면에 찍힌 핀이 몇인지 세어 말한다.
+//   말없이 지우면 핀이 갈 곳을 잃는다 — 자료에는 남는데 화면에서 영영 안 보인다.
+function dgPinsOn(k){
+  const 셈 = a => (Array.isArray(a) ? a : []).filter(x => x && x.pin && x.pin.map === k).length;
+  return 셈(typeof gearRows === 'function' ? gearRows() : [])
+       + 셈(typeof maint !== 'undefined' ? maint : [])
+       + 셈(typeof repair !== 'undefined' ? repair : []);
+}
+async function dgDrop(k){
+  if(typeof unlocked !== 'undefined' && !unlocked){ tell(t('보기 전용일 때는 도면을 바꿀 수 없습니다.')); return; }
+  if(dgFixed(k)){ tell(t('평면도와 측면도는 지울 수 없습니다.')); return; }
+  const 이름 = dgName(k);
+  const n = dgPinsOn(k);
+  const 말 = tsub('「{name}」 도면을 지웁니다.', { name: 이름 })
+    + (n ? '\n\n' + tsub('이 도면에 찍은 핀 {n}개도 함께 안 보이게 됩니다.', { n }) : '')
+    + '\n\n' + t('되돌리기로 되살릴 수 있습니다.');
+  if(!await ask(말, { ok: t('지우기'), warn: true })) return;
+  undoPush();
+  const 뺀다 = o => { const x = { ...o }; delete x[k]; return x; };
+  dgNames = 뺀다(dgNames); dgImgs = 뺀다(dgImgs);
+  dgSmall = 뺀다(dgSmall); dgRef = 뺀다(dgRef); dgPub = 뺀다(dgPub);
+  saveDg();
+  setMapKind(dgKeys()[0] || 'plan');
+  tell(tsub('「{name}」 도면을 지웠습니다.', { name: 이름 }));
+}
 function uploadDg(k){
   if(typeof unlocked!=='undefined' && !unlocked){ tell(t('잠금 상태에서는 도면을 바꿀 수 없습니다')); return; }
   const inp = document.createElement('input');
@@ -10991,7 +11266,7 @@ function uploadDg(k){
     const f = inp.files && inp.files[0];
     if(!f) return;
     resizeDg(f, async url=>{
-      const key = (k==='side' ? 'side' : 'plan');
+      const key = k;
       // 작은 사본을 먼저 만든다 — 아직 내 기기의 그림이라 캔버스가 잠기지 않는다
       const small = await new Promise(r => dgShrink(url, r));
       const st = await storePhotos([url]);          // 큰 도면은 창고로
@@ -11593,7 +11868,7 @@ const NEED_BOAT_WRAP = {
   'boat:stow':   ['listView',     '적재표'],
   'boat:gear':   ['gearWrap',     '장비'],
   'boat:mlog':   ['mlogWrap',     '정비수첩'],
-  'boat:maint':  ['maintWrap',    '정기점검'],
+  'boat:maint':  ['gearWrap',     '정기점검'],
   'boat:repair': ['repairWrap',   '수리목록'],
   'boat:fuel':   ['fuelWrap',     '연료 기록'],
   'boat:docs':   ['contactsWrap', '문서 · 연락처'],
@@ -13461,27 +13736,27 @@ async function mutePersonUI(uid, name){
   if(!uid){ tell(t('누가 올렸는지 알 수 없습니다')); return; }
   if(String(uid) === String(meUid()||'')){ tell(t('내 글은 숨길 수 없습니다')); return; }
   if(!await ask(tsub('{name} 님의 글과 댓글을 이 기기에서 안 보이게 할까요?', { name: name || t('이 사람') })
-      + '\n\n' + t('언제든 다시 볼 수 있습니다. 설정 › 안 보는 사람'), { ok: t('안 보기') })) return;
+      + '\n\n' + t('언제든 다시 볼 수 있습니다. 설정 › 차단한 사람'), { ok: t('차단하기') })) return;
   mutedNameKeep(uid, name);
   mutePerson(uid);
   tell(t('이제 이 사람의 글이 안 보입니다.'));
   try{ if(typeof backToTalk === 'function') backToTalk(); else renderTalk(); }catch(_){}
 }
-// 안 보는 사람 목록 — 되돌릴 길이 없으면 막는 기능을 아무도 안 쓴다
+// 차단한 사람 목록 — 되돌릴 길이 없으면 막는 기능을 아무도 안 쓴다
 function openMuted(){
   const ids = hiddenPeople();
   const P = document.getElementById('mrPanel');
   if(!P) return;
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('안 보는 사람'))}</b><span style="flex:1"></span></div>`
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('차단한 사람'))}</b><span style="flex:1"></span></div>`
     + (ids.length
         ? ids.map(id => `<div class="fleet"><div class="fmain">
             <div class="fname">${esc(mutedName(id) || t('(이름 모름)'))}</div>
             <div class="fsub">${esc(String(id).slice(-6))}</div></div>
             <div class="fbtns"><button class="minib blu"
               onclick="unmutePersonUI('${esc(id)}')">${esc(t('다시 보기'))}</button></div></div>`).join('')
-        : `<div class="mrnone">${esc(t('안 보는 사람이 없습니다'))}</div>`);
+        : `<div class="mrnone">${esc(t('차단한 사람이 없습니다'))}</div>`);
   showPanel(P);
-  setHeadTitle('안 보는 사람');
+  setHeadTitle('차단한 사람');
 }
 // 이름은 마지막에 본 것을 기억해 둔다 — 없으면 번호 뒷자리로 보여 준다
 function mutedName(uid){
@@ -14378,7 +14653,8 @@ function oldPhotoCount(){
     (typeof vdocs==='undefined'?[]:vdocs), (typeof posts==='undefined'?[]:posts)
   ].forEach(list => (Array.isArray(list) ? list : []).forEach(o => { if(o) cnt(o.photos); }));
   try{ (curBoat() && curBoat().intro || []).forEach(x=>{ if(x && x.t==='photo' && isInlinePhoto(x.v)) n++; }); }catch(_){}
-  ['plan','side'].forEach(k=>{ if(typeof dgImgs !== 'undefined' && isInlinePhoto(dgImgs[k])) n++; });
+  (typeof dgKeys === 'function' ? dgKeys() : ['plan','side'])
+    .forEach(k=>{ if(typeof dgImgs !== 'undefined' && isInlinePhoto(dgImgs[k])) n++; });
   return n;
 }
 // 옛 사진을 조금씩 창고로 옮긴다
@@ -14417,7 +14693,7 @@ async function fixOldPhotos(){
 async function fixOldDrawings(){
   if(!window.__photos) return 0;
   let n = 0;
-  for(const k of ['plan','side']){
+  for(const k of dgKeys()){
     try{
       if(typeof dgImgs === 'undefined' || !isInlinePhoto(dgImgs[k])) continue;
       if(typeof dgSeedKeyOf === 'function' && dgSeedKeyOf(k, dgImgs[k])) continue;   // 기본 도면은 그대로
@@ -14712,7 +14988,7 @@ async function openTalk(id){
       <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportTalk('${esc(po.id)}')">${esc(t('신고'))}</button>
       ${po.by && String(po.by) !== String(meUid()||'')
-        ? `<button class="mrbtn" onclick="mutePersonUI('${esc(po.by)}', '${esc(po.byName||'')}')">${esc(t('이 사람 안 보기'))}</button>` : ''}
+        ? `<button class="mrbtn" onclick="mutePersonUI('${esc(po.by)}', '${esc(po.byName||'')}')">${esc(t('이 사람 차단'))}</button>` : ''}
       ${canDelTalk(po)?`<button class="mrbtn warn" onclick="delTalk('${esc(po.id)}')">${esc(t('지우기'))}</button>`:''}
     </div>
     <div class="ghead"><b>${esc(t('댓글'))}</b><span class="gcnt">${all.length}</span></div>
@@ -15835,7 +16111,7 @@ function paintBoatPage(){
     <div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px;
          border-top:1px solid rgba(255,255,255,.06);margin-top:12px">
       <button class="minib" onclick="reportBoat('${esc(x.id)}')">${esc(t('신고'))}</button>
-      <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">${esc(t('안 보기'))}</button></div>`;
+      <button class="minib red" onclick="hideBoatUI('${esc(x.id)}')">${esc(t('차단하기'))}</button></div>`;
   showPanel(P);
   // 지도는 화면이 붙은 뒤에 켠다
   try{ requestAnimationFrame(()=> pubTrkPaint()); }catch(_){ pubTrkPaint(); }
@@ -17770,6 +18046,7 @@ async function loadBoatData(){
     dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
   dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
   seedDgIfNeeded();
+  await markLoad();   // ★ 무엇이 아직 안 올라간 것인지 알아야 클라우드가 덮지 못한다
   // ★ 배를 바꾸면 정비 목록이 통째로 바뀐다. 알람도 그 배 것으로 다시 건다.
   try{ maintAlarmSoon(); }catch(_){}
 }
@@ -18013,6 +18290,81 @@ function cloudErrHelp(e){
 }
 const snapOf = arr => { const m={}; arr.forEach(i=>{ m[String(i.id)] = JSON.stringify(i); }); return m; };
 
+// ══════════════════════════════════════════════════════════════
+// ★★ 폰에서 고친 것을 클라우드가 덮지 못하게 한다 (4.85)
+//
+//   전에는 받아온 것으로 폰 기록을 통째로 갈아치웠다 —
+//     if(Array.isArray(r.maint) && r.maint.length) maint = r.maint;
+//   어느 쪽이 더 나중 것인지 안 따졌다. 그래서 폰에서 고쳤는데 아직 못 올린 것이
+//   (보기 전용이었거나 · 인터넷이 끊겼거나 · 올리다 실패했거나 · 올리기 전에 앱이 닫혔거나)
+//   다음에 앱을 켜는 순간 폰에서도 지워졌다. 실제로 사장님 기록이 그렇게 날아갔다.
+//
+//   고친 방식 — 「마지막으로 올린 그대로인가」 를 기록 하나하나에 대해 남겨 둔다(자국).
+//     · 자국과 같다        → 올린 뒤로 안 건드렸다. 클라우드 것을 쓴다
+//                            (다른 기기에서 지웠으면 여기서 같이 사라진다 — 맞다)
+//     · 자국과 다르다      → 폰에서 고쳤다. **폰 것을 남긴다.** 곧 올라간다
+//     · 자국에 아예 없다   → 폰에서 새로 만들었다. 남긴다
+//     · 자국 자체가 없다   → 어느 것이 새것인지 알 수 없다. **하나도 안 버린다**(합친다)
+//
+//   자국은 통째 사본이 아니라 지문 한 줄씩이다 — 사본을 두면 그 사본이 또 어긋난다.
+const strHash = s => { let h = 0; const x = String(s);
+  for(let i = 0; i < x.length; i++) h = (h * 31 + x.charCodeAt(i)) | 0; return h.toString(36); };
+// 올린 것의 자국 { 컬렉션: { 번호: 지문 } }
+let cloudMark = {};
+const markFromSnap = snap => { const o = {};
+  for(const k in (snap || {})) o[k] = strHash(snap[k]); return o; };
+const rowMark = x => strHash(JSON.stringify(x));
+function markSet(coll, snap){ cloudMark[coll] = markFromSnap(snap); markSave(); }
+function markSave(){
+  try{
+    if(db) idbSet(bkey('mark'), cloudMark).catch(()=>{});
+    else localStorage.setItem('bt_' + bkey('mark'), JSON.stringify(cloudMark));
+  }catch(_){}
+}
+async function markLoad(){
+  cloudMark = {};
+  try{
+    if(db){ const v = await idbGet(bkey('mark')); if(v && typeof v === 'object') cloudMark = v; }
+    else { const v = JSON.parse(localStorage.getItem('bt_' + bkey('mark')) || 'null');
+           if(v && typeof v === 'object') cloudMark = v; }
+  }catch(_){ cloudMark = {}; }
+}
+// 받아온 줄과 폰의 줄을 합친다. ★ 폰에서 고친 것은 절대 안 버린다.
+function keepMine(coll, cloudRows){
+  const cloud = Array.isArray(cloudRows) ? cloudRows : [];
+  const mine  = localColl(coll);
+  const mark  = cloudMark[coll];
+  const out   = new Map();
+  cloud.forEach(x => { if(x && x.id != null) out.set(String(x.id), x); });
+  (Array.isArray(mine) ? mine : []).forEach(x => {
+    if(!x || x.id == null) return;
+    const id = String(x.id);
+    // 올린 그대로면 클라우드 쪽 판단을 따른다 (다른 기기에서 고쳤거나 지웠다)
+    if(mark && mark[id] === rowMark(x)) return;
+    out.set(id, x);   // 폰에서 고쳤다 · 새로 만들었다 · 자국이 없어 모른다
+  });
+  return [...out.values()];
+}
+// 받아온 것을 폰 것과 합쳐 돌려준다.
+// ★ 안 온 칸과 빈 칸으로는 폰 기록을 건드리지 않는다 — 통째로 비운 사고가 있었다.
+function pullInto(coll, rows){
+  const mine = localColl(coll);
+  if(!Array.isArray(rows) || !rows.length) return mine;
+  return keepMine(coll, rows);
+}
+// 아직 못 올린 것이 몇인가 — 화면에 정직하게 적기 위해서다
+function unsentCount(){
+  let n = 0;
+  SYNC_COLLS.forEach(coll => {
+    const mark = cloudMark[coll];
+    (localColl(coll) || []).forEach(x => {
+      if(!x || x.id == null) return;
+      if(!mark || mark[String(x.id)] !== rowMark(x)) n++;
+    });
+  });
+  return n;
+}
+
 window.__initCloud = async function(api){
   cloud = api;
   await storageReady;
@@ -18153,22 +18505,27 @@ async function cloudPull(){
   r.checkt = g('checkt'); r.mrtrash = g('mrtrash'); r.lockers = g('lockers');
   r.shapes = g('shapes'); r.posts = g('posts'); r.dgimgs = g('dgimgs');
   r.reviews = g('reviews');
-  if(Array.isArray(r.maint) && r.maint.length) maint = r.maint;
-  if(Array.isArray(r.repair) && r.repair.length) repair = r.repair;
-  if(Array.isArray(r.voyage) && r.voyage.length) voyage = r.voyage;
-  if(Array.isArray(r.fuel) && r.fuel.length) fuel = r.fuel;
-  if(Array.isArray(r.runs) && r.runs.length) runs = r.runs;
-  if(Array.isArray(r.contacts) && r.contacts.length) contacts = r.contacts;
-  if(Array.isArray(r.vdocs) && r.vdocs.length) vdocs = r.vdocs;
-  if(Array.isArray(r.checkt) && r.checkt.length) checkt = r.checkt;
-  if(Array.isArray(r.mrtrash)) mrTrash = r.mrtrash;
-  if(Array.isArray(r.lockers) && r.lockers.length) lockers = r.lockers;
-  if(Array.isArray(r.shapes) && r.shapes.length) shapes = r.shapes;
-  if(Array.isArray(r.posts) && r.posts.length) posts = r.posts;
-  if(Array.isArray(r.reviews) && r.reviews.length) reviews = r.reviews;
+  // ★ 받아온 것으로 갈아치우지 않는다 — 폰에서 고친 것과 합친다 (keepMine).
+  //   여기서 갈아치우는 바람에 아직 못 올린 기록이 통째로 사라졌었다.
+  maint    = pullInto('maint',    r.maint);
+  repair   = pullInto('repair',   r.repair);
+  voyage   = pullInto('voyage',   r.voyage);
+  fuel     = pullInto('fuel',     r.fuel);
+  runs     = pullInto('runs',     r.runs);
+  contacts = pullInto('contacts', r.contacts);
+  vdocs    = pullInto('vdocs',    r.vdocs);
+  checkt   = pullInto('checkt',   r.checkt);
+  lockers  = pullInto('lockers',  r.lockers);
+  shapes   = pullInto('shapes',   r.shapes);
+  posts    = pullInto('posts',    r.posts);
+  reviews  = pullInto('reviews',  r.reviews);
+  // 정비 휴지통은 빈 것도 뜻이 있다 — 다 비웠다는 뜻이다
+  if(Array.isArray(r.mrtrash)) mrTrash = keepMine('mrtrash', r.mrtrash);
   if(Array.isArray(r.dgimgs) && r.dgimgs.length){
-    dgImgs = dgFromArr(r.dgimgs); dgSmall = dgSmallFromArr(r.dgimgs);
-    dgRef = dgRefFromArr(r.dgimgs); dgPub = dgPubFromArr(r.dgimgs);
+    const dg = keepMine('dgimgs', r.dgimgs);
+    dgNames = dgNamesFromArr(dg);
+    dgImgs = dgFromArr(dg); dgSmall = dgSmallFromArr(dg);
+    dgRef = dgRefFromArr(dg); dgPub = dgPubFromArr(dg);
     dgResolve();   // 번호만 온 도면은 창고에서 받아온다
   }
   lastCloudMaint = snapOf(Array.isArray(r.maint)? r.maint : []);
@@ -18185,13 +18542,29 @@ async function cloudPull(){
   lastCloudPO = snapOf(Array.isArray(r.posts)? r.posts : []);
   lastCloudRV = snapOf(Array.isArray(r.reviews)? r.reviews : []);
   lastCloudDG = snapOf(Array.isArray(r.dgimgs)? r.dgimgs : []);
+  // ★ 자국 갱신 — 「이 줄들은 클라우드와 같다」.
+  //   안 온 칸은 지난 자국을 그대로 둔다. 자국을 비워 버리면 다른 기기에서 지운 것이
+  //   영영 안 지워지고 되살아난다.  (적재표·휴지통은 아래 seeded 갈래에서 따로 찍는다)
+  const PULLED = { maint:r.maint, repair:r.repair, voyage:r.voyage, fuel:r.fuel, runs:r.runs,
+    contacts:r.contacts, vdocs:r.vdocs, checkt:r.checkt, mrtrash:r.mrtrash, lockers:r.lockers,
+    shapes:r.shapes, posts:r.posts, reviews:r.reviews, dgimgs:r.dgimgs };
+  SYNC_COLLS.forEach(k => {
+    if(Array.isArray(PULLED[k])) cloudMark[k] = markFromSnap(snapOf(PULLED[k]));
+  });
+  markSave();
   // 여기까지 왔으면 이 배의 클라우드 자료를 다 받았다. 이제 올려도 된다.
   pullDone = true;
   cloudSeeded = !!r.seeded;
   if(pushWanted){ pushWanted = false; schedulePush(); }
   if(r.seeded){
-    items = migrate(r.items); trash = migrate(r.trash);
-    lastCloud = snapOf(items); lastCloudTrash = snapOf(trash);
+    // ★ 여기도 갈아치우면 안 된다 — 적재표가 제일 크고 제일 자주 고친다
+    const cloudI = migrate(Array.isArray(r.items) ? r.items : []);
+    const cloudT = migrate(Array.isArray(r.trash) ? r.trash : []);
+    // ★ 합치기가 먼저다. 자국을 먼저 갈면 무엇이 폰에서 고친 것인지 알 수 없게 된다.
+    items = cloudI.length ? keepMine('items', cloudI) : items;
+    trash = keepMine('trash', cloudT);
+    lastCloud = snapOf(cloudI); lastCloudTrash = snapOf(cloudT);
+    markSet('items', lastCloud); markSet('trash', lastCloudTrash);
     saveLocal();
     inBox=null; moveId=null; mergeId=null; editId=null;
     if(selected){ updateHeader(); renderPanelItems(); }
@@ -18470,22 +18843,22 @@ async function pushNow(){
       //   못 올렸는데 갱신하면 그 내용은 영영 안 올라간다. 예전에 그렇게 잃을 뻔했다.
       const okColl = (res && res.ok) || null;   // null 이면 전부 성공
       const ok = c => !okColl || okColl.has(c);
-      if(ok('items'))    lastCloud = curI;
-      if(ok('trash'))    lastCloudTrash = curT;
-      if(ok('maint'))    lastCloudMaint = curM;
-      if(ok('repair'))   lastCloudRepair = curR;
-      if(ok('voyage'))   lastCloudV = curV;
-      if(ok('fuel'))     lastCloudF = curF;
-      if(ok('runs'))     lastCloudRN = curRN;
-      if(ok('contacts')) lastCloudC = curC;
-      if(ok('vdocs'))    lastCloudD = curD;
-      if(ok('checkt'))   lastCloudK = curK;
-      if(ok('mrtrash'))  lastCloudMT = curMT;
-      if(ok('lockers'))  lastCloudL = curL;
-      if(ok('shapes'))   lastCloudSH = curSH;
-      if(ok('dgimgs'))   lastCloudDG = curDG;
-      if(ok('posts'))    lastCloudPO = curPO;
-      if(ok('reviews'))  lastCloudRV = curRV;
+      if(ok('items'))    { lastCloud = curI;        markSet('items', curI); }
+      if(ok('trash'))    { lastCloudTrash = curT;   markSet('trash', curT); }
+      if(ok('maint'))    { lastCloudMaint = curM;   markSet('maint', curM); }
+      if(ok('repair'))   { lastCloudRepair = curR;  markSet('repair', curR); }
+      if(ok('voyage'))   { lastCloudV = curV;       markSet('voyage', curV); }
+      if(ok('fuel'))     { lastCloudF = curF;       markSet('fuel', curF); }
+      if(ok('runs'))     { lastCloudRN = curRN;     markSet('runs', curRN); }
+      if(ok('contacts')) { lastCloudC = curC;       markSet('contacts', curC); }
+      if(ok('vdocs'))    { lastCloudD = curD;       markSet('vdocs', curD); }
+      if(ok('checkt'))   { lastCloudK = curK;       markSet('checkt', curK); }
+      if(ok('mrtrash'))  { lastCloudMT = curMT;     markSet('mrtrash', curMT); }
+      if(ok('lockers'))  { lastCloudL = curL;       markSet('lockers', curL); }
+      if(ok('shapes'))   { lastCloudSH = curSH;     markSet('shapes', curSH); }
+      if(ok('dgimgs'))   { lastCloudDG = curDG;     markSet('dgimgs', curDG); }
+      if(ok('posts'))    { lastCloudPO = curPO;     markSet('posts', curPO); }
+      if(ok('reviews'))  { lastCloudRV = curRV;     markSet('reviews', curRV); }
       cloudSeeded = true;
       if(res && res.failed && res.failed.length){
         // 어느 것이 막혔는지 이름을 말해 준다. '알 수 없는 오류' 는 아무 도움이 안 된다.
@@ -18502,9 +18875,12 @@ async function pushNow(){
     // 왜 안 되는지 한 번은 알려 준다. 조용히 실패하는 것이 가장 나쁘다.
     if(!pushErrShown){
       pushErrShown = true;
+      // ★ 몇 건이 아직 안 올라갔는지 세어서 말한다. 「그대로 있습니다」 만으로는 못 믿는다.
+      const 못올린 = (typeof unsentCount === 'function') ? unsentCount() : 0;
       setTimeout(()=>tell(t('클라우드에 올리지 못했습니다.\n\n') + lastPushErr
         + t('\n\n권한(permission) 오류라면 파이어스토어 규칙이 옛 것일 수 있습니다.\n')
-        + t('기록은 이 기기에 그대로 저장되어 있습니다.')), 400);
+        + t('기록은 이 기기에 그대로 저장되어 있습니다.')
+        + (못올린 ? '\n' + tsub('아직 못 올린 기록 {n}건은 다음에 닿으면 저절로 올라갑니다.', { n: 못올린 }) : '')), 400);
     }
   }
 }
@@ -18793,7 +19169,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.84';
+const APP_VER = '4.85';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -18958,17 +19334,29 @@ function shAdd(type, rect, mapKind, styleId){
 const UNDO_MAX = 40;
 let undoStack = [];
 let redoStack = [];
+// ★ 도면도 함께 기억한다. 4.85 에서 도면을 더하고 지울 수 있게 되었는데
+//   되돌리기가 수납칸·도형만 기억하고 있었다. 그러면 「되돌릴 수 있습니다」 가 거짓말이 된다.
+//   도면 칸은 늘 통째로 갈아 끼우므로(`{...dgImgs, [k]:v}`) 얕은 사본이면 된다 —
+//   깊은 사본을 뜨면 사진 글자열이 40겹으로 쌓인다.
 function undoSnap(){
-  return { lockers: deepCopy(lockers), shapes: deepCopy(shapes) };
+  return { lockers: deepCopy(lockers), shapes: deepCopy(shapes),
+           dg: { names:{ ...dgNames }, imgs:{ ...dgImgs }, small:{ ...dgSmall },
+                 ref:{ ...dgRef }, pub:{ ...dgPub } } };
 }
 function undoApply(sn){
   lockers = deepCopy(sn.lockers);
   shapes  = deepCopy(sn.shapes);
+  if(sn.dg){
+    dgNames = { ...sn.dg.names }; dgImgs = { ...sn.dg.imgs }; dgSmall = { ...sn.dg.small };
+    dgRef = { ...sn.dg.ref };     dgPub  = { ...sn.dg.pub };
+  }
   saveLocal();
   if(typeof schedulePush==='function') schedulePush();
   if(typeof refreshBoxes==='function') refreshBoxes();
   if(typeof drawShapes==='function') drawShapes();
   if(typeof renderList==='function') renderList();
+  if(typeof applyStowDg==='function') applyStowDg();
+  if(typeof dgTabsPaint==='function') dgTabsPaint();
   if(typeof paintUndoBtns==='function') paintUndoBtns();
 }
 // 무언가 바꾸기 "직전"에 부른다
@@ -20392,47 +20780,215 @@ function thumbHTML(it){
   return `<span class="thumbWrap" onclick="viewPhotos(${it.id})"><img class="thumb" loading="lazy" src="${thumbOf(it, 0)}">${extra}</span>`;
 }
 
+// ══════════════════════════════════════════════════════════════
+// 물품 줄 (4.85 — 사장님이 「그대로 해라」 하신 제안대로)
+//
+//  누르기        → 그 물품이 열린다        (예전에는 도면이 확대됐다. 그래서 안내 문구가 필요했다)
+//  − +           → 수량을 그 자리에서      (제일 자주 하는 일이 제일 가까이)
+//  길게 누르기   → 차림표 (이동·합침·수정·지우기)
+//  빈 곳 길게    → 고르기 모드 — 여러 개를 한 번에 옮기고 합치고 지운다
+//  사진          → 오른쪽. 없으면 자리를 안 만든다
+let openItemId = null;            // 열어 둔 물품
+let pickOn = false;               // 고르기 모드
+let pickSet = new Set();          // 고른 물품
+function itemTap(id){
+  if(pickOn){ pickToggle(id); return; }
+  openItemId = (openItemId === id) ? null : id;
+  renderPanelItems();
+}
+function pickToggle(id){
+  pickSet.has(id) ? pickSet.delete(id) : pickSet.add(id);
+  renderPanelItems();
+}
+function pickStart(id){
+  pickOn = true; pickSet = new Set(id == null ? [] : [id]);
+  openItemId = null; renderPanelItems();
+}
+function pickEnd(){ pickOn = false; pickSet = new Set(); renderPanelItems(); }
+function pickSync(){ try{ document.body.classList.toggle('picking', pickOn); }catch(_){} }
+// 수량 한 칸 올리고 내리기. 숫자가 아닌 수량(「1+2」 같은 것)은 건드리지 않는다.
+function qtyStep(id, d){
+  if(!unlocked) return;      // 잠그면 이 단추가 화면에 없다 (edt)
+  const it = getItem(id); if(!it) return;
+  const n = parseFloat(it.qty);
+  if(!isFinite(n)){ tell(t('숫자가 아닌 수량은 수정에서 고쳐 주세요.')); return; }
+  const v = Math.max(0, n + d);
+  items = items.map(i => i.id === id ? { ...i, qty: String(v) } : i);
+  save(); renderPanelItems(); refreshBoxes(); renderList();
+}
+// 길게 누르면 나오는 차림표. 창은 앱이 이미 쓰는 것을 그대로 쓴다 — 새 창을 만들지 않는다.
+async function itemMenu(id){
+  const it = getItem(id); if(!it) return;
+  if(!unlocked) return;      // 잠그면 이 단추가 화면에 없다 (edt)
+  const v = await tellShow({ title: it.name || t('(이름 없음)'), msg: '', esc: null, btns: [
+    { name: t('이동'),   v: 'move' },
+    { name: t('합침'),   v: 'merge' },
+    { name: t('수정'),   v: 'edit' },
+    { name: t('고르기'), v: 'pick' },
+    { name: t('지우기'), v: 'del', kind: 'warn' },
+    { name: t('닫기'),   v: null }
+  ]});
+  if(v === 'move')  { openItemId = null; toggleMove(id); }
+  else if(v === 'merge'){ openItemId = null; toggleMerge(id); }
+  else if(v === 'edit') { startEdit(id); }
+  else if(v === 'pick') { pickStart(id); }
+  else if(v === 'del')  { itemDropAsk([id]); }
+}
+async function itemDropAsk(ids){
+  const list = ids.map(getItem).filter(Boolean);
+  if(!list.length) return;
+  const 이름 = list.length === 1 ? (list[0].name || t('(이름 없음)'))
+                                 : tsub('{n}개', { n: list.length });
+  if(!await ask(tsub('{name} 을(를) 휴지통으로 보냅니다.', { name: 이름 })
+      + '\n\n' + t('휴지통에서 되살릴 수 있습니다.'), { ok: t('지우기'), warn: true })) return;
+  list.forEach(x => deleteItem(x.id));
+  if(pickOn) pickEnd();
+}
+// 길게 누르기 — 줄에서 시작하면 그 물품 차림표, 빈 곳에서 시작하면 고르기 모드.
+// ★ 손가락이 움직이면 그것은 넘기기(스크롤)다. 길게 누른 것으로 치지 않는다.
+function bindHold(){
+  const box = document.getElementById('pitems');
+  if(!box || box.__hold) return;
+  box.__hold = true;
+  let timer = null, sx = 0, sy = 0, done = false;
+  const stop = () => { clearTimeout(timer); timer = null; };
+  box.addEventListener('pointerdown', e => {
+    if(e.target.closest('.qadj') || e.target.closest('.thumbWrap')
+       || e.target.closest('.pickbar') || e.target.closest('.itcard')) return;
+    const row = e.target.closest('.it');
+    const id = row ? Number(row.dataset.id) : null;
+    sx = e.clientX; sy = e.clientY; done = false;
+    stop();
+    timer = setTimeout(() => { done = true;
+      try{ if(navigator.vibrate) navigator.vibrate(12); }catch(_){}
+      if(id != null && isFinite(id)) itemMenu(id);
+      else if(!pickOn && unlocked) pickStart(null);
+    }, 500);
+  });
+  box.addEventListener('pointermove', e => {
+    if(timer && (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy)) > 12) stop();
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(k =>
+    box.addEventListener(k, () => stop()));
+  // 길게 눌러 차림표가 뜬 뒤에는 그 손가락의 누르기를 삼킨다
+  box.addEventListener('click', e => { if(done){ done = false; e.stopPropagation(); e.preventDefault(); } }, true);
+}
+// 열린 물품 카드 — 이 안에서 도면으로 건너간다
+function itemCardHTML(it){
+  const g = (it.gearId && typeof gearOf === 'function') ? gearOf(it.gearId) : null;
+  const lowN = (typeof stockLow === 'function') ? (stockLow([it])[0] || null) : null;
+  return `<div class="itcard">
+    ${it.note ? `<div class="cardline">${esc(it.note)}</div>` : ''}
+    ${g ? `<div class="cardline">${esc(t('장비'))} · ${esc(gearLabel(g))}</div>` : ''}
+    ${it.min != null && it.min !== '' ? `<div class="cardline">${
+        esc(tsub('적어도 {n}', { n: String(it.min) + String(it.unit || '') }))}${
+        lowN ? ' · ' + esc(t('채워야 함')) : ''}</div>` : ''}
+    <div class="cardline">${esc(locPath(it))}</div>
+    ${(it.photos && it.photos.length)
+      ? `<img loading="lazy" src="${thumbOf(it, 0)}" onclick="viewPhotos(${it.id})">` : ''}
+    <div class="cardrow">
+      <button class="pbtn" onclick="showItemOnMap(${it.id})">${esc(t('이 칸 보기'))}</button>
+      <button class="pbtn edt" onclick="startEdit(${it.id})">${esc(t('수정'))}</button>
+      <button class="pbtn edt" onclick="itemMenu(${it.id})">${esc(t('더 보기'))}</button>
+    </div></div>`;
+}
 function renderPanelItems(){
   const wrap = document.getElementById('pitems');
   const li = selected ? sortItems(currentList()) : [];
-  if(li.length===0){ wrap.innerHTML = `<div style="color:#2a4a6a;font-size:12px;text-align:center;margin-top:14px">${esc(t('등록된 물품 없음'))}</div>`; }
-  else wrap.innerHTML = `<div class="itnote">${esc(t('물품을 누르면 도면에서 이 칸을 크게 보여 드립니다'))}</div>`
+  if(li.length === 0){
+    pickOn = false;
+    wrap.innerHTML = `<div style="color:#2a4a6a;font-size:12px;text-align:center;margin-top:14px">${
+      esc(t('등록된 물품 없음'))}</div>`;
+  }
+  else wrap.innerHTML =
+    (pickOn ? `<div class="picktop">${esc(tsub('{n}개 골랐습니다', { n: pickSet.size }))}</div>` : '')
     + li.map(it=>{
     const mv = moveId===it.id ? `<div class="mrrow" style="padding:0"><button class="minib grn" style="flex:1" onclick="mvFromMap(${it.id})">${esc(t('도면에서 고르기'))}</button></div><select class="mv" onchange="renderMoveSub(this.value, ${it.id})"><option value="">${esc(t('이름으로 고르기 — 구역 선택…'))}</option>${zoneOrder().map(z=>`<option value="${z}">${z}</option>`).join('')}</select><div id="mvSubWrap_${it.id}"></div>` : '';
     const mg = mergeId===it.id ? mergePanelHTML(it) : '';
     const hl = hlId===it.id ? ' hl' : '';
+    const on = pickSet.has(it.id) ? ' picked' : '';
+    const dot = pickOn ? `<span class="pickdot">${pickSet.has(it.id) ? '✓' : ''}</span>` : '';
+    // 수량 고치는 자리. 고르기 중에는 안 보인다 — 그때 할 일이 아니다.
+    // ★ 앱 규칙 ② — 이미 있는 것을 고치는 단추는 보기 전용에서 감춘다(edt).
+    //   눌러도 안 되는 단추가 널려 있으면 화면이 거짓말을 한다. 수는 그대로 보인다.
+    const qadj = pickOn ? ''
+      : `<div class="qadj">
+           <button class="edt" onclick="event.stopPropagation();qtyStep(${it.id},-1)">−</button>
+           <span class="qn">${esc(String(it.qty))}${esc(it.unit||'')}</span>
+           <button class="edt" onclick="event.stopPropagation();qtyStep(${it.id},1)">+</button></div>`;
     if(it.box){
       const cnt = children(it.id).length;
-      return `<div class="it isbox ${editId===it.id?'editing':''}${hl}">
-        <div class="itrow">${thumbHTML(it)}
-        <div style="flex:1" onclick="openBox(${it.id})"><div class="nm">📦 ${esc(it.name || '(이름 없음)')} <span style="font-size:11px;color:#b58a3a">(${cnt}개)</span></div>
-        <div class="meta">×<b>${esc(it.qty)}</b>${esc(it.unit||'')}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
-        <div class="ops">
-          <button class="openb" onclick="openBox(${it.id})">${esc(t('열기 ▸'))}</button>
-          <button class="pm" onclick="toggleMove(${it.id})">${esc(t('이동'))}</button>
-          <button class="pe" onclick="startEdit(${it.id})">${esc(t('수정'))}</button>
-          <button class="pd" onclick="deleteItem(${it.id})">✕</button>
-        </div></div>${mv}
+      return `<div class="it isbox${on}${editId===it.id?' editing':''}${hl}" data-id="${it.id}">
+        <div class="itrow" onclick="${pickOn?`pickToggle(${it.id})`:`openBox(${it.id})`}">${dot}
+          <div class="itx"><div class="nm">📦 ${esc(it.name || t('(이름 없음)'))}</div>
+            <div class="meta">${esc(tsub('안에 {n}개', { n: cnt }))}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
+          ${qadj}${thumbHTML(it)}</div>${mv}
       </div>`;
     }
-    return `<div class="it ${editId===it.id?'editing':''}${hl}">
-      <div class="itrow">${thumbHTML(it)}
-      <div style="flex:1;cursor:pointer" onclick="showItemOnMap(${it.id})"
-        title="누르면 도면에서 이 칸을 크게 봅니다"><div class="nm">${esc(it.name || '(이름 없음)')}</div>
-      <div class="meta">×<b>${esc(it.qty)}</b>${esc(it.unit||'')}${itGearTag(it)}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
-      <div class="ops">
-        <button class="pg" onclick="toggleMerge(${it.id})">${esc(t('합침'))}</button>
-        <button class="pm" onclick="toggleMove(${it.id})">${esc(t('이동'))}</button>
-        <button class="pe" onclick="startEdit(${it.id})">${esc(t('수정'))}</button>
-        <button class="pd" onclick="deleteItem(${it.id})">✕</button>
-      </div></div>${mv}${mg}
+    return `<div class="it${on}${editId===it.id?' editing':''}${hl}" data-id="${it.id}">
+      <div class="itrow" onclick="itemTap(${it.id})">${dot}
+        <div class="itx"><div class="nm">${esc(it.name || t('(이름 없음)'))}</div>
+          <div class="meta">${itGearTag(it)}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
+        ${qadj}${thumbHTML(it)}</div>
+      ${openItemId===it.id ? itemCardHTML(it) : ''}${mv}${mg}
     </div>`;
-  }).join('');
+  }).join('')
+    + (pickOn ? `<div class="pickbar">
+        <button onclick="pickMove()">${esc(t('이동'))}</button>
+        <button onclick="pickMerge()">${esc(t('합침'))}</button>
+        <button class="warn" onclick="itemDropAsk([...pickSet])">${esc(t('지우기'))}</button>
+        <button onclick="pickEnd()">${esc(t('취소'))}</button></div>` : '');
+  bindHold(); pickSync();
   const st = strayItems().length;
   document.getElementById('pf').textContent =
       tsub('전체 {a}개 물품 · {b}개 수납칸', { a: items.length, b: lockers.length })
     + (st ? ' · ' + tsub('미배치 {n}개', { n: st }) : '')
     + ' · ' + tsub('저장: {how}', { how: db ? t('대용량') : t('기본(5MB 제한)') });
+}
+// 여러 개를 한 칸으로 옮긴다 — 「이 다섯 개를 앞창고로」 가 실제로 하는 일이다
+async function pickMove(){
+  const ids = [...pickSet];
+  if(!ids.length){ tell(t('먼저 옮길 물품을 골라 주세요.')); return; }
+  const 구역 = zoneOrder();
+  const z = await tellShow({ title: t('어느 구역으로'), msg: '', esc: null,
+    btns: 구역.map(x => ({ name: x, v: x })).concat([{ name: t('취소'), v: null }]) });
+  if(z == null) return;
+  const 칸 = lockers.filter(l => l.zone === z);
+  if(!칸.length) return;
+  const lid = await tellShow({ title: z, msg: '', esc: null,
+    btns: 칸.map(l => ({ name: l.label, v: l.id })).concat([{ name: t('취소'), v: null }]) });
+  if(lid == null) return;
+  const l = getLocker(lid); if(!l) return;
+  const 상자 = new Set(ids.filter(i => { const x = getItem(i); return x && x.box; }));
+  items = items.map(i => {
+    if(pickSet.has(i.id)) return { ...i, lockerId: l.id, zone: l.zone, locker: l.label, parentId: null };
+    if(i.parentId != null && 상자.has(i.parentId)) return { ...i, lockerId: l.id, zone: l.zone, locker: l.label };
+    return i;
+  });
+  save(); pickEnd(); refreshBoxes(); renderList();
+  tell(tsub('{n}개를 {name} 으로 옮겼습니다.', { n: ids.length, name: l.label }));
+}
+// 고른 것을 하나로 합친다. 남는 것은 맨 처음 고른 것이다 — 어느 것이 남는지 먼저 말한다.
+async function pickMerge(){
+  const list = [...pickSet].map(getItem).filter(x => x && !x.box);
+  if(list.length < 2){ tell(t('합치려면 두 개 이상 골라 주세요.')); return; }
+  const tgt = list[0], srcs = list.slice(1);
+  if(!await ask(tsub('{n}개를 「{name}」 하나로 합칩니다.', { n: list.length, name: tgt.name || t('(이름 없음)') })
+      + '\n\n' + t('수량은 더해지고 사진은 모두 남습니다.'), { ok: t('합침') })) return;
+  let total = parseFloat(tgt.qty), numeric = isFinite(total);
+  srcs.forEach(x => { const n = parseFloat(x.qty); if(!isFinite(n)) numeric = false; else total += n; });
+  const units = new Set([tgt.unit || '', ...srcs.map(x => x.unit || '')]);
+  const qty  = (numeric && units.size === 1) ? String(total)
+             : [tgt.qty + (tgt.unit||''), ...srcs.map(x => x.qty + (x.unit||''))].join('+');
+  const unit = (numeric && units.size === 1) ? (tgt.unit || '') : '';
+  const photos = (tgt.photos || []).slice(); srcs.forEach(x => photos.push(...(x.photos || [])));
+  const note = [...new Set([tgt.note, ...srcs.map(x => x.note)].filter(x => x && x.trim()))].join(' / ');
+  const dead = new Set(srcs.map(x => x.id));
+  items = items.map(i => i.id === tgt.id ? { ...i, qty, unit, photos, note } : i)
+               .filter(i => !dead.has(i.id));
+  save(); pickEnd(); refreshBoxes(); renderList();
+  tell(tsub('합침 완료: {n}곳 → {name} (수량 {qty}, 사진 {p}장)',
+    { n: srcs.length, name: tgt.name, qty: String(qty) + String(unit || ''), p: photos.length }));
 }
 
 // 물품이 어느 장비 것인지 한 조각. 장비를 지웠으면 아무것도 안 붙는다.
@@ -20644,16 +21200,20 @@ function restoreData(ev){
       if(Array.isArray(data.posts) && data.posts.length) posts = deepCopy(data.posts);
       // 도면 이미지: 백업에 있으면 그것을, 없으면 칸이 기본 71칸일 때만 기본 도면을 쓴다.
       if(Array.isArray(data.dgimgs) && data.dgimgs.length){
+        // ★ 사람이 붙인 도면 이름(전기 배선도 …)도 같이 되살린다.
+        //   안 되살리면 그림은 돌아오는데 이름이 「도면」 으로 바뀐다.
+        dgNames = dgNamesFromArr(data.dgimgs);
         dgImgs = dgFromArr(data.dgimgs);
         dgSmall = dgSmallFromArr(data.dgimgs);
         dgRef  = dgRefFromArr(data.dgimgs);
         dgPub  = dgPubFromArr(data.dgimgs);
         dgResolve();
       } else {
-        dgImgs = { plan:null, side:null };
-        dgSmall = { plan:null, side:null };
-        dgRef  = { plan:null, side:null };
-        dgPub  = { plan:false, side:false };
+        dgNames = {};
+        dgImgs  = dgBlank(null);
+        dgSmall = dgBlank(null);
+        dgRef   = dgBlank(null);
+        dgPub   = dgBlank(false);
         seedDgIfNeeded();
       }
       const ids = new Set(valid.map(i=>i.id));
@@ -20699,7 +21259,12 @@ let maint = [], repair = [];
 // 켤 때는 언제나 '오늘'. 배를 하는 사람이 앱을 켜는 첫 이유는
 // '오늘 나갈 수 있나' 이지, 마지막에 보던 화면이 아니다.
 let curTab = 'home';
-let maintView = 'list', repairView = 'list';
+let maintView = 'list', repairView = 'list', gearView2 = 'list';
+// ★ 갈래마다 상태를 따로 들고 있으면 한 곳이 옛 값을 든다. 읽고 쓰는 문을 하나로 둔다.
+function mrViewOf(k){ return k === 'maint' ? maintView : k === 'repair' ? repairView : gearView2; }
+function mrViewSet(k, v){
+  if(k === 'maint') maintView = v; else if(k === 'repair') repairView = v; else gearView2 = v;
+}
 let mrMapKind = 'side';
 let mrOpenType = null, mrOpenId = null, pinTarget = null;
 
@@ -20980,14 +21545,24 @@ const BOATSUB_TITLES = {stow:t('적재표'), maint:t('정비'), gear:t('장비')
                         voyage:t('항해일지'), docs:t('문서')};
 
 // 「정비」 안의 네 갈래. 정비수첩이 먼저다 — 제일 자주 쓰고, 밖으로 나가는 것도 이것이다.
+// ★ 4.85 — 정기점검을 여기서 뺐다. 장비 안으로 들어갔다.
+//   까닭: 사장님 정기점검 17건이 전부 장비 이름이었다(「빌지펌프 작동 점검」).
+//   그런데 「빌지펌프 고장」은 수리에, 「빌지펌프」는 장비에 있어 서로를 몰랐다.
+//   같은 물건에 대한 일이면 그 물건 안에 모여야 한다.
 const MNT_SUBS = [
   { k:'mlog',   n:'정비수첩' },
-  { k:'maint',  n:'정기점검' },
   { k:'repair', n:'수리' },
   { k:'fuel',   n:'연료' }
 ];
-let mntSub = (function(){ try{ return localStorage.getItem('bt_mntsub') || 'mlog'; }catch(_){ return 'mlog'; } })();
+// ★ 4.84 까지 여기에 'maint' 가 저장돼 있을 수 있다. 그 갈래는 이제 장비 안에 있다.
+//   그대로 두면 정비 탭이 빈 화면이 된다.
+let mntSub = (function(){
+  try{ const v = localStorage.getItem('bt_mntsub') || 'mlog';
+       return MNT_SUBS.some(x => x.k === v) ? v : 'mlog'; }catch(_){ return 'mlog'; } })();
 function setMntSub(k){
+  // ★ 정기점검은 장비 안으로 갔다. 옛 바로가기·기억해 둔 화면이 여기로 들어온다.
+  //   길을 잃게 두지 않고 새 자리로 데려간다.
+  if(k === 'maint'){ setGearSub('maint'); setBoatSubTab('gear'); return; }
   mntSub = MNT_SUBS.some(x => x.k === k) ? k : 'mlog';
   try{ localStorage.setItem('bt_mntsub', mntSub); }catch(_){}
   switchTab('boat');
@@ -20995,7 +21570,7 @@ function setMntSub(k){
 // ★ 네 화면이 같은 띠를 쓴다. 그리는 일은 여기 한 곳에서만 한다 —
 //   화면마다 따로 그리면 한 곳이 옛 갈래를 켠 채로 남는다.
 function paintMntBar(){
-  ['mntBar1','mntBar2','mntBar3','mntBar4'].forEach(id=>{
+  ['mntBar1','mntBar3','mntBar4'].forEach(id=>{
     const el = document.getElementById(id);
     if(el) el.innerHTML = mntBar();
   });
@@ -21004,11 +21579,11 @@ function mntBar(){
   // ★ 4.70 — 「+ 추가」 가 없었다. 첫 건은 빈 화면의 「첫 정비수첩 쓰기」 로 만들 수 있는데,
   //   한 건이라도 생기면 그 안내가 사라져서 **두 번째를 만들 길이 없어졌다.** (사장님 지적)
   //   문서 화면(docBar)이 이미 오른쪽 끝에 「+ 추가」 를 달고 있다. 같은 자리, 같은 모양으로 붙인다.
-  const add = { mlog:['+ 정비수첩','addMlog()'], maint:['+ 정기점검',"mrAdd('maint')"],
+  const add = { mlog:['+ 정비수첩','addMlog()'],
                 repair:['+ 고장',"mrAdd('repair')"] }[mntSub];
   return `<div class="tfilt" style="align-items:center">` + MNT_SUBS.map(x =>
       `<button class="tchip${x.k === mntSub ? ' on' : ''}" onclick="setMntSub('${x.k}')">${
-        esc(t(x.n))}${x.k === 'maint' ? mntDueTag() : ''}</button>`).join('')
+        esc(t(x.n))}</button>`).join('')
     + (add ? `<span style="flex:1"></span>`
            + `<button class="tab edt" onclick="needEdit('${add[0].replace('+ ','')}을(를) 넣습니다.', ()=>${add[1]})">${
                esc(t(add[0]))}</button>` : '')
@@ -21249,7 +21824,6 @@ function switchTab(t){
   // 「정비」 통 — 안에서 고른 갈래만 보인다
   const onMnt = (t==='boat' && boatSubTab==='maint');
   show('mlogWrap',     onMnt && mntSub==='mlog');
-  show('maintWrap',    onMnt && mntSub==='maint');
   show('repairWrap',   onMnt && mntSub==='repair');
   show('fuelWrap',     onMnt && mntSub==='fuel');
   if(onMnt) paintMntBar();
@@ -21267,7 +21841,8 @@ function switchTab(t){
   show('marketWrap',   t==='community' && comSub==='market');
   // 「배 둘러보기」 와 「남의 배」 세 갈래는 같은 화면을 쓴다 (같은 자료에서 갈래만 다르다)
   show('exploreWrap',  (t==='community' && comSub==='explore') || t==='others');
-  const onMr = (t==='boat' && boatSubTab==='maint' && (mntSub==='maint'||mntSub==='repair'));
+  // ★ 도면은 이제 세 곳에서 쓴다 — 수리 · 장비 · 장비 안의 정기점검
+  const onMr = (t==='boat' && ((boatSubTab==='maint' && mntSub==='repair') || boatSubTab==='gear'));
   if(!onMr) show('mrMapWrap', false);
   closeMR();
   if(!onMr && typeof mrDrawOff === 'function') mrDrawOff();   // 그리기 모드도 안 남긴다
@@ -21600,14 +22175,14 @@ function renderHome(){
 
 // ===== 목록/도면 전환 =====
 function mrToggleView(kind){
-  if(kind==='maint') maintView = maintView==='list'?'map':'list';
-  else            repairView = repairView==='list'?'map':'list';
+  mrViewSet(kind, mrViewOf(kind) === 'list' ? 'map' : 'list');
   // ★ 도면을 떠나면 그리기도 끈다. 안 보이는 곳에 켜진 채로 남으면
   //   나중에 도면을 눌렀을 때 엉뚱하게 도형이 그려진다.
-  const isMap = (kind==='maint') ? maintView==='map' : repairView==='map';
-  if(!isMap) mrDrawOff();
+  if(mrViewOf(kind) !== 'map') mrDrawOff();
   renderMR();
 }
+// 지금 장비 통에서 보고 있는 갈래 (도면 단추가 무엇을 여는지 정한다)
+function gearScreenKind(){ return gearView === 'maint' ? 'maint' : 'gear'; }
 // 지금 실제로 보고 있는 화면 이름.
 // curTab 은 위 단계(home·boat·voyage·community)만 담는다.
 // 옛 이름(stow·maint·weather…)으로 비교해야 하는 곳은 반드시 이 함수를 쓴다.
@@ -21616,6 +22191,9 @@ function curScreen(){
   //   그리는 쪽이 정기점검인 줄 안다.
   if(curTab === 'boat' && boatSubTab === 'maint')
     return mntSub === 'mlog' ? 'mlog' : mntSub;
+  // ★ 「장비」 도 통이 되었다 — 안에 장비·정기점검·사용기가 있다.
+  if(curTab === 'boat' && boatSubTab === 'gear')
+    return gearView === 'maint' ? 'maint' : 'gear';
   if(curTab === 'boat')      return boatSubTab === 'docs' ? 'contacts' : boatSubTab;
   if(curTab === 'home')      return homeSub === 'today' ? 'home' : homeSub;
   if(curTab === 'community') return comSub;
@@ -21624,14 +22202,15 @@ function curScreen(){
 }
 function renderMR(){
   const cur = curScreen();
-  if(cur!=='maint' && cur!=='repair') return;
-  const isMap = (cur==='maint'?maintView:repairView)==='map';
+  // 장비·정기점검은 「장비」 통 안이다 — 그 통을 그리는 문이 따로 있다
+  if(cur === 'gear' || cur === 'maint'){ renderGearWrap(); return; }
+  if(cur!=='repair') return;
+  const isMap = repairView==='map';
   document.getElementById('mrMapWrap').style.display = isMap?'':'none';
-  document.getElementById('maintList').style.display  = (cur==='maint' && !isMap)?'':'none';
-  document.getElementById('repairList').style.display = (cur==='repair'&& !isMap)?'':'none';
-  document.getElementById(cur==='maint'?'maintViewBtn':'repairViewBtn').textContent = isMap?t('목록'):t('도면');
+  document.getElementById('repairList').style.display = !isMap?'':'none';
+  document.getElementById('repairViewBtn').textContent = isMap?t('목록'):t('도면');
   if(isMap) setMapKind(mrMapKind);
-  else cur==='maint' ? renderMaintList() : renderRepairList();
+  else renderRepairList();
   if(typeof pinBannerSync === 'function') pinBannerSync();
 }
 
@@ -21651,10 +22230,8 @@ function maintCounts(){
   return { late, soon, none, seed, all: maintRows().length };
 }
 function maintFilter(mode){
-  if(mode === 'real') return maintRows().filter(it => !it.seed);
   if(mode === 'late') return maintRows().filter(it => { const d = mStatus(it).days; return d !== null && d < 0; });
   if(mode === 'soon') return maintRows().filter(it => { const d = mStatus(it).days; return d !== null && d >= 0 && d <= 30; });
-  if(mode === 'none') return maintRows().filter(it => mStatus(it).days === null);
   return maint.slice();
 }
 let maintMode = 'all';
@@ -21681,8 +22258,6 @@ function renderMaintList(){
       ${chip('all',t('전체'),cnt.all)}
       ${cnt.late?chip('late',t('밀림'),cnt.late,'red'):''}
       ${cnt.soon?chip('soon',t('곧'),cnt.soon,'yel'):''}
-      ${cnt.none?chip('none',t('미기록'),cnt.none):''}
-      ${cnt.seed?chip('real','초안 빼고',cnt.all-cnt.seed):''}
     </div>`;
   const order = allGrps().filter(g=>view.some(it=>it.grp===g));
   L.innerHTML = bar + (order.length ? '' : `<div class="mrnone">${esc(t('해당하는 항목이 없습니다'))}</div>`) + order.map(g=>{
@@ -22212,19 +22787,49 @@ function mrPickPhoto(ev){
 }
 
 // ===== 도면 + 핀 =====
+// ★ 도면 고르는 줄 — 여기 한 곳에서 그린다. 도면이 늘고 주는 곳이 여러 군데면
+//   반드시 한 곳이 옛 목록을 들고 있게 된다.
+function dgTabsPaint(){
+  const tabs = document.getElementById('dgTabs');
+  if(tabs) tabs.innerHTML = dgTabsHtml();
+}
+function dgTabsHtml(){
+  return dgKeys().map(k =>
+      `<button class="tab${mrMapKind===k?' on':''}" onclick="setMapKind('${esc(k)}')">${esc(dgName(k))}</button>`
+    ).join('')
+    + `<button class="tab" onclick="dgAdd()" title="${esc(t('도면 추가'))}">+ ${esc(t('도면'))}</button>`
+    + `<button class="tab" id="mrDrawTab" onclick="toggleMrDraw()">${esc(t('도면 그리기'))}</button>`;
+}
+// ★★★ 어느 갈래의 핀을 그리나 (4.85 에서 고침)
+//   여태 정기점검·수리만 봤다. 그런데 장비에도 「핀 지정」 단추가 있었다 —
+//   즉 장비 핀은 찍혀서 저장되고 **영영 안 보였다.** 사장님이 잡아 주신 것이다.
+//   이제 지금 보고 있는 화면의 것을 그린다. 단추를 준 곳은 다 그려야 한다.
+function mrPinKind(){
+  const c = curScreen();
+  return (c === 'repair') ? 'repair' : (c === 'gear') ? 'gear' : 'maint';
+}
+function mrPinRows(){
+  const c = mrPinKind();
+  // ★ 장비는 따로 배열이 없다. 정비 배열 안에 typ:'gear' 로 산다 — gearRows() 가 그 문이다.
+  const src = (c === 'repair') ? repair
+            : (c === 'gear')   ? (typeof gearRows === 'function' ? gearRows() : [])
+            : maint;
+  return Array.isArray(src) ? src : [];
+}
 function setMapKind(k, keepView){
   if(!keepView){ dgTouched = false; dgV = { s:1, x:0, y:0 }; }
+  // ★ 없는 도면을 고르면 첫 도면으로 되돌린다 (지운 도면을 기억하고 있을 수 있다)
+  if(dgKeys().indexOf(k) < 0) k = dgKeys()[0] || 'plan';
   mrMapKind = k;
-  document.getElementById('kindSide').classList.toggle('on', k==='side');
-  document.getElementById('kindPlan').classList.toggle('on', k==='plan');
-  const cur = (curScreen()==='repair') ? 'repair' : 'maint';
-  const items = cur==='maint' ? maint : repair;
+  dgTabsPaint();
+  const cur = mrPinKind();
+  const items = mrPinRows();
   const pins = items.filter(i=>i.pin && i.pin.map===k);
   const src = dgShowSrc(k);
   if(!src){
     document.getElementById('mrMap').innerHTML =
       `<div style="padding:60px 20px;text-align:center;color:#8a97a8">`
-      + esc(tsub('이 배의 {kind}가 아직 없습니다.', {kind: k==='side'?t('측면도'):t('평면도')})) + `<br>`
+      + esc(tsub('이 배의 {kind}가 아직 없습니다.', {kind: dgName(k)})) + `<br>`
       + `<button class="btn" style="margin-top:12px" onclick="dgPickBuiltin('${k}')">${esc(t('기본 도면에서 고르기'))}</button>`
       + `<button class="btn" style="margin-top:8px" onclick="uploadDg('${k}')">${esc(t('도면 사진 올리기'))}</button>`
       + `<button class="btn" style="margin-top:8px" onclick="dgPickLib('${k}')">${esc(t('공개 도면에서 고르기'))}</button></div>`;
@@ -22241,10 +22846,15 @@ function setMapKind(k, keepView){
     + `<button onclick="uploadDg('${k}')" title="${esc(t('도면 사진 바꾸기'))}">🖼</button>`
     + `<button onclick="dgPickBuiltin('${k}')" title="${esc(t('기본 도면에서 고르기'))}">⛵</button>`
     + `<button onclick="dgPickLib('${k}')" title="${esc(t('공개 도면에서 고르기'))}">📚</button>`
-    + (dgPub[k==='side'?'side':'plan']
+    + (dgPub[k]
         ? `<button onclick="dgSetPublic('${k}',false)" title="${esc(t('공개 내리기 (지금 공개 중)'))}">🌐</button>`
-        : (dgRef[k==='side'?'side':'plan']
+        : (dgRef[k]
             ? `<button onclick="dgSetPublic('${k}',true)" title="${esc(t('이 도면 공개하기'))}">🔒</button>` : ''))
+    // ★ 더 넣은 도면만 이름을 바꾸고 지울 수 있다. 기본 둘은 못 지운다 —
+    //   지우면 적재표(평면도)와 기본 도면 고르기가 통째로 무너진다.
+    + (dgFixed(k) ? ''
+        : `<button onclick="dgRename('${esc(k)}')" title="${esc(t('도면 이름 바꾸기'))}">✎</button>`
+        + `<button onclick="dgDrop('${esc(k)}')" title="${esc(t('이 도면 지우기'))}">🗑</button>`)
     + `</div>`;
   dgFit();      // 이미지 비율에 맞춰 틀 높이를 잡는다
   dgApply();
@@ -22326,15 +22936,41 @@ function dgReset(anim){
   dgApply(anim !== false);
 }
 // 특정 핀(이미지 기준 %)을 화면 가운데에 놓고 확대한다
+// ★ 사장님 지적 — 「보기」 를 눌렀는데 그 자리가 화면 저 아래에 있었다.
+//   까닭이 둘이었다.
+//    ① 확대 상태로 바꾸면서 틀 높이를 안 줄였다. 틀이 화면보다 길면
+//       「틀의 한가운데」 는 화면 밖이다. 먼저 dgFit() 으로 틀을 화면 안 크기로 줄인다.
+//    ② 페이지를 그 틀로 옮겨 주지 않았다. 틀만 맞춰 놓고 화면은 그대로였다.
 function dgFocus(px, py, scale){
   const box = document.getElementById('mrMap'); if(!box) return;
-  const W = box.clientWidth, H = box.clientHeight;
   dgTouched = true;
+  dgFit();                                   // 틀부터 화면 안으로 줄인다
+  const W = box.clientWidth, H = box.clientHeight;
   dgV.s = Math.max(DG_MIN, Math.min(DG_MAX, scale || 2.6));
   // 핀 좌표는 도면 기준 % — 판 크기(폭×비율)로 환산해야 맞는다
   dgV.x = W/2 - (px/100)*W*dgV.s;
   dgV.y = H/2 - (py/100)*(W*dgRatio)*dgV.s;
   dgClamp(); dgApply(true);
+  dgScrollTo(box);
+}
+// 도면 틀을 화면 한가운데로 가져온다. 스크롤하는 것이 페이지일 수도, 안쪽 칸일 수도 있다.
+function dgScroller(el){
+  for(let p = el.parentElement; p; p = p.parentElement){
+    let ov = '';
+    try{ ov = getComputedStyle(p).overflowY; }catch(_){}
+    if(/(auto|scroll)/.test(ov) && p.scrollHeight > p.clientHeight + 4) return p;
+  }
+  return null;
+}
+function dgScrollTo(box){
+  try{
+    const r = box.getBoundingClientRect();
+    const 옮길것 = (r.top + r.height / 2) - (window.innerHeight / 2);
+    if(Math.abs(옮길것) < 8) return;          // 이미 가운데다
+    const sc = dgScroller(box);
+    if(sc) sc.scrollBy({ top: 옮길것, behavior: 'smooth' });
+    else   window.scrollBy({ top: 옮길것, behavior: 'smooth' });
+  }catch(_){}
 }
 // 끌기 · 두 손가락 확대
 function dgBind(){
@@ -22706,7 +23342,7 @@ const SCREEN_IDS = ['mrPanel','panel','formOv','hatPanelOv','trashView','helpOv'
 
 // ★ 탭에 붙어 있는 내용들. 화면이 바뀌면 이것들은 '사라진다' (감추는 게 아니라 자리에서 빠진다).
 const TAB_CONTENT = ['searchWrap','stowTools','mrSub','mapWrap','listView','hint',
-  'homeWrap','weatherWrap','checkWrap','gearWrap','mlogWrap','maintWrap','repairWrap','fuelWrap','contactsWrap',
+  'homeWrap','weatherWrap','checkWrap','gearWrap','mlogWrap','repairWrap','fuelWrap','contactsWrap',
   'mrMapWrap','voyageWrap','communityWrap','talkWrap','spotWrap','marketWrap',
   'exploreWrap','newsWrap'];
 window.TAB_CONTENT = TAB_CONTENT;
@@ -22857,18 +23493,35 @@ function tellNext(){
   const bs = document.getElementById('tellBtns');
   if(tt){ tt.textContent = String(o.title || ''); tt.style.display = o.title ? '' : 'none'; }
   // ★ 남이 쓴 글이 여기로 들어온다. 그대로 넣으면 남의 코드가 우리 화면에서 돈다.
-  if(mg) mg.textContent = String(o.msg == null ? '' : o.msg);
+  if(mg){ mg.textContent = String(o.msg == null ? '' : o.msg);
+          mg.style.display = o.msg ? '' : 'none'; }
+  // ★ 글을 적어 넣는 창. 앱에 이런 창이 없어서 도면 이름을 물을 데가 없었다.
+  //   브라우저 prompt 를 쓰면 앱 안에서 혼자 다른 모양이 된다 — 창은 하나다.
+  const ip = document.getElementById('tellInp');
+  if(ip){
+    if(o.input){
+      ip.classList.add('on');
+      ip.value = String(o.input.value == null ? '' : o.input.value);
+      ip.placeholder = String(o.input.ph || '');
+    } else { ip.classList.remove('on'); ip.value = ''; ip.placeholder = ''; }
+  }
   if(bs){
     bs.innerHTML = '';
     (o.btns || []).forEach(b => {
       const el = document.createElement('button');
       el.textContent = String(b.name || '');
       if(b.kind) el.className = b.kind;
-      el.onclick = () => tellDone(b.v);
+      // 글을 적는 창에서 「확인」 은 적힌 글을 돌려준다
+      el.onclick = () => tellDone((o.input && b.v === true && ip) ? String(ip.value || '') : b.v);
       bs.appendChild(el);
     });
+    // ★ 단추가 셋을 넘으면 세로로 세운다. 가로로 접히면 차림표가 뒤죽박죽이 된다.
+    bs.classList.toggle('col', (o.btns || []).length > 3);
     const last = bs.lastElementChild;
-    if(last) try{ last.focus(); }catch(e){}
+    if(o.input && ip){
+      ip.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); tellDone(String(ip.value || '')); } };
+      try{ ip.focus(); ip.select(); }catch(e){}
+    } else if(last) try{ last.focus(); }catch(e){}
   }
   if(ov) ov.classList.add('open');
   try{ overlayPush('tellOv'); }catch(e){}
@@ -22909,6 +23562,19 @@ function ask(msg, o){
     { name: d.no || t('닫기'), v: false },
     { name: d.ok || t('확인'), v: true, kind: d.warn ? 'warn' : 'ok' }
   ]});
+}
+// 글을 적어 달라고 한다. 「취소」 나 뒤로 가기면 null 이 온다.
+// ★ null(안 하겠다) 과 ''(빈칸으로 확인) 은 다른 것이다. 섞으면 실수로 이름이 지워진다.
+function askText(title, value, ph){
+  if(typeof document === 'undefined' || !document.getElementById('tellInp')){
+    const P = (typeof window !== 'undefined' && window.prompt) || globalThis.prompt;
+    try{ const r = P(String(title || ''), String(value == null ? '' : value));
+         return Promise.resolve(r == null ? null : String(r)); }
+    catch(e){ return Promise.resolve(null); }
+  }
+  return tellShow({ title: title, msg: '', esc: null,
+    input: { value: value == null ? '' : value, ph: ph || '' },
+    btns: [{ name: t('취소'), v: null }, { name: t('확인'), v: true, kind: 'ok' }] });
 }
 const OVERLAY_IDS = ['tellOv','photoView','recPick','dgPick','drawerOv'];
 const OVERLAY_STACK = [];
@@ -24565,7 +25231,7 @@ function openSettings(){
           'drawerRestore()', 'restoreBtn')
     // ★ 자주 안 보는 것은 맨 끝에. 다만 법이 「언제든 볼 수 있게」 하라는 것이라 감추지는 않는다.
     + lbl(t('커뮤니티'))
-    + row(t('안 보는 사람'), t('안 보기로 한 사람의 글을 다시 봅니다'), 'openMuted()')
+    + row(t('차단한 사람'), t('차단한 사람의 글을 다시 봅니다'), 'openMuted()')
     + lbl(t('앱'))
     + row(t('약관 · 개인정보'), t('이용약관 · 개인정보 처리방침'), "openLegal('terms')");
   showPanel(P);
@@ -24719,11 +25385,10 @@ function trBar(coll, id, src, cmt){
   //   둘 다 내 말이면 아무것도 안 낸다 — 한국어뿐인 글에 번역 줄이 붙으면 고장으로 보인다.
   //   하나라도 남의 말이면 옮긴다.
   const c = String(cmt == null ? '' : cmt).trim();
-  const mine = trSameLang(src, langNow()) && (!c || trSameLang(c, langNow()));
-  if(mine) return '';
+  if(trMine(src, c)) return '';
   // ★ 4.70 — 누르게 하지 않는다. 알아서 옮긴다.
   //   사람이 「원어로 보기」 를 눌렀던 글만 원문으로 남는다.
-  if(!TR_SKIP[key]){ trAuto(coll, id, (src || '') + ' ' + c); return ''; }
+  if(!TR_SKIP[key]){ trAuto(coll, id, src, c); return ''; }
   return `<div class="trbar"><span style="flex:1"></span>
     <button class="minib blu" onclick="trGo('${esc(coll)}','${esc(id)}')">${esc(t('번역해서 보기'))}</button></div>`;
 }
@@ -24768,14 +25433,23 @@ function trOff(coll, id){
 const TR_SKIP = {};
 let trQ = [], trRun = 0;
 const TR_PAR = 3;                     // 한 번에 셋
-function trAuto(coll, id, src){
+// 「이 글은 내 말로 쓰였나」 — 판단하는 곳을 하나로 둔다.
+// ★ 전에는 trBar 와 trAuto 가 **각각** 따로 셈했다. 그래서 한국어 글에 러시아어 댓글이
+//   달린 경우, trBar 는 「옮겨야 한다」 고 보고 trAuto 를 부르는데
+//   trAuto 는 글과 댓글을 이어 붙인 글자를 보고 「한국어네」 하며 되돌아갔다.
+//   그 글은 영영 안 옮겨졌다. 같은 판단이 두 곳에 있으면 반드시 어긋난다.
+function trMine(src, cmt){
+  const c = String(cmt == null ? '' : cmt).trim();
+  return trSameLang(src, langNow()) && (!c || trSameLang(c, langNow()));
+}
+function trAuto(coll, id, src, cmt){
   try{
     if(!window.__tr || !meUid()) return;
     if(navigator && navigator.onLine === false) return;
     const key = trKey(coll, id), lang = langNow();
     if(TR_SKIP[key] || TR_ON[key] || TR_BUSY[key]) return;
     if(TR_GOT[key + ':' + lang]){ TR_ON[key] = true; return; }
-    if(trSameLang(src, lang)) return;                       // 내 말로 쓰인 글은 그대로 둔다
+    if(trMine(src, cmt)) return;                            // 내 말로 쓰인 글은 그대로 둔다
     if(trQ.some(x => x.key === key)) return;
     trQ.push({ coll, id, key });
     trPump();
@@ -29475,10 +30149,20 @@ function renderGear(){
 
 // ── 장비 고르기 칸 — 정비·수리를 장비에 매단다
 // ★ 장비가 하나도 없으면 이 칸을 아예 안 보여 준다. 빈 고르기 칸은 묻기만 하고 답을 못 준다.
+// ★ 4.85 — 「장비가 하나도 없으면 이 칸을 숨긴다」 로 만들어 두었었다.
+//   그래서 장비를 한 번도 안 넣은 배에서는 이 칸이 영영 안 보였다.
+//   사장님이 「수리에서 어떤 장비인지 고를 수 있어야겠네」 하셨을 때
+//   그 기능은 이미 있었는데 숨어 있었던 것이다. 이제 늘 보여 주고,
+//   장비가 없으면 그 자리에서 만들어 매달 수 있게 한다.
 function gearPickRow(it, kind){
   const rows = gearRows();
-  if(!rows.length) return '';
   const cur = String(it.gearId || '');
+  if(!rows.length){
+    return `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>
+      <b class="mrv" style="flex:1">—</b>${unlocked
+      ? `<button class="minib blu" onclick="gearMakeFor('${esc(String(it.id))}','${esc(kind)}')">${
+          esc(t('장비 추가'))}</button>` : ''}</div>`;
+  }
   const sorted = rows.slice().sort((a,b) => {
     const sa = GEAR_SYS.indexOf(gearSysOf(a)), sb = GEAR_SYS.indexOf(gearSysOf(b));
     if(sa !== sb) return (sa < 0 ? 99 : sa) - (sb < 0 ? 99 : sb);
@@ -29494,6 +30178,22 @@ function gearPickRow(it, kind){
     now ? ` <button class="minib blu" onclick="openMR('gear','${now.id}')">${esc(t('장비 보기'))}</button>` : ''}</div>`;
 }
 
+// 지금 보고 있는 기록에 새 장비를 만들어 매단다.
+// ★ 이름은 그 기록의 제목에서 가져온다 — 「빌지펌프 작동 점검」 이면 「빌지펌프」 다.
+//   사람이 같은 말을 두 번 치게 하지 않는다.
+function gearMakeFor(id, kind){
+  if(!unlocked) return;
+  const rec = getMR(kind, id);
+  if(!rec) return;
+  const g = gearNew();
+  const 제목 = String(rec.name || rec.title || '').trim();
+  g.name = 제목.replace(/\s*(점검|교체|교환|수리|고장|확인|청소|정비)\s*$/, '').trim() || 제목;
+  if(rec.grp) g.sys = GEAR_SYS.indexOf(rec.grp) >= 0 ? rec.grp : '';
+  maint.push(g);
+  rec.gearId = String(g.id);
+  saveMR();
+  openMR(kind, id);
+}
 // ── 장비 상세
 function gearBody(it){
   const sys  = gearSysOf(it);
@@ -29535,24 +30235,24 @@ function gearBody(it){
       : (it.manual
           ? `<a class="mrbtn" style="text-decoration:none" href="${esc(it.manual)}" target="_blank" rel="noopener">${esc(t('설명서 열기'))}</a>`
           : `<b class="mrv">—</b>`)}</div>`
-    + hung('이 장비의 정비', mts, m => {
+    // ★ 사장님이 정하신 것 — 여기서는 **제목만 단추로** 보인다.
+    //   내용까지 펼치면 장비 하나를 여는데 다른 화면 셋이 통째로 딸려 나온다.
+    //   누르면 원래 기록이 열린다. 고치는 자리는 늘 한 곳이다.
+    + hung('이 장비의 정기점검', mts, m => {
         const st = mStatus(m);
-        return `<div class="mr gitem ${st.k}" onclick="openMR('maint','${m.id}')">
-          <div class="ct"><div class="cn">${esc(m.name || t('(이름 없음)'))}</div><span class="st ${st.k}">${st.t}</span></div>
-          <div class="mrm">${esc(tsub('마지막 {d}', { d: m.lastDate || '—' }))}</div></div>`;
+        return `<button class="mrbtn gbtn ${st.k}" onclick="openMR('maint','${m.id}')">${
+          esc(m.name || t('(이름 없음)'))}<span class="st ${st.k}">${esc(st.t)}</span></button>`;
       })
-    + hung('이 장비의 수리', rps, r => `<div class="mr gitem" onclick="openMR('repair','${r.id}')">
-          <div class="ct"><div class="cn">${esc(r.title || t('(제목 없음)'))}</div>
-            <span class="st ${RP_K[r.status]||'none'}">${RP_LABEL[r.status]}</span></div>
-          <div class="mrm">${esc(r.created || '—')}</div></div>`)
-    + hung('이 장비의 정비수첩', mlogForGear(it.id), x => `<div class="mr gitem" onclick="openMR('mlog','${x.id}')">
-          <div class="ct"><div class="cn">${esc(mlogTitle(x))}</div>${
-            howSteps(x).length ? `<span class="chip">${esc(tsub('{n}단계', { n: howSteps(x).length }))}</span>` : ''}</div>
-          <div class="mrm">${esc(x.date||'')}</div></div>`)
-    + hung('이 장비의 사용기', rvForGear(it.id), r => `<div class="mr gitem" onclick="openMR('review','${r.id}')">
-          <div class="ct"><div class="cn">${esc(rvTitle(r))}</div>${
-            Number(r.stars) ? `<span class="rvst">${rvStarText(r.stars)}</span>` : ''}</div>
-          <div class="mrm">${esc(String(r.text||'').slice(0,60) || t('아직 안 썼습니다'))}</div></div>`)
+    + hung('이 장비의 수리', rps, r =>
+        `<button class="mrbtn gbtn ${RP_K[r.status]||''}" onclick="openMR('repair','${r.id}')">${
+          esc(r.title || t('(제목 없음)'))}<span class="st ${RP_K[r.status]||'none'}">${
+          esc(RP_LABEL[r.status] || '')}</span></button>`)
+    + hung('이 장비의 정비수첩', mlogForGear(it.id), x =>
+        `<button class="mrbtn gbtn" onclick="openMR('mlog','${x.id}')">${esc(mlogTitle(x))}<span class="st">${
+          esc(x.date || '')}</span></button>`)
+    + hung('이 장비의 사용기', rvForGear(it.id), r =>
+        `<button class="mrbtn gbtn" onclick="openMR('review','${r.id}')">${esc(rvTitle(r))}<span class="st">${
+          Number(r.stars) ? esc(rvStarText(r.stars)) : ''}</span></button>`)
     + `<div class="mrrow edt" style="flex-wrap:wrap;gap:6px">
         <button class="mrbtn" onclick="addMlogForGear('${it.id}')">${esc(t('+ 정비수첩'))}</button>
         <button class="mrbtn" onclick="addMaintForGear('${it.id}')">${esc(t('+ 정기점검'))}</button>
@@ -30136,30 +30836,55 @@ function renderMLog(){
   }).join('');
 }
 
-// ── 장비 화면 안의 두 갈래 (장비 / 사용기)
-let gearView = (function(){ try{ return localStorage.getItem('bt_gearsub') || 'gear'; }catch(_){ return 'gear'; } })();
+// ── 장비 통 안의 세 갈래 (장비 / 정기점검 / 사용기)
+// ★ 4.85 — 정기점검이 여기로 들어왔다. 정기점검은 장비에 하는 일이라
+//   장비 밖에 따로 있으면 같은 물건을 두 곳에서 따로 관리하게 된다.
+const GEAR_SUBS = ['gear', 'maint', 'review'];
+let gearView = (function(){
+  try{ const v = localStorage.getItem('bt_gearsub') || 'gear';
+       return GEAR_SUBS.indexOf(v) >= 0 ? v : 'gear'; }catch(_){ return 'gear'; } })();
 function setGearSub(k){
-  gearView = (k === 'review') ? 'review' : 'gear';
+  gearView = GEAR_SUBS.indexOf(k) >= 0 ? k : 'gear';
   try{ localStorage.setItem('bt_gearsub', gearView); }catch(_){}
   renderGearWrap();
 }
 // ★ 그리는 일은 여기 한 곳에서 한다. 두 곳에서 그리면 단추와 화면이 어긋난다.
 function renderGearWrap(){
-  const isR = gearView === 'review';
-  const g = document.getElementById('gearList'), r = document.getElementById('rvList');
-  if(g) g.style.display = isR ? 'none' : '';
-  if(r) r.style.display = isR ? '' : 'none';
-  const bg = document.getElementById('gearTabG'), br = document.getElementById('gearTabR');
-  if(bg) bg.classList.toggle('on', !isR);
-  if(br) br.classList.toggle('on', isR);
+  const k = gearView;
+  const isR = k === 'review';
+  const isMap = !isR && mrViewOf(k) === 'map';
+  const put = (id, on) => { const e = document.getElementById(id); if(e) e.style.display = on ? '' : 'none'; };
+  put('gearList',  k === 'gear'  && !isMap);
+  put('maintList', k === 'maint' && !isMap);
+  put('rvList',    isR);
+  put('mrMapWrap', isMap);
+  const on = (id, v) => { const e = document.getElementById(id); if(e) e.classList.toggle('on', v); };
+  on('gearTabG', k === 'gear'); on('gearTabM', k === 'maint'); on('gearTabR', isR);
+  // 밀린 정기점검 수는 다른 갈래를 보고 있어도 보여야 한다
+  const bm = document.getElementById('gearTabM');
+  if(bm) bm.innerHTML = esc(t('정기점검')) + mntDueTag();
+  const vb = document.getElementById('gearViewBtn');
+  if(vb){ vb.style.display = isR ? 'none' : '';
+          vb.textContent = isMap ? t('목록') : t('도면'); }
   const ab = document.getElementById('gearAddBtn');
-  if(ab) ab.textContent = isR ? t('+ 제품 리뷰') : t('+ 추가');
+  if(ab){ ab.style.display = isMap ? 'none' : '';
+          // ★ 「+ 정기점검」 은 길어서 머리띠가 두 줄로 접힌다. 지금 보고 있는 갈래가
+          //   바로 위 단추에 켜져 있으므로 「+ 추가」 로 충분하다.
+          ab.textContent = isR ? t('+ 제품 리뷰') : t('+ 추가'); }
   // 배 리뷰는 사용기 갈래에서만 뜬다. 배 하나에 하나면 충분하므로 이미 썼으면 감춘다.
   const ab2 = document.getElementById('gearAddBtn2');
   if(ab2) ab2.style.display = (isR && unlocked && !brRows().length) ? '' : 'none';
-  isR ? renderReviews() : renderGear();
+  if(isMap) setMapKind(mrMapKind);
+  else if(isR) renderReviews();
+  else if(k === 'maint') renderMaintList();
+  else renderGear();
+  if(typeof pinBannerSync === 'function') pinBannerSync();
 }
-function gearAdd(){ gearView === 'review' ? addReview() : addGear(); }
+function gearAdd(){
+  if(gearView === 'review') return addReview();
+  if(gearView === 'maint')  return mrAdd('maint');
+  addGear();
+}
 // ★ 4.66 — 리뷰는 남의 자료에서 오는 것이 아니라 사람이 쓰는 것이다.
 //   항해일지·정비수첩은 제 기록에서 저절로 올라오지만 리뷰는 여기서 시작하지 않으면
 //   시작할 자리가 없다. 「남의 배 › 제품리뷰 / 배리뷰」 에서 바로 쓰러 온다.

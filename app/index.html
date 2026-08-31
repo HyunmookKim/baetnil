@@ -1806,6 +1806,22 @@ header{padding-top:var(--sat)}
 #formOv,#dgPick,#trashView,#helpOv,#hatPanelOv{padding-top:var(--sat)}
 #drawer{padding-top:calc(14px + var(--sat))}
 #panel{padding-top:calc(14px + var(--sat))}
+
+/* ══ 밑으로 펼쳐지는 고르기 (4.88) ═══════════════════════════════════════
+   ★ 새 모양을 만들지 않는다. 판은 .hcard 가 쓰는 유리, 줄은 .tab / .tab.on
+     그대로다. 그래야 갖다 붙인 것처럼 안 보인다.
+   ★ position:fixed 다 — 머리줄이 넘치는 것을 잘라내도 안 잘린다. */
+#pmOv{position:fixed;inset:0;z-index:120;display:none}
+#pmOv.open{display:block}
+#pmBox{position:fixed;min-width:132px;max-height:60vh;overflow-y:auto;
+  background:rgba(10,26,40,.94);backdrop-filter:blur(14px);
+  border:1px solid var(--bd);border-radius:13px;padding:5px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45)}
+#pmBox button{display:block;width:100%;text-align:left;white-space:nowrap;
+  border:none;background:transparent;color:var(--tx);
+  font-size:13px;font-weight:450;letter-spacing:-.01em;
+  padding:9px 15px;border-radius:9px;cursor:pointer}
+#pmBox button.on{background:rgba(156,198,232,.19);color:var(--ac);font-weight:550}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122a44">
@@ -1831,7 +1847,7 @@ header{padding-top:var(--sat)}
   <div id="hNav"></div>
   <div id="stowTools" style="display:none">
     <button class="tab" id="tabToggle" onclick="toggleView()" data-t="목록">목록</button>
-    <button class="tab" id="sortTab" onclick="cycleSort()" data-t="가나다순">가나다순</button>
+    <button class="tab" id="sortTab" onclick="sortMenu(this)">가나다순 ▾</button>
     <button class="tab" id="lkEditTab" onclick="toggleLkEdit()" data-t="칸 그리기">칸 그리기</button>
     <button class="tab" id="trashTab" onclick="openTrash()" data-t="휴지통">휴지통</button>
     <span id="lkTools" style="display:none">
@@ -1900,7 +1916,7 @@ header{padding-top:var(--sat)}
 </div>
 <div id="gearWrap" style="display:none">
   <div class="mrhead" style="flex-wrap:wrap">
-    <button class="tab on" id="gearTabG" onclick="setGearSub('gear')" data-t="장비">장비</button>
+    <button class="tab on" id="gearTabG" onclick="setGearSub('gear')" data-t="장비 목록">장비 목록</button>
     <button class="tab" id="gearTabM" onclick="setGearSub('maint')" data-t="정기점검">정기점검</button>
     <button class="tab" id="gearTabR" onclick="setGearSub('review')" data-t="사용기">사용기</button>
     <span style="flex:1"></span>
@@ -1975,6 +1991,7 @@ header{padding-top:var(--sat)}
 <button id="mobFab" class="mobfab" onclick="mobMark()" aria-label="사람 빠짐"><i></i><span data-t="사람 빠짐">사람 빠짐</span></button>
 
 
+<div id="pmOv" onclick="pmClose()"><div id="pmBox" onclick="event.stopPropagation()"></div></div>
 <div id="panel">
   <div class="ph">
     <button id="backBtn" onclick="goBack()">←</button>
@@ -2448,6 +2465,7 @@ const I18N = {
     '보기':'Open',
     // ── 3.85 · 내 배 화면
     '배 목록':'Boats',
+    '장비 목록':'Gear list',
     '도움말':'Help',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'This is your boat’s introduction. <b>Paste text together with photos and the photos land right where you paste.</b>',
     '지금은 <b>공개</b> 상태라 배 소개 페이지에 실립니다.':'It is <b>public</b> right now, so it appears on your boat page.',
@@ -4972,6 +4990,7 @@ const I18N = {
     '보기':'Открыть',
     // ── 3.85 · 내 배 화면
     '배 목록':'Суда',
+    '장비 목록':'Список снаряжения',
     '도움말':'Справка',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'Это рассказ о вашем судне. <b>Вставьте текст вместе с фото — фото окажутся там же.</b>',
     '지금은 <b>공개</b> 상태라 배 소개 페이지에 실립니다.':'Сейчас <b>открыто</b> — показывается на странице судна.',
@@ -7552,6 +7571,7 @@ const I18N = {
     '배를 등록하면 오늘 상태가 여기에 나옵니다':'船を登録すると、今日の状態がここに表示されます',
     '보기':'表示',
     '배 목록':'船の一覧',
+    '장비 목록':'装備一覧',
     '도움말':'ヘルプ',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'船を紹介する文章です。<b>文章を写真ごとコピーして貼り付けると、写真もその場所に</b>入ります。',
     '지금은 <b>공개</b> 상태라 배 소개 페이지에 실립니다.':'今は<b>公開</b>状態なので、船の紹介ページに掲載されます。',
@@ -11368,6 +11388,7 @@ let pvList = [], pvIdx = 0;
 
 function migrate(arr){
   return (arr||[]).map(i=>{
+    if(i && i.gone) return i;               // 완전삭제한 표 — 물품이 아니다
     const o = {box:false, parentId:null, unit:'', ...i};
     o.photos = Array.isArray(i.photos) ? i.photos : (i.photo ? [i.photo] : []);
     o.unit = i.unit || '';
@@ -11861,7 +11882,7 @@ function closeBoatSetup(){
 // 어디에 그릴지를 한 곳에 모은다 — 흩어 놓으면 새 화면을 더할 때 빠뜨린다.
 const NEED_BOAT_WRAP = {
   'boat:stow':   ['listView',     '적재표'],
-  'boat:gear':   ['gearWrap',     '장비'],
+  'boat:gear':   ['gearWrap',     '장비 목록'],
   'boat:mlog':   ['mlogWrap',     '정비수첩'],
   'boat:maint':  ['gearWrap',     '정기점검'],
   'boat:repair': ['repairWrap',   '수리목록'],
@@ -18083,6 +18104,8 @@ async function initStorage(){
     seedDgIfNeeded();
   }
   boats.forEach(b => migrateRanks(b));   // 옛 역할로 저장된 배를 등급으로 옮긴다
+  // 반 년 지난 「지웠다」 표를 걷는다. 사람 기록이 아니라 뒷정리다.
+  try{ gonePrune(); }catch(_){}
   // 회비 금액은 앱에 두지 않는다 — 옛 배에 남아 있으면 지운다.
   // ★ 이것은 사람이 고치는 일이 아니라 뒷정리다. 그래서 보기 전용 잠금과 상관없다.
   //   클라우드에는 회비를 쓸 수 있는 사람만 올린다 — 남의 배는 어차피 규칙이 막는다.
@@ -18267,6 +18290,7 @@ function applyLang(){
       if(last && last.nodeType === 3) last.nodeValue = t(k);
     });
   try{ document.documentElement.lang = langNow(); }catch(e){}
+  try{ sortTabPaint(); }catch(_){}
 }
 // ★ '오프라인 · 로컬' 한 마디로 뭉개면 사람이 엉뚱한 곳을 고친다.
 //   실제로 겪은 일 — 인터넷은 멀쩡한데 하루치 무료 한도를 다 써서 막힌 것을
@@ -18339,6 +18363,51 @@ async function markLoad(){
 //   앱은 지운 것을 버리지 않고 휴지통에 둔다(mrTrash · trash). 그것이 답이다 —
 //   휴지통에 있는 번호는 클라우드에서 와도 다시 안 싣는다.
 //   되살리기(mrRestore)를 누르면 휴지통에서 빠지므로 그때는 다시 실린다.
+// ══════════════════════════════════════════════════════════════
+// ★★ 완전삭제한 것이 되살아나던 나머지 절반 (4.89)
+//
+//   무슨 일이었나 —
+//   휴지통을 비우면 줄을 통째로 없앴고, 클라우드에서도 진짜로 지웠다.
+//   그러면 며칠 꺼져 있던 다른 기기가 돌아와서 「어? 서버에 없네」 하고
+//   제가 들고 있던 옛 줄을 도로 올린다. 지운 것이 다시 살아난다.
+//
+//   남들은 —
+//   CouchDB 는 지우는 대신 _deleted:true 를 붙이라고 공식 문서에 쓴다.
+//   카산드라는 「끊겼던 기기가 돌아오면 지운 자료가 되살아난다」고 경고하고
+//   묘비(tombstone)를 유예 기간 동안 들고 있는다.
+//
+//   우리 방법 —
+//   새 칸을 만들지 않는다. 휴지통 줄에서 「속」만 비우고 「표」만 남긴다.
+//   휴지통은 이미 클라우드로 오가므로 서버 함수도 규칙도 안 고쳐도 된다.
+//   표는 사람 눈에 안 보인다 — 비운 휴지통은 비어 보인다.
+//   표 한 줄은 100바이트도 안 된다. 반 년 지난 표는 걷어낸다.
+const GONE_DAYS = 180;
+const GONE_MS   = GONE_DAYS * 86400000;
+const isGone = x => !!(x && x.gone);
+// 보이는 휴지통 — 표는 뺀다. 세는 곳도 보여 주는 곳도 여기 하나를 쓴다.
+const trashShown   = () => (Array.isArray(trash)   ? trash   : []).filter(x => !isGone(x));
+const mrTrashShown = () => (Array.isArray(mrTrash) ? mrTrash : []).filter(x => !isGone(x));
+// 줄을 없애는 대신 표로 바꾼다.
+//   ★ mrtrash 는 deadIds 가 e.data.id 를 본다. 그 번호만 남긴다.
+function goneStub(x){
+  if(!x) return x;
+  const o = { id: x.id, gone: true, goneAt: new Date().toISOString() };
+  if(x.kind) o.kind = x.kind;
+  if(x.data && x.data.id != null) o.data = { id: x.data.id };
+  return o;
+}
+// 반 년 넘은 표는 걷어낸다. 묘비를 영원히 들고 있지 않는다.
+function gonePrune(){
+  const 낡 = x => {
+    if(!isGone(x)) return false;
+    const v = Date.parse(String(x.goneAt || x.delAt || ''));
+    return isFinite(v) && (Date.now() - v) > GONE_MS;
+  };
+  let 바뀜 = false;
+  if(Array.isArray(trash)){ const a = trash.length; trash = trash.filter(x=>!낡(x)); 바뀜 = 바뀜 || trash.length !== a; }
+  if(Array.isArray(mrTrash)){ const b = mrTrash.length; mrTrash = mrTrash.filter(x=>!낡(x)); 바뀜 = 바뀜 || mrTrash.length !== b; }
+  return 바뀜;
+}
 function deadIds(coll){
   const s = new Set();
   const KIND = { maint:['maint','gear','mlog'], repair:['repair'], reviews:['review'],
@@ -18576,6 +18645,13 @@ async function cloudPull(){
   r.checkt = g('checkt'); r.mrtrash = g('mrtrash'); r.lockers = g('lockers');
   r.shapes = g('shapes'); r.posts = g('posts'); r.dgimgs = g('dgimgs');
   r.reviews = g('reviews');
+  // ★★★ 휴지통을 **먼저** 합친다 (4.87).
+  //   지운 것은 휴지통에 남고, 그 휴지통이 「되살리지 마라」 는 표가 된다(deadIds).
+  //   그런데 휴지통을 나중에 합치면, 다른 기기에서 지운 것이 이번 받아오기에 실려 와도
+  //   그 표가 아직 없어서 그대로 되살아난다. 순서가 곧 버그였다.
+  if(Array.isArray(r.mrtrash)) mrTrash = keepMine('mrtrash', r.mrtrash);
+  if(Array.isArray(r.trash))   trash   = keepMine('trash',   migrate(r.trash));
+  try{ gonePrune(); }catch(_){}
   // ★ 받아온 것으로 갈아치우지 않는다 — 폰에서 고친 것과 합친다 (keepMine).
   //   여기서 갈아치우는 바람에 아직 못 올린 기록이 통째로 사라졌었다.
   maint    = pullInto('maint',    r.maint);
@@ -18591,7 +18667,6 @@ async function cloudPull(){
   posts    = pullInto('posts',    r.posts);
   reviews  = pullInto('reviews',  r.reviews);
   // 정비 휴지통은 빈 것도 뜻이 있다 — 다 비웠다는 뜻이다
-  if(Array.isArray(r.mrtrash)) mrTrash = keepMine('mrtrash', r.mrtrash);
   if(Array.isArray(r.dgimgs) && r.dgimgs.length){
     const dg = keepMine('dgimgs', r.dgimgs);
     dgNames = dgNamesFromArr(dg);
@@ -18634,7 +18709,7 @@ async function cloudPull(){
     const cloudT = migrate(Array.isArray(r.trash) ? r.trash : []);
     // ★ 합치기가 먼저다. 자국을 먼저 갈면 무엇이 폰에서 고친 것인지 알 수 없게 된다.
     items = cloudI.length ? keepMine('items', cloudI) : items;
-    trash = keepMine('trash', cloudT);
+    // 휴지통은 위에서 먼저 합쳤다 — 여기서 또 하면 두 번 합쳐진다
     lastCloud = snapOf(cloudI); lastCloudTrash = snapOf(cloudT);
     markSet('items', lastCloud); markSet('trash', lastCloudTrash);
     saveLocal();
@@ -18752,7 +18827,7 @@ async function cloudSeedCheck(){
   if(cloudSeeded) return;                 // 클라우드에 이미 자료가 있다
   if(cloudSeedAsked()) return;
   // 물품만 보면 안 된다. 정비·항해일지·체크리스트만 있는 배도 올려야 한다.
-  const n = items.length + trash.length + maint.length + repair.length + voyage.length
+  const n = items.length + trashShown().length + maint.length + repair.length + voyage.length
           + fuel.length + runs.length + contacts.length + vdocs.length + checkt.length
           + lockers.length + shapes.length + posts.length + reviews.length;
   if(!n) return;
@@ -18911,7 +18986,7 @@ async function pushNow(){
     if(pushed || canPush('meta')){
       const res = await cloud.push(Object.assign({}, payload, {
         meta: canPush('meta'),
-        itemCount:items.length, trashCount:trash.length,
+        itemCount:items.length, trashCount:trashShown().length,
         maintCount:maint.length, repairCount:repair.length}));
       // ★ 올라간 것만 기준값을 갱신한다.
       //   못 올렸는데 갱신하면 그 내용은 영영 안 올라간다. 예전에 그렇게 잃을 뻔했다.
@@ -19243,7 +19318,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.87';
+const APP_VER = '4.89';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -20639,28 +20714,29 @@ function deleteItem(id){
 function updateTrashTab(){
   // ★ 받는 이름을 t 로 쓰면 사전 함수 t() 가 가려진다. el 로 둔다.
   const el = document.getElementById('trashTab');
-  const n = trash.length + mrTrash.length;
+  const n = trashShown().length + mrTrashShown().length;
   if(el) el.textContent = n ? (t('휴지통') + ' (' + n + ')') : t('휴지통');
 }
 
 function openTrash(){
   closePanel();
   const ov = document.getElementById('trashView');
-  const mrHtml = mrTrash.length ? `<div class="secl" style="margin:10px 0 4px;padding:0">${esc(t('정비 · 기록'))}</div>` + [...mrTrash].reverse().map(e=>
+  const 통 = trashShown(), 정 = mrTrashShown();
+  const mrHtml = 정.length ? `<div class="secl" style="margin:10px 0 4px;padding:0">${esc(t('정비 · 기록'))}</div>` + [...정].reverse().map(e=>
     `<div class="trow"><div style="flex:1"><div style="font-size:13px;color:#D7D9DC;font-weight:600"><span class="chip nchip" style="margin-right:6px">${KIND_LABEL[e.kind]||e.kind}</span>${esc(mrTrashName(e))}</div>
       <div style="font-size:11px;color:#5A5F66">${String(e.delAt||'').slice(0,10)} 삭제</div></div>
       <div style="display:flex;gap:8px"><button class="trestore" onclick="mrRestore('${e.id}')">${esc(t('복원'))}</button><button class="tdelp" onclick="mrPurge('${e.id}')">${esc(t('완전삭제'))}</button></div></div>`).join('') : '';
-  if(!trash.length && !mrTrash.length){ ov.querySelector('#trashBody').innerHTML = `<div style="color:#3a5a7a;text-align:center;padding:30px;font-size:13px">${esc(t('휴지통이 비어 있습니다'))}</div>`; }
-  else if(!trash.length){ ov.querySelector('#trashBody').innerHTML = mrHtml; }
+  if(!통.length && !정.length){ ov.querySelector('#trashBody').innerHTML = `<div style="color:#3a5a7a;text-align:center;padding:30px;font-size:13px">${esc(t('휴지통이 비어 있습니다'))}</div>`; }
+  else if(!통.length){ ov.querySelector('#trashBody').innerHTML = mrHtml; }
   else {
-    ov.querySelector('#trashBody').innerHTML = `<div class="secl" style="margin:2px 0 4px;padding:0">${esc(t('적재표 물품'))}</div>` + trash.map(it=>{
+    ov.querySelector('#trashBody').innerHTML = `<div class="secl" style="margin:2px 0 4px;padding:0">${esc(t('적재표 물품'))}</div>` + 통.map(it=>{
       const loc = getLocker(it.lockerId);
       let path = loc ? (loc.zone + ' · ' + loc.label) : '(삭제된 칸)';
       if(it.parentId){ const b = trash.find(x=>x.id===it.parentId)||items.find(x=>x.id===it.parentId); if(b) path += ' › 📦 '+b.name; }
       const thumb = it.photos&&it.photos.length?`<img loading="lazy" src="${thumbOf(it, 0)}" style="width:34px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #2a5a8a;margin-right:8px">`:'';
       return `<div class="trow">${thumb}<div style="flex:1"><div style="font-size:13px;color:#c8dff0;font-weight:600">${it.box?'📦 ':''}${esc(it.name || t('(이름 없음)'))} <span style="color:#7aefaa">×${esc(it.qty)}${esc(it.unit||'')}</span></div><div style="font-size:11px;color:#5a7a9a">${esc(path)}</div></div>
         <div style="display:flex;gap:8px"><button class="trestore" onclick="restoreItem(${it.id})">${esc(t('복원'))}</button><button class="tdelp" onclick="purgeItem(${it.id})">${esc(t('완전삭제'))}</button></div></div>`;
-    }).join('') + mrHtml + ((trash.length+mrTrash.length)>1?`<button class="bs" style="width:100%;margin-top:10px;border-color:#7a3a3a;color:#c87a7a" onclick="purgeAll()">${esc(t('휴지통 비우기 (전체 완전삭제)'))}</button>`:'');
+    }).join('') + mrHtml + ((통.length+정.length)>1?`<button class="bs" style="width:100%;margin-top:10px;border-color:#7a3a3a;color:#c87a7a" onclick="purgeAll()">${esc(t('휴지통 비우기 (전체 완전삭제)'))}</button>`:'');
   }
   ov.style.display = 'flex';
 }
@@ -20669,6 +20745,7 @@ function closeTrash(){ document.getElementById('trashView').style.display='none'
 function restoreItem(id){
   const idx = trash.findIndex(i=>i.id===id); if(idx<0) return;
   const it = trash[idx];
+  if(isGone(it)) return;                    // 완전삭제한 표다 — 되살릴 속이 없다
   const restoreSet = [it];
   if(it.box){ trash.filter(x=>x.parentId===id).forEach(c=>restoreSet.push(c)); }
   if(it.parentId && !getItem(it.parentId) && !trash.find(x=>x.id===it.parentId)){
@@ -20683,14 +20760,15 @@ async function purgeItem(id){
   const it = trash.find(i=>i.id===id); if(!it) return;
   if(!await ask(tsub('"{name}"을(를) 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:it.name}), { ok: t('완전히 지우기'), warn: true })) return;
   const dead = new Set([id, ...trash.filter(x=>x.parentId===id).map(x=>x.id)]);
-  trash = trash.filter(i=>!dead.has(i.id));
+  trash = trash.map(i => dead.has(i.id) ? goneStub(i) : i);   // 표만 남긴다
   save(); updateTrashTab(); openTrash();
 }
 async function purgeAll(){
-  const n = trash.length + mrTrash.length;
+  const n = trashShown().length + mrTrashShown().length;
   if(!await ask(tsub('휴지통의 {n}개 항목을 모두 삭제합니다. 복구할 수 없습니다. 계속할까요?', {n:n}), { ok: t('완전히 지우기'), warn: true })) return;
-  trash = []; mrTrash = [];
-  save(); updateTrashTab(); openTrash();
+  trash   = trash.map(x => isGone(x) ? x : goneStub(x));      // 속은 버리고 표만 남긴다
+  mrTrash = mrTrash.map(x => isGone(x) ? x : goneStub(x));
+  save(); saveMR(); updateTrashTab(); openTrash();
 }
 
 
@@ -20896,6 +20974,51 @@ function sortItems(list){
     arr.sort((a,b)=>{ const na=parseFloat(a.qty), nb=parseFloat(b.qty); const va=isNaN(na)?-1:na, vb=isNaN(nb)?-1:nb; return vb-va || byName(a,b); });
   }
   return arr;
+}
+// ══ 밑으로 펼쳐지는 고르기 ═══════════════════════════════════════════════
+//   ★ 눌러서 하나씩 돌리는 방식은 「지금 무엇을 고를 수 있는지」 를 감춘다.
+//     사장님 말씀 — 누를 때마다 바뀌어 불편하다. 한 번에 다 보여 주고 고르게 한다.
+//   ★ 자리는 fixed 로 잡는다. 머리줄 안에 넣으면 잘린다.
+let pmPick = null;
+function pmOpen(anchor, rows, cur, onPick){
+  const ov = document.getElementById('pmOv'), box = document.getElementById('pmBox');
+  if(!ov || !box || !anchor) return;
+  pmPick = onPick;
+  box.innerHTML = rows.map(r =>
+    `<button class="${String(r[0]) === String(cur) ? 'on' : ''}" onclick="pmHit('${
+      String(r[0]).replace(/'/g, "\\'")}')">${esc(t(r[1]))}</button>`).join('');
+  ov.classList.add('open');
+  // 단추 바로 밑에 붙인다. 화면 밖으로 나가면 안으로 들인다.
+  const b = anchor.getBoundingClientRect();
+  box.style.left = '0px'; box.style.top = '0px';
+  const w = box.offsetWidth, h = box.offsetHeight;
+  let x = b.left, y = b.bottom + 6;
+  if(x + w > innerWidth - 8)  x = Math.max(8, innerWidth - 8 - w);
+  if(y + h > innerHeight - 8) y = Math.max(8, b.top - 6 - h);   // 아래가 좁으면 위로
+  box.style.left = Math.round(x) + 'px';
+  box.style.top  = Math.round(y) + 'px';
+  try{ overlayPush('pmOv'); }catch(_){}
+}
+function pmClose(){
+  const ov = document.getElementById('pmOv');
+  if(ov) ov.classList.remove('open');
+  pmPick = null;
+  try{ overlayPop('pmOv'); }catch(_){}
+}
+function pmHit(v){ const f = pmPick; pmClose(); if(f) f(v); }
+
+// 적재표 「가나다순 ▾」
+//   ★ 사전이 data-t 를 덮어쓰면 ▾ 가 지워진다. 그래서 여기서 그린다.
+function sortTabPaint(){
+  const el = document.getElementById('sortTab');
+  if(!el) return;
+  const m = SORT_MODES.find(x => x[0] === sortMode) || SORT_MODES[0];
+  el.textContent = t(m[1]) + ' \u25BE';
+}
+function sortMenu(btn){
+  pmOpen(btn, SORT_MODES, sortMode, v => {
+    sortMode = v; sortTabPaint(); renderPanelItems(); renderList();
+  });
 }
 function cycleSort(){
   const i = SORT_MODES.findIndex(m=>m[0]===sortMode);
@@ -22906,6 +23029,7 @@ function mrTrashName(e){
 function mrRestore(tid){
   const i = mrTrash.findIndex(e=>e.id===tid); if(i<0) return;
   const e = mrTrash[i];
+  if(isGone(e) || !e.data) return;          // 완전삭제한 표다 — 되살릴 속이 없다
   if(e.kind==='maint' || e.kind==='gear' || e.kind==='mlog') maint.push(e.data);
   else if(e.kind==='review') reviews.push(e.data);
   else if(e.kind==='repair') repair.push(e.data);
@@ -22922,7 +23046,7 @@ function mrRestore(tid){
 async function mrPurge(tid){
   const e = mrTrash.find(x=>x.id===tid); if(!e) return;
   if(!await ask(tsub('"{name}" 항목을 완전히 삭제합니다. 복구할 수 없습니다. 계속할까요?', {name:mrTrashName(e)}), { ok: t('완전히 지우기'), warn: true })) return;
-  mrTrash = mrTrash.filter(x=>x.id!==tid);
+  mrTrash = mrTrash.map(x => x.id===tid ? goneStub(x) : x);   // 표만 남긴다
   saveMR(); updateTrashTab(); openTrash();
 }
 function mrDelPhoto(i){
@@ -23817,7 +23941,7 @@ function askText(title, value, ph){
     input: { value: value == null ? '' : value, ph: ph || '' },
     btns: [{ name: t('취소'), v: null }, { name: t('확인'), v: true, kind: 'ok' }] });
 }
-const OVERLAY_IDS = ['tellOv','photoView','recPick','dgPick','drawerOv'];
+const OVERLAY_IDS = ['tellOv','photoView','recPick','dgPick','drawerOv','pmOv'];
 const OVERLAY_STACK = [];
 window.OVERLAY_STACK = OVERLAY_STACK;
 function overlayPush(id){
@@ -23839,7 +23963,8 @@ function closeTopOverlay(){
     recPick:   ()=>closeRecPick(),
     dgPick:    ()=>closeDgPick(),
     drawerOv:  ()=>closeDrawer(),
-    tellOv:    ()=>tellClose()
+    tellOv:    ()=>tellClose(),
+    pmOv:      ()=>pmClose()
   };
   try{ if(F[id]){ F[id](); return true; } }catch(_){}
   const el = document.getElementById(id);

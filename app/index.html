@@ -11231,7 +11231,7 @@ async function dgRename(k){
 // ★ 지우기 전에 그 도면에 찍힌 핀이 몇인지 세어 말한다.
 //   말없이 지우면 핀이 갈 곳을 잃는다 — 자료에는 남는데 화면에서 영영 안 보인다.
 function dgPinsOn(k){
-  const 셈 = a => (Array.isArray(a) ? a : []).filter(x => x && x.pin && x.pin.map === k).length;
+  const 셈 = a => (Array.isArray(a) ? a : []).filter(x => { const p = pinAt(x); return p && p.map === k; }).length;
   return 셈(typeof gearRows === 'function' ? gearRows() : [])
        + 셈(typeof maint !== 'undefined' ? maint : [])
        + 셈(typeof repair !== 'undefined' ? repair : []);
@@ -18099,6 +18099,8 @@ async function initStorage(){
 function saveLocal(){
   // ★ 기한이 바뀌었을 수 있다. 걸어 둔 알람도 따라와야 한다.
   try{ maintAlarmSoon(); }catch(_){}
+  // ★ 무엇이 바뀌었는지 여기서 한 번에 찍는다 (아래 stampEdits 주석 참고)
+  try{ stampEdits(); }catch(_){}
   if(db){
     // 기록은 배별로 나눠 저장한다. 배 목록과 현재 배는 공통이다.
     idbSet(bkey('all'), items).catch(e=>tell(t('저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 파일로 저장한 뒤 다시 시도해 주세요.')));
@@ -18221,6 +18223,10 @@ let cloudSeeded = false;   // 클라우드에 이 배의 자료가 있는가 (me
 // 컴퓨터에서 처음 켤 때 실제로 이 순서가 된다.
 let pullDone = false;
 let pushWanted = false;
+// ★ 밀어 둔 올리기가 있나. 앱을 덮을 때 그 자리에서 마저 보내려고 둔다.
+let pushPending = false;
+// 마지막으로 받아온 때 — 앞으로 나올 때마다 무턱대고 받으면 읽기 값이 샌다
+let lastPullAt = 0;
 let storageReadyResolve; const storageReady = new Promise(r=>storageReadyResolve=r);
 // ★ 옮기기는 여기 한 곳에서 — 부르는 자리가 열두 곳이다.
 function setSync(msg){ const el=document.getElementById('syncState'); if(el) el.textContent = t(msg); }
@@ -18325,18 +18331,60 @@ async function markLoad(){
   }catch(_){ cloudMark = {}; }
 }
 // 받아온 줄과 폰의 줄을 합친다. ★ 폰에서 고친 것은 절대 안 버린다.
+// ★★★ 여기서 지운 것 (4.87 — 사장님 지적으로 잡은 내 잘못)
+//   4.85 에서 「자국이 없으면 하나도 안 버린다」 로 만들었다. 안전하다고 여겼는데
+//   **지운 것까지 되살렸다.** 사장님이 안 쓰는 정기점검 초안을 다 지워 두셨는데
+//   판을 올리자 전부 되살아났다. 「안 버린다」 가 「되살린다」 가 된 것이다.
+//
+//   앱은 지운 것을 버리지 않고 휴지통에 둔다(mrTrash · trash). 그것이 답이다 —
+//   휴지통에 있는 번호는 클라우드에서 와도 다시 안 싣는다.
+//   되살리기(mrRestore)를 누르면 휴지통에서 빠지므로 그때는 다시 실린다.
+function deadIds(coll){
+  const s = new Set();
+  const KIND = { maint:['maint','gear','mlog'], repair:['repair'], reviews:['review'],
+                 voyage:['voyage'], fuel:['fuel'], runs:['run'], contacts:['contact'],
+                 vdocs:['vdoc'], checkt:['check'] };
+  const ks = KIND[coll];
+  const 휴 = (typeof mrTrash !== 'undefined' && Array.isArray(mrTrash)) ? mrTrash : [];
+  if(ks) 휴.forEach(e => {
+    if(e && ks.indexOf(e.kind) >= 0 && e.data && e.data.id != null) s.add(String(e.data.id));
+  });
+  if(coll === 'items'){
+    const 통 = (typeof trash !== 'undefined' && Array.isArray(trash)) ? trash : [];
+    통.forEach(x => { if(x && x.id != null) s.add(String(x.id)); });
+  }
+  return s;
+}
 function keepMine(coll, cloudRows){
   const cloud = Array.isArray(cloudRows) ? cloudRows : [];
   const mine  = localColl(coll);
   const mark  = cloudMark[coll];
+  // 휴지통에 있는 것은 클라우드에서 와도 다시 안 싣는다
+  const dead  = (coll === 'trash' || coll === 'mrtrash') ? new Set() : deadIds(coll);
   const out   = new Map();
-  cloud.forEach(x => { if(x && x.id != null) out.set(String(x.id), x); });
-  (Array.isArray(mine) ? mine : []).forEach(x => {
+  const 내것 = new Map();
+  (Array.isArray(mine) ? mine : []).forEach(x => { if(x && x.id != null) 내것.set(String(x.id), x); });
+  const 클것 = new Set();
+  // ── 클라우드 줄 중 이길 것
+  cloud.forEach(x => {
     if(!x || x.id == null) return;
     const id = String(x.id);
-    // 올린 그대로면 클라우드 쪽 판단을 따른다 (다른 기기에서 고쳤거나 지웠다)
-    if(mark && mark[id] === rowMark(x)) return;
-    out.set(id, x);   // 폰에서 고쳤다 · 새로 만들었다 · 자국이 없어 모른다
+    클것.add(id);
+    if(dead.has(id)) return;                                  // 여기서 지운 것은 안 되살린다
+    const l = 내것.get(id);
+    if(!l){ out.set(id, x); return; }                         // 여기 없던 것 — 받는다
+    const 남나중 = Number(x._m || 0) > Number(l._m || 0);
+    const 내나중 = Number(l._m || 0) > Number(x._m || 0);
+    if(내나중) return;                                        // 여기 것이 더 나중이다
+    // 시각이 같거나 없으면 자국으로 가른다 — 올린 그대로면 클라우드 쪽을 따른다
+    if(남나중 || (mark && mark[id] === rowMark(l))) out.set(id, x);
+  });
+  // ── 여기 줄 중 아직 안 담긴 것
+  내것.forEach((x, id) => {
+    if(out.has(id)) return;
+    // 클라우드에 없고, 올린 그대로였다면 → 다른 기기에서 지운 것이다
+    if(!클것.has(id) && mark && mark[id] === rowMark(x)) return;
+    out.set(id, x);
   });
   return [...out.values()];
 }
@@ -18346,6 +18394,34 @@ function pullInto(coll, rows){
   const mine = localColl(coll);
   if(!Array.isArray(rows) || !rows.length) return mine;
   return keepMine(coll, rows);
+}
+// ★★★ 기록마다 「이 기기에서 마지막으로 고친 때」 (4.87 — 사장님 자료가 옛것으로 돌아간 일)
+//   자국(mark)만으로는 「어느 쪽이 나중 것인가」 를 알 수 없었다. 그래서 클라우드에 남아 있던
+//   옛 내용이 사장님이 나중에 고친 것을 덮었다. 시각이 없으면 이 판단을 할 수가 없다.
+//   ★ 찍는 곳은 saveLocal 한 곳이다. 고치는 자리마다 손으로 찍게 하면 반드시 빠뜨린다.
+//   ★ 처음 읽어 들인 판은 안 찍는다 — 그때 다 찍으면 온 세상이 '방금 고침' 이 된다.
+let editSeen = {};
+function stampEdits(){
+  try{
+    SYNC_COLLS.forEach(coll => {
+      if(coll === 'trash' || coll === 'mrtrash') return;
+      const arr = localColl(coll);
+      if(!Array.isArray(arr)) return;
+      const seen = editSeen[coll] || null;
+      const next = {};
+      const now = Date.now();
+      arr.forEach(x => {
+        if(!x || x.id == null) return;
+        const id = String(x.id);
+        const h = strHash(JSON.stringify(Object.assign({}, x, { _m: 0 })));
+        next[id] = h;
+        if(!seen) return;                 // 처음 본 판 — 언제 고쳤는지 알 수 없다
+        if(seen[id] === h) return;         // 안 바뀌었다
+        x._m = now;                        // 이 기기에서 방금 고쳤다
+      });
+      editSeen[coll] = next;
+    });
+  }catch(_){}
 }
 // 아직 못 올린 것이 몇인가 — 화면에 정직하게 적기 위해서다
 function unsentCount(){
@@ -18549,6 +18625,7 @@ async function cloudPull(){
   markSave();
   // 여기까지 왔으면 이 배의 클라우드 자료를 다 받았다. 이제 올려도 된다.
   pullDone = true;
+  lastPullAt = Date.now();
   cloudSeeded = !!r.seeded;
   if(pushWanted){ pushWanted = false; schedulePush(); }
   if(r.seeded){
@@ -18763,12 +18840,14 @@ function schedulePush(){
   // 받아오기가 끝나기 전이면 미뤄 둔다. 끝나면 이어서 올린다.
   if(!pullDone){ pushWanted = true; setSync('받아오는 중…'); return; }
   setSync('저장 중…');
+  pushPending = true;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushNow, 1200);
 }
 async function pushNow(){
   if(!cloud || !unlocked) return;
   if(!pullDone){ pushWanted = true; return; }   // 받아오기 전에는 나가지 않는다
+  clearTimeout(pushTimer); pushTimer = null; pushPending = false;
   try{
     const curI = snapOf(items), curT = snapOf(trash), curM = snapOf(maint), curR = snapOf(repair);
     const diff = (cur, last)=>{
@@ -19164,7 +19243,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.86';
+const APP_VER = '4.87';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -19667,6 +19746,65 @@ function navPush(kind){
 // ★ 뒤로가기로 물릴 것이 남아 있나 — 판단하는 문은 이것 하나다.
 //   브라우저 뒤로가기(popstate)와 앱의 뒤로가기 단추가 같은 것을 본다.
 //   두 곳에 따로 적으면 한쪽만 고쳐져서, 앱에서만 엉뚱하게 도는 일이 난다.
+// ★★★ 뒤로 가기 — 탭마다 제 자국을 갖는다 (4.87)
+//
+//   사장님 지적: 「뒤로가기하면 지금 보던 탭이 꺼져 버리고 이전 탭으로 간다」
+//   그래서 처음에는 지나온 자리를 통째로 하나에 쌓았는데, 그러면 **탭을 옮긴 것까지**
+//   뒤로 가기가 되물린다. 사장님이 「다른 어플들은 어떻게 만들었냐」 물으셔서 확인했다.
+//
+//   구글이 정한 것 (Android Navigation — multiple back stacks):
+//     「탭마다 제 뒤로가기 자국을 따로 둔다. 그래야 탭을 오가도 **각 탭에서 보던 자리를
+//       잃지 않는다.**」 https://developer.android.com/guide/navigation/backstack/multi-back-stacks
+//     즉 **탭을 옮긴 것은 뒤로 가기로 되물리지 않는다.** 지금 탭 안에서만 한 걸음씩 물린다.
+//   애플도 같다 — 탭마다 제 화면 더미가 있고, 쓸어 넘기기는 그 안에서만 움직인다.
+//
+//   그래서 이렇게 한다:
+//     · 지금 탭 안에서 하위 갈래를 옮긴 것 → 한 걸음씩 물린다
+//     · 그 탭의 첫 자리까지 왔으면 → 오늘로
+//     · 탭을 옮긴 것 자체는 안 물린다. 대신 각 탭은 보던 자리를 그대로 갖고 있다
+function navSpot(){
+  return [curTab,
+          typeof boatSubTab !== 'undefined' ? boatSubTab : '',
+          typeof mntSub     !== 'undefined' ? mntSub     : '',
+          typeof gearView   !== 'undefined' ? gearView   : '',
+          typeof homeSub    !== 'undefined' ? homeSub    : '',
+          typeof comSub     !== 'undefined' ? comSub     : '',
+          typeof expSub     !== 'undefined' ? expSub     : ''].join('|');
+}
+const navTrails = {};          // { 탭: [자리, 자리, …] }
+let navBusy = false;
+const NAVTRAIL_MAX = 20;
+function navTrail(){ return (navTrails[curTab] = navTrails[curTab] || []); }
+function navMark(){
+  if(navBusy) return;                                   // 물리는 중에는 안 쌓는다
+  const tr = navTrail();
+  const now = navSpot();
+  if(tr[tr.length - 1] === now) return;                 // 같은 자리면 안 쌓는다
+  tr.push(now);
+  if(tr.length > NAVTRAIL_MAX) tr.shift();
+  try{ navPush('spot'); }catch(_){}
+}
+function navApplySpot(sp){
+  const a = String(sp).split('|');
+  navBusy = true;
+  try{
+    if(typeof boatSubTab !== 'undefined') boatSubTab = a[1];
+    if(typeof mntSub     !== 'undefined') mntSub     = a[2];
+    if(typeof gearView   !== 'undefined') gearView   = a[3];
+    if(typeof homeSub    !== 'undefined') homeSub    = a[4];
+    if(typeof comSub     !== 'undefined') comSub     = a[5];
+    if(typeof expSub     !== 'undefined') expSub     = a[6];
+    switchTab(a[0]);
+  } finally { navBusy = false; }
+}
+// 지금 탭 안에서 한 걸음 물린다. 더 물릴 것이 없으면 false — 그때는 오늘로 간다.
+function navSpotBack(){
+  const tr = navTrail();
+  if(tr.length < 2) return false;
+  tr.pop();
+  navApplySpot(tr[tr.length - 1]);
+  return true;
+}
 function navBackKind(){
   // 1) 그리기 중이면 한 걸음 물린다
   if(typeof lkEdit !== 'undefined' && lkEdit && canUndo()) return 'undo';
@@ -19677,7 +19815,9 @@ function navBackKind(){
   // 4) 떠 있는 화면이 있으면 맨 위 것부터 닫는다
   //    (내 배·물품 목록·입력·휴지통·도움말·할 일 — 쌓인 순서대로)
   if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length) return 'screen';
-  // 5) 오늘이 아니면 오늘로
+  // 5) 지금 탭 안에서 옮겨 다닌 자국이 있으면 한 걸음 물린다
+  if(navTrails[curTab] && navTrails[curTab].length > 1) return 'spot';
+  // 6) 그 탭의 첫 자리까지 왔으면 오늘로 (구글이 정한 것과 같다)
   if(curTab !== 'home') return 'tab';
   return '';                       // 더 물릴 것이 없다
 }
@@ -19688,6 +19828,7 @@ function navDoBack(kind){
   if(k === 'overlay'){ closeTopOverlay(); return true; }
   if(k === 'pubvoy'){ pubVoyBack(); return true; }
   if(k === 'screen'){ closeTopScreen(); return true; }
+  if(k === 'spot'){ return navSpotBack(); }
   if(k === 'tab'){ switchTab('home'); navPush('home'); return true; }
   return false;
 }
@@ -21855,6 +21996,7 @@ function switchTab(t){
   measureHeader();
 
   renderCurrent();
+  navMark();          // ★ 지나온 자리를 적는다 (뒤로 가기가 이것을 쓴다)
 }
 // ★ 지금 보고 있는 화면의 '내용만' 다시 그린다.
 //   화면을 옮기지도, 열어 둔 것을 닫지도 않는다.
@@ -22386,8 +22528,26 @@ async function mrRevertClose(){
   rerender(kind);
   closeMR();
 }
+// ★★★ 창 안에서 다른 기록으로 건너간 자국 (4.87 — 사장님 지적)
+//   「장비 → 엔진 → 그 안의 정기점검」 까지 들어갔는데 뒤로 쓸어 넘기면
+//   엔진이 아니라 목록으로 튀었다. 화면 쌓기(SCREEN_STACK)는 **칸 이름**으로 쌓는데
+//   기록 창은 언제나 같은 칸(mrPanel)이라 두 번째 기록이 안 쌓였다.
+//   ★ 사장님이 정하신 규칙 — 「모든 화면은 다 바로 이전 화면으로 간다」.
+//   그래서 기록은 따로 쌓아 둔다. 뒤로 가면 바로 앞 기록으로 돌아간다.
+//   「목록」 단추는 그대로 목록으로 간다 — 그 단추에 적힌 말이 그것이다.
+let mrBack = [];
+const MRBACK_MAX = 12;
+let mrGoingBack = false;
 function openMR(kind, id){
   const it = getMR(kind,id); if(!it) return;
+  // 다른 기록으로 건너가는 것이면 지금 것을 자국에 남긴다.
+  // 같은 기록을 다시 그리는 것(칸 하나 고칠 때마다 돈다)은 쌓지 않는다.
+  // ★ 뒤로 가는 길에는 쌓지 않는다 — 쌓으면 영영 못 빠져나온다.
+  if(!mrGoingBack && mrOpenType && mrOpenId != null
+     && !(mrOpenType === kind && String(mrOpenId) === String(id))){
+    mrBack.push({ type: mrOpenType, id: mrOpenId });
+    if(mrBack.length > MRBACK_MAX) mrBack.shift();
+  }
   mrOpenType=kind; mrOpenId=String(id);
   // ★ 창을 '처음 열 때' 만 찍는다. 칸 하나 고칠 때마다 openMR 이 다시 도는데,
   //   그때도 찍으면 방금 고친 것이 '처음 모습' 이 되어 되돌릴 것이 없어진다.
@@ -22657,6 +22817,7 @@ function closeMR(){
   // 'full' 도 같이 걷어낸다. 남겨 두면 다음에 다른 화면이 엉뚱한 크기로 뜬다.
   if(P) P.classList.remove('open', 'full');
   mrOpenType=null; mrOpenId=null;
+  mrBack = [];                          // 목록으로 나가면 자국도 지운다
   mrSnap = null; mrSnapKey = null;      // 다음에 열 때 다시 찍는다
   restorePanel();
 }
@@ -22810,13 +22971,20 @@ function mrPinKind(){
   const c = curScreen();
   return (c === 'repair') ? 'repair' : (c === 'gear') ? 'gear' : 'maint';
 }
+// ★★★ 「장비」 통의 도면은 한 장이다 (4.87 — 사장님 지적)
+//   「전기 점검은 장비랑 공유되는 거라서 여기서는 도면이 장비가 나와야 되는 거 아닌가?」
+//   맞다. 4.85 에서 정기점검을 장비 안으로 넣었고 도면 단추도 하나다.
+//   그런데 그리는 것은 지금 보고 있는 갈래 것만이라, 장비 도면인데 장비가 안 보였다.
+//   ★ 장비 통에서는 **장비와 정기점검을 함께** 그린다. 그림도 다르다 — ⚙ 장비 · 🔧 정기점검.
+//     장비에 매인 정기점검은 그 장비 자리를 따르므로(pinAt) 한자리에 겹쳐 뜬다.
+//     장비에 안 매인 정기점검(사장님이 예전에 만드신 것)도 제 핀 자리에 그대로 보인다.
+//   ★ 수리는 제 탭이 따로 있다. 거기서는 수리만 그린다.
 function mrPinRows(){
   const c = mrPinKind();
-  // ★ 장비는 따로 배열이 없다. 정비 배열 안에 typ:'gear' 로 산다 — gearRows() 가 그 문이다.
-  const src = (c === 'repair') ? repair
-            : (c === 'gear')   ? (typeof gearRows === 'function' ? gearRows() : [])
-            : maint;
-  return Array.isArray(src) ? src : [];
+  if(c === 'repair') return Array.isArray(repair) ? repair : [];
+  const 장비 = (typeof gearRows === 'function') ? gearRows() : [];
+  const 점검 = (typeof maintRows === 'function') ? maintRows() : [];
+  return 장비.concat(점검);
 }
 function setMapKind(k, keepView){
   if(!keepView){ dgTouched = false; dgV = { s:1, x:0, y:0 }; }
@@ -22829,8 +22997,8 @@ function setMapKind(k, keepView){
   // ★ 사장님이 정하신 것 — 도면에는 **아직 안 고친 것만** 보인다.
   //   다 고친 것까지 다 찍히면 도면이 지난 일로 뒤덮여서, 지금 손봐야 할 곳이 안 보인다.
   //   보고 싶으면 「완료된 수리」 를 누른다 — 목록과 같은 스위치(showDone)를 쓴다.
-  const pins = items.filter(i => i.pin && i.pin.map === k
-    && !(cur === 'repair' && !showDone && i.status === 'done'));
+  const pins = items.filter(i => { const pp = pinAt(i);
+    return pp && pp.map === k && !(cur === 'repair' && !showDone && i.status === 'done'); });
   const src = dgShowSrc(k);
   if(!src){
     document.getElementById('mrMap').innerHTML =
@@ -23041,20 +23209,42 @@ function pinGroups(pins){
   const R = 5;   // 이보다 가까우면 묶는다 (도면 폭 대비 %)
   const gs = [];
   pins.forEach(p=>{
-    const g = gs.find(g=> Math.hypot(g.x-p.pin.x, g.y-p.pin.y) < R);
-    if(g){ g.items.push(p); g.x=(g.x*(g.items.length-1)+p.pin.x)/g.items.length;
-           g.y=(g.y*(g.items.length-1)+p.pin.y)/g.items.length; }
-    else gs.push({ x:p.pin.x, y:p.pin.y, items:[p] });
+    const pp = pinAt(p); if(!pp) return;
+    const g = gs.find(g=> Math.hypot(g.x-pp.x, g.y-pp.y) < R);
+    if(g){ g.items.push(p); g.x=(g.x*(g.items.length-1)+pp.x)/g.items.length;
+           g.y=(g.y*(g.items.length-1)+pp.y)/g.items.length; }
+    else gs.push({ x:pp.x, y:pp.y, items:[p] });
   });
   return gs;
 }
 function pinColor(i, t){
   if(isGear(i)) return '#8ab4d8';          // 장비는 상태가 없다 — 한 가지 색
-  return t==='maint' ? mStatus(i).c : (RP_COLOR[i.status]||'#8a97a8');
+  // ★ 통 이름이 아니라 줄 스스로를 본다 — 장비 도면에 정기점검이 함께 있다.
+  if(t === 'repair') return RP_COLOR[i.status] || '#8a97a8';
+  return mStatus(i).c;
 }
 // 도면 위의 핀 하나가 어느 갈래인지. 장비와 정비가 같은 배열에 살아서 여기서 갈라야 한다.
-function pinKindOf(i, t){ return (t==='maint' && isGear(i)) ? 'gear' : t; }
-function pinLayer(pins, t){
+// 핀 하나가 무엇인가. 장비 통에서는 장비와 정기점검이 한 도면에 같이 있으므로
+// 통 이름이 아니라 줄 스스로를 보고 가른다.
+function pinKindOf(i, t){
+  if(t === 'repair') return 'repair';
+  return isGear(i) ? 'gear' : 'maint';
+}
+// ★★★ 그 기록이 도면 어디에 있나 (4.87 — 사장님이 정하신 것)
+//   「장비에 연결된 수리는 장비에 있는 핀이 자동으로 수리 도면 핀에도 나와야 하는 거 아닐까?」
+//   맞다. 수리는 「그 장비를 고치는 일」 이다. 자리가 이미 정해져 있는데
+//   사람에게 같은 자리를 두 번 찍게 할 까닭이 없다.
+//   ★ 제 핀이 있으면 그것이 이긴다 — 같은 장비라도 고친 데가 다를 수 있다.
+//   ★ 이름표는 그 기록의 이름을 쓴다. 장비 이름이 아니다 — 수리 도면에서
+//     「빌지펌프」 라고만 뜨면 무슨 일인지 알 수 없다.
+function pinAt(it){
+  if(!it) return null;
+  if(it.pin) return it.pin;
+  const g = (it.gearId && typeof gearOf === 'function') ? gearOf(it.gearId) : null;
+  return (g && g.pin) ? g.pin : null;
+}
+// ★ 매개변수 이름을 t 로 두면 사전 함수 t() 가 가려진다 (fix403test 가 잡는다)
+function pinLayer(pins, kind){
   return pinGroups(pins).map((g, gi)=>{
     const open = pinOpenClu === gi;
     if(g.items.length > 1 && !open)
@@ -23066,13 +23256,14 @@ function pinLayer(pins, t){
       const a = n>1 ? (k/n)*Math.PI*2 : 0;
       const dx = n>1 ? Math.cos(a)*4.5 : 0, dy = n>1 ? Math.sin(a)*4.5 : 0;
       const sel = pinSel === String(i.id);
-      const ty  = pinKindOf(i, t);
+      const ty  = pinKindOf(i, kind);
       const ico = ty==='gear' ? '⚙' : (ty==='maint' ? '🔧' : (PIN_ICON[i.status] || '!'));
       const st  = ty==='repair' ? (RP_LABEL[i.status]||'') : '';
-      return `<div class="mpin${sel?' sel':''}" style="left:${(i.pin.x+dx).toFixed(2)}%;top:${(i.pin.y+dy).toFixed(2)}%;background:${pinColor(i,t)}"
+      const pp = pinAt(i); if(!pp) return '';
+      return `<div class="mpin${sel?' sel':''}" style="left:${(pp.x+dx).toFixed(2)}%;top:${(pp.y+dy).toFixed(2)}%;background:${pinColor(i,kind)}"
                 onclick="event.stopPropagation();pinTap('${ty}','${i.id}')">${ico}</div>`
-        + (sel ? `<div class="mtip" style="left:${(i.pin.x+dx).toFixed(2)}%;top:${(i.pin.y+dy).toFixed(2)}%">${
-              esc(i.name || i.title || '(이름 없음)')}${st?`<i>${esc(st)}</i>`:''}</div>` : '');
+        + (sel ? `<div class="mtip" style="left:${(pp.x+dx).toFixed(2)}%;top:${(pp.y+dy).toFixed(2)}%">${
+              esc(i.name || i.title || t('(이름 없음)'))}${st?`<i>${esc(st)}</i>`:''}</div>` : '');
     }).join('');
   }).join('');
 }
@@ -23134,10 +23325,10 @@ function pinRemove(){
   it.pin=null; saveMR(); openMR(mrOpenType,mrOpenId);
 }
 function pinShow(){
-  const it=getMR(mrOpenType,mrOpenId); if(!it||!it.pin) return;
+  const it=getMR(mrOpenType,mrOpenId); const pp=pinAt(it); if(!it||!pp) return;
   const ty = mrOpenType, id = mrOpenId;
-  const px = it.pin.x, py = it.pin.y;
-  mrMapKind = it.pin.map;
+  const px = pp.x, py = pp.y;
+  mrMapKind = pp.map;
   closeMR();
   pinSel = String(id);          // 어느 핀인지 이름표로 알려준다
   pinOpenClu = null;
@@ -23434,7 +23625,11 @@ function closeTopScreen(){
   const id = SCREEN_STACK[SCREEN_STACK.length - 1];
   if(!id) return false;
   const F = {
-    mrPanel:   ()=>closeBoat(),
+    // ★ 기록 창은 안에서 다른 기록으로 건너뛸 수 있다. 자국이 있으면 그리로 돌아간다.
+    mrPanel:   ()=>{ if(mrBack.length){ const p = mrBack.pop();
+                       mrGoingBack = true; try{ openMR(p.type, p.id); } finally { mrGoingBack = false; }
+                       return; }
+                     closeBoat(); },
     panel:     ()=>closePanel(),
     formOv:    ()=>closeForm(),
     trashView: ()=>closeTrash(),
@@ -30893,6 +31088,7 @@ function setGearSub(k){
   gearView = GEAR_SUBS.indexOf(k) >= 0 ? k : 'gear';
   try{ localStorage.setItem('bt_gearsub', gearView); }catch(_){}
   renderGearWrap();
+  if(typeof navMark === 'function') navMark();   // 이것도 「자리」 다
 }
 // ★ 그리는 일은 여기 한 곳에서 한다. 두 곳에서 그리면 단추와 화면이 어긋난다.
 function renderGearWrap(){
@@ -33739,11 +33935,35 @@ initStorage().then(()=>{
 setTimeout(paintVer, 1500);      // 옛 파일이 물려 있는지 켜자마자 확인한다
 setTimeout(checkNewsBadge, 2500);
 setInterval(checkNewsBadge, 30*60*1000);
+// ★★★ 앱을 덮을 때 · 다시 앞으로 나올 때 (4.86 — 사장님 지적)
+//
+//   「폰에서 고친 게 컴퓨터에서 안 보인다」 — 까닭이 둘이었다.
+//
+//   ① 폰: 고친 것은 1.2초 뒤에 올라가게 밀어 둔다(schedulePush). 그런데 고치자마자
+//      앱을 덮거나 화면을 끄면 안드로이드가 그 타이머를 얼려서 **영영 안 돈다.**
+//      그러면 그 기록은 폰에만 남는다. → 덮는 순간 밀어 둔 것을 그 자리에서 보낸다.
+//   ② 컴퓨터: 받아오기를 **앱을 켤 때 딱 한 번**만 했다. 창을 띄워 둔 채로는
+//      폰이 올린 것을 영영 안 받았다. → 다시 앞으로 나올 때 받아온다.
+//      다만 나올 때마다 받으면 읽기 값이 샌다. 1분 안에는 다시 안 받는다.
+const PULL_AGAIN_MS = 60000;
+function appHidden(){
+  try{
+    if(pushPending && cloud && unlocked && pullDone){ clearTimeout(pushTimer); pushTimer = null; pushNow(); }
+  }catch(_){}
+}
+function appVisible(){
+  try{
+    if(cloud && Date.now() - lastPullAt > PULL_AGAIN_MS) cloudPull().catch(()=>{});
+  }catch(_){}
+}
 document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState !== 'visible') return;
+  if(document.visibilityState !== 'visible'){ appHidden(); return; }
+  appVisible();
   if(curScreen() === 'news'){ renderNews(true); }
   else { checkNewsBadge(); }
 });
+// 창을 닫을 때도 마저 보낸다 (컴퓨터에서 탭을 닫는 경우)
+window.addEventListener('pagehide', appHidden);
 </script>
 
 <!-- ── 글 편집기 (Quill 2.0.3) ─────────────────────────────────────────────

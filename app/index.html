@@ -2465,6 +2465,12 @@ const I18N = {
     '보기':'Open',
     // ── 3.85 · 내 배 화면
     '배 목록':'Boats',
+    '{n}장':'{n} photos',
+    '{a}MB / {b}MB':'{a} MB of {b} MB',
+    '이 기기에 저장한 사진':'Photos kept on this device',
+    '지워지지 않게 해 두었습니다':'protected from deletion',
+    '아이폰은 사파리로만 쓰면 7일 넘게 앱을 안 열었을 때 기록을 지웁니다. 애플이 정해 둔 규칙입니다.':'On iPhone, if you only use Safari, your records are deleted after 7 days without opening the app. This is Apple\\u2019s own rule.',
+    '홈 화면에 두면 이 규칙에서 빠집니다. 기록이 그대로 남습니다.':'Adding it to the Home Screen exempts it from that rule. Your records stay.',
     '장비 목록':'Gear list',
     '도움말':'Help',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'This is your boat’s introduction. <b>Paste text together with photos and the photos land right where you paste.</b>',
@@ -4990,6 +4996,12 @@ const I18N = {
     '보기':'Открыть',
     // ── 3.85 · 내 배 화면
     '배 목록':'Суда',
+    '{n}장':'{n} фото',
+    '{a}MB / {b}MB':'{a} МБ из {b} МБ',
+    '이 기기에 저장한 사진':'Фото на этом устройстве',
+    '지워지지 않게 해 두었습니다':'защищено от удаления',
+    '아이폰은 사파리로만 쓰면 7일 넘게 앱을 안 열었을 때 기록을 지웁니다. 애플이 정해 둔 규칙입니다.':'На iPhone, если пользоваться только Safari, записи удаляются после 7 дней без запуска приложения. Это правило самой Apple.',
+    '홈 화면에 두면 이 규칙에서 빠집니다. 기록이 그대로 남습니다.':'Если добавить на главный экран, это правило не действует. Записи сохраняются.',
     '장비 목록':'Список снаряжения',
     '도움말':'Справка',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'Это рассказ о вашем судне. <b>Вставьте текст вместе с фото — фото окажутся там же.</b>',
@@ -7571,6 +7583,12 @@ const I18N = {
     '배를 등록하면 오늘 상태가 여기에 나옵니다':'船を登録すると、今日の状態がここに表示されます',
     '보기':'表示',
     '배 목록':'船の一覧',
+    '{n}장':'{n}枚',
+    '{a}MB / {b}MB':'{a}MB / {b}MB',
+    '이 기기에 저장한 사진':'この端末に保存した写真',
+    '지워지지 않게 해 두었습니다':'削除されないようにしてあります',
+    '아이폰은 사파리로만 쓰면 7일 넘게 앱을 안 열었을 때 기록을 지웁니다. 애플이 정해 둔 규칙입니다.':'iPhone では Safari だけで使うと、7日間アプリを開かなかったときに記録が消されます。アップルが定めた規則です。',
+    '홈 화면에 두면 이 규칙에서 빠집니다. 기록이 그대로 남습니다.':'ホーム画面に置けばこの規則から外れます。記録はそのまま残ります。',
     '장비 목록':'装備一覧',
     '도움말':'ヘルプ',
     '배를 소개하는 글입니다. <b>글을 사진째 복사해 붙여넣으면 사진이 그 자리에</b> 들어갑니다.':'船を紹介する文章です。<b>文章を写真ごとコピーして貼り付けると、写真もその場所に</b>入ります。',
@@ -10732,7 +10750,43 @@ async function toStored(list){
 //   올린 사람은 그 사진을 이미 가지고 있으니 그때 바로 넣어 두면 된다.
 //
 //   실패해도 조용히 넘어간다 — 사진은 이미 창고에 올라갔고, 이것은 덤이다.
+// ══════════════════════════════════════════════════════════════
+// ★★ 폰이 우리 기록을 통째로 지우지 못하게 한다 (4.90)
+//
+//   무슨 일이 생길 수 있었나 —
+//   폰 저장공간이 부족하면 브라우저는 「오래 안 쓴 사이트」부터 지운다.
+//   그런데 사진만 지우는 것이 아니다. **그 사이트 것을 통째로** 지운다 —
+//   기록(IndexedDB)도 저장분(Cache)도 한꺼번이다.
+//   MDN 이 그렇게 적어 두었다: "전부 아니면 전무 — 일관성을 지키려고
+//   부분 삭제는 하지 않는다."
+//   그러니 사진 몇 장이 아니라 **사장님 기록 전체**가 날아갈 수 있었다.
+//
+//   persist() 로 표시해 두면 그 대상에서 빠진다. 사람이 직접 지울 때만 지워진다.
+//
+//   ★ 크롬·사파리는 묻지 않고 스스로 정한다(쓴 흔적을 본다).
+//     파이어폭스만 사람에게 묻는다.
+//     그래서 **기록이 생긴 뒤에** 부른다 — 빈 앱에 대고 부르면 거절당한다.
+let storeSafe = null;              // true 지켜짐 · false 아님 · null 모름
+async function askPersist(){
+  try{
+    const st = navigator.storage;
+    if(!st || !st.persist) return (storeSafe = null);
+    if(await st.persisted()) return (storeSafe = true);
+    storeSafe = !!(await st.persist());
+    return storeSafe;
+  }catch(_){ return (storeSafe = null); }
+}
+// 폰 자리를 얼마나 쓰고 있나 (추정값이다 — 브라우저가 정확히 안 알려 준다)
+async function storeUse(){
+  try{
+    const st = navigator.storage;
+    if(!st || !st.estimate) return { used:0, quota:0 };
+    const e = await st.estimate();
+    return { used: e.usage || 0, quota: e.quota || 0 };
+  }catch(_){ return { used:0, quota:0 }; }
+}
 const PHOTO_CACHE = 'baetnil-photos';
+const SEEN_CACHE  = 'baetnil-seen';   // sw.js 의 SEEN 과 같아야 한다
 async function primePhoto(url, dataUrl){
   try{
     if(!url || !/^https?:/i.test(url)) return;
@@ -10756,22 +10810,111 @@ async function primePhoto(url, dataUrl){
 //   안 남기는 것 — 글판 · 정박지 · 중고 장터 · 배 소개
 //     (그 셋은 뭍에서 인터넷이 있을 때 보는 것이고,
 //      브라우저가 한 시간쯤은 알아서 들고 있어 다시 봐도 인터넷을 새로 쓰지 않는다)
-const PHOTO_KEEP_MAX = 400;   // sw.js 의 PHOTO_KEEP 과 같아야 한다 — 검사에서 확인한다
+// ★ 몇 장까지 담을지는 **폰 여유를 보고 정한다** (4.90).
+//   여태 400장으로 못박혀 있었다. 사장님 배 한 척이 만드는 사진이 천 장이 넘는데
+//   그중 3분의 1만 담고 있었던 것이다. 폰에 자리가 남아도 안 늘었다.
+const PHOTO_KEEP_MIN = 400;    // 아무리 빠듯해도 이만큼은 담는다
+const PHOTO_KEEP_TOP = 4000;   // 아무리 넉넉해도 이 이상은 안 담는다
+const PHOTO_ONE_KB   = 620;    // 사진 한 장 어림 (원본 600KB + 여유)
+let PHOTO_KEEP_MAX = PHOTO_KEEP_MIN;   // photoKeepN 이 고쳐 넣는다
 const KEEP_PER_RUN = 40;      // 한 번에 몰아 받지 않는다 (데이터 요금)
-// 배에서 봐야 하는 사진 주소를 모은다
+
+// 폰 여유를 보고 몇 장까지 담을지 정한다
+//   ★ 남은 자리를 다 쓰지 않는다. 4분의 1까지만 — 나머지는 기록과 남의 몫이다.
+async function photoKeepN(){
+  const { used, quota } = await storeUse();
+  if(!quota) return PHOTO_KEEP_MIN;                 // 못 재면 옛 숫자대로
+  const free = Math.max(0, quota - used);
+  const n = Math.floor((free / 4) / (PHOTO_ONE_KB * 1024));
+  return Math.max(PHOTO_KEEP_MIN, Math.min(PHOTO_KEEP_TOP, n));
+}
+// ★ 자리가 빠듯하면 **남의 사진부터** 버린다 (사장님 지적).
+//   글판·장터·정박지 사진은 뭍에서 다시 받으면 그만이다.
+//   내 배 사진은 바다에서 못 받는다. 그러니 남의 것이 먼저 나간다.
+const SEEN_DROP_AT = 0.90;    // 폰 자리를 9할 넘게 쓰고 있으면
+async function seenDropIfTight(){
+  try{
+    const { used, quota } = await storeUse();
+    if(!quota) return false;
+    if(used / quota < SEEN_DROP_AT) return false;
+    if(typeof caches === 'undefined') return false;
+    await caches.delete(SEEN_CACHE);
+    return true;
+  }catch(_){ return false; }
+}
+// ★ 내 배 사진 자리를 정리한다 — 여기가 **문 하나**다.
+//
+//   ① 이제 내 기록에 없는 사진(지운 것)부터 버린다
+//   ② 그다음 **덜 중요한 것부터** 버린다 (boatPhotoUrls 의 순서 뒤쪽)
+//
+//   ★ sw.js 에도 같은 일을 하던 코드가 있었는데 **아무 데서도 안 불리고 있었다.**
+//     그래서 내 배 사진은 여태 한 번도 안 버려지고 계속 쌓이는 중이었다.
+//     이제 여기 한 곳에서만 한다. 저쪽은 없앴다.
+async function trimBoatPhotos(){
+  try{
+    if(typeof caches === 'undefined') return 0;
+    PHOTO_KEEP_MAX = await photoKeepN();
+    const 순서 = boatPhotoUrls();                     // 중요한 것이 앞
+    // ★ 저장분은 주소를 제 방식으로 고쳐 들고 있다 —
+    //   한글이나 빈칸이 든 주소는 %ED%95%9C 같은 부호로 바뀐다.
+    //   날것끼리 견주면 하나도 안 맞아서 **남길 것까지 다 지운다.**
+    //   실제로 그렇게 다 지워지는 것을 시험에서 봤다. 양쪽을 같은 꼴로 만든다.
+    const 같은꼴 = u => { try{ return new URL(u, location.href).href; }catch(_){ return String(u); } };
+    const 남길 = new Set(순서.slice(0, PHOTO_KEEP_MAX).map(같은꼴));
+    const c = await caches.open(PHOTO_CACHE);
+    const ks = await c.keys();
+    let 버림 = 0;
+    for(const k of ks){
+      if(남길.has(같은꼴(k.url))) continue;
+      await c.delete(k); 버림++;
+    }
+    return 버림;
+  }catch(_){ return 0; }
+}
+// ══ 배에서 봐야 하는 사진 — 「없으면 곤란한 순서」로 모은다 (4.90) ═══════
+//
+//   ★ 사장님 지적 — 「오래된 것부터 버리지 말고, 덜 중요한 것부터 버려라」
+//
+//   여태 버리는 자리(sw.js trimPhotos)는 **넣은 순서**로 버렸다.
+//   그러면 도면처럼 제일 먼저 넣고 제일 오래 쓰는 것이 제일 먼저 버려진다.
+//   거꾸로다. 그래서 순서를 여기서 정한다.
+//
+//   기준은 하나 — **바다 한가운데서 이것이 없으면 곤란한가.**
+//     ① 도면      없으면 적재표·장비 화면이 통째로 못 쓴다. 몇 장 안 된다
+//     ② 장비      고장 났을 때 제일 먼저 여는 곳
+//     ③ 정기점검·수리
+//     ④ 적재표    물건 찾을 때
+//     ⑤ 서류      검사증·보험증 — 항구에서 필요할 수 있다
+//     ⑥ 배 게시판  여럿이 탈 때
+//     ⑦ 항해일지  지나간 기록. 배에서 급하지 않다
 function boatPhotoUrls(){
   const out = [];
   const add = a => (Array.isArray(a) ? a : []).forEach(x=>{
     if(typeof x === 'string' && /^https?:/i.test(x)) out.push(x); });
-  [ (typeof items==='undefined'?[]:items), (typeof maint==='undefined'?[]:maint),
-    (typeof repair==='undefined'?[]:repair), (typeof voyage==='undefined'?[]:voyage),
-    (typeof vdocs==='undefined'?[]:vdocs), (typeof posts==='undefined'?[]:posts)
-  ].forEach(list=>{
-    (Array.isArray(list) ? list : []).forEach(o => { if(o) add(o.photos); });
-  });
-  // 도면 — 작은 사본은 자료 안에 있으니 큰 것만 챙긴다
-  if(typeof dgImgs !== 'undefined') add([dgImgs.plan, dgImgs.side]);
-  return [...new Set(out)];
+  const addRows = rows => (Array.isArray(rows) ? rows : []).forEach(o => { if(o) add(o.photos); });
+  const A = v => Array.isArray(v) ? v : [];
+  const 정비   = (typeof maint   === 'undefined') ? [] : A(maint);
+  const 수리   = (typeof repair  === 'undefined') ? [] : A(repair);
+  const 물품   = (typeof items   === 'undefined') ? [] : A(items);
+  const 서류   = (typeof vdocs   === 'undefined') ? [] : A(vdocs);
+  const 게시판 = (typeof posts   === 'undefined') ? [] : A(posts);
+  const 항해   = (typeof voyage  === 'undefined') ? [] : A(voyage);
+
+  // ① 도면 — 작은 사본은 자료 안에 있으니 큰 것만 챙긴다
+  if(typeof dgImgs !== 'undefined' && dgImgs){
+    const ks = (typeof dgKeys === 'function') ? dgKeys() : ['plan','side'];
+    add(ks.map(k => dgImgs[k]));
+  }
+  // ② 장비  ③ 정기점검 (둘 다 maint 에 있다 — typ 로 갈린다)
+  addRows(정비.filter(x => typeof isGear === 'function' ? isGear(x) : (x && x.typ === 'gear')));
+  addRows(정비.filter(x => typeof isGear === 'function' ? !isGear(x) : !(x && x.typ === 'gear')));
+  addRows(수리);
+  // ④ 적재표  ⑤ 서류  ⑥ 배 게시판  ⑦ 항해일지
+  addRows(물품);
+  addRows(서류);
+  addRows(게시판);
+  addRows(항해);
+  return [...new Set(out)];          // 앞에 온 것이 이긴다 = 중요한 쪽이 남는다
 }
 // 사진 한 장을 폰에 챙겨 둔다. 이미 있으면 아무 일도 안 한다.
 async function keepPhoto(url){
@@ -10794,12 +10937,15 @@ async function keepBoatPhotos(){
   keepBusy = true;
   let got = 0;
   try{
+    await seenDropIfTight();                 // 빠듯하면 남의 사진부터 비운다
+    PHOTO_KEEP_MAX = await photoKeepN();     // 폰 여유를 보고 한도를 다시 정한다
     const urls = boatPhotoUrls().slice(0, PHOTO_KEEP_MAX);
     for(const u of urls){
       if(await keepPhoto(u)) got++;
       if(got >= KEEP_PER_RUN) break;      // 나머지는 다음 기회에
     }
   }catch(_){}
+  try{ await trimBoatPhotos(); }catch(_){}    // 덜 중요한 것부터 버린다
   keepBusy = false;
   return got;
 }
@@ -14569,9 +14715,18 @@ function installHowTo(){
       t('<b>[설치]</b> 를 누릅니다')}</span></div>
     <div class="mrnone" style="text-align:left">${esc(t('카카오톡·인스타그램 안에서 열었다면 먼저 크롬으로 열어 주세요.'))}<br>${
       t('(오른쪽 위 <b>⋮</b> → <b>다른 브라우저로 열기</b>)')}</div>`;
+  // ★ 아이폰은 「하면 좋은 것」이 아니라 「안 하면 기록이 지워지는 것」이다.
+  //   애플(WebKit) 규칙 — 사파리로만 쓰면 7일 안 열었을 때 기록을 지운다.
+  //   홈 화면에 둔 앱은 그 규칙에서 빠진다고 애플이 명시해 두었다.
+  //   좋은 점만 말하고 이것을 안 말하면 그것이 조용한 거짓말이다.
+  const 경고 = isIOS()
+    ? `<div class="mrnone" style="text-align:left;border-left:3px solid var(--yel);padding-left:12px">${
+        esc(t('아이폰은 사파리로만 쓰면 7일 넘게 앱을 안 열었을 때 기록을 지웁니다. 애플이 정해 둔 규칙입니다.'))}<br>${
+        esc(t('홈 화면에 두면 이 규칙에서 빠집니다. 기록이 그대로 남습니다.'))}</div>`
+    : '';
   P.innerHTML = `<div class="mrhead"><b>${esc(t('홈 화면에 추가하기'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('홈 화면에 두면 아이콘으로 바로 열립니다. 전체 화면으로 뜨고, 배 위에서 인터넷이 없어도 기록·도면·사진을 볼 수 있습니다.'))}</div>`
-    + (isIOS() ? ios : etc);
+    + 경고 + (isIOS() ? ios : etc);
   showPanel(P);
   setHeadTitle('홈 화면에 추가');
 }
@@ -18734,6 +18889,9 @@ async function cloudPull(){
   //   클라우드가 비어 있으면(seeded 아님) 지난 셈은 거짓이 되므로 버린다.
   if(r.seeded) saveSyncBase(C); else clearSyncBase();
   if(curScreen()==='maint' || curScreen()==='repair') renderMR();
+  // ★ 기록이 생겼으니 이제 「이 기록은 지우지 마라」 를 표시해 둔다.
+  //   빈 앱에 대고 부르면 브라우저가 거절한다. 그래서 여기서 부른다.
+  setTimeout(()=>{ try{ askPersist(); }catch(_){} }, 800);
   // 배 사진을 폰에 챙겨 둔다 — 기다리지 않는다
   setTimeout(()=>{ try{ keepBoatPhotos(); }catch(_){} }, 1500);
   // 옛 사진·도면이 아직 문서 안에 있으면 조금씩 창고로 옮긴다
@@ -19318,7 +19476,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.89';
+const APP_VER = '4.90';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -25596,12 +25754,30 @@ function openSettings(){
     + act(t('파일에서 불러오기'), t('저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다'),
           'drawerRestore()', 'restoreBtn')
     // ★ 자주 안 보는 것은 맨 끝에. 다만 법이 「언제든 볼 수 있게」 하라는 것이라 감추지는 않는다.
+    + lbl(t('이 기기'))
+    + act(t('이 기기에 저장한 사진'), t('세는 중…'), 'keepBoatPhotos()', 'photoRow')
     + lbl(t('커뮤니티'))
     + row(t('차단한 사람'), t('차단한 사람의 글을 다시 봅니다'), 'openMuted()')
     + lbl(t('앱'))
     + row(t('약관 · 개인정보'), t('이용약관 · 개인정보 처리방침'), "openLegal('terms')");
   showPanel(P);
   setHeadTitle('설정');
+  try{ paintPhotoRow(); }catch(_){}
+}
+// 「이 기기에 저장한 사진」 줄을 채운다.
+//   ★ 숫자를 못 재는 브라우저가 있다. 그때는 장수만 말한다 — 0MB 라고 하면 거짓말이다.
+async function paintPhotoRow(){
+  const el = document.getElementById('photoRow');
+  if(!el) return;
+  let 장 = 0;
+  try{ 장 = (await (await caches.open(PHOTO_CACHE)).keys()).length; }catch(_){}
+  const { used, quota } = await storeUse();
+  const MB = b => Math.round(b / (1024*1024));
+  let sub = tsub('{n}장', { n: 장 });
+  if(quota) sub += ' · ' + tsub('{a}MB / {b}MB', { a: MB(used), b: MB(quota) });
+  if(storeSafe === true) sub += ' · ' + t('지워지지 않게 해 두었습니다');
+  const s2 = el.querySelector('span');
+  if(s2) s2.textContent = sub;
 }
 
 function openLang(){

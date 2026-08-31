@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-4.89';
+const CACHE = 'baetnil-4.90';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -8,7 +8,8 @@ const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려�
 //   배 위에서는 인터넷이 없는 것이 보통이다. 한 번 본 사진은 여기에 남긴다.
 //   앱 버전을 올려도 지우지 않는다 — 지우면 배에 나갈 때마다 처음부터 다시 받아야 한다.
 const PHOTO_HOSTS = ['firebasestorage.googleapis.com'];
-const PHOTO_KEEP = 400;          // 이보다 많아지면 오래된 것부터 버린다
+// 내 배 사진 한도는 앱이 폰 여유를 보고 정한다 (index.html · photoKeepN).
+// 여기서는 숫자를 갖지 않는다 — 두 곳에 두면 어긋난다.
 
 // ★★★ 사진이 느렸던 까닭 ③ — 이미 올라간 사진은 창고가 여전히 「들고 있지 말라」 고 한다 (4.82).
 //
@@ -73,14 +74,17 @@ async function networkFirst(req){
 }
 
 // 오래된 사진부터 버린다. Cache 는 넣은 차례대로 열쇠를 돌려준다.
-async function trimPhotos(){
-  try{
-    const c = await caches.open(PHOTOS);
-    const ks = await c.keys();
-    if(ks.length <= PHOTO_KEEP) return;
-    for(const k of ks.slice(0, ks.length - PHOTO_KEEP)) await c.delete(k);
-  }catch(_){}
-}
+// ★ 내 배 사진(PHOTOS)을 버리는 일은 **여기서 안 한다** (4.90).
+//
+//   여태 이 자리에 trimPhotos 가 있었는데 **아무 데서도 안 불리고 있었다.**
+//   그래서 내 배 사진은 한 번도 안 버려지고 계속 쌓이는 중이었다.
+//
+//   그리고 여기서는 버릴 수가 없다 — 저장분에는 「이게 도면인지 항해 사진인지」가
+//   안 적혀 있다. 넣은 순서밖에 모른다. 그러면 제일 먼저 넣고 제일 오래 쓰는
+//   도면이 제일 먼저 버려진다. 거꾸로다.
+//
+//   그것을 아는 것은 앱이다. 그래서 앱의 trimBoatPhotos 한 곳에서만 한다.
+//   문이 둘이면 서로 다른 판단을 하고, 그러면 사람은 왜 사진이 사라졌는지 모른다.
 
 // 오래된 것부터 버린다 — 본 사진 자리도 같은 방식이다
 async function trimSeen(){

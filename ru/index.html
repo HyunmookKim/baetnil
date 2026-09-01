@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Baetnil — журнал обслуживания вашей лодки</title>
+<meta name="description" content="Журнал обслуживания, список оборудования, судовой журнал и опись. Всё об одной лодке в одном месте. И разговоры о лодках с барахолкой.">
+<meta name="theme-color" content="#122a44">
+<meta property="og:title" content="Baetnil — журнал обслуживания вашей лодки">
+<meta property="og:description" content="Журнал обслуживания, список оборудования, судовой журнал и опись. Всё об одной лодке в одном месте. И разговоры о лодках с барахолкой.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://baetnil.com/ru/">
+<link rel="canonical" href="https://baetnil.com/ru/">
+<!-- ★ hreflang — 「같은 글의 다른 나라 말판은 저기 있다」 를 구글에 알려 준다.
+     구글 문서: 각 판은 자기 자신과 나머지 전부를 가리켜야 하고, 서로 안 가리키면 무시한다.
+     네 판이 다 같은 목록을 들고 있어야 하므로 여기에 그대로 둔다 (파일마다 안 바꾼다). -->
+<link rel="alternate" hreflang="ko" href="https://baetnil.com/">
+<link rel="alternate" hreflang="ja" href="https://baetnil.com/ja/">
+<link rel="alternate" hreflang="en" href="https://baetnil.com/en/">
+<link rel="alternate" hreflang="ru" href="https://baetnil.com/ru/">
+<link rel="alternate" hreflang="x-default" href="https://baetnil.com/">
+<style>
+:root{
+  --bg:#081521; --sf:#0E1D2B; --sf2:#132738;
+  --ln:#1E3549; --tx:#E7EFF6; --tx2:#9FB4C6;
+  --ac:#9CC6E8; --yel:#D9AE63; --grn:#5FB894; --red:#E4756A;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--tx);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+  line-height:1.7; font-size:17px;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+a{color:var(--ac); text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:900px; margin:0 auto; padding:0 20px}
+
+/* 언어 */
+.otherlang{display:none; margin:14px 0 0; padding:10px 14px; border-radius:12px;
+  background:var(--sf2); border:1px solid var(--ln); font-size:14px; color:var(--tx2)}
+.otherlang.on{display:block}
+.otherlang a{color:var(--ac); font-weight:700; text-decoration:none}
+.langbar{display:flex; justify-content:flex-end; gap:6px; padding:16px 0 0}
+.langbar button{
+  font:inherit; font-size:14px; font-weight:600;
+  background:transparent; color:var(--tx2);
+  border:1px solid var(--ln); border-radius:999px;
+  padding:7px 15px; cursor:pointer; min-height:38px;
+  transition:color .15s, border-color .15s, background .15s;
+}
+.langbar button:hover{color:var(--tx); border-color:var(--ac)}
+.langbar button[aria-pressed="true"]{
+  color:var(--bg); background:var(--ac); border-color:var(--ac);
+}
+
+header{padding:44px 0; text-align:center}
+.logo{
+  width:76px; height:76px; margin:0 auto 22px; border-radius:20px;
+  background:linear-gradient(160deg,#16344E,#0C2033);
+  border:1px solid var(--ln);
+  display:flex; align-items:center; justify-content:center;
+}
+.logo svg{width:44px; height:44px}
+h1{font-size:40px; font-weight:800; letter-spacing:-0.02em; margin-bottom:14px}
+.tag{font-size:20px; color:var(--tx2); max-width:600px; margin:0 auto}
+.tag b{color:var(--tx); font-weight:600}
+
+.get{padding:0 0 52px}
+.getgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px}
+.btn{
+  display:block; background:var(--sf); border:1px solid var(--ln); border-radius:14px;
+  padding:18px 20px; text-align:left; color:var(--tx); text-decoration:none;
+  transition:border-color .15s, background .15s;
+}
+.btn:hover{text-decoration:none}
+.btn.on:hover{border-color:var(--ac); background:var(--sf2)}
+.btn.off{opacity:.55}
+.btn b{display:block; font-size:17px; font-weight:700; margin-bottom:3px}
+.btn span{font-size:14px; color:var(--tx2)}
+.btn.main{background:linear-gradient(160deg,#1B4568,#12314A); border-color:#2A5A80}
+
+section{padding:52px 0; border-top:1px solid var(--ln)}
+.eyebrow{font-size:14px; font-weight:700; letter-spacing:.04em; color:var(--ac); margin-bottom:8px}
+.eyebrow.b{color:var(--yel)}
+h2{font-size:27px; font-weight:750; margin-bottom:10px; letter-spacing:-0.01em}
+.lead{color:var(--tx2); margin-bottom:28px; max-width:660px}
+.lead b{color:var(--tx); font-weight:600}
+.feat{display:grid; grid-template-columns:repeat(auto-fit,minmax(238px,1fr)); gap:14px}
+.card{background:var(--sf); border:1px solid var(--ln); border-radius:14px; padding:20px}
+.card h3{font-size:17px; font-weight:700; margin-bottom:6px; color:var(--tx)}
+.card p{font-size:15px; color:var(--tx2); line-height:1.65}
+.dot{display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:8px; vertical-align:middle}
+
+.note{
+  background:rgba(217,174,99,.09); border:1px solid rgba(217,174,99,.3);
+  border-radius:12px; padding:16px 18px; font-size:15px; color:var(--tx2);
+}
+.note b{color:var(--yel)}
+
+.biz{background:var(--sf); border:1px solid var(--ln); border-radius:14px; padding:22px; font-size:15px}
+.biz dl{display:grid; grid-template-columns:auto 1fr; gap:9px 18px}
+.biz dt{color:var(--tx2); white-space:nowrap}
+.biz dd{color:var(--tx)}
+
+footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; color:var(--tx2)}
+.links{display:flex; flex-wrap:wrap; gap:8px 22px; margin-bottom:18px}
+
+@media (max-width:560px){
+  header{padding:32px 0}
+  h1{font-size:32px}
+  .tag{font-size:18px}
+  body{font-size:16px}
+  h2{font-size:23px}
+  .biz dl{grid-template-columns:1fr; gap:2px 0}
+  .biz dt{margin-top:10px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="langbar">
+    <button type="button" data-lang="ja" aria-pressed="false">日本語</button>
+    <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
+    <button type="button" data-lang="en" aria-pressed="false">English</button>
+    <button type="button" data-lang="ru" aria-pressed="true">Русский</button>
+  </div>
+
+  <!-- ★ 브라우저가 바라는 말이 이 판과 다르면 그리로 가는 길을 하나 둔다.
+       워커가 Accept-Language 로 보내 주지 못한 때(그리고 보내 준 뒤 되돌아올 때)의 문이다.
+       ★ 자동으로 옮겨 놓고 되돌릴 길을 안 주면, 그 말을 못 읽는 사람이 갇힌다. -->
+  <p class="otherlang" id="otherLang"></p>
+
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#9CC6E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v11"/>
+        <path d="M12 4.5l6.5 9.5H12z" fill="rgba(156,198,232,.18)"/>
+        <path d="M11 6L5.5 14H11z" fill="rgba(156,198,232,.1)"/>
+        <path d="M3 17.5c1.2 0 1.8.9 3 .9s1.8-.9 3-.9 1.8.9 3 .9 1.8-.9 3-.9 1.8.9 3 .9"/>
+        <path d="M3 20.8c1.2 0 1.8.9 3 .9s1.8-.9 3-.9 1.8.9 3 .9 1.8-.9 3-.9 1.8.9 3 .9"/>
+      </svg>
+    </div>
+    <h1>뱃일</h1>
+    <p class="tag" data-t="tag">Всё об одной лодке — в одном месте.<br><b>Обслуживание · Оборудование · Журнал · Опись</b></p>
+  </header>
+
+  <div class="get">
+    <div class="getgrid">
+      <a class="btn main on" href="app/">
+        <b data-t="g1t">Открыть в браузере ›</b><span data-t="g1s">Ничего устанавливать не нужно</span>
+      </a>
+      <a class="btn off">
+        <b data-t="g2t">iPhone · iPad</b><span data-t="g2s">App Store — скоро</span>
+      </a>
+      <a class="btn off">
+        <b data-t="g3t">Android</b><span data-t="g3s">Google Play — скоро</span>
+      </a>
+      <a class="btn on" href="app/">
+        <b data-t="g4t">Windows · Mac</b><span data-t="g4s">Нажмите «Установить» в браузере</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ★ 배 가진 사람 섹션이 먼저다 (사장님이 정하신 것).
+       커뮤니티는 사람이 쌓이기 전에는 값이 0 이지만, 수첩은 혼자 써도 값이 난다.
+       그리고 사람이 없는데 「제일 많이 열리는 자리」 라고 적으면 화면이 거짓말을 한다. -->
+  <section>
+    <p class="eyebrow b" data-t="s2eye">ЕСЛИ У ВАС ЕСТЬ ЛОДКА</p>
+    <h2 data-t="s2h">В середине всего — журнал обслуживания</h2>
+    <p class="lead" data-t="s2lead">Что чинили однажды, придётся чинить снова. Чтобы тогда не искать «как я это делал в прошлый раз» — ради этого всё и сделано. То, что было разбросано по бумагам, памяти и фотографиям, лежит в одном месте. <b>Полезно, даже если вы один.</b></p>
+    <div class="feat">
+      <div class="card"><h3><span class="dot" style="background:var(--ac)"></span><span data-t="d1t">Журнал обслуживания</span></h3><p data-t="d1p">Один шаг — одно фото и одна строка. Сложность, потраченное время, деньги и использованные детали остаются рядом. Не просто запись, а <b>то, что можно повторить в следующий раз</b>.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--grn)"></span><span data-t="d2t">Список оборудования</span></h3><p data-t="d2p">Что установлено на лодке, разложено по двенадцати системам. Производитель, модель, серийный номер, дата установки — и все проверки, ремонты и запчасти этой позиции рядом.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--yel)"></span><span data-t="d3t">Чертежи и отметки</span></h3><p data-t="d3p">Держите столько чертежей, сколько нужно, и отмечайте, где что стоит. Неисправное показано другим значком.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--red)"></span><span data-t="d4t">Плановые проверки</span></h3><p data-t="d4p">По календарю, по моточасам или по обоим сразу. Если задано и то и другое — подскажет, что наступит раньше: «6 месяцев или 250 часов».</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--red)"></span><span data-t="d5t">Ремонт и замена</span></h3><p data-t="d5p">Неисправности остаются неисправностями. При замене старая позиция не удаляется — она уходит в историю замен, и её ремонты остаются при ней.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--ac)"></span><span data-t="d6t">Опись</span></h3><p data-t="d6p">Запишите, что в каком рундуке. Задайте минимальный запас — и вам скажут, когда его не хватает.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--grn)"></span><span data-t="d7t">Судовой журнал</span></h3><p data-t="d7p">От отхода до прихода. Часы под парусом и моточасы считаются сами, и трек остаётся при переходе.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--yel)"></span><span data-t="d8t">Экипаж, права и документы</span></h3><p data-t="d8p">Для каждого отдельно решаете, что он видит и что может менять. О сроках освидетельствования и страховки предупредим заранее.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow" data-t="s1eye">ДАЖЕ БЕЗ ЛОДКИ</p>
+    <h2 data-t="s1h">Место, где живут разговоры о лодках</h2>
+    <p class="lead" data-t="s1lead">Те, у кого лодки ещё нет; те, кто ищет, где научиться; те, кто хочет выйти в море с кем-то. <b>Читать можно без регистрации.</b></p>
+    <div class="feat">
+      <div class="card"><h3><span class="dot" style="background:var(--ac)"></span><span data-t="c1t">Доски</span></h3><p data-t="c1p">Спрашивайте, отвечайте, рассказывайте, где были. Разделено на ремонт, переходы, снаряжение и всё остальное.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--grn)"></span><span data-t="c2t">В команду</span></h3><p data-t="c2p">Лодки, которым нужны люди, и люди, которым нужна лодка. Деньги здесь не ходят.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--yel)"></span><span data-t="c3t">Барахолка</span></h3><p data-t="c3p">Отдать снаряжение, которым больше не пользуетесь, и найти нужное. Лодочные вещи просто так не купишь.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--ac)"></span><span data-t="c4t">Посмотреть лодки</span></h3><p data-t="c4p">Открытые журналы обслуживания и судовые журналы. Чужой порядок работ можно <b>перенести в свои записи</b>.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--grn)"></span><span data-t="c5t">Отзывы на товары</span></h3><p data-t="c5p">Отзывы о том, что люди действительно поставили на лодку: оценка, срок использования и чего не хватает. Сначала — совпадающее с вашим оборудованием.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--yel)"></span><span data-t="c6t">Стоянки</span></h3><p data-t="c6p">152 стоянки по всей Корее: где можно встать и что там нашли те, кто уже был.</p></div>
+      <div class="card"><h3><span class="dot" style="background:var(--ac)"></span><span data-t="c7t">Погода, приливы и новости</span></h3><p data-t="c7p">Ветер, волна и приливы там, где вы сейчас, и морские новости в одном месте. Иностранную статью можно перевести одним нажатием.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="s3h">Сделано, чтобы работать на борту</h2>
+    <p class="lead" data-t="s3lead">Рассчитано на качку и руки в перчатках.</p>
+    <div class="feat">
+      <div class="card"><h3 data-t="e1t">Нажать, а не набирать</h3><p data-t="e1p">Никаких цифр вручную. Кнопки — под палец.</p></div>
+      <div class="card"><h3 data-t="e2t">Работает без связи</h3><p data-t="e2p">Открывается вдали от берега. Появится сеть — само догонит.</p></div>
+      <div class="card"><h3 data-t="e3t">日本語 · 한국어 · English · Русский</h3><p data-t="e3p">Язык меняется в боковом меню.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 data-t="s4h">Что мы делаем с данными о местоположении</h2>
+    <div class="note"><p data-t="s4p"><b>Координаты не публикуются никогда.</b> Даже у открытого журнала точки отхода и прихода, трек, названия стоянок и имена тех, кто был на борту, остаются скрытыми. Иначе это значило бы объявить всем, где стоит пустая лодка и каким путём она ходит.</p></div>
+  </section>
+
+  <section>
+    <h2 data-t="s5h">Кто делает</h2>
+    <div class="biz">
+      <dl>
+        <dt data-t="b1">Название</dt><dd data-t="bv1">Hyunmook</dd>
+        <dt data-t="b2">Владелец</dt><dd data-t="bv2">Мёнджун Ким</dd>
+        <dt data-t="b3">Рег. номер</dt><dd>626-19-02739</dd>
+        <dt data-t="b4">Адрес</dt><dd data-t="bv4">Rm 101, 38 Seonwon 7-gil, Ёсу, Республика Корея</dd>
+        <dt data-t="b5">Связаться</dt><dd><a href="mailto:help@baetnil.com">help@baetnil.com</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <div class="links">
+      <a href="/terms.ru.html"    data-t="f1" data-doc="terms">Условия использования</a>
+      <a href="/privacy.ru.html"  data-t="f2" data-doc="privacy">Политика конфиденциальности</a>
+      <a href="/location.ru.html" data-t="f3" data-doc="location">Условия о геоданных</a>
+      <a href="mailto:help@baetnil.com" data-t="f4">Написать нам</a>
+    </div>
+    <p data-t="f5">© 2026 Hyunmook. Сделано в Республике Корея.</p>
+  </footer>
+
+</div>
+
+<script>
+// ★ 옛 주소(hyunmookkim.github.io/baetnil/)로 홈 화면에 깔아 둔 사람 보호.
+//   그 자리에 이제 소개 페이지가 있어서, 그냥 두면 아이콘을 눌렀을 때
+//   앱이 아니라 소개 페이지가 뜬다. 홈 화면 아이콘으로 연 것이면 앱으로 보낸다.
+//   주소를 치고 들어온 사람에게는 소개 페이지가 그대로 보인다.
+(function(){
+  try{
+    var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches)
+              || navigator.standalone === true;
+    if(app){ location.replace('app/'); }
+  }catch(_){}
+})();
+
+var I18N = {
+ ko:{
+  seeIn:'한국어로 보기',
+  title:'뱃일 — 배 정비수첩과 배 이야기',
+  desc:'정비수첩 · 장비 목록 · 항해일지 · 적재표. 배 한 척의 기록을 한 곳에 남깁니다. 배 이야기와 장터도 함께.',
+  tag:'배 한 척의 기록을 한 곳에.<br><b>정비수첩 · 장비 목록 · 항해일지 · 적재표</b>',
+  g1t:'웹에서 바로 쓰기 ›', g1s:'깔지 않고 브라우저에서 씁니다',
+  g2t:'아이폰 · 아이패드',   g2s:'앱스토어 — 준비 중',
+  g3t:'안드로이드',          g3s:'플레이스토어 — 준비 중',
+  g4t:'윈도우 · 맥',         g4s:'브라우저에서 「설치」를 누르면 됩니다',
+
+  s2eye:'배를 가지셨다면', s2h:'정비수첩이 한가운데 있습니다',
+  s2lead:'한 번 고치고 나면 다음에 또 합니다. 그때 「지난번에 어떻게 했더라」를 안 뒤지게 하는 것이 이 앱의 한가운데입니다. 종이와 머릿속과 사진첩에 흩어져 있던 것을 한 곳에 둡니다. <b>혼자 써도 됩니다.</b>',
+  d1t:'정비수첩',   d1p:'한 단계 = 사진 한 장 + 설명 한 줄. 난이도 · 걸린 시간 · 든 돈 · 쓴 부품까지 남습니다. 기록이 아니라 <b>다음에도 그대로 따라 할 수 있는 수첩</b>으로 남깁니다.',
+  d2t:'장비 목록',  d2p:'배에 달린 것을 계통 열둘로 나눠 적어 둡니다. 제조사 · 모델 · 일련번호 · 설치일, 그리고 그 장비에 매달린 점검 · 수리 · 부품이 한 자리에 모입니다.',
+  d3t:'도면과 자리', d3p:'도면을 여러 장 두고 장비가 배 어디에 있는지 찍어 둡니다. 고장 난 것은 도면에서 다른 표시로 나옵니다.',
+  d4t:'정기점검',   d4p:'달력 주기로도, 엔진 시간으로도 잡습니다. 둘 다 적으면 먼저 오는 쪽을 알려 줍니다 — 「6개월 또는 250시간 중 먼저」가 그것입니다.',
+  d5t:'수리와 교체', d5p:'고장은 고장대로 남습니다. 장비를 새것으로 바꾸면 지난 장비는 지워지지 않고 교체 이력에 남고, 지난 장비의 수리는 지난 장비 것으로 남습니다.',
+  d6t:'적재표',     d6p:'어느 칸에 무엇이 있는지 적어 둡니다. 예비품은 최소 수량을 정해 두면 모자랄 때 알려 줍니다.',
+  d7t:'항해일지',   d7p:'출항부터 입항까지. 항해 시간과 엔진 시간이 저절로 쌓이고, 지나온 길도 함께 남습니다.',
+  d8t:'명부 · 등급 · 서류', d8p:'같이 타는 사람마다 무엇을 보고 무엇을 고칠 수 있는지 하나씩 정합니다. 검사증 · 보험 만료일은 미리 알려 줍니다.',
+
+  s1eye:'배가 없어도', s1h:'배 이야기가 모이는 곳',
+  s1lead:'배를 아직 안 가진 사람, 배울 곳을 찾는 사람, 남의 배를 타 보고 싶은 사람. <b>로그인 없이도 읽을 수 있습니다.</b>',
+  c1t:'글판',        c1p:'묻고 답하고, 다녀온 이야기를 나눕니다. 정비 · 항해기 · 장비 · 잡담으로 갈래가 나뉩니다.',
+  c2t:'같이 타기',   c2p:'사람을 구하는 배와, 타 보고 싶은 사람이 만납니다. 돈을 주고받는 자리가 아닙니다.',
+  c3t:'중고 장터',   c3p:'쓰던 장비를 넘기고 구합니다. 배 물건은 아무 데서나 안 나옵니다.',
+  c4t:'배 둘러보기', c4p:'남이 공개해 둔 정비수첩 · 항해일지를 봅니다. 남의 정비 절차를 <b>내 기록으로 가져올 수도</b> 있습니다.',
+  c5t:'제품 리뷰',   c5p:'배에 달아 본 물건의 후기. 별점 · 써 본 기간 · 아쉬운 점까지 적습니다. 내 배 장비와 겹치는 것부터 보여 줍니다.',
+  c6t:'정박지',      c6p:'전국 정박지 152곳. 어디에 댈 수 있는지, 다녀온 사람들이 뭐라 했는지 봅니다.',
+  c7t:'날씨 · 물때 · 소식', c7p:'지금 있는 자리의 바람과 파고, 물때. 바다와 배 소식도 모아 둡니다. 외국 글은 눌러서 옮겨 읽습니다.',
+
+  s3h:'배 위에서 쓰라고 만들었습니다',
+  s3lead:'흔들리는 배에서 장갑 낀 손으로 쓰는 것을 앞에 두고 만들었습니다.',
+  e1t:'눌러서 고릅니다', e1p:'숫자를 찍어 넣게 하지 않습니다. 단추는 손가락에 맞춰 크게 두었습니다.',
+  e2t:'인터넷이 끊겨도 씁니다', e2p:'바다 한가운데서도 열립니다. 신호가 잡히면 알아서 맞춥니다.',
+  e3t:'日本語 · 한국어 · English · Русский', e3p:'서랍에서 언어를 바꿉니다.',
+  s4h:'자리 정보를 다루는 방법',
+  s4p:'<b>공개해도 좌표는 나가지 않습니다.</b> 항해일지를 공개로 두어도 출·입항 좌표, 항적, 정박지 이름, 같이 탄 사람 이름은 나가지 않습니다. 빈 배가 어디 있는지, 어느 길로 다니는지 알려주는 셈이 되기 때문입니다.',
+  s5h:'만드는 곳',
+  b1:'상호', bv1:'현묵', b2:'대표자', bv2:'김명준',
+  b3:'사업자등록번호', b4:'사업장', bv4:'전남광주통합특별시 여수시 선원7길 38, 101호',
+  b5:'문의',
+  f1:'이용약관', f2:'개인정보처리방침', f3:'위치정보 이용약관', f4:'문의하기',
+  f5:'© 2026 현묵. 뱃일은 대한민국에서 만듭니다.'
+ },
+ en:{
+  seeIn:'View in English',
+  title:'Baetnil — a maintenance log for your boat',
+  desc:'Maintenance log, equipment list, logbook and stowage. Everything about one boat, kept in one place. Plus boat talk and a marketplace.',
+  tag:'Everything about one boat, in one place.<br><b>Maintenance log · Equipment · Logbook · Stowage</b>',
+  g1t:'Open in your browser ›', g1s:'Nothing to install',
+  g2t:'iPhone · iPad',  g2s:'App Store — coming soon',
+  g3t:'Android',        g3s:'Google Play — coming soon',
+  g4t:'Windows · Mac',  g4s:'Press “Install” in your browser',
+
+  s2eye:'IF YOU HAVE A BOAT', s2h:'The maintenance log sits at the centre',
+  s2lead:'You fix a thing once, then you fix it again. Not having to dig for “how did I do this last time” is what this app is built around. The things scattered across paper, memory and your camera roll, kept in one place. <b>It is worth keeping on your own.</b>',
+  d1t:'Maintenance log', d1p:'One step = one photo and one line. Difficulty, time taken, what it cost and the parts used all stay with it. Not a record — <b>something you can follow again next time</b>.',
+  d2t:'Equipment list',  d2p:'What is fitted to her, sorted into twelve systems. Maker, model, serial, install date — and every check, repair and spare hanging off that one item.',
+  d3t:'Plans and pins',  d3p:'Keep as many plans as you need and pin where each item actually sits. Anything broken shows with a different mark.',
+  d4t:'Scheduled checks', d4p:'By the calendar, by engine hours, or both. Put in both and it tells you whichever comes first — “6 months or 250 hours, whichever comes first”.',
+  d5t:'Repairs and replacement', d5p:'Faults stay as faults. Replace an item and the old one is not deleted — it moves into the replacement history, and its repairs stay with it.',
+  d6t:'Stowage',        d6p:'Note what lives in which locker. Set a minimum on your spares and it tells you when you are short.',
+  d7t:'Logbook',        d7p:'Departure to arrival. Hours under way and engine hours add themselves up, and the track stays with the passage.',
+  d8t:'Crew, roles and papers', d8p:'Decide person by person what each of them can see and change. Survey and insurance expiry dates warn you ahead of time.',
+
+  s1eye:'EVEN WITHOUT A BOAT', s1h:'Where boat talk lives',
+  s1lead:'People who don\'t own a boat yet, people looking for somewhere to learn, people hoping for a place on someone else\'s boat. <b>You can read it without signing in.</b>',
+  c1t:'Boards',       c1p:'Ask, answer, and share where you have been. Split into maintenance, passages, gear and everything else.',
+  c2t:'Crewing',      c2p:'Boats looking for people, and people looking for a boat. No money changes hands here.',
+  c3t:'Marketplace',  c3p:'Pass on gear you no longer use, and find what you need. Boat kit is hard to come by.',
+  c4t:'Browse boats', c4p:'Read the maintenance logs and passage logs people have made public. You can <b>copy someone\'s procedure into your own records</b>.',
+  c5t:'Product reviews', c5p:'Reviews of gear people have actually fitted — rating, how long they have used it, and what it lacks. What matches your own equipment comes first.',
+  c6t:'Moorings',     c6p:'152 places to tie up across Korea — where you can go, and what people found when they got there.',
+  c7t:'Weather, tides and news', c7p:'Wind, swell and tides where you are, plus boating news gathered in one place. Tap a foreign article to read it in your language.',
+
+  s3h:'Built to be used on board',
+  s3lead:'Designed around a moving deck and gloved hands.',
+  e1t:'Tap, don\'t type', e1p:'No punching in numbers. Buttons are sized for fingers.',
+  e2t:'Works with no signal', e2p:'It opens offshore. When the signal comes back it catches up on its own.',
+  e3t:'日本語 · 한국어 · English · Русский', e3p:'Switch language in the drawer.',
+  s4h:'How we handle position data',
+  s4p:'<b>Coordinates never go public.</b> Even with a logbook set to public, departure and arrival positions, tracks, mooring names and the names of people aboard are all held back. Publishing them would tell the world where an empty boat sits and which way she goes.',
+  s5h:'Who makes it',
+  b1:'Business name', bv1:'Hyunmook', b2:'Owner', bv2:'Myung-Joon Kim',
+  b3:'Business reg. no.', b4:'Address', bv4:'Rm 101, 38 Seonwon 7-gil, Yeosu, Republic of Korea',
+  b5:'Contact',
+  f1:'Terms of Service', f2:'Privacy Policy', f3:'Location Data Terms', f4:'Get in touch',
+  f5:'© 2026 Hyunmook. Made in the Republic of Korea.'
+ },
+ ru:{
+  seeIn:'Смотреть по-русски',
+  title:'Baetnil — журнал обслуживания вашей лодки',
+  desc:'Журнал обслуживания, список оборудования, судовой журнал и опись. Всё об одной лодке в одном месте. И разговоры о лодках с барахолкой.',
+  tag:'Всё об одной лодке — в одном месте.<br><b>Обслуживание · Оборудование · Журнал · Опись</b>',
+  g1t:'Открыть в браузере ›', g1s:'Ничего устанавливать не нужно',
+  g2t:'iPhone · iPad', g2s:'App Store — скоро',
+  g3t:'Android',       g3s:'Google Play — скоро',
+  g4t:'Windows · Mac', g4s:'Нажмите «Установить» в браузере',
+
+  s2eye:'ЕСЛИ У ВАС ЕСТЬ ЛОДКА', s2h:'В середине всего — журнал обслуживания',
+  s2lead:'Что чинили однажды, придётся чинить снова. Чтобы тогда не искать «как я это делал в прошлый раз» — ради этого всё и сделано. То, что было разбросано по бумагам, памяти и фотографиям, лежит в одном месте. <b>Полезно, даже если вы один.</b>',
+  d1t:'Журнал обслуживания', d1p:'Один шаг — одно фото и одна строка. Сложность, потраченное время, деньги и использованные детали остаются рядом. Не просто запись, а <b>то, что можно повторить в следующий раз</b>.',
+  d2t:'Список оборудования', d2p:'Что установлено на лодке, разложено по двенадцати системам. Производитель, модель, серийный номер, дата установки — и все проверки, ремонты и запчасти этой позиции рядом.',
+  d3t:'Чертежи и отметки', d3p:'Держите столько чертежей, сколько нужно, и отмечайте, где что стоит. Неисправное показано другим значком.',
+  d4t:'Плановые проверки', d4p:'По календарю, по моточасам или по обоим сразу. Если задано и то и другое — подскажет, что наступит раньше: «6 месяцев или 250 часов».',
+  d5t:'Ремонт и замена', d5p:'Неисправности остаются неисправностями. При замене старая позиция не удаляется — она уходит в историю замен, и её ремонты остаются при ней.',
+  d6t:'Опись',          d6p:'Запишите, что в каком рундуке. Задайте минимальный запас — и вам скажут, когда его не хватает.',
+  d7t:'Судовой журнал', d7p:'От отхода до прихода. Часы под парусом и моточасы считаются сами, и трек остаётся при переходе.',
+  d8t:'Экипаж, права и документы', d8p:'Для каждого отдельно решаете, что он видит и что может менять. О сроках освидетельствования и страховки предупредим заранее.',
+
+  s1eye:'ДАЖЕ БЕЗ ЛОДКИ', s1h:'Место, где живут разговоры о лодках',
+  s1lead:'Те, у кого лодки ещё нет; те, кто ищет, где научиться; те, кто хочет выйти в море с кем-то. <b>Читать можно без регистрации.</b>',
+  c1t:'Доски',      c1p:'Спрашивайте, отвечайте, рассказывайте, где были. Разделено на ремонт, переходы, снаряжение и всё остальное.',
+  c2t:'В команду',  c2p:'Лодки, которым нужны люди, и люди, которым нужна лодка. Деньги здесь не ходят.',
+  c3t:'Барахолка',  c3p:'Отдать снаряжение, которым больше не пользуетесь, и найти нужное. Лодочные вещи просто так не купишь.',
+  c4t:'Посмотреть лодки', c4p:'Открытые журналы обслуживания и судовые журналы. Чужой порядок работ можно <b>перенести в свои записи</b>.',
+  c5t:'Отзывы на товары', c5p:'Отзывы о том, что люди действительно поставили на лодку: оценка, срок использования и чего не хватает. Сначала — совпадающее с вашим оборудованием.',
+  c6t:'Стоянки',    c6p:'152 стоянки по всей Корее: где можно встать и что там нашли те, кто уже был.',
+  c7t:'Погода, приливы и новости', c7p:'Ветер, волна и приливы там, где вы сейчас, и морские новости в одном месте. Иностранную статью можно перевести одним нажатием.',
+
+  s3h:'Сделано, чтобы работать на борту',
+  s3lead:'Рассчитано на качку и руки в перчатках.',
+  e1t:'Нажать, а не набирать', e1p:'Никаких цифр вручную. Кнопки — под палец.',
+  e2t:'Работает без связи', e2p:'Открывается вдали от берега. Появится сеть — само догонит.',
+  e3t:'日本語 · 한국어 · English · Русский', e3p:'Язык меняется в боковом меню.',
+  s4h:'Что мы делаем с данными о местоположении',
+  s4p:'<b>Координаты не публикуются никогда.</b> Даже у открытого журнала точки отхода и прихода, трек, названия стоянок и имена тех, кто был на борту, остаются скрытыми. Иначе это значило бы объявить всем, где стоит пустая лодка и каким путём она ходит.',
+  s5h:'Кто делает',
+  b1:'Название', bv1:'Hyunmook', b2:'Владелец', bv2:'Мёнджун Ким',
+  b3:'Рег. номер', b4:'Адрес', bv4:'Rm 101, 38 Seonwon 7-gil, Ёсу, Республика Корея',
+  b5:'Связаться',
+  f1:'Условия использования', f2:'Политика конфиденциальности', f3:'Условия о геоданных', f4:'Написать нам',
+  f5:'© 2026 Hyunmook. Сделано в Республике Корея.'
+ },
+ ja:{
+  seeIn:'日本語で見る',
+  title:'뱃일 — 船の整備手帳',
+  desc:'整備手帳・装備一覧・航海日誌・積載表。船一隻の記録をひとつの場所に。船の話と中古売買も。',
+  tag:'船一隻の記録を、ひとつの場所に。<br><b>整備手帳 · 装備一覧 · 航海日誌 · 積載表</b>',
+  g1t:'ブラウザですぐ使う ›', g1s:'インストール不要',
+  g2t:'iPhone · iPad', g2s:'App Store — 準備中',
+  g3t:'Android',      g3s:'Google Play — 準備中',
+  g4t:'Windows · Mac', g4s:'ブラウザの「インストール」を押すだけです',
+
+  s2eye:'船をお持ちなら', s2h:'まんなかにあるのは整備手帳です',
+  s2lead:'一度直したものは、また直すことになります。そのとき「前回どうやったか」を探さなくていいように — それがこのアプリのまんなかです。紙と記憶と写真フォルダに散らばっていたものを、ひとつの場所に置きます。<b>ひとりで使っても値打ちがあります。</b>',
+  d1t:'整備手帳',   d1p:'一手順 = 写真一枚と説明一行。難易度・作業時間・かかった費用・使用パーツまで残ります。ただの記録ではなく、<b>次も同じようにたどれる手帳</b>として残します。',
+  d2t:'装備一覧',   d2p:'船に付いているものを十二の系統に分けて書き留めます。メーカー・型番・製造番号・取付日、そしてその装備にぶら下がる点検・修理・パーツがひとつの場所に集まります。',
+  d3t:'図面と位置', d3p:'図面を何枚でも置いて、装備が船のどこにあるかを打っておきます。故障しているものは図面上で別の印になります。',
+  d4t:'定期点検',   d4p:'カレンダーでも、エンジン時間でも設定できます。両方入れると先に来るほうを知らせます —「6か月または250時間のいずれか早いほう」がそれです。',
+  d5t:'修理と交換', d5p:'故障は故障として残ります。装備を新しいものに替えても古い装備は消えず、交換履歴に残り、その修理は古い装備のものとして残ります。',
+  d6t:'積載表',     d6p:'どの区画に何があるかを書いておきます。予備品は最低数を決めておけば、足りないときに知らせます。',
+  d7t:'航海日誌',   d7p:'出港から入港まで。航海時間とエンジン時間はひとりでに積み上がり、通った航跡も一緒に残ります。',
+  d8t:'乗組員 · 役割 · 書類', d8p:'一緒に乗る人ごとに、何を見られて何を直せるかを決めます。検査証・保険の期限は前もって知らせます。',
+
+  s1eye:'船がなくても', s1h:'船の話が集まる場所',
+  s1lead:'まだ船を持っていない人、学べる場所を探している人、人の船に乗ってみたい人。<b>ログインしなくても読めます。</b>',
+  c1t:'掲示板',    c1p:'聞いて、答えて、行ってきた話を交わします。整備・航海記・装備・雑談に分かれています。',
+  c2t:'一緒に乗る', c2p:'人を探している船と、乗ってみたい人が出会います。お金のやり取りをする場所ではありません。',
+  c3t:'中古売買',  c3p:'使っていた装備を譲り、必要なものを探します。船のものはどこにでもあるわけではありません。',
+  c4t:'船を見る',  c4p:'公開されている整備手帳・航海日誌を見ます。人の整備手順を<b>自分の記録に取り込む</b>こともできます。',
+  c5t:'パーツレビュー', c5p:'船に取り付けてみたものの使用感。評価・使用期間・物足りない点まで書きます。自分の装備と重なるものから見せます。',
+  c6t:'係留地',    c6p:'韓国全土の係留地152か所。どこに着けられるか、行ってきた人が何と言っているかを見ます。',
+  c7t:'天気 · 潮汐 · ニュース', c7p:'いま居る場所の風と波、潮汐。海と船のニュースもまとめてあります。外国語の記事は押せば訳して読めます。',
+
+  s3h:'船の上で使うために作りました',
+  s3lead:'揺れる船の上で、手袋をした手で使うことを前に置いて作りました。',
+  e1t:'押して選びます', e1p:'数字を打ち込ませません。ボタンは指に合わせて大きくしてあります。',
+  e2t:'圏外でも使えます', e2p:'沖でも開きます。電波が入れば自分で追いつきます。',
+  e3t:'日本語 · 한국어 · English · Русский', e3p:'言語はメニューから変えられます。',
+  s4h:'位置情報の扱い方',
+  s4p:'<b>公開しても座標は出ていきません。</b> 航海日誌を公開にしても、出入港の座標・航跡・係留地の名前・同乗者の名前は出ていきません。空の船がどこにあるか、どの道を通るかを教えることになるからです。',
+  s5h:'作っているところ',
+  b1:'商号', bv1:'Hyunmook', b2:'代表者', bv2:'キム・ミョンジュン',
+  b3:'事業者登録番号', b4:'所在地', bv4:'Rm 101, 38 Seonwon 7-gil, 麗水市, 大韓民国',
+  b5:'お問い合わせ',
+  f1:'利用規約', f2:'プライバシーポリシー', f3:'位置情報利用規約', f4:'お問い合わせ',
+  f5:'© 2026 Hyunmook. 뱃일は大韓民国で作っています。'
+ }
+};
+
+// ★★★ 무슨 말로 보여 줄 것인가 (4.94)
+//
+//   여태는 여기서 글자만 바꿨다. 주소는 하나뿐이었다.
+//   그래서 구글이 보는 것은 「한국어 문서 한 장」 이었고,
+//   일본 사람이 구글에서 우리를 찾을 길이 없었다.
+//
+//   ★ 이제 말마다 주소가 따로 있다 —  /   /ja/   /en/   /ru/
+//     세 개는 build_web.js 가 이 파일에서 구워 낸다. 사전은 여기 하나뿐이다.
+//
+// ★ 고르는 차례
+//   ① 주소가 말한다 — /ja/ 로 들어온 사람은 일본어로 본다 (링크를 받고 온 사람)
+//   ② 골라 둔 것
+//   ③ 브라우저 말
+//   ④ 그래도 모르면 한국어
+(function(){
+  var KEY = 'bt_site_lang';
+  function pathLang(){
+    var m = String(location.pathname || '').match(/\/(ja|en|ru)\/?$/);
+    return (m && I18N[m[1]]) ? m[1] : 'ko';
+  }
+  function urlOf(lang){ return lang === 'ko' ? '/' : '/' + lang + '/'; }
+  // 브라우저가 바라는 말 (모르면 빈 값)
+  function wantLang(){
+    var list = (navigator.languages && navigator.languages.length)
+             ? navigator.languages : [navigator.language || ''];
+    for(var i = 0; i < list.length; i++){
+      var v = String(list[i] || '').slice(0,2).toLowerCase();
+      if(I18N[v]) return v;
+      if(v === 'uk' || v === 'be' || v === 'kk') return 'ru';   // 러시아어를 읽는 이웃 말
+    }
+    return '';
+  }
+  function saved(){
+    try{ var v = localStorage.getItem(KEY); if(v && I18N[v]) return v; }catch(_){}
+    return '';
+  }
+  // ★★★ 무슨 말로 보여 줄 것인가 — 주소가 정한다. 브라우저 말로 여기서 바꾸지 않는다.
+  //
+  //   전에는 여기서 브라우저 말을 보고 글자를 바꿨다. 그러면 이런 일이 생긴다 —
+  //   구글 로봇이 뿌리(/)를 열면 로봇의 말(영어)로 그려지는데,
+  //   canonical 과 hreflang 은 「/ 는 한국어판」 이라고 말한다. 서로 어긋난다.
+  //   ★ 그래서 주소가 곧 말이다. 브라우저 말은 **워커가 Accept-Language 로** 본다
+  //     (로봇은 그 머리말을 안 보내므로 뿌리에 그대로 남아 한국어로 색인된다).
+  //   여기서는 「바라는 말이 다르면 그리로 가는 띠」 만 띄운다.
+  function pick(){
+    var p = pathLang();
+    if(p !== 'ko') return p;        // /ja/ · /en/ · /ru/ 는 그 말이다
+    return saved() || 'ko';         // 뿌리는 한국어다 (고른 것이 있으면 그것)
+  }
+  function band(now){
+    var el = document.getElementById('otherLang');
+    if(!el) return;
+    var w = saved() || wantLang();
+    if(!w || w === now || !I18N[w]){ el.className = 'otherlang'; el.innerHTML = ''; return; }
+    el.innerHTML = '<a href="' + urlOf(w) + '" data-go="' + w + '">' + I18N[w].seeIn + ' →</a>';
+    el.className = 'otherlang on';
+    var a = el.querySelector('a');
+    if(a) a.addEventListener('click', function(){ remember(this.getAttribute('data-go')); });
+  }
+  // 고른 말을 남긴다 — 워커가 다음부터 안 보내도록 쿠키에도 남긴다
+  function remember(v){
+    try{ localStorage.setItem(KEY, v); }catch(_){}
+    try{ document.cookie = 'bt_lang=' + v + '; path=/; max-age=31536000; samesite=lax'; }catch(_){}
+  }
+  function draw(lang){
+    var d = I18N[lang] || I18N.ko;
+    document.documentElement.lang = lang;
+    document.title = d.title;
+    var m = document.querySelector('meta[name="description"]');
+    if(m) m.setAttribute('content', d.desc);
+    var ogt = document.querySelector('meta[property="og:title"]');
+    if(ogt) ogt.setAttribute('content', d.title);
+    var els = document.querySelectorAll('[data-t]');
+    for(var i=0;i<els.length;i++){
+      var k = els[i].getAttribute('data-t');
+      if(d[k] !== undefined) els[i].innerHTML = d[k];
+    }
+    // 약관 문서는 말마다 파일이 따로 있다 (terms.html / terms.en.html / terms.ru.html).
+    // ★ 일본어 약관은 아직 없다. 한국어보다는 영어가 읽힌다고 보아 영어를 건다.
+    //   일본에 내놓기 전에 세 문서를 일본어로 옮겨야 한다.
+    // ★ 뿌리(/)가 아닌 자리(/ja/ 등)에서도 열려야 하므로 절대 주소로 건다.
+    var docLang = (lang === 'ja') ? 'en' : lang;
+    var docs = document.querySelectorAll('[data-doc]');
+    for(var n=0;n<docs.length;n++){
+      var name = docs[n].getAttribute('data-doc');
+      docs[n].href = '/' + name + (docLang === 'ko' ? '' : '.' + docLang) + '.html';
+    }
+    var bs = document.querySelectorAll('.langbar button');
+    for(var j=0;j<bs.length;j++){
+      bs[j].setAttribute('aria-pressed', bs[j].getAttribute('data-lang') === lang ? 'true' : 'false');
+    }
+    band(lang);
+  }
+  var bs = document.querySelectorAll('.langbar button');
+  for(var i=0;i<bs.length;i++){
+    bs[i].addEventListener('click', function(){
+      var v = this.getAttribute('data-lang');
+      remember(v);
+      // ★ 고른 말의 주소로 옮겨 간다 — 주소와 화면이 어긋나면 안 된다.
+      //   파일로 열어 본 때(file://)는 옮길 곳이 없으니 그 자리에서 다시 그린다.
+      if(/^https?:$/.test(location.protocol) && v !== pathLang()){
+        location.href = urlOf(v);
+        return;
+      }
+      draw(v);
+    });
+  }
+  draw(pick());
+})();
+</script>
+
+</body>
+</html>

@@ -512,15 +512,14 @@ var I18N = {
       var k = els[i].getAttribute('data-t');
       if(d[k] !== undefined) els[i].innerHTML = d[k];
     }
-    // 약관 문서는 말마다 파일이 따로 있다 (terms.html / terms.en.html / terms.ru.html).
-    // ★ 일본어 약관은 아직 없다. 한국어보다는 영어가 읽힌다고 보아 영어를 건다.
-    //   일본에 내놓기 전에 세 문서를 일본어로 옮겨야 한다.
+    // 약관 문서는 말마다 파일이 따로 있다 (terms.html / .en / .ru / .ja).
+    // ★ 4.96 — 일본어 약관이 생겼다. 이제 넷 다 제 말로 건다.
+    //   그 파일들은 build_web.js 가 **앱의 약관에서 구워 낸다** — 손으로 맞추지 않는다.
     // ★ 뿌리(/)가 아닌 자리(/ja/ 등)에서도 열려야 하므로 절대 주소로 건다.
-    var docLang = (lang === 'ja') ? 'en' : lang;
     var docs = document.querySelectorAll('[data-doc]');
     for(var n=0;n<docs.length;n++){
       var name = docs[n].getAttribute('data-doc');
-      docs[n].href = '/' + name + (docLang === 'ko' ? '' : '.' + docLang) + '.html';
+      docs[n].href = '/' + name + (lang === 'ko' ? '' : '.' + lang) + '.html';
     }
     var bs = document.querySelectorAll('.langbar button');
     for(var j=0;j<bs.length;j++){

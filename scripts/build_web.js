@@ -152,14 +152,149 @@ function bakeFront(){
     out = out.replace(/(<button type="button" data-lang=")([a-z]{2})(" aria-pressed=")(?:true|false)(")/g,
       (all, a, v, b2, c) => a + v + b2 + (v === L ? 'true' : 'false') + c);
 
-    // 약관은 말마다 파일이 따로다. 일본어 약관은 아직 없어 영어를 건다.
-    //   ★ 자바스크립트도 같은 규칙을 쓴다 (index.html 의 docLang). 두 곳이 어긋나면 안 된다.
-    const dl = (L === 'ja') ? 'en' : L;
+    // 약관은 말마다 파일이 따로다 (bakeLegal 이 넷 다 굽는다).
+    //   ★ 자바스크립트도 같은 규칙을 쓴다 (index.html). 두 곳이 어긋나면 안 된다.
+    const dl = L;
     out = out.replace(/(<a href=")([a-z]+)(\.html"[^>]*data-doc=)/g, (all, a, name, b2) =>
       a + '/' + name + (dl === 'ko' ? '' : '.' + dl) + '.html"' + b2.slice(b2.indexOf(' ')));
 
     write(L + '/index.html', out);
     made++;
+  }
+  return made;
+}
+
+// ══════════════════════════════════════════════════════════════
+// 약관·개인정보·위치정보를 **앱에서 구워 낸다**  (4.96)
+//
+// ★ 왜 필요한가
+//   웹의 terms.html 은 판 1.2 인데 앱 안의 약관은 1.6 이었다. 사본이 둘이라 어긋난 것이다.
+//   법 문서가 두 곳에서 서로 다른 말을 하고 있었다 — 제일 나쁜 종류의 어긋남이다.
+//   ★ 이제 정본은 앱(app/index.html)의 LEGAL_DOCS 하나뿐이고, 여기서는 굽기만 한다.
+//     앱을 고치면 다음 굽기 때 웹이 따라온다. 손으로 맞출 일이 없어진다.
+const LEGAL_KEYS  = ['terms', 'privacy', 'location'];
+const LEGAL_HEAD  = {           // 「판 …부터 적용 …」 줄. 말마다 적는 법이 다르다.
+  ko: (v, d) => `판 ${v}부터 적용 ${d}`,
+  en: (v, d) => `Version ${v}, in effect from ${d}`,
+  ru: (v, d) => `Версия ${v}, действует с ${d}`,
+  ja: (v, d) => `版 ${v}・${d} から適用`
+};
+const LEGAL_FOOT = {
+  ko: '뱃일 — 배 타는 사람들을 위한 앱',
+  en: 'Baetnil — an app for people who go out on the water',
+  ru: 'Baetnil — приложение для тех, кто выходит в море',
+  ja: '뱃일 — 船に乗る人たちのアプリ'
+};
+const LEGAL_OPEN = { ko:'앱 열기', en:'Open the app', ru:'Открыть приложение', ja:'アプリを開く' };
+const LEGAL_ASK  = { ko:'문의', en:'Contact', ru:'Связаться', ja:'お問い合わせ' };
+const legalFile = (k, L) => k + (L === 'ko' ? '' : '.' + L) + '.html';
+
+const LEGAL_CSS = `
+  :root{--bg:#081521;--sf:#0E1D2B;--bd:#1B2E3E;--tx:#D6E2EC;--th:#F1F7FC;--tm:#8AA0B4;--ac:#9CC6E8}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--tx);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Pretendard","Malgun Gothic",sans-serif;
+    line-height:1.75;font-size:15px;-webkit-text-size-adjust:100%}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+  header{border-bottom:1px solid var(--bd);padding-bottom:16px;margin-bottom:22px}
+  .app{font-size:13px;letter-spacing:.14em;color:var(--tm);font-weight:700}
+  h1{font-size:23px;margin:8px 0 6px;color:var(--th);letter-spacing:-.02em}
+  .meta{font-size:13px;color:var(--tm)}
+  nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+  nav a{display:inline-block;padding:7px 13px;border:1px solid var(--bd);border-radius:999px;
+    color:var(--tx);text-decoration:none;font-size:13px;font-weight:600;background:var(--sf)}
+  nav a[aria-current]{background:var(--ac);border-color:var(--ac);color:#08131F}
+  pre{white-space:pre-wrap;word-break:break-word;font:inherit;margin:0}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--bd);font-size:13px;color:var(--tm)}
+  footer a{color:var(--ac)}
+  @media(prefers-color-scheme:light){
+    body{background:#fff;color:#1a2632}
+    :root{--sf:#f2f6fa;--bd:#d6e0ea;--th:#0d1a26;--tm:#5b7085;--ac:#1d6ea8}
+    nav a[aria-current]{color:#fff}
+  }`;
+
+function bakeLegal(){
+  const appPath = path.join(OUT, 'app', 'index.html');
+  if(!fs.existsSync(appPath)){ console.log('※ app/index.html 이 없어 약관은 안 굽습니다'); return 0; }
+  const src = fs.readFileSync(appPath, 'utf8');
+  const pick = re => (src.match(re) || [''])[0];
+  const grab = name => {
+    const i = src.indexOf('function ' + name + '(');
+    if(i < 0) return '';
+    let d = 0, j = src.indexOf('{', i);
+    for(; j < src.length; j++){
+      if(src[j] === '{') d++;
+      else if(src[j] === '}'){ d--; if(!d) return src.slice(i, j + 1); }
+    }
+    return '';
+  };
+  let API;
+  try{
+    API = new Function('langNow',
+      [ pick(/const LEGAL_VER  = [^\n]*\n/),
+        pick(/const LEGAL_DATES = \{[\s\S]*?\};/),
+        pick(/const LEGAL_DATE = [^\n]*\n/),
+        pick(/const LEGAL_OWNER = \{[\s\S]*?\n\};/),
+        pick(/const LEGAL_BIZ = \{[\s\S]*?\n\};/),
+        pick(/const LEGAL_LBS = [^\n]*\n/),
+        pick(/const LEGAL_DOCS = \{[\s\S]*?\n\};/),
+        pick(/const LEGAL_DOCS_EN = \{[\s\S]*?\n\};/),
+        pick(/const LEGAL_DOCS_JA = \{[\s\S]*?\n\};/),
+        pick(/const LEGAL_DOCS_RU = \{[\s\S]*?\n\};/),
+        grab('legalSet'), grab('legalText'),
+        'return { legalText, legalSet, LEGAL_VER, LEGAL_DATES };'
+      ].join('\n'))(() => 'ko');
+  }catch(e){ console.log('※ 앱에서 약관을 못 읽었습니다:', e.message); return 0; }
+
+  let made = 0;
+  for(const L of LANGS){
+    for(const k of LEGAL_KEYS){
+      let body = '', title = '';
+      try{
+        body  = API.legalText(k, L);
+        title = (API.legalSet(L)[k] || {}).title || '';
+      }catch(e){ continue; }
+      if(!body || !title) continue;
+      const date = API.LEGAL_DATES[L] || API.LEGAL_DATES.ko;
+      const head = (LEGAL_HEAD[L] || LEGAL_HEAD.ko)(API.LEGAL_VER, date);
+      const navDocs = LEGAL_KEYS.map(kk => {
+        const nm = (API.legalSet(L)[kk] || {}).title || kk;
+        return `<a href="${legalFile(kk, L)}"${kk === k ? ' aria-current="page"' : ''}>${esc(nm)}</a>`;
+      }).join('');
+      const navLang = LANGS.filter(x => x !== L).map(x =>
+        `<a href="${legalFile(k, x)}" hreflang="${x}">${
+          ({ ko:'한국어', en:'English', ru:'Русский', ja:'日本語' })[x]}</a>`).join('');
+      const hre = LANGS.map(x =>
+        `<link rel="alternate" hreflang="${x}" href="${SITE}/${legalFile(k, x)}">`).join('\n')
+        + `\n<link rel="alternate" hreflang="x-default" href="${SITE}/${legalFile(k, 'ko')}">`;
+      const html = `<!doctype html>
+<html lang="${L}">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} — 뱃일</title>
+<meta name="description" content="${esc(title)} — 뱃일. ${esc(head)}">
+<link rel="canonical" href="${SITE}/${legalFile(k, L)}">
+${hre}
+<style>${LEGAL_CSS}</style>
+<div class="wrap">
+<header>
+  <div class="app">뱃일 · BAETNIL</div>
+  <h1>${esc(title)}</h1>
+  <div class="meta">${esc(head)}</div>
+  <nav>${navDocs}</nav>
+  <nav style="margin-top:8px">${navLang}</nav>
+</header>
+<pre>${esc(body)}</pre>
+<footer>
+  ${esc(LEGAL_FOOT[L] || LEGAL_FOOT.ko)} · <a href="${SITE}/${L === 'ko' ? '' : L + '/'}">${
+    esc(LEGAL_OPEN[L] || LEGAL_OPEN.ko)}</a><br>
+  ${esc(LEGAL_ASK[L] || LEGAL_ASK.ko)} <a href="mailto:help@baetnil.com">help@baetnil.com</a>
+</footer>
+</div>
+`;
+      write(legalFile(k, L), html);
+      made++;
+    }
   }
   return made;
 }
@@ -209,6 +344,7 @@ function bakeFront(){
   const LDIRS = LANGS.filter(L => LPATH[L]).map(L => LPATH[L].replace(/\/$/,''));
   LDIRS.forEach(d => { gone += sweep(d, ['index.html']); });
   const baked = bakeFront();
+  const legal = bakeLegal();
 
   // ★ 지운 것을 git 에 알린다.
   //   일감(web.yml)의 `git add m v r sitemap.xml robots.txt` 에는 ja·en 이 없다.
@@ -221,12 +357,18 @@ function bakeFront(){
   //   구운 ru/index.html 이 커밋에 안 담겨 영영 안 올라간다.
   //   (일감의 `git add m v r ja en …` 줄에는 ru 가 없다. 그 파일은 내가 못 고치는 자리다.)
   //   그래서 걷어냈든 구웠든 **늘** 담는다.
+  //
+  // ★★★ 약관은 뿌리에 있는 낱개 파일이다 (terms.ja.html 처럼).
+  //   일감의 `git add m v r ja en …` 줄에도, 위의 폴더 목록에도 안 들어간다.
+  //   여기 안 적으면 **구워 놓고 영영 안 올라간다.** 대문 말판에서 이미 한 번 겪었다.
+  const LEGAL_FILES = [];
+  LEGAL_KEYS.forEach(k => LANGS.forEach(L => LEGAL_FILES.push(legalFile(k, L))));
   try{
     const { execFileSync } = require('child_process');
-    LDIRS.concat(['m','v','r']).forEach(d => {
+    LDIRS.concat(['m','v','r']).concat(LEGAL_FILES).forEach(d => {
       try{ execFileSync('git', ['add', '-A', '--', d], { cwd: OUT, stdio:'ignore' }); }catch(_){}
     });
   }catch(_){}
 
-  console.log(`구웠습니다: 주소 ${urls.length}개 · 대문 ${baked}장` + (gone ? ` · 옛 사본 ${gone}개 걷어냄` : ''));
+  console.log(`구웠습니다: 주소 ${urls.length}개 · 대문 ${baked}장 · 약관 ${legal}장` + (gone ? ` · 옛 사본 ${gone}개 걷어냄` : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

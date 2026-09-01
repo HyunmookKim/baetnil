@@ -149,7 +149,7 @@ const L10N = {
   ja: {
     '뱃일 — 배 타는 사람들':'뱃일 — 船に乗る人たち',
     '앱에서 보기':'アプリで見る', '앱 열기 →':'アプリを開く →',
-    '이용약관':'이용약관', '개인정보':'개인정보',
+    '이용약관':'利用規約', '개인정보':'プライバシー',
     '이 기록은 「뱃일」 앱에서 배 주인이 직접 남긴 것입니다.':'この記録は「뱃일」アプリで船主が自分で残したものです。',
     '내 배의 정비수첩·항해일지도 같은 방법으로 남길 수 있습니다.':'ご自分の船の整備手帳・航海日誌も同じように残せます。',
     '정비 기록':'整備記録', '정비수첩':'整備手帳', '항해일지':'航海日誌',
@@ -174,7 +174,7 @@ const L10N = {
   en: {
     '뱃일 — 배 타는 사람들':'Baetnil — for people on boats',
     '앱에서 보기':'Open in the app', '앱 열기 →':'Open the app →',
-    '이용약관':'이용약관', '개인정보':'개인정보',
+    '이용약관':'Terms', '개인정보':'Privacy',
     '이 기록은 「뱃일」 앱에서 배 주인이 직접 남긴 것입니다.':'This record was written by the boat owner in the Baetnil app.',
     '내 배의 정비수첩·항해일지도 같은 방법으로 남길 수 있습니다.':'You can keep your own maintenance log and passage log the same way.',
     '정비 기록':'Maintenance record', '정비수첩':'Maintenance log', '항해일지':'Passage log',
@@ -201,7 +201,7 @@ const L10N = {
   ru: {
     '뱃일 — 배 타는 사람들':'Baetnil — для тех, кто выходит в море',
     '앱에서 보기':'Открыть в приложении', '앱 열기 →':'Открыть приложение →',
-    '이용약관':'이용약관', '개인정보':'개인정보',
+    '이용약관':'Условия', '개인정보':'Конфиденциальность',
     '이 기록은 「뱃일」 앱에서 배 주인이 직접 남긴 것입니다.':'Эту запись владелец лодки сделал сам в приложении Baetnil.',
     '내 배의 정비수첩·항해일지도 같은 방법으로 남길 수 있습니다.':'Свой журнал обслуживания и судовой журнал можно вести так же.',
     '정비 기록':'Запись обслуживания', '정비수첩':'Журнал обслуживания', '항해일지':'Судовой журнал',
@@ -232,10 +232,11 @@ const wroteIn = L => (L === 'ko') ? '' :
   `<div class="meta">${esc(T(L,'이 기록은 한국어로 쓰였습니다.'))}</div>`;
 // 같은 기록의 다른 언어 주소
 const alt = (lang, rel) => `${SITE}/${LPATH[lang]}${rel}`;
-// 약관·개인정보는 말마다 파일이 따로다 (terms.html / terms.en.html / terms.ru.html).
-// ★ 일본어 약관은 아직 없다. 한국어보다는 영어가 읽힌다고 보아 영어를 건다.
+// 약관·개인정보는 말마다 파일이 따로다 (terms.html / .en / .ru / .ja).
+// ★ 4.96 — 일본어 약관이 생겼다. 이제 넷 다 제 말로 건다.
+//   그 파일들은 build_web.js 가 앱의 약관에서 구워 낸다.
 //   대문(index.html)도 같은 규칙을 쓴다. 두 곳이 어긋나면 안 된다.
-const DOC = { ko:'', ja:'.en', en:'.en', ru:'.ru' };
+const DOC = { ko:'', ja:'.ja', en:'.en', ru:'.ru' };
 
 function page({ title, desc, url, body, jsonld, noindex, lang, rel }){
   const L = lang || 'ko';
@@ -269,8 +270,8 @@ ${body}
 <div class="cta"><b>${esc(T(L,'이 기록은 「뱃일」 앱에서 배 주인이 직접 남긴 것입니다.'))}</b>
 ${esc(T(L,'내 배의 정비수첩·항해일지도 같은 방법으로 남길 수 있습니다.'))}
 <a href="${APP}">${esc(T(L,'앱 열기 →'))}</a></div>
-<footer>뱃일 · <a href="${SITE}/terms${DOC[L]}.html">이용약관</a> ·
-<a href="${SITE}/privacy${DOC[L]}.html">개인정보</a> · <a href="mailto:help@baetnil.com">help@baetnil.com</a></footer>
+<footer>뱃일 · <a href="${SITE}/terms${DOC[L]}.html">${esc(T(L,'이용약관'))}</a> ·
+<a href="${SITE}/privacy${DOC[L]}.html">${esc(T(L,'개인정보'))}</a> · <a href="mailto:help@baetnil.com">help@baetnil.com</a></footer>
 </div></body></html>`;
 }
 

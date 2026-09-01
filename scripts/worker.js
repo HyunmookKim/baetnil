@@ -330,15 +330,21 @@ function voyPage(b, v, L){
     [T(L,'거리'), v.nm ? v.nm + ' NM' : ''], [T(L,'항해 시간'), durText(v.hours)],
     [T(L,'종류'), v.kind], [T(L,'날씨'), [v.wxOut, v.wxIn].filter(Boolean).join(' → ')]
   ].filter(r => r[1]);
+  // ★ 4.95 — 사진이 자리마다 붙는다 (출발 · 중간 기록 · 도착 · 이 항해 사진).
+  //   읽는 사람에게는 「언제 어디서 찍은 것인지」 가 붙어 있어야 이야기가 된다.
+  const shot = u => `<img src="${esc(u)}" style="width:100%;border-radius:12px;margin:10px 0" loading="lazy" alt="">`;
+  const shots = a => (Array.isArray(a) ? a : []).map(pic).filter(Boolean).map(shot).join('');
   const pics = (v.photos||[]).map(pic).filter(Boolean).slice(0, 12);
   const body = `<h1>${esc(nm)}</h1>${byLine(b)}${wroteIn(L)}
 <div style="margin:14px 0 4px">${rows.map(r =>
   `<div class="row"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}</div>
+${shots(v.phOut)}
 ${v.note ? `<p>${esc(v.note)}</p>` : ''}
 ${(v.logs||[]).length ? `<h2 style="font-size:16px;margin:22px 0 4px">${esc(T(L,'중간 기록'))}</h2>` +
   (v.logs||[]).map(g => `<div class="row"><b>${esc(g.time||'')}</b><span>${
-    esc([g.kind, g.text].filter(Boolean).join(' · '))}</span></div>`).join('') : ''}
-${pics.map(u => `<img src="${esc(u)}" style="width:100%;border-radius:12px;margin:10px 0" loading="lazy" alt="">`).join('')}`;
+    esc([g.kind, g.text].filter(Boolean).join(' · '))}</span></div>` + shots(g.photos)).join('') : ''}
+${shots(v.phIn)}
+${pics.map(shot).join('')}`;
   return { rel: LPATH[L] + `v/${b.id}/${v.id}/index.html`, url, title, desc,
            html: page({ title, desc, url, body, noindex: !!b.adminHidden, lang:L, rel }) };
 }

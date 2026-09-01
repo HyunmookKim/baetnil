@@ -607,6 +607,19 @@ body{padding-bottom:62px}
 .mrbtn.ok{border-color:#2a6a4a;color:#7aefaa}
 .mrph{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .mrph img{width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid #2a5a8a}
+/* 항해일지 사진 — 출발 · 중간 기록 · 도착 (4.95)
+   ★ 고치는 중이 아니면 크게 보여 준다. 항해는 자랑하는 자리다.
+     고치는 중에는 작게 — 빼기 단추를 눌러야 하고, 화면이 길면 못 고친다. */
+.vphwrap{display:flex;flex-direction:column;gap:8px;padding:2px 14px 8px 74px}
+.vphwrap img.vphbig{width:100%;height:auto;border-radius:10px;display:block;background:#0b1420;cursor:zoom-in}
+.vphwrap.edit{flex-direction:row;flex-wrap:wrap;gap:8px}
+.vph1{position:relative;display:inline-block;line-height:0}
+.vph1 img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid #2a5a8a;display:block}
+.vph1 .rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;padding:0;line-height:20px;
+  border-radius:50%;border:1px solid #7a3b3b;background:#2a1414;color:#e88;font-size:12px;cursor:pointer}
+.vphwrap.sec{padding-left:14px}
+.vphrow{display:flex;gap:6px;padding:0 14px 10px 74px;flex-wrap:wrap}
+@media(max-width:700px){ .vphwrap,.vphrow{padding-left:14px} }
 .mhist{font-size:11px;color:#8FB6D2;margin:4px 0}
 body.locked .edt{display:none!important}
 
@@ -1992,6 +2005,8 @@ header{padding-top:var(--sat)}
 <div id="mrPanel"></div>
 <input type="file" id="mrCam" accept="image/*" capture="environment" style="display:none" onchange="mrPickPhoto(event)">
 <input type="file" id="mrFile" accept="image/*" multiple style="display:none" onchange="mrPickPhoto(event)">
+<input type="file" id="vphCam" accept="image/*" capture="environment" style="display:none" onchange="vphFilePick(event)">
+<input type="file" id="vphFile" accept="image/*" multiple style="display:none" onchange="vphFilePick(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
 <div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="계류장">계류장</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="내 배">내 배</span></button><button id="tabOthers" onclick="switchTab('others')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20l-2 3H4z"/><path d="M5 18v-6h9v6"/><path d="M14 12l4 6"/><path d="M9.5 12V8"/></svg><span data-t="남의 배">남의 배</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
@@ -3664,6 +3679,9 @@ const I18N = {
     '사진 한 장':'One photo',
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'A photo plus the spot on the drawing helps next time the same thing happens.',
     '사진을 불러오지 못했습니다':'Could not load the photo',
+    '이 항해 사진':'Photos from this passage',
+    '어느 자리랄 것 없는 사진':'Photos not tied to one moment',
+    '사진은 한 자리에 {n}장까지입니다.':'Up to {n} photos in one place.',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Could not load the photo — check your internet connection',
     '사진을 읽지 못했습니다':'Could not read the photo',
     '사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.':'The image is too large to save. Use a simpler drawing image.',
@@ -6216,6 +6234,9 @@ const I18N = {
     '사진 한 장':'Одна фотография',
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'Фото вместе с местом на чертеже пригодится, когда то же самое случится снова.',
     '사진을 불러오지 못했습니다':'Не удалось загрузить фото',
+    '이 항해 사진':'Фотографии этого перехода',
+    '어느 자리랄 것 없는 사진':'Снимки, не привязанные к моменту',
+    '사진은 한 자리에 {n}장까지입니다.':'В одном месте не более {n} фотографий.',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Не удалось загрузить фото — проверьте подключение к интернету',
     '사진을 읽지 못했습니다':'Не удалось прочитать фото',
     '사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.':'Изображение слишком велико. Возьмите более простой чертёж.',
@@ -8800,6 +8821,9 @@ const I18N = {
     '사진 한 장':'写真1枚',
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'写真と図面の位置を一緒に残しておくと、あとで同じ問題が起きたときの参考になります。',
     '사진을 불러오지 못했습니다':'写真を読み込めませんでした',
+    '이 항해 사진':'この航海の写真',
+    '어느 자리랄 것 없는 사진':'どの場面ということのない写真',
+    '사진은 한 자리에 {n}장까지입니다.':'写真は一か所に{n}枚までです。',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'写真を読み込めませんでした — インターネット接続を確認してください',
     '사진을 읽지 못했습니다':'写真を読み取れませんでした',
     '사진이 너무 커서 저장할 수 없습니다. 더 단순한 도면 사진을 써 주세요.':'写真が大きすぎて保存できません。もっと単純な図面の写真をお使いください。',
@@ -10991,7 +11015,9 @@ function boatPhotoUrls(){
   addRows(물품);
   addRows(서류);
   addRows(게시판);
-  addRows(항해);
+  // ★ 4.95 — 항해일지 사진은 photos 말고도 출발·중간 기록·도착에 있다.
+  //   voyPhotoUrls 로 한 번에 걷는다 (문 하나).
+  항해.forEach(v => { if(v) add(typeof voyPhotoUrls === 'function' ? voyPhotoUrls(v) : v.photos); });
   return [...new Set(out)];          // 앞에 온 것이 이긴다 = 중요한 쪽이 남는다
 }
 // 사진 한 장을 폰에 챙겨 둔다. 이미 있으면 아무 일도 안 한다.
@@ -13748,7 +13774,7 @@ function posLvRow(it){
 const PUB_OUT = {
   voyage: {
     plain: ['id','date','title','from','to','note','timeOut','timeIn','nm','hours','engineH','kind'],
-    via:   ['lv','trk','logs','posOut','posIn','wxOut','wxIn','fish','photos'],
+    via:   ['lv','trk','logs','posOut','posIn','wxOut','wxIn','fish','photos','phOut','phIn'],
     never: ['crew','plan','pub','pubLv','posLv','trkOn','trkPub','rideOn','rideN','trkPts','weather']
   },
   mlog: {
@@ -13843,6 +13869,12 @@ function buildPublic(b){
                  const q = trkPublicLogPos(g, v, hideNm);
                  const r = { time:g.time || '', kind:g.kind || '',
                              text:g.text || '', eng:g.eng || '' };
+                 // ★ 4.95 — 중간 기록 사진. 좌표와 달리 사진은 사람이 보라고 올린 것이다.
+                 //   한 자리에 두 장까지만 내보낸다 — 한 항해에 중간 기록이 스물이면
+                 //   장수 제한이 없을 때 페이지가 통째로 무거워진다.
+                 const gp = (typeof photoBudget === 'function')
+                              ? photoBudget((g.photos || []).slice(0, 2), 120).kept : [];
+                 if(gp.length) r.photos = gp;
                  if(q) r.pos = q;
                  else { const ar = trkPublicLogArea(g, v); if(ar) r.area = ar; }
                  return r;
@@ -13856,7 +13888,12 @@ function buildPublic(b){
         fish: (typeof catchTotal === 'function')
                 ? catchTotal(v).map(x => ({ name:x.name, n:x.n })) : [],
         photos: (typeof photoBudget === 'function')
-                ? photoBudget(v.photos || [], 300).kept : []
+                ? photoBudget(v.photos || [], 300).kept : [],
+        // ★ 4.95 — 출발·도착 사진
+        phOut: (typeof photoBudget === 'function')
+                ? photoBudget((v.phOut || []).slice(0, 3), 150).kept : [],
+        phIn:  (typeof photoBudget === 'function')
+                ? photoBudget((v.phIn  || []).slice(0, 3), 150).kept : []
       }));
   }
   // 정비 — 항목과 날짜만. 메모에 연락처나 개인정보가 섞여 있을 수 있다.
@@ -14856,6 +14893,10 @@ function photoUrlsOf(o){
   const add = a => (Array.isArray(a) ? a : []).forEach(x=>{
     if(typeof x === 'string' && /^https?:/i.test(x)) out.push(x); });
   add(o.photos); add(o.thumbs);
+  // ★ 4.95 — 항해일지는 출발·중간 기록·도착에도 사진이 붙는다.
+  //   여기 안 적으면 항해를 지워도 그 사진들이 창고에 그대로 남는다.
+  add(o.phOut); add(o.phIn);
+  (Array.isArray(o.logs) ? o.logs : []).forEach(g => { if(g) add(g.photos); });
   (Array.isArray(o.blocks) ? o.blocks : []).forEach(x=>{
     if(x && x.t === 'photo' && typeof x.v === 'string' && /^https?:/i.test(x.v)) out.push(x.v); });
   return [...new Set(out)];
@@ -16173,10 +16214,12 @@ function pubVoyOpen(id){
   try{ loadBpCmts((boatPageData||{}).id, id).then(()=>paintBoatPage()); }catch(_){}
 }
 function pubVoyBack(){ if(!pubVoyId) return false; pubVoyId = ''; paintBoatPage(); return true; }
-function pubVoyPhoto(i){
+function pubVoyPhoto(i){ pubVoyPhotoAt('all', i); }
+// ★ 4.95 — 남의 항해도 자리마다 사진이 붙는다. 꺼내는 문은 내 배와 같다(vphAt).
+function pubVoyPhotoAt(slot, i){
   const x = boatPageData; if(!x) return;
   const v = (x.voyage||[]).find(z=>String(z.id)===String(pubVoyId));
-  if(v) pvOpen(v.photos||[], i);
+  if(v) pvOpen(vphAt(v, slot), i);
 }
 // 소개 덩이에서 글자만 뽑는다 (어느 말로 쓰였는지 가릴 때 쓴다)
 function introText(intro){
@@ -16224,28 +16267,36 @@ function boatPageBody(x, k){
       const sail = (()=>{ const a=Number(v.hours)||0, b=Number(v.engineH)||0;
         return (a>0 && a>=b) ? durText(a-b) : ''; })();
       const fish = (v.fish||[]).filter(f=>f && f.n);
+      // ★ 4.95 — 남의 항해도 자리마다 사진이 붙는다. 내 배와 같은 모양(크게)으로 보여 준다.
+      //   ★ 남의 자료라 지우거나 넣을 수 없다 — 늘 「보기」 모양이다.
+      const pv = (a, key) => (Array.isArray(a) ? a : []).map((u,i)=>
+        `<img class="vphbig" loading="lazy" src="${esc(u)}" onclick="pubVoyPhotoAt('${esc(String(key))}',${i})">`).join('');
+      const pvBox = (a, key) => (Array.isArray(a) && a.length)
+        ? `<div class="vphwrap sec">${pv(a, key)}</div>` : '';
       return `<div class="mrrow"><button class="mrbtn" onclick="pubVoyBack()">${esc(t('← 항해일지'))}</button></div>
         <div class="mrsubtit">${esc(trIn('voyage', v.id, 'title', pubVoyName(v) || v.date || ''))}</div>
         <div class="postmeta">${esc(v.date||'')}</div>
         ${pubTrkBox(v)}
         ${row(t('출발'), [v.from, v.timeOut].filter(Boolean).join(' · '))}
         ${row(t('출발 날씨'), v.wxOut)}
+        ${pvBox(v.phOut, 'out')}
         ${logs.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('중간 기록'))}</span></div>`
           + logs.map(g=>`<div class="mrrow"><span class="mrlbl">${esc(g.time||'—')}</span>
               <b class="mrv" style="flex:1">${g.kind?`<span class="chip">${esc(g.kind)}</span> `:''}${esc(g.text||'')}</b>
-              ${g.eng==='on'?`<span class="chip engon">${esc(t('엔진 켬'))}</span>`:g.eng==='off'?`<span class="chip engoff">${esc(t('엔진 끔'))}</span>`:''}</div>`).join('')
+              ${g.eng==='on'?`<span class="chip engon">${esc(t('엔진 켬'))}</span>`:g.eng==='off'?`<span class="chip engoff">${esc(t('엔진 끔'))}</span>`:''}</div>`
+              + pvBox(g.photos, 'log:'+g.id)).join('')
           : ''}
         ${row(t('도착'), [v.to, v.timeIn].filter(Boolean).join(' · '))}
         ${row(t('도착 날씨'), v.wxIn)}
+        ${pvBox(v.phIn, 'in')}
         ${row(t('거리'), v.nm ? v.nm + ' NM' : '')}
         ${row(t('항해 시간'), v.hours ? durText(v.hours)
             + (sail ? ' ' + tsub('(엔진 {e} · 세일 {s})', { e: durText(v.engineH||0) || '0분', s: sail }) : '') : '')}
         ${fish.length ? row(t('조과'), fish.map(f=>esc(f.name)+' '+f.n).join(' · ')) : ''}
         ${v.note ? `<div class="mrrow"><span class="mrlbl">${esc(t('메모'))}</span></div>
                     <div class="postbody">${esc(trIn('voyage', v.id, 'note', v.note)).replace(/\n/g,'<br>')}</div>` : ''}
-        ${(v.photos||[]).length ? `<div class="mrrow"><span class="mrlbl">${esc(t('사진'))}</span></div>
-            <div class="mrph" style="padding:0 14px 14px">${(v.photos||[]).map((u,i)=>
-              `<img loading="lazy" src="${esc(u)}" onclick="pubVoyPhoto(${i})">`).join('')}</div>` : ''}
+        ${(v.photos||[]).length ? `<div class="secl">${esc(t('이 항해 사진'))}</div>`
+            + pvBox(v.photos, 'all') : ''}
         ${bpSocial(x.id, v.id)}`;
     }
     // 목록 — 이름과 날짜만. 최근 것이 맨 위.
@@ -19559,7 +19610,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.94';
+const APP_VER = '4.95';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -23073,7 +23124,9 @@ function openMR(kind, id){
   const P = document.getElementById('mrPanel');
   const TITLES = {maint:t('정기점검'), gear:t('장비'), mlog:t('정비수첩'), review:t('제품 리뷰'), repair:t('수리목록'),
                   voyage:t('항해일지'), fuel:t('연료 기록'), contact:t('연락처'), vdoc:t('문서')};
-  const hasPhotos = (kind==='maint'||kind==='gear'||kind==='mlog'||kind==='review'||kind==='repair'||kind==='voyage'||kind==='vdoc');
+  // ★ 4.95 — 항해일지는 사진이 자리마다 붙는다. 맨 아래 칸은 「이 항해 사진」 으로
+  //   도착 밑에 올라갔다(사장님이 정하신 것). 여기에 또 두면 같은 칸이 둘이 된다.
+  const hasPhotos = (kind==='maint'||kind==='gear'||kind==='mlog'||kind==='review'||kind==='repair'||kind==='vdoc');
   const ph = hasPhotos ? ((it.photos||[]).map((p,i)=>`<img src="${p}" onclick="pvOpen(getMR('${kind}','${id}').photos,${i})">`
              + (unlocked?`<button class="mrbtn warn edt phx" onclick="mrDelPhoto(${i})">&#10005;</button>`:''))
              .join('') || `<span class="mrnone2">${esc(t('사진 없음'))}</span>`) : '';
@@ -23199,9 +23252,17 @@ function openMR(kind, id){
         : (''
       // 낚시배일 때만 물때와 조과가 붙는다. 요트·보트 항해일지는 그대로다.
       + (isFishing() ? tideRow(it) + catchBox(it) : '')
-      + legRow('출발','from','timeOut','wxOut', it)
+      + legRow('출발','from','timeOut','wxOut', it) + vphBox(it, 'out')
       + logRows(it)                       // 출발 → 중간 기록 → 도착 순서로 읽힌다
-      + legRow('도착','to','timeIn','wxIn', it)
+      + legRow('도착','to','timeIn','wxIn', it) + vphBox(it, 'in')
+      // ★ 자리와 상관없는 사진(배 전체 사진 같은 것)은 여기 둔다.
+      //   여태 화면 맨 아래에 있던 그 칸이다 — 자리만 옮겼고 자료는 그대로다.
+      // ★ 이름표 칸(mrlbl)에 넣으면 「이 항해 사」 / 「진」 으로 두 줄이 된다.
+      //   묶음 이름표(secl)는 정비수첩 「정비 절차」 가 이미 쓰는 자리다.
+      + `<div class="secl">${esc(t('이 항해 사진'))}</div>`
+      + `<div class="mrm" style="padding:2px 14px 6px;color:#7b8794">${
+           esc(t('어느 자리랄 것 없는 사진'))}</div>`
+      + vphBox(it, 'all')
       + (unlocked && !String(it.timeIn||'').trim()
           ? `<div class="posrow"><span style="color:#7b8794">${esc(t('입항하면 한 번에 —'))}</span>`
             + `<button class="minib grn" onclick="arriveNow()">${esc(t('지금 도착 (시각·위치·날씨)'))}</button></div>` : '')
@@ -29761,7 +29822,8 @@ function legRow(label, placeKey, timeKey, wxKey, it){
   const time = unlocked
     ? `<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it[timeKey]||''))}" onchange="hmChange(this, v => voyTime('${timeKey}','${wxKey}', v))">`
     : `<b class="mrv">${esc(it[timeKey] ? hm(it[timeKey]) : '—')}</b>`;
-  return `<div class="mrrow"><span class="mrlbl">${label}</span>${place}${time}</div>`
+  // ★ 4.95 — 이름표가 사전을 안 거치고 있었다. 일본어로 열어도 「출발」 이 그대로 나왔다.
+  return `<div class="mrrow"><span class="mrlbl">${esc(t(label))}</span>${place}${time}</div>`
        + wxLine(it[wxKey], it[timeKey] ? `wxCapture('${wxKey}')` : '')
        + posLine(it, wxKey);
 }
@@ -29951,6 +30013,122 @@ function logDel(lid){
   it.logs = (it.logs||[]).filter(x=>x.id!==lid);
   saveMR(); renderVoyage(); openMR('voyage', mrOpenId);
 }
+// ══════════════════════════════════════════════════════════════
+// 항해일지 사진 — 출발 · 중간 기록 · 도착 (4.95)
+//
+// ★ 여태는 사진이 화면 맨 아래 한 곳에만 붙었다. 어디서 찍은 것인지가 안 남아
+//   「그냥 사진 몇 장」 이 되었다. 이제 자리마다 붙는다.
+//
+// ★ 자리는 넷이지만 **문은 하나다.** 어느 자리든 vphAt / vphSet 을 거친다.
+//   자리마다 따로 만들면 반드시 한 곳이 빠진다 (넣기는 되는데 지우기는 안 되는 식으로).
+//
+//     'out'        출발        → it.phOut
+//     'log:<번호>'  중간 기록    → 그 기록의 photos
+//     'in'         도착        → it.phIn
+//     'all'        이 항해 사진 → it.photos   (여태 쓰던 그 칸. 자리를 옮겼을 뿐이다)
+//
+// ★ 'all' 을 여기 끼워 넣은 까닭 — 사장님이 「남기되 도착 아래로 올린다」 고 정하셨다.
+//   같은 문을 쓰면 크게 보이는 규칙도 저절로 같아진다.
+const VPH_MAX = 12;                      // 한 자리에 넣을 수 있는 사진 수
+const vphLogId = slot => { const m = String(slot||'').match(/^log:(.+)$/); return m ? m[1] : ''; };
+function vphAt(it, slot){
+  if(!it) return [];
+  if(slot === 'out') return Array.isArray(it.phOut) ? it.phOut : [];
+  if(slot === 'in')  return Array.isArray(it.phIn)  ? it.phIn  : [];
+  if(slot === 'all') return Array.isArray(it.photos) ? it.photos : [];
+  const id = vphLogId(slot);
+  if(id){
+    const g = (Array.isArray(it.logs) ? it.logs : []).find(x => x && String(x.id) === id);
+    return (g && Array.isArray(g.photos)) ? g.photos : [];
+  }
+  return [];
+}
+function vphSet(it, slot, arr){
+  if(!it) return false;
+  const a = Array.isArray(arr) ? arr : [];
+  if(slot === 'out'){ it.phOut  = a; return true; }
+  if(slot === 'in'){  it.phIn   = a; return true; }
+  if(slot === 'all'){ it.photos = a; return true; }
+  const id = vphLogId(slot);
+  if(id){
+    const g = (Array.isArray(it.logs) ? it.logs : []).find(x => x && String(x.id) === id);
+    if(!g) return false;
+    g.photos = a; return true;
+  }
+  return false;
+}
+// 이 항해에 달린 사진 전부 (자리를 안 가린다) — 지울 때·챙겨 둘 때 쓴다
+function voyPhotoUrls(v){
+  const out = [];
+  const add = a => (Array.isArray(a) ? a : []).forEach(x=>{
+    if(typeof x === 'string' && x) out.push(x); });
+  if(!v) return out;
+  add(v.photos); add(v.phOut); add(v.phIn);
+  (Array.isArray(v.logs) ? v.logs : []).forEach(g => { if(g) add(g.photos); });
+  return out;
+}
+let vphSlot = '';
+function vphPick(slot, cam){
+  vphSlot = slot;
+  const el = document.getElementById(cam ? 'vphCam' : 'vphFile');
+  if(el) el.click();
+}
+function vphFilePick(ev){
+  const files = Array.from(ev.target.files || []); ev.target.value = '';
+  if(!files.length) return;
+  const ty = mrOpenType, id = mrOpenId, slot = vphSlot;
+  const it = getMR(ty, id); if(!it) return;
+  if(vphAt(it, slot).length + files.length > VPH_MAX){
+    tell(tsub('사진은 한 자리에 {n}장까지입니다.', { n: VPH_MAX })); return;
+  }
+  files.forEach(f=>{
+    resizePhoto(f, async url=>{
+      if(!url){ tell(t('사진을 불러오지 못했습니다')); return; }
+      const st = await storePhotos([url]);
+      const o = getMR(ty, id); if(!o) return;
+      // ★ 다시 꺼내 온다 — 사진 여러 장이 각각 따로 돌아오므로 앞의 것을 덮으면 안 된다
+      vphSet(o, slot, vphAt(o, slot).concat([st.photos[0] || url]));
+      saveMR();
+      if(mrOpenType === ty && mrOpenId === id) openMR(ty, id);
+    });
+  });
+}
+function vphDel(slot, i){
+  const it = getMR(mrOpenType, mrOpenId); if(!it || !unlocked) return;
+  const a = vphAt(it, slot).slice();
+  if(i < 0 || i >= a.length) return;
+  const gone = a[i];
+  a.splice(i, 1);
+  if(!vphSet(it, slot, a)) return;
+  saveMR();
+  // 창고에 있던 것이면 거기서도 치운다 (다른 데서 안 쓰는 것만)
+  try{ if(gone && /^https?:/i.test(gone) && typeof dropPhotos === 'function'
+          && !voyPhotoUrls(it).includes(gone)) dropPhotos([gone]); }catch(_){}
+  openMR(mrOpenType, mrOpenId);
+}
+function vphOpen(slot, i){
+  const it = getMR(mrOpenType, mrOpenId); if(!it) return;
+  pvOpen(vphAt(it, slot), i);
+}
+// 한 자리의 사진 칸을 그린다
+function vphBox(it, slot){
+  const a = vphAt(it, slot);
+  const s = esc(String(slot));
+  const btns = unlocked
+    ? `<div class="vphrow edt">
+         <button class="mrbtn edt" onclick="vphPick('${s}',true)">${esc(t('촬영'))}</button>
+         <button class="mrbtn edt" onclick="vphPick('${s}',false)">${esc(t('앨범'))}</button>
+       </div>`
+    : '';
+  if(!a.length) return btns;
+  const imgs = a.map((u,i)=> unlocked
+    ? `<span class="vph1"><img loading="lazy" src="${esc(u)}" onclick="vphOpen('${s}',${i})">
+         <button class="rm edt" onclick="event.stopPropagation();vphDel('${s}',${i})">&#10005;</button></span>`
+    : `<img class="vphbig" loading="lazy" src="${esc(u)}" onclick="vphOpen('${s}',${i})">`
+  ).join('');
+  // 'all' 은 묶음 이름표 아래에 온다 — 왼쪽을 이름표 칸만큼 비우지 않는다
+  return `<div class="vphwrap${unlocked ? ' edit' : ''}${slot === 'all' ? ' sec' : ''}">${imgs}</div>` + btns;
+}
 function logRows(it){
   const arr = (it.logs||[]).slice().sort((a,b)=> String(a.time||'').localeCompare(String(b.time||'')));
   const head = `<div class="mrrow"><span class="mrlbl">${esc(t('중간 기록'))}</span>
@@ -29987,7 +30165,8 @@ function logRows(it){
     return row + wxLine(g.wx, g.time ? `wxCapture('log:${g.id}')` : '') + posLine(it, 'log:'+g.id)
       + (hasPos ? `<div class="posrow" style="padding-top:0"><span style="flex:1"></span>
            <button class="minib blu" onclick="logShowOnMap('${g.id}')">${esc(t('지도에서 보기'))}</button></div>` : '')
-      + ((isFishing() && g.kind === '포인트') ? fishRows(g) : '');
+      + ((isFishing() && g.kind === '포인트') ? fishRows(g) : '')
+      + vphBox(it, 'log:' + g.id);
   }).join('') + foot;
 }
 

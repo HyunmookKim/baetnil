@@ -25,8 +25,8 @@ const API_KEY = process.env.FB_API_KEY || 'AIzaSyAH1iM-ljsnTmzWmExfSqrMbILhVaJaI
 const SITE    = (process.env.SITE_URL || 'https://baetnil.com').replace(/\/+$/, '');
 const OUT     = process.env.OUT_DIR || '.';
 
-const LANGS = ['ko', 'ja', 'en'];
-const LPATH = { ko:'', ja:'ja/', en:'en/' };
+const LANGS = ['ko', 'ja', 'en', 'ru'];
+const LPATH = { ko:'', ja:'ja/', en:'en/', ru:'ru/' };
 
 // ★ 웹에 나가는 것은 「공개」 하나뿐이다.
 //   worker.js 와 같은 규칙이다 — 목록에만 있고 페이지가 없거나, 그 반대가 되면 안 된다.
@@ -81,14 +81,17 @@ const esc = s => String(s == null ? '' : s)
 // ★ 옛 사본 걷어내기.
 //   ★ 통째로 지웠다 다시 만들지 않는다 — 만들다 실패하면 사이트가 통째로 빈다.
 //     여기서는 만들 것이 없으니 그냥 지우기만 하고, 무엇을 지웠는지 말한다.
-function sweep(dir){
+function sweep(dir, keep){
   const abs = path.join(OUT, dir);
   if(!fs.existsSync(abs)) return 0;
   let n = 0;
   for(const e of fs.readdirSync(abs, { withFileTypes:true })){
     const rel = path.join(dir, e.name);
+    if(keep && keep.indexOf(e.name) >= 0) continue;      // 남길 것 (대문 말판)
     if(e.isDirectory()){
-      n += sweep(rel);
+      // ★ 남길 것은 맨 윗자리에만 해당한다.
+      //   안 그러면 ja/v/b1/v1/index.html 같은 옛 사본까지 살아남는다 (실제로 그랬다).
+      n += sweep(rel, null);
       try{ if(!fs.readdirSync(path.join(OUT, rel)).length) fs.rmdirSync(path.join(OUT, rel)); }catch(_){}
     } else {
       fs.unlinkSync(path.join(OUT, rel)); n++;
@@ -98,6 +101,69 @@ function sweep(dir){
   return n;
 }
 
+// ══════════════════════════════════════════════════════════════
+// 대문(index.html)을 말마다 한 장씩 굽는다  —  /ja/  /en/  /ru/
+//
+// ★ 왜 필요한가
+//   대문은 자바스크립트로 글자만 바꿔 왔다. 주소가 하나뿐이었다.
+//   그래서 구글이 보는 것은 「한국어 문서 한 장」 이었고,
+//   일본 사람이 구글에서 우리를 찾을 길이 없었다.
+//   구글 문서: 각 말판은 자기 자신과 나머지 전부를 hreflang 으로 가리켜야 하고,
+//   서로 안 가리키면 무시한다. 그러려면 말마다 주소가 있어야 한다.
+//
+// ★ 사본이 아니다 — 사전은 index.html 안에 하나뿐이고, 여기서는 그것으로 굽기만 한다.
+//   index.html 을 고치면 다음 굽기 때 셋이 따라온다.
+//
+// ★ 구운 판에서도 자바스크립트는 그대로 돈다. 주소가 /ja/ 면 일본어를 집으므로
+//   구운 글자와 다시 그린 글자가 같다 (화면이 깜빡이지 않는다).
+function bakeFront(){
+  const srcPath = path.join(OUT, 'index.html');
+  if(!fs.existsSync(srcPath)) return 0;
+  const html = fs.readFileSync(srcPath, 'utf8');
+
+  // 사전을 꺼낸다
+  const m = html.match(/var I18N = \{[\s\S]*?\n\};/);
+  if(!m){ console.log('※ 대문 사전을 못 찾았습니다 — 대문은 안 굽습니다'); return 0; }
+  let I18N;
+  try{ I18N = new Function(m[0] + '\nreturn I18N;')(); }
+  catch(e){ console.log('※ 대문 사전을 못 읽었습니다:', e.message); return 0; }
+
+  let made = 0;
+  for(const L of LANGS){
+    if(L === 'ko') continue;                 // 한국어는 뿌리(index.html) 그대로다
+    const d = I18N[L];
+    if(!d){ console.log('※ 대문에 ' + L + ' 사전이 없습니다 — 건너뜁니다'); continue; }
+    let out = html;
+
+    // 글자를 미리 채운다 — data-t 자리는 원래 비어 있다
+    out = out.replace(/(data-t="([^"]+)"[^>]*>)(<\/)/g,
+      (all, open, key, close) => (d[key] === undefined ? all : open + d[key] + close));
+
+    // 머리
+    out = out.replace('<html lang="ko">', '<html lang="' + L + '">');
+    out = out.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(d.title) + '</title>');
+    out = out.replace(/(<meta name="description" content=")[^"]*(">)/, '$1' + esc(d.desc) + '$2');
+    out = out.replace(/(<meta property="og:title" content=")[^"]*(">)/, '$1' + esc(d.title) + '$2');
+    out = out.replace(/(<meta property="og:description" content=")[^"]*(">)/, '$1' + esc(d.desc) + '$2');
+    out = out.replace(/(<meta property="og:url" content=")[^"]*(">)/, '$1' + SITE + '/' + L + '/$2');
+    out = out.replace(/(<link rel="canonical" href=")[^"]*(">)/, '$1' + SITE + '/' + L + '/$2');
+
+    // 말 고르는 줄 — 지금 판을 눌린 것으로
+    out = out.replace(/(<button type="button" data-lang=")([a-z]{2})(" aria-pressed=")(?:true|false)(")/g,
+      (all, a, v, b2, c) => a + v + b2 + (v === L ? 'true' : 'false') + c);
+
+    // 약관은 말마다 파일이 따로다. 일본어 약관은 아직 없어 영어를 건다.
+    //   ★ 자바스크립트도 같은 규칙을 쓴다 (index.html 의 docLang). 두 곳이 어긋나면 안 된다.
+    const dl = (L === 'ja') ? 'en' : L;
+    out = out.replace(/(<a href=")([a-z]+)(\.html"[^>]*data-doc=)/g, (all, a, name, b2) =>
+      a + '/' + name + (dl === 'ko' ? '' : '.' + dl) + '.html"' + b2.slice(b2.indexOf(' ')));
+
+    write(L + '/index.html', out);
+    made++;
+  }
+  return made;
+}
+
 (async () => {
   const boats = (await readAll()).filter(b => b && !b.adminHidden);
 
@@ -105,6 +171,7 @@ function sweep(dir){
   const urls = [];
   const add = u => urls.push(u);
   LANGS.forEach(L => {
+    add(`${SITE}/${LPATH[L]}`);                      // 대문
     ['m','v','r'].forEach(d => add(`${SITE}/${LPATH[L]}${d}/`));
     boats.forEach(b => {
       const say = (d, arr, ok) => (b[arr] || []).forEach(r => {
@@ -135,22 +202,31 @@ function sweep(dir){
   ['m','v','r'].forEach(d => { gone += sweep(d); });
   ['m','v','r'].forEach(d => write(d + '/.keep',
     '이 폴더는 비어 있습니다. 기록 페이지는 클라우드플레어 워커가 볼 때 만듭니다.\n'));
+  // ★ 전에는 ja/ en/ 을 통째로 걷어냈다. 기록 페이지 사본이 거기 있었기 때문이다.
+  //   지금 그 자리에는 **대문의 말판**이 산다. 걷어내면 안 된다.
+  //   기록 페이지는 워커가 앞에서 가로채므로 이 폴더 안에 파일로 있으면 안 된다 —
+  //   그래서 index.html 만 남기고 나머지는 그대로 걷어낸다.
   const LDIRS = LANGS.filter(L => LPATH[L]).map(L => LPATH[L].replace(/\/$/,''));
-  LDIRS.forEach(d => { gone += sweep(d); });
+  LDIRS.forEach(d => { gone += sweep(d, ['index.html']); });
+  const baked = bakeFront();
 
   // ★ 지운 것을 git 에 알린다.
   //   일감(web.yml)의 `git add m v r sitemap.xml robots.txt` 에는 ja·en 이 없다.
   //   그 파일은 .github 안에 있어 내가 고칠 수 없는 자리다 —
   //   그래서 「내가 지운 것은 내가 담는다」 로 여기서 끝낸다.
   //   ★ git 이 없거나(내 컴퓨터에서 시험할 때) 담을 것이 없으면 조용히 넘어간다.
-  if(gone){
-    try{
-      const { execFileSync } = require('child_process');
-      LDIRS.concat(['m','v','r']).forEach(d => {
-        try{ execFileSync('git', ['add', '-A', '--', d], { cwd: OUT, stdio:'ignore' }); }catch(_){}
-      });
-    }catch(_){}
-  }
+  //
+  // ★★★ 4.94 — 전에는 「걷어낸 것이 있을 때만(if(gone))」 담았다.
+  //   이제 여기서 대문 말판을 **굽기도** 한다. 걷어낼 것이 하나도 없는 날에는
+  //   구운 ru/index.html 이 커밋에 안 담겨 영영 안 올라간다.
+  //   (일감의 `git add m v r ja en …` 줄에는 ru 가 없다. 그 파일은 내가 못 고치는 자리다.)
+  //   그래서 걷어냈든 구웠든 **늘** 담는다.
+  try{
+    const { execFileSync } = require('child_process');
+    LDIRS.concat(['m','v','r']).forEach(d => {
+      try{ execFileSync('git', ['add', '-A', '--', d], { cwd: OUT, stdio:'ignore' }); }catch(_){}
+    });
+  }catch(_){}
 
-  console.log(`구웠습니다: 주소 ${urls.length}개` + (gone ? ` · 옛 사본 ${gone}개 걷어냄` : ''));
+  console.log(`구웠습니다: 주소 ${urls.length}개 · 대문 ${baked}장` + (gone ? ` · 옛 사본 ${gone}개 걷어냄` : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

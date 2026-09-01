@@ -1822,6 +1822,12 @@ header{padding-top:var(--sat)}
   font-size:13px;font-weight:450;letter-spacing:-.01em;
   padding:9px 15px;border-radius:9px;cursor:pointer}
 #pmBox button.on{background:rgba(156,198,232,.19);color:var(--ac);font-weight:550}
+
+/* 줄마다 ⋮ — 길게 누르기 말고도 차림표에 닿는 길 (4.93) */
+.itdots{flex:0 0 auto;width:34px;min-height:38px;border:none;background:transparent;
+  color:var(--tm);font-size:17px;line-height:1;cursor:pointer;border-radius:9px;padding:0}
+.itdots:hover{background:var(--sf2);color:var(--tx)}
+.itdots:focus-visible{outline:2px solid var(--ac);outline-offset:-2px}
 </style>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#122a44">
@@ -1848,6 +1854,7 @@ header{padding-top:var(--sat)}
   <div id="stowTools" style="display:none">
     <button class="tab" id="tabToggle" onclick="toggleView()" data-t="목록">목록</button>
     <button class="tab" id="sortTab" onclick="sortMenu(this)">가나다순 ▾</button>
+    <button class="tab edt" id="pickTab" onclick="pickStart(null)" data-t="선택">선택</button>
     <button class="tab" id="lkEditTab" onclick="toggleLkEdit()" data-t="칸 그리기">칸 그리기</button>
     <button class="tab" id="trashTab" onclick="openTrash()" data-t="휴지통">휴지통</button>
     <span id="lkTools" style="display:none">
@@ -2094,7 +2101,7 @@ header{padding-top:var(--sat)}
 //   ★ 일본 · 한국 · 영어 · 러시아어 차례로 둔다.
 //     세토내해 방문 정박지를 실었고 일본을 주무대로 보므로 일본어가 먼저다.
 //   ★ 여기 차례만 바꾼다. 처음 켤 때 무슨 말로 열지는 폰이 정한 말을 따른다 —
-//     그건 따로다(langNow). 일본어를 위로 올렸다고 한국 사람 앱이 일본어로 열리지 않는다.
+//     그건 따로다(langFromDevice). 일본어를 위로 올렸다고 한국 사람 앱이 일본어로 열리지 않는다.
 const LANGS = [
   { v:'ja', name:'日本語' },
   { v:'ko', name:'한국어' },
@@ -2103,8 +2110,13 @@ const LANGS = [
 ];
 // 앱 안의 서로 다른 한국어 문구 수 (2026-08-29 기준 실측 — 사전 열쇠를 세어 맞췄다).
 // 사전이 얼마나 찼는지 재는 잣대다. 문구가 늘면 이 값도 올린다.
-const LANG_TOTAL = 2241;
+const LANG_TOTAL = 2450;
 const LANG_SHOW_AT = 0.6;    // 60% 는 차야 골라도 앱이 앱처럼 보인다
+// 폰 말을 보고 고른 값을 담아 둔다 (langFromDevice 가 쓴다).
+// ★ 여기 두는 까닭 — t() 가 앱 곳곳에서 아주 일찍 불린다. 선언이 그보다 아래 있으면
+//   「Cannot access 'langAuto' before initialization」 으로 앱이 통째로 안 뜬다.
+//   말 설정은 여기 한자리에 모아 둔다.
+let langAuto = null;
 
 // 열쇠는 한국어 원문 그대로 쓴다.
 // 따로 'home.tab' 같은 이름을 붙이면 코드를 읽을 때 무슨 말인지 알 수 없고,
@@ -2465,6 +2477,17 @@ const I18N = {
     '보기':'Open',
     // ── 3.85 · 내 배 화면
     '배 목록':'Boats',
+    '찾기':'Search',
+    '{n}시간마다':'every {n} h',
+    '남음 {n}시간':'{n} h left',
+    '지남 {n}시간':'{n} h over',
+    '지금까지 {n}시간':'{n} h so far',
+    '안 쓰면 달력만':'leave blank for calendar only',
+    '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'Enter how many engine hours between jobs — engine oil every 250 h, impeller every 500 h.<br><br>',
+    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'If you fill in <b>both</b> this and the calendar cycle, whichever comes <b>first</b> is shown — \'6 months or 250 hours, whichever comes first\'.<br><br>',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Hours are counted from the app\\u2019s <b>engine running records</b> plus running time in the voyage log. No gauge reading needed.<br><br>',
+    '안 적으면 여태처럼 달력만 봅니다.':'Leave it blank and it works on the calendar alone, as before.',
+    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'Engine jobs often go by running hours (e.g. 250 h). Put that in the <b>Engine hours</b> field below.',
     '교체':'Replace',
     '교체 이력':'Replacement history',
     '정기점검 이력':'Check history',
@@ -4465,6 +4488,7 @@ const I18N = {
     '대용량':'Large',
     '기본(5MB 제한)':'Basic (5MB limit)',
     '옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})':'An old app file is still cached — {old} is running (new file {now})',
+    '저장된 파일 {v} (새로고침 필요)':'Cached file {v} (refresh needed)',
     '마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.':'Enter the last service date and the app will show the next due date and days left.',
     '글과 사진을 섞어서 쓰시면 됩니다.':'You can mix text and photos.',
     '{n}척':'{n} boats',
@@ -5006,6 +5030,17 @@ const I18N = {
     '보기':'Открыть',
     // ── 3.85 · 내 배 화면
     '배 목록':'Суда',
+    '찾기':'Поиск',
+    '{n}시간마다':'каждые {n} ч',
+    '남음 {n}시간':'осталось {n} ч',
+    '지남 {n}시간':'просрочено на {n} ч',
+    '지금까지 {n}시간':'пока {n} ч',
+    '안 쓰면 달력만':'пусто — только календарь',
+    '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'Укажите, через сколько моточасов повторять — масло каждые 250 ч, крыльчатка каждые 500 ч.<br><br>',
+    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'Если заполнить <b>оба</b> — календарь и моточасы — покажем то, что наступит <b>раньше</b>: «6 месяцев или 250 часов, что раньше».<br><br>',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Часы считаются по <b>записям работы двигателя</b> в приложении и по наработке из судового журнала. Прибор считывать не нужно.<br><br>',
+    '안 적으면 여태처럼 달력만 봅니다.':'Оставьте пустым — будет работать только по календарю, как раньше.',
+    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'Обслуживание двигателя часто идёт по моточасам (например, 250 ч). Впишите это в поле <b>Моточасы</b> ниже.',
     '교체':'Заменить',
     '교체 이력':'История замен',
     '정기점검 이력':'История ТО',
@@ -7005,6 +7040,7 @@ const I18N = {
     '대용량':'Большое',
     '기본(5MB 제한)':'Базовое (лимит 5 МБ)',
     '옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})':'Остался старый файл приложения — работает {old} (новый файл {now})',
+    '저장된 파일 {v} (새로고침 필요)':'Сохранённый файл {v} (нужно обновить)',
     '마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.':'Укажите дату последнего обслуживания — приложение покажет следующую дату и остаток дней.',
     '글과 사진을 섞어서 쓰시면 됩니다.':'Можно смешивать текст и фотографии.',
     '{n}척':'Судов: {n}',
@@ -7603,6 +7639,17 @@ const I18N = {
     '배를 등록하면 오늘 상태가 여기에 나옵니다':'船を登録すると、今日の状態がここに表示されます',
     '보기':'表示',
     '배 목록':'船の一覧',
+    '찾기':'検索',
+    '{n}시간마다':'{n}時間ごと',
+    '남음 {n}시간':'あと{n}時間',
+    '지남 {n}시간':'{n}時間超過',
+    '지금까지 {n}시간':'これまで{n}時間',
+    '안 쓰면 달력만':'空欄ならカレンダーのみ',
+    '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'エンジン何時間ごとの作業かを書きます — エンジンオイル 250時間、インペラ 500時間 のように。<br><br>',
+    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'カレンダー周期と<b>両方</b>書くと、<b>先に来るほう</b>を知らせます。「6か月または250時間のいずれか早いほう」です。<br><br>',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'時間はアプリの<b>エンジン稼働記録</b>と航海日誌の稼働時間を合わせて数えます。計器を読む必要はありません。<br><br>',
+    '안 적으면 여태처럼 달력만 봅니다.':'書かなければ、これまでどおりカレンダーだけで見ます。',
+    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'エンジンの整備は稼働時間基準（例：250時間）のことも多いです。その場合は下の<b>エンジン時間</b>欄に書いてください。',
     '교체':'交換',
     '교체 이력':'交換履歴',
     '정기점검 이력':'定期点検の履歴',
@@ -9528,6 +9575,7 @@ const I18N = {
     '대용량':'大容量',
     '기본(5MB 제한)':'標準（5MB制限）',
     '옛 앱 파일이 남아 있습니다 — 지금 {old} 가 돌고 있습니다 (새 파일 {now})':'古いアプリのファイルが残っています — 現在 {old} が動いています（新しいファイル {now}）',
+    '저장된 파일 {v} (새로고침 필요)':'保存されたファイル {v}（再読み込みが必要）',
     '마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.':'最終点検日を入力すると、次回の予定日と残り期間をお知らせします。',
     '글과 사진을 섞어서 쓰시면 됩니다.':'文章と写真を混ぜてお書きいただけます。',
     '{n}척':'{n}隻',
@@ -11608,7 +11656,12 @@ const HELP = {
     t('얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>') +
     t('마지막 점검일을 입력하면 다음 예정일이 자동으로 계산되고, 목록에 남은 기간이 표시됩니다. ') +
     t('기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>') +
-    t('엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 주기를 대략적인 기간으로 잡고 메모에 시간을 적어 두시면 됩니다.')],
+    t('엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.')],
+  hrs: [t('엔진 시간'),
+    t('엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>') +
+    t('달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>') +
+    t('시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>') +
+    t('안 적으면 여태처럼 달력만 봅니다.')],
   pin: [t('도면 핀'),
     t('항목이 배의 어느 위치인지 도면에 표시해 둘 수 있습니다.<br><br>') +
     t('항목을 연 뒤 <b>핀 지정</b>을 누르고 도면에서 해당 위치를 탭하면 됩니다.') +
@@ -19506,7 +19559,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.92';
+const APP_VER = '4.94';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -21277,7 +21330,11 @@ function pickStart(id){
   openItemId = null; renderPanelItems();
 }
 function pickEnd(){ pickOn = false; pickSet = new Set(); renderPanelItems(); }
-function pickSync(){ try{ document.body.classList.toggle('picking', pickOn); }catch(_){} }
+function pickSync(){
+  try{ document.body.classList.toggle('picking', pickOn); }catch(_){}
+  // 도구줄의 「선택」 이 지금 켜져 있는지 보여 준다 — 화면이 거짓말하지 않게
+  try{ const b = document.getElementById('pickTab'); if(b) b.classList.toggle('on', pickOn); }catch(_){}
+}
 // 수량 한 칸 올리고 내리기. 숫자가 아닌 수량(「1+2」 같은 것)은 건드리지 않는다.
 function qtyStep(id, d){
   if(!unlocked) return;      // 잠그면 이 단추가 화면에 없다 (edt)
@@ -21397,11 +21454,19 @@ function renderPanelItems(){
           ${qadj}${thumbHTML(it)}</div>${mv}
       </div>`;
     }
+    // ★ 4.93 — 줄마다 ⋮ 를 단다 (애플 지침)
+    //   「길게 누르기가 유일한 길이면 안 된다. 차림표의 모든 항목은
+    //    눈에 보이는 다른 길로도 닿을 수 있어야 한다」
+    //   흔들리는 배에서는 손가락을 멈춰 두어야 하는 동작 자체가 잘 실패한다.
+    //   길게 누르기는 아는 사람을 위한 지름길로 그대로 남긴다.
+    const dots = (pickOn || !unlocked) ? ''
+      : `<button class="itdots edt" onclick="event.stopPropagation();itemMenu(${it.id})"
+           aria-label="${esc(t('더 보기'))}">⋮</button>`;
     return `<div class="it${on}${editId===it.id?' editing':''}${hl}" data-id="${it.id}">
       <div class="itrow" onclick="itemTap(${it.id})">${dot}
         <div class="itx"><div class="nm">${esc(it.name || t('(이름 없음)'))}</div>
           <div class="meta">${itGearTag(it)}${it.note?`<i>${esc(it.note)}</i>`:''}</div></div>
-        ${qadj}${thumbHTML(it)}</div>
+        ${qadj}${thumbHTML(it)}${dots}</div>
       ${openItemId===it.id ? itemCardHTML(it) : ''}${mv}${mg}
     </div>`;
   }).join('')
@@ -21961,13 +22026,61 @@ const nowHM = () => { const d = new Date();
 // ★ 상태 글자를 여기서 이어 붙여 만들었다 — 사전을 거칠 자리가 없었다.
 //   이 함수는 오늘 화면의 「곧 해야 할 정비」 카드에도 쓰인다.
 //   그래서 영어로 켜도 첫 화면부터 '지남 36일' 이 나왔다.
+// ══════════════════════════════════════════════════════════════
+// ★★ 정기점검 — 달력과 엔진 시간, 먼저 오는 쪽 (4.93)
+//
+//   왜 —
+//   배 정비의 절반은 달력이 아니라 **엔진 시간**으로 온다.
+//   엔진오일·임펠러·발전기가 그렇다. 여태 달력 주기밖에 없어서
+//   그 절반을 아예 못 적었다.
+//
+//   남들 —
+//   Vessel Vanguard · UpKeep · Fiix · MaintainX 전부
+//   달력 / 엔진 시간 / 「둘 중 먼저 오는 것」 셋을 갖는다.
+//   「3개월 또는 3,000마일 중 먼저」가 교과서 예시다.
+//
+//   ★ 계기판을 자동으로 읽지 않는다. 앱에 이미 **엔진 가동 기록**이 있고
+//     그 숫자를 쓴다. 머큐리조차 계기판 읽는 장비를 따로 판다.
+//   ★ 시간 주기를 안 적으면 여태와 똑같이 달력만 본다. 있던 기록은 그대로다.
+const engNow = () => { try{ return engineHours().total || 0; }catch(_){ return 0; } };
+// 시간 주기로 볼 때 얼마나 남았나 (시간 주기가 없으면 null)
+function mHourLeft(it){
+  const per = parseFloat(it && it.hrs);
+  if(!isFinite(per) || per <= 0) return null;
+  const base = parseFloat(it.lastH);
+  const from = isFinite(base) ? base : 0;
+  return (from + per) - engNow();
+}
 function mStatus(it){
-  if(!it.lastDate) return {c:'#5A5F66', t:t('미기록'), k:'none', next:null, days:null};
-  const nd = addPeriod(it.lastDate, it.months, it.unit||'m');
-  const days = Math.floor((nd - new Date())/864e5);
-  if(days<0)   return {c:'#E4756A', t:tsub('지남 {n}일', {n:-days}), k:'late', next:nd, days};
-  if(days<=30) return {c:'#D9AE63', t:tsub('남음 {n}일', {n:days}),  k:'soon', next:nd, days};
-  return {c:'#5FB894', t:tsub('남음 {n}일', {n:days}), k:'ok', next:nd, days};
+  const hl = mHourLeft(it);                       // 시간으로 본 남은 양
+  if(!it.lastDate && hl === null)
+    return {c:'#5A5F66', t:t('미기록'), k:'none', next:null, days:null};
+  // ── 달력으로 본 것
+  let days = null, nd = null;
+  if(it.lastDate){
+    nd = addPeriod(it.lastDate, it.months, it.unit||'m');
+    days = Math.floor((nd - new Date())/864e5);
+  }
+  // ── 시간으로만 볼 때
+  if(days === null){
+    if(hl < 0)   return {c:'#E4756A', t:tsub('지남 {n}시간', {n:Math.round(-hl)}), k:'late', next:null, days:null, hrsLeft:hl};
+    if(hl <= 20) return {c:'#D9AE63', t:tsub('남음 {n}시간', {n:Math.round(hl)}),  k:'soon', next:null, days:null, hrsLeft:hl};
+    return {c:'#5FB894', t:tsub('남음 {n}시간', {n:Math.round(hl)}), k:'ok', next:null, days:null, hrsLeft:hl};
+  }
+  // ── 달력만 볼 때
+  const 달력 = (days<0)   ? {c:'#E4756A', t:tsub('지남 {n}일', {n:-days}), k:'late', next:nd, days}
+             : (days<=30) ? {c:'#D9AE63', t:tsub('남음 {n}일', {n:days}),  k:'soon', next:nd, days}
+                          : {c:'#5FB894', t:tsub('남음 {n}일', {n:days}), k:'ok', next:nd, days};
+  if(hl === null) return 달력;
+  // ── 둘 다 있으면 **먼저 오는 쪽**을 보여 준다
+  //   ★ 하루를 대략 한 시간 가동으로 보고 견준다 — 배는 매일 안 나간다.
+  //     자로 잰 값이 아니라 「어느 쪽이 더 급한가」를 가리는 데만 쓴다.
+  const 시간 = (hl<0)   ? {c:'#E4756A', t:tsub('지남 {n}시간', {n:Math.round(-hl)}), k:'late', next:nd, days, hrsLeft:hl}
+             : (hl<=20) ? {c:'#D9AE63', t:tsub('남음 {n}시간', {n:Math.round(hl)}),  k:'soon', next:nd, days, hrsLeft:hl}
+                        : {c:'#5FB894', t:tsub('남음 {n}시간', {n:Math.round(hl)}), k:'ok', next:nd, days, hrsLeft:hl};
+  const 급함 = { late:0, soon:1, ok:2, none:3 };
+  if(급함[시간.k] !== 급함[달력.k]) return 급함[시간.k] < 급함[달력.k] ? 시간 : 달력;
+  return (hl <= days) ? 시간 : 달력;              // 같은 급이면 더 가까운 쪽
 }
 // ★ 장비는 maint 배열에 함께 산다. 그래도 갈래 이름은 따로 둔다 —
 //   갈래가 'maint' 이면 창을 다시 그릴 때 정비 목록을 그리려 들어 장비 화면이 안 바뀐다.
@@ -22719,6 +22832,59 @@ function maintFilter(mode){
 }
 let maintMode = 'all';
 function setMaintMode(m){ maintMode = m; renderMaintList(); }
+// ══════════════════════════════════════════════════════════════
+// ★★ 내 배 기록 찾기 (4.93)
+//
+//   여태 찾기는 **적재표에만** 있었다. 장비·정기점검·수리·정비수첩에는 없었다.
+//   장비가 예순 개, 정기점검이 스무 개 넘어가면 눈으로 훑을 수가 없다.
+//
+//   ★ 폰 안에서 찾는다. 서버에 안 묻는다 —
+//     내 배 기록은 이미 폰에 통째로 있고, 바다에서는 인터넷이 없다.
+//   ★ 문을 하나로 둔다. 네 곳이 각자 만들면 어느 하나만 고쳐져 어긋난다.
+//   ★ 새 말을 안 만든다 — 「찾기」 도 「검색 결과 없음」 도 앱에 이미 있는 말이다.
+const mrFindQ = { gear:'', maint:'', repair:'', mlog:'' };
+function mrFindSet(kind, v){
+  mrFindQ[kind] = String(v || '');
+  if(kind === 'gear') renderGear();
+  else if(kind === 'maint') renderMaintList();
+  else if(kind === 'repair') renderRepairList();
+  else if(kind === 'mlog') renderMLog();
+  // 글자를 치는 중이라 자리를 잃으면 안 된다
+  try{
+    const el = document.getElementById('mrFind_' + kind);
+    if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }catch(_){}
+}
+function mrFindBox(kind){
+  const v = mrFindQ[kind] || '';
+  return `<div class="qbox"><input id="mrFind_${kind}" value="${esc(v)}"
+    placeholder="${esc(t('찾기'))}" autocomplete="off"
+    oninput="mrFindSet('${kind}', this.value)"></div>`;
+}
+// 한 기록이 찾는 말에 걸리나 — 이름만이 아니라 적어 둔 것 전부를 본다
+function mrFindHit(o, q){
+  if(!q) return true;
+  const 봄 = [];
+  const 담 = v => { if(typeof v === 'string' && v) 봄.push(v); };
+  ['name','title','note','memo','maker','model','sn','grp','sys','kind','label','manual']
+    .forEach(k => 담(o && o[k]));
+  try{
+    if(o && o.gearId && typeof gearOf === 'function'){
+      const g = gearOf(o.gearId);
+      if(g) 담(typeof gearLabel === 'function' ? gearLabel(g) : g.name);
+    }
+  }catch(_){}
+  const hay = norm(봄.join(' '));
+  // 띄어쓰기로 나눠 **다 걸려야** 한다 — 「임펠러 교체」 로 좁힐 수 있게
+  return norm(q).split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+}
+function mrFindRows(kind, rows){
+  const q = mrFindQ[kind] || '';
+  if(!q) return rows;
+  return (Array.isArray(rows) ? rows : []).filter(o => mrFindHit(o, q));
+}
+const mrFindNone = () => `<div class="mrnone">${esc(t('검색 결과 없음'))}</div>`;
+
 function renderMaintList(){
   const L = document.getElementById('maintList');
   normalizeMaint();
@@ -22742,9 +22908,14 @@ function renderMaintList(){
       ${cnt.late?chip('late',t('밀림'),cnt.late,'red'):''}
       ${cnt.soon?chip('soon',t('곧'),cnt.soon,'yel'):''}
     </div>`;
-  const order = allGrps().filter(g=>view.some(it=>it.grp===g));
-  L.innerHTML = bar + (order.length ? '' : `<div class="mrnone">${esc(t('해당하는 항목이 없습니다'))}</div>`) + order.map(g=>{
-    const arr = view.filter(it=>it.grp===g).sort((a,b)=>{
+  const 걸린것 = mrFindRows('maint', view);
+  const order = allGrps().filter(g=>걸린것.some(it=>it.grp===g));
+  L.innerHTML = mrFindBox('maint') + bar
+    + (order.length ? ''
+       : (mrFindQ.maint ? mrFindNone()
+          : `<div class="mrnone">${esc(t('해당하는 항목이 없습니다'))}</div>`))
+    + order.map(g=>{
+    const arr = 걸린것.filter(it=>it.grp===g).sort((a,b)=>{
       const da=mStatus(a).days, db=mStatus(b).days;
       if(da===null && db===null) return String(a.name).localeCompare(String(b.name),'ko');
       if(da===null) return 1; if(db===null) return -1;
@@ -22794,9 +22965,10 @@ function renderRepairList(){
         <span class="st ${RP_K[it.status]||'none'}">${RP_LABEL[it.status]||it.status}</span></div>
       <div class="mrm">발견 ${it.created||'—'}${it.doneDate?' · 완료 '+it.doneDate:''}${it.pin?' · 핀':''}${it.photos&&it.photos.length?' · 사진 '+it.photos.length:''}${it.note?' · '+esc(it.note).slice(0,30):''}</div>
     </div>`;
-  L.innerHTML =
-    (open_.map(row).join('') || (done_.length
-      ? `<div class="mrnone">${esc(t('진행 중인 항목이 없습니다'))}</div>`
+  const 연것 = mrFindRows('repair', open_), 끝것 = mrFindRows('repair', done_);
+  L.innerHTML = mrFindBox('repair') +
+    (연것.map(row).join('') || (끝것.length || mrFindQ.repair
+      ? `<div class="mrnone">${esc(mrFindQ.repair ? t('검색 결과 없음') : t('진행 중인 항목이 없습니다'))}</div>`
       : `<div class="emptybox">
           <b>${esc(t('수리목록'))}</b>
           <div>${esc(t('고장이나 손상을 발견했을 때 기록하는 곳입니다.'))}<br>
@@ -22804,9 +22976,12 @@ function renderRepairList(){
           <div class="emptysub">${esc(t('사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.'))}</div>
           ${true ? `<button class="mrbtn" onclick="needEdit('수리 항목을 넣습니다.', ()=>mrAdd('repair'))">${esc(t('첫 항목 등록하기'))}</button>` : ''}
         </div>`))
-    + (done_.length ? `<div class="ghead" onclick="toggleDone()">
-        <span class="garr">${showDone?'&#9662;':'&#9656;'}</span><b>${esc(t('완료된 수리'))}</b><span class="gcnt">${done_.length}</span></div>`
-        + (showDone ? done_.map(row).join('') : '') : '');
+    // ★ 찾는 중에는 완료된 수리도 펼친다 — 걸렸는데 접혀 있으면 못 찾은 줄 안다
+    //   (장비 계통을 펼치는 것과 같은 까닭이다)
+    + (끝것.length ? (()=>{ const 편다 = showDone || !!mrFindQ.repair;
+        return `<div class="ghead" onclick="toggleDone()">
+        <span class="garr">${편다?'&#9662;':'&#9656;'}</span><b>${esc(t('완료된 수리'))}</b><span class="gcnt">${끝것.length}</span></div>`
+        + (편다 ? 끝것.map(row).join('') : ''); })() : '');
 }
 
 // ===== 추가 =====
@@ -22934,6 +23109,11 @@ function openMR(kind, id){
              <option value="m"${(it.unit||'m')==='m'?' selected':''}>${esc(t('개월'))}</option>
            </select>`
         :`<b class="mrv">${it.months}${UNIT_LABEL[it.unit||'m']}</b>`}</div>
+      <div class="mrrow"><span class="mrlbl">${esc(t('엔진 시간'))}${helpBtn('hrs')}</span>${unlocked
+        ?`<input type="number" min="0" step="1" value="${esc(it.hrs == null ? '' : it.hrs)}" style="width:78px"
+            placeholder="${esc(t('안 쓰면 달력만'))}" onchange="mrField('hrs', this.value === '' ? '' : (parseFloat(this.value)||''))">
+          <span class="mrv2">${esc(tsub('지금까지 {n}시간', { n: Math.round(engNow()) }))}</span>`
+        :`<b class="mrv">${it.hrs ? tsub('{n}시간마다', { n: it.hrs }) : '—'}</b>`}</div>
       <div class="mrrow"><span class="mrlbl">${esc(t('마지막'))}</span>${unlocked
         ?`<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
         :`<b class="mrv">${it.lastDate||'—'}</b>`}
@@ -23217,6 +23397,8 @@ async function mrComplete(){
   if(it.lastDate) it.history.unshift({date:it.lastDate});
   if(it.history.length>20) it.history.length=20;
   it.lastDate = today(); it.seed=false;
+  // ★ 그때의 엔진 시간을 찍어 둔다 — 다음 주기를 여기서부터 센다 (4.93)
+  try{ it.lastH = engNow(); }catch(_){}
   // ★ 완료를 누르면 정비수첩 한 건이 저절로 생긴다.
   //   두 번 쓰게 하면 아무도 안 쓴다 — 날짜와 항목은 이미 앱이 안다.
   //   빈 껍데기라도 있어야 나중에 「그때 뭐 했더라」 를 적어 넣을 자리가 생긴다.
@@ -24346,13 +24528,34 @@ function paintVer(){
     // ★ 지도 타일(baetnil-tiles)·사진(baetnil-photos)도 같은 이름으로 시작한다.
     //   아무거나 집으면 '저장된 파일 photos (새로고침 필요)' 라는 헛소리를 띄운다.
     //   판 번호로 시작하는 것만 앱 파일이다.
-    const c = ks.find(k=>/^baetnil-\d/.test(k));
-    if(!c) return;
-    const got = c.replace('baetnil-', '');
-    el.textContent = (got === APP_VER)
-      ? '뱃일 ' + APP_VER
-      : '뱃일 ' + APP_VER + ' · 저장된 파일 ' + got + ' (새로고침 필요)';
-    el.classList.toggle('warn', got !== APP_VER);
+    //
+    // ★★ 4.93 — 사장님 지적: 「새로 받기 눌렀는데도 계속 반복해서 뜬다」
+    //
+    //   까닭 — 앱 저장분이 **여럿일 수 있다.** 서비스워커는 새 판을 받아 두고
+    //   옛것을 바로 안 치운다(옛 서비스워커가 놓아 줄 때까지 기다린다).
+    //   그런데 여기서는 `.find()` 로 **맨 먼저 만들어진 것** 하나만 집었다.
+    //   그러면 새 판이 멀쩡히 담겨 있어도 옛 이름을 보고 「새로고침 필요」를 띄운다.
+    //   눌러도 또 뜬다 — 옛 껍데기가 하나라도 남으면 계속 그것을 집기 때문이다.
+    //
+    //   고침 — **지금 판이 담겨 있으면 아무 말도 안 한다.** 그것이 참이다.
+    //   그리고 남은 옛 껍데기는 조용히 치운다 — 서비스워커가 못 치운 쓰레기다.
+    const 앱것 = ks.filter(k => /^baetnil-\d/.test(k));
+    if(!앱것.length) return;
+    const 지금것 = 'baetnil-' + APP_VER;
+    const 있나 = 앱것.indexOf(지금것) >= 0;
+    if(있나){
+      el.textContent = t('뱃일') + ' ' + APP_VER;
+      el.classList.remove('warn');
+      verBanner(APP_VER);                       // 띠를 걷는다
+      // 옛 껍데기 치우기 — 기록·사진·지도는 안 건드린다
+      앱것.filter(k => k !== 지금것).forEach(k => { try{ caches.delete(k); }catch(_){} });
+      return;
+    }
+    // 지금 판이 안 담겨 있다 — 그때만 말한다. 제일 나중 것을 보여 준다.
+    const got = 앱것[앱것.length - 1].replace('baetnil-', '');
+    el.textContent = t('뱃일') + ' ' + APP_VER + ' · '
+      + tsub('저장된 파일 {v} (새로고침 필요)', { v: got });
+    el.classList.add('warn');
     verBanner(got);
   }).catch(()=>{});
 }
@@ -24361,7 +24564,17 @@ function paintVer(){
 async function forceReload(){
   if(!await ask(t('저장된 앱 파일을 지우고 새로 받아옵니다.\n\n')
     + t('기록은 지워지지 않습니다.\n계속할까요?'), { ok: t('새로 받기') })) return;
-  const done = ()=>{ location.reload(true); };
+  // ★ location.reload() 만으로는 브라우저가 들고 있던 옛 index.html 을 그대로 줄 때가 있다.
+  //   주소에 표를 하나 붙여 「이건 새 주소다」 로 만들어 확실히 새로 받게 한다.
+  const done = ()=>{
+    try{
+      const u = new URL(location.href);
+      u.searchParams.set('nv', String(Date.now()));
+      location.replace(u.toString());
+      return;
+    }catch(_){}
+    location.reload(true);
+  };
   const jobs = [];
   try{
     // ★ 지도 타일과 사진은 남긴다. 앱이 옛 판에 묶인 것과 상관이 없고,
@@ -25143,12 +25356,48 @@ function addVoyage(){
 //   "무슨 폰 쓰세요?" 를 물으면 답이 안 온다. 앱이 알아서 붙인다.
 //   그리고 접수한 것은 클라우드에 남긴다 — 메일이 안 가도 사라지지 않는다.
 
+// ★★★ 처음 켤 때 무슨 말로 열 것인가 (4.94)
+//
+//   4.93 까지 langNow() 는 저장된 것이 없으면 무조건 'ko' 를 돌려줬다.
+//   폰 말을 한 번도 안 봤다. 일본어 사전이 2,450개로 다 차 있는데도
+//   일본 사람이 앱을 켜면 한국어가 나왔다. 다 만들어 놓고 아무도 못 봤다.
+//   ★ 게다가 LANGS 목록 위 주석에 「처음 켤 때 무슨 말로 열지는 폰이 정한 말을 따른다」
+//     라고 적어 두었다. 그런 코드가 없었다 — 주석이 거짓말을 하고 있었다.
+//
+// ★ 규칙 셋
+//   ① 사람이 고른 것이 있으면 그것이 언제나 이긴다.
+//   ② 자동은 「아직 안 골랐을 때」 만이다.
+//   ③ 자동으로 고른 것은 **저장하지 않는다.** 저장하면 사람이 고른 것과 구분이 안 되고,
+//      나중에 폰 말을 바꿔도 앱은 옛 말을 붙들고 있게 된다.
+//
+// ★ 덜 찬 말은 자동으로도 안 고른다 (langReady 와 같은 문을 쓴다).
+//   골랐는데 화면이 반만 바뀌면 사람은 앱이 고장난 줄 안다.
+//
+// ★ 담아 두는 칸(langAuto)은 이 파일 위쪽 LANG_SHOW_AT 옆에 있다.
+//   여기에 두었더니 앱이 통째로 터졌다 — t() 가 이 줄보다 먼저 불리는데
+//   let 은 그 줄을 지나기 전에는 읽을 수 없다(TDZ). 검사가 잡아 주었다.
+function langFromDevice(){
+  if(langAuto) return langAuto;
+  let got = 'ko';
+  try{
+    const ready = (typeof langReady === 'function' ? langReady() : LANGS).map(x => x.v);
+    const nav = (typeof navigator !== 'undefined') ? navigator : null;
+    const list = (nav && nav.languages && nav.languages.length)
+               ? nav.languages : [ (nav && nav.language) || '' ];
+    for(const raw of list){
+      // 'ja-JP' · 'JA-JP' · 'ja' 가 다 같은 말이다
+      const v = String(raw || '').slice(0, 2).toLowerCase();
+      if(ready.indexOf(v) >= 0){ got = v; break; }
+    }
+  }catch(_){}
+  return (langAuto = got);
+}
 function langNow(){
   try{
     const v = localStorage.getItem('bt_lang');
     if(v && LANGS.some(x=>x.v===v)) return v;
   }catch(e){}
-  return 'ko';
+  return langFromDevice();
 }
 // ★ 옮긴 말이 없으면 한국어 원문을 그대로 낸다. 빈 칸이 나오면 안 된다.
 function t(s){
@@ -30882,11 +31131,14 @@ function renderGear(){
     return;
   }
   const fold = gearFold();
-  const order = GEAR_SYS.concat(['기타']).filter(sy => rows.some(g => gearSysOf(g) === sy));
-  L.innerHTML = order.map(sy => {
-    const arr = rows.filter(g => gearSysOf(g) === sy)
+  const 걸린것 = mrFindRows('gear', rows);
+  const order = GEAR_SYS.concat(['기타']).filter(sy => 걸린것.some(g => gearSysOf(g) === sy));
+  if(!order.length){ L.innerHTML = mrFindBox('gear') + mrFindNone(); return; }
+  L.innerHTML = mrFindBox('gear') + order.map(sy => {
+    const arr = 걸린것.filter(g => gearSysOf(g) === sy)
                     .sort((a,b) => String(gearLabel(a)).localeCompare(String(gearLabel(b)), 'ko'));
-    const closed = !!fold[sy];
+    // ★ 찾는 중에는 접어 둔 계통도 펼친다 — 걸렸는데 안 보이면 못 찾은 줄 안다
+    const closed = mrFindQ.gear ? false : !!fold[sy];
     const red = arr.filter(g => gearState(g.id).k === 'late').length;
     const yel = arr.filter(g => gearState(g.id).k === 'soon').length;
     const head = `<div class="ghead" onclick="toggleGearGrp('${esc(sy)}')">
@@ -30973,15 +31225,20 @@ function gearBody(it){
     ? `<div class="ghead" style="cursor:default"><b>${esc(t(title))}</b><span class="gcnt">${arr.length}</span></div>`
       + arr.map(draw).join('')
     : '';
-  // ★ 4.91 — 「상태」 줄 (사장님 지적)
-  //   「그냥 고장 목록만 추가하는 게 아니라 고장으로 표시되게도 해 놔라」
-  //   ★ 상태를 따로 적어 두지 않는다. 매달린 수리·정기점검에서 셈한다 —
-  //     목록이 쓰는 것과 같은 셈(gearState)이다. 두 곳에 적으면 어긋난다.
-  const 상태 = gearState(it.id);
+  // ★ 「상태」 줄 — **장비가 성한가**만 말한다 (4.93 에서 고침)
+  //
+  //   4.91 에서 제가 정기점검 남은 날짜(「곧 1」·「밀림 1」)까지 여기 넣었다. 잘못이다.
+  //   사장님 지적 —「상태 곧은 또 뭐냐. 정기점검 내용은 아래 다 표시되는데
+  //   왜 여기다 굳이 또 써 놓냐. 이건 말 그대로 상태를 쓰는 곳인데」
+  //
+  //   맞다. 「곧 1」은 점검 날짜지 장비 상태가 아니고, 그것은 아래
+  //   「이 장비의 정기점검」 줄에 이미 다 나온다. 한 화면에 같은 말을 두 번 쓴 것이다.
+  //   상태는 **고장이냐 아니냐** 하나다.
+  const 고장수 = gearRepair(it.id).filter(r => r && r.status !== 'done').length;
   const 상태줄 = `<div class="mrrow"><span class="mrlbl">${esc(t('상태'))}</span>`
-    + (상태.k === 'none'
-        ? `<b class="mrv" style="color:var(--grn)">${esc(t('이상 없음'))}</b>`
-        : `<span class="st ${상태.k}">${esc(상태.label)}</span>`)
+    + (고장수
+        ? `<span class="st late">${esc(tsub('고장 {n}', { n: 고장수 }))}</span>`
+        : `<b class="mrv" style="color:var(--grn)">${esc(t('이상 없음'))}</b>`)
     + `</div>`;
   return `
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>${unlocked
@@ -31659,8 +31916,10 @@ function renderMLog(){
     </div>`;
     return;
   }
-  const arr = rows.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
-  L.innerHTML = arr.map(x => {
+  const arr = mrFindRows('mlog', rows.slice())
+    .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  if(!arr.length){ L.innerHTML = mrFindBox('mlog') + mrFindNone(); return; }
+  L.innerHTML = mrFindBox('mlog') + arr.map(x => {
     const n = howSteps(x).length;
     const g = x.gearId ? gearOf(x.gearId) : null;
     const tags = [];
@@ -34490,10 +34749,112 @@ try{ ensureWx(); }catch(e){}
 // ★ 사진이 창고에 있으니 인터넷이 없으면 못 받는다.
 //   깨진 그림 아이콘만 뜨면 사람은 '사진이 날아갔다' 고 생각한다.
 //   까닭을 적어 주고, 인터넷이 돌아오면 스스로 다시 받는다.
+// ══════════════════════════════════════════════════════════════
+// ★★ 앱에서도 담아 둔 사진·지도가 보이게 한다 (4.93)
+//
+//   무슨 일이었나 —
+//   웹에서는 서비스워커가 사진 요청을 가로채 담아 둔 것을 꺼내 준다.
+//   그런데 **앱(캐퍼시터)에는 서비스워커가 없다.** 일부러 안 켠다 —
+//   앱 안의 파일은 이미 폰에 있고, 켜 두면 옛 화면이 남기 때문이다.
+//   그래서 앱에서는 <img> 가 그대로 인터넷으로 나갔고,
+//   바다에서 인터넷이 끊기면 **사진도 지도도 빈 화면**이었다.
+//   담아 두기는 하는데 꺼내 주는 놈이 없었다.
+//
+//   고침 —
+//   서비스워커 없이도 저장분은 읽을 수 있다. MDN 이 적어 두었다 —
+//   「서비스워커뿐 아니라 window 에서도 쓸 수 있다」.
+//   그러니 사진이 안 떠서 오류가 나면, 그때 저장분을 뒤져 붙여 준다.
+//   ★ 사진을 거는 자리가 스무 곳이 넘는다. 거기를 다 고치지 않는다 —
+//     오류가 나는 자리는 여기 한 곳이다. 문 하나다.
+//   ★ 인터넷이 되면 이 길로 아예 안 온다. 평소에는 아무 일도 안 한다.
+const IMG_CACHES = ['baetnil-photos', 'baetnil-seen', 'baetnil-tiles'];
+// ══ 앱에서 지도 타일을 담는다 (4.93) ═════════════════════════════════
+//
+//   웹에서는 서비스워커가 담는다. 앱에는 서비스워커가 없어 아무도 안 담았다 —
+//   그래서 앱은 바다에서 지도가 통째로 빈 화면이었다.
+//
+//   ★ **본 자리만 담는다.** 미리 받지 않는다.
+//     OpenStreetMap 재단 규칙이 그렇게 정해 두었다 —
+//     "Offline use is not permitted on tile.openstreetmap.org",
+//     미리 받기(bulk downloading)는 통보 없이 막힐 수 있다고 적혀 있다.
+//     반대로 「사람이 지금 보고 있는 칸」과 「그것을 제 저장분에서 다시 보는 것」은
+//     규칙이 허락한다. 우리가 하는 것이 그것이다.
+//   ★ 이미 화면에 뜬 뒤에 담는다. 브라우저가 방금 받아 들고 있으므로
+//     force-cache 로 부르면 인터넷을 다시 쓰지 않는다.
+const TILE_CACHE = 'baetnil-tiles';
+const TILE_KEEP  = 3000;              // 한 장 20KB 남짓 — 60MB 쯤
+const tileSeen = new Set();           // 이번에 이미 챙긴 것 (같은 일을 두 번 안 한다)
+let tileBusy = false;
+async function keepTile(url){
+  try{
+    if(typeof caches === 'undefined') return;
+    if(tileSeen.has(url)) return;
+    tileSeen.add(url);
+    if(tileSeen.size > 6000) tileSeen.clear();
+    const c = await caches.open(TILE_CACHE);
+    if(await c.match(url)) return;
+    const r = await fetch(url, { cache:'force-cache', mode:'cors', credentials:'omit' });
+    if(!r || !r.ok) return;
+    await c.put(url, r);
+    if(!tileBusy) trimTiles();
+  }catch(_){}
+}
+// 타일에도 끝이 있어야 한다 — 여태 한도가 없어 무한정 쌓였다 (웹도 마찬가지였다)
+async function trimTiles(){
+  if(tileBusy) return;
+  tileBusy = true;
+  try{
+    const c = await caches.open(TILE_CACHE);
+    const ks = await c.keys();
+    if(ks.length > TILE_KEEP){
+      for(const k of ks.slice(0, ks.length - TILE_KEEP)) await c.delete(k);
+    }
+  }catch(_){}
+  tileBusy = false;
+}
+// 타일이 화면에 뜨면 챙긴다. 앱에서만 — 웹은 서비스워커가 한다.
+document.addEventListener('load', e=>{
+  try{
+    const el = e.target;
+    if(!el || el.tagName !== 'IMG' || !el.classList.contains('mt')) return;
+    if(typeof isNative === 'function' && !isNative()) return;
+    const u = el.getAttribute('src') || '';
+    if(/^https?:/i.test(u)) keepTile(u);
+  }catch(_){}
+}, true);
+const imgTried = new WeakSet();          // 한 그림에 한 번만 — 무한 되돌이를 막는다
+async function imgFromCache(el, url){
+  try{
+    if(typeof caches === 'undefined') return false;
+    for(const name of IMG_CACHES){
+      let c; try{ c = await caches.open(name); }catch(_){ continue; }
+      const hit = await c.match(url, { ignoreVary:true });
+      if(!hit) continue;
+      const b = await hit.blob();
+      if(!b || !b.size) continue;
+      el.src = URL.createObjectURL(b);    // 담아 둔 것을 그대로 붙인다
+      el.classList.remove('imgfail');
+      return true;
+    }
+  }catch(_){}
+  return false;
+}
 document.addEventListener('error', e=>{
   const el = e.target;
   if(!el || el.tagName !== 'IMG') return;
-  if(!/^https?:/i.test(el.getAttribute('src') || '')) return;   // 문서에 담긴 옛 사진은 해당 없음
+  const url = el.getAttribute('src') || '';
+  if(!/^https?:/i.test(url)) return;   // 문서에 담긴 옛 사진은 해당 없음
+  // ★ 먼저 담아 둔 것을 찾아본다. 있으면 그것으로 뜬다 (앱에는 서비스워커가 없다).
+  if(!imgTried.has(el)){
+    imgTried.add(el);
+    imgFromCache(el, url).then(된다=>{
+      if(된다) return;
+      if(el.classList.contains('mt')) return;    // 타일은 그냥 빈다
+      el.classList.add('imgfail');
+      el.alt = t('사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요');
+    });
+    return;
+  }
   // ★ 지도 타일은 사진이 아니다.
   //   인터넷이 없을 때 지도 칸마다 '사진을 불러오지 못했습니다' 가 도배됐다.
   //   타일은 원래 안 보이면 그냥 비는 것이 맞다.

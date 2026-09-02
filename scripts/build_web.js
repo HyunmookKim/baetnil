@@ -116,8 +116,20 @@ function sweep(dir, keep){
 //
 // ★ 구운 판에서도 자바스크립트는 그대로 돈다. 주소가 /ja/ 면 일본어를 집으므로
 //   구운 글자와 다시 그린 글자가 같다 (화면이 깜빡이지 않는다).
+// ★★★ 4.97 — 한국어 대문도 구워 낸다.
+//   여태 index.html 은 「빈 틀 + 자바스크립트」 였다. 글자를 자바스크립트가 채웠다.
+//   그래서 **자바스크립트를 안 돌리는 읽개에게는 대문이 통째로 비어 있었다** — 69자리가 빈 채였다.
+//   ja·en·ru 는 구워서 채워 놓고 정작 정본인 한국어만 비어 있었던 것이다.
+//   ★ 실제로 그록이 「정비수첩 설명 한 줄만 더 있으면」 이라고 했는데,
+//     그 줄은 이미 있었다. 그록이 자바스크립트를 안 돌려서 못 본 것이었다.
+//     사람이 아니라 기계가 읽는 자리(구글·AI 읽개)가 다 그렇게 본다.
+//
+//   ★ 그래서 틀을 site.html 로 옮기고 넷 다 여기서 굽는다.
+//     index.html 은 이제 「구워 낸 한국어 대문」 이다. 손으로 고치지 않는다.
+const FRONT_SRC = 'site.html';
 function bakeFront(){
-  const srcPath = path.join(OUT, 'index.html');
+  let srcPath = path.join(OUT, FRONT_SRC);
+  if(!fs.existsSync(srcPath)) srcPath = path.join(OUT, 'index.html');   // 아직 안 옮겼을 때
   if(!fs.existsSync(srcPath)) return 0;
   const html = fs.readFileSync(srcPath, 'utf8');
 
@@ -130,7 +142,6 @@ function bakeFront(){
 
   let made = 0;
   for(const L of LANGS){
-    if(L === 'ko') continue;                 // 한국어는 뿌리(index.html) 그대로다
     const d = I18N[L];
     if(!d){ console.log('※ 대문에 ' + L + ' 사전이 없습니다 — 건너뜁니다'); continue; }
     let out = html;
@@ -141,12 +152,13 @@ function bakeFront(){
 
     // 머리
     out = out.replace('<html lang="ko">', '<html lang="' + L + '">');
+    const rel = (L === 'ko') ? '/' : '/' + L + '/';
     out = out.replace(/<title>[\s\S]*?<\/title>/, '<title>' + esc(d.title) + '</title>');
     out = out.replace(/(<meta name="description" content=")[^"]*(">)/, '$1' + esc(d.desc) + '$2');
     out = out.replace(/(<meta property="og:title" content=")[^"]*(">)/, '$1' + esc(d.title) + '$2');
     out = out.replace(/(<meta property="og:description" content=")[^"]*(">)/, '$1' + esc(d.desc) + '$2');
-    out = out.replace(/(<meta property="og:url" content=")[^"]*(">)/, '$1' + SITE + '/' + L + '/$2');
-    out = out.replace(/(<link rel="canonical" href=")[^"]*(">)/, '$1' + SITE + '/' + L + '/$2');
+    out = out.replace(/(<meta property="og:url" content=")[^"]*(">)/, '$1' + SITE + rel + '$2');
+    out = out.replace(/(<link rel="canonical" href=")[^"]*(">)/, '$1' + SITE + rel + '$2');
 
     // 말 고르는 줄 — 지금 판을 눌린 것으로
     out = out.replace(/(<button type="button" data-lang=")([a-z]{2})(" aria-pressed=")(?:true|false)(")/g,
@@ -158,7 +170,7 @@ function bakeFront(){
     out = out.replace(/(<a href=")([a-z]+)(\.html"[^>]*data-doc=)/g, (all, a, name, b2) =>
       a + '/' + name + (dl === 'ko' ? '' : '.' + dl) + '.html"' + b2.slice(b2.indexOf(' ')));
 
-    write(L + '/index.html', out);
+    write(L === 'ko' ? 'index.html' : L + '/index.html', out);
     made++;
   }
   return made;
@@ -361,7 +373,7 @@ ${hre}
   // ★★★ 약관은 뿌리에 있는 낱개 파일이다 (terms.ja.html 처럼).
   //   일감의 `git add m v r ja en …` 줄에도, 위의 폴더 목록에도 안 들어간다.
   //   여기 안 적으면 **구워 놓고 영영 안 올라간다.** 대문 말판에서 이미 한 번 겪었다.
-  const LEGAL_FILES = [];
+  const LEGAL_FILES = ['index.html'];        // ★ 구워 낸 한국어 대문도 담아야 한다
   LEGAL_KEYS.forEach(k => LANGS.forEach(L => LEGAL_FILES.push(legalFile(k, L))));
   try{
     const { execFileSync } = require('child_process');

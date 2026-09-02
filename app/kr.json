@@ -1,6 +1,102 @@
 {
- "updated": "2026-09-01T22:53:44.640Z",
+ "updated": "2026-09-02T22:53:37.621Z",
  "gov": [
+  {
+   "title": "부산 앞바다에서 예인선 전복 사고로 1명 사망 6명 실종, 해경 야간 수색작업",
+   "press": "비즈니스포스트",
+   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE53Y1lRRS1qblNldmFiM0JBLXZsblVwQ29BVWNtT1d3Q2NhWnIzMUNlcDV6M3JvTmtyZUtseS1ZQ3FTYTBVdU5WbWxWMGlBcl91MjlBbGFrZ0xMQTdmSUlybFBKQzRJTjJEOU9nU2c3b0RLYmc?oc=5",
+   "source": "해양안전",
+   "date": "2026-09-02T22:11:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "규제 벽 넘은 해양레저 신기술…부산 바다서 실증 나선다",
+   "press": "서울경제TV",
+   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE9ZU0gzVUN2eVJ3TXUwMEM1NE53aHg4UzJsZHB3VnZLZzl4UDllNl9wU3RRVjRPazZpRTBxYzdKcWU4eVhqZTNlM2dMMkdGUXZkM0IwQmVtbXBmTTNsODRTV3FQNlI?oc=5",
+   "source": "해양안전",
+   "date": "2026-09-02T20:45:48.000Z",
+   "cat": "산업"
+  },
+  {
+   "title": "부산 전복 예인선, '조종 불능' 컨테이너선 예인하려다 사고난 듯 - 머니투데이",
+   "press": "mt.co.kr",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFB0UlZaSm5seTFtYVFwajl2S3BPdkE1bUI5UGtJVkxJQWsybGt1NmVSUk03SzlhR0VTR0pWdS1CVzAtek93N0U4aTVMMVJZZUZhOUU0SUlHamFPSURHWXZ0c2VxU0ZWOG40a0c0RHozR2hSenpiVVlqZktlNTZTZ9IBfkFVX3lxTFB0UlZaSm5seTFtYVFwajl2S3BPdkE1bUI5UGtJVkxJQWsybGt1NmVSUk03SzlhR0VTR0pWdS1CVzAtek93N0U4aTVMMVJZZUZhOUU0SUlHamFPSURHWXZ0c2VxU0ZWOG40a0c0RHozR2hSenpiVVlqZktlNTZTZw?oc=5",
+   "source": "해양안전",
+   "date": "2026-09-02T13:55:51.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "태안·보령 앞바다서 낚시객 갯벌 고립·어선 충돌 등 사고 잇따라",
+   "press": "네이트",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBiMnJ3ZGdTNUxoRFhaODIyRGpyV2pxNEVTWjBMMVNTVXFZRXZ2OHIzMFJxNmZ2bVVPcG4tVzF3dzB4bWlVaHBKOXJPNTRoWFdDeVZiV3VQVHBfNDczQXlPajJtOG91VFpNUk9hREh3?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-09-02T09:44:22.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "해경, 가을철 낚시어선 안전 관리 강화…사고 28% 9~10월 발생",
+   "press": "뉴스핌",
+   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE0zb1hEM3AzTDVEUDlOQjZ0V202d21wVGM4azVnYTRPVHpGSGdhaWtkVU9nM254OGsxWEthbm5lUWhVWWVyWVpWbm1NcnFnaHRkYnZBOGh6QnNNX1ZV?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-09-02T08:03:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "태안해경, 낚시어선 안전정보 온라인 플랫폼 구축",
+   "press": "중도일보",
+   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE83dkR2STVBSUxweGxpa3QwV1Fzb25DaE0xemhCMHJ2LXhlaGI2Rk1TbnNxRTU3bFZSdUR1TVlMR0hscG1fNXRFdU4tX2hxSDVzbVZ5MzhKMGtxaVFjWE1JRDBwNHI?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-09-02T05:26:44.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "남해안컵 국제요트대회 9월 여수·통영·부산서 개최…280여명 참가",
+   "press": "gukjenews.com",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE8wRzd5VjQ0Y2V1WWNNRTlVNS1BY280NU1kNmxsOEhRNjhmQkM5RXBRVTlVVFdXMldkdm9PX1NjYUxKMl8tc2c5dUlhaEhxMUxoQ3lzclJ4cmFtSXoxSnI1YkJHWFQ5dEVUcmtseEhR?oc=5",
+   "source": "요트·마리나",
+   "date": "2026-09-02T05:25:00.000Z",
+   "cat": "산업"
+  },
+  {
+   "title": "기관장 없이 조업한 52톤급 어선 적발…군산해경, 승무기준 위반 조사",
+   "press": "로컬세계",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5xS0tHTnVWMXV4dk5ZeGxIVDJ3YU5Qd0VVQ0taUk5fQVZoOEJRanVUYy1kdV9LQUN2emFKRnplLUxXZ3JlcXJIVm5JRkkta21MQnJFYkR4dnlDbDFlM2dkUNIBWEFVX3lxTE9TQmJSY3F4SkxWZ2ZsemNQMXJFMjRGSG56NHdjSDNQMzU0NU1abTBDNUkxdmRHYnV1NG1lNWVCV2djNURsN1Rzak5MOVBiR2thck5yTkxWRmY?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-09-02T05:13:11.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "해양경찰청-한국전파진흥협회, 첨단 전파·통신 기술로 더 안전한 바다 만든다",
+   "press": "서울일보",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9FbGNrcGJaNTZ0NkdnUmdfTFJ3NWlxcVpybGtfallNTkU0Z3FvNENrY2dKOENNTUdaVy00SGljX2lQc2Rkd0JRbXFpeEc5ajlVdXJnQzBhc0hqWGFFNUdwNzJ4SU54Y0EyRjJNM9IBb0FVX3lxTFBzUWJock5zV1pLV2t6WFRqY2xOSTAxNEVBbFJRc0Y4eDcyZ2RsMmgtUWtrb3RiUHc5dHB3UTNyT3UxY2xQbWIwdlQ5cGNvWDVNZTVsWDFOUFFBN0lMOWV1Q0xKSU5mZzgxVkxmaTZSYw?oc=5",
+   "source": "해양정책",
+   "date": "2026-09-02T03:22:56.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "인천 소야도서 어선 전복…기름 유출 방제 작업",
+   "press": "네이트",
+   "link": "https://news.google.com/rss/articles/CBMiU0FVX3lxTFBxM3NqX0FKWVF4ZUFHTGdEOG5SNDZCUl9hZ0FOTnZuS3JJYTZPV3Bka3ZOaW42Y0FUNTFHMmtYcmY0ekp3LWVxS0Zmekd4T1RJd2pz?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-09-02T02:32:00.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "제주 437㎞ 해상 크루즈서 임신부 응급환자 긴급 이송",
+   "press": "뉴시스",
+   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9GeEwwQzVYMHIzWDBZR2pfZ0JxNkoxN3c0elBDc3RUV1ZYV0lCYXlydEh2aWlBREw4YTBfYk1JYUZmNEdad2E2clRzSE9vd3lfMkNNeGJFT2dUbTd6Rnp6STk0Wl9UUEs5NFJyZ2lYdEkwN3VyUkIyQtIBeEFVX3lxTE9GeEwwQzVYMHIzWDBZR2pfZ0JxNkoxN3c0elBDc3RUV1ZYV0lCYXlydEh2aWlBREw4YTBfYk1JYUZmNEdad2E2clRzSE9vd3lfMkNNeGJFT2dUbTd6Rnp6STk0Wl9UUEs5NFJyZ2lYdEkwN3VyUkIyQg?oc=5",
+   "source": "해양정책",
+   "date": "2026-09-02T01:15:46.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "중부해경 \"3년새 낚시어선 사고 41%…9~10월 집중\"",
+   "press": "네이트",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9ZSkFGdlBWb2ZzMVRZNVRCQS1xdl9aZXZLYUNQWUtqa1B2eU1iWktYQ1pDTTNGR0VtVjV1QTdpR19SVUx4bEdxdlhPNm1wNDdFd1djZ09VQVlYc0RxTkdPeG9rSkFyWm1oLUNVTXR3?oc=5",
+   "source": "해양정책",
+   "date": "2026-09-02T01:06:00.000Z",
+   "cat": "안전"
+  },
   {
    "title": "포항 해양레저산업의 미래 \"밝음\"… 포항시, '신해양레저 광역연계형 규제자유특구' 첫 지정 |",
    "press": "폴리뉴스 Polinews",
@@ -528,76 +624,120 @@
    "source": "해양안전",
    "date": "2026-08-26T23:56:40.000Z",
    "cat": "안전"
-  },
-  {
-   "title": "[기자수첩] 해경의 해상 실종 대응은 안전한가",
-   "press": "중도일보",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBKOG82TmJ6MF90cEdQeHVpM2swM2RfRVNmTDRGTkJkT2JKUmN1NGhXUGFzRS14V3VGRDdUTEZEeGt6dGRVSFE1T2FjdmZuVDJicUpJMnJScjkzUVR6SFFJSndJSHpqZmE0NmNnMg?oc=5",
-   "source": "해양정책",
-   "date": "2026-08-26T22:33:57.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "동해시 묵호항, ‘가상 항로표지’로 사고 예방 나선다",
-   "press": "reporternside.com",
-   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBGZTVJUW1YVV9JRFFiMVFGUWRYdVhFbjM0dnp5dVdfbi1MM0xUZHVuYndIc0t2QjZGczdBaDNWenlLYlQ2UmwxWEdCbjc0VXIzcGEyWXhncllsMGt4dUN2QkFrazl6MkxLX3hNdzdIWlVmUQ?oc=5",
-   "source": "해양안전",
-   "date": "2026-08-26T09:12:17.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "기름 한 방울 없이 5,500km, \"태양광 요트로 유럽 횡단\"",
-   "press": "강원지방신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1fWjBnVmY0R0hraVdIdTJvMThTbW5NLTFHYUg4U0c0SmtfREpad0U0b2NIU05panpoM3dFV0dVQWV2bXBkUlhrVUxtZ2JwMzNPUHpCT0xEVm8wdVVObmZVYWxrZ3JuQUxVNWpj?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-08-26T09:10:48.000Z",
-   "cat": "산업"
-  },
-  {
-   "title": "서귀포 앞바다에서 나홀로 어선 전복.. \"선장 무사히 구조\"",
-   "press": "JIBS제주방송",
-   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOTzBhM3htMzlOb0VkNWd5eG15b1F3SXJpM3ZaLTFydlZablhCMDR5aUltV0Y2YXJMQ3RsOWV3c2pFY1YzLVFfYXZjMVBhLUFHRmwtRWVpUG5wZzJ1WVoxODNjcFBUUFlQaVAwYlRoYXJJWGtTNm5TU0szcUVHaHE3cDd6OXRfVEdDSzFXeU53?oc=5",
-   "source": "해양안전",
-   "date": "2026-08-26T08:30:18.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "해수부, 소형선박 선박검사 부담 '뚝↓'…위험풀 검사 전문성은 '쑥↑' - 머니투데이",
-   "press": "머니투데이",
-   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTE9pSjI2UEJId0NodlVFWXJWN0RjbWJHN1dSQjBnN2JMMmFucUVvRVgzZk5YdDZ5R2lKSG9XM1B1UHNMWWRsQ1NjS1VHTWtLVmNUUDBqUEJsQmtxaFpZZTVqRE5CSVQyY0dtU05pUE9IYVVIQVVOOGxETdIBfkFVX3lxTE5SdmFOSnhmbFNOalRiZEpBenIzUGwzT3Bmd1g5VlAyMW9TZjZBcHNjSnh6SWthU1RMeWROd1BfRVJfRGJzY0ZiaDlES3gwbEg0VmQ1ZmI2elNqZ2JsOHNXQ2N1M0FzTDRyWkhOQ3hkNmkxaDJ1U0hUX1hNanVEZw?oc=5",
-   "source": "해양정책",
-   "date": "2026-08-26T08:05:05.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "한국해대-대구요트협회, 해양 스포츠 활성화 및 인재 육성 업무협약",
-   "press": "해양한국",
-   "link": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBFaUZWdTlSSGJ2ZFFYbVRQVmhLX1cwczVOQlpOQkVab1NvcFZKeFVUNVpkS0p2ZzNpUFIzVVFCT1FaaE43MkVrSkticGJMcjlCdFkwR2d4NW10LWZaT1ZDVzE4ZzRPLVM1N0UtYlN6NWZXdlRjY3dzb0FR?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-08-26T04:29:50.000Z",
-   "cat": "산업"
-  },
-  {
-   "title": "[테크스냅] 카카오 AI 돛, 첫 오프라인 행사 '세일링 부산' 진행",
-   "press": "연합뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE5vVVdwSHlSSUljQklqZUFnS3hCTFJxZEZPWjhPUjd2TjZXbmxiZ3JmdmZ0aVFxLVJjZElnSVZFWXU5VThoR1JNS3VHN2Q4OVQxNXNZVzJCY1BnbXJ6Z2c3RNIBYEFVX3lxTE5vVVdwSHlSSUljQklqZUFnS3hCTFJxZEZPWjhPUjd2TjZXbmxiZ3JmdmZ0aVFxLVJjZElnSVZFWXU5VThoR1JNS3VHN2Q4OVQxNXNZVzJCY1BnbXJ6Z2c3RA?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-08-26T02:02:13.000Z",
-   "cat": "산업"
-  },
-  {
-   "title": "보령해경 해상 대응력 강화를 위한 종합훈련 돌입",
-   "press": "대전일보",
-   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5aY2FnR0hoOXo2UHQwa2c0VEwzQTkyR21pa0xnOVFRN1JMaE9raDEwUjlBekVnN3RwWF9waFZocEQtMXI2ZDdmMlhiaXVGZTRvWnhUeGM4OHY5bHQxUjVMc2s5SW1wc1Axc2JYUzM2UdIBc0FVX3lxTE11aVVqRUpMUHBfb3JZSlQzR0ZKbFp0OXpVOFdaVkltZno3NjR3QUl0Z21LLUoxenBxMzI0a0NFdFRkNFVSRUs2ZWJuWk9YV3ZEWWx0MnNLcHBFdzYtV09KcmZPeHZ1WjU3TGl3UVdmUVpHNkE?oc=5",
-   "source": "해양정책",
-   "date": "2026-08-26T01:49:00.000Z",
-   "cat": "안전"
   }
  ],
  "wx": {
   "src": "KMA",
-  "zones": [],
-  "active": [],
-  "summary": "발효 중인 해상 특보 없음"
+  "zones": [
+   {
+    "kind": "ǳ������",
+    "reg": "���س��γ��ʾ��ʸչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��γ��ʹٱ��չٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��γ��ʾ��ʸչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��γ��ʹٱ��չٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ص��ξ��ʸչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ؼ��μ��ʸչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ؼ��ε��ʸչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ��Ϻξչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ����ξչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ����ξչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ����ξչٴ�",
+    "tmEf": "202609040558"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���չٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "��ϳ��ξչٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��κ��ʾ��ʸչٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���س��κ��ʹٱ��չٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "�λ�չٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "�����õ��ξչٴ�",
+    "tmEf": "202609041158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ص��ιٱ��չٴ�",
+    "tmEf": "202609031158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ����ʹٱ��չٴ�",
+    "tmEf": "202609031158"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ������ʾ��ʸչٴ�",
+    "tmEf": "202609032358"
+   },
+   {
+    "kind": "ǳ������",
+    "reg": "���ֵ������ʾ��ʸչٴ�",
+    "tmEf": "202609032358"
+   }
+  ],
+  "active": [
+   "ǳ������: ���س��γ��ʾ��ʸչٴ�, ���س��γ��ʹٱ��չٴ�, ���ص��ξ��ʸչٴ�, ���ؼ��μ��ʸչٴ�, ���ؼ��ε��ʸչٴ�, ���ֵ��Ϻξչٴ�, ���ֵ����ξչٴ�, ���չٴ�, ��ϳ��ξչٴ�, ���س��κ��ʾ��ʸչٴ�, ���س��κ��ʹٱ��չٴ�, �λ�չٴ�, �����õ��ξչٴ�, ���ص��ιٱ��չٴ�, ���ֵ����ʹٱ��չٴ�, ���ֵ������ʾ��ʸչٴ�"
+  ],
+  "summary": ""
  }
 }

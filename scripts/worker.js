@@ -464,10 +464,177 @@ function wantLang(req){
   return '';
 }
 
+// ══════════════════════════════════════════════════════════════
+// ★★★ 일본 해상경보 — /app/warn-jp.json  (4.99 뒤에 붙인 것)
+//
+// ★ 무엇을 하나
+//   気象庁이 낸 「地方海上警報」 전문을 그 자리에서 읽어, 지금 발효 중인
+//   경보만 추려 앱에 넘긴다. 해역 이름·해역 번호·경보 이름은 전문에 적힌
+//   글자를 **그대로** 옮긴다. 여기서 새로 지어내는 값은 하나도 없다.
+//
+// ★ 왜 워커에서 하나 (일감으로 하루 한 번 굽지 않고)
+//   해상경보는 여섯 시간마다 나오고, 바다가 험해지면 그 사이에도 나온다.
+//   하루 한 번 구워 두면 「어제 것」 을 오늘 것인 양 보여 주게 된다.
+//   사람이 이 화면을 보고 바다에 나간다. 여기서 늦은 자료를 주면 안 된다.
+//   ★ 대신 気象庁 쪽은 10분 갈무리한다 — 남의 서버다. 아껴 쓴다.
+//
+// ★ 출처 — 気象庁 防災情報XML (政府標準利用規約).
+//   출처를 밝히면 상업 이용이 된다. 자료에도 화면에도 적는다. 빼면 못 쓴다.
+//
+// ★ 못 읽었을 때 빈 목록을 주지 않는다.
+//   빈 목록은 앱에서 「경보 없음」 으로 읽힌다. 그건 조용한 거짓말이고
+//   그 말을 믿고 나가면 배가 위험해진다. 못 읽었으면 못 읽었다고 말한다.
+// ★ 소식줄을 둘 다 읽는다.
+//   other.xml     — 잦은 것. 바로 앞 한두 시간만 담는다.
+//   other_l.xml   — 긴 것. 며칠치를 담는데 갱신이 한 발 늦을 때가 있다 (실제로 하루 늦은 것을 봤다).
+//   ★ 하나만 읽으면 어느 쪽이든 구멍이 난다. 둘을 합치고 발표 시각으로 다시 세운다.
+const JMA_FEEDS = [
+  'https://www.data.jma.go.jp/developer/xml/feed/other.xml',
+  'https://www.data.jma.go.jp/developer/xml/feed/other_l.xml'
+];
+const JMA_KIND  = '地方海上警報';
+const JMA_LINK  = 'https://www.jma.go.jp/bosai/seawarning/';
+const JMA_FROM  = '気象庁 防災情報XML (政府標準利用規約)';
+const JMA_TTL   = 600;   // 초. 気象庁 쪽 갈무리
+const JMA_MAX   = 14;    // 한 번에 읽을 해상기상대 수 (지금 열둘이다. 여유를 둔다)
+
+// 이름칸(namespace)이 붙든 안 붙든 같은 이름표를 잡는다.
+// ★ 気象庁 전문은 <Report> 안에서 이름칸이 세 번 바뀐다. 이름칸을 따지기 시작하면
+//   전문 모양이 조금만 달라져도 통째로 못 읽는다. 이름표만 본다.
+function jmaTag(name){
+  return new RegExp('<(?:[A-Za-z_][\\w.-]*:)?' + name + '(?:\\s[^>]*)?>([\\s\\S]*?)<\\/(?:[A-Za-z_][\\w.-]*:)?' + name + '>', 'g');
+}
+function jmaOne(xml, name){
+  const m = jmaTag(name).exec(String(xml || ''));
+  return m ? m[1].trim() : '';
+}
+function jmaAll(xml, name){
+  const re = jmaTag(name), s = String(xml || ''), out = [];
+  let m; while((m = re.exec(s))) out.push(m[1]);
+  return out;
+}
+
+// ── 소식줄(Atom)에서 「地方海上警報」 줄만 뽑는다
+function jmaFeedRows(xml){
+  const out = [];
+  jmaAll(xml, 'entry').forEach(e => {
+    if(jmaOne(e, 'title').indexOf(JMA_KIND) !== 0) return;
+    const m = /<link[^>]*\shref="([^"]+)"/.exec(e);
+    if(!m) return;
+    out.push({ who: jmaOne(e, 'content') || jmaOne(e, 'id'), href: m[1], at: jmaOne(e, 'updated') });
+  });
+  return out;
+}
+// 여러 소식줄을 합쳐 해상기상대마다 **가장 새로 낸 것** 하나씩 고른다.
+// ★ 「소식줄에서 먼저 나온 것이 최신」 이라고 믿지 않는다. 발표 시각으로 다시 세운다.
+function jmaFeedPick(){
+  const rows = [];
+  for(let i = 0; i < arguments.length; i++)
+    jmaFeedRows(arguments[i]).forEach(r => rows.push(r));
+  rows.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  const seen = {}, out = [];
+  rows.forEach(r => { if(!r.who || seen[r.who]) return; seen[r.who] = 1; out.push(r); });
+  return out.slice(0, JMA_MAX);
+}
+
+// ── 전문 하나를 읽는다
+//
+// ★ 무엇을 「지금 걸린 경보」 로 보나
+//   気象庁이 Headline 에 적어 둔 것만 본다. 그것이 그 전문의 요지다.
+//   해제·경보없음(코드 00)은 경보로 세지 않는다 — 세면 없는 위험을 있다고 말하게 된다.
+function jmaParse(xml){
+  const head  = jmaOne(xml, 'Head');
+  const ctrl  = jmaOne(xml, 'Control');
+  const info  = jmaOne(jmaOne(head, 'Headline'), 'Information');
+  const zones = [];
+  jmaAll(info, 'Item').forEach(it => {
+    const k    = jmaOne(it, 'Kind');
+    const kind = jmaOne(k, 'Name');
+    const code = jmaOne(k, 'Code');
+    if(!kind || kind.indexOf('警報') < 0) return;
+    if(kind.indexOf('解除') >= 0 || kind.indexOf('なし') >= 0 || code === '00') return;
+    jmaAll(jmaOne(it, 'Areas'), 'Area').forEach(a => {
+      const reg = jmaOne(a, 'Name');
+      if(!reg) return;
+      zones.push({ kind, code, reg, regCode: jmaOne(a, 'Code') });
+    });
+  });
+  return {
+    office: jmaOne(head, 'Title'),                 // 神戸海上気象
+    by:     jmaOne(ctrl, 'PublishingOffice'),      // 高松地方気象台
+    at:     jmaOne(head, 'ReportDateTime'),
+    until:  jmaOne(head, 'ValidDateTime'),
+    zones
+  };
+}
+
+// 유효 시각이 지난 전문은 안 쓴다. 지난 경보를 지금 경보인 양 보여 주면 안 된다.
+function jmaLive(rep, now){
+  if(!rep || !rep.zones || !rep.zones.length) return false;
+  if(!rep.until) return true;                      // 유효 시각이 없으면 그대로 둔다
+  const t = Date.parse(rep.until);
+  return !isFinite(t) || t >= now;
+}
+
+async function jmaGet(url){
+  const r = await fetch(url, {
+    cf: { cacheTtl: JMA_TTL, cacheEverything: true },
+    headers: { 'user-agent': 'baetnil.com marine app (contact help@baetnil.com)' }
+  });
+  if(!r.ok) throw new Error(url.replace(/^https?:\/\/[^/]+/, '') + ' → ' + r.status);
+  return await r.text();
+}
+
+async function jmaWarnJson(){
+  const now  = Date.now();
+  const feeds = [], bad = [];
+  for(const f of JMA_FEEDS){
+    try{ feeds.push(await jmaGet(f)); }catch(e){ bad.push(String(e && e.message || e)); }
+  }
+  // ★ 둘 다 못 읽었을 때만 성을 낸다. 하나라도 읽었으면 그것으로 한다.
+  if(!feeds.length) throw new Error(bad.join(' · ') || '소식줄을 못 읽었습니다');
+  const rows = jmaFeedPick.apply(null, feeds);
+  if(!rows.length)
+    return { ok:true, read:new Date(now).toISOString(), from:JMA_FROM, link:JMA_LINK,
+             reports:[], zones:[] };
+  const reps = [];
+  for(const row of rows){
+    const url = new URL(row.href, JMA_FEEDS[0]).href;
+    let rep;
+    try{ rep = jmaParse(await jmaGet(url)); }catch(e){ continue; }
+    if(jmaLive(rep, now)) reps.push(rep);
+  }
+  const zones = [];
+  reps.forEach(r => r.zones.forEach(z => zones.push({ ...z, office: r.office, until: r.until })));
+  return { ok:true, read:new Date(now).toISOString(), from:JMA_FROM, link:JMA_LINK,
+           reports:reps, zones };
+}
+
+function jmaRes(body, ok){
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      'access-control-allow-origin': '*',
+      'cache-control': ok ? 'public, max-age=300' : 'no-store'
+    }
+  });
+}
+
 export default {
   async fetch(req){
     const u = new URL(req.url);
     const p = u.pathname;
+
+    // ── 일본 해상경보 (気象庁). 파일이 아니라 그 자리에서 읽어 낸다.
+    if(p === '/app/warn-jp.json'){
+      try{ return jmaRes(await jmaWarnJson(), true); }
+      catch(e){
+        // ★ 빈 목록을 주지 않는다. 못 읽었으면 못 읽었다고 말한다.
+        return jmaRes({ ok:false, why:String(e && e.message || e),
+                        read:new Date().toISOString(), from:JMA_FROM, link:JMA_LINK }, false);
+      }
+    }
 
     // ── 대문 — 그 나라 말판으로 보낸다
     if(p === '/' || p === '/index.html'){

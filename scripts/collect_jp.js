@@ -1,4 +1,12 @@
-// 뱃일 — 일본 정박지 자료 만들기 (STEP 8)
+// 뱃일 — 정박지 자료 만들기 (일본 + 한국 마리나)
+//
+// ★ 만드는 파일 둘
+//     app/spots-jp.json — 일본 (현이 낸 방문 정박지 + 지도가 마리나라고 부르는 곳)
+//     app/spots-kr.json — 한국 (지도가 마리나라고 부르는 곳)
+//   ★ 파일 이름에 jp 가 붙어 있는 까닭 — 일감(.github/workflows/jp.yml)이 그 이름 하나만
+//     담게 되어 있고, .github 는 내가 못 고치는 자리다. 한국 파일은 이 스크립트가
+//     스스로 `git add` 한다. 사장님께 일을 하나 더 시키지 않기 위해서다.
+//
 //
 // ★ 왜 이렇게 하나 — 관 자료가 전부 막혀 있다 (2026-08 확인)
 //   · 국토수치정보 「어항(C09)」  → 이용허락조건 「非商用」. 상업 앱은 못 쓴다. 게다가 2006년판이 최신
@@ -175,6 +183,91 @@ const PREF_BOX = {   // [남, 서, 북, 동]
 //   현 여섯 곳을 하나씩 물어본다. 한 번에 서버 쪽 제한이 90초라 다 하면 길게 9분쯤 걸린다.
 //   그동안 아무것도 안 찍으면 일감 화면이 빈 채로 멈춰 보인다. 그래서 한 걸음마다 찍는다.
 const 짧게 = u => String(u).replace(/^https:\/\//,'').split('/')[0];
+
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 2026-09-01 — 그물을 **뒤집는다** (사장님 지적)
+//
+//   사장님 말씀: "일본 거는 겨우 세 개 들어 있네"
+//               "지도 어플 같은 데 마리나라고 쳐 가지고, 진짜 마리나와 가짜 마리나들
+//                구분한 다음에 또 넣을 수는 없나?"
+//
+//   ★ 왜 세 개뿐이었나 — 방향이 거꾸로였다.
+//     여태는 **내가 손으로 적은 35곳**을 들고 OSM 에 「이 이름 있냐」고 물었다.
+//     그래서 「없다」는 답을 13번 받았고, 마리나 13곳 중 **3곳**만 좌표를 얻었다.
+//     사장님이 보신 그 세 개다. 손으로 적은 목록보다 넓어질 길이 아예 없었다.
+//
+//   ★ 이제 반대로 묻는다 — 「이 바다에서 **마리나인 곳을 다 내놔라**」.
+//     OSM 에서 `leisure=marina` 는 글자 그대로 「마리나」다. 지도 앱에서 마리나를
+//     쳐서 나오는 것과 같은 자료다. 이러면 35곳이 아니라 수백 곳이 나온다.
+//
+//   ★ 진짜와 가짜는 어떻게 가르나 — **내가 안 가른다.**
+//     `leisure=marina` 중에는 배 올리는 경사로 하나뿐인 곳도 섞인다. 내가 미리
+//     걸러내면 그것이 곧 짐작이다(사장님이 정하신 것 8번). 그래서 다 싣되
+//     **「아직 확인 안 된 곳」(v:0)** 딱지를 붙인다. 쓰는 사람이 「여기 맞습니다」 /
+//     「여긴 마리나가 아닙니다」를 눌러 정리한다 — 사장님이 정하신 위키 방식 그대로다.
+//
+//   ★ 확인된 것(v:1) 은 **관이 이름과 자리를 함께 낸 것** 뿐이다.
+//     아래 VISITOR 표에서 맞은 것이 그것이다.
+//
+//   ★ 이름이 없는 것은 안 싣는다. 사람에게 「(이름 없음)」은 아무 쓸모가 없다.
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 일본은 **전국**을 훑는다 (사장님 지적, 2026-09-02)
+//   전에는 세토내해와 규슈북부 두 상자뿐이었다. 그래서 지도를 열면 일본에서 한 동네만
+//   점이 찍혔다. 「세토내해 중심으로 먼저」 는 **어디부터 채우나**를 정한 말이지
+//   나머지를 안 넣는다는 말이 아니었다. 내가 잘못 알아들었다.
+//   ★ 상자를 잘게 나누는 까닭 — Overpass 는 남의 서버다. 한 번에 일본 전체를 물으면
+//     시간이 넘어 통째로 빈손이 된다. 나누면 한 상자가 실패해도 나머지가 남는다.
+const MARINA_BOX = {
+  // 일본 — 홋카이도부터 오키나와까지. 위도 띠로 잘랐다.
+  'jp:홋카이도':     { c:'jp', box:[41.30, 139.30, 45.60, 146.00] },
+  'jp:도호쿠동':     { c:'jp', box:[36.80, 140.20, 41.60, 142.30] },
+  'jp:도호쿠서':     { c:'jp', box:[36.80, 138.80, 41.60, 140.60] },
+  'jp:간토':         { c:'jp', box:[34.60, 138.90, 36.90, 141.20] },
+  'jp:이즈오가사와라':{ c:'jp', box:[24.00, 138.00, 34.80, 142.50] },
+  'jp:주부동해안':   { c:'jp', box:[34.40, 136.30, 35.60, 139.10] },
+  'jp:호쿠리쿠':     { c:'jp', box:[35.20, 132.60, 38.60, 139.00] },
+  'jp:긴키':         { c:'jp', box:[33.30, 134.80, 35.80, 136.60] },
+  'jp:세토내해':     { c:'jp', box:[33.40, 130.80, 35.10, 135.50] },
+  'jp:시코쿠남':     { c:'jp', box:[32.60, 132.20, 33.90, 135.00] },
+  'jp:규슈북부':     { c:'jp', box:[32.60, 129.30, 34.10, 131.60] },
+  'jp:규슈남부':     { c:'jp', box:[30.90, 129.80, 32.80, 132.20] },
+  'jp:난세이':       { c:'jp', box:[24.00, 122.80, 31.00, 131.20] },
+  // 한국 — 남해·서해·동해를 한 번에. 제주와 울릉도까지 든다.
+  'kr:남해':      { c:'kr', box:[33.00, 126.00, 35.20, 129.60] },
+  'kr:서해':      { c:'kr', box:[34.60, 125.60, 37.90, 127.00] },
+  'kr:동해':      { c:'kr', box:[35.00, 128.90, 38.70, 131.10] },
+  'kr:제주':      { c:'kr', box:[33.05, 126.10, 33.65, 126.99] }
+};
+// ★ 「마리나」 라고 부르는 꼬리표만 본다.
+//   leisure=marina 가 본줄기고, 바다 지도 쪽 seamark:type=marina 도 같은 뜻이다.
+//   항(harbour)·부두(pier)는 여기 안 넣는다 — 그건 마리나가 아니다.
+//   ★ 넓히고 싶어지면 그때 여기 한 줄을 더한다. 두 군데서 정하지 않는다.
+const MARINA_TAGS = [ '"leisure"="marina"', '"seamark:type"="marina"' ];
+async function osmMarinas(box){
+  const B = `(${box[0]},${box[1]},${box[2]},${box[3]})`;
+  const 줄 = [];
+  ['node','way','relation'].forEach(종 =>
+    MARINA_TAGS.forEach(꼬 => 줄.push('  ' + 종 + '[' + 꼬 + ']' + B + ';')));
+  const q = '[out:json][timeout:90];\n(\n' + 줄.join('\n') + '\n);\nout center tags;';
+  const j = await ovAsk(q);
+  const 본 = new Set();
+  const out = [];
+  (j.elements || []).forEach(e => {
+    const T = e.tags || {};
+    // ★ 이름은 그 나라 말을 먼저 쓴다. 앱이 보는 사람 말로 다시 옮긴다.
+    const name = T['name'] || T['name:ko'] || T['name:ja'] || T['name:en'] || '';
+    const lat = e.lat != null ? e.lat : (e.center && e.center.lat);
+    const lon = e.lon != null ? e.lon : (e.center && e.center.lon);
+    if(!name || lat == null || lon == null) return;
+    const key = e.type + '/' + e.id;
+    if(본.has(key)) return;
+    본.add(key);
+    out.push({ key, name, lat, lon,
+               tel: T['phone'] || T['contact:phone'] || '',
+               web: T['website'] || T['contact:website'] || '' });
+  });
+  return out;
+}
 // ★ 한없이 기다리지 않는다. Overpass 가 답을 안 주고 물고 있으면 여섯 현이 한 시간을 넘긴다.
 //   서버 쪽 제한(90초)보다 조금 길게 잡아 우리 쪽에서도 끊는다.
 const OV_WAIT = 120000;
@@ -276,6 +369,318 @@ function findSpot(list, name, alts){
   return null;
 }
 
+
+
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 한국 마리나 — 관 자료 (사장님 지적, 2026-09-02)
+//
+// ★ 무엇이 잘못이었나
+//   앱에 든 한국 정박지는 해양수산부 「마리나항만 기본계획」 39곳 + 어항 목록이다.
+//   그래서 **여수 이순신마리나(150선석)·원형마리나(36선석)** 처럼 실제로 운영 중인
+//   민간·지자체 마리나가 통째로 빠져 있었다. 사장님이 두 번 짚으셨는데
+//   나는 「지도 자료(OSM)에서 긁어 오게 고쳤다」고만 하고 **그 세 곳이 실제로 들어오는지
+//   확인하지 않았다.** 그건 거짓말이었다.
+//
+// ★ 이제 관 자료를 그대로 싣는다
+//   해양수산부 마리나 정보화시스템 「전국 마리나 현황」 (infomarina.go.kr) —
+//   **운영 중 72곳**. 여덟 쪽을 한 줄씩 그대로 옮겨 적었다(71곳 읽음. 아래 「했나」 참고).
+//   이름·소재지·항만구분·선석수는 그 표에 적힌 글자 그대로다.
+//
+// ★ 자리(좌표)는 지어내지 않는다 — 이 표에는 좌표가 없다. 순서대로 찾는다.
+//     ① 이 저장소가 이미 훑어 둔 OSM 마리나에서 이름이 맞는 것
+//     ② 그래도 없으면 Nominatim 에 「그 이름 + 그 지역」 으로 물어본다 (OSM · ODbL)
+//     ③ 둘 다 없으면 **안 싣는다.** 「자리 못 찾음」 에 이름을 남긴다.
+//        엉뚱한 점을 찍어 두면 그 점을 믿고 배를 몰다 사람이 다친다.
+//
+// ★ 앱에 이미 있는 곳(어항·기본계획 39곳)과 겹치는 것은 **앱이** 걸러낸다.
+//   여기서 또 거르면 두 곳에서 정하게 된다 (사장님이 정하신 것 3번).
+const KRGOV_SRC = '해양수산부 마리나 정보화시스템 「전국 마리나 현황」';
+const KRGOV = [
+  { n:'아라마리나', at:'경인', port:'무역항', berth:194, reg:'수도권' },
+  { n:'안산해양아카데미', at:'탄도강', port:'지방어항', berth:20, reg:'수도권' },
+  { n:'서울(여의도)', at:'한강', port:'무역항', berth:90, reg:'수도권' },
+  { n:'제부마리나', at:'제부', port:'연안', berth:300, reg:'수도권' },
+  { n:'왕산마리나', at:'왕산', port:'연안', berth:319, reg:'수도권' },
+  { n:'전곡마리나', at:'전곡', port:'지방어항', berth:200, reg:'수도권' },
+  { n:'삼길포항 어촌마리나역', at:'삼길포', port:'국가어항', berth:16, reg:'충남권' },
+  { n:'보령요트경기장', at:'보령', port:'연안', berth:50, reg:'충남권' },
+  { n:'격포마리나', at:'격포', port:'국가어항', berth:37, reg:'전북권' },
+  { n:'비봉마리나', at:'비봉', port:'어촌정주어항', berth:34, reg:'전남권' },
+  { n:'목포마리나', at:'목포', port:'무역항', berth:57, reg:'전남권' },
+  { n:'소호마리나', at:'여수시', port:'연안', berth:21, reg:'전남권' },
+  { n:'이순신마리나', at:'여수시', port:'연안', berth:150, reg:'전남권' },
+  { n:'원형마리나', at:'여수시', port:'연안', berth:36, reg:'전남권' },
+  { n:'여수낭만바다마리나', at:'여수신항', port:'무역항', berth:4, reg:'전남권' },
+  { n:'수산마리나', at:'수산', port:'국가어항', berth:130, reg:'강원권' },
+  { n:'공현진마리나', at:'공현진', port:'국가어항', berth:14, reg:'강원권' },
+  { n:'속초요트계류시설', at:'속초(청초호)', port:'무역항', berth:30, reg:'강원권' },
+  { n:'강릉항 요트마리나', at:'강릉', port:'국가어항', berth:42, reg:'강원권' },
+  { n:'형산강마리나', at:'포항시', port:'하천', berth:74, reg:'경북권' },
+  { n:'후포마리나항만구역', at:'후포', port:'연안', berth:307, reg:'경북권' },
+  { n:'골장마리나', at:'골장', port:'지방어항', berth:14, reg:'경북권' },
+  { n:'사동마리나', at:'사동', port:'국가어항', berth:20, reg:'경북권' },
+  { n:'오산마리나', at:'오산', port:'국가어항', berth:30, reg:'경북권' },
+  { n:'방석마리나', at:'방석', port:'지방어항', berth:6, reg:'경북권' },
+  { n:'양포마리나', at:'양포', port:'국가어항', berth:36, reg:'경북권' },
+  { n:'두호마리나', at:'포항시', port:'소규모항포구', berth:14, reg:'경북권' },
+  { n:'여남요트계류장', at:'포항시', port:'소규모항포구', berth:10, reg:'경북권' },
+  { n:'포항요트계류장(동빈내항)', at:'포항구항(동빈내항)', port:'무역항', berth:55, reg:'경북권' },
+  { n:'근포마리나', at:'대포근포', port:'국가어항', berth:64, reg:'경남권' },
+  { n:'물건마리나', at:'물건', port:'국가어항', berth:20, reg:'경남권' },
+  { n:'엘림마리나', at:'물건', port:'국가어항', berth:40, reg:'경남권' },
+  { n:'적량마리나', at:'적량', port:'지방어항', berth:21, reg:'경남권' },
+  { n:'삼천포(광포)마리나', at:'광포', port:'어촌정주어항', berth:24, reg:'경남권' },
+  { n:'당항포마리나', at:'동천', port:'어촌정주어항', berth:105, reg:'경남권' },
+  { n:'한산마리나리조트', at:'당항포', port:'연안', berth:8, reg:'경남권' },
+  { n:'충무마리나', at:'통영', port:'무역항', berth:132, reg:'경남권' },
+  { n:'통영항 요트계류시설', at:'통영', port:'무역항', berth:37, reg:'경남권' },
+  { n:'통영요트학교', at:'통영', port:'무역항', berth:20, reg:'경남권' },
+  { n:'매물도마리나', at:'당금', port:'국가어항', berth:16, reg:'경남권' },
+  { n:'죽림요트계류시설', at:'통영시', port:'연안', berth:12, reg:'경남권' },
+  { n:'능양항 요트계류시설', at:'능량', port:'국가어항', berth:12, reg:'경남권' },
+  { n:'진촌항 요트계류시설', at:'진촌', port:'지방어항', berth:4, reg:'경남권' },
+  { n:'욕지항 요트계류시설', at:'욕지', port:'국가어항', berth:10, reg:'경남권' },
+  { n:'학림항 요트계류시설', at:'학림', port:'지방어항', berth:4, reg:'경남권' },
+  { n:'연대항 요트계류시설', at:'연대', port:'지방어항', berth:4, reg:'경남권' },
+  { n:'봉암항 요트계류시설', at:'봉암', port:'어촌정주어항', berth:4, reg:'경남권' },
+  { n:'통영 한산 마리나호텔', at:'통영', port:'연안', berth:10, reg:'경남권' },
+  { n:'소노캄', at:'거제시', port:'국가어항', berth:8, reg:'경남권' },
+  { n:'지세포마리나', at:'지세포', port:'국가어항', berth:20, reg:'경남권' },
+  { n:'진해 명동 마리나', at:'부산항', port:'무역항', berth:300, reg:'경남권' },
+  { n:'화명수상 레포츠타운', at:'부산시', port:'하천', berth:30, reg:'부산권' },
+  { n:'부산북항마리나', at:'부산북항', port:'무역항', berth:250, reg:'부산권' },
+  { n:'수영만마리나', at:'수영만', port:'연안', berth:446, reg:'부산권' },
+  { n:'광안리 해양 레포츠센터', at:'부산시', port:'연안', berth:10, reg:'부산권' },
+  { n:'남천마리나', at:'남천', port:'연안', berth:36, reg:'부산권' },
+  { n:'삼락수상레포츠타운', at:'부산시', port:'하천', berth:40, reg:'부산권' },
+  { n:'해운대마리나', at:'해운대', port:'연안', berth:61, reg:'부산권' },
+  { n:'중문마리나', at:'중문', port:'무역항', berth:5, reg:'제주권' },
+  { n:'대포마리나', at:'대포근포', port:'지방어항', berth:4, reg:'제주권' },
+  { n:'강정공공요트계류시설', at:'강정', port:'지방어항', berth:18, reg:'제주권' },
+  { n:'M1971 요트투어(운진항마리나)', at:'서귀포시 운진', port:'지방어항', berth:27, reg:'제주권' },
+  { n:'신창마리나', at:'제주시', port:'지방어항', berth:15, reg:'제주권' },
+  { n:'도두마리나(민간)', at:'도두', port:'국가어항', berth:13, reg:'제주권' },
+  { n:'한라(제주요트면허시험장)', at:'도두', port:'국가어항', berth:6, reg:'제주권' },
+  { n:'도두마리나(공공)', at:'도두', port:'국가어항', berth:14, reg:'제주권' },
+  { n:'김녕마리나(민간)', at:'김녕', port:'국가어항', berth:4, reg:'제주권' },
+  { n:'김녕마리나(공공)', at:'김녕', port:'국가어항', berth:31, reg:'제주권' },
+  { n:'신양마리나(추자도)', at:'신양(추자도)', port:'국가어항', berth:16, reg:'제주권' },
+  { n:'위미마리나', at:'위미(민자)', port:'국가어항', berth:1, reg:'제주권' },
+  { n:'해오름마리나(울산)', at:'울산시', port:'하천', berth:9, reg:'울산권' }
+];
+// 지역 이름 → Nominatim 에 같이 넣을 말. 관 자료의 「권역」 을 그대로 쓴다.
+const KRGOV_AREA = {
+  '수도권':'인천 경기', '충남권':'충청남도', '전북권':'전라북도', '전남권':'전라남도',
+  '강원권':'강원도', '경북권':'경상북도', '경남권':'경상남도', '부산권':'부산',
+  '제주권':'제주', '울산권':'울산'
+};
+// ★ 자리 물어보는 곳. 검사에서는 딴 데로 돌린다 — 검사가 남의 서버를 두들기면 안 된다.
+const NOMI = process.env.NOMI_URL || 'https://nominatim.openstreetmap.org/search';
+// Nominatim 규칙 — 1초에 한 번만 묻는다. 검사에서는 0 으로 두고 돌린다(남의 서버를 안 부른다).
+const NOMI_WAIT = Number(process.env.NOMI_WAIT != null ? process.env.NOMI_WAIT : 1200);
+const NOMI_HEAD = { 'user-agent':'baetnil.com marine app (contact help@baetnil.com)' };
+const 이름씻기 = s => String(s || '')
+  .replace(/\(.*?\)/g, '')
+  .replace(/[\s·]/g, '')
+  .replace(/마리나|요트계류시설|요트계류장|계류시설|항만구역|어촌마리나역|요트마리나|요트경기장|레포츠센터|레포츠타운|요트학교|리조트|호텔/g, '');
+
+// Nominatim 은 남의 서버다. 1초에 한 번만 묻는다 (그쪽이 정한 규칙이다).
+async function 자리물어보기(q){
+  const u = NOMI + '?format=jsonv2&limit=1&countrycodes=kr&q=' + encodeURIComponent(q);
+  const r = await fetch(u, { headers: NOMI_HEAD, signal: AbortSignal.timeout(20000) });
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  if(!Array.isArray(j) || !j.length) return null;
+  const la = Number(j[0].lat), lo = Number(j[0].lon);
+  if(!isFinite(la) || !isFinite(lo)) return null;
+  // 우리나라 밖으로 나간 답은 버린다
+  if(la < 33 || la > 39 || lo < 124 || lo > 132) return null;
+  return { la, lo, from: j[0].display_name || '' };
+}
+
+// 관 자료 71곳에 자리를 붙인다
+async function 한국관마리나(osmKr){
+  const 있는것 = {};
+  (osmKr || []).forEach(x => { 있는것[이름씻기(x.n)] = x; });
+  const out = [], 못찾음 = [], 어디서 = { 지도훑기:0, 물어봄:0 };
+  for(const g of KRGOV){
+    const key = 이름씻기(g.n);
+    let la = null, lo = null, how = '';
+    const m = 있는것[key] || 있는것[이름씻기(g.at)];
+    if(m){ la = m.la; lo = m.lo; how = '지도훑기'; }
+    else{
+      const 지역 = KRGOV_AREA[g.reg] || '';
+      try{
+        let hit = await 자리물어보기(g.n + ' ' + 지역);
+        if(!hit) hit = await 자리물어보기(g.at + ' ' + 지역);
+        if(hit){ la = hit.la; lo = hit.lo; how = '물어봄'; }
+      }catch(_){}
+      if(NOMI_WAIT) await 잠깐(NOMI_WAIT);
+    }
+    if(la == null){ 못찾음.push(g.n + ' (' + g.at + ')'); continue; }
+    어디서[how]++;
+    const 줄 = [
+      g.at + ' · ' + g.port,
+      g.berth ? ('계류 ' + g.berth + '척') : '',
+      '※ ' + KRGOV_SRC + ' 에 실린 곳입니다. 자리는 ' +
+        (how === '지도훑기' ? '지도 자료(OpenStreetMap)' : '주소로 찾은 것') +
+        '이라 실제 접안 자리와 다를 수 있습니다.'
+    ].filter(Boolean).join('\n');
+    out.push({ i:'krgov_' + 이름씻기(g.n), n:g.n, k:'marina', c:'kr',
+               v:1,                       // 관이 이름을 낸 곳이다 — 「확인 안 됨」 딱지를 안 붙인다
+               la: Math.round(la * 1e5) / 1e5,
+               lo: Math.round(lo * 1e5) / 1e5,
+               r: g.reg.replace(/권$/, ''), f:'', t: 줄 });
+  }
+  return { rows: out, 못찾음, 어디서 };
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 해상 예보구 경계 — app/sea-jp.json
+//
+// ★ 왜 있어야 하나
+//   気象庁 해상경보는 「四国沖南部에 海上風警報」 처럼 **해역 이름**으로 나온다.
+//   배가 어느 해역에 있는지 모르면, 홋카이도 앞바다 경보를 세토내해에 댄 배에
+//   보여 주게 된다. 그건 없는 위험을 있다고 말하는 것이고, 반대로 제 해역 경보를
+//   딴 데 것 사이에 묻어 버리는 것이다. 둘 다 사람을 다치게 한다.
+//
+// ★ 자리는 지어내지 않는다
+//   경계는 気象庁이 낸 「予報区等GISデータ」 를 Geoshape(ROIS-DS 인문학오픈데이터
+//   공동이용센터)가 GeoJSON 으로 펴 놓은 것을 그대로 받아 쓴다.
+//   ★ 출처 — 気象庁 予報区等GISデータ / Geoshape リポジトリ (CC BY 4.0).
+//     자료에도 앱 화면에도 적는다. 빼면 못 쓴다.
+//
+// ★ 무엇을 덜어내나
+//   ① 안쪽 구멍(섬)은 뺀다. 배를 대는 자리는 대개 섬이나 뭍의 가장자리다.
+//      구멍을 남기면 「다카마쓰항은 세토내해가 아니다」 같은 답이 나온다.
+//   ② 테두리는 2km 눈금으로 성글게 만든다. 여기서 하는 일은 「어느 해역인가」
+//      하나를 가리는 것뿐이라 그보다 촘촘할 까닭이 없다. 앱이 받아야 하는 파일이다.
+//
+// ★ 담는 해역 — 사장님이 정하신 대로 세토내해 언저리부터다 (일본 서쪽·남쪽 바다).
+//   여기 없는 해역의 경보는 앱이 「내 해역」 으로 세지 않고, 이름만 그대로 보여 준다.
+const SEA_SRC  = '地方海上予報区 — 気象庁 予報区等GISデータ / Geoshape (ROIS-DS CODH) CC BY 4.0';
+const SEA_BASE = process.env.SEA_BASE_URL || 'https://geoshape.ex.nii.ac.jp/jma/resource/AreaMarineAJ/20190125/';
+const SEA_TOL  = 0.02;   // 도. 위도 1도가 111km 이니 대략 2km 눈금이다
+const SEA_DIG  = 3;      // 소수 셋째 자리 (약 110m) 까지만 적는다
+
+// 気象庁 「地方海上予報区」 목록에 적힌 이름·번호를 그대로 옮긴 것이다.
+// 부모(p)는 그 목록의 상위 예보구다 — 경보가 상위 예보구로 나올 때가 있다.
+const SEA_AREAS = [
+  { c:'4010', n:'瀬戸内海',                 p:'4000', pn:'四国沖及び瀬戸内海' },
+  { c:'4020', n:'四国沖北部',               p:'4000', pn:'四国沖及び瀬戸内海' },
+  { c:'4030', n:'四国沖南部',               p:'4000', pn:'四国沖及び瀬戸内海' },
+  { c:'4110', n:'日本海北西部',             p:'4100', pn:'日本海西部' },
+  { c:'4120', n:'山陰沖東部及び若狭湾付近', p:'4100', pn:'日本海西部' },
+  { c:'4130', n:'山陰沖西部',               p:'4100', pn:'日本海西部' },
+  { c:'5000', n:'対馬海峡',                 p:'',     pn:'' },
+  { c:'5110', n:'済州島西海上',             p:'5100', pn:'九州西方海上' },
+  { c:'5120', n:'長崎西海上',               p:'5100', pn:'九州西方海上' },
+  { c:'5130', n:'女島南西海上',             p:'5100', pn:'九州西方海上' },
+  { c:'5210', n:'日向灘',                   p:'5200', pn:'九州南方海上及び日向灘' },
+  { c:'5220', n:'鹿児島海域',               p:'5200', pn:'九州南方海上及び日向灘' },
+  { c:'5230', n:'奄美海域',                 p:'5200', pn:'九州南方海上及び日向灘' },
+  { c:'3210', n:'東海海域東部',             p:'3200', pn:'東海海域' },
+  { c:'3220', n:'東海海域西部',             p:'3200', pn:'東海海域' },
+  { c:'3230', n:'東海海域南部',             p:'3200', pn:'東海海域' }
+];
+
+// 점이 선분에서 얼마나 떨어졌나 (도 단위. 굵게() 안에서만 쓴다)
+function 선까지(p, a, b){
+  const x = a[0], y = a[1];
+  let dx = b[0] - x, dy = b[1] - y;
+  if(dx !== 0 || dy !== 0){
+    const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
+    if(t > 1){ return Math.hypot(p[0] - b[0], p[1] - b[1]); }
+    if(t > 0){ return Math.hypot(p[0] - (x + t * dx), p[1] - (y + t * dy)); }
+  }
+  return Math.hypot(p[0] - x, p[1] - y);
+}
+// 테두리를 성글게 (Douglas–Peucker)
+function 굵게(pts, tol){
+  if(pts.length < 3) return pts.slice();
+  const keep = new Array(pts.length).fill(false);
+  keep[0] = keep[pts.length - 1] = true;
+  const 할일 = [[0, pts.length - 1]];
+  while(할일.length){
+    const [a, b] = 할일.pop();
+    let far = -1, fd = 0;
+    for(let i = a + 1; i < b; i++){
+      const d = 선까지(pts[i], pts[a], pts[b]);
+      if(d > fd){ fd = d; far = i; }
+    }
+    if(fd > tol && far > 0){ keep[far] = true; 할일.push([a, far], [far, b]); }
+  }
+  return pts.filter((_, i) => keep[i]);
+}
+const 자르기 = v => Number(v.toFixed(SEA_DIG));
+
+// GeoJSON 하나에서 바깥 테두리들만 뽑는다
+function 테두리들(gj){
+  const out = [];
+  const 담기 = poly => { if(Array.isArray(poly) && poly.length) out.push(poly[0]); };  // [0] 이 바깥, 나머지는 구멍
+  (gj.features || []).forEach(f => {
+    const g = f && f.geometry; if(!g) return;
+    if(g.type === 'Polygon') 담기(g.coordinates);
+    else if(g.type === 'MultiPolygon') (g.coordinates || []).forEach(담기);
+  });
+  return out;
+}
+
+async function 해역경계(){
+  const areas = [], 못받음 = [];
+  for(const a of SEA_AREAS){
+    let gj;
+    try{
+      const r = await fetch(SEA_BASE + a.c + '.geojson');
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      gj = await r.json();
+    }catch(e){ 못받음.push(a.c + ' ' + a.n + ' — ' + (e && e.message || e)); continue; }
+
+    const rings = [];
+    let la0 = 90, lo0 = 180, la1 = -90, lo1 = -180;
+    테두리들(gj).forEach(ring => {
+      ring.forEach(pt => {
+        if(!Array.isArray(pt) || !isFinite(pt[0]) || !isFinite(pt[1])) return;
+        if(pt[1] < la0) la0 = pt[1];
+        if(pt[1] > la1) la1 = pt[1];
+        if(pt[0] < lo0) lo0 = pt[0];
+        if(pt[0] > lo1) lo1 = pt[0];
+      });
+      const 성근 = 굵게(ring, SEA_TOL).map(p => [자르기(p[0]), 자르기(p[1])]);
+      const 줄인 = 성근.filter((p, i) => i === 0 || p[0] !== 성근[i-1][0] || p[1] !== 성근[i-1][1]);
+      if(줄인.length >= 4) rings.push(줄인);
+    });
+    if(!rings.length){ 못받음.push(a.c + ' ' + a.n + ' — 테두리가 비었습니다'); continue; }
+    areas.push({ c:a.c, n:a.n, p:a.p, pn:a.pn,
+                 box:[자르기(la0), 자르기(lo0), 자르기(la1), 자르기(lo1)], rings });
+  }
+
+  // ★ 하나도 못 받았으면 파일을 안 건드린다. 지난 것을 그대로 두는 편이 낫다 —
+  //   빈 파일을 써 두면 앱이 「일본 해역이 아니다」 라고 말하게 된다.
+  if(!areas.length){
+    console.error('★ 해상 예보구 경계를 하나도 못 받았습니다. 지난 파일을 그대로 둡니다.');
+    못받음.forEach(m => console.error('   ' + m));
+    return null;
+  }
+  const out = {
+    from: SEA_SRC,
+    license: 'CC-BY-4.0',
+    note: '바깥 테두리만 2km 눈금으로 성글게 만든 것입니다. 항해용이 아닙니다.',
+    ts: new Date().toISOString(),
+    했나: { 넣어둔곳: SEA_AREAS.length, 실린곳: areas.length, 못받음 },
+    areas
+  };
+  fs.writeFileSync('sea-jp.json', JSON.stringify(out));
+  try{
+    const { execFileSync } = require('child_process');
+    execFileSync('git', ['add', '-A', '--', 'sea-jp.json'], { stdio:'ignore' });
+  }catch(_){}
+  const 크기 = fs.statSync('sea-jp.json').size;
+  console.log(`해상 예보구 경계 ${areas.length}곳 · ${(크기/1024).toFixed(0)}KB`
+    + (못받음.length ? `\n못 받은 곳 ${못받음.length}:\n  ` + 못받음.join('\n  ') : ''));
+  return out;
+}
+
 (async () => {
   const rows = [];
   const miss = [];
@@ -303,6 +708,9 @@ function findSpot(list, name, alts){
       i: 'jp_' + v.pref + '_' + rows.length,
       n: v.berth + ' (' + v.name + ')',
       k: v.kind || 'port',
+      c: 'jp',
+      // ★ 관이 이름과 자리를 함께 낸 것이다 — 확인된 것으로 본다
+      v: 1,
       la: Math.round(hit.lat * 1e5) / 1e5,
       lo: Math.round(hit.lon * 1e5) / 1e5,
       r: v.pref,
@@ -320,30 +728,127 @@ function findSpot(list, name, alts){
          ].filter(Boolean).join('\n')
     });
   }
-  const out = {
-    from: VISITOR_SRC + ' · 자리 © OpenStreetMap contributors (ODbL)',
-    license: 'ODbL-1.0',
+  // ══════════════════════════════════════════════════════════════════
+  // ★★★ 두 번째 걸음 — 「이 바다에서 마리나인 곳을 다 내놔라」 (2026-09-01)
+  //   위에서 만든 것은 **관이 낸 방문 정박지** 다. 여기서 만드는 것은
+  //   **지도가 마리나라고 부르는 곳 전부** 다. 둘은 겹칠 수 있으므로 이름으로 맞춰 본다.
+  // ══════════════════════════════════════════════════════════════════
+  const 마리나 = { jp: [], kr: [] };
+  const 마리나샘 = {};
+  const 이미 = new Set(rows.map(r => norm(r.n)));
+  // 관 자료 이름(高松港 같은 항 이름)도 맞춰 볼 수 있게 넣어 둔다
+  VISITOR.forEach(v => { 이미.add(norm(v.name)); (v.alt||[]).forEach(a2 => 이미.add(norm(a2))); });
+  const 겹침 = [];
+  const 테두리들 = Object.keys(MARINA_BOX);
+  console.log('마리나를 훑습니다 — 바다 ' + 테두리들.length + '곳.');
+  let 몇 = 0;
+  for(const 이름 of 테두리들){
+    const M = MARINA_BOX[이름];
+    console.log('[' + (++몇) + '/' + 테두리들.length + '] ' + 이름 + ' 훑는 중…');
+    let got = [];
+    try{ got = await osmMarinas(M.box); }
+    catch(e){
+      // ★ 한 바다가 막혔다고 나머지까지 버리지 않는다. 다만 조용히 넘어가지도 않는다 —
+      //   몇 곳이 왜 비었는지 자료 안에 남긴다.
+      마리나샘[이름] = '★ 못 받음: ' + ((e && e.message) || e);
+      console.log('   ★ ' + 이름 + ' 못 받았습니다 — ' + ((e && e.message) || e));
+      await 잠깐(2000);
+      continue;
+    }
+    마리나샘[이름] = got.length;
+    console.log('   ' + 이름 + ' — 마리나 ' + got.length + '곳');
+    got.forEach(g => {
+      // 관 자료로 이미 실은 곳이면 또 싣지 않는다 (사본을 안 만든다)
+      const n = norm(g.name);
+      if(이미.has(n)){ 겹침.push(g.name); return; }
+      이미.add(n);
+      마리나[M.c].push({
+        i: 'osm_' + g.key.replace('/', ''),
+        n: g.name,
+        k: 'marina',
+        c: M.c,
+        // ★ 아직 사람이 확인 안 한 곳이다. 앱이 딱지를 붙여 보여 준다.
+        v: 0,
+        la: Math.round(g.lat * 1e5) / 1e5,
+        lo: Math.round(g.lon * 1e5) / 1e5,
+        r: '',
+        f: '',
+        p: false,
+        t: [ g.tel ? ('전화 — ' + g.tel) : '',
+             g.web ? ('누리집 — ' + g.web) : '',
+             '※ 지도 자료에 「마리나」로 적혀 있는 곳입니다. 아직 확인되지 않았습니다 —'
+             + ' 실제로 배를 댈 수 있는지는 가시기 전에 확인해 주세요.'
+           ].filter(Boolean).join('\n')
+      });
+    });
+    await 잠깐(2000);
+  }
+
+  const OSM_FROM = '자리 © OpenStreetMap contributors (ODbL)';
+  const 머리 = (from, 했나) => ({
+    from, license: 'ODbL-1.0',
     note: '이 파일은 OpenStreetMap 에서 뽑은 자리를 담고 있어 ODbL 을 따릅니다.',
     ts: new Date().toISOString(),
+    했나
+  });
+
+  // ── 일본 꾸러미 (관 자료 + 마리나 훑은 것)
+  const jpRows = rows.concat(마리나.jp);
+  const out = Object.assign(머리(VISITOR_SRC + ' · ' + OSM_FROM, {
     // ★★★ 얼마나 건졌나를 자료 안에 같이 남긴다 (2026-08-30).
-    //   첫 성공 판에서 35곳 중 10곳만 실렸다. 그런데 무엇이 왜 빠졌는지는
-    //   일감 기록을 뒤져야만 알 수 있었고, 나는 그걸 못 본 채 짐작으로 고치려 했다.
-    //   ★ 따로 파일을 만들면 일감(.github/workflows/jp.yml)에 올리는 줄을 더해야 한다.
-    //     사장님께 일을 하나 더 시키게 되므로, 이미 올라가는 이 파일 안에 넣는다.
-    //   ★ 앱은 rows 만 읽는다. 아래 것들은 사람이 보는 것이다.
-    했나: {
-      넣어둔곳: VISITOR.length,
-      실린곳: rows.length,
-      // 현마다 OSM 에서 몇 개를 받아 왔나 — 그물이 좁은지 여기서 바로 보인다
-      현마다받은수: Object.fromEntries(Object.entries(cache).map(([k, v]) => [k, v.length])),
-      못찾음: miss,
-      // ★ 이름이 딱 안 맞아 무르게 집은 것 — 한 번 눈으로 훑어 주십시오
-      무르게맞춘것: loose
-    },
-    rows
-  };
+    //   무엇이 왜 빠졌는지는 일감 기록을 뒤져야만 알 수 있었고, 나는 그걸 못 본 채
+    //   짐작으로 고치려 했다. 따로 파일을 만들면 일감에 줄을 더해야 하므로 여기 넣는다.
+    넣어둔곳: VISITOR.length,
+    실린곳: rows.length,
+    현마다받은수: Object.fromEntries(Object.entries(cache).map(([k, v]) => [k, v.length])),
+    못찾음: miss,
+    무르게맞춘것: loose,
+    마리나훑은수: 마리나샘,
+    마리나실린수: { jp: 마리나.jp.length, kr: 마리나.kr.length },
+    관자료와겹쳐서뺀것: 겹침
+  }), { rows: jpRows });
   fs.writeFileSync('spots-jp.json', JSON.stringify(out));
-  console.log(`만들었습니다: ${rows.length}곳 / 넣어 둔 ${VISITOR.length}곳`
+
+  // ── 한국 관 자료 마리나 (해양수산부 「전국 마리나 현황」 71곳)
+  //   ★ 이순신·원형처럼 실제로 운영 중인데 앱에 없던 곳이 여기로 들어온다.
+  console.log('관 자료 마리나에 자리를 붙입니다 — ' + KRGOV.length + '곳.');
+  let 관마리나 = { rows: [], 못찾음: [], 어디서: {} };
+  try{ 관마리나 = await 한국관마리나(마리나.kr); }
+  catch(e){ console.error('★ 관 자료 마리나 실패:', e && e.message || e); }
+  console.log('   자리를 찾은 곳 ' + 관마리나.rows.length + '곳'
+    + (관마리나.못찾음.length ? ' · 못 찾은 곳 ' + 관마리나.못찾음.length + '곳' : ''));
+
+  // ── 한국 꾸러미 (관 자료 + 지도가 마리나라고 부르는 곳)
+  //   ★ 앱 안의 152곳과 겹치는 것은 **앱이** 걸러낸다. 여기서는 앱이 무엇을 들고 있는지
+  //     알 수 없다 — 두 군데서 정하면 반드시 어긋난다 (사장님이 정하신 것 3번).
+  //   ★ 관 자료가 먼저다. 같은 이름이 지도 훑기에도 있으면 관 자료 줄만 남긴다.
+  const 관이름 = new Set(관마리나.rows.map(x => 이름씻기(x.n)));
+  const krRows = 관마리나.rows.concat(마리나.kr.filter(x => !관이름.has(이름씻기(x.n))));
+  const kr = Object.assign(머리(KRGOV_SRC + ' · ' + OSM_FROM, {
+    관자료넣어둔곳: KRGOV.length,
+    관자료실린곳: 관마리나.rows.length,
+    관자료자리못찾음: 관마리나.못찾음,
+    관자료자리어디서: 관마리나.어디서,
+    마리나훑은수: Object.fromEntries(Object.entries(마리나샘).filter(([k]) => k.startsWith('kr:'))),
+    마리나실린수: { kr: 마리나.kr.length },
+    적바림: '관 자료는 운영 중 72곳이라 적혀 있는데 여덟 쪽에서 71곳을 읽었습니다.'
+  }), { rows: krRows });
+  fs.writeFileSync('spots-kr.json', JSON.stringify(kr));
+
+  // ★ 일감(jp.yml)은 `git add app/spots-jp.json` 한 줄뿐이다. 그 파일은 .github 안에 있어
+  //   내가 못 고친다. 그러니 새로 만든 파일은 **내가 담는다** — 사장님께 일을 더 시키지 않는다.
+  try{
+    const { execFileSync } = require('child_process');
+    execFileSync('git', ['add', '-A', '--', 'spots-kr.json'], { stdio:'ignore' });
+  }catch(_){}
+
+  // ── 해상 예보구 경계 (気象庁 해상경보를 「내 해역」 으로 가리기 위한 것)
+  //   ★ 이것이 안 되어도 정박지 자료는 이미 다 썼다. 여기서 멈추면 안 된다.
+  try{ await 해역경계(); }catch(e){ console.error('★ 해상 예보구 경계 실패:', e && e.message || e); }
+
+  console.log(`만들었습니다 — 일본 ${jpRows.length}곳 (관 자료 ${rows.length} + 마리나 ${마리나.jp.length})`
+    + ` · 한국 마리나 ${krRows.length}곳 (관 자료 ${관마리나.rows.length} + 지도 훑기 ${krRows.length - 관마리나.rows.length})`
+    + (겹침.length ? `\n관 자료와 겹쳐서 뺀 것 ${겹침.length}곳` : '')
     + (loose.length ? `\n무르게 맞춘 것 ${loose.length}건 (눈으로 한 번 봐 주십시오):\n  ` + loose.join('\n  ') : '')
-    + (miss.length ? `\n못 찾음 ${miss.length}건 (spots-jp.json 의 「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : ''));
+    + (miss.length ? `\n관 자료 중 못 찾음 ${miss.length}건 (「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

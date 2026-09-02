@@ -19,11 +19,23 @@
 .mapbox svg.mov{position:absolute;left:0;top:0;pointer-events:none}
 .mapbox .mdot{position:absolute;width:12px;height:12px;border-radius:50%;
   transform:translate(-50%,-50%);border:2px solid #0e1620;pointer-events:none}
+/* ★ 이름표도 손가락을 받는다 — 핀은 26px 인데 이름은 그 몇 배다.
+   사람은 작은 동그라미보다 이름을 누른다. 눌리는 자리를 이름까지 넓힌다. */
 .mapbox .mlbl{position:absolute;font-size:11px;color:#fff;white-space:nowrap;
-  text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none}
+  text-shadow:0 0 3px #000,0 0 3px #000;pointer-events:none;cursor:pointer}
+.mapbox .mlbl[data-key]{pointer-events:auto}
 .mapbox .mgpin{position:absolute;transform:translate(-50%,-100%);pointer-events:none;
   filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
 .mapbox .mzoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:6}
+/* 고른 자리로 돌아가는 띠 — 카카오·네이버가 고른 곳을 띠로 보여 주는 그 자리다 */
+.mapbox .mhotbar{position:absolute;left:8px;bottom:26px;z-index:6;max-width:calc(100% - 70px)}
+.mapbox .mhot{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  min-height:38px;padding:8px 13px;border-radius:9px;border:1px solid #2A3B4C;
+  background:rgba(11,16,23,.88);color:#DFE6EE;font-size:13.5px;font-weight:600;cursor:pointer}
+/* 지금 있는 자리 */
+.mapbox .mme{position:absolute;width:14px;height:14px;border-radius:50%;
+  transform:translate(-50%,-50%);background:#4EA8F5;border:2px solid #fff;
+  box-shadow:0 0 0 6px rgba(78,168,245,.25);pointer-events:none;z-index:2}
 .mapbox .mzoom button{width:44px;height:44px;border-radius:10px;border:1px solid #2A3B4C;
   background:rgba(11,16,23,.82);color:#DFE6EE;font-size:18px;line-height:1;cursor:pointer}
 .mapbox .mattr{position:absolute;left:6px;bottom:4px;font-size:11px;color:#9BB0C4;
@@ -1589,6 +1601,10 @@ body.panelfull #panel .ph{padding-top:0}
 .wxbox.warn{background:rgba(228,117,106,.13);border:none;
   box-shadow:inset 0 0 0 1px rgba(228,117,106,.34)}
 .wxbox.warn b{color:#F0958C}
+/* 일본 해상경보 한 줄 — 海の安全情報 처럼 「해역 │ 현상」 을 크게, 기준은 작게 */
+.jwz{margin-top:6px;font-size:15px;line-height:1.45}
+.jwz b{font-weight:700}
+.jwsub{font-size:12px;color:var(--tm);line-height:1.5;margin-bottom:2px}
 .wxfoot{color:var(--tm)}
 .wxfoot a{color:var(--ac)}
 .qres{background:rgba(255,255,255,.045);border-radius:14px}
@@ -4532,6 +4548,75 @@ const I18N = {
     '항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?':'Count the engine as running for the whole passage and enter {h} hours?',
     '해상 특보':'Marine warnings',
     '해상 특보 발효 중':'Marine warning in force',
+    '일본 기상청에서 실시간 확인':'Check live at the Japan Meteorological Agency',
+    '출처 — 일본 기상청(気象庁) 해상경보 · 해역 경계는 기상청 예보구 자료':'Source — JMA marine warnings; sea areas from JMA forecast-area data',
+    '일본 기상청 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'Could not fetch the JMA marine warnings just now — please check them directly below',
+    '이 해역에 발효 중인 일본 해상경보 없음':'No JMA marine warning in force for these waters',
+    '다른 해역 {n}구역 발효 중':'{n} other areas under warning',
+    '읽음':'Read',
+    '최대풍속 64노트 이상':'max wind 64 kt or more',
+    '최대풍속 48노트 이상':'max wind 48 kt or more',
+    '강풍':'Gale',
+    '태풍':'Typhoon',
+    '위치를 확인하지 못했습니다.':'Could not get your position.',
+    '일본 해상경보':'JMA marine warnings',
+    '일본 해상경보 발효 중':'JMA marine warning in force',
+    '동해 북부 및 오호츠크해 남부':'Northern Sea of Japan (East Sea) and southern Sea of Okhotsk',
+    '사할린 동쪽 해상':'Sea east of Sakhalin',
+    '사할린 서쪽 해상':'Sea west of Sakhalin',
+    '아바시리 앞바다':'Sea off Abashiri',
+    '소야 해협':'Soya Strait',
+    '홋카이도 서쪽 해상':'Sea west of Hokkaido',
+    '홋카이도 남쪽 및 동쪽 해상':'Seas south and east of Hokkaido',
+    '홋카이도 동쪽 해상':'Sea east of Hokkaido',
+    '구시로 앞바다':'Sea off Kushiro',
+    '히다카 앞바다':'Sea off Hidaka',
+    '쓰가루 해협':'Tsugaru Strait',
+    '히야마·쓰가루 앞바다':'Sea off Hiyama and Tsugaru',
+    '산리쿠 앞바다':'Sea off Sanriku',
+    '산리쿠 앞바다 동부':'Eastern sea off Sanriku',
+    '산리쿠 앞바다 서부':'Western sea off Sanriku',
+    '간토 해역':'Kanto sea area',
+    '간토 해역 북부':'Northern Kanto sea area',
+    '간토 해역 남부':'Southern Kanto sea area',
+    '동해 중부':'Central Sea of Japan (East Sea)',
+    '연해주 남부 앞바다':'Sea off southern Primorye',
+    '아키타 앞바다':'Sea off Akita',
+    '사도 앞바다':'Sea off Sado',
+    '노토 앞바다':'Sea off Noto',
+    '도카이 해역':'Tokai sea area',
+    '도카이 해역 동부':'Eastern Tokai sea area',
+    '도카이 해역 서부':'Western Tokai sea area',
+    '도카이 해역 남부':'Southern Tokai sea area',
+    '시코쿠 앞바다 및 세토 내해':'Sea off Shikoku and the Seto Inland Sea',
+    '세토 내해':'Seto Inland Sea',
+    '시코쿠 앞바다 북부':'Northern sea off Shikoku',
+    '시코쿠 앞바다 남부':'Southern sea off Shikoku',
+    '동해 서부':'Western Sea of Japan (East Sea)',
+    '동해 북서부':'Northwestern Sea of Japan (East Sea)',
+    '산인 앞바다 동부 및 와카사만 부근':'Eastern sea off San\'in and around Wakasa Bay',
+    '산인 앞바다 서부':'Western sea off San\'in',
+    '쓰시마 해협':'Tsushima Strait',
+    '규슈 서쪽 해상':'Sea west of Kyushu',
+    '제주도 서쪽 해상':'Sea west of Jeju Island',
+    '나가사키 서쪽 해상':'Sea west of Nagasaki',
+    '메시마 남서쪽 해상':'Sea southwest of Meshima',
+    '규슈 남쪽 해상 및 휴가나다':'Sea south of Kyushu and Hyuganada',
+    '휴가나다':'Hyuganada',
+    '가고시마 해역':'Kagoshima sea area',
+    '아마미 해역':'Amami sea area',
+    '오키나와 해역':'Okinawa sea area',
+    '동중국해 남부':'Southern East China Sea',
+    '오키나와 동쪽 해상':'Sea east of Okinawa',
+    '오키나와 남쪽 해상':'Sea south of Okinawa',
+    '내 배 자리 {r}':'Your boat is in {r}',
+    '폭풍':'Storm',
+    '짙은 안개':'Dense fog',
+    '착빙':'Icing',
+    '너울':'Swell',
+    '최대풍속 34~47노트':'max wind 34-47 kt',
+    '최대풍속 28~33노트':'max wind 28-33 kt',
+    '시정 0.3해리(약 500m) 이하 · 세토 내해는 0.5해리(약 1km) 이하':'visibility 0.3 nm (about 500 m) or less; 0.5 nm in the Seto Inland Sea',
     '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Tap the <b>Share</b> button<span class="insico">⬆︎</span> at the <b>bottom centre</b> of the screen (a square with an arrow pointing up)',
   
 
@@ -7155,6 +7240,75 @@ const I18N = {
     '항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?':'Считать, что двигатель работал весь переход, и записать {h} ч?',
     '해상 특보':'Штормовые предупреждения',
     '해상 특보 발효 중':'Действует штормовое предупреждение',
+    '일본 기상청에서 실시간 확인':'Проверить на сайте Метеоагентства Японии',
+    '출처 — 일본 기상청(気象庁) 해상경보 · 해역 경계는 기상청 예보구 자료':'Источник — морские предупреждения JMA; границы районов — данные JMA',
+    '일본 기상청 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'Сейчас не удалось получить морские предупреждения JMA — проверьте их напрямую ниже',
+    '이 해역에 발효 중인 일본 해상경보 없음':'Для этой акватории действующих предупреждений JMA нет',
+    '다른 해역 {n}구역 발효 중':'предупреждения ещё в {n} районах',
+    '읽음':'Прочитано',
+    '최대풍속 64노트 이상':'макс. ветер от 64 узлов',
+    '최대풍속 48노트 이상':'макс. ветер от 48 узлов',
+    '강풍':'Штормовой ветер',
+    '태풍':'Тайфун',
+    '위치를 확인하지 못했습니다.':'Не удалось определить местоположение.',
+    '일본 해상경보':'Морские предупреждения JMA',
+    '일본 해상경보 발효 중':'Действует морское предупреждение JMA',
+    '동해 북부 및 오호츠크해 남부':'Северная часть Японского моря (Восточного моря) и юг Охотского моря',
+    '사할린 동쪽 해상':'Море к востоку от Сахалина',
+    '사할린 서쪽 해상':'Море к западу от Сахалина',
+    '아바시리 앞바다':'Море у Абасири',
+    '소야 해협':'Пролив Лаперуза',
+    '홋카이도 서쪽 해상':'Море к западу от Хоккайдо',
+    '홋카이도 남쪽 및 동쪽 해상':'Моря к югу и востоку от Хоккайдо',
+    '홋카이도 동쪽 해상':'Море к востоку от Хоккайдо',
+    '구시로 앞바다':'Море у Кусиро',
+    '히다카 앞바다':'Море у Хидака',
+    '쓰가루 해협':'Сангарский пролив',
+    '히야마·쓰가루 앞바다':'Море у Хиямы и Цугару',
+    '산리쿠 앞바다':'Море у Санрику',
+    '산리쿠 앞바다 동부':'Восточная часть моря у Санрику',
+    '산리쿠 앞바다 서부':'Западная часть моря у Санрику',
+    '간토 해역':'Акватория Канто',
+    '간토 해역 북부':'Северная акватория Канто',
+    '간토 해역 남부':'Южная акватория Канто',
+    '동해 중부':'Центральная часть Японского моря (Восточного моря)',
+    '연해주 남부 앞바다':'Море у юга Приморья',
+    '아키타 앞바다':'Море у Акиты',
+    '사도 앞바다':'Море у Садо',
+    '노토 앞바다':'Море у Ното',
+    '도카이 해역':'Акватория Токай',
+    '도카이 해역 동부':'Восточная акватория Токай',
+    '도카이 해역 서부':'Западная акватория Токай',
+    '도카이 해역 남부':'Южная акватория Токай',
+    '시코쿠 앞바다 및 세토 내해':'Море у Сикоку и Внутреннее Японское море',
+    '세토 내해':'Внутреннее Японское море',
+    '시코쿠 앞바다 북부':'Северная часть моря у Сикоку',
+    '시코쿠 앞바다 남부':'Южная часть моря у Сикоку',
+    '동해 서부':'Западная часть Японского моря (Восточного моря)',
+    '동해 북서부':'Северо-западная часть Японского моря (Восточного моря)',
+    '산인 앞바다 동부 및 와카사만 부근':'Восточная часть моря у Санин и район залива Вакаса',
+    '산인 앞바다 서부':'Западная часть моря у Санин',
+    '쓰시마 해협':'Цусимский пролив',
+    '규슈 서쪽 해상':'Море к западу от Кюсю',
+    '제주도 서쪽 해상':'Море к западу от острова Чеджу',
+    '나가사키 서쪽 해상':'Море к западу от Нагасаки',
+    '메시마 남서쪽 해상':'Море к юго-западу от Месимы',
+    '규슈 남쪽 해상 및 휴가나다':'Море к югу от Кюсю и Хюганада',
+    '휴가나다':'Хюганада',
+    '가고시마 해역':'Акватория Кагосима',
+    '아마미 해역':'Акватория Амами',
+    '오키나와 해역':'Акватория Окинава',
+    '동중국해 남부':'Южная часть Восточно-Китайского моря',
+    '오키나와 동쪽 해상':'Море к востоку от Окинавы',
+    '오키나와 남쪽 해상':'Море к югу от Окинавы',
+    '내 배 자리 {r}':'Судно находится в районе {r}',
+    '폭풍':'Шторм',
+    '짙은 안개':'Густой туман',
+    '착빙':'Обледенение',
+    '너울':'Зыбь',
+    '최대풍속 34~47노트':'макс. ветер 34-47 узлов',
+    '최대풍속 28~33노트':'макс. ветер 28-33 узла',
+    '시정 0.3해리(약 500m) 이하 · 세토 내해는 0.5해리(약 1km) 이하':'видимость 0,3 мили (около 500 м) и менее; во Внутреннем Японском море — 0,5 мили',
     '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'Нажмите кнопку <b>Поделиться</b><span class="insico">⬆︎</span> <b>внизу по центру</b> экрана (квадрат со стрелкой вверх)',
   
 
@@ -9782,6 +9936,75 @@ const I18N = {
     '항해 내내 엔진을 켠 것으로 보고 {h}시간으로 넣을까요?':'航海中ずっとエンジンをかけていたものとして {h}時間で入力しますか？',
     '해상 특보':'海上警報・注意報',
     '해상 특보 발효 중':'海上警報・注意報 発表中',
+    '일본 기상청에서 실시간 확인':'気象庁でリアルタイム確認',
+    '출처 — 일본 기상청(気象庁) 해상경보 · 해역 경계는 기상청 예보구 자료':'出典 — 気象庁 海上警報・海域は気象庁 予報区等GISデータ',
+    '일본 기상청 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'気象庁の海上警報を今は受け取れませんでした — 下でご確認ください',
+    '이 해역에 발효 중인 일본 해상경보 없음':'この海域に発表中の海上警報はありません',
+    '다른 해역 {n}구역 발효 중':'ほかの海域 {n}区域で発表中',
+    '읽음':'取得',
+    '최대풍속 64노트 이상':'最大風速64ノット以上',
+    '최대풍속 48노트 이상':'最大風速48ノット以上',
+    '강풍':'強風',
+    '태풍':'台風',
+    '위치를 확인하지 못했습니다.':'現在地を確認できませんでした。',
+    '일본 해상경보':'海上警報',
+    '일본 해상경보 발효 중':'海上警報 発表中',
+    '동해 북부 및 오호츠크해 남부':'日本海北部及びオホーツク海南部',
+    '사할린 동쪽 해상':'サハリン東方海上',
+    '사할린 서쪽 해상':'サハリン西方海上',
+    '아바시리 앞바다':'網走沖',
+    '소야 해협':'宗谷海峡',
+    '홋카이도 서쪽 해상':'北海道西方海上',
+    '홋카이도 남쪽 및 동쪽 해상':'北海道南方及び東方海上',
+    '홋카이도 동쪽 해상':'北海道東方海上',
+    '구시로 앞바다':'釧路沖',
+    '히다카 앞바다':'日高沖',
+    '쓰가루 해협':'津軽海峡',
+    '히야마·쓰가루 앞바다':'檜山津軽沖',
+    '산리쿠 앞바다':'三陸沖',
+    '산리쿠 앞바다 동부':'三陸沖東部',
+    '산리쿠 앞바다 서부':'三陸沖西部',
+    '간토 해역':'関東海域',
+    '간토 해역 북부':'関東海域北部',
+    '간토 해역 남부':'関東海域南部',
+    '동해 중부':'日本海中部',
+    '연해주 남부 앞바다':'沿海州南部沖',
+    '아키타 앞바다':'秋田沖',
+    '사도 앞바다':'佐渡沖',
+    '노토 앞바다':'能登沖',
+    '도카이 해역':'東海海域',
+    '도카이 해역 동부':'東海海域東部',
+    '도카이 해역 서부':'東海海域西部',
+    '도카이 해역 남부':'東海海域南部',
+    '시코쿠 앞바다 및 세토 내해':'四国沖及び瀬戸内海',
+    '세토 내해':'瀬戸内海',
+    '시코쿠 앞바다 북부':'四国沖北部',
+    '시코쿠 앞바다 남부':'四国沖南部',
+    '동해 서부':'日本海西部',
+    '동해 북서부':'日本海北西部',
+    '산인 앞바다 동부 및 와카사만 부근':'山陰沖東部及び若狭湾付近',
+    '산인 앞바다 서부':'山陰沖西部',
+    '쓰시마 해협':'対馬海峡',
+    '규슈 서쪽 해상':'九州西方海上',
+    '제주도 서쪽 해상':'済州島西海上',
+    '나가사키 서쪽 해상':'長崎西海上',
+    '메시마 남서쪽 해상':'女島南西海上',
+    '규슈 남쪽 해상 및 휴가나다':'九州南方海上及び日向灘',
+    '휴가나다':'日向灘',
+    '가고시마 해역':'鹿児島海域',
+    '아마미 해역':'奄美海域',
+    '오키나와 해역':'沖縄海域',
+    '동중국해 남부':'東シナ海南部',
+    '오키나와 동쪽 해상':'沖縄東方海上',
+    '오키나와 남쪽 해상':'沖縄南方海上',
+    '내 배 자리 {r}':'船の位置は{r}',
+    '폭풍':'暴風',
+    '짙은 안개':'濃霧',
+    '착빙':'着氷',
+    '너울':'うねり',
+    '최대풍속 34~47노트':'最大風速34ノット以上48ノット未満',
+    '최대풍속 28~33노트':'最大風速28ノット以上34ノット未満',
+    '시정 0.3해리(약 500m) 이하 · 세토 내해는 0.5해리(약 1km) 이하':'視程0.3海里（約500m）以下・瀬戸内海は0.5海里（約1km）以下',
     '화면 <b>아래쪽 가운데</b>의 <b>공유</b> 단추<span class="insico">⬆︎</span> 를 누릅니다 (네모에서 화살표가 위로 나온 그림)':'画面 <b>下の中央</b> にある <b>共有</b> ボタン<span class="insico">⬆︎</span> を押します（四角から矢印が上に出た絵）',
     '보내는 중…':'送信中…',
     '앱이 스스로 잡은 오류입니다.':'アプリが自動で検知したエラーです。',
@@ -19928,7 +20151,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.99';
+const APP_VER = '4.100';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29291,9 +29514,21 @@ function spotPackLoadLocal(){
     }catch(_){}
   });
 }
-// 받아 온다. 한 번 받으면 다시 안 받는다 — 정박지 자료는 자주 안 바뀐다.
+// ★★★ 5.00 — 받아 둔 것이 **영영 안 바뀌던 것**을 고쳤다 (사장님 지적)
+//
+//   사장님 말씀: "어플에는 일본 정박지수가 컴퓨터 브라우저에 나오는것보다 더 적게 나오는거 같은데"
+//
+//   ★ 무엇이 잘못이었나 — 여기 첫 줄이 `if(spotPackRows[pk.k]) return;` 이었다.
+//     바로 앞에서 spotPackLoadLocal() 이 기기에 남겨 둔 것을 이미 채워 넣는다.
+//     그래서 **한 번 받아 본 기기는 그 뒤로 새 자료를 한 번도 안 받았다.**
+//     폰에는 옛 22곳이 굳어 있고, 지운 적 있는 브라우저에는 새것이 들어간 것이다.
+//     「정박지 자료는 자주 안 바뀐다」 고 적어 두었는데, 그게 내 짐작이었다 —
+//     자료는 달마다 다시 만들어지고, 이번에는 관 자료 71곳이 통째로 늘어난다.
+//
+//   ★ 기기에 남겨 둔 것은 **화면을 바로 띄우기 위한 것**이다. 받아오기는 늘 한다.
+//     받으면 갈아 끼운다. 못 받으면 남겨 둔 것을 그대로 쓴다 (바다에서 인터넷이 없다).
 async function spotPackGet(pk){
-  if(!pk || spotPackRows[pk.k] || spotPackTried[pk.k]) return;
+  if(!pk || spotPackTried[pk.k]) return;   // 앱을 켤 때 한 번만 받는다
   spotPackTried[pk.k] = true;
   try{
     const r = await fetch(DATA_BASE + pk.file + '?v=' + Date.now(), { cache:'no-store' });
@@ -31544,7 +31779,17 @@ function mapPaint(full){
   let TL = el.querySelector('.mtl'), OL = el.querySelector('.mol');
   if(!TL || !OL){
     el.innerHTML = `<div class="mtl"></div><div class="mol"></div>`
-      + `<div class="mzoom"><button onclick="mapZoom(1)">+</button><button onclick="mapZoom(-1)">−</button></div>`
+      + `<div class="mzoom">`
+        + `<button onclick="mapZoom(1)" aria-label="${esc(t('확대'))}" title="${esc(t('확대'))}">+</button>`
+        + `<button onclick="mapZoom(-1)" aria-label="${esc(t('축소'))}" title="${esc(t('축소'))}">−</button>`
+        // ★★★ 5.00 — 「막 돌리다 딴 데로 가 버린다」 (사장님 지적)
+        //   지도 앱들이 다 같은 자리에 두는 단추 둘이다.
+        //   ◎ 현재 위치 (구글·카카오·네이버가 쓰는 그 표시) · ⤢ 전체 보기 (앱의 도면 지도가 이미 쓰는 말)
+        //   ★ 말을 지어내지 않았다. 둘 다 앱 사전에 이미 있는 말이다.
+        + `<button onclick="mapHere()" aria-label="${esc(t('현재 위치'))}" title="${esc(t('현재 위치'))}">◎</button>`
+        + `<button onclick="mapFit()" aria-label="${esc(t('전체 보기'))}" title="${esc(t('전체 보기'))}">⤢</button>`
+      + `</div>`
+      + `<div class="mhotbar"></div>`
       + `<div class="mattr">© OpenSeaMap · © OpenStreetMap</div>`;
     TL = el.querySelector('.mtl'); OL = el.querySelector('.mol');
     S.anchor = { cx:S.cx, cy:S.cy };   // 층을 채운 시점의 중심
@@ -31677,7 +31922,7 @@ function mapPaint(full){
       const fy = 자리잡기(sx(p) - (lab.length * 7 + 10) / 2, sy(p) - 30, lab.length);
       // 깃발은 아래끝이 점에 닿는다(translate -100%). 그러니 「자리 잡은 윗변 + 깃발 높이」 가 닿을 자리다.
       h += `<div class="mflag${on}" style="left:${sx(p).toFixed(1)}px;top:${(fy + 30).toFixed(1)}px"
-              onclick="mapFlagTap('${esc(p.key)}')"><div class="fl">${esc(lab)}</div><div class="st"></div></div>`;
+              data-tap="flag" data-key="${esc(p.key)}"><div class="fl">${esc(lab)}</div><div class="st"></div></div>`;
       h += `<div class="mdot" style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px;background:${c}"></div>`;
       return;
     }
@@ -31686,8 +31931,8 @@ function mapPaint(full){
     if(String(p.key||'').indexOf('spot:') === 0){
       h += `<div class="mpin${S.hot === p.key ? ' sel' : ''}"
               style="left:${sx(p).toFixed(1)}px;top:${sy(p).toFixed(1)}px"
-              onclick="mapSpotTap('${esc(p.key)}')">⚓</div>`;
-      if(p.label) h += `<div class="mlbl" style="left:${(sx(p)+14).toFixed(1)}px;top:${
+              data-tap="spot" data-key="${esc(p.key)}">⚓</div>`;
+      if(p.label) h += `<div class="mlbl" data-tap="spot" data-key="${esc(p.key)}" style="left:${(sx(p)+14).toFixed(1)}px;top:${
         자리잡기(sx(p)+14, sy(p)-9, String(p.label).length).toFixed(1)}px">${esc(p.label)}</div>`;
       return;
     }
@@ -31699,12 +31944,75 @@ function mapPaint(full){
     if(lab) h += `<div class="mlbl" style="left:${(sx(p)+9).toFixed(1)}px;top:${
       자리잡기(sx(p)+9, sy(p)-9, lab.length).toFixed(1)}px">${esc(lab)}</div>`;
   });
+  // ★ 지금 있는 자리 — 「현재 위치」 를 누르면 여기가 어디였는지 남는다
+  if(S.me && isFinite(S.me.lat) && isFinite(S.me.lon)){
+    h += `<div class="mme" style="left:${sx(S.me).toFixed(1)}px;top:${sy(S.me).toFixed(1)}px"></div>`;
+  }
   if(S.pick){
     h += `<div class="mgpin" style="left:${sx(S.pick).toFixed(1)}px;top:${sy(S.pick).toFixed(1)}px">
       <svg width="28" height="36" viewBox="0 0 26 34"><path d="M13 34C13 34 25 19.5 25 12A12 12 0 1 0 1 12c0 7.5 12 22 12 22z"
         fill="#ff5a3c" stroke="#fff" stroke-width="2.2"/></svg></div>`;
   }
   OL.innerHTML = h;
+  // 고른 자리로 돌아가는 띠 — 겹침층 밖에 둔다(층은 끌 때마다 통째로 밀린다)
+  const HB = el.querySelector('.mhotbar');
+  if(HB) HB.innerHTML = mapHotBar();
+}
+
+// ★★★ 5.00 — 지도에서 길을 잃지 않게 (사장님 지적)
+//   "모든 지도에 현위치로 돌아가는 버튼이 필요한거 같다. 이게 없으니까 막 돌리니까 딴대로 가버린다"
+//   "정박지 지도같은경우엔 지금 선택한 마리나로 돌아가게 하는 버튼도 있어야 하고"
+//
+// ★ 말은 지어내지 않았다 — 「현재 위치」·「전체 보기」 둘 다 앱 사전에 이미 있던 말이다.
+//   고른 자리로 돌아가는 것은 **그 자리 이름을 단 띠**로 만들었다.
+//   카카오·네이버 지도가 고른 곳을 띠로 보여 주고 누르면 그리로 돌아가는 그 방식이다.
+//   이러면 내가 새로 이름 붙일 것이 아예 없다.
+
+// 지도를 어느 자리로 옮긴다 (배율은 그대로)
+function mapGo(lat, lon, z){
+  const S = mapS; if(!S) return;
+  if(!isFinite(lat) || !isFinite(lon)) return;
+  if(z) S.z = Math.max(3, Math.min(17, z));
+  S.cx = MERC.x(lon, S.z); S.cy = MERC.y(lat, S.z);
+  S.anchor = { cx:S.cx, cy:S.cy };
+  mapPaint(true);
+}
+// 처음 잡아 준 자리로 (점이 다 보이는 배율)
+function mapFit(){
+  const S = mapS; if(!S) return;
+  const el = document.getElementById(S.elId); if(!el) return;
+  const pts = (S.line && S.line.length) ? S.pts.concat(S.line) : S.pts;
+  const v = fitView(pts || [], el.clientWidth || 320, el.clientHeight || 260);
+  S.z = v.z; S.cx = v.cx; S.cy = v.cy;
+  S.anchor = { cx:S.cx, cy:S.cy };
+  mapPaint(true);
+}
+// 지금 있는 자리로.
+// ★ 위치를 읽는 문은 앱에 하나뿐이다(geoGet). 여기서 따로 부르지 않는다.
+function mapHere(){
+  if(!mapS) return;
+  geoGet('지도에서 현재 위치 보기',
+    p => {
+      const la = p && p.coords && p.coords.latitude, lo = p && p.coords && p.coords.longitude;
+      if(!isFinite(la) || !isFinite(lo)){ tell(t('위치를 확인하지 못했습니다.')); return; }
+      mapS.me = { lat:la, lon:lo };
+      mapGo(la, lo, Math.max(mapS.z, 13));
+    },
+    () => tell(t('위치를 확인하지 못했습니다.')),
+    { enableHighAccuracy:true, timeout:10000, maximumAge:15000 });
+}
+// 고른 자리로 돌아가는 띠 — 자리 이름을 그대로 단추에 적는다
+function mapHotBar(){
+  const S = mapS;
+  if(!S || !S.hot) return '';
+  const p = (S.pts || []).find(x => x && x.key === S.hot);
+  if(!p || p.lat == null || p.lon == null || !p.label) return '';
+  return `<button class="mhot" onclick="mapBackToHot()">⚓ ${esc(p.label)}</button>`;
+}
+function mapBackToHot(){
+  const S = mapS; if(!S || !S.hot) return;
+  const p = (S.pts || []).find(x => x && x.key === S.hot);
+  if(p) mapGo(p.lat, p.lon, Math.max(S.z, 13));
 }
 
 function mapZoom(d){
@@ -31763,11 +32071,33 @@ function mapBind(el){
     const wasDrag = drag; drag = null;
     if(!mapS) return;
     mapS.dragging = false;
+    // ★★★ 5.00 — 정박지 핀이 왜 안 눌렸나 (사장님이 두 번 지적하신 것)
+    //
+    //   ① 손가락을 붙잡아 둔다 (setPointerCapture). 붙잡는 동안 브라우저는
+    //      click 을 붙잡은 쪽(지도)에 보낸다. 핀에는 안 간다.
+    //   ② 게다가 바로 아래 mapPaint() 가 겹침층을 통째로 새로 그린다.
+    //      눌린 핀이 그 순간 사라지므로 브라우저는 click 을 보낼 곳을 잃는다.
+    //   ★ 그래서 4.99 에서 pointer-events 를 되살렸는데도 여전히 안 눌렸다.
+    //     보이는 것만 고치고 손가락이 오는 길은 안 고쳤다. 내 잘못이다.
+    //
+    //   ★ 이제 **다시 그리기 전에** 손가락 밑에 무엇이 있었는지 먼저 보고,
+    //     그것을 여기서 직접 연다. 부르는 곳은 여기 하나다 (문 하나).
+    const 탭 = !!wasDrag && moved < 6;
+    let 맞은것 = null;
+    if(탭){
+      const 밑 = document.elementFromPoint(e.clientX, e.clientY);
+      const hit = 밑 && 밑.closest ? 밑.closest('[data-tap]') : null;
+      if(hit) 맞은것 = { how: hit.getAttribute('data-tap'), key: hit.getAttribute('data-key') };
+    }
     mapPaint();          // 손을 뗐다 — 새 위치의 타일을 채운다
     if(!wasDrag) return;
     // 거의 안 움직였으면 탭으로 본다
     if(moved >= 6) return;
-    if(e.target && e.target.closest && e.target.closest('.mflag,.mpin')) return;   // 깃발·핀은 제 일이 있다
+    if(맞은것 && 맞은것.key){
+      if(맞은것.how === 'spot') mapSpotTap(맞은것.key);
+      else if(맞은것.how === 'flag') mapFlagTap(맞은것.key);
+      return;
+    }
     const el2 = document.getElementById(mapS.elId);
     const W = el2.clientWidth, H = el2.clientHeight;
     const q = pt(e);
@@ -34643,6 +34973,12 @@ function myWarnings(){
 // 특보가 바뀌었는지 보는 셈. ★ 한 곳에만 둔다 —
 // 화면·알림·본 표시가 저마다 세면 늘 한 곳만 고쳐져 어긋났다.
 function wxKeyOf(k){
+  // ★★★ 일본 해역에 있는 배는 일본 경보가 그 배의 특보다. 여기서 같이 세지 않으면
+  //   화면에는 뜨는데 알림 점은 안 켜진다 — 두 곳이 어긋나는 그 흠이다.
+  //   ★ 어느 나라 것을 셀지는 화면과 **똑같은 문**(seaMine)에서 갈린다.
+  //     여기서 따로 가르면, 일본 바다에 있는 배에 한국 특보로 점이 켜진다.
+  if(typeof seaMine === 'function' && seaMine())
+    return 'jp:' + ((typeof jwKeyOf === 'function') ? jwKeyOf(jwCache) : '');
   const wx = k && k.wx;
   if(!wx) return '';
   if(Array.isArray(wx.zones)){
@@ -34652,7 +34988,246 @@ function wxKeyOf(k){
   }
   return (wx.active || []).join('|');
 }
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 일본 해상경보 (気象庁) — 5.00
+//
+// ★ 무엇을 고치는 것인가
+//   4.97 부터 배가 한국 해역 밖에 있으면 「그 나라 기상 기관에서 확인해 주세요」
+//   한 줄로 끝났다. 거짓말은 아니지만, 세토내해에 배를 댄 사람에게는
+//   **아무것도 안 해 주는 화면**이다. 이제 気象庁 해상경보를 그대로 가져다 보여 준다.
+//
+// ★ 자료가 오는 길
+//   앱 → https://baetnil.com/app/warn-jp.json → (워커가 그 자리에서) 気象庁 防災情報XML
+//   ★ 파일로 구워 두지 않는다. 해상경보는 여섯 시간마다, 험해지면 그 사이에도 나온다.
+//
+// ★ 「내 해역」 을 어떻게 아나
+//   気象庁이 낸 「地方海上予報区」 경계(app/sea-jp.json)를 받아 배 자리가 어느
+//   예보구에 드는지 본다. 경계 자료가 없으면 **아무 말도 안 한다** —
+//   어느 해역인지 모르면서 남의 해역 경보를 보여 주는 것이 제일 나쁘다.
+//
+// ★ 出典 — 気象庁 防災情報XML (政府標準利用規約) ·
+//   地方海上予報区 경계는 気象庁 予報区等GISデータ / Geoshape (CC BY 4.0).
+//   화면에서 이 줄을 빼면 못 쓴다.
+let seaJP = null, seaJPTried = false;
+async function loadSeaJP(){
+  if(seaJPTried) return seaJP;
+  seaJPTried = true;
+  try{
+    const r = await fetch(DATA_BASE + 'sea-jp.json', { cache:'default' });
+    if(r.ok) seaJP = await r.json();
+  }catch(e){}
+  return seaJP;
+}
+let jwCache = null, jwTried = false;
+async function loadJW(force){
+  if(jwTried && !force) return jwCache;
+  jwTried = true;
+  try{
+    const r = await fetch(DATA_BASE + 'warn-jp.json?v=' + Date.now(), { cache:'no-store' });
+    jwCache = r.ok ? await r.json() : { ok:false, why:'HTTP ' + r.status };
+  }catch(e){ jwCache = { ok:false, why:String(e && e.message || e) }; }
+  return jwCache;
+}
+
+// 점이 테두리 안에 드나 (ray casting). 테두리는 [경도, 위도] 차례다.
+function inRing(lon, lat, ring){
+  let inside = false;
+  for(let i = 0, j = ring.length - 1; i < ring.length; j = i++){
+    const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+    if(((yi > lat) !== (yj > lat)) &&
+       (lon < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi)) inside = !inside;
+  }
+  return inside;
+}
+// 이 자리가 어느 예보구인가.
+// ★ 테두리 안이면 그 해역이다.
+// ★ 테두리 밖이라도 그 해역 상자 안이면 그 해역으로 본다 —
+//   배를 대는 자리는 뭍이나 섬 가장자리라 바다 테두리에서 조금 벗어난다.
+//   여러 상자에 들면 **작은 상자**를 고른다. 넓은 상자는 언저리까지 다 삼킨다.
+// ★ 아무 상자에도 안 들면 null 이다. 모른다고 말한다.
+function seaAt(lat, lon){
+  if(!seaJP || !Array.isArray(seaJP.areas)) return null;
+  if(!isFinite(lat) || !isFinite(lon)) return null;
+  let box = null, boxSize = Infinity;
+  for(const a of seaJP.areas){
+    if(!a || !a.box || !Array.isArray(a.rings)) continue;
+    if(lat < a.box[0] || lat > a.box[2] || lon < a.box[1] || lon > a.box[3]) continue;
+    if(a.rings.some(r => inRing(lon, lat, r))) return a;
+    const size = (a.box[2] - a.box[0]) * (a.box[3] - a.box[1]);
+    if(size < boxSize){ boxSize = size; box = a; }
+  }
+  return box;
+}
+// 지금 보는 배가 든 예보구
+function seaMine(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b || b.lat == null || b.lon == null) return null;
+  if(typeof boatOutsideKR === 'function' && !boatOutsideKR()) return null;
+  return seaAt(Number(b.lat), Number(b.lon));
+}
+// ★★★ 경보를 어떻게 적나 — 남들이 해 놓은 것을 그대로 따른다 (사장님이 정하신 것 7번)
+//
+//   ① 海上保安庁 「海の安全情報」 — 배 타는 사람에게 알리는 것이 일인 곳이다.
+//      그 표는 칸이 둘뿐이다:  발표 해역 │ 발표 항목
+//      그리고 항목에서 「海上」 「警報」 을 다 떼고 **현상만** 적는다 — 風 · 強風 · 濃霧.
+//      그래서 우리도 현상을 앞에 크게 적는다. 「海上風警報」 라고 통으로 적지 않는다.
+//
+//   ② 気象庁은 같은 경보에 **영문 이름과 기호를 이미 정해 두었다**
+//      (気象庁 予報の解説 · 무선모사통보 영문 해상경보에서 쓰는 그 이름이다).
+//      네비텍스·영문 팩스에 그 글자가 그대로 찍히므로, 대조하실 수 있게 작게 남긴다.
+//
+//   ★ ko 는 한자 그대로의 우리말이다 (風→바람, 強風→강풍, 濃霧→짙은 안개).
+//     내가 새로 지어낸 이름이 아니다. 표에 없는 경보는 気象庁 이름을 그대로 낸다.
+//   ★ how 는 気象庁이 제 자료에 적어 둔 기준이다. 우리가 정한 값이 아니다.
+// ★★★ 해역 이름 — 気象庁 「地方海上予報区」 48곳을 네 말로 다 낸다 (사장님 지적, 5.00)
+//
+//   ★ 왜 사전에 태우나 — 처음에 일본어 이름을 그대로 냈다. 한국 사람도 러시아 사람도
+//     「四国沖南部」 를 못 읽는다. 경보를 보여 주면서 어디 바다인지 모르게 하면
+//     안 보여 준 것과 같다.
+//   ★ 気象庁은 이 예보구 이름을 영어로 안 낸다 (영문 해상경보는 먼바다 구역만 있다).
+//     그래서 관에서 가져다 쓸 영어 이름이 없다. 여기 이름은 그 바다의 통용 이름이다 —
+//     瀬戸内海=Seto Inland Sea, 対馬海峡=Korea Strait 처럼 이미 쓰이는 이름을 적었고,
+//     四国沖南部 처럼 「어디 앞바다의 어느 쪽」 인 이름은 그 뜻 그대로 옮겼다.
+//   ★ 日本海 는 우리말로 동해다. 영어·러시아어는 두 이름을 함께 적는다.
+//   ★★ 気象庁이 낸 원래 이름은 **아랫줄에 늘 그대로 남긴다.**
+//      気象庁 화면·네비텍스와 대조하실 때 이름이 달라지면 못 찾는다.
+//   ★ 이 표에 없는 이름이 오면 気象庁 글자를 그대로 낸다. 지어내지 않는다.
+const JMA_SEA = {
+  '日本海北部及びオホーツク海南部': '동해 북부 및 오호츠크해 남부',
+  'サハリン東方海上': '사할린 동쪽 해상',
+  'サハリン西方海上': '사할린 서쪽 해상',
+  '網走沖': '아바시리 앞바다',
+  '宗谷海峡': '소야 해협',
+  '北海道西方海上': '홋카이도 서쪽 해상',
+  '北海道南方及び東方海上': '홋카이도 남쪽 및 동쪽 해상',
+  '北海道東方海上': '홋카이도 동쪽 해상',
+  '釧路沖': '구시로 앞바다',
+  '日高沖': '히다카 앞바다',
+  '津軽海峡': '쓰가루 해협',
+  '檜山津軽沖': '히야마·쓰가루 앞바다',
+  '三陸沖': '산리쿠 앞바다',
+  '三陸沖東部': '산리쿠 앞바다 동부',
+  '三陸沖西部': '산리쿠 앞바다 서부',
+  '関東海域': '간토 해역',
+  '関東海域北部': '간토 해역 북부',
+  '関東海域南部': '간토 해역 남부',
+  '日本海中部': '동해 중부',
+  '沿海州南部沖': '연해주 남부 앞바다',
+  '秋田沖': '아키타 앞바다',
+  '佐渡沖': '사도 앞바다',
+  '能登沖': '노토 앞바다',
+  '東海海域': '도카이 해역',
+  '東海海域東部': '도카이 해역 동부',
+  '東海海域西部': '도카이 해역 서부',
+  '東海海域南部': '도카이 해역 남부',
+  '四国沖及び瀬戸内海': '시코쿠 앞바다 및 세토 내해',
+  '瀬戸内海': '세토 내해',
+  '四国沖北部': '시코쿠 앞바다 북부',
+  '四国沖南部': '시코쿠 앞바다 남부',
+  '日本海西部': '동해 서부',
+  '日本海北西部': '동해 북서부',
+  '山陰沖東部及び若狭湾付近': '산인 앞바다 동부 및 와카사만 부근',
+  '山陰沖西部': '산인 앞바다 서부',
+  '対馬海峡': '쓰시마 해협',
+  '九州西方海上': '규슈 서쪽 해상',
+  '済州島西海上': '제주도 서쪽 해상',
+  '長崎西海上': '나가사키 서쪽 해상',
+  '女島南西海上': '메시마 남서쪽 해상',
+  '九州南方海上及び日向灘': '규슈 남쪽 해상 및 휴가나다',
+  '日向灘': '휴가나다',
+  '鹿児島海域': '가고시마 해역',
+  '奄美海域': '아마미 해역',
+  '沖縄海域': '오키나와 해역',
+  '東シナ海南部': '동중국해 남부',
+  '沖縄東方海上': '오키나와 동쪽 해상',
+  '沖縄南方海上': '오키나와 남쪽 해상'
+};
+const JMA_KIND = {
+  '海上台風警報': { ko:'태풍',      en:'TYPHOON WARNING', sym:'TW',  how:'최대풍속 64노트 이상' },
+  '海上暴風警報': { ko:'폭풍',      en:'STORM WARNING',   sym:'SW',  how:'최대풍속 48노트 이상' },
+  '海上強風警報': { ko:'강풍',      en:'GALE WARNING',    sym:'GW',  how:'최대풍속 34~47노트' },
+  '海上風警報':   { ko:'바람',      en:'WIND WARNING',    sym:'W',   how:'최대풍속 28~33노트' },
+  '海上濃霧警報': { ko:'짙은 안개', en:'FOG WARNING',     sym:'FOG',
+                   how:'시정 0.3해리(약 500m) 이하 · 세토 내해는 0.5해리(약 1km) 이하' },
+  '海上着氷警報': { ko:'착빙',      en:'ICING WARNING',   sym:'ICING', how:'' },
+  '海上うねり警報': { ko:'너울',    en:'SWELL WARNING',   sym:'SWELL', how:'' }
+};
+// 내 해역 경보만 고른다. 윗 예보구로 나온 경보도 내 것이다.
+function jwMineZones(w, area){
+  if(!w || !w.ok || !Array.isArray(w.zones) || !area) return [];
+  return w.zones.filter(z => z && (
+    String(z.regCode) === String(area.c) ||
+    (area.p && String(z.regCode) === String(area.p)) ||
+    z.reg === area.n || (area.pn && z.reg === area.pn)));
+}
+// 특보가 바뀌었는지 보는 셈에 일본 것도 넣는다 — 안 넣으면 알림이 안 간다.
+function jwKeyOf(w){
+  const area = seaMine();
+  if(!area) return '';
+  return jwMineZones(w, area).map(z => z.kind + '@' + z.reg).sort().join('|');
+}
+// 해역 이름을 보는 사람 말로. 표에 없으면 気象庁 글자 그대로 — 지어내지 않는다.
+// ★ 이름을 고르는 곳은 여기 하나다. 여러 군데서 고르면 화면마다 다른 이름이 나온다.
+// ★★ 이름이 jwSeaName 인 까닭 — 앱에 이미 seaName(위도, 경도) 가 있다(한국 해역 이름).
+//    같은 이름으로 두면 나중에 선언한 이것이 그것을 덮어써서, 한국 해역 이름 자리에
+//    위도 숫자가 나온다. 실제로 그렇게 만들었다가 검사가 잡았다.
+function jwSeaName(jp){
+  const ko = JMA_SEA[jp];
+  return ko ? t(ko) : String(jp || '');
+}
+// 한 줄 = 해역 │ 현상.  아랫줄에 気象庁 기준과 **원래 이름**을 작게 붙인다.
+// ★ 원래 이름을 늘 남긴다 — 気象庁 화면·네비텍스와 대조하실 때 이름이 달라지면 못 찾는다.
+// ★ 표에 없는 경보는 気象庁 이름을 그대로 낸다 — 모르는 것을 아는 척하지 않는다.
+function jwLine(z){
+  const k = JMA_KIND[z.kind];
+  const 이름 = jwSeaName(z.reg);
+  const 원래 = [이름 === z.reg ? '' : z.reg, z.kind,
+               k ? k.en + ' [' + k.sym + ']' : ''].filter(Boolean).join(' · ');
+  const 아래 = [k && k.how ? t(k.how) : '', 원래].filter(Boolean).join(' · ');
+  return `<div class="jwz"><b>${esc(이름)}</b> — ${esc(k ? t(k.ko) : z.kind)}</div>`
+       + `<div class="jwsub">${esc(아래)}</div>`;
+}
+// 일본 해역에 있는 배에 보여 줄 칸. 아니면 '' 를 준다(한국 칸이 그대로 나온다).
+function jwAlertBox(){
+  const area = seaMine();
+  if(!area) return '';
+  const w = jwCache;
+  const foot = `<a href="https://www.jma.go.jp/bosai/seawarning/" target="_blank" rel="noopener">${
+      esc(t('일본 기상청에서 실시간 확인'))}</a>`;
+  const src  = `<div class="wxfoot">${esc(t('출처 — 일본 기상청(気象庁) 해상경보 · 해역 경계는 기상청 예보구 자료'))}</div>`;
+  // ★ 「해상 특보」 는 우리 기상청 말이다. 여기 것은 気象庁 해상경보다 — 이름을 섞지 않는다.
+  const 해역 = jwSeaName(area.n);
+  // ★ 못 받았으면 못 받았다고 말한다. 「경보 없음」 이라고 하면 그 말을 믿고 나간다.
+  if(!w || !w.ok){
+    return `<div class="wxbox"><b>${esc(t('일본 해상경보'))} · ${esc(해역)}</b>
+      <div>${esc(t('일본 기상청 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요'))}</div>
+      <div class="wxfoot">${foot}</div>${src}</div>`;
+  }
+  const mine = jwMineZones(w, area);
+  const 남은 = (w.zones || []).length - mine.length;
+  // ★ 언제 읽은 것인지는 **보는 사람 시각**으로 적는다. 세계표준시를 그대로 내면
+  //   아홉 시간 전 것으로 읽혀서 「낡은 자료」 로 오해한다.
+  let when = '';
+  try{
+    const d = new Date(w.read), p2 = n => String(n).padStart(2, '0');
+    if(!isNaN(d)) when = p2(d.getMonth()+1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }catch(_){}
+  if(mine.length){
+    // ★ 제목에 해역을 또 적지 않는다 — 아래 줄마다 해역이 이미 적혀 있다.
+    //   내 배가 어느 해역인지는 아랫줄에 한 번만 밝힌다.
+    return `<div class="wxbox warn"><b>${esc(t('일본 해상경보 발효 중'))}</b>${
+      mine.map(z => jwLine(z)).join('')}
+      <div class="wxfoot">${esc(tsub('내 배 자리 {r}', { r: 해역 }))} · ${esc(t('읽음'))} ${esc(when)} · ${foot}</div>${src}</div>`;
+  }
+  return `<div class="wxbox"><b>${esc(t('일본 해상경보'))} · ${esc(해역)}</b>
+    <div>${esc(t('이 해역에 발효 중인 일본 해상경보 없음'))}${
+      남은 > 0 ? ' · ' + esc(tsub('다른 해역 {n}구역 발효 중', { n: 남은 })) : ''}</div>
+    <div class="wxfoot">${esc(t('읽음'))} ${esc(when)} · ${foot}</div>${src}</div>`;
+}
 function wxAlertBox(){
+  // ★ 배가 일본 예보구 안에 있으면 気象庁 것을 보여 준다. 한 자리에서 갈린다.
+  const jp = jwAlertBox();
+  if(jp) return jp;
   const w = myWarnings();
   const foot = `<a href="https://www.weather.go.kr/w/special-report/overall.do" target="_blank" rel="noopener">${esc(t('기상청 실시간 확인'))}</a>`;
   const when = (krCache && krCache.updated) ? String(krCache.updated).slice(5,16).replace('T',' ') : '';
@@ -34743,6 +35318,10 @@ async function checkNewsBadge(){
   try{
     const seen = lastSeen();
     let fresh=false, wx=false;
+    // ★ 일본 해역에 있는 배는 일본 경보를 먼저 받아 둔다. 안 받으면 wxKeyOf 가 빈손이 된다.
+    if(typeof boatOutsideKR === 'function' && boatOutsideKR()){
+      try{ await loadSeaJP(); if(seaMine()) await loadJW(true); }catch(_){}
+    }
     try{
       const r = await fetch(DATA_BASE+'kr.json?v='+Date.now(), {cache:'no-store'});
       if(r.ok){ const k = await r.json();
@@ -36088,6 +36667,11 @@ async function renderWeather(){
   if(!wxCur){ wxInit(); }
   await loadTide();
   await loadKr();
+  // ★ 배가 한국 해역 밖일 때만 일본 자료를 받는다. 한국에 있는 배에는 부를 까닭이 없다.
+  if(typeof boatOutsideKR === 'function' && boatOutsideKR()){
+    await loadSeaJP();
+    if(seaMine()) await loadJW(true);
+  }
   if(!wxCur){
     // 지점이 없으면 곧바로 현재 위치로 시작한다. 묻지 않는다.
     if(!wxGeoTried){

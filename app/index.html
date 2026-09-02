@@ -2184,6 +2184,7 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': 'Removed {n} points recorded after arrival.',
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what} time set to {t} as well.',
     '지금 출발 (시각·위치·날씨)': 'Depart now (time, position, weather)',
     '시각 없음': 'No time',
@@ -4807,6 +4808,7 @@ const I18N = {
     '멈추기':'Stop',
   },
   ru: {
+    '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': 'Удалено {n} точек, записанных после прихода.',
     '{what} 시각도 {t} 로 함께 넣었습니다.': 'Время «{what}» тоже проставлено: {t}.',
     '지금 출발 (시각·위치·날씨)': 'Отход сейчас (время, координаты, погода)',
     '시각 없음': 'Без времени',
@@ -7440,6 +7442,7 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': '到着後に記録された点を{n}個外しました。',
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what}の時刻も{t}で一緒に入れました。',
     '지금 출발 (시각·위치·날씨)': '今すぐ出発（時刻・位置・天気）',
     '시각 없음': '時刻なし',
@@ -12922,32 +12925,17 @@ function trkPush(pos){
   trkLive();
   return true;
 }
-// 이미 남아 있는 항적에서 튄 점을 골라낸다 (사람이 눌러서)
-async function trkTidy(){
-  const it = getMR('voyage', mrOpenId);
-  if(!it || !Array.isArray(it.trk) || it.trk.length < 3){ tell(t('다듬을 항적이 없습니다')); return; }
-  const r = trkClean(it.trk);
-  if(!r.dropped){ tell(t('버릴 점이 없습니다. 항적이 깨끗합니다.')); return; }
-  const q0 = trkQuality(it.trk), q1 = trkQuality(r.pts);
-  // ★★★ 4.99 — 무엇을 왜 버리는지 사실대로 적는다.
-  //   여태 「배가 낼 수 없는 속도로 튄 점」 이라고만 적었다. 이제 「나갔다가 그대로
-  //   되돌아온 점」 도 버리므로, 그대로 두면 화면이 거짓말을 한다 (정하신 것 2번).
-  const 까닭 = [ r.fast ? tsub('배가 낼 수 없는 속도 {n}개', { n: r.fast }) : '',
-                 r.back ? tsub('나갔다가 그대로 되돌아온 자리 {n}개', { n: r.back }) : ''
-               ].filter(Boolean).join(' · ');
-  if(!await ask(tsub('튄 점 {n}개를 찾았습니다 — {why}.\n\n{m}개만 남기고 지울까요?\n\n되돌리기로 되살릴 수 있습니다.',
-      { n: r.dropped, why: 까닭, m: r.pts.length })
-      + '\n\n' + tsub('지금 {a}NM · 평균 {b}노트  →  다듬으면 {c}NM · 평균 {d}노트',
-          { a: q0.nm, b: q0.kt, c: q1.nm, d: q1.kt }), { ok: t('다듬기') })) return;
-  undoPush();
-  it.trk = r.pts;
-  saveMR();
-  if(typeof schedulePush === 'function') schedulePush();
-  openMR('voyage', it.id);
-  // ★ 다듬고도 못 믿을 항적이면 그렇다고 말한다. 그럴듯한 선을 그려 주는 것이 제일 나쁘다.
-  await tell(tsub('{n}개를 지웠습니다.', { n: r.dropped })
-    + (q1.ok ? '' : '\n\n' + t('그래도 이 항적은 믿기 어렵습니다. 폰이 GPS 대신 기지국으로 자리를 잡은 것 같습니다. 출발·도착·중간 기록의 위치는 정확하니 그것으로 보시는 편이 낫습니다.')));
-}
+// ★★★ 4.99 — 「튄 점 다듬기」 를 없앴다 (사장님 지적).
+//
+//   사장님 말씀: "도대체 왜 항적다듬기 버튼이 있냐?
+//                사용자는 어플 고치는 사람이 아니라고"
+//
+//   ★ 여기 있던 trkTidy() 는 사람이 눌러야 항적이 깨끗해지는 문이었다.
+//     그건 앱이 할 일을 사람에게 떠넘긴 것이다.
+//   ★ 이제 두 자리에서 앱이 알아서 한다:
+//       · 그릴 때   — trkLine() 이 걸러서 그린다 (자료는 안 건드린다)
+//       · 도착할 때 — trkStop() 이 실제로 다듬어 저장한다 (사람이 도착을 눌렀다)
+//   ★ 거르는 셈(trkClean·trkBackTrack)은 그대로 둔다. 문만 없앴다.
 
 // 두 점 사이가 이 배가 낼 수 없는 속도인가
 function trkTooFast(a, b){
@@ -15726,6 +15714,10 @@ async function delTalk(id){
 function paintAdminMenu(){
   const el = document.getElementById('dAdmin');
   if(el) el.style.display = (isAdmin() && !amSeriesOnly()) ? '' : 'none';
+  // ★★★ 4.99 — 운영자가 된 그때 새 고객센터 글도 한 번 센다.
+  //   앱을 켠 뒤 로그인이 늦게 붙으므로, 여기서 한 번 더 부르지 않으면
+  //   켠 직후에는 점이 안 뜬다.
+  try{ supBadgeCheck(); }catch(_){}
 }
 // 내 계정 번호. 남을 운영자로 임명하려면 그 사람의 번호를 받아야 한다.
 function copyMyUid(){
@@ -23618,15 +23610,14 @@ function openMR(kind, id){
       + suggestRow(it, 'engineH')
       // ★ 지도는 늘 하나만 둔다. 보는 곳이자 적는 곳이다.
       //   점이 하나도 없어도 그린다 — 「지도에서」를 눌렀을 때 그릴 자리가 있어야 한다.
+      // ★★★ 4.99 — 「튄 점 다듬기」 단추를 없앴다 (사장님 지적:
+      //   「도대체 왜 항적다듬기 버튼이 있냐? 사용자는 어플 고치는 사람이 아니다」).
+      //   이제 앱이 그릴 때마다 알아서 거른다 (trkLine).
       + `<div class="mrrow"><span class="mrlbl">${esc(t('항적'))}</span>
            <span class="mrm" style="flex:1;color:#7b8794">${
              trkHas(it)
                ? esc(t('끌어서 이동 · 두 손가락으로 확대'))
-               : esc(t('저장된 위치가 없습니다'))}</span>${
-             // ★ 폰이 기지국으로 지어낸 자리가 섞여 들어와 항적이 시내로 뻗치는 일이 있다.
-             //   4.51 부터는 들어올 때 걸러내지만, 그 전에 남은 것은 여기서 다듬는다.
-             (unlocked && Array.isArray(it.trk) && it.trk.length > 2 && trkClean(it.trk).dropped)
-               ? `<button class="minib" onclick="trkTidy()">${esc(t('튄 점 다듬기'))}</button>` : ''}</div>`
+               : esc(t('저장된 위치가 없습니다'))}</span></div>`
       + mapBox('trkMap','44vh')
       + (trkHas(it)
           ? `<div class="mrnone" style="text-align:left">${esc(t('기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.'))}<br>
@@ -28610,7 +28601,7 @@ function supportDone(id, on){
   const val = (on === true || on === 'true');
   panelMark();                       // ★ 처리한 뒤에도 보던 자리에 머문다
   window.__support.edit(id, { done: val })
-    .then(()=>openAdmin())
+    .then(()=>{ try{ supBadgeCheck(); }catch(_){} return openAdmin(); })
     .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e)));
 }
 
@@ -30935,6 +30926,11 @@ function wxLine(w, refetch){
 function voyTime(timeKey, wxKey, v){
   const it = getMR('voyage', mrOpenId); if(!it) return;
   it[timeKey] = hm(v); it.seed = false;
+  // ★★★ 4.99 — 도착 시각을 손으로 적어도 그것이 도착이다 (문 하나).
+  //   여태는 「지금 도착」 을 눌러야만 항적이 멈췄다. 그래서 시각만 적은 사람은
+  //   집에 가는 길이 항해로 남았다.
+  if(timeKey === 'timeIn' && String(v || '').trim())
+    try{ voyArrived(it); }catch(_){}
   // 출발·도착 시각이 정해지면 항해 시간과 엔진 시간을 다시 잡는다
   const sh = sailHours(it); if(sh !== null) it.hours = sh;
   const eh = engineHoursFromLogs(it); if(eh !== null) it.engineH = eh;
@@ -30958,6 +30954,66 @@ function departNow(){
   try{ if(typeof trkStart === 'function') trkStart(it.id); }catch(e){}
   renderVoyage(); openMR('voyage', it.id);
 }
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.99 — 「도착」 하나로 항해가 끝난다 (사장님 지적)
+//
+//   사장님 말씀: "그냥 지금 여기서 도착 누르면 모든 게 끝나야지.
+//                시간은 또 따로이고, 점 찍는 건 또 따로냐. 왜 이게 집까지 따라와요?"
+//
+//   ★ 「집까지 따라온」 까닭 — 항적을 멈추는 곳이 arriveNow 하나뿐이었다.
+//     도착 시각을 손으로 적거나 도착 자리만 찍은 사람은 항적이 안 멈췄다.
+//     그래서 배에서 내려 차 타고 집에 가는 길이 그대로 항해로 남았다.
+//     여수 앞바다에서 시내 도로를 타고 무선산까지 올라간 그 선이 그것이다.
+//
+//   ★ 이제 **도착을 어떤 길로 찍든** 여기로 모인다 (문 하나).
+//     ① 항적을 멈춘다  ② 도착 시각 뒤에 찍힌 점을 잘라낸다  ③ 저장한다
+//
+//   ★ 자르는 것은 「사람이 도착을 찍은 그 순간」 뿐이다. 앱이 혼자 옛 기록을
+//     뒤져 지우지 않는다 (사장님이 정하신 것 0번).
+function voyInAt(it){
+  // 도착 시각을 실제 시각으로. 도착이 출발보다 이르면 자정을 넘긴 것이다.
+  if(!it || !it.date || !String(it.timeIn || '').trim()) return null;
+  const d = String(it.date).slice(0, 10);
+  const T = v => Date.parse(d + 'T' + hm(v) + ':00');
+  let ms = T(it.timeIn);
+  if(!isFinite(ms)) return null;
+  const out = String(it.timeOut || '').trim() ? T(it.timeOut) : NaN;
+  if(isFinite(out) && ms < out) ms += 864e5;      // 자정을 넘겼다
+  return ms;
+}
+// 도착 뒤에 찍힌 점이 몇 개인가
+function trkAfterIn(it){
+  const at = voyInAt(it);
+  if(at == null || !Array.isArray(it.trk)) return 0;
+  // ★ 도착을 찍는 데 몇 분 걸릴 수 있다. 5분은 봐 준다 — 접안하고 나서 누른다.
+  const 봐줌 = at + 5 * 60000;
+  return it.trk.filter(p => { const t2 = Date.parse(p && p.t); return isFinite(t2) && t2 > 봐줌; }).length;
+}
+// 도착 뒤 점을 잘라낸다. 자른 개수를 돌려준다.
+function trkCutAfterIn(it){
+  const n = trkAfterIn(it);
+  if(!n) return 0;
+  const 봐줌 = voyInAt(it) + 5 * 60000;
+  it.trk = it.trk.filter(p => { const t2 = Date.parse(p && p.t); return !(isFinite(t2) && t2 > 봐줌); });
+  return n;
+}
+// ★★★ 도착했다 — 여기 하나로 다 끝난다
+async function voyArrived(it, quiet){
+  if(!it) return;
+  // ① 이 항해의 항적을 켜 두었으면 멈춘다
+  try{
+    if(typeof trkNow !== 'undefined' && trkNow && String(trkNow.vid) === String(it.id))
+      await trkStop();
+  }catch(_){}
+  // ② 도착 뒤에 찍힌 점을 잘라낸다 (배에서 내려 집에 가는 길이 항해로 남지 않게)
+  const 잘림 = trkCutAfterIn(it);
+  if(잘림){
+    try{ saveMR(); }catch(_){}
+    try{ schedulePush(); }catch(_){}
+    if(!quiet) try{ tell(tsub('도착 뒤에 찍힌 점 {n}개를 뺐습니다.', { n: 잘림 })); }catch(_){}
+  }
+  return 잘림;
+}
 function arriveNow(){
   if(!unlocked) return;
   const it = getMR('voyage', mrOpenId); if(!it) return;
@@ -30966,8 +31022,8 @@ function arriveNow(){
   it.timeIn = p(now.getHours())+':'+p(now.getMinutes());
   it.seed = false; saveMR();
   posHere('wxIn', it.id, true, () => wxCapture('wxIn', it.id));
-  // ★ 입항을 찍으면 항적도 끝낸다. 여기서 클라우드로 한 번에 올라간다.
-  try{ trkStop().then(()=>{ try{ openMR('voyage', it.id); }catch(e){} }); }catch(e){}
+  // ★ 입항을 찍으면 항적도 끝내고, 도착 뒤 점도 잘라낸다 (문 하나).
+  try{ voyArrived(it, true).then(()=>{ try{ openMR('voyage', it.id); }catch(e){} }); }catch(e){}
   renderVoyage(); openMR('voyage', it.id);
 }
 
@@ -31414,10 +31470,22 @@ function logShowOnMap(lid){
 //   이름표 점(출발·중간·도착)과 섞지 않는다 — 시각으로 줄 세우려다 보니
 //   자정을 넘긴 항해나 도착 시각을 나중에 고친 경우 선이 튀었다 (검사가 잡았다).
 //   자동 항적은 받은 차례가 곧 지나온 차례라 따로 줄 세울 것이 없다.
+// ★★★ 4.99 — 항적은 **앱이 알아서** 다듬어 보여 준다 (사장님 지적)
+//
+//   사장님 말씀: "도대체 왜 항적다듬기 버튼이 있냐?
+//                사용자는 어플 고치는 사람이 아니라고"
+//
+//   ★ 맞는 말씀이다. 누를 줄 알아야 깨끗해지는 기록은 안 깨끗한 기록이다.
+//     단추를 없애고, **그릴 때마다 걸러서 그린다.**
+//   ★ 저장된 자료는 손대지 않는다 (사장님이 정하신 것 0번).
+//     걸러내는 것은 화면에 그릴 때뿐이다 — 원래 점은 그대로 남아 있다.
+//   ★ 도착을 찍는 그 순간에만 실제로 잘라낸다. 그건 사람이 누른 것이다.
 function trkLine(it){
   const a = trkRaw(it);
+  // 튄 점·되돌아온 점을 빼고 그린다. 자료는 그대로 두고 보이는 것만 고른다.
+  const 깨끗 = (Array.isArray(a) && a.length > 2) ? trkClean(a).pts : a;
   const out = [];
-  a.forEach(p => {
+  (깨끗 || []).forEach(p => {
     if(p && isFinite(p.la) && isFinite(p.lo)) out.push({ lat:p.la, lon:p.lo });
   });
   return out.length > 1 ? out : null;
@@ -31959,6 +32027,9 @@ function posHere(key, vid, quiet, done){
         try{ tell(tsub('{what} 시각도 {t} 로 함께 넣었습니다.',
                        { what: posWhatName(key), t: 넣은 })); }catch(_){}
       }
+      // ★★★ 4.99 — 도착 자리를 찍은 것도 도착이다 (문 하나).
+      //   「지금 여기」 하나로 시각·자리·날씨·항적 끝내기까지 다 된다.
+      if(key === 'wxIn' && !quiet) try{ voyArrived(it); }catch(_){}
       fin();
     },
     e=>{
@@ -34621,10 +34692,50 @@ function updateBadge(){
   const b = document.getElementById('newsBadge');
   if(b){ b.classList.toggle('on', on); b.textContent = badgeState.wx ? t('특보') : t('새 소식'); }
 }
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.99 — 새 고객센터 글이 오면 알려 준다 (사장님 지적으로 드러난 것)
+//
+//   ★ 무슨 일이 있었나 — 관공서에서 온 보완 요청 두 통이
+//     앱에는 들어왔는데 지메일로는 안 갔다. 그런데 **앱도 아무 말을 안 했다.**
+//     운영자 화면을 우연히 열어야만 보였다. 기한이 있는 민원을 그렇게 두면 안 된다.
+//
+//   ★ 지메일은 구글 것이고 넘기기는 클라우드플레어 것이다. 남의 것에 기대면 또 놓친다.
+//     **앱은 그 두 통을 다 받았다.** 그러니 앱이 알려 주는 것이 제일 확실하다.
+//
+//   ★ 여기서 하는 것은 「앱을 켰을 때」 다. 앱을 안 켜도 울리게 하려면 서버(함수)에서
+//     밀어 줘야 한다 — 그건 따로다. 짐작으로 반쪽을 만들어 「된다」 고 하지 않는다.
+let supNewN = 0;                     // 아직 확인 안 한 고객센터 글 수 (운영자만)
+function supBadgeOn(){ return supNewN > 0; }
+async function supBadgeCheck(){
+  // 운영자가 아니면 셀 까닭이 없다. 남의 접수를 읽지도 못한다.
+  if(!window.__support || !(typeof isAdmin === 'function' && isAdmin('support'))){
+    supNewN = 0; paintSupDot(); return 0;
+  }
+  try{
+    const rows = await window.__support.list();
+    supNewN = (rows || []).filter(x => x && !x.done).length;
+  }catch(_){ /* 못 세면 그냥 둔다 — 없는 수를 지어내지 않는다 */ }
+  paintSupDot();
+  return supNewN;
+}
+// 삼선 메뉴에 점을 찍고, 서랍의 「운영자」 줄에 갯수를 적는다
+function paintSupDot(){
+  try{
+    const d = document.getElementById('menuDot');
+    if(d && supBadgeOn()) d.classList.add('on');
+    const a2 = document.getElementById('dAdmin');
+    if(a2){
+      const 이름 = t('운영자');
+      a2.textContent = supBadgeOn() ? (이름 + ' (' + supNewN + ')') : 이름;
+    }
+  }catch(_){}
+}
 // 뉴스는 커뮤니티 안으로 들어갔다. 새 소식 점은 커뮤니티 탭에 찍는다.
 function paintNewsDot(on){
   const d = document.getElementById('menuDot');
-  if(d) d.style.display = on ? '' : 'none';
+  // ★ 고객센터에 안 본 글이 있으면 뉴스가 없어도 점은 남는다.
+  //   여기서 그냥 끄면 새 메일 표시가 뉴스에 밀려 사라진다.
+  if(d) d.style.display = (on || supBadgeOn()) ? '' : 'none';
   const t = document.getElementById('tabCommunity');
   if(t) t.classList.toggle('dot', !!on);
 }
@@ -36438,6 +36549,9 @@ document.addEventListener('visibilitychange', ()=>{
   appVisible();
   if(curScreen() === 'news'){ renderNews(true); }
   else { checkNewsBadge(); }
+  // ★★★ 4.99 — 앱을 다시 볼 때마다 새 고객센터 글도 센다.
+  //   관공서 민원처럼 기한이 있는 것을 우연에 맡기면 안 된다.
+  try{ supBadgeCheck(); }catch(_){}
 });
 // 창을 닫을 때도 마저 보낸다 (컴퓨터에서 탭을 닫는 경우)
 window.addEventListener('pagehide', appHidden);

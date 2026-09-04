@@ -272,7 +272,19 @@ async function osmMarinas(box){
     본.add(key);
     // ★ 꼬리표만 믿지 않는다 — 이름으로 한 번 더 거른다 (계류자리인가)
     if(typeof 계류자리인가 === 'function' && !계류자리인가(name, key)) return;
+    // ★★★ 2026-09-04 — 그 나라 말이 아닌 사람을 위한 이름을 **자료에 담아 간다**.
+    //   사장님 지적: 「일본 항구들 번역 안 된 건 이유가 뭐지?」
+    //   ★ 지명은 뜻으로 옮기면 없는 곳이 된다(「미야지마 방문자 버스」). 그래서 옮기지 않는다.
+    //     대신 지도 앱들이 하는 그대로 — **OSM 에 사람이 적어 둔 이름**을 그대로 가져간다.
+    //     name:ko 가 있으면 그것이 제일 좋고, 없으면 가나(name:ja-Hira)를 담아 두면
+    //     앱이 국립국어원 「가나와 한글 대조표」로 한글 소리를 만들 수 있다.
+    //   ★ 없으면 안 담는다. 지어내지 않는다.
+    const 이름들 = {};
+    ['name:ko','name:en','name:ja','name:ja-Hira','name:ja_kana','name:ru'].forEach(k => {
+      if(T[k] && T[k] !== name) 이름들[k.replace('name:','')] = T[k];
+    });
     out.push({ key, name, lat, lon,
+               nm: Object.keys(이름들).length ? 이름들 : undefined,
                tel: T['phone'] || T['contact:phone'] || '',
                web: T['website'] || T['contact:website'] || '' });
   });
@@ -404,6 +416,9 @@ function findSpot(list, name, alts){
 //
 // ★ 앱에 이미 있는 곳(어항·기본계획 39곳)과 겹치는 것은 **앱이** 걸러낸다.
 //   여기서 또 거르면 두 곳에서 정하게 된다 (사장님이 정하신 것 3번).
+// ★★★ 사람이 눈으로 보고 정한 것은 여기 하나에 모아 둔다 (문 하나).
+//   수집기도 이 표를 보고, 이미 나간 자료를 고칠 때도 같은 표를 본다.
+const 손 = require('./spot_hand.js');
 const KRGOV_SRC = '해양수산부 마리나 정보화시스템 「전국 마리나 현황」';
 const KRGOV = [
   { n:'아라마리나', at:'경인', port:'무역항', berth:194, reg:'수도권' },
@@ -547,6 +562,8 @@ const 손으로뺀것 = {
 function 계류자리인가(name, key){
   const n = String(name || '');
   if(key && 손으로뺀것[key]) return false;
+  // ★ 사람이 하나하나 찾아보고 「배를 매는 곳이 아니다」 라고 적어 둔 것 (spot_hand.js)
+  if(손.계류자리아님[n]) return false;
   if(계류하는말.some(w => n.indexOf(w) >= 0)) return true;
   return !계류아닌말.some(w => n.indexOf(w) >= 0);
 }
@@ -582,78 +599,137 @@ function 한자리로묶기(rows){
   return { rows: 남길것, 뺀것 };
 }
 // 관 자료 71곳에 자리를 붙인다
+// ★★★ 이 점이 물가인가 — 마리나라면 물에서 1.5km 안이어야 한다.
+//   해안선(natural=coastline)·물(natural=water)·부두(man_made=pier)가 둘레에 하나도 없으면
+//   그건 물가가 아니다. 강·호수 마리나도 natural=water 로 잡히므로 같이 산다.
+//   ★ 못 물어봤을 때(서버가 죽었을 때)는 **모른다(null)** 로 두고 그냥 싣는다 —
+//     남의 서버가 안 된다고 우리 자료를 지우면 안 된다.
+const 물반경m = 1500;
+const 물에서먼것 = [];
+async function 물가인가(la, lo){
+  const q = `[out:json][timeout:25];(
+    way["natural"="coastline"](around:${물반경m},${la},${lo});
+    way["natural"="water"](around:${물반경m},${la},${lo});
+    rel["natural"="water"](around:${물반경m},${la},${lo});
+    way["man_made"="pier"](around:${물반경m},${la},${lo});
+    way["waterway"="riverbank"](around:${물반경m},${la},${lo});
+  );out ids 1;`;
+  try{
+    const j = await ovAsk(q);
+    if(!j || !Array.isArray(j.elements)) return null;   // 모르겠다 — 그냥 싣는다
+    return j.elements.length > 0;
+  }catch(_){ return null; }
+}
 async function 한국관마리나(osmKr){
   const 있는것 = {};
   (osmKr || []).forEach(x => { 있는것[이름씻기(x.n)] = x; });
-  const out = [], 못찾음 = [], 어디서 = { 지도훑기:0, 물어봄:0, 소재지이름:0 };
+  const out = [], 못찾음 = [], loose = [], 어디서 = { 사람이확인:0, 지도훑기:0, 물어봄:0, 소재지이름:0 };
   const 쓴자리 = {};               // 이미 쓴 점 → 그 점을 쓴 곳의 「소재지·항 구분」
   const 쓴번호 = {};               // 이름을 씻으면 겹치는 것이 있다 (도두 공공/민간)
   for(const g of KRGOV){
     const key = 이름씻기(g.n);
     let la = null, lo = null, how = '';
-    // ★★★ 2026-09-03 — 「진해 명동 마리나」 가 **부산항**에 찍혀 있었다 (25km 어긋남).
-    //   관 자료의 「소재지」 칸은 곳에 따라 **관할 무역항**이 적혀 있다.
-    //   명동은 창원시 진해구인데 그 칸에 '부산항' 이 적혀 있었고, 그 이름으로 지도를 뒤져
-    //   부산 북항의 점을 집어 왔다. 배가 딴 데로 간다.
-    //   ★ 그래서 믿는 차례를 바꾼다 — ① 마리나 **제 이름** 으로 지도에서 찾기
-    //     ② 주소로 물어보기 ③ 그래도 없으면 그때만 소재지 이름으로 찾기.
-    //   소재지는 제일 나중이다. 그게 틀릴 수 있는 칸이기 때문이다.
-    let m = 있는것[key];
-    if(!m && key.length >= 3){
-      const 품은 = Object.keys(있는것).find(k => k.length >= 3 && (k.indexOf(key) >= 0 || key.indexOf(k) >= 0));
-      if(품은) m = 있는것[품은];
-    }
-    if(m){ la = m.la; lo = m.lo; how = '지도훑기'; }
-    else{
-      const 지역 = KRGOV_AREA[g.reg] || '';
-      const 항씻김 = 이름씻기(String(g.at || '').replace(/항$/, ''));
-      try{
-        // ★ 한 가지 말로만 물으면 못 찾는다. 좁은 것부터 넓은 것까지 차례로 묻는다.
-        //   ★ 못 찾으면 안 싣는다 — 엉뚱한 점을 찍지 않는다는 원칙은 그대로다.
-        const 물을말 = [
-          g.n + ' ' + 지역,
-          g.at + ' ' + 지역,
-          (String(g.at || '').replace(/항$/, '') + '항 ' + 지역),
-          (g.port ? g.port + ' ' + 지역 : '')
-        ].filter(Boolean);
-        let hit = null;
-        for(const q of 물을말){
-          try{ hit = await 자리물어보기(q); }catch(_){}
-          // ★★★ 같은 점을 **다른 곳**에 주지 않는다 (2026-09-03)
-          //   「형산강마리나(포항시·하천)」 와 「여남요트계류장(포항시·소규모항포구)」 가
-          //   **똑같은 점**에 찍혀 있었다. 둘 다 못 찾아 '포항시' 로 떨어진 것이다.
-          //   그건 찾은 것이 아니라 시청 자리다. 못 찾은 것으로 치고 이름을 남긴다.
-          //   ★ 다만 소재지와 항 구분이 **둘 다 같으면** 진짜로 한 자리다 —
-          //     「도두마리나(공공)」 과 「도두마리나(민간)」, 「이순신」 과 「원형」(둘 다 여수시·연안)
-          //     은 같은 점을 나눠 갖는 것이 맞다.
-          if(hit){
-            const 점 = hit.la.toFixed(5) + ',' + hit.lo.toFixed(5);
-            const 나 = String(g.at || '') + '·' + String(g.port || '');
-            if(쓴자리[점] && 쓴자리[점] !== 나) hit = null;
+    // ★★★ ⓪ 사람이 눈으로 보고 정한 것이 제일 앞이다 (spot_hand.js)
+    const 찍은 = 손.손으로찍은자리[g.n];
+    if(찍은){ la = 찍은.la; lo = 찍은.lo; how = '사람이확인'; }
+    if(la == null){
+      // ★★★ 2026-09-03 — 「진해 명동 마리나」 가 **부산항**에 찍혀 있었다 (25km 어긋남).
+      //   관 자료의 「소재지」 칸은 곳에 따라 **관할 무역항**이 적혀 있다.
+      //   명동은 창원시 진해구인데 그 칸에 '부산항' 이 적혀 있었고, 그 이름으로 지도를 뒤져
+      //   부산 북항의 점을 집어 왔다. 배가 딴 데로 간다.
+      //   ★ 그래서 믿는 차례를 바꾼다 — ① 마리나 **제 이름** 으로 지도에서 찾기
+      //     ② 주소로 물어보기 ③ 그래도 없으면 그때만 소재지 이름으로 찾기.
+      //   소재지는 제일 나중이다. 그게 틀릴 수 있는 칸이기 때문이다.
+      let m = 있는것[key];
+      if(!m && key.length >= 3){
+        const 품은 = Object.keys(있는것).find(k => k.length >= 3 && (k.indexOf(key) >= 0 || key.indexOf(k) >= 0));
+        if(품은) m = 있는것[품은];
+      }
+      if(m){ la = m.la; lo = m.lo; how = '지도훑기'; }
+      else if(손.자리를못찾은곳[g.n]){
+        // ★★★ 사람이 「그 자리는 틀렸다」 고 확인해 둔 곳이다 — **짐작으로 자리를 주지 않는다.**
+        //   ★ 다만 지도(OSM)에 그 마리나가 이름째 있으면 그건 짐작이 아니라 실제 자리라
+        //     바로 위 ① 에서 이미 썼다. 여기까지 오는 것은 짐작밖에 안 남았을 때다.
+        못찾음.push(g.n + ' (' + g.at + ') — ' + 손.자리를못찾은곳[g.n]);
+        continue;
+      }
+      else{
+        const 지역 = KRGOV_AREA[g.reg] || '';
+        const 항씻김 = 이름씻기(String(g.at || '').replace(/항$/, ''));
+        try{
+          // ★ 한 가지 말로만 물으면 못 찾는다. 좁은 것부터 넓은 것까지 차례로 묻는다.
+          //   ★ 못 찾으면 안 싣는다 — 엉뚱한 점을 찍지 않는다는 원칙은 그대로다.
+          const 물을말 = [
+            g.n + ' ' + 지역,
+            g.at + ' ' + 지역,
+            (String(g.at || '').replace(/항$/, '') + '항 ' + 지역),
+            (g.port ? g.port + ' ' + 지역 : '')
+          ].filter(Boolean);
+          let hit = null;
+          for(const q of 물을말){
+            try{ hit = await 자리물어보기(q); }catch(_){}
+            // ★★★ 같은 점을 **다른 곳**에 주지 않는다 (2026-09-03)
+            //   「형산강마리나(포항시·하천)」 와 「여남요트계류장(포항시·소규모항포구)」 가
+            //   **똑같은 점**에 찍혀 있었다. 둘 다 못 찾아 '포항시' 로 떨어진 것이다.
+            //   그건 찾은 것이 아니라 시청 자리다. 못 찾은 것으로 치고 이름을 남긴다.
+            //   ★ 다만 소재지와 항 구분이 **둘 다 같으면** 진짜로 한 자리다 —
+            //     「도두마리나(공공)」 과 「도두마리나(민간)」, 「이순신」 과 「원형」(둘 다 여수시·연안)
+            //     은 같은 점을 나눠 갖는 것이 맞다.
+            // ★★★ 되짚어 확인 (2026-09-04) — 나온 자리가 **그 도(道)** 안인가.
+            //   구글 주소 확인이 쓰는 방법이다: 주소로 자리를 찾은 뒤 거꾸로 되돌려 맞춰 본다.
+            //   「진해 명동 마리나(경남권)」 에 부산 북항 자리가 나왔던 것을 여기서 막는다.
+            if(hit && !손.도가맞나(g.reg, hit.from)){
+              loose.push(g.n + ' — 지도가 딴 도를 줬습니다: ' + hit.from);
+              hit = null;
+            }
+            if(hit){
+              const 점 = hit.la.toFixed(5) + ',' + hit.lo.toFixed(5);
+              const 나 = String(g.at || '') + '·' + String(g.port || '');
+              if(쓴자리[점] && 쓴자리[점] !== 나) hit = null;
+            }
+            if(hit) break;
+            if(NOMI_WAIT) await 잠깐(NOMI_WAIT);
           }
-          if(hit) break;
-          if(NOMI_WAIT) await 잠깐(NOMI_WAIT);
+          if(hit){ la = hit.la; lo = hit.lo; how = '물어봄'; }
+        }catch(_){}
+        if(NOMI_WAIT) await 잠깐(NOMI_WAIT);
+        // ③ 그래도 없으면 그때만 소재지(항) 이름으로 지도에서 찾는다
+        if(la == null){
+          const m2 = 있는것[이름씻기(g.at)] || 있는것[항씻김]
+            || (항씻김.length >= 3
+                  ? 있는것[Object.keys(있는것).find(k => k.length >= 3 && k.indexOf(항씻김) >= 0)]
+                  : null);
+          if(m2){ la = m2.la; lo = m2.lo; how = '소재지이름'; }
         }
-        if(hit){ la = hit.la; lo = hit.lo; how = '물어봄'; }
-      }catch(_){}
-      if(NOMI_WAIT) await 잠깐(NOMI_WAIT);
-      // ③ 그래도 없으면 그때만 소재지(항) 이름으로 지도에서 찾는다
-      if(la == null){
-        const m2 = 있는것[이름씻기(g.at)] || 있는것[항씻김]
-          || (항씻김.length >= 3
-                ? 있는것[Object.keys(있는것).find(k => k.length >= 3 && k.indexOf(항씻김) >= 0)]
-                : null);
-        if(m2){ la = m2.la; lo = m2.lo; how = '소재지이름'; }
       }
     }
     if(la == null){ 못찾음.push(g.n + ' (' + g.at + ')'); continue; }
+    // ★★★ 2026-09-04 — **바다에서 먼 점은 안 싣는다** (사장님 지적)
+    //
+    //   「여수 원형마리나 보니까 바다가 아니라 어디 이상한 산 같은 데로 좌표가 찍혀 있던데」
+    //
+    //   재 보니 실제로 **물에서 4.0km** 들어간 자리였다. 마리나는 물가에 있다 —
+    //   4km 안쪽이면 그건 마리나 자리가 아니라 주소의 한가운데(동사무소 근처)다.
+    //   ★ 지도에서 마리나 자체를 찾은 것(지도훑기)은 물 위에 있으니 안 잰다.
+    //     **주소·소재지 이름으로 찾은 것만** 잰다 — 틀리는 것은 늘 그쪽이다.
+    //   ★ 못 미더우면 **안 싣는다.** 엉뚱한 점을 찍느니 그 마리나가 목록에 없는 편이 낫다.
+    //     (배를 그 점으로 몰고 가면 산으로 간다)
+    if(how !== '지도훑기' && how !== '사람이확인'){
+        const 물 = await 물가인가(la, lo);
+        if(물 === false){
+          못찾음.push(g.n + ' (' + g.at + ') — 물에서 멉니다: ' + la.toFixed(5) + ',' + lo.toFixed(5));
+          물에서먼것.push({ 이름:g.n, 소재지:g.at, la, lo, 어떻게:how });
+          continue;
+        }
+    }
     어디서[how]++;
     쓴자리[la.toFixed(5) + ',' + lo.toFixed(5)] = String(g.at || '') + '·' + String(g.port || '');
     const 줄 = [
       g.at + ' · ' + g.port,
       g.berth ? ('계류 ' + g.berth + '척') : '',
       '※ ' + KRGOV_SRC + ' 에 실린 곳입니다. 자리는 ' +
-        (how === '지도훑기' ? '지도 자료(OpenStreetMap)'
+        (how === '사람이확인' ? '사람이 눈으로 확인한 것'
+          : how === '지도훑기' ? '지도 자료(OpenStreetMap)'
           : how === '소재지이름' ? '소재지 이름으로 지도에서 찾은 것' : '주소로 찾은 것') +
         '이라 실제 접안 자리와 다를 수 있습니다.'
     ].filter(Boolean).join('\n');
@@ -667,7 +743,7 @@ async function 한국관마리나(osmKr){
                lo: Math.round(lo * 1e5) / 1e5,
                r: g.reg.replace(/권$/, ''), f:'', t: 줄 });
   }
-  return { rows: out, 못찾음, 어디서 };
+  return { rows: out, 못찾음, 무른것: loose, 어디서 };
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -950,7 +1026,7 @@ async function 해역경계(){
   // ── 한국 관 자료 마리나 (해양수산부 「전국 마리나 현황」 71곳)
   //   ★ 이순신·원형처럼 실제로 운영 중인데 앱에 없던 곳이 여기로 들어온다.
   console.log('관 자료 마리나에 자리를 붙입니다 — ' + KRGOV.length + '곳.');
-  let 관마리나 = { rows: [], 못찾음: [], 어디서: {} };
+  let 관마리나 = { rows: [], 못찾음: [], 무른것: [], 어디서: {} };
   try{ 관마리나 = await 한국관마리나(마리나.kr); }
   catch(e){ console.error('★ 관 자료 마리나 실패:', e && e.message || e); }
   console.log('   자리를 찾은 곳 ' + 관마리나.rows.length + '곳'
@@ -982,10 +1058,15 @@ async function 해역경계(){
     관자료넣어둔곳: KRGOV.length,
     관자료실린곳: 관마리나.rows.length,
     관자료자리못찾음: 관마리나.못찾음,
+    관자료딴도가나온것: 관마리나.무른것,   // 되짚어 확인에 걸린 것 — 자리를 안 쓴다
+    사람이확인한자리: Object.fromEntries(Object.entries(손.손으로찍은자리).map(([k,v])=>[k, v.왜])),
+    배매는곳이아니라뺀것: 손.계류자리아님,
     관자료자리어디서: 관마리나.어디서,
     마리나훑은수: Object.fromEntries(Object.entries(마리나샘).filter(([k]) => k.startsWith('kr:'))),
     마리나실린수: { kr: 마리나.kr.length },
     한자리라뺀것: kr묶기.뺀것,
+    물에서먼것,                       // ★ 바다에서 멀어 안 실은 것 — 왜 빠졌는지 자료에 남긴다
+    물본반경m: 물반경m,
     적바림: '관 자료는 운영 중 72곳이라 적혀 있는데 여덟 쪽에서 71곳을 읽었습니다.'
   }), { rows: krRows });
   fs.writeFileSync('spots-kr.json', JSON.stringify(kr));

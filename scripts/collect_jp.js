@@ -295,8 +295,45 @@ async function osmMarinas(box){
 const OV_WAIT = 120000;
 // ★ 물어보기. 막히면 다음 서버로 넘어간다. 다 막히면 그때 소리 내어 실패한다 —
 //   조용히 빈 자료를 내면 앱에서 일본 정박지가 통째로 사라진 채 아무도 모른다.
+// ★★★ 2026-09-04 — **적게 받은 날 지난 자료를 덮어쓰지 않는다**
+//
+//   남의 서버(Overpass)가 바쁜 날이 있다. 한 현이 막혀도 넘어가게 고쳤지만,
+//   그러면 이번에는 **반쯤 빈 자료로 멀쩡한 파일을 덮어쓰는** 일이 생긴다.
+//   그러면 어제까지 보이던 정박지가 오늘 사라진다 — 배를 대러 가는 사람에게는 그게 더 나쁘다.
+//   ★ 그래서 지난 파일보다 크게 줄었으면 **안 쓴다.** 왜 안 썼는지 소리 내어 알린다.
+//     (앱의 해상 예보구 굽기가 이미 같은 규칙을 쓴다 — 「하나도 못 받으면 지난 파일을 안 건드린다」)
+const 줄어도되는몫 = 0.85;       // 지난 판의 85% 아래로 떨어지면 안 쓴다
+function 안전하게쓰기(파일, 새것){
+  let 지난수 = 0;
+  try{ 지난수 = (JSON.parse(fs.readFileSync(파일, 'utf8')).rows || []).length; }catch(_){}
+  const 새수 = (새것.rows || []).length;
+  if(지난수 && 새수 < 지난수 * 줄어도되는몫){
+    console.error('★ ' + 파일 + ' 을 **안 썼습니다** — 지난 판 ' + 지난수 + '곳 → 이번 ' + 새수
+      + '곳. 남의 서버가 덜 준 날로 보입니다. 지난 자료를 그대로 둡니다.');
+    return false;
+  }
+  fs.writeFileSync(파일, JSON.stringify(새것));
+  console.log('  ' + 파일 + ' — ' + 새수 + '곳' + (지난수 ? ' (지난 판 ' + 지난수 + '곳)' : ''));
+  return true;
+}
+// ★ 2026-09-04 — 서버 다섯 대가 **한꺼번에** 바쁜 때가 있다 (兵庫 에서 실제로 겪었다).
+//   한 바퀴 다 돌아 실패하면 1분 쉬었다 **한 바퀴 더** 돈다. 504 는 「지금 바쁘다」 이지
+//   「영영 안 준다」 가 아니다. 두 바퀴로 끝낸다 — 남의 서버를 붙들고 늘어지지 않는다.
+const OV_ROUNDS = Number(process.env.OV_ROUNDS != null ? process.env.OV_ROUNDS : 2);
+const OV_ROUND_WAIT = Number(process.env.OV_ROUND_WAIT != null ? process.env.OV_ROUND_WAIT : 60000);
 async function ovAsk(q){
   const 탈 = [];
+  for(let 바퀴 = 0; 바퀴 < OV_ROUNDS; 바퀴++){
+    if(바퀴){
+      console.log('   … 서버가 다 바빴습니다. ' + Math.round(OV_ROUND_WAIT/1000) + '초 쉬었다 한 바퀴 더 돕니다.');
+      await 잠깐(OV_ROUND_WAIT);
+    }
+    const 얻음 = await ov한바퀴(q, 탈);
+    if(얻음) return 얻음;
+  }
+  throw new Error('overpass 를 다 못 썼습니다 — ' + 탈.join(' / '));
+}
+async function ov한바퀴(q, 탈){
   for(const url of OVERPASS_LIST){
     for(let 번 = 0; 번 < 2; 번++){
       try{
@@ -321,7 +358,7 @@ async function ovAsk(q){
     }
     await 잠깐(2000);
   }
-  throw new Error('overpass 를 다 못 썼습니다 — ' + 탈.join(' / '));
+  return null;
 }
 // ★★★ 왜 그물을 넓혔나 (2026-08-30 — 첫 성공 판에서 35곳 중 10곳만 실렸다)
 //   여태는 harbour · leisure=marina · seamark:type=harbour 세 가지 꼬리표만 봤다.
@@ -898,6 +935,7 @@ async function 해역경계(){
   const rows = [];
   const miss = [];
   const loose = [];
+  const 못받은현 = [];      // 남의 서버가 안 될 때 — 무엇이 왜 비었는지 남긴다
   const cache = {};
   // ★ 물어볼 현이 몇 곳인지 먼저 알린다. 「1/6」 이 보이면 멈춘 것이 아님을 안다.
   const 현들 = [...new Set(VISITOR.map(v => v.pref))].filter(p => PREF_BOX[p]);
@@ -906,11 +944,28 @@ async function 해역경계(){
   for(const v of VISITOR){
     const box = PREF_BOX[v.pref];
     if(!box){ miss.push(v.berth + ' (테두리 없음)'); continue; }
+    // ★★★ 2026-09-04 — **한 현이 막혔다고 전부를 버리지 않는다** (실제로 그랬다)
+    //
+    //   일감 기록: 香川 182곳 · 広島 246곳을 이미 받아 놓고 兵庫 에서 overpass 다섯 대가
+    //   모두 504·timeout 을 내자 **여기서 통째로 죽었다.** 이미 받은 428곳도 같이 버려졌다.
+    //   ★ 마리나 훑기는 이미 「한 바다가 막혀도 넘어간다」 로 되어 있었는데
+    //     관 자료 쪽만 안 그랬다 — 같은 흠을 한쪽만 고쳐 둔 것이다 (사장님이 정하신 것 3·12).
+    //   ★ 조용히 넘어가지도 않는다. 못 받은 현을 자료와 화면에 남긴다.
     if(!cache[v.pref]){
       console.log('[' + (++몇째) + '/' + 현들.length + '] ' + v.pref + ' 물어보는 중…');
-      cache[v.pref] = await osmIn(box);
-      console.log('   ' + v.pref + ' — 자리 ' + cache[v.pref].length + '곳을 받았습니다');
+      try{
+        cache[v.pref] = await osmIn(box);
+        console.log('   ' + v.pref + ' — 자리 ' + cache[v.pref].length + '곳을 받았습니다');
+      }catch(e){
+        cache[v.pref] = [];
+        못받은현.push(v.pref + ' — ' + ((e && e.message) || e));
+        console.log('   ★ ' + v.pref + ' 못 받았습니다 — ' + ((e && e.message) || e));
+      }
       await new Promise(r=>setTimeout(r, 1200));
+    }
+    if(!cache[v.pref].length && 못받은현.some(x => x.startsWith(v.pref + ' '))){
+      miss.push(v.berth + ' — ' + v.pref + ' 을(를) 못 받았습니다');
+      continue;
     }
     const hit = findSpot(cache[v.pref], v.name, v.alt);
     if(!hit){ miss.push(v.berth + ' — ' + v.name + ' 을(를) OSM 에서 못 찾음'); continue; }
@@ -1009,6 +1064,16 @@ async function 해역경계(){
   //   ★ 한 자리에 여러 개가 실리는 것을 여기서 막는다 (사장님 지적 — 제부항 7곳)
   const jp묶기 = 한자리로묶기(rows.concat(마리나.jp));
   const jpRows = jp묶기.rows;
+  // ★★★ 4.102 — 사람이 찾아 적어 둔 **읽는 법**을 붙인다 (spot_hand.js ⑤)
+  //   지도에 가나 읽기가 붙은 곳은 얼마 안 된다. 그래서 사람이 관공서 자료에서 찾아 적었다.
+  //   ★ 지도에 name:ko 가 이미 있으면 그것을 그대로 둔다 — 그 지역 사람이 적어 둔 이름이 먼저다.
+  jpRows.forEach(r => {
+    const 읽 = 손.일본이름읽기[r.n];
+    if(!읽) return;
+    r.nm = r.nm || {};
+    if(!r.nm['ko']) r.nm['ko'] = 읽.한글;
+    if(!r.nm['ja-Hira']) r.nm['ja-Hira'] = 읽.가나;
+  });
   const out = Object.assign(머리(VISITOR_SRC + ' · ' + OSM_FROM, {
     // ★★★ 얼마나 건졌나를 자료 안에 같이 남긴다 (2026-08-30).
     //   무엇이 왜 빠졌는지는 일감 기록을 뒤져야만 알 수 있었고, 나는 그걸 못 본 채
@@ -1017,13 +1082,14 @@ async function 해역경계(){
     실린곳: rows.length,
     현마다받은수: Object.fromEntries(Object.entries(cache).map(([k, v]) => [k, v.length])),
     못찾음: miss,
+    못받은현,                          // 남의 서버가 안 줘서 통째로 빈 현
     무르게맞춘것: loose,
     마리나훑은수: 마리나샘,
     마리나실린수: { jp: 마리나.jp.length, kr: 마리나.kr.length },
     관자료와겹쳐서뺀것: 겹침,
     한자리라뺀것: jp묶기.뺀것
   }), { rows: jpRows });
-  fs.writeFileSync('spots-jp.json', JSON.stringify(out));
+  안전하게쓰기('spots-jp.json', out);
 
   // ── 한국 관 자료 마리나 (해양수산부 「전국 마리나 현황」 71곳)
   //   ★ 이순신·원형처럼 실제로 운영 중인데 앱에 없던 곳이 여기로 들어온다.
@@ -1046,7 +1112,7 @@ async function 해역경계(){
     적바림: '러시아는 관 자료가 없어 지도(OpenStreetMap)에서 훑은 것만 담습니다. '
           + '전부 「아직 확인 안 됨」 입니다.'
   }), { rows: ru묶기.rows });
-  fs.writeFileSync('spots-ru.json', JSON.stringify(ru));
+  안전하게쓰기('spots-ru.json', ru);
   console.log('러시아 마리나 ' + ru묶기.rows.length + '곳을 담았습니다.');
 
   // ── 한국 꾸러미 (관 자료 + 지도가 마리나라고 부르는 곳)
@@ -1071,7 +1137,7 @@ async function 해역경계(){
     물본반경m: 물반경m,
     적바림: '관 자료는 운영 중 72곳이라 적혀 있는데 여덟 쪽에서 71곳을 읽었습니다.'
   }), { rows: krRows });
-  fs.writeFileSync('spots-kr.json', JSON.stringify(kr));
+  안전하게쓰기('spots-kr.json', kr);
 
   // ★ 일감(jp.yml)은 `git add app/spots-jp.json` 한 줄뿐이다. 그 파일은 .github 안에 있어
   //   내가 못 고친다. 그러니 새로 만든 파일은 **내가 담는다** — 사장님께 일을 더 시키지 않는다.
@@ -1088,5 +1154,6 @@ async function 해역경계(){
     + ` · 한국 마리나 ${krRows.length}곳 (관 자료 ${관마리나.rows.length} + 지도 훑기 ${krRows.length - 관마리나.rows.length})`
     + (겹침.length ? `\n관 자료와 겹쳐서 뺀 것 ${겹침.length}곳` : '')
     + (loose.length ? `\n무르게 맞춘 것 ${loose.length}건 (눈으로 한 번 봐 주십시오):\n  ` + loose.join('\n  ') : '')
-    + (miss.length ? `\n관 자료 중 못 찾음 ${miss.length}건 (「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : ''));
+    + (miss.length ? `\n관 자료 중 못 찾음 ${miss.length}건 (「했나」 에도 남겼습니다):\n  ` + miss.join('\n  ') : '')
+    + (못받은현.length ? `\n★ 남의 서버가 안 줘서 통째로 빈 현 ${못받은현.length}곳:\n  ` + 못받은현.join('\n  ') : ''));
 })().catch(e => { console.error('★ 실패:', e && e.message || e); process.exit(1); });

@@ -2648,13 +2648,9 @@ const I18N = {
     '{n}시간마다':'every {n} h',
     '남음 {n}시간':'{n} h left',
     '지남 {n}시간':'{n} h over',
-    '지금까지 {n}시간':'{n} h so far',
-    '안 쓰면 달력만':'leave blank for calendar only',
     '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'Enter how many engine hours between jobs — engine oil every 250 h, impeller every 500 h.<br><br>',
     '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'If you fill in <b>both</b> this and the calendar cycle, whichever comes <b>first</b> is shown — \'6 months or 250 hours, whichever comes first\'.<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Hours are counted from the app\\u2019s <b>engine running records</b> plus running time in the voyage log. No gauge reading needed.<br><br>',
-    '안 적으면 여태처럼 달력만 봅니다.':'Leave it blank and it works on the calendar alone, as before.',
-    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'Engine jobs often go by running hours (e.g. 250 h). Put that in the <b>Engine hours</b> field below.',
     '교체':'Replace',
     '교체 이력':'Replacement history',
     '정기점검 이력':'Check history',
@@ -4890,7 +4886,6 @@ const I18N = {
   
 
     // ── 4.11
-    '내 위치정보 이용내역':'My location use history',
     '앱이 위치를 쓸 때마다 저절로 남는 기록입니다.':'This record is written automatically every time the app uses your location.',
     '언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.':'Only when and what for are recorded - never the coordinates.',
     '6개월이 지난 것은 저절로 지워집니다.':'Records older than six months are erased automatically.',
@@ -4912,7 +4907,7 @@ const I18N = {
   
 
     // ── 4.12
-    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\n\nDo you agree?\n(You can withdraw at any time under Menu - My location use history.)',
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\n\nDo you agree?\n(You can withdraw at any time under Menu - My location use history.)',
     '위치정보 수집 동의 거두기':'Withdraw location consent',
     '위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.':'Withdraw your consent to location collection?\n\nFeatures such as "Here now" and weather for your current position will stop working.\nCoordinates already saved stay as they are - you can delete them individually in the logbook.',
     '내려받기':'Download',
@@ -5338,13 +5333,6 @@ const I18N = {
   
 
     // ── 4.102-엔진시간
-    '{n}시간 뒤 (기준 {b}시간 + {p}시간)':'in {n} hours (from {b} h + {p} h)',
-    '{n}시간 지났습니다.':'{n} hours overdue.',
-    '기준 지움':'Clear baseline',
-    '기준이 없습니다. [지금부터] 를 누르면 지금 가동시간부터 셉니다.':'No baseline yet. Press [From now] to count from the current engine hours.',
-    '안 쓰면 달력만 봅니다.':'Leave it blank to go by the calendar only.',
-    '오늘로 맞춤':'Set to now',
-    '지금부터':'From now',
     '해수펌프 임펠러 점검':'Sea water pump impeller check',
   
 
@@ -5356,11 +5344,8 @@ const I18N = {
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요.':'[draft] This also comes due by engine hours. Put the figure from your manual in the Engine hours field.',
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요. 샤프트 방식이면 삭제하세요.':'[draft] This also comes due by engine hours. Put the figure from your manual in the Engine hours field. Delete this if you have a shaft drive.',
     '[초안] 정비소 일감입니다. 주기는 엔진 설명서를 보세요.':'[draft] A job for the yard. For the interval, see your engine manual.',
-    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다.<br><br>':'If you fill in <b>both</b> this and the calendar cycle, whichever comes <b>first</b> is shown.<br><br>',
     '밸브 간극 점검·조정':'Valve clearance check and adjustment',
     '에어클리너 청소':'Clean the air cleaner',
-    '엔진 몇 시간마다 할 일인지 적습니다.<br><br>':'Enter how many engine hours between jobs.<br><br>',
-    '엔진 정비는 가동시간 기준인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요 — 숫자는 내 엔진 설명서를 보십시오.':'Engine jobs often go by running hours. Put that in the <b>Engine hours</b> field below — take the figure from your own engine manual.',
     '연료 분사 노즐 점검':'Fuel injection nozzle check',
   
 
@@ -5399,6 +5384,34 @@ const I18N = {
     '처음 오셨습니다. 두 가지만 골라 주세요.':'Welcome. Just two things to choose.',
     '출항 전 점검표':'Pre-departure checklist',
     '점검표를 기본값으로 되돌리기':'Reset the checklist to defaults',
+  
+
+    // ── 4.102-정비주기화면
+    '{n}시간 남음':'{n} h left',
+    '{n}시간 지남':'{n} h overdue',
+    '엔진 {n}시간':'{n} engine hours',
+    '달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.':'You will be told whichever comes first — the date or the engine hours.',
+    '엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.':'If this job goes by engine hours, put the figure in the box on the right. Leave it blank to go by the calendar only.',
+    '마지막으로 했을 때 엔진이 몇 시간이었는지 적으세요. 그래야 남은 시간을 셀 수 있습니다.':'Enter the engine hours as they were the last time this was done. That is how the hours left are counted.',
+    '<b>엔진 시간</b> — 엔진 몇 시간마다 하는 일이면 오른쪽 칸에 적습니다. ':'<b>Engine hours</b> — if the job goes by engine hours, put that figure in the box on the right. ',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.':'The hours are added up from the app\'s <b>engine running log</b> and the hours in your voyage logs. You do not have to read the gauge.',
+  
+
+    // ── 4.102-정비주기화면
+    '지금 {n}시간':'Now: {n} h',
+  
+
+    // ── 4.102-특보깨짐
+    '특보를 제대로 못 읽었습니다 — 기상청에서 확인해 주세요':'The warnings could not be read properly — please check with the KMA',
+  
+
+    // ── 4.102-육상특보
+    '육상 특보':'Land warnings',
+    '해상 특보는 없습니다':'No marine warnings',
+  
+
+    // ── 4.102-위치동의문구
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\\n\\nDo you agree?\\n(You can switch it off and on at any time under Menu - Terms & Privacy - Location.)',
   },
   ru: {
     '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': 'Удалено {n} точек, записанных после прихода.',
@@ -5797,13 +5810,9 @@ const I18N = {
     '{n}시간마다':'каждые {n} ч',
     '남음 {n}시간':'осталось {n} ч',
     '지남 {n}시간':'просрочено на {n} ч',
-    '지금까지 {n}시간':'пока {n} ч',
-    '안 쓰면 달력만':'пусто — только календарь',
     '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'Укажите, через сколько моточасов повторять — масло каждые 250 ч, крыльчатка каждые 500 ч.<br><br>',
     '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'Если заполнить <b>оба</b> — календарь и моточасы — покажем то, что наступит <b>раньше</b>: «6 месяцев или 250 часов, что раньше».<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Часы считаются по <b>записям работы двигателя</b> в приложении и по наработке из судового журнала. Прибор считывать не нужно.<br><br>',
-    '안 적으면 여태처럼 달력만 봅니다.':'Оставьте пустым — будет работать только по календарю, как раньше.',
-    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'Обслуживание двигателя часто идёт по моточасам (например, 250 ч). Впишите это в поле <b>Моточасы</b> ниже.',
     '교체':'Заменить',
     '교체 이력':'История замен',
     '정기점검 이력':'История ТО',
@@ -8039,7 +8048,6 @@ const I18N = {
   
 
     // ── 4.11
-    '내 위치정보 이용내역':'Мои записи о местоположении',
     '앱이 위치를 쓸 때마다 저절로 남는 기록입니다.':'Эта запись создаётся автоматически каждый раз, когда приложение использует ваше местоположение.',
     '언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.':'Фиксируются только когда и для чего — координаты не записываются.',
     '6개월이 지난 것은 저절로 지워집니다.':'Записи старше шести месяцев стираются автоматически.',
@@ -8061,7 +8069,7 @@ const I18N = {
   
 
     // ── 4.12
-    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)':'Чтобы определить текущее местоположение, нужно согласие на использование данных о местоположении.\n\nСогласны?\n(Отозвать можно в любой момент: Меню — Мои записи о местоположении.)',
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'Чтобы определить текущее местоположение, нужно согласие на использование данных о местоположении.\n\nСогласны?\n(Отозвать можно в любой момент: Меню — Мои записи о местоположении.)',
     '위치정보 수집에 동의':'Согласие на сбор дано', '위치정보 수집에 동의하기':'Согласиться на сбор местоположения', '동의·철회':'Согласие',
     '위치정보 수집 동의 거두기':'Отозвать согласие',
     '위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.':'Отозвать согласие на сбор местоположения?\n\nПерестанут работать «Я здесь» и погода по текущему месту.\nУже сохранённые координаты останутся — их можно удалить по отдельности в судовом журнале.',
@@ -8487,13 +8495,6 @@ const I18N = {
   
 
     // ── 4.102-엔진시간
-    '{n}시간 뒤 (기준 {b}시간 + {p}시간)':'через {n} ч (от {b} ч + {p} ч)',
-    '{n}시간 지났습니다.':'просрочено на {n} ч.',
-    '기준 지움':'Сбросить отсчёт',
-    '기준이 없습니다. [지금부터] 를 누르면 지금 가동시간부터 셉니다.':'Точка отсчёта не задана. Нажмите [С этого момента], чтобы считать от текущей наработки.',
-    '안 쓰면 달력만 봅니다.':'Оставьте пустым — тогда только по календарю.',
-    '오늘로 맞춤':'Отсчёт с текущего момента',
-    '지금부터':'С этого момента',
     '해수펌프 임펠러 점검':'Проверка крыльчатки забортного насоса',
   
 
@@ -8505,11 +8506,8 @@ const I18N = {
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요.':'[черновик] Срок наступает и по моточасам. Впишите число из руководства в поле «Моточасы».',
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요. 샤프트 방식이면 삭제하세요.':'[черновик] Срок наступает и по моточасам. Впишите число из руководства в поле «Моточасы». Удалите, если у вас валовая передача.',
     '[초안] 정비소 일감입니다. 주기는 엔진 설명서를 보세요.':'[черновик] Работа для сервиса. Интервал — по руководству двигателя.',
-    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다.<br><br>':'Если заполнить <b>и это, и</b> календарный интервал, показывается тот, что наступает <b>раньше</b>.<br><br>',
     '밸브 간극 점검·조정':'Проверка и регулировка тепловых зазоров клапанов',
     '에어클리너 청소':'Чистка воздушного фильтра',
-    '엔진 몇 시간마다 할 일인지 적습니다.<br><br>':'Укажите, через сколько моточасов повторять.<br><br>',
-    '엔진 정비는 가동시간 기준인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요 — 숫자는 내 엔진 설명서를 보십시오.':'Обслуживание двигателя часто считают по моточасам. Впишите это в поле <b>Моточасы</b> ниже — число возьмите из руководства своего двигателя.',
     '연료 분사 노즐 점검':'Проверка топливных форсунок',
   
 
@@ -8548,6 +8546,34 @@ const I18N = {
     '처음 오셨습니다. 두 가지만 골라 주세요.':'Добро пожаловать. Выберите всего две вещи.',
     '출항 전 점검표':'Предотходный чек-лист',
     '점검표를 기본값으로 되돌리기':'Вернуть предотходный чек-лист',
+  
+
+    // ── 4.102-정비주기화면
+    '{n}시간 남음':'осталось {n} ч',
+    '{n}시간 지남':'просрочено на {n} ч',
+    '엔진 {n}시간':'{n} моточасов',
+    '달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.':'Сообщим о том, что наступит раньше — срок по календарю или по моточасам.',
+    '엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.':'Если работа выполняется по моточасам, впишите число в поле справа. Оставьте пустым — только по календарю.',
+    '마지막으로 했을 때 엔진이 몇 시간이었는지 적으세요. 그래야 남은 시간을 셀 수 있습니다.':'Впишите моточасы на момент последнего выполнения. По ним и считается остаток.',
+    '<b>엔진 시간</b> — 엔진 몇 시간마다 하는 일이면 오른쪽 칸에 적습니다. ':'<b>Моточасы</b> — если работа идёт по моточасам, впишите это число в поле справа. ',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.':'Часы складываются из <b>журнала работы двигателя</b> в приложении и наработки из судовых журналов. Показания счётчика вводить не нужно.',
+  
+
+    // ── 4.102-정비주기화면
+    '지금 {n}시간':'Сейчас {n} ч',
+  
+
+    // ── 4.102-특보깨짐
+    '특보를 제대로 못 읽었습니다 — 기상청에서 확인해 주세요':'Предупреждения не удалось прочитать — проверьте на сайте метеослужбы Кореи',
+  
+
+    // ── 4.102-육상특보
+    '육상 특보':'Предупреждения на суше',
+    '해상 특보는 없습니다':'Морских предупреждений нет',
+  
+
+    // ── 4.102-위치동의문구
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'Чтобы определить текущее местоположение, нужно согласие на использование данных о местоположении.\\n\\nСогласны?\\n(Выключить и включить можно в любой момент: Меню — Условия и конфиденциальность — Данные о местоположении.)',
   },
   // ── 일본어 (4.68)
   //
@@ -9003,13 +9029,9 @@ const I18N = {
     '{n}시간마다':'{n}時間ごと',
     '남음 {n}시간':'あと{n}時間',
     '지남 {n}시간':'{n}時間超過',
-    '지금까지 {n}시간':'これまで{n}時間',
-    '안 쓰면 달력만':'空欄ならカレンダーのみ',
     '엔진 몇 시간마다 할 일인지 적습니다 — 엔진오일 250시간, 임펠러 500시간 같은 것입니다.<br><br>':'エンジン何時間ごとの作業かを書きます — エンジンオイル 250時間、インペラ 500時間 のように。<br><br>',
     '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다. 「6개월 또는 250시간 중 먼저」가 그것입니다.<br><br>':'カレンダー周期と<b>両方</b>書くと、<b>先に来るほう</b>を知らせます。「6か月または250時間のいずれか早いほう」です。<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'時間はアプリの<b>エンジン稼働記録</b>と航海日誌の稼働時間を合わせて数えます。計器を読む必要はありません。<br><br>',
-    '안 적으면 여태처럼 달력만 봅니다.':'書かなければ、これまでどおりカレンダーだけで見ます。',
-    '엔진 정비는 가동시간 기준(예: 250시간)인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요.':'エンジンの整備は稼働時間基準（例：250時間）のことも多いです。その場合は下の<b>エンジン時間</b>欄に書いてください。',
     '교체':'交換',
     '교체 이력':'交換履歴',
     '정기점검 이력':'定期点検の履歴',
@@ -11149,7 +11171,6 @@ const I18N = {
     '잔량 추정은 [만탱크] 주유가 두 번 이상 쌓이면 계산됩니다.':'残量の推定は［満タン］給油が2回以上たまると計算されます。',
     '넣은 시각입니다. 다르면 고쳐 주세요':'給油した時刻です。違う場合は修正してください',
     '시각을 0000~2359 사이로 넣어 주세요.':'時刻は0000〜2359の間で入力してください。',
-    '내 위치정보 이용내역':'位置情報の利用履歴',
     '앱이 위치를 쓸 때마다 저절로 남는 기록입니다.':'アプリが位置情報を使うたびに自動で残る記録です。',
     '언제 · 무엇에 썼는지만 남기고 좌표는 남기지 않습니다.':'いつ・何に使ったかだけを残し、座標は残しません。',
     '6개월이 지난 것은 저절로 지워집니다.':'6か月が過ぎたものは自動で削除されます。',
@@ -11168,7 +11189,7 @@ const I18N = {
     '날씨 지점 잡기':'天気地点の設定',
     '정박지 자리를 커뮤니티에 올림':'係留地の位置をコミュニティに投稿',
     '항해 항적 기록':'航海の航跡記録',
-    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)':'位置情報の利用に同意していただくと現在地を取得できます。\n\n同意されますか？\n（メニュー › 位置情報の利用履歴 からいつでも撤回できます。）',
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'位置情報の利用に同意していただくと現在地を取得できます。\n\n同意されますか？\n（メニュー › 位置情報の利用履歴 からいつでも撤回できます。）',
     '위치정보 수집 동의 거두기':'位置情報の収集同意を撤回',
     '위치정보 수집 동의를 거둘까요?\n\n거두면 「지금 여기」·현재 위치 날씨 같은 기능이 멈춥니다.\n이미 저장된 좌표는 그대로 남습니다 — 항해 기록에서 따로 지우실 수 있습니다.':'位置情報の収集同意を撤回しますか？\n\n撤回すると「現在地」・現在地の天気などの機能が止まります。\nすでに保存された座標はそのまま残ります — 航海記録から個別に削除できます。',
     '내려받기':'ダウンロード',
@@ -11556,13 +11577,6 @@ const I18N = {
   
 
     // ── 4.102-엔진시간
-    '{n}시간 뒤 (기준 {b}시간 + {p}시간)':'あと{n}時間（基準{b}時間＋{p}時間）',
-    '{n}시간 지났습니다.':'{n}時間過ぎています。',
-    '기준 지움':'基準を消す',
-    '기준이 없습니다. [지금부터] 를 누르면 지금 가동시간부터 셉니다.':'基準がありません。[今から] を押すと現在の稼働時間から数えます。',
-    '안 쓰면 달력만 봅니다.':'空欄なら暦だけで見ます。',
-    '오늘로 맞춤':'今に合わせる',
-    '지금부터':'今から',
     '해수펌프 임펠러 점검':'海水ポンプインペラ点検',
   
 
@@ -11574,11 +11588,8 @@ const I18N = {
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요.':'[下書き] エンジン稼働時間でも来ます。説明書の時間を「エンジン時間」欄に入れてください。',
     '[초안] 엔진 가동시간으로도 옵니다. 설명서의 시간을 「엔진 시간」 칸에 넣으세요. 샤프트 방식이면 삭제하세요.':'[下書き] エンジン稼働時間でも来ます。説明書の時間を「エンジン時間」欄に入れてください。シャフト式の場合は削除してください。',
     '[초안] 정비소 일감입니다. 주기는 엔진 설명서를 보세요.':'[下書き] 整備工場の作業です。周期はエンジン取扱説明書をご覧ください。',
-    '달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다.<br><br>':'暦の周期と<b>両方</b>入れると、<b>先に来るほう</b>をお知らせします。<br><br>',
     '밸브 간극 점검·조정':'バルブクリアランス点検・調整',
     '에어클리너 청소':'エアクリーナ清掃',
-    '엔진 몇 시간마다 할 일인지 적습니다.<br><br>':'エンジン何時間ごとに行うかを入力します。<br><br>',
-    '엔진 정비는 가동시간 기준인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요 — 숫자는 내 엔진 설명서를 보십시오.':'エンジン整備は稼働時間基準のことも多いです。その場合は下の<b>エンジン時間</b>欄に入れてください — 数字はご自分のエンジン取扱説明書をご覧ください。',
     '연료 분사 노즐 점검':'燃料噴射ノズル点検',
   
 
@@ -11617,6 +11628,34 @@ const I18N = {
     '처음 오셨습니다. 두 가지만 골라 주세요.':'はじめまして。二つだけお選びください。',
     '출항 전 점검표':'出港前チェックリスト',
     '점검표를 기본값으로 되돌리기':'出港前チェックリストを初期値に戻す',
+  
+
+    // ── 4.102-정비주기화면
+    '{n}시간 남음':'残り{n}時間',
+    '{n}시간 지남':'{n}時間超過',
+    '엔진 {n}시간':'エンジン{n}時間',
+    '달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.':'カレンダーとエンジン時間のうち、先に来るほうをお知らせします。',
+    '엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.':'エンジン時間ごとの作業なら右の欄に入れてください。空欄ならカレンダーのみで見ます。',
+    '마지막으로 했을 때 엔진이 몇 시간이었는지 적으세요. 그래야 남은 시간을 셀 수 있습니다.':'前回行ったときのエンジン時間を入れてください。それで残り時間を数えます。',
+    '<b>엔진 시간</b> — 엔진 몇 시간마다 하는 일이면 오른쪽 칸에 적습니다. ':'<b>エンジン時間</b> — エンジン時間ごとの作業なら、その数字を右の欄に入れます。',
+    '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.':'時間はアプリの<b>エンジン稼働記録</b>と航海日誌の稼働時間を合わせて数えます。計器を読み取る必要はありません。',
+  
+
+    // ── 4.102-정비주기화면
+    '지금 {n}시간':'現在 {n}時間',
+  
+
+    // ── 4.102-특보깨짐
+    '특보를 제대로 못 읽었습니다 — 기상청에서 확인해 주세요':'警報・注意報を正しく読めませんでした — 気象庁（韓国）でご確認ください',
+  
+
+    // ── 4.102-육상특보
+    '육상 특보':'陸上の警報・注意報',
+    '해상 특보는 없습니다':'海上警報・注意報はありません',
+  
+
+    // ── 4.102-위치동의문구
+    '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'位置情報の利用に同意していただくと現在地を取得できます。\\n\\n同意されますか？\\n（メニュー › 規約・方針 › 位置情報 からいつでもオン・オフできます。）',
   }
 };
 
@@ -13669,22 +13708,18 @@ const HELP = {
     t('<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>') +
     t('<b>수리목록</b>은 고장이 생겼을 때 기록합니다. 발견한 날부터 고칠 때까지의 상태(고장 → 진행 중 → 완료)를 따라갑니다.<br><br>') +
     t('주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.')],
+  // ★★★ 4.102 — 「?」 를 둘에서 하나로 줄였다 (사장님 지적).
+  //   화면이 스스로 말하게 고쳤으니 도움말은 **화면에 안 적히는 것**만 담는다.
   cycle: [t('점검 주기'),
     t('얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>') +
     t('마지막 점검일을 입력하면 다음 예정일이 자동으로 계산되고, 목록에 남은 기간이 표시됩니다. ') +
     t('기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>') +
-    t('엔진 정비는 가동시간 기준인 경우도 많습니다. 그때는 아래 <b>엔진 시간</b> 칸에 적으세요 — 숫자는 내 엔진 설명서를 보십시오.')],
-  hrs: [t('엔진 시간'),
-    // ★★★ 4.102 — 여기에 **숫자 보기를 적지 않는다** (사장님 지적).
-    //   「이 어플이 그냥 얀마 엔진만 쓰는 사람이 쓰는 어플이냐?」
+    t('<b>엔진 시간</b> — 엔진 몇 시간마다 하는 일이면 오른쪽 칸에 적습니다. ') +
+    // ★ 여기에 **숫자 보기를 적지 않는다** (사장님이 정하신 것 14).
     //   보기로 적은 숫자도 사람은 「그 값을 쓰면 되나 보다」 로 읽는다.
-    //   주기는 엔진마다 다르고, 틀리면 엔진이 깨진다. **설명서를 보게 한다.**
-    t('엔진 몇 시간마다 할 일인지 적습니다.<br><br>') +
     t('<b>주기는 엔진마다 다릅니다.</b> 얀마·볼보펜타·베타·나니·선외기가 다 다르고, 같은 회사라도 기종마다 다릅니다. ') +
     t('<b>내 엔진 설명서의 정비 주기표</b>를 보고 그 숫자를 적으세요. 앱은 숫자를 지어내지 않습니다.<br><br>') +
-    t('달력 주기와 <b>둘 다</b> 적으면 <b>먼저 오는 쪽</b>을 알려 줍니다.<br><br>') +
-    t('시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>') +
-    t('안 적으면 여태처럼 달력만 봅니다.')],
+    t('시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.')],
   pin: [t('도면 핀'),
     t('항목이 배의 어느 위치인지 도면에 표시해 둘 수 있습니다.<br><br>') +
     t('항목을 연 뒤 <b>핀 지정</b>을 누르고 도면에서 해당 위치를 탭하면 됩니다.') +
@@ -14374,7 +14409,7 @@ function locSet(on){
 async function locAsk(quiet){
   if(locOK()) return true;
   if(quiet) return false;
-  const yes = await ask(t('위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 내 위치정보 이용내역 에서 언제든 거두실 수 있습니다.)'), { ok: t('동의하기') });
+  const yes = await ask(t('위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\n\n동의하시겠습니까?\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)'), { ok: t('동의하기') });
   if(!yes) return false;
   locSet(true);
   return true;
@@ -24551,13 +24586,14 @@ function mHourLeft(it){
   // ★★★ 4.102 — 기준이 없으면 시간으로 세지 않는다.
   //   여태는 기준이 없으면 **0시간부터** 센 셈으로 봤다. 엔진을 이미 400시간 돌린 배에서는
   //   「250시간 지남」 이 바로 떠 버린다 — 앱이 모르는 것을 아는 척한 것이다.
-  //   기준이 없으면 달력만 본다. 그리고 화면에서 「지금부터」 를 눌러 기준을 잡게 한다.
+  //   기준이 없으면 달력만 본다. 화면에서는 「마지막 · 엔진 [ ] 시간」 칸에 적어 넣는다.
   if(!isFinite(base)) return null;
   return (base + per) - engNow();
 }
 // 이 항목의 시간 기준이 잡혀 있나
 function mHasBase(it){ return isFinite(parseFloat(it && it.lastH)); }
-// 「지금부터」 — 지금 가동시간을 이 항목의 기준으로 삼는다
+// 「지금 21.6」 단추 — 마지막에 한 때의 엔진 시간을 **지금 값**으로 채운다.
+//   ★ 4.102 — 단추 이름에 들어갈 숫자를 그대로 보여 준다. 눌러 보지 않아도 무엇이 들어갈지 안다.
 function mHourBaseNow(){
   const it = getMR('maint', mrOpenId); if(!it) return;
   it.lastH = engNow(); it.seed = false;
@@ -24565,41 +24601,91 @@ function mHourBaseNow(){
   if(typeof schedulePush === 'function') schedulePush();
   rerender('maint'); openMR('maint', mrOpenId);
 }
-function mHourClear(){
-  const it = getMR('maint', mrOpenId); if(!it) return;
-  delete it.lastH;
-  saveMR();
-  if(typeof schedulePush === 'function') schedulePush();
-  rerender('maint'); openMR('maint', mrOpenId);
-}
+
 // ★★★ 4.102 — 엔진 시간 줄. 「몇 시간마다」 만으로는 사람이 아무것도 못 한다.
 //   지금 몇 시간인지, 이 항목 기준이 언제인지, 다음까지 얼마나 남았는지를 같이 보여 준다.
 //   (사장님이 메모에 손으로 「현재 12시간 즉 42시간때 체크」 라고 적고 계셨다 — 그걸 앱이 한다)
-function mHourRow(it){
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.102 — 정비 주기 화면을 **보자마자 알게** 다시 만들었다 (사장님 지적)
+//
+//   사장님 말씀:
+//     「인간이 직관적으로 이해하고 쓸 수 있게 만들라 했잖아. 니만 이해하게 만드냐?
+//      이해가 딱 봐서 하나도 안 되는데 이걸 어떻게 쓰라는 거야?
+//      누가 어플을 공부해서 쓰냐? 다시 만들어」
+//
+// ★ 무엇이 잘못이었나 — 내 머릿속 말을 화면에 그대로 옮겨 놓았다.
+//     「엔진 시간 [    ] 안 쓰면 달력만 · 지금까지 21.6시간 · [지금부터] [기준 지움] [오늘로 맞춤]」
+//   · 「기준」 이 무엇인지 화면 어디에도 없다. 도움말 「?」 를 눌러야 안다.
+//   · 「지금부터」·「오늘로 맞춤」·「기준 지움」 — 셋이 무엇이 다른지 눌러 봐야 안다.
+//   · 「지금까지 21.6시간」 이 내 엔진 총 시간인지 이 항목 것인지 알 수 없다.
+//   ★ **도움말을 눌러야 이해되는 화면은 못 만든 화면이다.**
+//
+// ★ 다른 데는 어떻게 하나 (찾아보고 그대로 따랐다)
+//   차량 정비 앱(오토업·마카롱·카닥)은 한결같이 **두 가지만** 묻는다 —
+//     ① 「교체 주기」 (12개월 / 10,000km)   ② 「최근 교체일」 · 「최근 교체 주행거리」
+//   달력과 거리를 **나란히** 놓고, 이름이 곧 설명이다. 「기준」 같은 말은 쓰지 않는다.
+//
+// ★ 그래서 이렇게 바꿨다 — 묻는 것은 딱 두 줄이다
+//     주기    [6] [개월▾]   엔진 [250] 시간
+//     마지막  [2026-09-04]  엔진 [21.6] 시간   [지금 21.6]
+//     다음    2027-03-04 · 180일 남음 · 엔진 271.6시간(250시간 남음)
+//   · 엔진 칸은 **주기와 마지막에 하나씩** 있고, 자리가 뜻을 말해 준다.
+//   · 단추는 **하나**다 — 「지금 21.6」 은 눌러 보지 않아도 무엇이 들어갈지 보인다.
+//   · 「기준」 이라는 말을 화면에서 없앴다. 비우면 안 세고, 적으면 센다.
+function mCycleRow(it){
+  const per = parseFloat(it.hrs);
+  const 시간있음 = isFinite(per) && per > 0;
+  if(!unlocked){
+    return `<div class="mrrow"><span class="mrlbl">${esc(t('주기'))}</span>
+      <b class="mrv">${it.months}${UNIT_LABEL[it.unit||'m']}${
+        시간있음 ? ' · ' + esc(tsub('엔진 {n}시간', { n: per })) : ''}</b></div>`;
+  }
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('주기'))}${helpBtn('cycle')}</span>
+      <input type="number" min="1" value="${it.months}" style="width:56px"
+             onchange="mrField('months',parseInt(this.value,10)||12)">
+      <select onchange="mrField('unit',this.value)">
+        <option value="d"${(it.unit||'m')==='d'?' selected':''}>${esc(t('일'))}</option>
+        <option value="w"${(it.unit||'m')==='w'?' selected':''}>${esc(t('주'))}</option>
+        <option value="m"${(it.unit||'m')==='m'?' selected':''}>${esc(t('개월'))}</option>
+      </select>
+      <span class="mrv2" style="margin-left:10px">${esc(t('엔진'))}</span>
+      <input type="number" min="0" step="1" value="${esc(it.hrs == null ? '' : it.hrs)}" style="width:64px"
+             onchange="mrField('hrs', this.value === '' ? '' : (parseFloat(this.value)||''))">
+      <span class="mrv2">${esc(t('시간'))}</span></div>
+    <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(
+      시간있음 ? t('달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.')
+               : t('엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.'))}</div>`;
+}
+function mLastRow(it, s){
+  const per = parseFloat(it.hrs);
+  const 시간있음 = isFinite(per) && per > 0;
   const 지금 = Math.round(engNow() * 10) / 10;
-  const per  = parseFloat(it.hrs);
-  const 있음 = isFinite(per) && per > 0;
   const 기준 = mHasBase(it) ? (Math.round(parseFloat(it.lastH) * 10) / 10) : null;
   const 남음 = mHourLeft(it);
-  let 알림 = '';
-  if(!있음)            알림 = t('안 쓰면 달력만 봅니다.');
-  else if(기준 === null) 알림 = t('기준이 없습니다. [지금부터] 를 누르면 지금 가동시간부터 셉니다.');
-  else if(남음 < 0)     알림 = tsub('{n}시간 지났습니다.', { n: Math.round(-남음) });
-  else                  알림 = tsub('{n}시간 뒤 (기준 {b}시간 + {p}시간)',
-                                    { n: Math.round(남음), b: 기준, p: per });
-  const 단추 = (unlocked && 있음)
-    ? (기준 === null
-        ? `<button class="minib grn" onclick="mHourBaseNow()">${esc(t('지금부터'))}</button>`
-        : `<button class="minib" onclick="mHourBaseNow()">${esc(t('오늘로 맞춤'))}</button>`
-          + `<button class="minib" onclick="mHourClear()">${esc(t('기준 지움'))}</button>`)
-    : '';
-  return `<div class="mrrow"><span class="mrlbl">${esc(t('엔진 시간'))}${helpBtn('hrs')}</span>${unlocked
-      ? `<input type="number" min="0" step="1" value="${esc(it.hrs == null ? '' : it.hrs)}" style="width:78px"
-           placeholder="${esc(t('안 쓰면 달력만'))}"
-           onchange="mrField('hrs', this.value === '' ? '' : (parseFloat(this.value)||''))">
-         <span class="mrv2">${esc(tsub('지금까지 {n}시간', { n: 지금 }))}</span>${단추}`
-      : `<b class="mrv">${있음 ? esc(tsub('{n}시간마다', { n: per })) : '—'}</b>`}</div>
-    ${있음 ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(알림)}</div>` : ''}`;
+  // ── 「다음」 줄 — 사람이 정말 알고 싶은 것. 계산해서 보여만 준다.
+  const 다음들 = [];
+  if(s.next) 다음들.push(fmtDate(s.next));
+  if(시간있음 && 기준 !== null)
+    다음들.push(tsub('엔진 {n}시간', { n: Math.round((기준 + per) * 10) / 10 })
+      + ' (' + (남음 < 0 ? tsub('{n}시간 지남', { n: Math.round(-남음) })
+                        : tsub('{n}시간 남음', { n: Math.round(남음) })) + ')');
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('마지막'))}</span>${unlocked
+      ? `<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
+      : `<b class="mrv">${it.lastDate||'—'}</b>`}
+      ${시간있음 ? (unlocked
+        ? `<span class="mrv2" style="margin-left:10px">${esc(t('엔진'))}</span>
+           <input type="number" min="0" step="0.1" value="${기준 === null ? '' : 기준}" style="width:64px"
+                  onchange="mrField('lastH', this.value === '' ? '' : (parseFloat(this.value)||0))">
+           <span class="mrv2">${esc(t('시간'))}</span>
+           <button class="minib ${기준 === null ? 'grn' : ''}" onclick="mHourBaseNow()"
+             >${esc(tsub('지금 {n}시간', { n: 지금 }))}</button>`
+        : `<b class="mrv">${기준 === null ? '—' : esc(tsub('엔진 {n}시간', { n: 기준 }))}</b>`) : ''}
+      <span class="st ${s.k}">${esc(s.t)}</span></div>
+    ${다음들.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('다음'))}</span>
+      <b class="mrv" style="flex:1;font-weight:450">${esc(다음들.join(' · '))}</b></div>` : ''}
+    ${시간있음 && 기준 === null && unlocked
+      ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(
+          t('마지막으로 했을 때 엔진이 몇 시간이었는지 적으세요. 그래야 남은 시간을 셀 수 있습니다.'))}</div>` : ''}`;
 }
 function mStatus(it){
   const hl = mHourLeft(it);                       // 시간으로 본 남은 양
@@ -25681,19 +25767,8 @@ function openMR(kind, id){
       <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
         ?`<input list="grpList" value="${esc(t(it.grp||'기타'))}" style="width:130px" onchange="mrField('grp',this.value.trim()||'기타')">`
         :`<b class="mrv">${esc(t(it.grp||'기타'))}</b>`}</div>
-      <div class="mrrow"><span class="mrlbl">${esc(t('주기'))}${helpBtn('cycle')}</span>${unlocked
-        ?`<input type="number" min="1" value="${it.months}" style="width:62px" onchange="mrField('months',parseInt(this.value,10)||12)">
-           <select onchange="mrField('unit',this.value)">
-             <option value="d"${(it.unit||'m')==='d'?' selected':''}>${esc(t('일'))}</option>
-             <option value="w"${(it.unit||'m')==='w'?' selected':''}>${esc(t('주'))}</option>
-             <option value="m"${(it.unit||'m')==='m'?' selected':''}>${esc(t('개월'))}</option>
-           </select>`
-        :`<b class="mrv">${it.months}${UNIT_LABEL[it.unit||'m']}</b>`}</div>
-      ${mHourRow(it)}
-      <div class="mrrow"><span class="mrlbl">${esc(t('마지막'))}</span>${unlocked
-        ?`<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
-        :`<b class="mrv">${it.lastDate||'—'}</b>`}
-        <span class="st ${s.k}">${esc(s.t)}</span>${s.next?`<span class="mrv2">${esc(t('다음'))} ${fmtDate(s.next)}</span>`:''}</div>
+      ${mCycleRow(it)}
+      ${mLastRow(it, s)}
       ${gearPickRow(it, 'maint')}
       <div class="mrrow"><span class="mrlbl">${esc(t('담당'))}</span>
         <b class="mrv" style="flex:1">${it.who ? esc(taskOwnerName(curBoat(), it.who)) : esc(t('없음'))}</b>
@@ -29558,9 +29633,13 @@ const LEGAL_BIZ = {
            ja:'大韓民国 全羅南道 麗水市 船源7ギル38 101号' },
   no: '626-19-02739'
 };
-// 위치기반서비스사업 신고를 마치면 신고번호를 여기 적는다 (예: '제2026-00호').
+// ★★★ 2026-09-04 — 위치기반서비스사업 **신고를 마쳤다.**
+//   방송미디어통신위원회 신고확인증 (전자문서번호 E5D5-38DD-3CAE-F55B)
+//   「위치정보의 보호 및 이용 등에 관한 법률」 제9조 제1항 · 같은 법 시행령 제9조 제1항,
+//   같은 법 제9조의2 제4항과 같은 법 시행령 제10조 제3항에 따라 신고함.
+//   사업 종류 — 위치기반서비스사업 (선박 운항기록 및 해양 안전정보 제공)
 // ★ 이 앱은 GPS 좌표를 항해 기록으로 서버에 저장하므로 신고 면제 대상이 아니다.
-const LEGAL_LBS = null;
+const LEGAL_LBS = '12276';
 
 const LEGAL_DOCS = {
 terms: { title: '이용약관', body: `
@@ -29793,8 +29872,11 @@ location: { title: '위치정보 이용약관', body: `
    1. 날씨 지점을 잡는 데 쓰는 값 — 기기 안에만 두고 서버로 보내지 않습니다.
    2. 항해일지의 출발·중간기록·도착에 남기는 값 — 그 항해 기록의 일부로 서버에 저장됩니다.
 ③ 허락을 거절해도 앱은 모두 쓸 수 있습니다. 지점을 직접 고르시면 됩니다.
-④ 위치정보 이용 동의는 [메뉴] → [내 위치정보 이용내역] 에서 언제든 거두실 수 있습니다.
+④ 위치정보 이용 동의는 [메뉴] → [약관 · 개인정보] → [위치정보] 에서 언제든 거두실 수 있습니다.
    기기 설정에서 거두셔도 됩니다.
+⑤ 위치정보법 제24조 제2항에 따라 **잠시 멈추는 것**도 언제든 하실 수 있습니다.
+   같은 자리의 스위치를 끄면 그때부터 위치를 받지 않고, 다시 켜면 그때부터 다시 받습니다.
+   끄고 켜는 것을 저희가 막지 않습니다.
 
 제4조 (서버에 저장되는 좌표)
 ① 홈포트·정박지 좌표는 이용자가 지도에서 직접 찍은 값입니다.
@@ -29823,20 +29905,24 @@ location: { title: '위치정보 이용약관', body: `
 아래 제11조의 위치정보관리책임자에게 연락하시면 확인해 정리해 드립니다.
 위치정보 수집 동의는 앱의 [메뉴] → [약관 · 개인정보] → [위치정보] 에서 직접 거두실 수 있습니다.
 
-제8조 (제3자 제공)
-위치정보를 남에게 주지 않습니다. 법령에 따른 적법한 요구가 있을 때만 그에 따릅니다.
+제8조 (제3자 제공과 통보)
+① 위치정보를 남에게 주지 않습니다. 법령에 따른 적법한 요구가 있을 때만 그에 따릅니다.
+② 앞으로 이용자가 지정한 제3자에게 개인위치정보를 제공하게 되면, 위치정보법 제19조 제3항에 따라
+   제공받는 자 · 제공 일시 · 제공 목적을 그때마다 즉시 알려 드립니다.
 
 제9조 (이용자의 권리)
 이용자는 자기 위치정보의 수집·이용·제공에 대한 동의를 언제든 거둘 수 있고,
 저장된 자료를 보거나 지워 달라고 할 수 있습니다. 연락처: {EMAIL}
 
-제10조 (만 14세 미만)
-이 앱은 만 14세 미만의 가입을 받지 않으므로 위치정보도 받지 않습니다.
+제10조 (만 14세 미만 · 8세 이하 아동등)
+① 이 앱은 만 14세 미만의 가입을 받지 않으므로 위치정보도 받지 않습니다.
+② 위치정보법 제26조의 8세 이하 아동, 피성년후견인, 중증 정신장애인의 위치정보를
+   이 앱은 따로 다루지 않습니다. 보호의무자의 동의를 받아 그분들의 위치를 찾아 주는 기능이 없습니다.
 
 제11조 (위치정보관리책임자 및 문의)
 위치정보관리책임자: {OWNER}
 연락처: {EMAIL}
-위치정보에 관한 문의는 위 연락처로 해 주십시오.{LBS}
+위치정보에 관한 문의는 위 연락처로 해 주십시오.{BIZ}{LBS}
 
 이 약관은 {DATE}부터 적용합니다. (판 {VER})
 ` }
@@ -30104,8 +30190,11 @@ Article 3 (Current position)
    b. to record a departure, waypoint or arrival in the logbook - it is stored on the
       server as part of that voyage record.
 3. You can use the whole App if you refuse. Simply choose a spot yourself.
-4. You may withdraw your consent at any time under [Menu] - [My location use history],
+4. You may withdraw your consent at any time under [Menu] - [Terms & Privacy] - [Location],
    or in your device settings.
+5. Under Article 24(2) of the Location Information Act you may also pause collection at any time.
+   Turning the same switch off stops collection from that moment; turning it back on resumes it.
+   We do not prevent you from switching it off and on.
 
 Article 4 (Coordinates stored on the server)
 1. Home port and berth coordinates are values you mark on the map yourself.
@@ -30141,21 +30230,27 @@ will look it up and send it to you.
 You can withdraw your consent yourself in the App under
 [Menu] - [Terms & Privacy] - [Location].
 
-Article 8 (Disclosure to third parties)
-Location information is not given to anyone else. It is disclosed only where there is a
-lawful requirement to do so.
+Article 8 (Disclosure to third parties and notification)
+1. We do not give your location information to anyone else. We comply only with lawful demands
+   made under the law.
+2. If we ever provide personal location information to a third party you have designated, we will
+   tell you who received it, when, and why, each time and immediately, as required by Article 19(3)
+   of the Location Information Act.
 
 Article 9 (Your rights)
 You may withdraw consent to the collection, use and provision of your location information
 at any time, and you may ask to see or delete what is stored. Contact: {EMAIL}
 
-Article 10 (Children under 14)
-The App does not accept anyone under 14, so no location information is received from them.
+Article 10 (Children under 14, and children aged 8 or under)
+1. This app does not accept members under 14, so we do not take their location information either.
+2. This app does not separately handle the location information of the children aged 8 or under,
+   adults under guardianship, or persons with severe mental disabilities referred to in Article 26 of
+   the Location Information Act. There is no feature that locates such a person with a guardian's consent.
 
 Article 11 (Location information manager and enquiries)
 Location information manager: {OWNER}
 Contact: {EMAIL}
-Please direct enquiries about location information to the contact above.{LBS}
+Please direct enquiries about location information to the contact above.{BIZ}{LBS}
 
 These Terms apply from {DATE}. (Version {VER})
 ` }
@@ -30732,8 +30827,11 @@ location: { title: 'Условия использования данных о м
    b. для записи выхода, промежуточной записи или прихода в судовом журнале —
       сохраняется на сервере как часть этой записи о походе.
 3. При отказе Приложением можно пользоваться полностью — выберите точку вручную.
-4. Согласие можно отозвать в любой момент: [Меню] - [Мои записи о местоположении],
+4. Согласие можно отозвать в любой момент: [Меню] - [Условия и конфиденциальность] - [Данные о местоположении],
    либо в настройках устройства.
+5. Согласно ст. 24(2) Закона вы можете также приостановить сбор в любой момент. Если выключить
+   тот же переключатель, сбор прекращается с этого момента; если включить снова — возобновляется.
+   Мы не препятствуем выключению и включению.
 
 Статья 4 (Координаты, хранящиеся на сервере)
 1. Координаты порта приписки и стоянок вы отмечаете на карте сами.
@@ -30769,22 +30867,27 @@ location: { title: 'Условия использования данных о м
 Согласие на сбор можно отозвать самостоятельно в Приложении:
 [Меню] - [Условия и конфиденциальность] - [Данные о местоположении].
 
-Статья 8 (Передача третьим лицам)
-Данные о местоположении не передаются третьим лицам. Раскрытие возможно только
-по законному требованию.
+Статья 8 (Передача третьим лицам и уведомление)
+1. Мы не передаём данные о вашем местоположении никому. Мы исполняем только законные требования.
+2. Если мы когда-либо передадим персональные данные о местоположении третьему лицу, указанному
+   вами, мы каждый раз незамедлительно сообщим, кто их получил, когда и с какой целью, —
+   как того требует ст. 19(3) Закона о защите и использовании данных о местоположении.
 
 Статья 9 (Права пользователя)
 Вы вправе в любой момент отозвать согласие на сбор, использование и передачу данных
 о вашем местоположении, а также потребовать показать или удалить сохранённые данные.
 Контакт: {EMAIL}
 
-Статья 10 (Лица младше 14 лет)
-Приложение не принимает лиц младше 14 лет, поэтому данные об их местоположении не собираются.
+Статья 10 (Лица младше 14 лет и дети 8 лет и младше)
+1. Приложение не принимает пользователей младше 14 лет, поэтому их данные о местоположении мы не получаем.
+2. Приложение не обрабатывает отдельно данные о местоположении детей 8 лет и младше, лиц под опекой
+   и лиц с тяжёлыми психическими нарушениями, о которых говорится в ст. 26 Закона. Функции поиска
+   такого человека по согласию опекуна в приложении нет.
 
 Статья 11 (Ответственный за данные о местоположении и вопросы)
 Ответственный за данные о местоположении: {OWNER}
 Контакт: {EMAIL}
-С вопросами о данных местоположения обращайтесь по указанному контакту.{LBS}
+С вопросами о данных местоположения обращайтесь по указанному контакту.{BIZ}{LBS}
 
 Настоящие условия применяются с {DATE}. (Редакция {VER})
 ` }
@@ -37517,7 +37620,27 @@ function myWarnings(){
              summary: wx.zones.length ? '' : t('발효 중인 해상 특보 없음'),
              region:'', note:t('배 위치를 몰라 전국 특보를 보여 드립니다 — 내 배 > 기본 정보에서 홈포트를 찍어 주세요') };
   const mine = wx.zones.filter(z => re.test(z.reg));
-  if(mine.length) return { active: warnLines(mine), summary:'', region, note:'' };
+  // ★★★ 2026-09-04 — **육상 특보도 같이 본다** (사장님 지적)
+  //   그날 기상청에는 「강풍주의보 : 전라남도(여수 …)」 가 떠 있었다. 배가 마리나에 매여 있어도
+  //   강풍은 그 배가 맞는다 — 계류줄·펜더·비미니를 챙겨야 하는 일이다.
+  //   ★ 해상과 한 줄로 섞지 않는다. 둘은 뜻이 다르다 (나갈 수 있나 / 매어 둔 배가 괜찮나).
+  const 육상 = Array.isArray(wx.land) ? wx.land.filter(z => re.test(z.reg)) : [];
+  if(mine.length || 육상.length)
+    return { active: warnLines(mine), land: warnLines(육상), summary:'', region, note:'' };
+  // ★★★ 2026-09-04 — **못 읽은 것을 「없음」 이라고 하지 않는다** (사장님 지적)
+  //
+  //   사장님: 「야 특보 있는데 왜 없다고 하냐」
+  //   그날 기상청에는 풍랑경보(남해서부동쪽먼바다)가 떠 있었는데, 자료에 실린 구역 이름이
+  //   글자가 깨진 채(「���ؼ��ε��ʸչٴ�」) 들어와 어느 해역과도 안 맞았다.
+  //   그래서 앱은 「전남 해역은 특보 없음」 이라고 했다. **경보가 떠 있는데 없다고 한 것이다.**
+  //
+  //   ★ 수집기 쪽을 고쳐 깨진 자료는 아예 안 싣게 했다. 그래도 앱에서 한 겹 더 막는다 —
+  //     이름이 한글이 아니면 「없음」 이라고 말할 자격이 없다. 못 읽었다고 말하고 기상청으로 보낸다.
+  //     (사장님이 정하신 것 2 — 화면이 거짓말하게 두지 않는다)
+  const 깨진것 = wx.zones.filter(z => !/[가-힣]/.test(String(z.reg || '')));
+  if(깨진것.length)
+    return { active: [], region, note: t('기상청 실시간 확인'),
+             summary: t('특보를 제대로 못 읽었습니다 — 기상청에서 확인해 주세요'), 못읽음: true };
   return { active: [], region, note:'',
            summary: wx.zones.length
              ? tsub('{r} 해역은 특보 없음 · 다른 해역 {n}구역 발효 중',
@@ -38163,10 +38286,19 @@ function wxAlertBox(){
   const w = myWarnings();
   const foot = `<a href="https://www.weather.go.kr/w/special-report/overall.do" target="_blank" rel="noopener">${esc(t('기상청 실시간 확인'))}</a>`;
   const when = (krCache && krCache.updated) ? String(krCache.updated).slice(5,16).replace('T',' ') : '';
-  if(w && w.active && w.active.length){
+  const 육상줄 = (w && Array.isArray(w.land)) ? w.land : [];
+  if(w && ((w.active && w.active.length) || 육상줄.length)){
+    // ★ 해상과 육상을 **줄을 나눠** 보여 준다. 뜻이 다르다 —
+    //   해상은 「나갈 수 있나」, 육상은 「매어 둔 배가 괜찮나(계류줄·펜더·비미니)」 다.
+    const 해상 = (w.active && w.active.length)
+      ? w.active.map(x=>`<div>${esc(x)}</div>`).join('')
+      : `<div class="wxfoot">${esc(t('해상 특보는 없습니다'))}</div>`;
+    const 육상 = 육상줄.length
+      ? `<div class="wxfoot" style="margin-top:6px">${esc(t('육상 특보'))}</div>`
+        + 육상줄.map(x=>`<div>${esc(x)}</div>`).join('')
+      : '';
     return `<div class="wxbox warn"><b>${esc(t('해상 특보 발효 중'))}${
-        w.region ? ' · ' + esc(tsub('{r} 해역', { r: w.region })) : ''}</b>${
-      w.active.map(x=>`<div>${esc(x)}</div>`).join('')}
+        w.region ? ' · ' + esc(tsub('{r} 해역', { r: w.region })) : ''}</b>${해상}${육상}
       ${w.note?`<div class="wxfoot">${esc(w.note)}</div>`:''}
       <div class="wxfoot">${esc(tsub('수집 {when}', { when: when }))} · ${foot}</div></div>`;
   }

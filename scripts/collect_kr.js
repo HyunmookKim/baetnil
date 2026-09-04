@@ -158,16 +158,64 @@ ${JSON.stringify(payload)}`;
 //   그러면 부산·인천·제주 사람에게는 언제나 '특보 없음' 이다 — 조용한 거짓말이다.
 //   이제 전 구역을 그대로 담고, 어느 해역이 내 해역인지는 앱이 배 위치로 고른다.
 
+// ★★★ 2026-09-04 — **글자가 깨져서 특보를 못 알아본 일이 있었다** (사장님 지적)
+//
+//   사장님: 「야 특보 있는데 왜 없다고 하냐」
+//
+//   그날 기상청에는 **풍랑경보(남해서부동쪽먼바다)** 와 **강풍주의보(전남 여수)** 가 떠 있었다.
+//   그런데 앱은 「전남 해역은 특보 없음 · 다른 해역 22구역 발효 중」 이라고 했다.
+//   자료를 열어 보니 구역 이름이 「남해서부동쪽먼바다」 가 아니라 「���ؼ��ε��ʸչٴ�」 였다.
+//
+//   ★ 왜 — 기상청 API허브는 **EUC-KR** 로 준다. 그런데 여기서 EUC-KR 인지 가리는 잣대가
+//     「본문 앞 800자에 charset=euc-kr 이 있나」 하나뿐이었다. 그건 **HTML** 에나 있는 말이고,
+//     API허브 응답은 `#` 로 시작하는 **그냥 글 파일**이라 그 말이 없다. 그래서 UTF-8 로 읽었고,
+//     한글이 전부 깨진 채로 자료에 실렸다. 앱은 그 글자를 「내 해역」 과 맞춰 볼 수 없었다.
+//
+//   ★ **이건 조용한 거짓말이라 제일 나쁜 갈래다.** 경보가 떠 있는데 「없음」 이라고 했다.
+//     그 말을 믿고 나가면 사람이 다친다.
+//
+//   ★ 그래서 잣대를 셋으로 늘린다 —
+//     ① 서버가 알려 준 Content-Type ② HTML 의 charset ③ **읽어 보고 깨졌으면 다시 읽는다**
+//     ③번이 핵심이다. 앞의 둘은 서버가 안 알려 주면 소용이 없다.
+function 깨진수(t){ let n = 0; for(const c of String(t)) if(c === '\uFFFD') n++; return n; }
+function 한글수(t){ return (String(t).match(/[가-힣]/g) || []).length; }
+// ★★★ 2026-09-04 — **어떻게든 읽어 낸다** (사장님: 「어떻게든 싣게 만들어야지」)
+//
+//   기상청 API허브는 EUC-KR 로 주는데 charset 을 안 알려 준다. 전에는 그걸 UTF-8 로 읽어
+//   한글이 통째로 깨진 채 자료에 실렸고, 앱은 「특보 없음」 이라고 했다.
+//   ★ 처음 고칠 때 나는 「깨졌으면 안 싣는다」 로 막았다. 그건 포기다 —
+//     그러면 특보가 떠 있는 날 화면이 비어 버린다. **읽어 내는 것이 일이다.**
+//
+// ★ 그래서 **글자표를 하나씩 다 대 본다.** 한국 사이트가 쓰는 것은 사실상 이 넷뿐이다.
+//   한글이 제일 많이 나오고 깨진 글자가 없는 쪽을 고른다. 사람이 눈으로 고르는 것과 같다.
+const 글자표들 = ['utf-8', 'euc-kr', 'cp949', 'windows-949', 'iso-8859-1'];
+function 제일잘읽힌것(buf, 힌트){
+  const 잰것 = [];
+  for(const enc of (힌트 ? [힌트].concat(글자표들) : 글자표들)){
+    let t = null;
+    try{ t = new TextDecoder(enc).decode(buf); }catch(_){ continue; }
+    잰것.push({ enc, t, 깨짐: 깨진수(t), 한글: 한글수(t) });
+  }
+  if(!잰것.length) return { enc:'utf-8', t: buf.toString('utf8') };
+  // ① 깨진 글자가 없는 것 ② 그중 한글이 제일 많은 것
+  잰것.sort((a, b) => (a.깨짐 - b.깨짐) || (b.한글 - a.한글));
+  return 잰것[0];
+}
 async function fetchText(url, ms){
   const r = await fetch(url, { headers: UA, redirect:'follow',
     signal: AbortSignal.timeout(ms || 20000) });
   if(!r.ok) throw new Error('HTTP '+r.status);
   const buf = Buffer.from(await r.arrayBuffer());
-  let t = buf.toString('utf8');
-  if(/charset=euc-kr/i.test(t.slice(0,800))){
-    try{ t = new TextDecoder('euc-kr').decode(buf); }catch(e){}
-  }
-  return t;
+  // 서버가 알려 준 것이 있으면 그것부터 대 본다 (없어도 상관없다 — 어차피 다 대 본다)
+  const ct = (r.headers && r.headers.get && r.headers.get('content-type')) || '';
+  const 미리 = buf.toString('latin1').slice(0, 800);
+  let 힌트 = '';
+  const m = /charset=["']?([\w-]+)/i.exec(ct) || /charset=["']?([\w-]+)/i.exec(미리);
+  if(m) 힌트 = m[1].toLowerCase();
+  const 고른것 = 제일잘읽힌것(buf, 힌트);
+  if(고른것.enc !== 'utf-8')
+    console.log('   글자표 — ' + 고른것.enc + ' 로 읽었습니다 (한글 ' + (고른것.한글 || 0) + '자)');
+  return 고른것.t;
 }
 
 function parseWarnText(body){
@@ -241,7 +289,31 @@ async function collectWxHub(){
   try{
     if(txt.length < 400 && /401|403|Unauthorized|인증|권한/i.test(txt))
       throw new Error('인증/권한 실패 — 활용신청 상태 확인');
-    const all = parseHub(txt);
+    let all = parseHub(txt);
+    // ★★★ 글자가 깨졌으면 **바이트로 되돌려 다시 읽는다** (2026-09-04, 사장님 지적)
+    //   사장님: 「야 장난하냐? 어떻게든 싣게 만들어야지」 — 맞다. 안 싣는 것은 포기다.
+    //   여기까지 왔다는 것은 글자표 고르기가 어쩌다 빗나갔다는 뜻이다. 한 번 더 대 본다.
+    const 깨진줄 = r => /\uFFFD/.test(r.reg + r.kind) || !/[가-힣]/.test(r.reg);
+    if(all.some(깨진줄)){
+      console.warn('WX HUB 글자가 깨졌습니다 — 다시 읽어 봅니다.');
+      const buf2 = Buffer.from(txt, 'latin1');           // 읽은 것을 바이트로 되돌린다
+      for(const enc of ['euc-kr', 'cp949', 'windows-949']){
+        let t2 = null;
+        try{ t2 = new TextDecoder(enc).decode(buf2); }catch(_){ continue; }
+        const 다시 = parseHub(t2);
+        if(다시.length && !다시.some(깨진줄)){
+          console.log('   ' + enc + ' 로 되읽어 살렸습니다 — ' + 다시.length + '건');
+          all = 다시; txt = t2;
+          break;
+        }
+      }
+    }
+    // 그래도 안 되면 **깨진 줄만 버리고 성한 줄은 싣는다.** 하나도 못 싣는 것보다 낫다.
+    if(all.some(깨진줄)){
+      const 성한 = all.filter(r => !깨진줄(r));
+      console.warn('WX HUB 되읽기 실패 — 성한 줄 ' + 성한.length + '/' + all.length + '건만 싣습니다.');
+      all = 성한;
+    }
     if(!all.length){
       console.warn('WX HUB 파싱 0건 — 응답 원문 앞부분:');
       console.warn(txt.replace(key,'***').slice(0, 600));
@@ -253,6 +325,11 @@ async function collectWxHub(){
       src: 'KMA',
       // ★ 전 구역. 앱이 배 위치로 골라 쓴다.
       zones: marine.map(r=>({ kind:r.kind, reg:r.reg, tmEf:r.tmEf || '' })),
+      // ★★★ 2026-09-04 — **육상 특보도 담는다** (사장님 지적)
+      //   그날 기상청에는 「강풍주의보 : 전라남도(여수, 거문도·초도, 고흥…)」 가 떠 있었다.
+      //   배는 마리나에 매여 있어도 강풍을 맞는다. 계류줄·펜더·비미니는 육상 특보로 챙긴다.
+      //   ★ 해상과 섞지 않는다. 앱에서 줄을 나눠 보여 준다 — 둘은 뜻이 다르다.
+      land: all.filter(r => !r.marine).map(r=>({ kind:r.kind, reg:r.reg, tmEf:r.tmEf || '' })),
       // 아래 둘은 옛 앱(3.24 이하) 호환용 — 전국 요약이다.
       active: groupWarn(marine),
       summary: marine.length ? '' : '발효 중인 해상 특보 없음'
@@ -260,8 +337,33 @@ async function collectWxHub(){
   }catch(e){ console.warn('WX HUB FAIL', why(e)); return null; }
 }
 
+// ★★★ 2026-09-04 — 긁어 온 것에서도 **구역을 뽑아낸다** (사장님: 「어떻게든 싣게 만들어야지」)
+//
+//   전에는 허브가 막히면 「풍랑주의보: 남해동부안쪽먼바다, 남해동부바깥먼바다 …」 라는
+//   **한 줄 글**만 실었다. 그러면 앱이 「내 해역」 을 못 가려 전국 특보를 그대로 보여 준다.
+//   여수에 댄 배에 동해 특보가 섞여 나오면 사람이 그걸 제 해역으로 읽는다.
+//   ★ 그 줄에 구역 이름이 이미 다 들어 있다. 쉼표로 갈라 담으면 된다. 안 할 까닭이 없었다.
+function zonesFromLines(lines){
+  const 바다 = /바다|해상|해역|앞바다|먼바다/;
+  const out = [];
+  (lines || []).forEach(줄 => {
+    const m = /^(.+?)\s*[:：]\s*(.+)$/.exec(String(줄));
+    if(!m) return;
+    const kind = m[1].trim();
+    m[2].split(/\s*[,，·]\s*/).forEach(reg => {
+      const r = reg.replace(/\s+/g, ' ').trim();
+      // 「전라남도(여수」 처럼 괄호가 열린 채 잘린 것은 괄호 안쪽만 쓴다
+      const 안 = /\(([^)]*)$/.exec(r);
+      const 이름 = (안 ? 안[1] : r).replace(/[()]/g, '').trim();
+      if(!이름 || !/[가-힣]/.test(이름)) return;
+      if(out.some(z => z.kind === kind && z.reg === 이름)) return;
+      out.push({ kind, reg: 이름, marine: 바다.test(이름), tmEf: '' });
+    });
+  });
+  return out;
+}
+
 // 허브가 막히면 긁어 오거나 보도로 대체한다.
-// 이 경로들은 구역을 또렷이 못 뽑아서 zones 를 만들지 않는다 — 앱은 그때 전국 줄을 그대로 보여 준다.
 async function collectWx(){
   const hub = await collectWxHub();
   if(hub) return hub;
@@ -274,8 +376,15 @@ async function collectWx(){
       const body = strip(await fetchText(url));
       const lines = parseWarnText(body);
       console.log('WX TRY', url.slice(8,40), '추출', lines.length, '건');
-      if(lines.length)
-        return { src:'KMA', active: lines.slice(0,8), summary:'' };
+      if(lines.length){
+        // ★ 줄에서 구역을 뽑아 담는다 — 그래야 앱이 「내 해역」 을 가릴 수 있다
+        const z = zonesFromLines(lines);
+        const marine = z.filter(x => x.marine);
+        console.log('   구역으로 갈라 담았습니다 — 해상', marine.length, '· 육상', z.length - marine.length);
+        return { src:'KMA', active: lines.slice(0,8), summary:'',
+                 zones: marine.map(x=>({ kind:x.kind, reg:x.reg, tmEf:'' })),
+                 land:  z.filter(x=>!x.marine).map(x=>({ kind:x.kind, reg:x.reg, tmEf:'' })) };
+      }
       if(/특보.{0,80}(없|해제)/.test(body))
         return { src:'KMA', active: [], summary:'발효 중인 해상 특보 없음' };
     }catch(e){ console.warn('WX FAIL', url, e.message); }

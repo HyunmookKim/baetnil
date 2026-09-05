@@ -2514,6 +2514,7 @@ const I18N = {
     '수심':'Depth', '저조위 기준':'Chart datum', '바닥':'Bottom',
     '마리나':'Marina', '항·부두':'Port', '방파제':'Breakwater', '묘박지':'Anchorage',
     '정비':'Maintenance', '수리':'Repairs', '적재표':'Stowage', '주유':'Fuel',
+    '올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.':'Once posted, anyone can see it. If you write your name or contact details, those are visible too. You can delete your post yourself afterwards.',
     '글쓰기':'Write', '올리기':'Post', '신고':'Report', '수정':'Edit',
     // ── 3.78 에서 새로 넣은 것
     '가':'A',
@@ -5676,6 +5677,7 @@ const I18N = {
     '수심':'Глубина', '저조위 기준':'От нуля глубин', '바닥':'Грунт',
     '마리나':'Марина', '항·부두':'Порт', '방파제':'Волнолом', '묘박지':'Якорная стоянка',
     '정비':'Обслуживание', '수리':'Ремонт', '적재표':'Хранение', '주유':'Топливо',
+    '올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.':'После публикации материал виден всем. Если вы укажете имя или контакты, они тоже будут видны. Удалить свою публикацию вы можете сами в любое время.',
     '글쓰기':'Написать', '올리기':'Опубликовать', '신고':'Пожаловаться', '수정':'Изменить',
     // ── 3.78 에서 새로 넣은 것
     '가':'А',
@@ -8805,6 +8807,7 @@ const I18N = {
     '수리':'修理',
     '적재표':'積載表',
     '주유':'給油',
+    '올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.':'投稿すると誰でも見られます。お名前や連絡先を書かれると、それも一緒に表示されます。投稿後もご自身で削除できます。',
     '글쓰기':'投稿',
     '올리기':'アップロード',
     '신고':'通報',
@@ -17263,6 +17266,10 @@ function writeTalk(id){
   const lastReg = (function(){ try{ return localStorage.getItem('bt_talkreg') || ''; }catch(_){ return ''; } })();
   openForm({
     title: po ? '글 고치기' : '새 글',
+    // ★★★ 4.103 — 「올리면 누구나 본다」 를 **올리기 전에** 말한다.
+    //   러시아 개인정보법 제10.1조는 공개 배포에 **따로** 알리고 동의를 받으라고 한다.
+    //   그 나라 법 때문만은 아니다 — 이름과 전화번호를 적어 올리는 사람이 실제로 있다.
+    sub: '올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.',
     okText: po ? '저장' : '올리기',
     filter: true,
     fields: [
@@ -21849,7 +21856,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.102';
+const APP_VER = '4.103';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29609,11 +29616,11 @@ function trRepaint(coll, id){
 //
 // 고칠 곳: LEGAL_OWNER(이름·연락처), LEGAL_BIZ(사업자등록 하면).
 // 내용을 고치면 LEGAL_VER 을 올린다 — 그러면 이용자에게 다시 동의를 받는다.
-const LEGAL_VER  = '1.7';
+const LEGAL_VER  = '1.8';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
-const LEGAL_DATES = { ko:'2026년 8월 22일', en:'22 August 2026', ru:'22 августа 2026 г.',
-                      ja:'2026年8月22日' };
+const LEGAL_DATES = { ko:'2026년 9월 4일', en:'4 September 2026', ru:'4 сентября 2026 г.',
+                      ja:'2026年9月4日' };
 const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
 // ★ 이름은 말마다 따로 적는다. 사전에 넣으면 자동 번역이 사람 이름을 건드린다.
 //   본인이 쓰는 표기가 있으므로 여기서만 고친다.
@@ -29660,6 +29667,9 @@ terms: { title: '이용약관', body: `
    법정대리인의 동의를 받아야 하는데, 이 앱은 그 절차를 두고 있지 않기 때문입니다.
    배를 함께 타는 미성년자는 보호자 계정에 구성원으로 넣어 주십시오.
 ③ 남의 이름이나 이메일로 가입할 수 없습니다.
+④ 나라에 따라 더 높은 나이를 정한 곳이 있습니다. 일본에서는 만 15세, 유럽에서는 만 16세,
+   러시아에서는 만 18세가 되지 않으면 가입할 수 없습니다.
+   그 나라에 계신 분은 그 나이를 따릅니다.
 
 제5조 (서비스 내용)
 ① 이 앱은 배의 물품·정비·수리·항해·주유 기록, 배 구성원 관리, 날씨와 물때 참고 정보,
@@ -29685,6 +29695,9 @@ terms: { title: '이용약관', body: `
    이 앱을 해도·항행통보·기상청 실시간 특보·선박 계기 대신 쓰지 마십시오.
 ⑦ 운영자는 이 앱의 정보를 믿고 한 판단으로 생긴 사고나 손해에 대하여
    운영자의 고의 또는 중대한 과실이 없는 한 책임지지 않습니다.
+⑧ 이 앱은 **스스로 예보를 만들지 않습니다.** 각 나라 기상 관청이 낸 것을 고치지 않고
+   그대로 전할 뿐입니다. 어느 기관이 언제 낸 것인지 화면에 함께 적습니다.
+   운영자는 그 기관들과 아무런 관계가 없고, 그 기관들이 이 앱을 보증하지도 않습니다.
 
 제7조 (이용자의 의무)
 이용자는 다음 행위를 해서는 안 됩니다.
@@ -29703,6 +29716,13 @@ terms: { title: '이용약관', body: `
 ③ 제7조를 어긴 게시물은 신고가 쌓이면 자동으로 가려지고, 운영자가 지울 수 있습니다.
 ④ 배 안의 기록(물품·정비·항해 등)은 그 배의 구성원만 볼 수 있습니다.
    공개 설정을 켠 항목만 밖으로 나갑니다.
+⑤ 어느 글이든 옆의 [신고]로 알려 주실 수 있습니다. 신고를 받으면 **사흘(영업일) 안에**
+   사람이 직접 보고, 내릴지 둘지 정합니다. 기계가 혼자 지우지 않습니다.
+⑥ 글을 내릴 때에는 올린 분에게 **어떤 글을, 제7조의 어느 항을 어겼다고 보아, 무엇을 근거로**
+   내렸는지 알려 드리고, 이의를 제기하는 길도 함께 알려 드립니다.
+   이의가 오면 다시 사람이 봅니다.
+⑦ 신고 창구는 {EMAIL} 입니다. 관계 당국의 연락도 같은 곳으로 받습니다.
+   한국어·영어로 주고받습니다.
 
 제9조 (중고 장터)
 ① 운영자는 거래 장소만 제공하는 중개자이며, 거래의 당사자가 아닙니다.
@@ -29738,7 +29758,21 @@ terms: { title: '이용약관', body: `
    법이 정한 운영자의 책임을 면제하지 않습니다.
 
 제14조 (준거법과 관할)
-이 약관은 대한민국 법을 따릅니다. 분쟁이 생기면 민사소송법이 정한 법원에 소를 제기합니다.
+① 이 약관과 이 앱을 쓰면서 생긴 분쟁에는 대한민국 법을 적용합니다.
+② 다만 제1항은, 이용자가 소비자로서 살고 있는 나라의 법 가운데 **당사자 합의로 물릴 수 없는
+   소비자 보호 규정**이 이용자에게 주는 보호를 빼앗지 않습니다.
+   그 규정이 이 약관보다 이용자에게 이로우면 그 규정이 먼저입니다.
+③ 소송은 대한민국 서울중앙지방법원을 제1심 법원으로 합니다. 다만 이용자가 소비자인 때에는,
+   **이용자는 자기가 사는 곳의 법원에도 소를 제기할 수 있고,** 운영자는 그 이용자에 대하여
+   그 나라 법원에만 소를 제기합니다. 이용자가 사는 나라의 법이 다른 법원을 보장하면 그 법을 따릅니다.
+④ 이 조는 이용자가 자기 나라의 소비자 분쟁 조정기관이나 감독기관에 이의를 제기할 권리에
+   아무 영향을 주지 않습니다.
+
+제15조 (어느 바다를 위한 앱인가)
+① 이 앱은 **대한민국·일본·러시아 극동 해역**에서 배를 타는 분들을 위해 만들었습니다.
+   유럽연합·유럽경제지역·영국을 대상으로 하는 서비스가 아닙니다.
+② 그 밖의 나라에서도 내려받아 쓰실 수 있지만, 그 나라 해역의 정박지·물때·해상 특보 자료는
+   담고 있지 않습니다. 그 바다에서는 이 앱을 참고 자료로도 쓰지 마십시오.
 
 부칙
 이 약관은 {DATE}부터 적용합니다. (판 {VER})
@@ -29849,6 +29883,34 @@ privacy: { title: '개인정보처리방침', body: `
 15. 방침이 바뀔 때
  내용을 고치면 앱 안에 알리고, 중요한 변경은 다시 동의를 받습니다.
 
+16. 계정과 자료를 지우는 길
+ · 앱 안에서: 서랍 › 계정 › 탈퇴
+ · 앱을 지우신 뒤에도: **baetnil.com/delete.html** 에서 지워 달라고 하실 수 있습니다.
+   {EMAIL} 로 알려 주셔도 됩니다.
+ · 탈퇴하시면 계정 정보와 이용자가 만든 기록을 지체 없이 지웁니다.
+ · 남의 글에 단 댓글처럼 남의 글과 얽힌 것은, 이름을 지우고 내용만 남깁니다.
+   그것까지 지우면 남의 글이 앞뒤가 안 맞게 되기 때문입니다.
+
+17. 대한민국 밖에서 쓰시는 분께
+ · 이 앱의 서버는 **대한민국**에 있습니다 (Google Cloud Firestore 서울 리전).
+   어느 나라에 계시든, 서버에 저장되는 것은 대한민국에서 다루어집니다.
+ · 대한민국에는 「개인정보 보호법」이 있고, 개인정보보호위원회(pipc.go.kr)가 감독합니다.
+   유럽연합 집행위원회는 2021년 12월 대한민국을 개인정보 보호 수준이 충분한 나라로
+   인정했고(결정 2022/254, 2026년 재검토에서 유지), 영국도 2022년 12월 같은 인정을
+   했습니다. 러시아 연방도 대한민국을 적정한 보호를 제공하는 나라로 정하고 있습니다
+   (로스콤나드조르 고시 제128호).
+ · 운영자는 이 제도를 확인한 뒤, 위 10번에 적은 조치를 하고 있습니다.
+ · 유럽·영국에 계신 분은 자기 나라 감독기관에 이의를 제기하실 수 있습니다.
+
+18. 기기 밖으로 나가는 것 (외부송신)
+ 이 앱이 이용자의 기기에서 밖으로 보내는 것은 다음이 전부입니다.
+ · **Google Firebase** (로그인·자료 보관 / 대한민국 서울) — 로그인 정보, 이용자가 넣은 기록
+ · **날씨·물때를 받는 곳** — 날씨를 볼 **지점의 좌표만** 보냅니다. 누가 물었는지는 보내지 않습니다.
+   대한민국 기상청·국립해양조사원, 일본 기상청, 그 밖에 화면에 출처로 적힌 관청
+ · **지도 그림** — OpenStreetMap
+ 광고, 접속 통계, 이용자 행동을 따라다니는 것은 **하나도 넣지 않았습니다.**
+ 광고 식별자도 읽지 않습니다.
+
 이 방침은 {DATE}부터 적용합니다. (판 {VER})
 ` },
 
@@ -29886,9 +29948,17 @@ location: { title: '위치정보 이용약관', body: `
 ④ 정박지 좌표는 커뮤니티에 공개됩니다. 올리기 전에 화면에서 확인하실 수 있으며,
    올린 뒤에도 본인이 지울 수 있습니다.
 
-제5조 (보유 기간)
-① 저장된 좌표는 이용자가 지울 때까지, 또는 탈퇴할 때까지 보관하고 그 뒤 파기합니다.
-② 제6조의 확인자료는 남긴 때부터 6개월 동안 보관하고 그 뒤 저절로 지워집니다.
+제5조 (보유 목적과 보유 기간, 보유 근거)
+① 개인위치정보를 갖고 있는 **목적**은 제2조에 적은 것뿐입니다 — 그 자리의 날씨·물때를 맞추고,
+   잰 수심을 저조위 기준으로 바꾸고, 그 해역의 특보만 골라 보여 주고,
+   이용자가 찍은 정박지 자리와 항해 항로를 그리기 위해서입니다. 그 밖의 목적은 없습니다.
+② 저장된 좌표는 이용자가 지울 때까지, 또는 탈퇴할 때까지 보관하고 그 뒤 파기합니다.
+   목적을 다하거나 동의를 거두시면 그때 파기합니다.
+③ 제6조의 **확인자료**는 「위치정보의 보호 및 이용 등에 관한 법률」 **제16조 제2항**이
+   위치정보시스템에 자동으로 기록·보존하도록 정하고 있기 때문에 갖고 있습니다.
+   이것이 **보유 근거**입니다.
+④ 확인자료의 **보유 기간은 6개월**입니다. 남긴 때부터 6개월이 지나면 저절로 지워집니다.
+   법이 이보다 더 오래 보관하도록 정한 것은 없습니다.
 
 제6조 (이용·제공사실 확인자료)
 ① 위치정보법 제16조 제2항에 따라, 이 앱은 위치정보를 수집·이용·제공할 때마다
@@ -29924,6 +29994,13 @@ location: { title: '위치정보 이용약관', body: `
 연락처: {EMAIL}
 위치정보에 관한 문의는 위 연락처로 해 주십시오.{BIZ}{LBS}
 
+제12조 (요금과 조건)
+① 위치정보의 수집·이용·제공에 **요금은 없습니다.** 전부 무료입니다.
+② 위치정보를 주지 않으셔도 앱은 다 쓰실 수 있습니다. 날씨 지점을 직접 고르시면 됩니다.
+   위치를 주는 것이 이용의 조건이 아닙니다.
+③ 앞으로 요금을 받게 되면 미리 앱 안에 알리고 다시 동의를 받습니다.
+   이미 무료로 쓰시던 것을 예고 없이 유료로 바꾸지 않습니다.
+
 이 약관은 {DATE}부터 적용합니다. (판 {VER})
 ` }
 };
@@ -29955,6 +30032,9 @@ Article 4 (Contract of Use)
    the consent of a legal guardian, and the App has no procedure for that.
    Please add minors who sail with you as crew members under a guardian's account.
 3. You may not sign up using another person's name or email address.
+4. Some countries set a higher age. You may not sign up if you are under 15 in Japan,
+   under 16 in the European Union or the United Kingdom, or under 18 in Russia.
+   If you are in one of those countries, that age applies to you.
 
 Article 5 (What the App Does)
 1. The App keeps records of a boat's gear, maintenance, repairs, voyages and fuel;
@@ -29983,6 +30063,10 @@ Article 6 (Limits of Weather, Tide and Depth Information; the Decision to Sail)
    charts, notices to mariners, live meteorological warnings or the boat's instruments.
 7. The operator is not liable for accidents or losses arising from decisions made in
    reliance on the App, except where the operator acted with intent or gross negligence.
+8. The App does **not produce forecasts of its own.** It passes on, unaltered, what each
+   country's official meteorological service has issued. The issuing body and the time of
+   issue are shown on screen alongside. The operator is not affiliated with those bodies,
+   and they do not endorse the App.
 
 Article 7 (Your Obligations)
 You must not:
@@ -30002,6 +30086,14 @@ Article 8 (User Content)
    and the operator may delete it.
 4. Records inside a boat (gear, maintenance, voyages and so on) can be seen only by that
    boat's crew. Only the items you switch on in the publishing settings leave the boat.
+5. Any post can be reported using the [Report] control beside it. A report is reviewed by a
+   person within **three working days**, who decides whether to take the post down.
+   Nothing is deleted by machine alone.
+6. When a post is taken down, the person who posted it is told **which post, which paragraph
+   of Article 7 it is considered to breach, and on what basis**, together with how to object.
+   An objection is reviewed by a person again.
+7. The point of contact for reports is {EMAIL}. Authorities may use the same address.
+   Correspondence is in Korean or English.
 
 Article 9 (Second-hand Market)
 1. The operator only provides the place to trade and is not a party to any transaction.
@@ -30043,8 +30135,26 @@ Article 13 (Limitation of Liability)
    liability the law imposes on the operator.
 
 Article 14 (Governing Law and Jurisdiction)
-These Terms are governed by the law of the Republic of Korea. Disputes are brought before
-the court determined by the Civil Procedure Act.
+1. These Terms, and any dispute arising out of or in connection with the App, are governed
+   by the law of the Republic of Korea.
+2. Paragraph 1 shall not, however, have the result of **depriving a user who is a consumer of
+   the protection afforded by provisions of the law of the country of that user's habitual
+   residence that cannot be derogated from by agreement.** Where those provisions are more
+   favourable to the user than these Terms, those provisions prevail.
+3. The Seoul Central District Court of the Republic of Korea is the court of first instance.
+   However, where the user is a consumer, **the user may also bring proceedings in the courts
+   of the country of the user's habitual residence,** and the operator will bring proceedings
+   against such a user only in those courts. Where the law of the user's habitual residence
+   guarantees a different forum, that law prevails.
+4. Nothing in this Article affects the user's right to complain to a consumer dispute
+   resolution body or a supervisory authority in the user's own country.
+
+Article 15 (Which Waters This App Is For)
+1. The App is made for people who go to sea in **the Republic of Korea, Japan and the Russian
+   Far East.** It is not a service offered to the European Union, the European Economic Area
+   or the United Kingdom.
+2. It can be downloaded elsewhere, but it holds no berth, tide or marine warning data for
+   other waters. Do not rely on it there, not even for reference.
 
 Supplementary Provision
 These Terms apply from {DATE}. (Version {VER})
@@ -30161,6 +30271,35 @@ if the two differ, the Korean text prevails.
 15. When this policy changes
  Changes are announced inside the App, and consent is sought again for material changes.
 
+16. How to delete your account and your data
+ · Inside the App: Drawer > Account > Leave
+ · After you have removed the App: ask at **baetnil.com/delete.html**, or write to {EMAIL}.
+ · When you leave, your account details and the records you made are deleted without delay.
+ · Where something is bound up with another person's post - a comment you left on it - the
+   name is removed and only the text stays, so that their post still makes sense.
+
+17. If you are outside the Republic of Korea
+ · The App's servers are in **the Republic of Korea** (Google Cloud Firestore, Seoul region).
+   Wherever you are, what is stored on the server is handled in Korea.
+ · Korea has the Personal Information Protection Act, supervised by the Personal Information
+   Protection Commission (pipc.go.kr). The European Commission recognised Korea as providing
+   an adequate level of protection in December 2021 (Decision (EU) 2022/254, maintained at the
+   2026 review), and the United Kingdom did the same in December 2022. The Russian Federation
+   also lists Korea as providing adequate protection (Roskomnadzor Order No. 128).
+ · The operator has taken account of that framework and applies the measures in section 10.
+ · If you are in Europe or the United Kingdom you may complain to your own supervisory authority.
+
+18. What leaves your device
+ These are the only things the App sends off your device.
+ · **Google Firebase** (sign-in and storage / Seoul, Korea) - sign-in details and the records
+   you enter
+ · **Weather and tide sources** - only **the coordinates of the point you are looking at.**
+   Who asked is not sent. Korea Meteorological Administration and KHOA, the Japan
+   Meteorological Agency, and any other body named on screen as the source
+ · **Map images** - OpenStreetMap
+ There is **no advertising, no analytics and nothing that follows what you do.**
+ The advertising identifier is not read.
+
 This policy applies from {DATE}. (Version {VER})
 ` },
 
@@ -30206,11 +30345,19 @@ Article 4 (Coordinates stored on the server)
 4. Berth coordinates are published to the community. You can check them on screen before
    posting, and you can delete them afterwards.
 
-Article 5 (Retention)
-1. Stored coordinates are kept until you delete them, or until you leave, and are then
-   destroyed.
-2. The confirmation data described in Article 6 is kept for six months from the time it is
-   recorded, and is then erased automatically.
+Article 5 (Purpose of retention, retention period, and the basis for it)
+1. The **purpose** of holding personal location data is only what Article 2 sets out: to fix
+   the weather and tide for that place, to convert a measured depth to chart datum, to show
+   only the warnings for those waters, and to draw the berths and voyage tracks you record.
+   There is no other purpose.
+2. Stored coordinates are kept until you delete them or until you leave, and are then
+   destroyed. They are destroyed when the purpose is met or when you withdraw consent.
+3. The **confirmation data** in Article 6 is held because **Article 16(2) of the Act on the
+   Protection and Use of Location Information (Republic of Korea)** requires it to be recorded
+   and preserved automatically in the location information system.
+   That is the **basis for retaining it.**
+4. The **retention period for confirmation data is six months.** It is erased automatically
+   six months after it is recorded. No law requires it to be kept longer.
 
 Article 6 (Confirmation data on collection, use and provision)
 1. As required by Article 16(2) of the Location Information Act, the App automatically
@@ -30252,6 +30399,15 @@ Location information manager: {OWNER}
 Contact: {EMAIL}
 Please direct enquiries about location information to the contact above.{BIZ}{LBS}
 
+Article 12 (Charges and conditions)
+1. There is **no charge** for the collection, use or provision of location information.
+   All of it is free.
+2. You can use the whole App without giving your location. Choose a weather point yourself.
+   Giving your location is not a condition of use.
+3. If a charge is introduced in future it will be announced inside the App beforehand and
+   fresh consent will be sought. What you already use free of charge will not be made paid
+   without notice.
+
 These Terms apply from {DATE}. (Version {VER})
 ` }
 };
@@ -30283,6 +30439,9 @@ terms: { title: '利用規約', body: `
    法定代理人の同意が必要ですが、本アプリはその手続きを設けていないためです。
    一緒に船に乗る未成年の方は、保護者のアカウントに乗組員として加えてください。
 ③ 他人の名前やメールアドレスで登録することはできません。
+④ 国によっては、より高い年齢が定められています。日本では満15歳未満、欧州では満16歳未満、
+   ロシアでは満18歳未満の方はご登録いただけません。
+   その国におられる方には、その年齢が適用されます。
 
 第5条（サービスの内容）
 ① 本アプリは、船の積載品・整備・修理・航海・給油の記録、乗組員の管理、
@@ -30310,6 +30469,10 @@ terms: { title: '利用規約', body: `
    使わないでください。
 ⑦ 運営者は、本アプリの情報を信じて行った判断によって生じた事故や損害について、
    運営者の故意または重大な過失がない限り責任を負いません。
+⑧ 本アプリは**独自の予報を行いません。**各国の気象官署が発表したものを、変更せずに
+   そのまま伝えるだけです。どの機関がいつ発表したものかを画面に併記します。
+   運営者はこれらの機関と関係がなく、これらの機関が本アプリを保証するものでもありません。
+   （気象業務法第17条の予報業務には当たりません。）
 
 第7条（利用者の義務）
 利用者は、次の行為をしてはなりません。
@@ -30328,6 +30491,13 @@ terms: { title: '利用規約', body: `
 ③ 第7条に反する投稿物は、通報が積み重なると自動的に隠され、運営者が削除できます。
 ④ 船の中の記録（積載品・整備・航海など）は、その船の乗組員だけが見られます。
    公開設定をオンにした項目だけが外に出ます。
+⑤ どの投稿にも横の［通報］からお知らせいただけます。通報を受けたときは**3営業日以内に**
+   人が直接確認し、取り下げるかどうかを判断します。機械だけで削除することはありません。
+⑥ 投稿を取り下げるときは、投稿された方に**どの投稿を、第7条のどの項に反すると判断し、
+   何を根拠に**取り下げたのかをお知らせし、あわせて異議申立ての方法もご案内します。
+   異議をいただいたときは、改めて人が確認します。
+⑦ 通報の窓口は {EMAIL} です。関係当局からのご連絡も同じ窓口で承ります。
+   やり取りは日本語・韓国語・英語で行います。
 
 第9条（中古売買）
 ① 運営者は取引の場を提供する仲介者であり、取引の当事者ではありません。
@@ -30365,8 +30535,23 @@ terms: { title: '利用規約', body: `
    ありません。
 
 第14条（準拠法と管轄）
-本規約は大韓民国法に従います。紛争が生じたときは、民事訴訟法が定める裁判所に
-訴えを提起します。
+① 本規約および本アプリの利用に関して生じた紛争には、大韓民国法を適用します。
+② ただし第1項は、利用者が消費者として常居所を有する国の法のうち、**当事者の合意によって
+   排除することのできない消費者保護の規定**が利用者に与える保護を奪うものではありません。
+   その規定が本規約より利用者に有利であるときは、その規定が優先します。
+   （日本の消費者の方は、法の適用に関する通則法第11条により、日本の強行規定の適用を
+   主張することができます。）
+③ 訴訟は大韓民国ソウル中央地方法院を第一審裁判所とします。ただし利用者が消費者であるときは、
+   **利用者はご自身の常居所地の裁判所にも訴えを提起することができ、**運営者はその利用者に対して
+   常居所地の裁判所にのみ訴えを提起します。
+④ 本条は、利用者がご自身の国の消費者紛争解決機関や監督機関に申立てをする権利に
+   何ら影響を与えません。
+
+第15条（どの海のためのアプリか）
+① 本アプリは、**大韓民国・日本・ロシア極東**の海で船に乗る方のために作りました。
+   欧州連合・欧州経済領域・英国を対象として提供するサービスではありません。
+② ほかの国でも入手できますが、その海域の係留地・潮汐・海上警報の資料は含んでいません。
+   その海では、参考としても本アプリに頼らないでください。
 
 附則
 本規約は {DATE} から適用します。（版 {VER}）
@@ -30483,6 +30668,47 @@ privacy: { title: 'プライバシーポリシー', body: `
 15. 方針が変わるとき
  内容を改めたときは本アプリ内でお知らせし、重要な変更については改めて同意をいただきます。
 
+16. アカウントとデータの消し方
+ ・アプリの中で: 引き出し › アカウント › 退会
+ ・アプリを削除された後でも: **baetnil.com/delete.html** から削除をご請求いただけます。
+   {EMAIL} にご連絡いただいても結構です。
+ ・退会されたときは、アカウント情報とご自身で作られた記録を遅滞なく削除します。
+ ・他の方の投稿に付けたコメントのように他人の投稿と結びついているものは、
+   お名前を消し、本文だけを残します。それまで消すと、その方の投稿が意味をなさなくなるためです。
+
+17. 個人情報取扱事業者の表示と、外国での取扱いについて（個人情報保護法第32条）
+ ・事業者の氏名（代表者）: {OWNER}{BIZ}
+ ・利用目的: 上記3のとおりです。
+ ・保有個人データに関する開示・訂正・利用停止・消去のご請求、および苦情のお申出先:
+   {EMAIL}（上記8・13のとおり）
+ ・**本アプリのサーバーは大韓民国にあります**（Google Cloud Firestore ソウルリージョン）。
+   日本の利用者の個人データも、大韓民国において取り扱われます。
+ ・**大韓民国の個人情報保護制度について**（外的環境の把握）
+   大韓民国には「個人情報保護法」があり、独立の監督機関である個人情報保護委員会
+   （PIPC・pipc.go.kr）が監督しています。同法は利用目的の特定、安全管理措置、開示・訂正・
+   削除の請求権、越境移転の制限、漏えい時の通知を定めており、日本の個人情報保護法と
+   同等の水準にあると評価されています（欧州委員会は2021年12月に十分性認定を行い、
+   2026年の再検討でも維持されました）。
+   運営者はこの制度を確認したうえで、上記10の安全管理措置を講じています。
+ ・第三者への提供はしていません（上記5のとおり）。
+ ・日本にお住まいの方は、個人情報保護委員会（ppc.go.jp）にご相談いただけます。
+
+18. 外部送信について（電気通信事業法第27条の12）
+ 本アプリが利用者の端末から外部に送信する情報は、次のものだけです。
+ ・**Google Firebase**（ログイン処理・データ保管／大韓民国ソウル）
+   — 送信する情報: ログイン情報、利用者が入力された記録
+   — 利用目的: アカウントの認証と、記録を複数の端末で見られるようにするため
+ ・**気象・潮汐の提供元**
+   — 送信する情報: **画面で見ている地点の座標のみ。**誰が問い合わせたかは送りません。
+   — 送信先: 大韓民国気象庁・国立海洋調査院、日本の気象庁、その他画面に出典として
+     表示している機関
+   — 利用目的: その地点の天気・潮汐・海上警報を表示するため
+ ・**地図の画像** — OpenStreetMap（表示している範囲のタイル）
+ 広告、アクセス解析、利用者の行動を追跡するものは**一切組み込んでいません。**
+ 広告識別子（AAID／IDFA）も読み取りません。
+ これらの送信をお止めになりたいときは、位置情報の同意を撤回されるか、
+ アプリを削除してください。
+
 本方針は {DATE} から適用します。（版 {VER}）
 ` },
 
@@ -30519,9 +30745,17 @@ location: { title: '位置情報利用規約', body: `
 ④ 係留地の座標はコミュニティに公開されます。投稿する前に画面でご確認いただけ、
    投稿した後もご本人が削除できます。
 
-第5条（保有期間）
-① 保存された座標は、利用者が削除するまで、または退会まで保管し、その後破棄します。
-② 第6条の確認資料は、残した時から6か月間保管し、その後自動的に消去されます。
+第5条（保有の目的・保有期間・保有の根拠）
+① 個人位置情報を保有する**目的**は、第2条に記したものだけです — その場所の天気と潮汐を
+   合わせること、測った水深を最低潮位基準に換算すること、その海域の警報だけを選んで
+   表示すること、利用者が指定した係留地と航跡を描くことです。ほかの目的はありません。
+② 保存された座標は、利用者が削除するまで、または退会まで保管し、その後破棄します。
+   目的を達したとき、または同意を撤回されたときにも破棄します。
+③ 第6条の**確認資料**は、大韓民国「位置情報の保護および利用等に関する法律」**第16条第2項**が
+   位置情報システムに自動的に記録・保存することを定めているため保有しています。
+   これが**保有の根拠**です。
+④ 確認資料の**保有期間は6か月**です。記録した時から6か月を過ぎると自動的に消去されます。
+   これより長く保管することを定めた法令はありません。
 
 第6条（利用・提供事実の確認資料）
 ① 大韓民国の位置情報法第16条第2項に基づき、本アプリは位置情報を収集・利用・提供する
@@ -30553,7 +30787,14 @@ location: { title: '位置情報利用規約', body: `
 第11条（位置情報管理責任者およびお問い合わせ）
 位置情報管理責任者: {OWNER}
 連絡先: {EMAIL}
-位置情報に関するお問い合わせは、上記の連絡先までお願いします。{LBS}
+位置情報に関するお問い合わせは、上記の連絡先までお願いします。{BIZ}{LBS}
+
+第12条（料金と条件）
+① 位置情報の収集・利用・提供に**料金はかかりません。**すべて無料です。
+② 位置情報を提供されなくても、本アプリはすべてご利用いただけます。
+   天気の地点をご自身で選んでください。位置の提供は利用の条件ではありません。
+③ 今後、料金をいただくことになったときは、事前に本アプリ内でお知らせし、
+   改めて同意をいただきます。すでに無料でお使いのものを、予告なく有料に変えることはしません。
 
 本規約は {DATE} から適用します。（版 {VER}）
 ` }
@@ -30583,6 +30824,10 @@ terms: { title: 'Пользовательское соглашение', body: `
    Несовершеннолетних, выходящих с вами в море, добавляйте как членов экипажа
    в учётной записи взрослого.
 3. Нельзя регистрироваться под чужим именем или чужим адресом электронной почты.
+4. В некоторых странах установлен более высокий возраст. Регистрация невозможна лицам
+   младше 15 лет в Японии, младше 16 лет в Европейском союзе и Великобритании,
+   младше 18 лет в Российской Федерации. Если вы находитесь в такой стране,
+   применяется этот возраст.
 
 Статья 5 (Состав услуг)
 1. Приложение ведёт учёт вещей, обслуживания, ремонта, походов и заправок судна,
@@ -30611,6 +30856,10 @@ terms: { title: 'Пользовательское соглашение', body: `
    карт, извещений мореплавателям, оперативных штормовых предупреждений и судовых приборов.
 7. Оператор не несёт ответственности за происшествия и убытки, вызванные решениями,
    принятыми в опоре на Приложение, кроме случаев умысла или грубой неосторожности оператора.
+8. Приложение **не составляет собственных прогнозов.** Оно лишь передаёт без изменений то,
+   что выпустила официальная гидрометеорологическая служба соответствующей страны.
+   Название органа и время выпуска указываются на экране рядом со сведениями.
+   Оператор не связан с этими органами, и они не поручаются за Приложение.
 
 Статья 7 (Обязанности пользователя)
 Пользователю запрещается:
@@ -30631,6 +30880,16 @@ terms: { title: 'Пользовательское соглашение', body: `
    и оператор вправе их удалить.
 4. Записи внутри судна (вещи, обслуживание, походы и прочее) видны только экипажу этого судна.
    Наружу выходит лишь то, что вы включили в настройках публикации.
+5. О любом материале можно сообщить кнопкой [Пожаловаться] рядом с ним. Сообщение
+   рассматривает человек **в течение трёх рабочих дней** и решает, снимать материал или нет.
+   Автоматическое удаление без участия человека не применяется.
+6. При снятии материала автору сообщается, **какой материал, какой пункт статьи 7 он,
+   по мнению оператора, нарушает и на каком основании**, а также как подать возражение.
+   Возражение рассматривает человек заново.
+7. Требование о прекращении распространения ваших персональных данных (ст. 10.1 закона
+   «О персональных данных») исполняется **в течение трёх рабочих дней**.
+8. Адрес для сообщений: {EMAIL}. По этому же адресу принимаются обращения органов власти.
+   Переписка ведётся на русском, корейском или английском языке.
 
 Статья 9 (Барахолка)
 1. Оператор лишь предоставляет площадку и не является стороной сделки.
@@ -30672,8 +30931,25 @@ terms: { title: 'Пользовательское соглашение', body: `
    от ответственности, установленной законом.
 
 Статья 14 (Применимое право и подсудность)
-Настоящее соглашение регулируется правом Республики Корея. Споры рассматриваются судом,
-определяемым Гражданским процессуальным кодексом.
+1. К настоящему соглашению и к спорам, связанным с использованием Приложения, применяется
+   право Республики Корея.
+2. Пункт 1, однако, **не может повлечь лишение пользователя-потребителя защиты, предоставляемой
+   ему императивными нормами права страны его места жительства,** от которых нельзя отступить
+   соглашением сторон (ст. 1212 ГК РФ). Если такие нормы благоприятнее для пользователя,
+   чем настоящее соглашение, применяются они.
+3. Судом первой инстанции является Центральный районный суд Сеула (Республика Корея).
+   Однако если пользователь является потребителем, **он вправе предъявить иск и в суд по месту
+   своего жительства,** а оператор предъявляет иск к такому пользователю только в этот суд.
+4. Настоящая статья не затрагивает право пользователя обратиться в орган по разрешению
+   потребительских споров или в надзорный орган своей страны.
+
+Статья 15 (Для каких вод это приложение)
+1. Приложение создано для тех, кто выходит в море в **Республике Корея, Японии и на российском
+   Дальнем Востоке.** Оно не предлагается как услуга в Европейском союзе, Европейском
+   экономическом пространстве или Великобритании.
+2. Его можно загрузить и в других странах, но данных о стоянках, приливах и морских
+   предупреждениях для иных вод в нём нет. В таких водах не полагайтесь на Приложение
+   даже как на справочное средство.
 
 Заключительное положение
 Настоящее соглашение применяется с {DATE}. (Редакция {VER})
@@ -30796,6 +31072,38 @@ privacy: { title: 'Политика конфиденциальности', body:
  Об изменениях сообщается внутри Приложения; при существенных изменениях согласие
  запрашивается заново.
 
+16. Как удалить учётную запись и данные
+ · В Приложении: Меню › Учётная запись › Выйти из сервиса
+ · Даже после удаления Приложения: запрос можно оставить на **baetnil.com/delete.html**
+   либо написать на {EMAIL}.
+ · При выходе из сервиса учётные данные и созданные вами записи удаляются без промедления.
+ · То, что связано с чужими материалами (например, ваш комментарий к чужой записи),
+   лишается имени, а текст остаётся, иначе чужая запись потеряет смысл.
+ · **Требование о прекращении распространения** ваших персональных данных, размещённых
+   на доске объявлений или барахолке, исполняется **в течение трёх рабочих дней**
+   (ст. 10.1 закона № 152-ФЗ).
+
+17. Если вы находитесь вне Республики Корея
+ · Серверы Приложения находятся **в Республике Корея** (Google Cloud Firestore, регион Сеул).
+   Где бы вы ни были, всё, что сохраняется на сервере, обрабатывается в Корее.
+ · В Республике Корея действует закон «О защите персональных данных», надзор осуществляет
+   Комиссия по защите персональных данных (pipc.go.kr). Приказом Роскомнадзора
+   от 05.08.2022 № 128 Республика Корея включена в перечень стран, обеспечивающих
+   адекватную защиту прав субъектов персональных данных.
+ · Оператор ознакомился с этим правовым режимом и применяет меры, указанные в пункте 10.
+
+18. Что уходит с вашего устройства
+ Приложение отправляет с устройства только следующее.
+ · **Google Firebase** (вход и хранение / Сеул, Корея) — данные для входа и записи,
+   которые вы вводите
+ · **Источники погоды и приливов** — **только координаты точки, которую вы смотрите.**
+   Сведения о том, кто сделал запрос, не передаются. Метеорологическое управление Кореи
+   и KHOA, Японское метеорологическое агентство и другие органы, указанные на экране
+   как источник
+ · **Изображения карты** — OpenStreetMap
+ **Рекламы, счётчиков посещаемости и средств слежения за вашими действиями нет ни одного.**
+ Рекламный идентификатор не считывается.
+
 Настоящая политика применяется с {DATE}. (Редакция {VER})
 ` },
 
@@ -30843,11 +31151,18 @@ location: { title: 'Условия использования данных о м
 4. Координаты стоянок публикуются в сообществе. Их можно проверить на экране до публикации,
    а после публикации — удалить.
 
-Статья 5 (Срок хранения)
-1. Сохранённые координаты хранятся до их удаления вами либо до выхода из сервиса,
-   после чего уничтожаются.
-2. Записи об использовании из статьи 6 хранятся шесть месяцев с момента записи,
-   после чего стираются автоматически.
+Статья 5 (Цель хранения, срок хранения и основание для него)
+1. **Цель** хранения персональных данных о местоположении — только то, что указано в статье 2:
+   подобрать погоду и прилив для этого места, пересчитать измеренную глубину к нулю глубин,
+   показать предупреждения именно для этих вод и нанести стоянки и треки, которые вы записали.
+   Иных целей нет.
+2. Сохранённые координаты хранятся до их удаления вами либо до выхода из сервиса, после чего
+   уничтожаются. Они уничтожаются также по достижении цели или при отзыве согласия.
+3. **Записи об использовании** из статьи 6 хранятся потому, что **пункт 2 статьи 16 закона
+   Республики Корея «О защите и использовании данных о местоположении»** требует их
+   автоматической записи и сохранения в системе. Это и есть **основание хранения.**
+4. **Срок хранения этих записей — шесть месяцев.** Через шесть месяцев после записи они
+   стираются автоматически. Закона, требующего хранить их дольше, нет.
 
 Статья 6 (Записи об использовании: сбор, использование, передача)
 1. Согласно пункту 2 статьи 16 Закона о данных о местоположении, Приложение
@@ -30888,6 +31203,15 @@ location: { title: 'Условия использования данных о м
 Ответственный за данные о местоположении: {OWNER}
 Контакт: {EMAIL}
 С вопросами о данных местоположения обращайтесь по указанному контакту.{BIZ}{LBS}
+
+Статья 12 (Плата и условия)
+1. За сбор, использование и передачу данных о местоположении **плата не взимается.**
+   Всё это бесплатно.
+2. Приложением можно пользоваться полностью, не сообщая своё местоположение — точку погоды
+   можно выбрать вручную. Передача местоположения не является условием пользования.
+3. Если в будущем появится плата, об этом будет объявлено внутри Приложения заранее и будет
+   запрошено новое согласие. То, чем вы уже пользуетесь бесплатно, не станет платным
+   без предупреждения.
 
 Настоящие условия применяются с {DATE}. (Редакция {VER})
 ` }
@@ -31480,6 +31804,7 @@ function itemForm(){
   P.innerHTML = `<div class="mrhead"><b>${marketDraft && marketDraft.id ? t('물건 고치기') : t('팔 물건 올리기')}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToMarket()">${esc(t('취소'))}</button>
       <button class="tab on" onclick="itemSave()">${esc(t('올리기'))}</button></div>
+    <div class="fhint" style="padding:8px 12px 0">${esc(t('올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('제목'))}</span>
       <input id="mkTitle" style="flex:1" placeholder="${esc(t('예: 야마하 9.9마력 선외기'))}" value="${esc(d.title||'')}"></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('품목'))}</span></div>
@@ -33031,6 +33356,7 @@ function spotForm(){
       ${옮김 ? `<button class="tab" onclick="spotPickPlace()">${esc(t('← 자리'))}</button>` : ''}
       <button class="tab" onclick="backToSpots()">${esc(t('취소'))}</button>
       <button class="tab on" onclick="spotSave()">${esc(t('올리기'))}</button></div>
+    <div class="fhint" style="padding:8px 12px 0">${esc(t('올리면 누구나 볼 수 있습니다. 이름·연락처를 적으시면 그것도 함께 보입니다. 올린 뒤에도 본인이 지울 수 있습니다.'))}</div>
     ${옮김 ? '' : `<div class="mrnone" style="text-align:left">${
         esc(t('자리(핀)는 운영자만 옮깁니다. 자리가 틀렸으면 다녀온 이야기로 알려 주세요.'))}</div>`}
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>

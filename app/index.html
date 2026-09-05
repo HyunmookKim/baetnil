@@ -150,13 +150,30 @@
 /* ★ 지도 위에 얹는 띠 — 지도를 하나만 두려고 만들었다.
    전에는 「지도에서」를 누르면 지도를 하나 더 만들어 화면에 둘이 떴다.
    게다가 지도 상태(mapS)는 하나뿐이라 나중 것이 앞 것을 죽였다. */
-.mapbar{position:absolute;left:0;right:0;top:0;z-index:5;display:flex;align-items:center;gap:6px;
-  padding:8px;background:linear-gradient(180deg,rgba(8,17,26,.94),rgba(8,17,26,.72),transparent)}
-.mapbar b{flex:1;font-size:12.5px;color:#DFE6EE;line-height:1.4}
-.mapbar button{min-height:38px;padding:8px 13px;border-radius:9px;font-size:13.5px;
-  border:1px solid #2A3B4C;background:rgba(11,16,23,.9);color:#DFE6EE;cursor:pointer}
-.mapbar button.ok{background:#2C6A9B;border-color:#3E86BE;color:#fff;font-weight:700}
-.mapbar button[disabled]{opacity:.4}
+/* ★★★ 4.104 — 「저장」이 확대(+) 단추에 깔려서 안 눌리던 것 (사장님 지적)
+   사장님 말씀: 「저장 스위치가 기존에 지도 스위치랑 겹쳐 가지고 안 눌러진다」
+
+   ★ 무엇이 잘못이었나 — .mapbar 가 `left:0;right:0;top:0` 이라 위쪽을 통째로 덮었는데,
+     확대·축소 단추(.mzoom)가 같은 오른쪽 위에 있고 z-index 가 더 높았다(6 > 5).
+     그래서 「저장」 위에 「+」 가 얹혀 있었다. 누르면 확대만 됐다.
+   ★ 바로 옆의 .mhotbar 는 `max-width:calc(100% - 70px)` 로 그 자리를 이미 피해 두었다.
+     같은 규칙이 한 곳에만 있었다 (사장님이 정하신 것 3 — 사본).
+   ★ 남들은 어떻게 하나 — 구글·카카오·네이버 지도는 「이 위치로」 같은 확인 단추를
+     **아래**에 둔다. 위 오른쪽은 확대 단추 자리다. 그대로 따른다.
+   → 안내 글은 위에 남기되 오른쪽 60px 을 비우고, 누르는 단추는 아래로 내린다. */
+.mapbar{position:absolute;left:0;right:0;top:0;z-index:5;
+  padding:8px 60px 8px 8px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,17,26,.94),rgba(8,17,26,.72),transparent)}
+.mapbar b{display:block;font-size:12.5px;color:#DFE6EE;line-height:1.4}
+/* 누르는 단추 — 아래 왼쪽. 오른쪽 60px 은 확대 단추 자리라 어떤 높이에서도 안 겹친다 */
+.mapbtm{position:absolute;left:8px;right:60px;bottom:8px;z-index:7;display:flex;gap:8px}
+.mapbtm button{flex:1;min-height:48px;padding:10px 12px;border-radius:10px;font-size:15px;
+  font-weight:600;border:1px solid #2A3B4C;background:rgba(11,16,23,.92);color:#DFE6EE;cursor:pointer}
+.mapbtm button.ok{background:#2C6A9B;border-color:#3E86BE;color:#fff;font-weight:700}
+.mapbtm button[disabled]{opacity:.4}
+/* 단추가 떠 있는 동안은 출처와 「고른 자리」 띠를 비켜 준다 — 가리면 출처 표기 의무를 어긴다 */
+.mapbox.picking .mattr{bottom:66px}
+.mapbox.picking .mhotbar{display:none}
 /* 중간 기록 깃발 — 항적 위에 무엇이 있었는지 그대로 보인다 */
 .mapbox .mflag{position:absolute;transform:translate(-50%,-100%);z-index:3;
   display:flex;flex-direction:column;align-items:center;pointer-events:auto;cursor:pointer}
@@ -21856,7 +21873,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.103';
+const APP_VER = '4.104';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -35147,14 +35164,21 @@ function posPickSave(){
 }
 
 // ── 지도 위에 얹는 띠. text 가 null 이면 걷어 낸다.
+// 지도 위 안내 줄과 단추.
+// ★ 글은 위(.mapbar), 누르는 단추는 아래(.mapbtm) 로 따로 놓는다 —
+//   위 오른쪽은 확대·축소 단추 자리라 단추를 두면 깔린다 (4.104 사고).
 function mapBar(text, btns){
   const el = document.getElementById(mapS && mapS.elId ? mapS.elId : 'trkMap');
   if(!el) return;
-  const old = el.querySelector('.mapbar');
-  if(old) old.remove();
+  const old = el.querySelector('.mapbar');   if(old) old.remove();
+  const oldB = el.querySelector('.mapbtm');  if(oldB) oldB.remove();
+  el.classList.remove('picking');
   if(text == null) return;
-  el.insertAdjacentHTML('beforeend',
-    `<div class="mapbar"><b>${esc(text)}</b>${btns || ''}</div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="mapbar"><b>${esc(text)}</b></div>`);
+  if(btns){
+    el.insertAdjacentHTML('beforeend', `<div class="mapbtm">${btns}</div>`);
+    el.classList.add('picking');
+  }
 }
 
 // ── 거리·엔진시간 자동 계산

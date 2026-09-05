@@ -2042,7 +2042,7 @@ header{padding-top:var(--sat)}
     <div class="mark" style="right:-5px;top:48%;transform:rotate(90deg)" data-t="우현">우현</div>
     <div class="mark" style="left:50%;top:82%;transform:translateX(-50%);color:#6a4a9a;letter-spacing:2px;font-size:8px" data-t="── 2층 (갑판) ──">── 2층 (갑판) ──</div>
   </div>
-  <div class="mapzoom">
+  <div class="mapzoom mctl">
     <button onclick="stowZoom(1.5)" aria-label="확대" data-tal="확대">+</button>
     <button onclick="stowZoom(1/1.5)" aria-label="축소" data-tal="축소">&minus;</button>
     <button id="mapZBack" style="display:none" onclick="mapZReset()" aria-label="원래대로" data-tal="원래대로">&#10530;</button>
@@ -21873,7 +21873,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.104';
+const APP_VER = '4.105';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -23083,7 +23083,8 @@ function stowZoomBind(){
     return { x:e.clientX-r.left, y:e.clientY-r.top }; };
   f.addEventListener('pointerdown', e=>{
     if(lkEdit) return;
-    if(e.target.closest && e.target.closest('.mapzoom')) return;
+    // ★ 지도·도면 위에 얹힌 도구는 `mctl` 표 하나로 막는다 (4.105). 이름을 하나하나 적지 않는다.
+    if(e.target.closest && e.target.closest('.mctl')) return;
     drag = pt(e); mapPanned = 0;
   });
   f.addEventListener('pointermove', e=>{
@@ -26285,7 +26286,7 @@ function setMapKind(k, keepView){
     + ` onerror="dgFallback(this,'${k}')">`
     + `<svg id="mrShLayer" viewBox="0 0 100 100" preserveAspectRatio="none">${shSvg(shOf(k))}</svg>`
     + pinLayer(pins, cur) + `</div>`
-    + `<div class="mrzoom"><button onclick="dgZoom(1.5)">+</button>`
+    + `<div class="mrzoom mctl"><button onclick="dgZoom(1.5)">+</button>`
     + `<button onclick="dgZoom(1/1.5)">−</button>`
     + `<button onclick="dgReset()" title="${esc(t('전체 보기'))}">⤢</button>`
     + `<button onclick="uploadDg('${k}')" title="${esc(t('도면 사진 바꾸기'))}">🖼</button>`
@@ -26426,7 +26427,7 @@ function dgBind(){
   const pt = e => { const r = box.getBoundingClientRect();
     return { x:e.clientX-r.left, y:e.clientY-r.top }; };
   box.addEventListener('pointerdown', e=>{
-    if(e.target.closest('.mrzoom')) return;
+    if(e.target.closest('.mctl')) return;      // ★ 4.105 — 도구는 표 하나로 막는다
     drag = pt(e); moved = 0;
   });
   box.addEventListener('pointermove', e=>{
@@ -26711,7 +26712,7 @@ function mrDrawBind(){
   box.__shdraw = true;
   box.addEventListener('pointerdown', e=>{
     if(!mrDraw) return;
-    if(e.target.closest && e.target.closest('.mrzoom')) return;
+    if(e.target.closest && e.target.closest('.mctl')) return;   // ★ 4.105 — 표 하나로 막는다
     const p = mrPct(e); if(!p) return;
     e.preventDefault(); e.stopPropagation();
     // 이미 그린 도형을 잡았는가?
@@ -34667,7 +34668,7 @@ function mapPaint(full){
   let TL = el.querySelector('.mtl'), OL = el.querySelector('.mol');
   if(!TL || !OL){
     el.innerHTML = `<div class="mtl"></div><div class="mol"></div>`
-      + `<div class="mzoom">`
+      + `<div class="mzoom mctl">`
         + `<button onclick="mapZoom(1)" aria-label="${esc(t('확대'))}" title="${esc(t('확대'))}">+</button>`
         + `<button onclick="mapZoom(-1)" aria-label="${esc(t('축소'))}" title="${esc(t('축소'))}">−</button>`
         // ★★★ 5.00 — 「막 돌리다 딴 데로 가 버린다」 (사장님 지적)
@@ -34677,7 +34678,7 @@ function mapPaint(full){
         + `<button onclick="mapHere()" aria-label="${esc(t('현재 위치'))}" title="${esc(t('현재 위치'))}">◎</button>`
         + `<button onclick="mapFit()" aria-label="${esc(t('전체 보기'))}" title="${esc(t('전체 보기'))}">⤢</button>`
       + `</div>`
-      + `<div class="mhotbar"></div>`
+      + `<div class="mhotbar mctl"></div>`
       + `<div class="mattr">© OpenSeaMap · © OpenStreetMap</div>`;
     TL = el.querySelector('.mtl'); OL = el.querySelector('.mol');
     S.anchor = { cx:S.cx, cy:S.cy };   // 층을 채운 시점의 중심
@@ -35005,8 +35006,23 @@ function mapBind(el){
   const pt = e => { const r = el.getBoundingClientRect();
     return { x:e.clientX-r.left, y:e.clientY-r.top }; };
 
+  // ★★★ 4.105 — 「저장」을 눌렀는데 **그 단추 밑의 자리가 저장되던 것** (사장님 지적)
+  //
+  //   사장님 말씀: 「원래 내가 고른 자리가 처음엔 표기되는데 저장 누르니까 다른 자리로 바뀜.
+  //               아마 저장 스위치가 있는 자리에 같이 눌러지면서 그 자리가 저장되는 것 같은데?」
+  //   **그대로였다.** 4.104 에서 단추를 지도 위로 내렸는데, 지도가 그 손가락을 같이 먹었다.
+  //   누르면 ① 지도가 「거기를 골랐구나」 하고 핀을 옮기고 ② 그 다음 단추의 저장이 돌았다.
+  //   그래서 눈에 보이던 자리가 아니라 **단추 밑의 자리**가 저장됐다.
+  //
+  //   ★ 왜 또 났나 — 막는 줄이 `closest('.mzoom')` 이었다. **이름을 하나하나 적어 둔 것**이다.
+  //     지도 위에 도구가 하나 늘 때마다 이 줄을 같이 고쳐야 했고, 나는 안 고쳤다.
+  //     (사장님이 정하신 것 3 — 사본을 만들면 반드시 어긋난다.)
+  //   ★ 그래서 도구마다 `mctl` 표를 붙이고 **여기 한 곳에서** 막는다.
+  //     새 도구를 올려도 `mctl` 만 붙이면 저절로 막힌다.
+  const 도구인가 = e => !!(e.target && e.target.closest && e.target.closest('.mctl'));
+
   el.onpointerdown = e=>{
-    if(e.target.closest('.mzoom')) return;
+    if(도구인가(e)) return;
     el.setPointerCapture && el.setPointerCapture(e.pointerId);
     drag = pt(e); moved = 0;
     if(mapS) mapS.dragging = true;
@@ -35019,6 +35035,9 @@ function mapBind(el){
     mapPaint();          // 끄는 중 — 층을 밀기만 한다
   };
   el.onpointerup = e=>{
+    // ★ 손을 뗀 자리가 도구 위면 지도는 아무 일도 하지 않는다.
+    //   누르기 시작한 자리에서만 막으면, 도구 위에서 뗐을 때가 안 막힌다.
+    if(도구인가(e)){ drag = null; if(mapS) mapS.dragging = false; return; }
     const wasDrag = drag; drag = null;
     if(!mapS) return;
     mapS.dragging = false;
@@ -35071,6 +35090,7 @@ function mapBind(el){
   el.onpointercancel = ()=>{ drag=null; if(mapS){ mapS.dragging=false; mapPaint(); } };
   // 두 손가락 확대·축소
   el.ontouchstart = e=>{
+    if(도구인가(e)) return;
     if(e.touches.length===2){
       const d = Math.hypot(e.touches[0].clientX-e.touches[1].clientX,
                            e.touches[0].clientY-e.touches[1].clientY);
@@ -35174,9 +35194,9 @@ function mapBar(text, btns){
   const oldB = el.querySelector('.mapbtm');  if(oldB) oldB.remove();
   el.classList.remove('picking');
   if(text == null) return;
-  el.insertAdjacentHTML('beforeend', `<div class="mapbar"><b>${esc(text)}</b></div>`);
+  el.insertAdjacentHTML('beforeend', `<div class="mapbar mctl"><b>${esc(text)}</b></div>`);
   if(btns){
-    el.insertAdjacentHTML('beforeend', `<div class="mapbtm">${btns}</div>`);
+    el.insertAdjacentHTML('beforeend', `<div class="mapbtm mctl">${btns}</div>`);
     el.classList.add('picking');
   }
 }

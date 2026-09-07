@@ -733,6 +733,51 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   font-family:inherit;font-size:17px;font-weight:800;color:#93AABD;line-height:1.3;
   border-bottom:2px solid transparent}
 .hsub.on{color:var(--tx,#eaf2f8);border-bottom-color:var(--ac,#e8663c)}
+/* ── 달력 ─────────────────────────────────────────────────
+   ★ 삼성 달력과 같은 모양이다 — 한 달을 한눈에 보고, 칸 안에 제목이 글자로 보인다.
+     점만 찍으면 무엇인지 몰라 매번 눌러 봐야 한다.
+   ★ 날짜 밑은 물때 자리다. 삼성이 음력을 다는 그 자리인데, 배에는 물때가 그 값이다. */
+.calhead{display:flex;align-items:center;gap:6px;padding:10px 14px 6px;flex-wrap:nowrap}
+.calym{font-size:19px;font-weight:800;color:var(--th);text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calnav{border:0;background:none;color:var(--tx);font-size:26px;line-height:1;
+  padding:0 8px;cursor:pointer;font-family:inherit}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;
+  background:var(--bd2);border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2)}
+.caldow{border-bottom:0}
+.cdow{background:var(--bg);text-align:center;font-size:11px;font-weight:700;
+  color:var(--tm);padding:5px 0}
+.cdow.sun{color:#E4756A}
+.cdow.sat{color:#7FB3E0}
+.ccell{background:var(--bg);min-height:82px;padding:3px 2px 4px;cursor:pointer;
+  overflow:hidden;position:relative}
+.ccell.out{background:var(--bd2);opacity:.35;cursor:default}
+.ccell.sel{background:var(--acs)}
+.cnum{font-size:13px;font-weight:700;color:var(--tx);text-align:center;line-height:1.35}
+.cnum.sun{color:#E4756A}
+.cnum.sat{color:#7FB3E0}
+.ccell.today .cnum{background:var(--th);color:var(--bg);border-radius:999px;
+  width:21px;height:21px;line-height:21px;margin:0 auto}
+.ctide{font-size:9px;color:#6E8497;text-align:center;line-height:1.3;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:12px}
+.cchip{font-size:9.5px;line-height:1.35;color:var(--tx);background:var(--sf2);
+  border-left:3px solid var(--tm);border-radius:2px;margin:1.5px 1px 0;padding:1px 3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmore{font-size:9px;color:var(--tm);padding:1px 4px}
+/* 고른 날 — 그 날 것을 다 펼친다 */
+.calday{margin:12px 14px 20px;background:var(--sf);border-radius:15px;padding:12px 14px}
+.cdtit{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.cdtit b{font-size:16px;font-weight:800;color:var(--th)}
+.cdrow{display:flex;align-items:center;gap:8px;padding:9px 2px;cursor:pointer;
+  border-top:1px solid var(--bd2)}
+.cdbar{width:3px;height:17px;border-radius:2px;flex:none}
+.cdk{font-size:11px;color:var(--tm);flex:none;min-width:52px}
+.cdt{font-size:14px;color:var(--tx);flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdnone{font-size:13px;color:var(--tm);padding:8px 2px}
+.cdadd{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.calout{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:12px 14px 0}
+.calouth{font-size:11px;color:var(--tm);flex:1;min-width:0}
 #stowTools,#mrSub,.subrow{display:flex;gap:8px;padding:10px 16px 0;
   flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overflow-y:hidden;
   scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -2103,6 +2148,7 @@ header{padding-top:var(--sat)}
 </div>
 <div id="contactsWrap" style="display:none"><div id="contactsList"></div></div>
 <div id="checkWrap" style="display:none"><div id="checkList"></div></div>
+<div id="calWrap" style="display:none"><div id="calList"></div></div>
 <div id="mrMapWrap" style="display:none;padding:6px 14px 10px">
   <div id="dgTabs" style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap"></div>
   <div id="mrDrawTools" style="display:none;gap:6px;justify-content:center;margin-bottom:8px;flex-wrap:wrap">
@@ -2269,6 +2315,12 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '달력':'Calendar',
+    '{n}건 더':'+{n} more',
+    '이 날에 만들기':'Add something on this day',
+    '달력 파일 내보내기':'Export calendar file',
+    '이 달에는 아무것도 없습니다':'Nothing this month',
+    '구글 · 아이폰 달력에 넣으실 수 있습니다':'You can add it to Google or Apple Calendar',
     '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': 'Removed {n} points recorded after arrival.',
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what} time set to {t} as well.',
     '지금 출발 (시각·위치·날씨)': 'Depart now (time, position, weather)',
@@ -5432,6 +5484,12 @@ const I18N = {
     '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\\n\\nDo you agree?\\n(You can switch it off and on at any time under Menu - Terms & Privacy - Location.)',
   },
   ru: {
+    '달력':'Календарь',
+    '{n}건 더':'ещё {n}',
+    '이 날에 만들기':'Добавить на этот день',
+    '달력 파일 내보내기':'Выгрузить файл календаря',
+    '이 달에는 아무것도 없습니다':'В этом месяце ничего нет',
+    '구글 · 아이폰 달력에 넣으실 수 있습니다':'Можно добавить в Google или Apple Календарь',
     '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': 'Удалено {n} точек, записанных после прихода.',
     '{what} 시각도 {t} 로 함께 넣었습니다.': 'Время «{what}» тоже проставлено: {t}.',
     '지금 출발 (시각·위치·날씨)': 'Отход сейчас (время, координаты, погода)',
@@ -8606,6 +8664,12 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '달력':'カレンダー',
+    '{n}건 더':'他 {n}件',
+    '이 날에 만들기':'この日に作る',
+    '달력 파일 내보내기':'カレンダーファイルを書き出す',
+    '이 달에는 아무것도 없습니다':'今月は何もありません',
+    '구글 · 아이폰 달력에 넣으실 수 있습니다':'Google・iPhoneのカレンダーに取り込めます',
     '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': '到着後に記録された点を{n}個外しました。',
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what}の時刻も{t}で一緒に入れました。',
     '지금 출발 (시각·위치·날씨)': '今すぐ出発（時刻・位置・天気）',
@@ -8807,7 +8871,7 @@ const I18N = {
     '더 보기':'もっと見る',
     '새로고침':'更新',
     '날씨 · 물때':'天気・潮汐',
-    '출항 전 점검':'出港前点検',
+    '출항 전 점검':'発航前検査',
     '지금 나갈 수 있나':'今は出られるか',
     '바람':'風',
     '돌풍':'突風',
@@ -9438,7 +9502,7 @@ const I18N = {
     '세부까지':'詳細まで',
     '제원이 밖으로 안 나갑니다.':'仕様は外に出ません。',
     '제조사·모델·연식·길이·폭만 나갑니다.':'製造・モデル・年式・長さ・幅だけが出ます。',
-    '적어 두신 제원을 다 보여 줍니다. 출항 한계 풍속·리프 풍속도 포함됩니다.':'記入した仕様をすべて見せます。出航限界風速・リーフ風速も含みます。',
+    '적어 두신 제원을 다 보여 줍니다. 출항 한계 풍속·리프 풍속도 포함됩니다.':'記入した仕様をすべて見せます。出港限界風速・リーフ風速も含みます。',
     '아직 적어 둔 제원이 없습니다.':'まだ記入された仕様がありません。',
     '예: 010-1234-5678':'例: 010-1234-5678',
     '배 공개설정에서 연락처를 켜 두셨습니다. 남의 배에서 이 번호가 보입니다.':'船の公開設定で連絡先を入にしています。「ほかの船」でこの番号が見えます。',
@@ -10099,7 +10163,7 @@ const I18N = {
     '묘박할 수 있는 수심을 가늠합니다. 보통 수심의 5~7배가 필요합니다.':'錨泊できる水深の目安です。通常、水深の5〜7倍が必要です。',
     '무료 나눔':'無料でお譲り',
     '무슨 일이 있었는지':'何があったか',
-    '무시':'無視',
+    '무시':'長潮',
     '무엇이 문제인지 알려 주세요':'何が問題かお知らせください',
     '무엇이 잘못됐나요?':'何が問題ですか？',
     '무엇인가요':'何ですか',
@@ -10422,7 +10486,7 @@ const I18N = {
     '예: 열기':'例：開く',
     '예: 중조 이상에만 접안':'例：中潮以上のみ接岸',
     '예: 출장':'例：出張',
-    '예: 출항 전 점검':'例：出港前点検',
+    '예: 출항 전 점검':'例：発航前検査',
     '예: 하루 3만원 / 무료':'例：1日3万ウォン / 無料',
     '예: 한 달에 한 번, 격주 토요일':'例：月に1回、隔週土曜日',
     '예약중':'予約中',
@@ -10695,7 +10759,7 @@ const I18N = {
     '출발과 도착 사이에 있었던 일':'出発から到着までの出来事',
     '출항 3일 전까지':'出港3日前まで',
     '출항 당일까지':'出港当日まで',
-    '출항 전 점검처럼 나갈 때마다 하는 것':'出港前点検のように、出るたびに行うもの',
+    '출항 전 점검처럼 나갈 때마다 하는 것':'発航前検査のように、出るたびに行うもの',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'出港前・入港後のように場面ごとに分けておくと探しやすくなります',
     '출항 전날까지':'出港前日まで',
     '충남':'忠清南道',
@@ -11393,7 +11457,7 @@ const I18N = {
     '글판에 올리기':'掲示板に載せる',
     '댓글을 남깁니다.':'コメントを書きます。',
     '막힌 방향':'開いている方向',
-    '정박지를 옛 판으로 되돌립니다.':'停泊地を前の版に戻します。',
+    '정박지를 옛 판으로 되돌립니다.':'係留地を前の版に戻します。',
     '지도에서 현재 위치 보기':'地図で現在地を見る',
     '방오도료':'防汚塗料',
     '아연':'亜鉛（アノード）',
@@ -11635,10 +11699,10 @@ const I18N = {
     'VHF 조난·안전 채널':'VHF 遭難・安全チャンネル',
     '{what} 를 기본값으로 되돌렸습니다.':'{what} を初期値に戻しました。',
     '{what} 를 이 나라 기본값으로 되돌릴까요?\n\n고쳐 두신 것은 사라집니다.':'{what} をこの国の初期値に戻しますか？\n\n直された内容は消えます。',
-    '고르신 나라에 맞는 긴급 연락처와 출항 전 점검표가 처음에 들어갑니다. 나중에 마음대로 고치실 수 있습니다.':'選ばれた国に合った緊急連絡先と出港前チェックリストが最初に入ります。あとから自由に直せます。',
+    '고르신 나라에 맞는 긴급 연락처와 출항 전 점검표가 처음에 들어갑니다. 나중에 마음대로 고치실 수 있습니다.':'選ばれた国に合った緊急連絡先と発航前検査チェックリストが最初に入ります。あとから自由に直せます。',
     '선택함':'選択中',
     '기본값으로 되돌리기':'初期値に戻す',
-    '긴급 연락처와 출항 전 점검표가 이 나라 것으로 처음에 들어갑니다.':'この国の緊急連絡先と出港前チェックリストが最初に入ります。',
+    '긴급 연락처와 출항 전 점검표가 이 나라 것으로 처음에 들어갑니다.':'この国の緊急連絡先と発航前検査チェックリストが最初に入ります。',
     '나라를 바꿔도 이미 적어 두신 것은 그대로 둡니다.':'国を変えても、すでに書かれたものはそのまま残します。',
     '나중에 언어를 바꾸셔도 이 기록들은 그대로 둡니다.':'あとから言語を変えても、これらの記録はそのまま残します。',
     '시작하기':'はじめる',
@@ -11646,8 +11710,8 @@ const I18N = {
     '연락처를 기본값으로 되돌리기':'連絡先を初期値に戻す',
     '지금 적혀 있는 것을 이 나라의 기본값으로 되돌립니다. 고쳐 두신 것은 사라집니다.':'いま書かれている内容をこの国の初期値に戻します。直された内容は消えます。',
     '처음 오셨습니다. 두 가지만 골라 주세요.':'はじめまして。二つだけお選びください。',
-    '출항 전 점검표':'出港前チェックリスト',
-    '점검표를 기본값으로 되돌리기':'出港前チェックリストを初期値に戻す',
+    '출항 전 점검표':'発航前検査チェックリスト',
+    '점검표를 기본값으로 되돌리기':'発航前検査チェックリストを初期値に戻す',
   
 
     // ── 4.102-정비주기화면
@@ -14193,7 +14257,8 @@ const NEED_BOAT_WRAP = {
   'boat:fuel':   ['fuelWrap',     '연료 기록'],
   'boat:docs':   ['contactsWrap', '문서 · 연락처'],
   'boat:voyage': ['voyageWrap',   '항해일지'],
-  'home:check':  ['checkWrap',    '체크리스트']
+  'home:check':  ['checkWrap',    '체크리스트'],
+  'home:cal':    ['calWrap',      '달력']
 };
 // ★ 안내를 넣기 전에 있던 것을 기억해 둔다.
 //
@@ -15720,9 +15785,29 @@ function mrLv(ty, it){
 }
 // 단계를 바꾼다. pub 도 같이 맞춰 둔다 — 옛 판이 읽어도 뜻이 안 어긋나게.
 // ★ 저장·클라우드·밖 사본이 전부 이 문 안에 있다. 밖에서 따로 부르지 않는다.
+// 기록 하나에서 사람이 읽는 글만 모은다 (사진·주소는 badReadable 이 뺀다)
+// ★ 항해일지·정비수첩·리뷰는 기록 창의 칸에 직접 쓴다 — openForm 을 안 지난다.
+//   그래서 「공개로 돌리는 그 순간」 이 거를 수 있는 마지막 자리다.
+function pubTexts(it){
+  const out = [];
+  const 담기 = v => {
+    if(typeof v === 'string'){ out.push(v); return; }
+    if(Array.isArray(v)){ v.forEach(담기); return; }
+    if(v && typeof v === 'object'){
+      ['title','name','text','note','work','used','v','from','to','nm','weather','memo']
+        .forEach(k => { if(typeof v[k] === 'string') out.push(v[k]); });
+      if(Array.isArray(v.logs)) v.logs.forEach(담기);
+      if(Array.isArray(v.how))  v.how.forEach(담기);
+    }
+  };
+  담기(it);
+  return out.slice(0, 400);
+}
 function pubLvSet(k){
   const it = getMR(mrOpenType, mrOpenId); if(!it || !unlocked) return;
   if(!PUB_LEVELS.some(x => x.k === k)) return;
+  // ★ 공개로 돌릴 때만 본다. 비공개로 되돌리는 것은 언제나 되어야 한다.
+  if(k !== 'none' && !badOk.apply(null, pubTexts(it))) return;
   it.pubLv = k;
   it.pub = (k !== 'none');
   saveMR();
@@ -16088,6 +16173,26 @@ function mutePerson(uid){
 }
 function unmutePerson(uid){
   saveHiddenPeople(hiddenPeople().filter(x => x !== String(uid)));
+}
+// ★★ 4.106 — 차단이 **글판에만** 걸려 있었다.
+//   차단해 놓아도 그 사람이 장터에 올린 물건, 남의 배에 올린 항해일지·정비수첩·리뷰,
+//   정박지에 남긴 다녀온 이야기는 그대로 보였다. 애플 심사규정 1.2 가 말하는
+//   「그 이용자를 막는다」 는 한 화면만 막는 것이 아니다.
+//
+//   ★ 정박지 자리 자체는 안 뺀다 — 여럿이 함께 채우는 자리라서, 처음 올린 사람 하나
+//     때문에 지우면 남들이 쓸 수심·요금·연락처가 통째로 사라진다.
+//     그 사람이 남긴 **다녀온 이야기**만 뺀다.
+const MUTE_LISTS = ['talk', 'market', 'explore'];
+function muteListOn(k){
+  const key = String(k || '');
+  return MUTE_LISTS.some(x => key === x || key.indexOf(x + ':') === 0);
+}
+// 목록을 읽는 문 하나. 걸러야 할 목록이면 걸러서 준다.
+// ★ listRows 자체는 안 건드린다 — 그 값이 다시 저장되는 자리가 있어서,
+//   거기서 거르면 차단을 풀어도 되살아나지 않는다.
+function listRowsSeen(k){
+  const rows = listRows(k);
+  return muteListOn(k) ? filterMuted(rows) : rows;
 }
 // ★ 글·댓글을 거르는 문 하나. 목록마다 따로 적으면 한 곳을 빠뜨린다.
 function filterMuted(list){
@@ -16580,7 +16685,7 @@ async function renderTalk(){
       listSet('talk', r.rows, r.done);
     }catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
-  talkList = listRows('talk');
+  talkList = listRowsSeen('talk');
 
   const kinds = `<div class="tfilt">`
     + `<button class="tchip${talkKind?'':' on'}" onclick="setTalkKind('')">${esc(t('전체'))}</button>`
@@ -18041,7 +18146,7 @@ async function openExplore(biz){
     try{ listSet(ck, await window.__pub.list(exploreBiz), true); }
     catch(e){ W.innerHTML = wrBtn + `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
-  exploreAll = listRows(ck);
+  exploreAll = listRowsSeen(ck);
   const ph = { voyage: t('항구 · 배 이름으로 찾기'),
                maint:  t('정비 항목 · 계통으로 찾기'),
                review: t('제품 · 제조사 · 종류로 찾기'),
@@ -18851,6 +18956,8 @@ function editIntro(){
   openForm({
     title: '배 소개글',
     okText: '저장',
+    filter: true,     // ★ 밖으로 나가는 글 — 배 둘러보기에 그대로 실린다
+
     fields: [ { key:'doc', type:'rich', label:'내용', value: body,
                 placeholder:'배 소개, 연혁, 자랑거리를 자유롭게 쓰세요' } ],
     onOk: v => {
@@ -18891,6 +18998,8 @@ function addIntro(kind){
   openForm({
     title: isV ? '유튜브 링크' : '글',
     okText: '넣기',
+    filter: true,     // ★ 밖으로 나가는 글 — 배 둘러보기에 그대로 실린다
+
     fields: isV
       ? [ { key:'v', label:'유튜브 주소', value:'', placeholder:'https://youtu.be/...' } ]
       : [ { key:'v', type:'multi', rows:5, label:'내용', value:'',
@@ -21873,7 +21982,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.105';
+const APP_VER = '4.106';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -24782,7 +24891,7 @@ const TAB_TITLES = {home:t('오늘'), boat:t('내 배'), others:t('남의 배'),
 // ★ 「점검」이라고만 하면 배 탭의 「정기점검」과 헷갈린다 —
 //   정기점검은 주기가 있는 정비, 이쪽은 나갈 때마다 훑는 목록이다. 그래서 「체크리스트」다.
 // ★ 뉴스는 「바깥 소식」 이다 — 날씨 옆이 제자리다.
-const HOMESUB_TITLES = {today:t('오늘'), weather:t('날씨 · 물때'), news:t('뉴스'), check:t('체크리스트')};
+const HOMESUB_TITLES = {today:t('오늘'), cal:t('달력'), weather:t('날씨 · 물때'), news:t('뉴스'), check:t('체크리스트')};
 // ★ 이름이 길면 360픽셀 화면에서 마지막 칸이 [편집 중] 단추에 잘려 보인다.
 //   옆으로 밀어 볼 수는 있지만, 잘린 글자는 고장으로 읽힌다. 짧게 줄인다.
 // ★ 「정비」 한 통에 정비수첩·정기점검·수리·연료가 들어간다.
@@ -25083,6 +25192,7 @@ function switchTab(t){
   show('weatherWrap',  t==='home' && homeSub==='weather');
   show('newsWrap',     t==='home' && homeSub==='news');
   show('checkWrap',    t==='home' && homeSub==='check');
+  show('calWrap',      t==='home' && homeSub==='cal');
   show('gearWrap',     t==='boat' && boatSubTab==='gear');
   // 「정비」 통 — 안에서 고른 갈래만 보인다
   const onMnt = (t==='boat' && boatSubTab==='maint');
@@ -25142,6 +25252,7 @@ function renderCurrent(){
 
   if(t==='home'){
     if(homeSub==='today') renderHome();
+    else if(homeSub==='cal') renderCal();
     else if(homeSub==='weather') renderWeather();
     else if(homeSub==='news') renderNews();
     else renderCheck();
@@ -25664,16 +25775,18 @@ function renderRepairList(){
 }
 
 // ===== 추가 =====
-function mrAdd(kind){
+function mrAdd(kind, on){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   // 창을 여러 번 띄우지 않는다. 빈 항목을 만들고 바로 편집 화면을 연다.
   const id = newId();
+  // ★ 달력에서 날짜를 눌러 만들면 그 날로 올린다. 안 주면 오늘이다.
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(String(on || '')) ? String(on) : today();
   if(kind==='maint'){
     maint.push({id, grp:'기타', name:'', months:12, unit:'m', lastDate:'',
                 note:'', photos:[], pin:null, history:[], seed:false});
   } else {
     repair.push({id, grp:'', title:'', status:'open', note:'',
-                 photos:[], pin:null, created:today(), doneDate:''});
+                 photos:[], pin:null, created:day, doneDate:''});
   }
   saveMR(); renderMR(); openMR(kind, id);
 }
@@ -28152,6 +28265,8 @@ function rideEdit(){
   openForm({
     title: it.rideOn ? '모집 고치기' : '같이 탈 사람 구하기',
     okText: it.rideOn ? '저장' : '글판에 올리기',
+    filter: true,     // ★ 밖으로 나가는 글 — 글판에 그대로 올라간다
+
     sub: RIDE_LAW,
     fields: [
       { key:'n', label:'몇 자리', type:'pick', value:String(Number(it.rideN)||1),
@@ -28228,12 +28343,15 @@ const isPlan = v => !!(v && v.plan);
 //   그 날 날씨·물때를 미리 볼 수 있고, 출항 전 점검이 그 날짜에 붙고,
 //   진짜 나가는 날 새로 만들지 않고 열기만 하면 된다.
 //   (항해 중에 정신없어서 기록을 놓친다는 말이 여러 번 있었다)
-function addPlan(){
+function addPlan(on){
   if(!unlocked) return;
   const d = new Date(); d.setDate(d.getDate() + 7);
   const p = n => String(n).padStart(2,'0');
+  // ★ 달력에서 날짜를 눌러 만들면 그 날로 잡는다. 안 주면 이레 뒤가 기본이다.
+  const day = /^\d{4}-\d{2}-\d{2}$/.test(String(on || '')) ? String(on)
+            : d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
   const v = {id:newId(), plan:true,
-             date: d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),
+             date: day,
              title:'', pub:true,
              from:'', to:'', nm:'', hours:'', engineH:'', crew:'',
              timeOut:'', timeIn:'',
@@ -31661,7 +31779,7 @@ async function renderMarket(){
       listSet('market', r.rows, r.done);
     }catch(e){ W.innerHTML = `<div class="mrnone">${esc(tsub('불러오지 못했습니다: {why}', { why: (e&&e.message)||String(e) }))}</div>`; return; }
   }
-  marketList = listRows('market');
+  marketList = listRowsSeen('market');
 
   W.innerHTML = `<div class="tfilt">`
       + `<button class="tchip${marketCat?'':' on'}" onclick="setMarketCat('')">${esc(t('전체'))}</button>`
@@ -32504,7 +32622,7 @@ async function loadBpCmts(boatId, recId){
 function bpSocial(boatId, recId){
   const key = bpKey(boatId, recId);
   if(!boatId || !recId) return '';
-  const all = (bpCmts[key] || []).slice()
+  const all = filterMuted(bpCmts[key] || []).slice()
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
@@ -33218,7 +33336,7 @@ async function loadSpotCmts(id){
 }
 function spotCmtHtml(s){
   const tv = trView('spots', s.id);
-  const all = (spotCmts[String(s.id)] || [])
+  const all = filterMuted(spotCmts[String(s.id)] || [])
     .slice().sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
@@ -33776,6 +33894,313 @@ function tideRow(it){
              <button class="tchip${st==='south'?' on':''}" onclick="setTideStyle('south')">${esc(t('남해식'))}</button></div>
            <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(t('지역마다 부르는 법이 다릅니다. 서해는 조금 다음이 무시, 남해는 바로 1물입니다.'))}<br>${esc(t('달의 삭 시각으로 음력일을 구해 정합니다.'))}</div>`
         : '');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ★★ 달력 (4.106 — 사장님이 정하신 것)
+//
+//   「항해일지 쓰면은 자동으로 달력에 들어가고 예정이나 이런 것들도 다 들어가고,
+//    또 달력에서도 이날 정비 뭐 있다라고 쓰면서 바로 정비수첩으로 가기,
+//    정기점검으로 가기, 수리목록으로 가기 그런 식으로 만들면 좋을 것 같은데」
+//
+//  ★ 달력은 아무것도 저장하지 않는다. 거울이다.
+//    날짜가 붙은 기록이 이미 여섯 갈래 있는데(예정·항해일지·정기점검·정비수첩·수리·문서)
+//    한자리에 모아 보는 데가 없었다. 그 여섯을 읽어서 보여 주기만 한다.
+//
+//    ─ 왜 저장 칸을 안 만드나
+//      한 배의 기록이 어느 칸에 있는지가 네 곳에 손으로 나열돼 있다(colltest 가 지킨다).
+//      칸을 더하면 스무 곳을 고쳐야 하고, 한 곳만 빠뜨리면 기록이 조용히 사라진다.
+//      달력은 그 위험을 아예 안 진다 — 잘못 만들어도 기록이 상하지 않는다.
+//
+//    ─ 손님 예약은 「예정」이 그대로 맡는다
+//      낚싯배 예약은 실제로 출항 예정이고, 나가는 날 그 예정이 항해일지로 바뀐다.
+//      이미 있는 것과 똑같은 것에 새 이름을 붙이지 않는다.
+//
+//  ★ 왜 날짜 밑에 물때를 다나
+//    삼성 달력은 그 자리에 음력을 단다. 배 타는 사람에게 필요한 것은 음력 자체가 아니라
+//    거기서 나오는 물때다. 같은 자리, 더 쓸모 있는 값.
+// ══════════════════════════════════════════════════════════════
+//
+// 갈래마다 색과 이름. ★ 한 곳에서만 정한다 — 색을 자리마다 적으면 반드시 어긋난다.
+const CAL_KINDS = {
+  plan:   { c:'#4C8FD0', n:'예정' },
+  voyage: { c:'#3A6A96', n:'항해일지' },
+  maint:  { c:'#D9AE63', n:'정기점검' },
+  mlog:   { c:'#5FB894', n:'정비수첩' },
+  repair: { c:'#E4756A', n:'수리' },
+  vdoc:   { c:'#C4574B', n:'문서' }
+};
+
+// 그 기간에 걸린 것을 다 모은다. from·to 는 'YYYY-MM-DD' (양 끝 포함).
+// ★★ 이 함수는 읽기만 한다. 여기서 save 를 부르면 안 된다 — caltest 가 지킨다.
+function calItems(from, to){
+  const out = [];
+  const add = (date, kind, id, title) => {
+    const d = String(date == null ? '' : date).slice(0, 10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+    if(from && d < from) return;
+    if(to   && d > to)   return;
+    out.push({ date:d, kind, id:String(id),
+               title:String(title == null ? '' : title),
+               color:CAL_KINDS[kind].c });
+  };
+  // ── 예정 · 항해일지
+  (Array.isArray(voyage) ? voyage : []).forEach(v => {
+    if(!v) return;
+    const k = isPlan(v) ? 'plan' : 'voyage';
+    add(v.date, k, v.id, String(v.title || '').trim() || t(CAL_KINDS[k].n));
+  });
+  // ── 정기점검 — ★ 마지막에 한 날이 아니라 **다음 할 날**로 들어간다.
+  //    지난 날로 넣으면 달력에 끝난 일만 쌓이고 앞으로 할 일이 안 보인다.
+  maintRows().forEach(m => {
+    if(!m) return;
+    let st = null;
+    try{ st = mStatus(m); }catch(_){ st = null; }
+    if(!st || !st.next) return;
+    add(fmtDate(st.next), 'maint', m.id, String(m.name || '').trim() || t('정기점검'));
+  });
+  // ── 정비수첩 — 한 날
+  mlogRows().forEach(g => { if(g) add(g.date, 'mlog', g.id, mlogTitle(g)); });
+  // ── 수리 — 고쳤으면 고친 날, 아직이면 올린 날
+  (Array.isArray(repair) ? repair : []).forEach(r => {
+    if(!r) return;
+    add(r.doneDate || r.created, 'repair', r.id, String(r.title || '').trim() || t('수리'));
+  });
+  // ── 문서 만료일
+  (Array.isArray(vdocs) ? vdocs : []).forEach(d => {
+    if(!d) return;
+    add(String(d.expiry || '').slice(0, 10), 'vdoc', d.id,
+        String(d.title || '').trim() || t('문서'));
+  });
+  out.sort((a, b) => a.date.localeCompare(b.date) || a.kind.localeCompare(b.kind));
+  return out;
+}
+
+// ── 달력 파일 (.ics) ──────────────────────────────────────────
+// ★ 규격을 한 줄이라도 어기면 구글·아이폰이 **말없이** 안 읽는다.
+//   사람은 「눌렀는데 아무 일도 없다」 로만 겪는다. 그래서 검사로 묶어 둔다.
+
+// 글자 벗기기. ★ 역슬래시를 **먼저** 벗겨야 한다 — 나중에 하면 두 번 벗겨진다.
+function icsEsc(s){
+  return String(s == null ? '' : s)
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g,  '\\;')
+    .replace(/,/g,  '\\,')
+    .replace(/\r\n|\r|\n/g, '\\n');
+}
+// 한 줄은 75 바이트를 넘으면 안 된다(RFC 5545). 넘으면 다음 줄 앞에 빈칸 하나를 두고 잇는다.
+// ★ 글자 가운데를 자르지 않는다 — 한글은 한 자가 3바이트라 자르면 깨진다.
+function icsFold(line){
+  const s = String(line);
+  const len = c => { try{ return unescape(encodeURIComponent(c)).length; }catch(_){ return c.length; } };
+  let out = '', cur = '', n = 0, first = true;
+  for(const ch of s){
+    const w = len(ch);
+    if(n + w > (first ? 75 : 74)){
+      out += (out ? '\r\n ' : '') + cur;
+      cur = ''; n = 0; first = false;
+    }
+    cur += ch; n += w;
+  }
+  return out + (out ? '\r\n ' : '') + cur;
+}
+function calIcs(from, to){
+  const rows = calItems(from, to);
+  const p = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const stamp = now.getUTCFullYear() + p(now.getUTCMonth() + 1) + p(now.getUTCDate())
+              + 'T' + p(now.getUTCHours()) + p(now.getUTCMinutes()) + p(now.getUTCSeconds()) + 'Z';
+  const ymd = s => String(s).replace(/-/g, '');
+  // 하루 종일 일정은 끝나는 날을 **다음 날**로 적는다. 규격이 그렇다.
+  const nextDay = s => {
+    const d = new Date(String(s) + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10).replace(/-/g, '');
+  };
+  const bn = (typeof curBoat === 'function' && curBoat()) ? String(curBoat().name || '') : '';
+  const L = ['BEGIN:VCALENDAR',
+             'VERSION:2.0',
+             'PRODID:-//baetnil//' + (typeof APP_VER !== 'undefined' ? APP_VER : '') + '//KO',
+             'CALSCALE:GREGORIAN',
+             'METHOD:PUBLISH',
+             'X-WR-CALNAME:' + icsEsc((bn ? bn + ' · ' : '') + '뱃일')];
+  rows.forEach(r => {
+    L.push('BEGIN:VEVENT');
+    L.push('UID:' + r.kind + '-' + r.id + '-' + ymd(r.date) + '@baetnil.com');
+    L.push('DTSTAMP:' + stamp);
+    L.push('DTSTART;VALUE=DATE:' + ymd(r.date));
+    L.push('DTEND;VALUE=DATE:' + nextDay(r.date));
+    L.push('SUMMARY:' + icsEsc('[' + t(CAL_KINDS[r.kind].n) + '] ' + r.title));
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  return L.map(icsFold).join('\r\n') + '\r\n';
+}
+
+// ── 화면 ──────────────────────────────────────────────────────
+let calYM  = '';   // 'YYYY-MM'    보고 있는 달
+let calSel = '';   // 'YYYY-MM-DD' 펼쳐 놓은 날
+
+function calMonth(){
+  if(!/^\d{4}-\d{2}$/.test(calYM)) calYM = today().slice(0, 7);
+  return calYM;
+}
+function calMove(n){
+  const [y, m] = calMonth().split('-').map(Number);
+  const d = new Date(y, m - 1 + n, 1);
+  calYM = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  calSel = '';
+  renderCal();
+}
+function calToday(){ calYM = today().slice(0, 7); calSel = today(); renderCal(); }
+function calPick(d){ calSel = (calSel === d) ? '' : String(d); renderCal(); }
+
+// 줄을 누르면 그 기록 창으로. ★ 달력은 기록을 품지 않는다 — 원래 자리로 보낸다.
+function calGo(kind, id){
+  const K = { plan:'voyage', voyage:'voyage', maint:'maint', mlog:'mlog',
+              repair:'repair', vdoc:'vdoc' }[kind];
+  if(!K) return;
+  openMR(K, id);
+}
+// 그 날짜로 새 기록. ★ 만드는 일은 원래 함수가 한다 — 여기서 모양을 베끼지 않는다.
+function calAdd(kind){
+  if(!unlocked) return;
+  const d = calSel || today();
+  if(kind === 'plan')   return addPlan(d);
+  if(kind === 'mlog')   return addMlog({ date:d });
+  if(kind === 'repair') return mrAdd('repair', d);
+}
+async function calExport(){
+  const ym = calMonth();
+  const [y, m] = ym.split('-').map(Number);
+  const last = new Date(y, m, 0).getDate();
+  const txt = calIcs(ym + '-01', ym + '-' + String(last).padStart(2, '0'));
+  const err = await saveFile('baetnil-' + ym + '.ics', 'text/calendar', txt);
+  if(err) tell(t('파일로 저장하지 못했습니다.') + '\n\n' + err, { kind:'bad' });
+  else tell(t('구글 · 아이폰 달력에 넣으실 수 있습니다'), { kind:'good' });
+}
+
+// ★ 요일 이름은 사전에 안 태운다 — '일'·'월'·'수'·'금' 은 다른 뜻으로 이미 쓰이는 낱말이라
+//   사전에 넣으면 엉뚱한 말로 옮겨진다. 여기서 언어별로 곧장 적는다.
+const CAL_DOW = {
+  ko: ['일', '월', '화', '수', '목', '금', '토'],
+  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+  ru: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+  ja: ['日', '月', '火', '水', '木', '金', '土']
+};
+// ★ 달 이름도 마찬가지다. 사전은 {m} 자리에 숫자만 끼울 수 있어서
+//   영어의 「September 2026」 을 만들 길이 없다. 여기서 언어별로 적는다.
+const CAL_MON = {
+  ko: null,   // 「2026년 9월」 — 숫자를 그대로 쓴다
+  ja: null,   // 「2026年9月」
+  en: ['January','February','March','April','May','June',
+       'July','August','September','October','November','December'],
+  ru: ['Январь','Февраль','Март','Апрель','Май','Июнь',
+       'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+};
+function calLang(){
+  let v = 'ko';
+  try{ v = (typeof langNow === 'function') ? langNow() : 'ko'; }catch(_){}
+  return CAL_DOW[v] ? v : 'ko';
+}
+function calDow(){ return CAL_DOW[calLang()] || CAL_DOW.ko; }
+// 「2026년 9월」 · 「2026年9月」 · 「September 2026」 · 「Сентябрь 2026」
+function calTitle(y, m){
+  const v = calLang();
+  const mon = CAL_MON[v];
+  if(mon) return mon[(m - 1 + 12) % 12] + ' ' + y;
+  return (v === 'ja') ? (y + '年' + m + '月') : (y + '년 ' + m + '월');
+}
+
+function renderCal(){
+  const L = document.getElementById('calList'); if(!L) return;
+  const ym = calMonth();
+  const [Y, M] = ym.split('-').map(Number);
+  const last  = new Date(Y, M, 0).getDate();
+  const lead  = new Date(Y, M - 1, 1).getDay();          // 그 달 1일의 요일 (일=0)
+  const from  = ym + '-01';
+  const to    = ym + '-' + String(last).padStart(2, '0');
+  const rows  = calItems(from, to);
+  const byDay = {};
+  rows.forEach(r => { (byDay[r.date] = byDay[r.date] || []).push(r); });
+  const td = today();
+  const st = (typeof tideStyle === 'function') ? tideStyle() : 'west';
+
+  // 머리 — 달 넘기기 · 오늘 · 내보내기
+  const ago = new Date(Y, M - 2, 1), nxt = new Date(Y, M, 1);
+  const lbl = d => calTitle(d.getFullYear(), d.getMonth() + 1);
+  let h = `<div class="calhead">
+      <button class="calnav" onclick="calMove(-1)" aria-label="${esc(lbl(ago))}">‹</button>
+      <b class="calym">${esc(calTitle(Y, M))}</b>
+      <button class="calnav" onclick="calMove(1)" aria-label="${esc(lbl(nxt))}">›</button>
+      <span style="flex:1"></span>
+      <button class="tab" onclick="calToday()">${esc(t('오늘'))}</button>
+    </div>`;
+
+  // 요일 줄
+  h += `<div class="calgrid caldow">` + calDow().map((d, i) =>
+        `<div class="cdow${i === 0 ? ' sun' : (i === 6 ? ' sat' : '')}">${esc(d)}</div>`).join('') + `</div>`;
+
+  // 날짜 칸
+  const cells = [];
+  for(let i = 0; i < lead; i++) cells.push('<div class="ccell out"></div>');
+  for(let d = 1; d <= last; d++){
+    const ds  = ym + '-' + String(d).padStart(2, '0');
+    const dow = (lead + d - 1) % 7;
+    const its = byDay[ds] || [];
+    // ★ 물때 — 삼성 달력이 음력을 다는 자리다. 배에는 물때가 그 자리다.
+    let tide = '';
+    try{ tide = tideName(ds, st) || ''; }catch(_){ tide = ''; }
+    const show = its.slice(0, 2);
+    const more = its.length - show.length;
+    cells.push(
+      `<div class="ccell${ds === td ? ' today' : ''}${ds === calSel ? ' sel' : ''}" onclick="calPick('${ds}')">
+         <div class="cnum${dow === 0 ? ' sun' : (dow === 6 ? ' sat' : '')}">${d}</div>
+         <div class="ctide">${esc(tide)}</div>
+         ${show.map(r => `<div class="cchip" style="border-left-color:${r.color}">${esc(r.title)}</div>`).join('')}
+         ${more > 0 ? `<div class="cmore">${esc(tsub('{n}건 더', { n:more }))}</div>` : ''}
+       </div>`);
+  }
+  while(cells.length % 7) cells.push('<div class="ccell out"></div>');
+  h += `<div class="calgrid">` + cells.join('') + `</div>`;
+  // ★ 내보내기는 머리줄에 두면 좁은 화면에서 달 이름 위로 겹쳐 올라앉는다. 표 아래 제 줄에 둔다.
+  h += `<div class="calout">
+      <button class="tab" onclick="calExport()">${esc(t('달력 파일 내보내기'))}</button>
+      <span class="calouth">${esc(t('구글 · 아이폰 달력에 넣으실 수 있습니다'))}</span>
+    </div>`;
+
+  // 고른 날 — 그 날 것을 다 펼치고, 새로 만드는 길을 둔다
+  if(calSel){
+    const its = byDay[calSel] || [];
+    let mark = '';
+    try{ mark = (typeof tideMark === 'function' ? tideMark(calSel) : '') || ''; }catch(_){}
+    let nm = '';
+    try{ nm = tideName(calSel, st) || ''; }catch(_){}
+    const selDow = (() => { const q = calSel.split('-').map(Number);
+      return calDow()[new Date(q[0], q[1] - 1, q[2]).getDay()] || ''; })();
+    h += `<div class="calday">
+        <div class="cdtit"><b>${esc(calSel + (selDow ? ' (' + selDow + ')' : ''))}</b>
+          ${nm ? `<span class="chip">${esc(nm)}</span>` : ''}
+          ${mark ? `<span class="chip notice">${esc(mark)}</span>` : ''}</div>`;
+    h += its.length
+      ? its.map(r => `<div class="cdrow" onclick="calGo('${r.kind}','${String(r.id).replace(/'/g, "\\'")}')">
+             <span class="cdbar" style="background:${r.color}"></span>
+             <span class="cdk">${esc(t(CAL_KINDS[r.kind].n))}</span>
+             <span class="cdt">${esc(r.title)}</span></div>`).join('')
+      : `<div class="cdnone">${esc(t('이 날에 만들기'))}</div>`;
+    if(typeof unlocked !== 'undefined' && unlocked){
+      h += `<div class="cdadd">
+          <button class="tab edt" onclick="calAdd('plan')">${esc(t('+ 예정'))}</button>
+          <button class="tab edt" onclick="calAdd('mlog')">${esc(t('+ 정비수첩'))}</button>
+          <button class="tab edt" onclick="calAdd('repair')">${esc(t('+ 고장'))}</button>
+        </div>`;
+    }
+    h += `</div>`;
+  } else if(!rows.length){
+    h += `<div class="cdnone" style="margin:16px">${esc(t('이 달에는 아무것도 없습니다'))}</div>`;
+  }
+
+  L.innerHTML = h;
 }
 
 // ===== 조행기 =====

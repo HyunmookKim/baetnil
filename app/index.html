@@ -774,6 +774,10 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .cdk{font-size:11px;color:var(--tm);flex:none;min-width:52px}
 .cdt{font-size:14px;color:var(--tx);flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cdcal{flex:none;border:1px solid var(--bd);background:none;border-radius:12px;
+  padding:4px 9px;font-size:11px;font-family:inherit;color:var(--tm);cursor:pointer;
+  min-height:30px;white-space:nowrap}
+.cdcal:active{background:var(--acs);color:var(--tx)}
 .cdnone{font-size:13px;color:var(--tm);padding:8px 2px}
 .cdadd{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
 .calout{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:12px 14px 0}
@@ -2315,6 +2319,7 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '달력에 넣기':'Add to calendar',
     '지난 정비':'Serviced',
     '고친 날':'Fixed',
     '달력':'Calendar',
@@ -5486,6 +5491,7 @@ const I18N = {
     '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\\n\\nDo you agree?\\n(You can switch it off and on at any time under Menu - Terms & Privacy - Location.)',
   },
   ru: {
+    '달력에 넣기':'В календарь',
     '지난 정비':'Обслужено',
     '고친 날':'Исправлено',
     '달력':'Календарь',
@@ -8668,6 +8674,7 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '달력에 넣기':'カレンダーに追加',
     '지난 정비':'済んだ整備',
     '고친 날':'直した日',
     '달력':'カレンダー',
@@ -21988,7 +21995,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.107';
+const APP_VER = '4.108';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -34096,6 +34103,7 @@ function calIcs(from, to){
 // ── 화면 ──────────────────────────────────────────────────────
 let calYM  = '';   // 'YYYY-MM'    보고 있는 달
 let calSel = '';   // 'YYYY-MM-DD' 펼쳐 놓은 날
+let calShown = []; // 지금 그린 줄들 — 「달력에 넣기」 단추가 이 자리를 가리킨다
 
 function calMonth(){
   if(!/^\d{4}-\d{2}$/.test(calYM)) calYM = today().slice(0, 7);
@@ -34158,6 +34166,86 @@ function calAdd(kind){
   if(kind === 'mlog')   return addMlog({ date:d });
   if(kind === 'repair') return mrAdd('repair', d);
 }
+// ══════════════════════════════════════════════════════════════
+// ★★ 폰 달력에 바로 넣기 (4.108 — 사장님 지적)
+//
+//   「내가 파일로 받아서 넣어줘야 하는 거야? 바로 연동 안 되고?
+//    다른 어플들 어케하는지 알아보고 한 거야?」
+//
+//   ★ 알아본 것 (4.106 에서는 배 앱만 보고 이 길을 놓쳤다 — 제 잘못이다)
+//     · 안드로이드 — 구글 공식 문서가 「앱은 캘린더에 쓰는 데 **권한이 필요 없다.**
+//       인텐트로 캘린더 앱에 넘겨라」 라고 하고, 그 방식을 **권장**한다.
+//       (developer.android.com/guide/topics/providers/calendar-provider)
+//     · 아이폰 — iOS 17 부터 EKEventEditViewController 는 「어떤 사용자 권한도
+//       필요로 하지 않는다」 (애플 WWDC23 샘플). Info.plist 에 캘린더 키도 안 넣는다.
+//     · 웹 — 브라우저에서 폰 달력에 쓰는 표준은 **없다.** W3C 가 2014년에 폐기했다.
+//     · ★ 구글 캘린더 앱은 .ics 가져오기를 **PC 에서만** 지원한다 —
+//       구글 공식 문서에 「일정을 가져오려면 **컴퓨터에서** 구글 캘린더를 여세요」.
+//       그래서 파일만으로는 안드로이드 폰에서 끝을 못 본다. 사장님 지적이 정확했다.
+//
+//   ★ 문 하나 — 세 가지 길을 여기서만 가른다. 자리마다 적으면 한 곳이 옛 길로 남는다.
+//     ① 껍데기 앱에 달력 부품이 있으면 → 폰 달력 창이 그대로 뜬다 (권한을 안 묻는다)
+//     ② 없으면 → 구글 달력 「일정 만들기」 를 연다 (폰에 구글 달력이 있으면 그 앱이 열린다)
+//     ③ 그것도 안 되면 → 그 날짜짜리 달력 파일을 내보낸다
+//
+//   ★ 부품이 없어도 앱이 멀쩡히 돈다. 부품을 깔면 ①이 저절로 켜진다.
+const CAL_PLUG = 'CapacitorCalendar';
+function calPlug(){
+  try{
+    const P = capPlug(CAL_PLUG);
+    return (P && typeof P.createEventWithPrompt === 'function') ? P : null;
+  }catch(_){ return null; }
+}
+function calRowName(r){
+  return '[' + t(CAL_KINDS[r.kind].n) + '] ' + String((r && r.title) || '');
+}
+// 구글 달력 「일정 만들기」 주소. ★ 하루 종일 일정은 끝나는 날을 **다음 날**로 적는다.
+function calGoogleUrl(r){
+  const ymd = x => String(x).replace(/-/g, '');
+  const d = new Date(String(r.date) + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + 1);
+  let tz = '';
+  try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(_){}
+  const b = (typeof curBoat === 'function' && curBoat()) ? String(curBoat().name || '') : '';
+  const q = new URLSearchParams();
+  q.set('action', 'TEMPLATE');
+  q.set('text', calRowName(r));
+  q.set('dates', ymd(r.date) + '/' + d.toISOString().slice(0, 10).replace(/-/g, ''));
+  q.set('details', '뱃일' + (b ? ' · ' + b : ''));
+  if(tz) q.set('ctz', tz);
+  return 'https://calendar.google.com/calendar/render?' + q.toString();
+}
+async function calPhone(i){
+  const r = (calShown || [])[Number(i)];
+  if(!r) return;
+  // ① 폰 달력 창을 바로 띄운다 — 권한을 안 묻는 길이다
+  const P = calPlug();
+  if(P){
+    const a = new Date(String(r.date) + 'T00:00:00');
+    if(isFinite(a.getTime())){
+      try{
+        await P.createEventWithPrompt({
+          title: calRowName(r), isAllDay: true,
+          startDate: a.getTime(), endDate: a.getTime() + 864e5,
+          description: '뱃일' });
+        return;
+      }catch(err){
+        // 사람이 그만둔 것은 잘못이 아니다 — 조용히 끝낸다
+        const m = String((err && err.message) || err);
+        if(/cancel|dismiss|abort/i.test(m)) return;
+        // 부품이 있어도 안 되면 아래 길로 내려간다
+      }
+    }
+  }
+  // ② 구글 달력 「일정 만들기」
+  try{
+    const w = window.open(calGoogleUrl(r), '_blank', 'noopener');
+    if(w) return;
+  }catch(_){}
+  // ③ 그 날짜짜리 달력 파일
+  const why = await saveFile('baetnil-' + r.date + '.ics', 'text/calendar', calIcs(r.date, r.date));
+  if(why) tell(t('파일로 저장하지 못했습니다.') + '\n\n' + why, { kind:'bad' });
+}
 async function calExport(){
   const ym = calMonth();
   const [y, m] = ym.split('-').map(Number);
@@ -34209,6 +34297,7 @@ function renderCal(){
   const from  = ym + '-01';
   const to    = ym + '-' + String(last).padStart(2, '0');
   const rows  = calItems(from, to);
+  calShown = rows;
   const byDay = {};
   rows.forEach(r => { (byDay[r.date] = byDay[r.date] || []).push(r); });
   const td = today();
@@ -34274,7 +34363,10 @@ function renderCal(){
       ? its.map(r => `<div class="cdrow" onclick="calGo('${r.kind}','${String(r.id).replace(/'/g, "\\'")}')">
              <span class="cdbar" style="background:${r.color}"></span>
              <span class="cdk">${esc(t(CAL_KINDS[r.kind].n))}</span>
-             <span class="cdt">${esc(r.title)}</span></div>`).join('')
+             <span class="cdt">${esc(r.title)}</span>
+             <button class="cdcal"
+               onclick="event.stopPropagation();calPhone(${rows.indexOf(r)})">${
+               esc(t('달력에 넣기'))}</button></div>`).join('')
       : `<div class="cdnone">${esc(t('이 날에 만들기'))}</div>`;
     if(typeof unlocked !== 'undefined' && unlocked){
       h += `<div class="cdadd">

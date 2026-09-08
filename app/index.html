@@ -772,8 +772,20 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
   border-top:1px solid var(--bd2)}
 .cdbar{width:3px;height:17px;border-radius:2px;flex:none}
 .cdk{font-size:11px;color:var(--tm);flex:none;min-width:52px}
+.cdhm{font-size:12px;color:var(--th);flex:none;font-variant-numeric:tabular-nums}
 .cdt{font-size:14px;color:var(--tx);flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 엔진이 돌고 있을 때 — 화면을 열면 이것부터 보여야 한다 */
+.runon{margin:12px 14px;padding:16px 14px;border-radius:15px;text-align:center;
+  background:var(--sf);border:1px solid #2F6B4E}
+.runlab{font-size:12px;color:#5FB894;font-weight:700;letter-spacing:.06em}
+.runbig{font-size:34px;font-weight:800;color:var(--th);margin:6px 0 2px;
+  font-variant-numeric:tabular-nums}
+.runsub{font-size:12px;color:var(--tm)}
+.runwarn{font-size:12px;color:var(--yel);margin-top:8px;line-height:1.5}
+.runon .runstop{margin-top:12px;width:100%;min-height:56px;height:auto;
+  font-size:17px;font-weight:700;padding:14px 12px;border-radius:12px}
+.chip.warn{background:#3A2A18;border-color:#6B5326;color:var(--yel)}
 .cdcal{flex:none;border:1px solid var(--bd);background:none;border-radius:12px;
   padding:4px 9px;font-size:11px;font-family:inherit;color:var(--tm);cursor:pointer;
   min-height:30px;white-space:nowrap}
@@ -2265,7 +2277,7 @@ header{padding-top:var(--sat)}
   <div class="mobtit" data-t="사람 빠짐 — 이 자리">사람 빠짐 — 이 자리</div>
   <div id="mobBody"></div>
   <div class="mobbtns">
-    <a class="mob122" href="tel:122" data-t="해경 122">해경 122</a>
+    <a class="mob122" id="mobSos" href="tel:112">112</a>
     <button class="mobx" onclick="mobClose()" data-t="끄기">끄기</button>
   </div>
 </div></div>
@@ -2319,6 +2331,17 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '엔진 가동을 마칩니다.':'Finish this engine run.',
+    '엔진이 돌고 있습니다':'The engine is running',
+    '{d} {t} 부터':'since {d} {t}',
+    '지금 껐습니다':'Stopped it now',
+    '아직 돌고 있습니다':'Still running',
+    '켠 시각':'Started',
+    '끈 시각':'Stopped',
+    '돌고 있음':'Running',
+    '적으시면 가동시간이 저절로 셈해집니다':'Fill this in and the running time is worked out for you',
+    '엔진을 껐습니다 — {v} 돌렸습니다':'Engine stopped — it ran {v}',
+    '하루가 넘었습니다. 끄는 것을 잊으셨다면 시각을 고쳐 주세요.':'More than a day. If you forgot to stop it, correct the time.',
     '달력에 넣기':'Add to calendar',
     '지난 정비':'Serviced',
     '고친 날':'Fixed',
@@ -2332,7 +2355,7 @@ const I18N = {
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what} time set to {t} as well.',
     '지금 출발 (시각·위치·날씨)': 'Depart now (time, position, weather)',
     '시각 없음': 'No time',
-    '이 항해': 'This passage',
+    '이 항해': 'This voyage',
     '지도에서 항적 선을 눌러도 됩니다': 'You can also tap the track line on the map',
     '튄 점 {n}개를 찾았습니다 — {why}.\n\n{m}개만 남기고 지울까요?\n\n되돌리기로 되살릴 수 있습니다.': 'Found {n} stray points — {why}.\n\nKeep only {m} and delete the rest?\n\nUndo will bring them back.',
     '배가 낼 수 없는 속도 {n}개': '{n} at a speed this boat cannot make',
@@ -2353,7 +2376,7 @@ const I18N = {
     '아직 고친 적이 없습니다.': 'It has not been edited yet.',
     '이 자리 사진': 'Photos of this place',
     '이 판으로 되돌리기': 'Restore this revision',
-    '지금 판': 'Current',
+    '지금 판': 'Current revision',
     '처음 올린 판입니다.': 'This is the first revision.',
     '사진은 올린 분과 운영자만 바꿉니다.': 'Only the person who posted it and an operator can change the photos.',
     '확인 안 됨': 'Unverified',
@@ -2373,7 +2396,7 @@ const I18N = {
     '항구 · 배 이름으로 찾기':'Search by port or boat name',
     '정비 항목 · 계통으로 찾기':'Search by job or system',
     '제품 · 제조사 · 종류로 찾기':'Search by product, maker or type',
-    '아직 공개된 항해일지가 없습니다':'No passage logs shared yet',
+    '아직 공개된 항해일지가 없습니다':'No logbooks shared yet',
     '아직 공개된 정비수첩이 없습니다':'No maintenance logs shared yet',
     '아직 공개된 제품 리뷰가 없습니다':'No product reviews shared yet',
     '아직 공개된 배 리뷰가 없습니다':'No boat reviews shared yet',
@@ -2400,9 +2423,9 @@ const I18N = {
     '배에 <b>달려 있는 것</b>을 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'This is where you list <b>what is fitted to the boat</b> — engine, winch, plotter, bilge pump.',
     '제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.':'Write the maker, model and serial once and you never have to look them up again when buying parts or booking a repair.',
     '장비마다 정비·수리 기록이 매달리고, 도면에 자리를 찍어 둘 수 있습니다.':'Maintenance and repair records hang off each item, and you can pin its place on the drawing.',
-    '첫 장비 추가하기':'Add your first item',
+    '첫 장비 추가하기':'Add your first piece of gear',
     '제조사·모델을 적어 두세요':'Write the maker and model',
-    '장비 보기':'View item',
+    '장비 보기':'View gear',
     '안 쓰면 종류나 모델이 대신 들어갑니다':'Leave blank and the type or model goes in instead',
     '고르거나 직접 쓰세요':'Pick one or type your own',
     '계통을 먼저 고르면 목록이 나옵니다':'Pick the system first and the list appears',
@@ -2462,7 +2485,7 @@ const I18N = {
     '다음에 같은 일을 할 때 그대로 보고 따라 하면 됩니다.':'Next time you do the same job, you just follow it.',
     '정기점검에서 「완료 처리」를 누르면 한 건이 저절로 만들어집니다.':'Mark a scheduled check done and an entry is created for you.',
     '첫 정비수첩 쓰기':'Write your first maintenance log',
-    '아직 안 올라갑니다':'Not going out yet',
+    '아직 안 올라갑니다':'Not shared yet',
     '배 쪽 공개설정에서 「{name}」이(가) 꺼져 있어 아직 안 올라갑니다.':'"{name}" is off in the boat sharing settings, so this is not going out yet.',
     '{name} 공개 켜기':'Turn on {name}',
     '{name} 공개를 켰습니다. 잠시 뒤 남의 배에 실립니다.':'{name} sharing is on. It appears on other boats shortly.',
@@ -2493,7 +2516,7 @@ const I18N = {
     '글판':'Talk', '정박지':'Berths', '중고 장터':'Market', '배 둘러보기':'Boats', '뉴스':'News',
     '로그인':'Sign in', '로그아웃':'Sign out', '계정':'Account',
     '언어':'Language', '고객센터 · 건의하기':'Support',
-    '약관 · 개인정보':'Terms & Privacy', '앱 새로 받기':'Reload app',
+    '약관 · 개인정보':'Terms & Privacy', '앱 새로 받기':'Update the app',
         '클라우드에 올리기':'Upload to cloud', '클라우드에서 받아오기':'Download from cloud',
     '운영자':'Admin', '편집 중':'Editing', '보기 전용':'View only',
     '동기화됨':'Synced', '오프라인 · 로컬':'Offline · local',
@@ -2539,10 +2562,10 @@ const I18N = {
     '완전히 지우기':'Delete for good',
     '복원하기':'Restore',
     '버리고 닫기':'Discard',
-    '휴지통으로':'To the bin',
-    '새로 받기':'Get the new one',
+    '휴지통으로':'To Trash',
+    '새로 받기':'Update',
     '편집 중으로':'Switch to editing',
-    '그만두기':'Stop it',
+    '그만두기':'Stop',
     '출항 기록':'Log departure',
     '거두기':'Withdraw',
     '신청하기':'Apply',
@@ -2627,8 +2650,8 @@ const I18N = {
     '댓글을 지웁니다.':'Delete a comment.',
     '배 게시판에 글을 씁니다.':'Write on the boat board.',
     '배 게시판 글에 댓글을 답니다.':'Comment on a boat board post.',
-    '정박지를 올리거나 고칩니다.':'Add or edit a mooring.',
-    '정박지를 지웁니다.':'Delete a mooring.',
+    '정박지를 올리거나 고칩니다.':'Add or edit a berth.',
+    '정박지를 지웁니다.':'Delete a berth.',
     '다녀온 이야기를 남깁니다.':'Leave a visit note.',
     '다녀온 이야기를 지웁니다.':'Delete a visit note.',
     '장터에 물건을 올리거나 고칩니다.':'List or edit an item for sale.',
@@ -2730,7 +2753,7 @@ const I18N = {
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Hours are counted from the app\\u2019s <b>engine running records</b> plus running time in the voyage log. No gauge reading needed.<br><br>',
     '교체':'Replace',
     '교체 이력':'Replacement history',
-    '정기점검 이력':'Check history',
+    '정기점검 이력':'Scheduled check history',
     '"{name}" 을(를) 새것으로 교체합니다.':'Replace "{name}" with a new one.',
     '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'The old one is not deleted — it stays in Replacement history.',
     '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Moves to the new one — {a} checks, {b} parts, system, type, plan pin',
@@ -2753,14 +2776,14 @@ const I18N = {
     '소개글 고치기':'Edit the introduction',
     '소개글 쓰기':'Write an introduction',
     '유튜브':'YouTube',
-    '공개 설정 열기':'Open publishing settings',
+    '공개 설정 열기':'Open sharing settings',
     '고치려면 <b>공개(publish)</b> 권한이 있어야 합니다.':'You need the <b>publish</b> permission to edit this.',
     '등급 설정에서 권한을 켜 주세요.':'Turn it on in the rank settings.',
     '먼저 로그인해 주세요 — 서랍 > 로그인.':'Please sign in first — Menu > Sign in.',
     '이름':'Name',
     '종류':'Type',
     '홈포트':'Home port',
-    '제조사':'Builder',
+    '제조사':'Maker',
     '모델':'Model',
     '연식':'Year',
     '{y}년':'{y}',
@@ -2794,13 +2817,13 @@ const I18N = {
     '신청을 안 받으려면 위에서 닫아 두세요.':'Close it above if you do not want requests.',
     '기록':'Records',
     '물품':'Items',
-    '정기점검':'Service',
+    '정기점검':'Scheduled check',
     '항해':'Voyages',
     '배는 여러 척 등록할 수 있습니다. 등록해 둔 배를 오가려면 위의 <b>배 목록 ▾</b> 을 누르세요.':'You can register more than one boat. Tap <b>Boats ▾</b> above to switch between them.',
     '로그인하면 다른 사람과 함께 관리할 수 있습니다.':'Sign in to run the boat together with other people.',
     '나':'me',
     '등급':'Rank',
-    '함께 관리':'Crew',
+    '함께 관리':'Co-managed',
     '{n}명':'{n}',
     '날씨 한계값 다시 계산':'Recalculate weather limits',
     '표시된 칸은 <b>[날씨 한계값 다시 계산]</b> 을 누르면 배 길이·선종으로 <b>덮어써지는</b> 값입니다. 직접 넣으신 값도 바뀝니다.':'Marked fields are <b>overwritten</b> from the boat’s length and type when you press <b>[Recalculate weather limits]</b> — including values you typed yourself.',
@@ -2852,14 +2875,14 @@ const I18N = {
     '기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.':'No voyages recorded yet. Tap [+ Record] above to start one.',
     '아직 나가지 않은 항해입니다':'This voyage has not started yet',
     '출항했습니다':'We have departed',
-    '구하면 글판에 올라갑니다':'Once you ask, it is posted on the board',
+    '구하면 글판에 올라갑니다':'Once you ask, it is posted in Talk',
     '사람 구하기':'Look for crew',
     '마감됐습니다':'closed',
     '구하는 분':'Looking for',
     '누구나':'Anyone',
     '{d} 까지 받습니다':'Accepting until {d}',
     '모집 고치기':'Edit the request',
-    '글판에서 보기':'See it on the board',
+    '글판에서 보기':'See it in Talk',
     '모집 그만두기':'Stop looking',
     '{d} 출항 예정입니다.':'Departing on {d}.',
     '자리':'Berths',
@@ -2894,7 +2917,7 @@ const I18N = {
     '{n}개를 「{name}」 하나로 합칩니다.':'Merge {n} items into "{name}".',
     '수량은 더해지고 사진은 모두 남습니다.':'Quantities are added up and all photos are kept.',
     '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'Edit non-numeric quantities from Edit.',
-    '휴지통에서 되살릴 수 있습니다.':'You can restore it from the bin.',
+    '휴지통에서 되살릴 수 있습니다.':'You can restore it from Trash.',
     '차단한 사람':'Blocked people',
     '차단하기':'Block',
     '이 사람 차단':'Block this person',
@@ -2919,9 +2942,9 @@ const I18N = {
     '장비 추가':'Add gear',
     '평면도와 측면도는 이름을 바꿀 수 없습니다.':'The deck plan and side view cannot be renamed.',
     '평면도와 측면도는 지울 수 없습니다.':'The deck plan and side view cannot be deleted.',
-    '이 장비의 정기점검':'This gear\'s service',
+    '이 장비의 정기점검':'This gear\'s scheduled checks',
     '이 장비의 수리':'This gear\'s repairs',
-    '이 장비의 정비수첩':'This gear\'s service log',
+    '이 장비의 정비수첩':'This gear\'s maintenance logs',
     '이 장비의 사용기':'This gear\'s reviews',
     '이 장비의 부품':'This gear\'s parts',
     '가나다순':'By name',
@@ -3132,7 +3155,6 @@ const I18N = {
     '사람 빠짐 — 이 자리 표시':'MAN OVERBOARD — mark this position',
     '사람 빠짐 — 자리를 표시했습니다':'Man overboard — position marked',
     '사람 빠짐 — 자리 표시':'Man overboard — marking position',
-    '해경 122':'Coast Guard 122',
     '끄기':'Dismiss',
     '위치를 받지 못했습니다':'No position available',
     '{c} {d}° · {m}m':'{c} {d}° · {m} m',
@@ -3238,7 +3260,7 @@ const I18N = {
     '등록':'Register',
     '정보':'Info',
     '+ 배 등록하기':'+ Register a boat',
-    '글판은 로그인해야 볼 수 있습니다':'Sign in to see the board',
+    '글판은 로그인해야 볼 수 있습니다':'Sign in to see Talk',
     '로그인하러 가기':'Go to sign in',
     '전체':'All',
     '전 지역':'All regions',
@@ -3252,7 +3274,7 @@ const I18N = {
     '사람':'Person',
     '← 운영자':'← Admin',
     '불러오는 중…':'Loading…',
-    '최고 운영자입니다.':'This is the owner.',
+    '최고 운영자입니다.':'This is the top admin.',
     '이 앱의 주인이라 앱에서는 권한을 바꾸거나 해임할 수 없습니다.':'As the app owner, their rights cannot be changed or removed here.',
     '풀기':'Unblock',
     '막기':'Block',
@@ -3286,8 +3308,8 @@ const I18N = {
     '설명':'Description',
     '정박지는 로그인해야 볼 수 있습니다':'Sign in to see moorings',
     '인터넷이 없습니다 — 관에서 낸 정박지는 그대로 보입니다. 사람들이 올린 곳과 다녀온 이야기는 연결되면 보입니다.':'No internet — official moorings are still here. Places added by others and their notes appear once you reconnect.',
-    '+ 정박지 올리기':'+ Add a mooring',
-    '아직 올라온 정박지가 없습니다.':'No moorings posted yet.',
+    '+ 정박지 올리기':'+ Add a berth',
+    '아직 올라온 정박지가 없습니다.':'No berths posted yet.',
     '다녀오신 마리나·항구·묘박지를 하나만 올려 주세요.':'Post just one marina, harbour or anchorage you have been to.',
     '이름과 자리만 찍어도 됩니다. 수심·요금·연락처는 아는 만큼만.':'The name and the spot are enough. Depth, fees and contacts only as far as you know.',
     '내용 채우기':'Fill in the details',
@@ -3311,7 +3333,7 @@ const I18N = {
     '\n\n메일로 보내시겠습니까?':'\n\nSend it by email instead?',
     '\n\n직접 고쳐 두신 값도 이 값으로 덮어씁니다. 계속할까요?':'\n\nValues you edited yourself will be overwritten too. Continue?',
     ' (현재 위치)':' (current location)',
-    ' (휴지통 {n}개)':' ({n} in the bin)',
+    ' (휴지통 {n}개)':' ({n} in Trash)',
     '"{name}" — 오늘({d}) 완료 처리할까?':'Mark "{name}" done today ({d})?',
     '"{name}" 기준값을 삭제할까?':'Delete the reference value "{name}"?',
     '"{name}" 목록을 항목 {n}개와 함께 휴지통으로 옮길까요?':'Move the list "{name}" and its {n} items to the bin?',
@@ -3325,7 +3347,7 @@ const I18N = {
     '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?':'(Item locations, coordinates, dues and private notes never go out, even when this is on.)\n\nContinue?',
     '(사라진 배)':'(boat is gone)',
     '(자동)':'(auto)',
-    '(저조위 기준)':'(from lowest tide)',
+    '(저조위 기준)':'(chart datum)',
     '+ 계정 번호로 세우기':'+ Add by account ID',
     '+ 글':'+ Text',
     '+ 사진':'+ Photo',
@@ -3366,7 +3388,7 @@ const I18N = {
     '<b>완료</b>로 바꾸면 완료일이 기록되고 목록 아래로 접힙니다.<br><br>':'Setting it to <b>Done</b> records the date and folds it to the bottom of the list.<br><br>',
     '<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>':'<b>Scheduled maintenance</b> is work on a fixed cycle. Register jobs like engine oil every 6 months or zinc anodes every 12 months and the app tells you how long is left.<br><br>',
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>':'<b>In progress</b> means parts are ordered or work has started.<br>',
-    '[사진1]':'[사진1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
+    '[사진1]':'[photo 1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
     '{dirs} 바람에 트여 있습니다':'Open to wind from {dirs}',
     '{d} 출항':'Departs {d}',
     '{d}m (저조위 기준 · 잰 값 {r}m − 그때 조위 {t}m)':'{d} m (from lowest tide · measured {r} m − tide then {t} m)',
@@ -3384,7 +3406,7 @@ const I18N = {
     '{src}입니다.':'Source: {src}.',
     '· 만 14세 미만은 가입할 수 없습니다.':'· You must be 14 or older to sign up.',
     '· 여유':'· clearance',
-    '← 공개 설정':'← Publishing',
+    '← 공개 설정':'← Sharing',
     '← 등급 설정':'← Ranks',
     '← 자리':'← Berth',
     '−10분':'−10 min',
@@ -3434,20 +3456,20 @@ const I18N = {
     '고장이나 손상을 발견했을 때 기록하는 곳입니다.':'This is where you log a fault or damage you have found.',
     '고정':'Pinned',
     '고칠 권한이 없습니다':'You do not have permission to edit',
-    '공개 내리기 (지금 공개 중)':'Unpublish (published now)',
+    '공개 내리기 (지금 공개 중)':'Stop sharing (shared now)',
     '공개 도면 목록을 불러오지 못했습니다: ':'Could not load the public drawings: ',
     '공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다':'Public drawings need an internet connection',
   
 
     // ── 3.90 · 외국어 ②
     '공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.':'You need to sign in to view public drawings.\nPlease sign in on the Account screen.',
-    '공개 설정을 바꿀 권한이 없습니다':'You do not have permission to change publishing',
+    '공개 설정을 바꿀 권한이 없습니다':'You do not have permission to change sharing',
     '공개 자료 지우기':'Delete public page',
     '공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n':'Shared: the drawing itself, the builder and model, and the name you gave it\n',
     '공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n':'Not shared: boat name, item list, and all maintenance, voyage and contact records\n\n',
-    '공개된 배가 아직 없습니다':'No boats have been published yet',
-    '공개된 배가 없습니다':'No published boats',
-    '공개된 자료가 없습니다':'Nothing has been published',
+    '공개된 배가 아직 없습니다':'No boats have been shared yet',
+    '공개된 배가 없습니다':'No shared boats',
+    '공개된 자료가 없습니다':'Nothing has been shared',
     '공개를 내렸습니다.\n이미 가져간 사람의 도면은 그대로 남습니다.':'Unpublished.\nCopies people already took stay with them.',
     '공개했습니다. 다른 사용자가 "공개 도면에서 고르기"로 쓸 수 있습니다.':'Published. Others can now use it through "Pick from public drawings".',
     '공지':'Notice',
@@ -3513,7 +3535,7 @@ const I18N = {
     '이걸 끄면 아래가 전부 멈춥니다':'Turning this off stops everything below',
     '나에게 오는 것':'FOR ME',
     '내 글에 댓글':'Comments on my posts',
-    '글판 · 정박지':'Board and moorings',
+    '글판 · 정박지':'Talk and berths',
     '정비 · 점검 기한':'Service and check due dates',
     '7일 전 · 당일 · 지났을 때':'7 days before, on the day, and once overdue',
     '구독 · 관심':'SUBSCRIBED',
@@ -3604,7 +3626,7 @@ const I18N = {
     '기항':'Port call',
     '길이 {n}m':'LOA {n} m',
     '끔':'Off',
-    '나중에 언제든 공개하거나 내릴 수 있습니다.':'You can publish or unpublish at any time later.',
+    '나중에 언제든 공개하거나 내릴 수 있습니다.':'You can share it or stop sharing at any time later.',
     '나중에 왜 막았는지 알 수 있게':'So you remember later why you blocked them',
     '나중에 정비 문제로 도움을 구할 때, 상대가 배를 알아야 답이 정확해집니다. ':'When you later ask for help with maintenance, people answer more accurately if they know the boat. ',
     '낚시장비':'Fishing gear',
@@ -3677,13 +3699,13 @@ const I18N = {
     '더 불러오지 못했습니다.\n\n':'Could not load more.\n\n',
     '덧붙일 말':'Anything to add',
     '도면 도형이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)':'The drawing shapes are locked.\n\nUnlock them now?\nAfter unlocking, try again.\n(You can also use the padlock on the toolbar.)',
-    '도면 사진':'Drawing image',
-    '도면 사진 바꾸기':'Replace the drawing image',
-    '도면 핀':'Drawing pins',
-    '도면 🔓':'Drawing 🔓',
-    '도면·수납칸 편집':'Edit drawings and lockers',
+    '도면 사진':'Plan image',
+    '도면 사진 바꾸기':'Replace the plan image',
+    '도면 핀':'Plan pins',
+    '도면 🔓':'Plan 🔓',
+    '도면·수납칸 편집':'Edit plans and lockers',
     '도면은 이 기기에 저장했습니다.\n앱 창고에 올리지 못했습니다: ':'The drawing was saved on this device.\nIt could not be uploaded to the app store: ',
-    '도면을 불러오지 못했습니다':'Could not load the drawing',
+    '도면을 불러오지 못했습니다':'Could not load the plan',
     '도움됐어요':'Helpful',
     '도움됐어요가 눌린 순서입니다. 아주 오래된 글은 여기 안 나올 수 있습니다.':'Sorted by how often people marked it helpful. Very old posts may not appear here.',
     '도착':'Arrival',
@@ -3763,7 +3785,7 @@ const I18N = {
     '매체 이름을 넣어 주세요.\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.':'Enter the publication name.\n\nIt is a condition of the reprint permission, so it cannot be left out.',
     '맨 위에 고정됩니다':'Pinned to the top',
     '먼저 감추기를 써 보시는 편이 낫습니다.':'It is better to try hiding it first.',
-    '먼저 도면을 고르거나 올려 주세요':'Pick or upload a drawing first',
+    '먼저 도면을 고르거나 올려 주세요':'Pick or upload a plan first',
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Register a boat first. You can change anything you enter later.',
     '먼저 파일로 저장해 두시길 권합니다.':'We recommend saving to a file first.',
     '먼저 출항 날짜를 정해 주세요':'Set the departure date first',
@@ -3831,8 +3853,8 @@ const I18N = {
     '방어':'Yellowtail',
     '방파제 안쪽 접안':'Alongside inside the breakwater',
     '배 감추기·지우기':'Hide or delete boats',
-    '배 공개 설정':'Boat publishing',
-    '배 공개 설정을 바꿉니다.':'Change the boat\'s publishing settings.',
+    '배 공개 설정':'Boat sharing',
+    '배 공개 설정을 바꿉니다.':'Change the boat\'s sharing settings.',
     '배 기록':'Boat records',
     '배 길이 넣기':'Enter the boat\'s length',
     '배 길이와 선종으로 다시 계산합니다.\n\n':'Recalculate from the boat\'s length and type.\n\n',
@@ -3886,8 +3908,8 @@ const I18N = {
     '보내지 못했습니다: ':'Could not send it: ',
     '보낸 사람':'Sender',
     '보는 중':'Viewing',
-    '보여드릴 도면이 없습니다':'There is no drawing to show',
-    '보유 장비':'Equipment',
+    '보여드릴 도면이 없습니다':'There is no plan to show',
+    '보유 장비':'Gear on board',
     '복원':'Restore',
     '복원 완료: {n}개 물품':'Restored: {n} items',
     '본문':'Body',
@@ -4036,7 +4058,7 @@ const I18N = {
     '아나고':'Conger eel',
     '아래에 적어 주세요':'Write it below',
     '아무도 안 맡은 일':'Unassigned',
-    '아직 공개한 자료가 없습니다.':'You have not published anything yet.',
+    '아직 공개한 자료가 없습니다.':'You have not shared anything yet.',
     '아직 글이 없습니다':'No posts yet',
     '아직 글이 없습니다. 첫 글을 써 보세요.':'No posts yet. Be the first to write one.',
     '아직 모인 소식이 없습니다.':'No news collected yet.',
@@ -4191,9 +4213,9 @@ const I18N = {
     '이 기기의 기록을 클라우드에 올렸습니다.':'This device\'s records have been uploaded to the cloud.',
     '이 댓글은 지울 수 없습니다':'This comment cannot be deleted',
     '이 댓글을 지울까요?':'Delete this comment?',
-    '이 도면 공개하기':'Publish this drawing',
+    '이 도면 공개하기':'Share this plan',
     '이 도면을 다른 사람도 쓸 수 있게 공개할까요?\n\n':'Publish this drawing so other people can use it?\n\n',
-    '이 도면의 그림이 없습니다':'There is no image for this drawing',
+    '이 도면의 그림이 없습니다':'There is no image for this plan',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 수납칸에는 영향이 없습니다.':'Delete this shape?\n\nShapes are only drawings — items and lockers are unaffected.',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.':'Delete this shape?\n\nShapes are only drawings — items and maintenance records are unaffected.',
     '이 등급 지우기':'Delete this rank',
@@ -4293,7 +4315,7 @@ const I18N = {
     '점검 항목 고치기':'Edit check item',
     '점검 항목 추가':'Add a check item',
     '점검 항목을 넣어 주세요':'Please enter a check item',
-    '정기점검과 수리목록':'Scheduled maintenance and repairs',
+    '정기점검과 수리목록':'Scheduled checks and repairs',
     '정기점검에 「{list}」 항목이 남아 있습니다.':'The scheduled list still has 「{list}」 on it.',
     '정말 지울까요':'Really delete it',
     '정박 중 점검처럼 주 단위로 하는 것':'Weekly jobs, like checks while lying alongside',
@@ -4306,7 +4328,7 @@ const I18N = {
     '정비 · 기록':'Maintenance and records',
     '정비 기록':'Maintenance records',
     '정비 항목을 넣습니다.':'Add a maintenance item.',
-    '정비 휴지통':'Maintenance bin',
+    '정비 휴지통':'Maintenance trash',
     '정비·수리':'Maintenance and repairs',
     '정해 둔 기준 안에 있습니다':'Within the limits you set',
     '제가 냅니다':'I pay',
@@ -4338,7 +4360,7 @@ const I18N = {
     '중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n':'The log entries have no engine on or off records.\n\n',
     '중고 장터를 여시기 전에 알려 드립니다.\n\n':'Before you open the market, please read this.\n\n',
     '지금':'Now',
-    '지금 공개 중입니다.':'Published right now.',
+    '지금 공개 중입니다.':'Shared right now.',
     '지금 납부로 기록할까요?':'Record it as paid now?',
     '지금 새로 받기':'Download it again now',
     '지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.':'Have you just departed?\n\nThis turns the plan into a log entry and records the time, position and weather now.',
@@ -4346,7 +4368,7 @@ const I18N = {
     '지금으로':'Set to now',
     '지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.':'You are in read-only mode (editing locked).\n\nTap [Read only] in the top bar\nand switch it to [Editing].',
     '지금은 보기 전용입니다.\n\n오른쪽 위 머리줄의 [보기 전용] 을 눌러\n[편집 중] 으로 바꾸시면 됩니다.':'You are in read-only mode.\n\nTap [Read only] in the top bar\nand switch it to [Editing].',
-    '지금은 비공개입니다.':'Not published right now.',
+    '지금은 비공개입니다.':'Not shared right now.',
     '지금은 소개 페이지가 꺼져 있어 밖에 보이지 않습니다.':'The boat page is off, so nobody outside can see it.',
     '지금은 앱으로 보낼 수 없습니다.\n\n메일로 보내시겠습니까?':'It cannot be sent through the app right now.\n\nSend it by email instead?',
     '지깅':'Jigging',
@@ -4516,9 +4538,9 @@ const I18N = {
     '회비를 안 받는 사람':'Someone who pays no dues',
     '회원 명부 보기':'View the crew list',
     '회항 · 이동':'Return trip · delivery',
-    '휴지통 비우기 (전체 완전삭제)':'Empty the bin (delete everything for good)',
+    '휴지통 비우기 (전체 완전삭제)':'Empty Trash (delete everything for good)',
     '휴지통의 {n}개 항목을 모두 삭제합니다. 복구할 수 없습니다. 계속할까요?':'All {n} items in the bin will be deleted for good. This cannot be undone. Continue?',
-    '휴지통이 비어 있습니다':'The bin is empty',
+    '휴지통이 비어 있습니다':'Trash is empty',
     '흘림':'Drift fishing',
     '📦 상자/공구함 (안에 물품 추가 가능)':'📦 Box or toolbox (items can go inside)',
   
@@ -4528,7 +4550,7 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ⑩
-    '도면을 탭하면 핀 위치가 지정됩니다':'Tap the drawing to place the pin',
+    '도면을 탭하면 핀 위치가 지정됩니다':'Tap the plan to place the pin',
   
 
     // ── 3.90 · 외국어 ⑪
@@ -4610,7 +4632,7 @@ const I18N = {
     '프로펠러·샤프트 점검':'Check the propeller and shaft',
     '하부 방오도장(안티파울링)':'Antifouling the bottom',
     '항해등·계기 점검':'Check navigation lights and instruments',
-    '항해일지 기록 (거리·엔진시간)':'Fill in the log (distance and engine hours)',
+    '항해일지 기록 (거리·엔진시간)':'Fill in the logbook (distance and engine hours)',
     '해수 시콕 잠금':'Close the raw-water seacock',
     '해수펌프 임펠러 교체':'Replace the raw-water pump impeller',
     '해양경찰 긴급신고':'Coast guard emergency',
@@ -4683,7 +4705,7 @@ const I18N = {
     '이름·바로가기 주소':'Name and shortcut link',
     '이 일을 맡을 사람':'Who takes this on',
     '다른 목록으로':'To another list',
-    '휴지통으로 옮깁니다':'Moves to the bin',
+    '휴지통으로 옮깁니다':'Moves to Trash',
     '날마다 · 주마다 · 직접':'Daily, weekly, or by hand',
     '목록 고치기':'Edit list',
     '요트계류시설':'Yacht Mooring',
@@ -5159,7 +5181,7 @@ const I18N = {
     '전화번호':'Phone number',
     '게시판 공개 글':'Public board posts',
     '공개로 표시한 글만':'Only posts marked public',
-    '정비 기록 · 정비수첩':'Maintenance records · service notes',
+    '정비 기록 · 정비수첩':'Maintenance records · maintenance logs',
     '항목과 날짜 · 정비수첩은 한 건씩 따로 켬 · 적어 두신 메모도 함께 나감':'Item and date · each service note is shared one by one · your notes go out with it',
     '물품 이름만 · 어느 칸인지는 나가지 않음':'Item names only · locker positions are not shared',
     '제품 리뷰 · 배 리뷰':'Product reviews · boat reviews',
@@ -5203,10 +5225,10 @@ const I18N = {
     '저장해 둔 파일로 이 기기의 기록을 갈아 끼웁니다.':'This replaces the records on this device with a saved file.',
     '항적을 남에게 보일지 바꿉니다.':'This changes whether others can see the track.',
     '같이 탈 사람 구하기':'Look for crew',
-    '글판에 올리기':'Post to the board',
+    '글판에 올리기':'Post to Talk',
     '댓글을 남깁니다.':'This posts a comment.',
     '막힌 방향':'Exposed direction',
-    '정박지를 옛 판으로 되돌립니다.':'This rolls the anchorage back to an earlier version.',
+    '정박지를 옛 판으로 되돌립니다.':'This rolls the berth back to an earlier version.',
     '지도에서 현재 위치 보기':'Show current position on the map',
     '방오도료':'Antifouling',
     '아연':'Anodes',
@@ -5290,7 +5312,7 @@ const I18N = {
     '조명탄':'Flares',
     '자동팽창식 구명환':'Self-inflating lifebuoy',
     '빌지 알람':'Bilge alarm',
-    '장비를 넣습니다.':'This adds equipment.',
+    '장비를 넣습니다.':'This adds gear.',
     '갓 달았음':'Just fitted',
     '1년 미만':'Under a year',
     '1~3년':'1–3 years',
@@ -5305,7 +5327,7 @@ const I18N = {
     '이 배의 첫 리뷰입니다.':'This is the first review of this boat.',
     '이 제품의 첫 사용기입니다.':'This is the first review of this product.',
     '갓 샀음':'Just bought',
-    '정비수첩을 씁니다.':'This writes a service note.',
+    '정비수첩을 씁니다.':'This writes a maintenance log.',
     '이 단계의 사진을 뺍니다.':'This removes the photo from this step.',
     '이 단계에 사진을 넣습니다.':'This adds a photo to this step.',
     '단계 순서를 바꿉니다.':'This changes the order of the steps.',
@@ -5329,8 +5351,8 @@ const I18N = {
     '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.':'Please sign out, sign in again, and press once more.',
     '계정을 지웠습니다.':'Your account has been deleted.',
     '그동안 써 주셔서 고맙습니다.':'Thank you for using it.',
-    '물품과 정비·수리·항해일지·도면':'items, maintenance, repairs, logbook and drawings',
-    '도면 위치':'Position on drawing',
+    '물품과 정비·수리·항해일지·도면':'items, maintenance, repairs, logbook and plans',
+    '도면 위치':'Position on plan',
     '[정비 기록]':'[Maintenance record]',
     '[수리 기록]':'[Repair record]',
     '(아래 그림)':'(see drawing below)',
@@ -5355,7 +5377,7 @@ const I18N = {
     '되돌릴 수 없습니다. 계속하려면 아래에 «{word}» 를 그대로 적어 주세요.':'This cannot be undone. To continue, type «{word}» below exactly.',
     '{name} 운용':'{name} — operations',
     '물품 {n}개와 정비·수리·항해일지·도면':'{n} items, maintenance, repairs, logbook and drawings',
-    '정기점검 · 마지막 {date}':'Scheduled service · last {date}',
+    '정기점검 · 마지막 {date}':'Scheduled check · last {date}',
     '(모두 {n}회)':'({n} times in all)',
     '사진 {n}장':'{n} photos',
     '{n}건':'{n}',
@@ -5489,8 +5511,35 @@ const I18N = {
 
     // ── 4.102-위치동의문구
     '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'You need to agree to the use of location information before the app can fix your current position.\\n\\nDo you agree?\\n(You can switch it off and on at any time under Menu - Terms & Privacy - Location.)',
+  
+
+    // ── 4.110-일본어
+    '해경 119':'Coast Guard 119',
+    '해상보안청 118':'Japan Coast Guard 118',
+    '긴급 112':'Emergency 112',
+    '바다 사고도 119 (122 는 2016년 119 로 합쳐졌습니다)':'Sea accidents also go to 119 (122 was merged into 119 in 2016)',
+    '일본식':'Japanese',
+  
+
+    // ── 4.110-물때
+    '일본은 大潮·中潮·小潮·長潮·若潮 다섯 가지로 부릅니다. 부르는 표가 관에 없어 자료마다 하루쯤 다를 수 있습니다.':'Japan uses five names (大潮, 中潮, 小潮, 長潮, 若潮). There is no official table, so sources can differ by about a day.',
+  
+
+    // ── 4.111-예정시각
+    '출항 시각':'Departure time',
   },
   ru: {
+    '엔진 가동을 마칩니다.':'Завершить работу двигателя.',
+    '엔진이 돌고 있습니다':'Двигатель работает',
+    '{d} {t} 부터':'с {d} {t}',
+    '지금 껐습니다':'Только что остановил',
+    '아직 돌고 있습니다':'Ещё работает',
+    '켠 시각':'Запуск',
+    '끈 시각':'Остановка',
+    '돌고 있음':'Работает',
+    '적으시면 가동시간이 저절로 셈해집니다':'Заполните — время работы посчитается само',
+    '엔진을 껐습니다 — {v} 돌렸습니다':'Двигатель остановлен — работал {v}',
+    '하루가 넘었습니다. 끄는 것을 잊으셨다면 시각을 고쳐 주세요.':'Больше суток. Если забыли выключить, поправьте время.',
     '달력에 넣기':'В календарь',
     '지난 정비':'Обслужено',
     '고친 날':'Исправлено',
@@ -5546,7 +5595,7 @@ const I18N = {
     '정비 항목 · 계통으로 찾기':'Поиск по работе или системе',
     '제품 · 제조사 · 종류로 찾기':'Поиск по товару, марке, типу',
     '아직 공개된 항해일지가 없습니다':'Пока нет опубликованных журналов',
-    '아직 공개된 정비수첩이 없습니다':'Пока нет опубликованных записей',
+    '아직 공개된 정비수첩이 없습니다':'Пока нет опубликованных журналов работ',
     '아직 공개된 제품 리뷰가 없습니다':'Пока нет опубликованных отзывов',
     '아직 공개된 배 리뷰가 없습니다':'Пока нет отзывов о лодках',
     '찾는 것이 없습니다':'Ничего не найдено',
@@ -5560,9 +5609,9 @@ const I18N = {
     '아쉬운 점':'Недостатки',
     '나가기 전에 채우는 것이 좋겠습니다.':'Лучше заполнить до выхода.',
     '제품 리뷰':'Отзыв о товаре',
-    '이 항목의 정비수첩':'Записи по этому пункту',
+    '이 항목의 정비수첩':'Журнал работ по этому пункту',
     '+ 정비수첩 — 이번에 어떻게 했는지 남기기':'+ Запись — как это было сделано',
-    '이 수리의 정비수첩':'Записи по этому ремонту',
+    '이 수리의 정비수첩':'Журнал работ по этому ремонту',
     '+ 정비수첩 — 어떻게 고쳤는지 남기기':'+ Запись — как починили',
     '정비수첩에 어떻게 고쳤는지 남길까요?\n\n다음에 같은 고장이 났을 때 그대로 씁니다.':'Записать в журнал, как починили?\n\nВ следующий раз пригодится.',
     '적기':'Записать',
@@ -5586,8 +5635,8 @@ const I18N = {
     '설명서 PDF 주소 (있으면)':'Ссылка на PDF (если есть)',
     '설명서 열기':'Открыть инструкцию',
     '아직 안 썼습니다':'Ещё не написано',
-    '+ 정비수첩':'+ Запись',
-    '+ 정기점검':'+ Плановая проверка',
+    '+ 정비수첩':'+ Журнал работ',
+    '+ 정기점검':'+ Пункт регламента',
     '+ 고장':'+ Неисправность',
     '+ 제품 리뷰':'+ Отзыв',
     '채워야 함':'Нужно заполнить',
@@ -5633,7 +5682,7 @@ const I18N = {
     '<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.':'<b>Одна работа — одна запись.</b> Что и как сделали сегодня, с фото.',
     '다음에 같은 일을 할 때 그대로 보고 따라 하면 됩니다.':'В следующий раз просто повторите по записи.',
     '정기점검에서 「완료 처리」를 누르면 한 건이 저절로 만들어집니다.':'Отметьте проверку выполненной — запись создастся сама.',
-    '첫 정비수첩 쓰기':'Написать первую запись',
+    '첫 정비수첩 쓰기':'Начать журнал работ',
     '아직 안 올라갑니다':'Пока не публикуется',
     '배 쪽 공개설정에서 「{name}」이(가) 꺼져 있어 아직 안 올라갑니다.':'«{name}» выключено в настройках публикации лодки — пока не выходит.',
     '{name} 공개 켜기':'Включить: {name}',
@@ -5648,8 +5697,8 @@ const I18N = {
     '고장 {n}':'Неисправностей: {n}',
     '밀림 {n}':'Просрочено: {n}',
     '곧 {n}':'Скоро: {n}',
-    '정기점검 {n}':'Проверок: {n}',
-    '정비수첩 {n}':'Записей: {n}',
+    '정기점검 {n}':'Регламент: {n}',
+    '정비수첩 {n}':'Журнал работ: {n}',
     '수리 {n}':'Ремонтов: {n}',
     '부품 {n}':'Деталей: {n}',
     '외 {n}':'и ещё {n}',
@@ -5658,10 +5707,10 @@ const I18N = {
     '나만':'Только я',
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
 
-    '오늘':'Сегодня', '배':'Судно', '항해일지':'Журнал', '커뮤니티':'Сообщество',
+    '오늘':'Сегодня', '배':'Судно', '항해일지':'Судовой журнал', '커뮤니티':'Сообщество',
     '내 배':'Моё судно', '기본정보':'Основное', '제원':'Характеристики', '배소개':'О судне',
     '회원명부':'Экипаж', '등급설정':'Роли', '게시판':'Доска', '할일':'Задачи',
-    '가입신청':'Заявки', '공개설정':'Доступ',
+    '가입신청':'Заявки', '공개설정':'Публикация',
     '글판':'Форум', '정박지':'Стоянки', '중고 장터':'Барахолка', '배 둘러보기':'Суда', '뉴스':'Новости',
     '로그인':'Войти', '로그아웃':'Выйти', '계정':'Аккаунт',
     '언어':'Язык', '고객센터 · 건의하기':'Поддержка',
@@ -5902,7 +5951,7 @@ const I18N = {
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합해서 셉니다. 계기판을 따로 읽지 않습니다.<br><br>':'Часы считаются по <b>записям работы двигателя</b> в приложении и по наработке из судового журнала. Прибор считывать не нужно.<br><br>',
     '교체':'Заменить',
     '교체 이력':'История замен',
-    '정기점검 이력':'История ТО',
+    '정기점검 이력':'История регламента',
     '"{name}" 을(를) 새것으로 교체합니다.':'Заменить «{name}» на новое.',
     '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'Старое не удаляется — оно останется в истории замен.',
     '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Переходит к новому — ТО: {a}, деталей: {b}, система, тип, метка на плане',
@@ -5927,19 +5976,19 @@ const I18N = {
     '유튜브':'YouTube',
     '공개 설정 열기':'Открыть настройки публикации',
     '고치려면 <b>공개(publish)</b> 권한이 있어야 합니다.':'Для изменения нужно право <b>публикации</b>.',
-    '등급 설정에서 권한을 켜 주세요.':'Включите его в настройках уровней.',
+    '등급 설정에서 권한을 켜 주세요.':'Включите его в настройках ролей.',
     '먼저 로그인해 주세요 — 서랍 > 로그인.':'Сначала войдите — Меню > Вход.',
     '이름':'Название',
     '종류':'Тип',
     '홈포트':'Порт приписки',
-    '제조사':'Верфь',
+    '제조사':'Производитель',
     '모델':'Модель',
     '연식':'Год',
     '{y}년':'{y} г.',
     '복사':'Копировать',
     '영업 배':'Коммерческое',
     '예: 여수 Sunshine':'напр. Sunshine',
-    '예: 여수 원형마리나':'напр. марина Ёсу',
+    '예: 여수 원형마리나':'напр. марина Владивосток',
     '예: Beneteau':'напр. Beneteau',
     '예: First 45f5':'напр. First 45f5',
     '예: Yanmar 4JH4E':'напр. Yanmar 4JH4E',
@@ -5971,7 +6020,7 @@ const I18N = {
     '배는 여러 척 등록할 수 있습니다. 등록해 둔 배를 오가려면 위의 <b>배 목록 ▾</b> 을 누르세요.':'Можно зарегистрировать несколько судов. Нажмите <b>Суда ▾</b> сверху, чтобы переключиться.',
     '로그인하면 다른 사람과 함께 관리할 수 있습니다.':'Войдите, чтобы вести судно вместе с другими.',
     '나':'я',
-    '등급':'Уровень',
+    '등급':'Роль',
     '함께 관리':'Экипаж',
     '{n}명':'{n}',
     '날씨 한계값 다시 계산':'Пересчитать погодные пределы',
@@ -6093,7 +6142,7 @@ const I18N = {
     '평면도와 측면도는 지울 수 없습니다.':'План палубы и вид сбоку удалить нельзя.',
     '이 장비의 정기점검':'Регламент этого снаряжения',
     '이 장비의 수리':'Ремонт этого снаряжения',
-    '이 장비의 정비수첩':'Журнал обслуживания этого снаряжения',
+    '이 장비의 정비수첩':'Журнал работ по этому снаряжению',
     '이 장비의 사용기':'Отзывы об этом снаряжении',
     '이 장비의 부품':'Запчасти этого снаряжения',
     '가나다순':'По имени',
@@ -6303,7 +6352,6 @@ const I18N = {
     '사람 빠짐 — 이 자리 표시':'ЧЕЛОВЕК ЗА БОРТОМ — отметить точку',
     '사람 빠짐 — 자리를 표시했습니다':'Человек за бортом — точка отмечена',
     '사람 빠짐 — 자리 표시':'Человек за бортом — отметка точки',
-    '해경 122':'Береговая охрана 122',
     '끄기':'Закрыть',
     '위치를 받지 못했습니다':'Координаты не получены',
     '{c} {d}° · {m}m':'{c} {d}° · {m} м',
@@ -6423,7 +6471,7 @@ const I18N = {
     '사람':'Человек',
     '← 운영자':'← Администратор',
     '불러오는 중…':'Загрузка…',
-    '최고 운영자입니다.':'Это владелец.',
+    '최고 운영자입니다.':'Это главный администратор.',
     '이 앱의 주인이라 앱에서는 권한을 바꾸거나 해임할 수 없습니다.':'Как владельца приложения, его права нельзя изменить или снять здесь.',
     '풀기':'Разблокировать',
     '막기':'Заблокировать',
@@ -6440,11 +6488,11 @@ const I18N = {
     '내보내기':'Исключить',
     '회원 명부':'Список экипажа',
     '← 내 배':'← Моё судно', '← 계류장':'← Стоянка', '계류장':'Стоянка',
-    '남의 배':'Другие суда', '항해기록':'Переходы', '정비수첩':'Журнал ТО', '제품리뷰':'Отзывы',
+    '남의 배':'Другие суда', '항해기록':'Переходы', '정비수첩':'Журнал работ', '제품리뷰':'Отзывы',
     '배리뷰':'Отзывы о судах',
-    '등급 설정':'Настройка уровней',
+    '등급 설정':'Настройка ролей',
     '위에 있을수록 높은 등급입니다. 자기보다 낮은 등급만 고칠 수 있습니다.':'Чем выше в списке, тем выше уровень. Менять можно только уровни ниже своего.',
-    '+ 등급 만들기':'+ Новый уровень',
+    '+ 등급 만들기':'+ Новая роль',
     '약관·방침':'Условия и конфиденциальность',
     '뱃일은 거래의 당사자가 아닙니다.':'Baetnil не является стороной сделки.',
     '뱃일은 장터 자리를 빌려주는 중개자일 뿐이며, 물건과 거래에 관한 책임은 파는 사람(판매자)과 사는 사람(구매자)에게 있습니다. 물건 정보와 거래 조건은 반드시 직접 확인해 주세요.':'Baetnil лишь предоставляет площадку. Ответственность за товар и сделку несут продавец и покупатель. Всегда проверяйте товар и условия сами.',
@@ -6496,7 +6544,7 @@ const I18N = {
     '(물품 위치·좌표·회비·개인 메모는 켜도 나가지 않습니다)\n\n계속할까요?':'(Места хранения, координаты, взносы и личные заметки не публикуются даже при включении.)\n\nПродолжить?',
     '(사라진 배)':'(судна больше нет)',
     '(자동)':'(авто)',
-    '(저조위 기준)':'(от малой воды)',
+    '(저조위 기준)':'(от нуля глубин)',
     '+ 계정 번호로 세우기':'+ Добавить по номеру аккаунта',
     '+ 글':'+ Текст',
     '+ 사진':'+ Фото',
@@ -6537,7 +6585,7 @@ const I18N = {
     '<b>완료</b>로 바꾸면 완료일이 기록되고 목록 아래로 접힙니다.<br><br>':'При переводе в <b>Готово</b> записывается дата и запись сворачивается вниз списка.<br><br>',
     '<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>':'<b>Регламент</b> — работы с заданной периодичностью. Внесите, например, масло двигателя раз в 6 месяцев или цинковые аноды раз в 12 месяцев, и приложение покажет, сколько осталось.<br><br>',
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>':'<b>В работе</b> — детали заказаны или работа начата.<br>',
-    '[사진1]':'[사진1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
+    '[사진1]':'[фото 1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
     '{dirs} 바람에 트여 있습니다':'Открыто ветру с направлений {dirs}',
     '{d} 출항':'Выход {d}',
     '{d}m (저조위 기준 · 잰 값 {r}m − 그때 조위 {t}m)':'{d} м (от малой воды · замер {r} м − уровень {t} м)',
@@ -6606,7 +6654,7 @@ const I18N = {
     '고정':'Закреплено',
     '고칠 권한이 없습니다':'Нет прав на изменение',
     '공개 내리기 (지금 공개 중)':'Снять с публикации (сейчас опубликовано)',
-    '공개 도면 목록을 불러오지 못했습니다: ':'Не удалось загрузить список общих чертежей: ',
+    '공개 도면 목록을 불러오지 못했습니다: ':'Не удалось загрузить список общих планов: ',
     '공개 도면은 인터넷에 연결된 상태에서만 볼 수 있습니다':'Общие чертежи доступны только при подключении к интернету',
   
 
@@ -6848,13 +6896,13 @@ const I18N = {
     '더 불러오지 못했습니다.\n\n':'Не удалось загрузить ещё.\n\n',
     '덧붙일 말':'Что добавить',
     '도면 도형이 잠겨 있습니다.\n\n지금 열까요?\n열고 나서 다시 한 번 해주세요.\n(도구 막대의 자물쇠로도 열고 닫을 수 있습니다)':'Фигуры на чертеже заблокированы.\n\nРазблокировать сейчас?\nПосле разблокировки повторите действие.\n(Замок на панели инструментов делает то же самое.)',
-    '도면 사진':'Изображение чертежа',
-    '도면 사진 바꾸기':'Заменить изображение чертежа',
-    '도면 핀':'Метки на чертеже',
-    '도면 🔓':'Чертёж 🔓',
-    '도면·수납칸 편집':'Правка чертежей и рундуков',
+    '도면 사진':'Изображение плана',
+    '도면 사진 바꾸기':'Заменить изображение плана',
+    '도면 핀':'Метки на плане',
+    '도면 🔓':'План 🔓',
+    '도면·수납칸 편집':'Правка планов и рундуков',
     '도면은 이 기기에 저장했습니다.\n앱 창고에 올리지 못했습니다: ':'Чертёж сохранён на этом устройстве.\nВыгрузить в хранилище не удалось: ',
-    '도면을 불러오지 못했습니다':'Не удалось загрузить чертёж',
+    '도면을 불러오지 못했습니다':'Не удалось загрузить план',
     '도움됐어요':'Полезно',
     '도움됐어요가 눌린 순서입니다. 아주 오래된 글은 여기 안 나올 수 있습니다.':'Сортировка по числу отметок «Полезно». Совсем старые записи сюда могут не попасть.',
     '도착':'Приход',
@@ -6934,7 +6982,7 @@ const I18N = {
     '매체 이름을 넣어 주세요.\n\n옮긴 글은 허락 조건이라 빠지면 안 됩니다.':'Укажите название издания.\n\nЭто условие разрешения на перепечатку, его нельзя опустить.',
     '맨 위에 고정됩니다':'Закрепляется вверху',
     '먼저 감추기를 써 보시는 편이 낫습니다.':'Лучше сначала попробовать «Скрыть».',
-    '먼저 도면을 고르거나 올려 주세요':'Сначала выберите или загрузите чертёж',
+    '먼저 도면을 고르거나 올려 주세요':'Сначала выберите или загрузите план',
     '먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.':'Сначала зарегистрируйте судно. Всё введённое можно потом изменить.',
     '먼저 파일로 저장해 두시길 권합니다.':'Советуем сначала сохранить в файл.',
     '먼저 출항 날짜를 정해 주세요':'Сначала укажите дату выхода',
@@ -7057,7 +7105,7 @@ const I18N = {
     '보내지 못했습니다: ':'Не удалось отправить: ',
     '보낸 사람':'Отправитель',
     '보는 중':'Просмотр',
-    '보여드릴 도면이 없습니다':'Показать нечего — чертежа нет',
+    '보여드릴 도면이 없습니다':'Показать нечего — плана нет',
     '보유 장비':'Оборудование',
     '복원':'Восстановить',
     '복원 완료: {n}개 물품':'Восстановлено: {n} вещей',
@@ -7215,7 +7263,7 @@ const I18N = {
     '아직 수집된 뉴스가 없습니다.':'Новости пока не собраны.',
     '아직 아무 일도 맡지 않았습니다. 아래에서 할 수 있는 일을 켜 주세요.':'Обязанностей пока нет. Включите ниже то, что он может делать.',
     '아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.':'Это место ещё никто не описал.\n\nСначала опубликуйте его через «Заполнить».',
-    '아직 앱 창고에 올라가지 않은 도면입니다':'Этот чертёж ещё не выгружен в хранилище приложения',
+    '아직 앱 창고에 올라가지 않은 도면입니다':'Этот план ещё не выгружен в хранилище приложения',
     '아직 없습니다. 다녀오셨으면 어땠는지 남겨 주세요.':'Пока пусто. Если вы там были, расскажите, как оно.',
     '아직 올라온 물건이 없습니다.':'Объявлений пока нет.',
     '아직 지점이 없습니다':'Точек пока нет',
@@ -7362,9 +7410,9 @@ const I18N = {
     '이 기기의 기록을 클라우드에 올렸습니다.':'Записи с этого устройства выгружены в облако.',
     '이 댓글은 지울 수 없습니다':'Этот комментарий нельзя удалить',
     '이 댓글을 지울까요?':'Удалить этот комментарий?',
-    '이 도면 공개하기':'Опубликовать этот чертёж',
+    '이 도면 공개하기':'Опубликовать этот план',
     '이 도면을 다른 사람도 쓸 수 있게 공개할까요?\n\n':'Опубликовать этот чертёж, чтобы им могли пользоваться другие?\n\n',
-    '이 도면의 그림이 없습니다':'У этого чертежа нет изображения',
+    '이 도면의 그림이 없습니다':'У этого плана нет изображения',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 수납칸에는 영향이 없습니다.':'Удалить эту фигуру?\n\nФигуры — только рисунок, на вещи и рундуки они не влияют.',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.':'Удалить эту фигуру?\n\nФигуры — только рисунок, на вещи и записи об обслуживании они не влияют.',
     '이 등급 지우기':'Удалить эту роль',
@@ -7435,7 +7483,7 @@ const I18N = {
     '작게':'Меньше',
     '잠가도 올라와 있던 자료는 지워지지 않습니다. 다시 열면 그대로 돌아옵니다.':'Блокировка не удаляет опубликованное. Разблокируйте — и всё вернётся.',
     '잠금':'Заблокировано',
-    '잠금 상태에서는 도면을 바꿀 수 없습니다':'Пока заблокировано, чертёж менять нельзя',
+    '잠금 상태에서는 도면을 바꿀 수 없습니다':'Пока заблокировано, план менять нельзя',
     '잠시 후 다시 확인해 주세요.':'Загляните чуть позже.',
     '잡담':'Разговоры',
     '잡은 것':'Улов',
@@ -7451,8 +7499,8 @@ const I18N = {
     '저장하지 못했습니다. 기기 저장 공간이 부족할 수 있습니다. 파일로 저장한 뒤 다시 시도해 주세요.':'Не удалось сохранить. Возможно, не хватает памяти. Сохраните в файл и повторите.',
     '저조위 기준으로 바꿔 드립니다.':'и переведём к отсчёту от малой воды.',
     '적어 둔 것 없음':'Записей нет',
-    '적재표 (물품)':'Размещение (вещи)',
-    '적재표 물품':'Вещи на борту',
+    '적재표 (물품)':'Хранение (вещи)',
+    '적재표 물품':'Вещи в хранении',
     '전기':'Электричество',
     '전남':'Южная Чоллато',
     '전북':'Северная Чоллато',
@@ -7699,7 +7747,7 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ⑩
-    '도면을 탭하면 핀 위치가 지정됩니다':'Нажмите на чертёж, чтобы поставить метку',
+    '도면을 탭하면 핀 위치가 지정됩니다':'Нажмите на план, чтобы поставить метку',
   
 
     // ── 3.90 · 외국어 ⑪
@@ -8345,7 +8393,7 @@ const I18N = {
     '0분':'0 мин',
     '항적 가리개를 바꿉니다.':'Это изменит, кому виден трек.',
     '아무에게도 맡기지 않음':'Никому не поручено',
-    '등급 없음':'Без ранга',
+    '등급 없음':'Без роли',
     '모든 권한 · 고정':'Все права · закреплено',
     '배 없음':'Нет судна',
     '동기화됨 (권한 없는 것 제외)':'Синхронизировано (кроме недоступного вам)',
@@ -8501,8 +8549,8 @@ const I18N = {
     '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.':'Выйдите, войдите снова и нажмите ещё раз.',
     '계정을 지웠습니다.':'Учётная запись удалена.',
     '그동안 써 주셔서 고맙습니다.':'Спасибо, что пользовались приложением.',
-    '물품과 정비·수리·항해일지·도면':'вещи, обслуживание, ремонты, судовой журнал и чертежи',
-    '도면 위치':'Место на чертеже',
+    '물품과 정비·수리·항해일지·도면':'вещи, обслуживание, ремонты, судовой журнал и планы',
+    '도면 위치':'Место на плане',
     '[정비 기록]':'[Запись обслуживания]',
     '[수리 기록]':'[Запись ремонта]',
     '(아래 그림)':'(см. рисунок ниже)',
@@ -8526,8 +8574,8 @@ const I18N = {
     '<b>남의 배 {n}척</b>에 참여 중입니다 —':'Вы участник <b>{n} чужих судов</b> —',
     '되돌릴 수 없습니다. 계속하려면 아래에 «{word}» 를 그대로 적어 주세요.':'Отменить нельзя. Чтобы продолжить, введите ниже «{word}» в точности.',
     '{name} 운용':'{name} — эксплуатация',
-    '물품 {n}개와 정비·수리·항해일지·도면':'{n} вещей, обслуживание, ремонты, судовой журнал и чертежи',
-    '정기점검 · 마지막 {date}':'Плановое обслуживание · последнее {date}',
+    '물품 {n}개와 정비·수리·항해일지·도면':'{n} вещей, обслуживание, ремонты, судовой журнал и планы',
+    '정기점검 · 마지막 {date}':'Регламент · последний раз {date}',
     '(모두 {n}회)':'(всего {n} раз)',
     '사진 {n}장':'{n} фото',
     '{n}건':'{n}',
@@ -8537,7 +8585,7 @@ const I18N = {
     '댓 {n}':'{n} комм.',
     '~{to} 부재':'отсутствует до {to}',
     '{until}까지 부재':'отсутствует до {until}',
-    '{name} 의 등급':'Ранг: {name}',
+    '{name} 의 등급':'Роль: {name}',
     '다음 납부일 {d}':'Следующий взнос {d}',
     '납부 {n}회':'оплачено {n} раз',
     '{n}가지 보기':'просмотр {n} разделов',
@@ -8661,6 +8709,22 @@ const I18N = {
 
     // ── 4.102-위치동의문구
     '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'Чтобы определить текущее местоположение, нужно согласие на использование данных о местоположении.\\n\\nСогласны?\\n(Выключить и включить можно в любой момент: Меню — Условия и конфиденциальность — Данные о местоположении.)',
+  
+
+    // ── 4.110-일본어
+    '해경 119':'Береговая охрана 119',
+    '해상보안청 118':'Береговая охрана Японии 118',
+    '긴급 112':'Экстренный 112',
+    '바다 사고도 119 (122 는 2016년 119 로 합쳐졌습니다)':'Морские происшествия — тоже 119 (122 объединён с 119 в 2016 году)',
+    '일본식':'Японский',
+  
+
+    // ── 4.110-물때
+    '일본은 大潮·中潮·小潮·長潮·若潮 다섯 가지로 부릅니다. 부르는 표가 관에 없어 자료마다 하루쯤 다를 수 있습니다.':'В Японии пять названий (大潮, 中潮, 小潮, 長潮, 若潮). Официальной таблицы нет, поэтому источники могут расходиться примерно на день.',
+  
+
+    // ── 4.111-예정시각
+    '출항 시각':'Время отхода',
   },
   // ── 일본어 (4.68)
   //
@@ -8674,6 +8738,17 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '엔진 가동을 마칩니다.':'エンジンの稼働を終えます。',
+    '엔진이 돌고 있습니다':'エンジンが動いています',
+    '{d} {t} 부터':'{d} {t} から',
+    '지금 껐습니다':'今、止めました',
+    '아직 돌고 있습니다':'まだ動いています',
+    '켠 시각':'始動時刻',
+    '끈 시각':'停止時刻',
+    '돌고 있음':'稼働中',
+    '적으시면 가동시간이 저절로 셈해집니다':'入力すると稼働時間が自動で計算されます',
+    '엔진을 껐습니다 — {v} 돌렸습니다':'エンジンを止めました — {v} 動きました',
+    '하루가 넘었습니다. 끄는 것을 잊으셨다면 시각을 고쳐 주세요.':'一日を超えています。止め忘れなら時刻を直してください。',
     '달력에 넣기':'カレンダーに追加',
     '지난 정비':'済んだ整備',
     '고친 날':'直した日',
@@ -8683,9 +8758,9 @@ const I18N = {
     '달력 파일 내보내기':'カレンダーファイルを書き出す',
     '이 달에는 아무것도 없습니다':'今月は何もありません',
     '구글 · 아이폰 달력에 넣으실 수 있습니다':'Google・iPhoneのカレンダーに取り込めます',
-    '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': '到着後に記録された点を{n}個外しました。',
+    '도착 뒤에 찍힌 점 {n}개를 뺐습니다.': '入港後に記録された点を{n}個外しました。',
     '{what} 시각도 {t} 로 함께 넣었습니다.': '{what}の時刻も{t}で一緒に入れました。',
-    '지금 출발 (시각·위치·날씨)': '今すぐ出発（時刻・位置・天気）',
+    '지금 출발 (시각·위치·날씨)': '出港（今の時刻・位置・天気）',
     '시각 없음': '時刻なし',
     '이 항해': 'この航海',
     '지도에서 항적 선을 눌러도 됩니다': '地図の航跡線をタップしてもかまいません',
@@ -8756,7 +8831,7 @@ const I18N = {
     '제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.':'メーカー・モデル・シリアル番号を一度書いておけば、部品を買うときも修理を頼むときも探し直さずに済みます。',
     '장비마다 정비·수리 기록이 매달리고, 도면에 자리를 찍어 둘 수 있습니다.':'装備ごとに整備・修理の記録がぶら下がり、図面に場所をピンで留められます。',
     '첫 장비 추가하기':'最初の装備を追加',
-    '제조사·모델을 적어 두세요':'メーカー・モデルを書いてください',
+    '제조사·모델을 적어 두세요':'メーカー・モデルを入力してください',
     '장비 보기':'装備を見る',
     '안 쓰면 종류나 모델이 대신 들어갑니다':'空にすると種類やモデルが代わりに入ります',
     '고르거나 직접 쓰세요':'選ぶか、直接書いてください',
@@ -8819,7 +8894,7 @@ const I18N = {
     '첫 정비수첩 쓰기':'最初の整備手帳を書く',
     '아직 안 올라갑니다':'まだ公開されません',
     '배 쪽 공개설정에서 「{name}」이(가) 꺼져 있어 아직 안 올라갑니다.':'船の公開設定で「{name}」がオフのため、まだ公開されません。',
-    '{name} 공개 켜기':'{name} の公開をオン',
+    '{name} 공개 켜기':'{name} を公開する',
     '{name} 공개를 켰습니다. 잠시 뒤 남의 배에 실립니다.':'{name} の公開をオンにしました。まもなくほかの船に載ります。',
     '걸린 시간 {v}':'作業時間 {v}',
     '{n}단계':'{n}ステップ',
@@ -8851,7 +8926,7 @@ const I18N = {
     '제원':'仕様',
     '배소개':'船の紹介',
     '회원명부':'メンバー名簿',
-    '등급설정':'権限設定',
+    '등급설정':'役割の設定',
     '게시판':'掲示板',
     '할일':'やること',
     '가입신청':'参加申請',
@@ -8866,8 +8941,8 @@ const I18N = {
     '계정':'アカウント',
     '언어':'言語',
     '고객센터 · 건의하기':'サポート・ご意見',
-    '약관 · 개인정보':'약관 · 개인정보',
-    '앱 새로 받기':'アプリを再取得',
+    '약관 · 개인정보':'規約・個人情報',
+    '앱 새로 받기':'アプリを最新版にする',
     '클라우드에 올리기':'クラウドへアップロード',
     '클라우드에서 받아오기':'クラウドから取得',
     '운영자':'管理者',
@@ -8885,7 +8960,7 @@ const I18N = {
     '새로고침':'更新',
     '날씨 · 물때':'天気・潮汐',
     '출항 전 점검':'発航前検査',
-    '지금 나갈 수 있나':'今は出られるか',
+    '지금 나갈 수 있나':'今、出港できるか',
     '바람':'風',
     '돌풍':'突風',
     '파고':'波高',
@@ -8907,17 +8982,17 @@ const I18N = {
     '신고':'通報',
     '수정':'編集',
     '← 내 배':'← マイボート',
-    '← 계류장':'← 係留場',
-    '계류장':'係留場',
+    '← 계류장':'← 係留場所',
+    '계류장':'係留場所',
     '남의 배':'ほかの船',
     '항해기록':'航海記録',
     '정비수첩':'整備手帳',
     '제품리뷰':'パーツレビュー',
-    '위치정보 수집에 동의':'위치정보 수집에 동의',
-    '위치정보 수집에 동의하기':'위치정보 수집에 동의하기',
-    '동의·철회':'동의·철회',
+    '위치정보 수집에 동의':'位置情報の収集に同意',
+    '위치정보 수집에 동의하기':'位置情報の収集に同意する',
+    '동의·철회':'同意・撤回',
     '{n}배':'{n}隻',
-    '{n}개 목록 중':'{n}件の一覧中',
+    '{n}개 목록 중':'リスト {n} 件',
     '[초안] 주기·내용 확인 필요':'[下書き] 周期・内容の確認が必要',
     '[초안] 확인 필요':'[下書き] 確認が必要',
     '이 사람 안 보기':'この人を非表示',
@@ -8933,7 +9008,7 @@ const I18N = {
     'Google로 계속하기':'Googleで続ける',
     'Apple로 계속하기':'Appleで続ける',
     '앱':'アプリ',
-    '이용약관 · 개인정보 처리방침':'이용약관 · 개인정보 처리방침',
+    '이용약관 · 개인정보 처리방침':'利用規約・プライバシーポリシー',
     '클라우드':'クラウド',
     '파일':'ファイル',
     '파일로 저장':'ファイルに保存',
@@ -8958,7 +9033,7 @@ const I18N = {
     '복원하기':'復元する',
     '버리고 닫기':'破棄して閉じる',
     '휴지통으로':'ゴミ箱へ',
-    '새로 받기':'再取得',
+    '새로 받기':'最新版にする',
     '편집 중으로':'編集中にする',
     '그만두기':'やめる',
     '출항 기록':'出港記録',
@@ -8980,10 +9055,10 @@ const I18N = {
     '로그인하셔야 알림을 보낼 수 있습니다.':'お知らせを送るにはログインが必要です。',
     '알릴 사람을 먼저 골라 주세요.':'先に知らせる人を選んでください。',
     '고른 분의 폰으로 갑니다. 받는 분이 설정에서 끄면 가지 않습니다.':'選んだ方のスマホに届きます。受け取る方が設定でオフにすると届きません。',
-    '같이 타기 신청한 분':'一緒に乗るに申し込んだ方',
+    '같이 타기 신청한 분':'乗船を申し込んだ方',
     '모집 글에 댓글을 남긴 분들입니다':'募集の投稿にコメントを残した方々です',
     '한 번에 더하기':'まとめて追加',
-    '같이 타기에 신청한 분이 없습니다.':'一緒に乗るに申し込んだ方はいません。',
+    '같이 타기에 신청한 분이 없습니다.':'乗船を申し込んだ方はいません。',
     '{n}분을 더했습니다.':'{n}人を追加しました。',
     '이미 다 골라 두셨습니다.':'すでに全員選んでいます。',
     '저장해 둔 묶음':'保存したグループ',
@@ -9047,7 +9122,7 @@ const I18N = {
     '글을 이어서 올리고 싶습니다':'続けて記事を投稿したいです',
     '어떤 글을 올리시겠습니까':'どんな記事を投稿されますか',
     '직접 쓴 글':'自分で書いた記事',
-    '옮긴 글':'翻訳した記事',
+    '옮긴 글':'転載記事',
     '어떤 글인가요':'どんな記事ですか',
     '그동안 쓰신 글 (선택)':'これまでに書かれた記事（任意）',
     '무엇을 얼마나 쓰실 생각인지 적어 주세요':'何をどれくらい書くつもりか書いてください',
@@ -9079,7 +9154,7 @@ const I18N = {
     '여기까지는 배가 없어도 바로 쓸 수 있습니다.':'ここまでは船がなくてもすぐに使えます。',
     '배 등록하기':'船を登録する',
     '등록하면 그 배 기준으로 날씨·물때·정비가 맞춰집니다.':'登録すると、その船に合わせて天気・潮汐・整備が表示されます。',
-    '지금 나가도 되나':'今出ても大丈夫か',
+    '지금 나가도 되나':'今、出港しても大丈夫か',
     '바람·돌풍·파고·물때를 한 화면에서 보고 판단합니다':'風・突風・波高・潮汐を一つの画面で見て判断します',
     '어디에 댈까':'どこに着けようか',
     '정박지 수심·요금·연락처를 다녀온 사람들과 함께 모읍니다':'係留地の水深・料金・連絡先を、行ってきた人たちと一緒に集めます',
@@ -9167,8 +9242,8 @@ const I18N = {
     '{y}년':'{y}年',
     '복사':'コピー',
     '영업 배':'営業船',
-    '예: 여수 Sunshine':'例：ヨス Sunshine',
-    '예: 여수 원형마리나':'例：ヨス 円形マリーナ',
+    '예: 여수 Sunshine':'例：Sunshine',
+    '예: 여수 원형마리나':'例：横浜ベイサイドマリーナ',
     '예: Beneteau':'例：Beneteau',
     '예: First 45f5':'例：First 45f5',
     '예: Yanmar 4JH4E':'例：Yanmar 4JH4E',
@@ -9293,7 +9368,7 @@ const I18N = {
     '{n}개를 「{name}」 하나로 합칩니다.':'{n} 個を「{name}」ひとつにまとめます。',
     '수량은 더해지고 사진은 모두 남습니다.':'数量は合算され、写真はすべて残ります。',
     '숫자가 아닌 수량은 수정에서 고쳐 주세요.':'数字でない数量は「修正」から直してください。',
-    '휴지통에서 되살릴 수 있습니다.':'ごみ箱から戻せます。',
+    '휴지통에서 되살릴 수 있습니다.':'ゴミ箱から戻せます。',
     '차단한 사람':'ブロックした人',
     '차단하기':'ブロックする',
     '이 사람 차단':'この人をブロック',
@@ -9311,7 +9386,7 @@ const I18N = {
     '되돌리기로 되살릴 수 있습니다.':'「元に戻す」で戻せます。',
     '보기 전용일 때는 도면을 바꿀 수 없습니다.':'閲覧のみのときは図面を変えられません。',
     '아직 못 올린 기록 {n}건은 다음에 닿으면 저절로 올라갑니다.':'まだ送れていない記録が {n} 件あります。次につながったときに自動で送られます。',
-    '예: 전기 배선도':'例: 配線図',
+    '예: 전기 배선도':'例：配線図',
     '이 도면 지우기':'この図面を削除',
     '이 도면에 찍은 핀 {n}개도 함께 안 보이게 됩니다.':'この図面に打ったピン {n} 個も表示されなくなります。',
     '이름을 적어 주세요.':'名前を書いてください。',
@@ -9331,7 +9406,7 @@ const I18N = {
     '칸 그리기':'収納スペースを描く',
     '도면 그리기':'図面を描く',
     '그리기 끝':'描画終了',
-    '휴지통':'ごみ箱',
+    '휴지통':'ゴミ箱',
     '되돌리기':'元に戻す',
     '다시하기':'やり直す',
     '수납칸':'収納スペース',
@@ -9426,14 +9501,14 @@ const I18N = {
     '발견':'発見',
     '엔진/전기…':'エンジン/電気…',
     '제목':'タイトル',
-    '안 쓰면 출발 → 도착 이 대신 들어갑니다':'未入力の場合は「出発 → 到着」が代わりに入ります',
+    '안 쓰면 출발 → 도착 이 대신 들어갑니다':'未入力の場合は「出港 → 入港」が代わりに入ります',
     '공개':'公開',
     '이 항해는 비공개':'この航海は非公開',
     '입항하면 한 번에 —':'入港したら一度に —',
-    '지금 도착 (시각·위치·날씨)':'今、到着（時刻・位置・天気）',
+    '지금 도착 (시각·위치·날씨)':'入港（今の時刻・位置・天気）',
     '거리':'距離',
     '항해 시간':'航海時間',
-    '출발·도착에서 계산':'出発・到着から計算',
+    '출발·도착에서 계산':'出港・入港から計算',
     '엔진 시간':'エンジン時間',
     '중간 기록에서 계산':'中間記録から計算',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'エンジン時間は航海時間に含まれます。',
@@ -9452,7 +9527,7 @@ const I18N = {
     '지금 여기':'現在地',
     '또는':'または',
     '지도에서':'地図から',
-    '지금 여기로 출발 위치 잡기':'現在地を出発位置にする',
+    '지금 여기로 출발 위치 잡기':'現在地を出港位置にする',
     '가동시간':'稼働時間',
     '시간':'時間',
     '분':'分',
@@ -9464,7 +9539,7 @@ const I18N = {
     '보험증권':'保険証券',
     '조종면허':'小型船舶操縦免許証',
     '무선국 허가증':'無線局免許状',
-    '등록필증':'登録済証',
+    '등록필증':'小型船舶登録票',
     '안전장비 유효기간':'安全装備の有効期限',
     '선택 안 함':'選択しない',
     '만료일':'満了日',
@@ -9524,13 +9599,12 @@ const I18N = {
     '적어 두신 메모도 함께 나갑니다. 산 값만 따로 켜야 나갑니다.':'記入したメモも一緒に出ます。購入価格だけ別に切り替えます。',
     '남의 배 목록에 실립니다. 아무나 찾아봅니다.':'「ほかの船」の一覧に載ります。誰でも見つけられます。',
     '목록에는 안 실립니다. 내 배를 찾아 들어온 사람은 봅니다. 가입도 필요 없습니다.':'一覧には載りません。船のページを開いた人には見えます。登録も要りません。',
-    '밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.':'外には出ません。船の中では等級のとおりに見えます。',
+    '밖으로 안 나갑니다. 배 안에서는 등급대로 보입니다.':'外には出ません。船の中では役割のとおりに見えます。',
     '사람 빠짐':'落水（MOB）',
     '사람 빠짐 — 이 자리':'落水（MOB） — この位置',
     '사람 빠짐 — 이 자리 표시':'落水（MOB） — この位置をマーク',
     '사람 빠짐 — 자리를 표시했습니다':'落水（MOB） — 位置をマークしました',
     '사람 빠짐 — 자리 표시':'落水（MOB） — 位置マーク',
-    '해경 122':'海上保安庁 122',
     '끄기':'オフ',
     '위치를 받지 못했습니다':'位置を取得できませんでした',
     '{c} {d}° · {m}m':'{c} {d}° · {m}m',
@@ -9565,11 +9639,11 @@ const I18N = {
     '메모':'メモ',
     '삭제':'削除',
     '총 가동시간':'総稼働時間',
-    'L/시간':'L/時間',
+    'L/시간':'L/時',
     '주유량 L':'給油量 L',
     '내가 적음':'自分で入力',
-    'L/시간과 잔량은 눌러서 고칠 수 있습니다.':'L/時間と残量はタップして直せます。',
-    'L/시간은 {v} 로 적어 두셨습니다.':'L/時間は {v} と入力されています。',
+    'L/시간과 잔량은 눌러서 고칠 수 있습니다.':'L/時と残量はタップして直せます。',
+    'L/시간은 {v} 로 적어 두셨습니다.':'L/時は {v} と入力されています。',
     '앱이 셈한 값은 {v} 입니다.':'アプリの計算値は {v} です。',
     '앱이 셈한 값으로':'計算値に戻す',
     '만탱크와 만탱크 사이에 넣은 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 구간 {n}개 평균 {v} L/h.':'満タンから満タンまでに入れた燃料を、その間のエンジン稼働時間で割った値です。区間{n}個の平均 {v} L/h。',
@@ -9586,14 +9660,14 @@ const I18N = {
     '탱크 용량({L}L)보다 많습니다.':'タンク容量（{L}L）より多いです。',
     '연료 소비량을 고칩니다.':'燃料消費量を直します。',
     '지금 잔량을 적습니다.':'今の残量を入力します。',
-    '잔량 추정 L':'残量推定 L',
+    '잔량 추정 L':'推定残量 L',
     '리터':'リットル',
     '만':'万',
     '연료비':'燃料費',
     '연료 소비량은 주유 2회 이상과 그 사이의 가동 기록이 있어야 계산됩니다.':'燃料消費量は、給油2回以上とその間の稼働記録がある場合に計算されます。',
     '잔량 추정은 주유 기록에서 [만탱크]를 켜면 계산됩니다.':'残量推定は、給油記録で[満タン]をオンにすると計算されます。',
     '연료 탱크 용량을 넣으면 잔량을 추정합니다.':'燃料タンク容量を入力すると残量を推定します。',
-    '연료 탱크 넣기':'燃料タンクを入力',
+    '연료 탱크 넣기':'燃料タンク容量を入力',
     '기록이 없습니다. 주유와 엔진 가동을 기록하면 소비량과 잔량이 계산됩니다.':'記録がありません。給油とエンジン稼働を記録すると、消費量と残量が計算されます。',
     '전화':'電話',
     '메일':'メール',
@@ -9601,8 +9675,8 @@ const I18N = {
     '마리나 · VTS · 해경 · 보험 · 부품상 번호를 넣어 두세요':'マリーナ・VTS・海上保安庁・保険・パーツ店の番号を登録しておきましょう',
     '보험증서 · 선박검사증 · 면허 사진을 보관할 수 있습니다. 인터넷이 없어도 열람됩니다.':'保険証券・船舶検査証書・免許証の写真を保管できます。インターネットがなくても閲覧できます。',
     '미분류':'未分類',
-    '목록이 없습니다.':'一覧がありません。',
-    '+ 목록':'+ 一覧',
+    '목록이 없습니다.':'リストがありません。',
+    '+ 목록':'+ リスト',
     '바로가기':'ショートカット',
     '미분류 항목이 없습니다.':'未分類の項目がありません。',
     '항목이 없습니다. 아래에서 추가해 주세요.':'項目がありません。下から追加してください。',
@@ -9614,8 +9688,8 @@ const I18N = {
     '옛 사진':'古い写真',
     '문서 안에 남아 있는 사진은 앱을 켤 때마다 조금씩 창고로 옮깁니다':'書類の中に残っている写真は、アプリを起動するたびに少しずつ保管庫へ移します',
     '계정 지우기':'アカウント削除',
-    '이용약관':'이용약관',
-    '개인정보처리방침':'개인정보처리방침',
+    '이용약관':'利用規約',
+    '개인정보처리방침':'プライバシーポリシー',
     '또는 이메일로':'またはメールで',
     '이메일':'メールアドレス',
     '비밀번호':'パスワード',
@@ -9645,14 +9719,14 @@ const I18N = {
     '댓글 쓰기':'コメントを書く',
     '불러오지 못했습니다.':'読み込めませんでした。',
     '사람':'ユーザー',
-    '← 운영자':'← 運営者',
+    '← 운영자':'← 管理者',
     '불러오는 중…':'読み込み中…',
-    '최고 운영자입니다.':'最高運営者です。',
+    '최고 운영자입니다.':'最高管理者です。',
     '이 앱의 주인이라 앱에서는 권한을 바꾸거나 해임할 수 없습니다.':'このアプリの所有者のため、アプリ上で権限の変更や解任はできません。',
     '풀기':'解除',
     '막기':'ブロック',
-    '운영자 권한':'運営者権限',
-    '운영자에서 내리기':'運営者から外す',
+    '운영자 권한':'管理者権限',
+    '운영자에서 내리기':'管理者から外す',
     '글쓰기 막기':'投稿をブロック',
     '둘러보려면 로그인이 필요합니다':'見て回るにはログインが必要です',
     '영업':'営業',
@@ -9664,10 +9738,10 @@ const I18N = {
     '내보내기':'書き出し',
     '회원 명부':'メンバー名簿',
     '배리뷰':'船のレビュー',
-    '등급 설정':'ランク設定',
-    '위에 있을수록 높은 등급입니다. 자기보다 낮은 등급만 고칠 수 있습니다.':'上にあるほど高いランクです。自分より低いランクのみ編集できます。',
-    '+ 등급 만들기':'+ ランクを作成',
-    '약관·방침':'약관·방침',
+    '등급 설정':'役割の設定',
+    '위에 있을수록 높은 등급입니다. 자기보다 낮은 등급만 고칠 수 있습니다.':'上にあるほど高い役割です。自分より低い役割のみ編集できます。',
+    '+ 등급 만들기':'+ 役割を作る',
+    '약관·방침':'規約・方針',
     '뱃일은 거래의 당사자가 아닙니다.':'뱃일 は取引の当事者ではありません。',
     '뱃일은 장터 자리를 빌려주는 중개자일 뿐이며, 물건과 거래에 관한 책임은 파는 사람(판매자)과 사는 사람(구매자)에게 있습니다. 물건 정보와 거래 조건은 반드시 직접 확인해 주세요.':'뱃일 は売買の場を貸す仲介者にすぎず、商品と取引に関する責任は売る人（出品者）と買う人（購入者）にあります。商品情報と取引条件は必ずご自身でご確認ください。',
     '거래 전에 꼭 확인하세요':'取引の前に必ずご確認ください',
@@ -9727,36 +9801,36 @@ const I18N = {
     '+ 지역 추가':'+ 地域を追加',
     '+10분':'+10分',
     '+1시간':'+1時間',
-    '10물':'10番潮',
-    '11물':'11番潮',
-    '12물':'12番潮',
-    '13물':'13番潮',
-    '14물':'14番潮',
-    '1물':'1番潮',
+    '10물':'10ムル',
+    '11물':'11ムル',
+    '12물':'12ムル',
+    '13물':'13ムル',
+    '14물':'14ムル',
+    '1물':'1ムル',
     '1박 이상':'1泊以上',
     '1자리':'1桁',
     '20% 줄임':'20% 縮小',
     '20% 키움':'20% 拡大',
     '200명까지만 보여 드립니다. 이름으로 찾아 주세요.':'200名までしか表示できません。名前で検索してください。',
-    '2물':'2番潮',
+    '2물':'2ムル',
     '2자리':'2桁',
-    '3물':'3番潮',
+    '3물':'3ムル',
     '3자리':'3桁',
-    '4물':'4番潮',
+    '4물':'4ムル',
     '4자리':'4桁',
-    '5물':'5番潮',
+    '5물':'5ムル',
     '5자리 이상':'5桁以上',
-    '6물':'6番潮',
+    '6물':'6ムル',
     '6자 이상':'6文字以上',
-    '7물':'7番潮',
-    '8물':'8番潮',
-    '9물':'9番潮',
+    '7물':'7ムル',
+    '8물':'8ムル',
+    '9물':'9ムル',
     '<b>고장</b>은 발견했지만 아직 손대지 않은 상태입니다.<br>':'<b>故障</b>は、見つけたがまだ手をつけていない状態です。<br>',
     '<b>수리목록</b>은 고장이 생겼을 때 기록합니다. 발견한 날부터 고칠 때까지의 상태(고장 → 진행 중 → 완료)를 따라갑니다.<br><br>':'<b>修理リスト</b>は、故障が起きたときに記録します。見つけた日から直すまでの状態（故障 → 進行中 → 完了）を追います。<br><br>',
     '<b>완료</b>로 바꾸면 완료일이 기록되고 목록 아래로 접힙니다.<br><br>':'<b>完了</b>に変えると完了日が記録され、一覧の下に折りたたまれます。<br><br>',
     '<b>정기점검</b>은 주기가 정해진 일입니다. 엔진오일 6개월, 아연 아노드 12개월처럼 때가 되면 해야 하는 작업을 등록해 두면 남은 기간을 알려 드립니다.<br><br>':'<b>定期点検</b>は周期が決まっている作業です。エンジンオイル6か月、亜鉛アノード12か月のように、時期が来たら行う作業を登録しておくと、残りの期間をお知らせします。<br><br>',
     '<b>진행 중</b>은 부품을 주문했거나 작업을 시작한 상태입니다.<br>':'<b>進行中</b>は、部品を注文した、または作業を始めた状態です。<br>',
-    '[사진1]':'[사진1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
+    '[사진1]':'[写真1]',   // ★ 옮기지 않는다 — 글 안에 박히는 표시라 옮기면 사진과 어긋난다
     '{dirs} 바람에 트여 있습니다':'{dirs} の風に開けています',
     '{d} 출항':'{d} 出港',
     '{d}m (저조위 기준 · 잰 값 {r}m − 그때 조위 {t}m)':'{d}m（最低水面基準・実測 {r}m − そのときの潮位 {t}m）',
@@ -9772,10 +9846,10 @@ const I18N = {
     '{n}종':'{n}種',
     '{r} 해역은 특보 없음 · 다른 해역 {n}구역 발효 중':'{r} 海域は警報・注意報なし・ほかの海域 {n}区域で発表中',
     '{src}입니다.':'{src}です。',
-    '· 만 14세 미만은 가입할 수 없습니다.':'· 만 14세 미만은 가입할 수 없습니다.',
+    '· 만 14세 미만은 가입할 수 없습니다.':'・満14歳未満の方はご登録いただけません。',
     '· 여유':'・余裕',
     '← 공개 설정':'← 公開設定',
-    '← 등급 설정':'← ランク設定',
+    '← 등급 설정':'← 役割の設定',
     '← 자리':'← 場所',
     '−10분':'−10分',
     '−1시간':'−1時間',
@@ -9799,7 +9873,7 @@ const I18N = {
     '같은 모델을 쓰는 사람의 경험도 그만큼 잘 맞습니다.<br><br>':'同じモデルを使っている人の経験も、それだけよく当てはまります。<br><br>',
     '같이 탈 사람 구하기 · 탈 자리 구하기':'一緒に乗る人を探す・乗る席を探す',
     '같이 탈 사람을 구합니다':'一緒に乗る人を募集します',
-    '개인정보 수집·이용':'개인정보 수집·이용',
+    '개인정보 수집·이용':'個人情報の収集・利用',
     '갯지렁이':'ゴカイ',
     '갱신':'更新',
     '거짓 정보':'虚偽の情報',
@@ -9811,7 +9885,7 @@ const I18N = {
     '경남':'慶南',
     '경북':'慶北',
     '계류·정비 용품 등':'係留・整備用品など',
-    '계류장·요트 전용':'係留場・ヨット専用',
+    '계류장·요트 전용':'係留場所・ヨット専用',
     '계산이 0보다 작습니다. 잰 값이나 잰 시각을 다시 봐 주세요.':'計算結果が0を下回ります。実測値または計測時刻をもう一度ご確認ください。',
     '계속할까요?':'続けますか？',
     '계정 번호를 넣어 주세요':'アカウント番号を入力してください',
@@ -9922,7 +9996,7 @@ const I18N = {
     '{p} 에 넣었습니다.':'{p} に保存しました。',
     '항적 보이기':'航跡を表示',
     '공개 항해일지에서 지나온 길을 보여 줍니다':'公開した航海日誌で通った航路を表示します',
-    '출발·도착 둘레 {n}해리를 가리고 {k}점을 보입니다':'出発・到着の周囲 {n}海里を隠して {k}点を表示します',
+    '출발·도착 둘레 {n}해리를 가리고 {k}점을 보입니다':'出港・入港の周囲 {n}海里を隠して {k}点を表示します',
     '배가 매인 자리는 안 나갑니다. 가리개 넓이는 배 › 공개 설정에서 바꾸십시오.':'船の係留位置は公開されません。隠す範囲は 船 › 公開設定 で変えてください。',
     '항적 가리개':'航跡の目隠し',
     '둘레 가림':'周囲を隠す',
@@ -10023,8 +10097,8 @@ const I18N = {
     '남해식':'南海式',
     '내 계정 번호\n\n':'自分のアカウント番号\\n\\n',
     '내 계정 번호를 복사했습니다.\n\n':'自分のアカウント番号をコピーしました。\\n\\n',
-    '내 등급보다 낮은 자리만 줄 수 있습니다':'自分の等級より低い役職のみ与えられます',
-    '내 등급보다 높은 자리는 줄 수 없습니다':'自分の等級より高い役職は与えられません',
+    '내 등급보다 낮은 자리만 줄 수 있습니다':'自分より低い役割のみ与えられます',
+    '내 등급보다 높은 자리는 줄 수 없습니다':'自分より高い役割は与えられません',
     '내 배를 고친 이야기 · 고장·수리':'マイボートを直した話・故障・修理',
     '내가 누를 때까지 그대로 둔다':'自分が押すまでそのままにする',
     '내가 올린 글·정박지·중고 장터':'自分が上げた投稿・係留地・中古売買',
@@ -10045,8 +10119,8 @@ const I18N = {
     '다녀온 곳':'行った場所',
     '다녀와서 알게 된 것을 적어 주세요':'行って分かったことを書いてください',
     '다른 기기에서는 아직 안 보일 수 있습니다.':'ほかの端末ではまだ表示されないことがあります。',
-    '다른 목록으로 옮기기':'ほかの一覧に移す',
-    '다른 사람을 운영자로 세우기':'ほかの人を運営者にする',
+    '다른 목록으로 옮기기':'ほかのリストに移す',
+    '다른 사람을 운영자로 세우기':'ほかの人を管理者にする',
     '다리 통과 높이를 계산할 때 쓰는 기준값입니다':'橋の通過高さを計算するときに使う基準値です',
     '다리 통과높이':'橋の通過高さ',
     '다만 클라우드에 올리지 못했습니다. 인터넷이 되면 다시 올립니다.\n':'ただしクラウドにアップロードできませんでした。インターネットにつながれば再度アップロードします。\\n',
@@ -10071,13 +10145,13 @@ const I18N = {
     '도면을 불러오지 못했습니다':'図面を読み込めませんでした',
     '도움됐어요':'役に立った',
     '도움됐어요가 눌린 순서입니다. 아주 오래된 글은 여기 안 나올 수 있습니다.':'「役に立った」が押された順です。とても古い投稿はここに出ないことがあります。',
-    '도착':'到着',
-    '도착 날씨':'到着地の天気',
+    '도착':'入港',
+    '도착 날씨':'入港時の天気',
     '도형':'図形',
     '돈이 오가는 곳 — 문제가 생기면 여기부터 잠그세요':'お金がやり取りされる場所 — 問題が起きたらまずここをロックしてください',
     '동':'東',
     '동그라미':'丸',
-    '동기화 실패 · 눌러서 확인':'同期失敗・押して確認',
+    '동기화 실패 · 눌러서 확인':'同期失敗・タップして確認',
     '동남동':'東南東',
     '동북동':'東北東',
     '동의':'同意',
@@ -10095,16 +10169,16 @@ const I18N = {
     '확인한 것이 없습니다':'確認したものはありません',
     '들어온 이야기가 없습니다':'届いた話はありません',
     '들어온 참여 신청이 없습니다':'届いた参加申し込みはありません',
-    '등급 관리':'等級管理',
-    '등급 이름':'等級名',
-    '등급 이름을 넣어 주세요':'等級名を入れてください',
-    '등급 이름을 바꿉니다.':'等級名を変更します。',
-    '등급을 만들 권한이 없습니다':'等級を作る権限がありません',
-    '등급을 바꿀 권한이 없습니다':'等級を変える権限がありません',
-    '등급을 설정할 권한이 없습니다':'等級を設定する権限がありません',
-    '등급을 지웁니다.':'等級を削除します。',
-    '등급의 권한을 바꿉니다.':'等級の権限を変更します。',
-    '등급이 너무 적습니다. 하나는 남겨 두세요.':'等級が少なすぎます。一つは残してください。',
+    '등급 관리':'役割の管理',
+    '등급 이름':'役割の名前',
+    '등급 이름을 넣어 주세요':'役割の名前を入れてください',
+    '등급 이름을 바꿉니다.':'役割の名前を変更します。',
+    '등급을 만들 권한이 없습니다':'役割を作る権限がありません',
+    '등급을 바꿀 권한이 없습니다':'役割を変える権限がありません',
+    '등급을 설정할 권한이 없습니다':'役割を設定する権限がありません',
+    '등급을 지웁니다.':'役割を削除します。',
+    '등급의 권한을 바꿉니다.':'役割の権限を変更します。',
+    '등급이 너무 적습니다. 하나는 남겨 두세요.':'役割が少なすぎます。一つは残してください。',
     '등록된 물품 없음':'登録された物品なし',
     '등록한 뒤에는 <b>도면에서 보기</b>로 그 자리를 확대해서 볼 수 있습니다.<br><br>':'登録したあとは <b>図面で表示</b> でその位置を拡大して見られます。<br><br>',
     '로그인 계정':'ログインアカウント',
@@ -10163,10 +10237,10 @@ const I18N = {
     '모름':'不明',
     '모양':'形',
     '모집을 그만둘까요?\n\n글판에 올린 글은 마감으로 바뀝니다.':'募集をやめますか？\\n\\n掲示板に投稿した記事は締切に変わります。',
-    '목록 삭제':'一覧の削除',
-    '목록 이름':'一覧の名前',
+    '목록 삭제':'リストを削除',
+    '목록 이름':'リストの名前',
     '목록 이름을 넣어 주세요':'一覧の名前を入力してください',
-    '목록 지우기':'一覧を削除',
+    '목록 지우기':'リストを削除',
     '목록에 없는 것을 적어 주세요':'一覧にないものを記入してください',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'一覧が1つだけです。先に一覧を追加してください。',
     '목포':'木浦',
@@ -10176,10 +10250,10 @@ const I18N = {
     '묘박할 수 있는 수심을 가늠합니다. 보통 수심의 5~7배가 필요합니다.':'錨泊できる水深の目安です。通常、水深の5〜7倍が必要です。',
     '무료 나눔':'無料でお譲り',
     '무슨 일이 있었는지':'何があったか',
-    '무시':'長潮',
+    '무시':'ムシ',
     '무엇이 문제인지 알려 주세요':'何が問題かお知らせください',
     '무엇이 잘못됐나요?':'何が問題ですか？',
-    '무엇인가요':'何ですか',
+    '무엇인가요':'ご用件',
     '문단 하나':'1段落',
     '문서 · 연락처':'書類・連絡先',
     '문어':'タコ',
@@ -10258,7 +10332,7 @@ const I18N = {
     '파일 저장·불러오기':'ファイルの保存・読み込み',
     '뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n':'뱃일は取引の当事者ではありません。場をお貸しするだけであり、\\n',
     '뱃일을 쓰시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.':'뱃일をご利用いただくには、以下にご同意ください。内容はいつでもメニュー › 規約・ポリシー でご確認いただけます。',
-    '법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).':'법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).',
+    '법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).':'法律で保存が定められている記録は、その期間だけ別に保存します（プライバシーポリシー参照）。',
     '변경':'変更',
     '보기 불편한 사진이나 글':'見るのが不快な写真や書き込み',
     '보기만 가능':'閲覧のみ',
@@ -10271,7 +10345,7 @@ const I18N = {
     '보여드릴 도면이 없습니다':'表示できる図面がありません',
     '보유 장비':'保有装備',
     '복원':'復元',
-    '복원 완료: {n}개 물품':'復元完了: 備品 {n}件',
+    '복원 완료: {n}개 물품':'復元完了: 物品 {n}件',
     '본문':'本文',
     '본문을 넣어 주세요':'本文を入力してください',
     '부산':'釜山',
@@ -10450,7 +10524,7 @@ const I18N = {
     '어종 직접 넣기':'魚種を直接入力',
     '어종을 누르면 한 마리씩 · 오른쪽 칸은 가장 큰 것 cm':'魚種を押すと1匹ずつ · 右の欄は最大のもの cm',
     '어종을 적어 주세요':'魚種を入力してください',
-    '어항·물양장·물때 접안':'漁港・物揚場・潮汐接岸',
+    '어항·물양장·물때 접안':'漁港・物揚場・潮位次第で接岸',
     '언제 다녀오셨는지도 함께 적어 주시면 좋습니다':'いつ行かれたかも一緒に書いていただけると助かります',
     '언제까지':'いつまで',
     '언제까지 못 오는지':'いつまで来られないか',
@@ -10490,10 +10564,10 @@ const I18N = {
     '예: 450':'例：450',
     '예: 갤리':'例：ギャレー',
     '예: 기관장':'例：機関長',
-    '예: 사키토마리':'例：サキトマリ',
+    '예: 사키토마리':'例：東京湾',
     '예: 싱크대 아래':'例：シンクの下',
-    '예: 안도항':'例：アンド港',
-    '예: 안도항 물양장':'例：アンド港の物揚場',
+    '예: 안도항':'例：三崎港',
+    '예: 안도항 물양장':'例：三崎港の物揚場',
     '예: 야마하 9.9마력 선외기':'例：ヤマハ 9.9馬力 船外機',
     '예: 연료 잔량 확인':'例：燃料残量の確認',
     '예: 열기':'例：開く',
@@ -10519,7 +10593,7 @@ const I18N = {
     '옮긴 글일 때만':'転載記事のときのみ',
     '옮긴 글일 때만 · https://…':'転載記事のときのみ · https://…',
     '옮긴 글일 때만 · 예: Yacht Russia':'転載記事のときのみ · 例：Yacht Russia',
-    '옮길 목록':'移動する一覧',
+    '옮길 목록':'移動先のリスト',
     '완도':'莞島',
     '완료된 수리':'完了した修理',
     '완전삭제':'完全削除',
@@ -10529,7 +10603,7 @@ const I18N = {
     '요트·보트·낚시배':'ヨット・ボート・釣り船',
     '욕설·비방':'暴言・誹謗',
     '우럭':'クロソイ',
-    '운영자 세우기':'管理者を立てる',
+    '운영자 세우기':'管理者に任命',
     '운영자 임명':'管理者の任命',
     '운영자가 보고 켜 드립니다. 켜지면 뉴스 ▸ 연재에 글 올리는 단추가 생깁니다.':'管理者が確認してオンにします。オンになると、ニュース ▸ 連載に投稿ボタンが表示されます。',
     '운영자가 아닙니다.':'管理者ではありません。',
@@ -10544,7 +10618,7 @@ const I18N = {
     '원제':'原題',
     '원투':'投げ釣り',
     '웜':'ワーム',
-    '위에 없는 이야기':'上にない話',
+    '위에 없는 이야기':'上記以外',
     '위치 —':'位置 —',
     '위치 정하기':'位置を決める',
     '위치를 가져오지 못했습니다.':'位置を取得できませんでした。',
@@ -10573,11 +10647,11 @@ const I18N = {
     '이 도면의 그림이 없습니다':'この図面の画像がありません',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 수납칸에는 영향이 없습니다.':'この図形を削除しますか？\\n\\n図形は絵にすぎないため、物品や収納スペースには影響ありません。',
     '이 도형을 지울까요?\n\n도형은 그림일 뿐이라 물품이나 정비 기록에는 영향이 없습니다.':'この図形を削除しますか？\\n\\n図形は絵にすぎないため、物品や整備記録には影響ありません。',
-    '이 등급 지우기':'この等級を削除',
-    '이 등급은 바꿀 수 없습니다':'この等級は変更できません',
-    '이 등급은 지울 수 없습니다':'この等級は削除できません',
-    '이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.':'この等級の{n}名は、一番下の等級に下がります。',
-    '이 등급인 사람이 각 화면에서 할 수 있는 일입니다.':'この等級の人が各画面でできることです。',
+    '이 등급 지우기':'この役割を削除',
+    '이 등급은 바꿀 수 없습니다':'この役割は変更できません',
+    '이 등급은 지울 수 없습니다':'この役割は削除できません',
+    '이 등급인 {n}명은 맨 아래 등급으로 내려갑니다.':'この役割の{n}名は、一番下の役割に下がります。',
+    '이 등급인 사람이 각 화면에서 할 수 있는 일입니다.':'この役割の人が各画面でできることです。',
     '이 물품은 아직 수납칸에 넣지 않았습니다':'この物品はまだ収納スペースに入れていません',
     '이 배':'この船',
     '이 배를 목록에서 안 보이게 할까요?\n\n이 기기에서만 숨겨집니다.\n언제든 다시 볼 수 있습니다.':'この船を一覧に表示しないようにしますか？\\n\\nこの端末でのみ非表示になります。\\nいつでも再び表示できます。',
@@ -10590,9 +10664,9 @@ const I18N = {
     '이 분':'この方',
     '이 사람은 내보낼 수 없습니다':'この人は退出させられません',
     '이 사람을 배에서 내보냅니다.':'この人を船から退出させます。',
-    '이 사람의 등급':'この人の等級',
-    '이 사람의 등급은 바꿀 수 없습니다':'この人の等級は変更できません',
-    '이 사람의 등급을 바꿉니다.':'この人の等級を変更します。',
+    '이 사람의 등급':'この人の役割',
+    '이 사람의 등급은 바꿀 수 없습니다':'この人の役割は変更できません',
+    '이 사람의 등급을 바꿉니다.':'この人の役割を変更します。',
     '이 신청을 거절할까요?':'この申請を拒否しますか？',
     '이 연재 글을 지울까요?':'この連載記事を削除しますか？',
     '이 파고를 넘으면 나가지 않는다고 정해 둔 값입니다.':'この波高を超えたら出港しないと決めておいた値です。',
@@ -10676,7 +10750,7 @@ const I18N = {
     '정박지 올리기':'係留地の投稿',
     '정박지 올리기·보기':'係留地の投稿・表示',
     '정박지 이름 · 지역으로 찾기':'係留地名・地域で検索',
-    '정박지나 계류장 자리를 찍어 두시면 됩니다.':'係留地や係留場の場所を地図で指定しておいてください。',
+    '정박지나 계류장 자리를 찍어 두시면 됩니다.':'係留地や係留場所を地図で指定しておいてください。',
     '정비 · 기록':'整備・記録',
     '정비 기록':'整備記録',
     '정비 항목을 넣습니다.':'整備項目を追加します。',
@@ -10708,13 +10782,13 @@ const I18N = {
     '주소를 넣으면 눌러서 봅니다':'アドレスを入力するとタップして開けます',
     '주인':'オーナー',
     '주차':'駐車',
-    '줄 수 있는 등급이 없습니다':'付与できる権限がありません',
+    '줄 수 있는 등급이 없습니다':'付与できる役割がありません',
     '중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n':'途中の記録にエンジンを停止・始動した記録がありません。\\n\\n',
     '중고 장터를 여시기 전에 알려 드립니다.\n\n':'中古売買をご利用になる前にお知らせします。\\n\\n',
     '지금':'今',
     '지금 공개 중입니다.':'現在公開中です。',
     '지금 납부로 기록할까요?':'今、支払い済みとして記録しますか？',
-    '지금 새로 받기':'今すぐ取得',
+    '지금 새로 받기':'今すぐ最新版にする',
     '지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.':'今、出港されましたか？\\n\\nこの予定を航海日誌に変え、現在の時刻・位置・天気を記録します。',
     '지금 크기':'現在のサイズ',
     '지금으로':'今にする',
@@ -10766,10 +10840,10 @@ const I18N = {
     '초안 표시':'下書き表示',
     '최고 운영자':'最高管理者',
     '최대':'最大',
-    '출발':'出発',
-    '출발 날씨':'出発時の天気',
-    '출발 시각과 도착 시각을 먼저 넣어 주세요':'出発時刻と到着時刻を先に入力してください',
-    '출발과 도착 사이에 있었던 일':'出発から到着までの出来事',
+    '출발':'出港',
+    '출발 날씨':'出港時の天気',
+    '출발 시각과 도착 시각을 먼저 넣어 주세요':'出港時刻と入港時刻を先に入力してください',
+    '출발과 도착 사이에 있었던 일':'出港から入港までの出来事',
     '출항 3일 전까지':'出港3日前まで',
     '출항 당일까지':'出港当日まで',
     '출항 전 점검처럼 나갈 때마다 하는 것':'発航前検査のように、出るたびに行うもの',
@@ -10830,7 +10904,7 @@ const I18N = {
     '한 글':'投稿1件',
     '한 글에 넣을 수 있는 사진 용량을 넘었습니다.':'1件の投稿に入れられる写真の容量を超えました。',
     '한 달에 한 번':'月に1回',
-    '한 물품':'品物1件',
+    '한 물품':'物品1件',
     '한 연재 글':'連載1件',
     '한 자리':'1か所',
     '한 줄에 하나씩 · 시각,높이cm':'1行に1つずつ・時刻,高さcm',
@@ -11039,7 +11113,7 @@ const I18N = {
     '이름·바로가기 주소':'名前・ショートカット',
     '이 일을 맡을 사람':'担当する人',
     '다른 목록으로':'ほかのリストへ',
-    '휴지통으로 옮깁니다':'ごみ箱に移します',
+    '휴지통으로 옮깁니다':'ゴミ箱に移します',
     '날마다 · 주마다 · 직접':'毎日・毎週・手動',
     '목록 고치기':'リストを編集',
     '요트계류시설':'ヨット係留施設',
@@ -11248,16 +11322,16 @@ const I18N = {
     '시정이 정해 둔 기준보다 나쁩니다':'視程が設定した基準より悪いです',
     '조류가 정해 둔 한계를 넘었습니다':'潮流が設定した限界を超えました',
     '바람 {n}kt':'風 {n}kt',
-    '오늘 클라우드 한도 다 씀 · 눌러서 확인':'本日のクラウド上限に到達・押して確認',
-    '권한이 없습니다 · 눌러서 확인':'権限がありません・押して確認',
-    '로그인이 풀렸습니다 · 눌러서 확인':'ログインが解除されました・押して確認',
+    '오늘 클라우드 한도 다 씀 · 눌러서 확인':'本日のクラウド上限に到達・タップして確認',
+    '권한이 없습니다 · 눌러서 확인':'権限がありません・タップして確認',
+    '로그인이 풀렸습니다 · 눌러서 확인':'ログインが解除されました・タップして確認',
     '비밀번호는 6자 이상이어야 합니다.':'パスワードは6文字以上にしてください。',
     '로그인하지 못했습니다. ({code})':'ログインできませんでした。({code})',
     '제목 없는 항해':'無題の航海',
     '출항':'出港',
     '고쳐야 할 곳':'修理が必要な箇所',
     '수리 탭':'修理タブ',
-    '클라우드 연결 안 됨 · 눌러서 확인':'クラウド未接続・押して確認',
+    '클라우드 연결 안 됨 · 눌러서 확인':'クラウド未接続・タップして確認',
     '클라우드에 닿지 못했습니다.\n\n인터넷이 끊겼거나, 클라우드 쪽이 잠시 멈춘 것일 수 있습니다.\n\n기기에 있는 기록으로 앱은 그대로 쓰실 수 있고, 다시 닿으면 저절로 맞춰집니다.':'クラウドに接続できませんでした。\n\nインターネットが切れているか、クラウド側が一時的に停止している可能性があります。\n\n端末にある記録でアプリはそのままお使いいただけ、再び接続できれば自動で同期されます。',
     '먼저 도면을 넣어 주세요.\n\n도면 화면에서 기본 도면을 고르거나 사진을 올릴 수 있습니다.':'先に図面を入れてください。\n\n図面画面で基本の図面を選ぶか、写真をアップロードできます。',
     '오늘 옮길 수 있는 양을 다 썼습니다. 내일 다시 해 주세요.':'本日転送できる量を使い切りました。明日もう一度お試しください。',
@@ -11279,8 +11353,8 @@ const I18N = {
     '배 등록 — 홈포트 위치':'船の登録 — ホームポートの位置',
     '홈포트 위치 잡기':'ホームポートの位置設定',
     '정박지 자리 잡기':'係留地の位置設定',
-    '항해일지 출발 위치':'航海日誌の出発位置',
-    '항해일지 도착 위치':'航海日誌の到着位置',
+    '항해일지 출발 위치':'航海日誌の出港位置',
+    '항해일지 도착 위치':'航海日誌の入港位置',
     '항해일지 중간 기록 위치':'航海日誌の中間記録の位置',
     '지금 있는 곳 날씨·물때':'現在地の天気・潮汐',
     '날씨 지점 잡기':'天気地点の設定',
@@ -11426,9 +11500,9 @@ const I18N = {
     '정비 기록 · 정비수첩':'整備記録・整備手帳',
     '항목과 날짜 · 정비수첩은 한 건씩 따로 켬 · 적어 두신 메모도 함께 나감':'項目と日付・整備手帳は一件ずつ個別に公開・書き留めたメモも一緒に出ます',
     '물품 이름만 · 어느 칸인지는 나가지 않음':'物品名のみ・どの区画かは出ません',
-    '제품 리뷰 · 배 리뷰':'製品レビュー・船レビュー',
+    '제품 리뷰 · 배 리뷰':'パーツレビュー・船レビュー',
     '제품·별점·써 보니 · 산 값은 리뷰마다 따로 켬 · 적어 두신 메모도 함께 나감':'製品・評価・使ってみて・購入価格はレビューごとに個別に公開・書き留めたメモも一緒に出ます',
-    '이름과 등급만 · 회비·부재는 나가지 않음':'名前と等級のみ・会費や不在は出ません',
+    '이름과 등급만 · 회비·부재는 나가지 않음':'名前と役割のみ・会費や不在は出ません',
     '영업 탭에 실립니다':'営業タブに掲載されます',
     '돈을 받고 사람을 태우려면 낚시어선업 신고나 마리나선박 대여업 등록이 있어야 합니다. ':'料金を取って人を乗せるには、遊漁船業の届出またはマリーナ船舶貸渡業の登録が必要です。',
     '기름값을 나누는 정도까지만 적어 주세요. 금액은 적을 수 없습니다.':'燃料代を分担する範囲までにしてください。金額は書けません。',
@@ -11437,7 +11511,7 @@ const I18N = {
     '0분':'0分',
     '항적 가리개를 바꿉니다.':'航跡の公開範囲を変えます。',
     '아무에게도 맡기지 않음':'誰にも割り当てない',
-    '등급 없음':'等級なし',
+    '등급 없음':'役割なし',
     '모든 권한 · 고정':'すべての権限・固定',
     '배 없음':'船なし',
     '동기화됨 (권한 없는 것 제외)':'同期しました（権限のないものを除く）',
@@ -11449,8 +11523,8 @@ const I18N = {
     '어로장비':'漁労装備',
     '이 기능':'この機能',
     '동승':'同乗',
-    '출발지':'出発地',
-    '도착지(예정)':'到着地（予定）',
+    '출발지':'出港地',
+    '도착지(예정)':'入港地（予定）',
     '엔진을 끄고 있던 시간은 {h} 입니다.':'エンジンを止めていた時間は {h} です。',
     '세일로 간 시간은 {h} 입니다.':'セールで走った時間は {h} です。',
     '날씨(옛기록)':'天気（旧記録）',
@@ -11629,7 +11703,7 @@ const I18N = {
     '댓 {n}':'コメント {n}',
     '~{to} 부재':'{to} まで不在',
     '{until}까지 부재':'{until} まで不在',
-    '{name} 의 등급':'{name} の等級',
+    '{name} 의 등급':'{name} の役割',
     '다음 납부일 {d}':'次の納付日 {d}',
     '납부 {n}회':'納付 {n} 回',
     '{n}가지 보기':'{n} 項目を閲覧',
@@ -11655,7 +11729,7 @@ const I18N = {
     '저조위 기준 {v}':'最低水面基準 {v}',
     '음력 {d}일':'旧暦 {d} 日',
     '위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다':'位置 {p} 点の直線合計 {v} NM・実際の航路より短い',
-    '출발~도착 기준 {v} 시간':'出発〜到着で {v} 時間',
+    '출발~도착 기준 {v} 시간':'出港〜入港で {v} 時間',
     '항해 {v}h · 단독가동 {r}h':'航海 {v}h・単独稼働 {r}h',
     '수집 {when}':'取得 {when}',
     '{n}편':'第 {n} 回',
@@ -11668,7 +11742,7 @@ const I18N = {
 
     // ── 4.101 — 누르기 전에 알려 주는 말
     '같은 이름 없음':'同じ名前なし',
-    '수납칸 없음':'収納区画なし',
+    '수납칸 없음':'収納スペースなし',
     '같은 이름 {n}개':'同じ名前 {n} 件',
   
   
@@ -11753,6 +11827,22 @@ const I18N = {
 
     // ── 4.102-위치동의문구
     '위치정보 이용에 동의하셔야 현재 위치를 잡을 수 있습니다.\\n\\n동의하시겠습니까?\\n(서랍 › 약관·방침 › 위치정보 에서 언제든 끄고 켜실 수 있습니다.)':'位置情報の利用に同意していただくと現在地を取得できます。\\n\\n同意されますか？\\n（メニュー › 規約・方針 › 位置情報 からいつでもオン・オフできます。）',
+  
+
+    // ── 4.110-일본어
+    '해경 119':'韓国海洋警察 119',
+    '해상보안청 118':'海上保安庁 118',
+    '긴급 112':'緊急 112',
+    '바다 사고도 119 (122 는 2016년 119 로 합쳐졌습니다)':'海の事故も119（122は2016年に119へ統合）',
+    '일본식':'日本式',
+  
+
+    // ── 4.110-물때
+    '일본은 大潮·中潮·小潮·長潮·若潮 다섯 가지로 부릅니다. 부르는 표가 관에 없어 자료마다 하루쯤 다를 수 있습니다.':'日本では大潮・中潮・小潮・長潮・若潮の五つで呼びます。公的に定まった表がないため、資料によって一日ほど違うことがあります。',
+  
+
+    // ── 4.111-예정시각
+    '출항 시각':'出港時刻',
   }
 };
 
@@ -14347,7 +14437,7 @@ function openBoatSetup(){
       <input id="nbName" style="flex:1" placeholder="${esc(t('예: 여수 Sunshine'))}" autocomplete="off"></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('종류'))}</span>
       <select id="nbType" style="flex:1">${
-        Object.entries(BOAT_TYPES).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+        Object.entries(BOAT_TYPES).map(([k,v])=>`<option value="${k}">${esc(t(v))}</option>`).join('')}</select></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('홈포트'))}</span>
       <input id="nbPort" style="flex:1" placeholder="${esc(t('예: 여수 원형마리나'))}" autocomplete="off"></div>
     ${mapBox('setupMap','40vh')}
@@ -16729,7 +16819,7 @@ async function renderTalk(){
           <div class="fsub">${(isAdmin() && po.by)
               ? `<span class="whoa" onclick="event.stopPropagation();openPerson('${esc(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
               : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}
-            ${po.region?' · '+esc(po.region):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
+            ${po.region?' · '+esc(t(po.region)):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
         </div></div>`;
   }
   const 보일것 = filterMuted(talkList)
@@ -16860,8 +16950,8 @@ function boatLine(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   if(!b) return '';
   const sp = (b.spec || {});
-  const bits = [ b.maker, b.model, b.year ? (b.year + '년') : '',
-                 (typeof BOAT_TYPES !== 'undefined' ? (BOAT_TYPES[b.type] || '') : ''),
+  const bits = [ b.maker, b.model, b.year ? tsub('{y}년', { y: b.year }) : '',
+                 (typeof BOAT_TYPES !== 'undefined' ? keyShow(BOAT_TYPES[b.type]) : ''),
                  loaText(b.loa) ].filter(Boolean);
   const out = [];
   if(bits.length) out.push(t('배') + ': ' + bits.join(' · '));
@@ -17494,7 +17584,7 @@ async function openTalk(id){
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',po.title))}</b><span style="flex:1"></span>
       <button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
-      ${po.region?`<span class="chip">${esc(po.region)}</span>`:''}
+      ${po.region?`<span class="chip">${esc(t(po.region))}</span>`:''}
       ${(isAdmin() && po.by)
         ? `<span class="whoa" onclick="openPerson('${esc(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
         : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
@@ -18376,7 +18466,7 @@ function pubHowBody(m, backName){
     ${row('계통',     m.sys && t(m.sys))}
     ${row('난이도',   m.hard ? howHardText(m.hard) : '')}
     ${row('걸린 시간', m.work ? (durText(m.work) || String(m.work)) : '')}
-    ${row('든 돈',    m.cost ? (Number(String(m.cost).replace(/[^0-9.]/g,'')||0).toLocaleString() + t('원')) : '')}
+    ${row('든 돈',    m.cost ? (Number(String(m.cost).replace(/[^0-9.]/g,'')||0).toLocaleString() + curOf(m)) : '')}
     ${row('부품·공구', m.used)}
     <div class="secl" style="margin-top:16px">${esc(t('정비 절차'))}</div>
     ${(m.how||[]).map((st2,i)=>`<div class="howstep">
@@ -18683,7 +18773,7 @@ function boatPageBody(x, k){
           <div class="ct"><div class="cn">${esc(m.name||'')}</div>
           ${n?`<span class="chip">${esc(tsub('{n}단계', { n }))}</span>`:''}
           <span class="st ok">${esc(m.lastDate||'')}</span></div>
-          <div class="mrm">${esc(m.grp||'')}${n?' · '+esc(t('눌러서 절차 보기')):''}</div></div>`;
+          <div class="mrm">${esc(keyShow(m.grp))}${n?' · '+esc(t('눌러서 절차 보기')):''}</div></div>`;
       }).join('');
   }
   if(k === 'review') return (x.review||[]).slice()
@@ -19406,7 +19496,7 @@ function openMyTasks(){
               + (tk.days!==null ? ' · ' + (tk.days<0 ? tsub('{n}일 지남', { n: -tk.days })
                                                      : tsub('{n}일 남음', { n: tk.days })) : '')
             : t('기록 없음'))
-        : (tk.grp || '')}</div></div></div>`;
+        : keyShow(tk.grp)}</div></div></div>`;
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('내 할 일'))}</b><span style="flex:1"></span>
       </div>`
@@ -21995,7 +22085,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.108';
+const APP_VER = '4.111';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -24607,6 +24697,12 @@ function allGrps(){
   if(!s.includes('기타')) s.push('기타');
   return s;
 }
+// 계통 칸에 적힌 것을 다시 한국어 열쇠로 되돌려 저장한다.
+// ★ 화면에는 그 사람 말로 보여 주고, 저장은 언제나 한국어 열쇠다.
+function mrGrpSet(v, dflt){
+  const back = keyBack(v, allGrps().concat(GEAR_SYS));
+  mrField('grp', back || (dflt || ''));
+}
 function grpFold(){ try{ return JSON.parse(localStorage.getItem('bt_gfold')||'{}'); }catch(e){ return {}; } }
 function toggleGrp(g){
   const f = grpFold(); f[g] = !f[g];
@@ -25728,7 +25824,7 @@ function renderMaintList(){
     const yel = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d>=0&&d<=30;}).length;
     const closed = (maintMode === 'all') ? !!fold[g] : false;
     const head = `<div class="ghead" onclick="toggleGrp('${esc(g)}')">
-      <span class="garr">${closed?'&#9656;':'&#9662;'}</span><b>${esc(g)}</b>
+      <span class="garr">${closed?'&#9656;':'&#9662;'}</span><b>${esc(keyShow(g))}</b>
       <span class="gsum">${red?`<span class="gdot" style="background:#F05B52"></span>${red}`:''}${yel?` <span class="gdot" style="background:#E8B33C"></span>${yel}`:''}</span>
       <span class="gcnt">${arr.length}</span></div>`;
     if(closed) return head;
@@ -25916,8 +26012,8 @@ function openMR(kind, id){
         ?`<input value="${esc(it.name)}" placeholder="${esc(t('점검 항목 이름'))}" style="flex:1" onchange="mrField('name',this.value)">`
         :`<b class="mrv">${esc(it.name || t('(이름 없음)'))}</b>`}${it.seed?` <span class="seedb">${esc(t('초안'))}</span>${helpBtn('seed')}`:''}</div>
       <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
-        ?`<input list="grpList" value="${esc(t(it.grp||'기타'))}" style="width:130px" onchange="mrField('grp',this.value.trim()||'기타')">`
-        :`<b class="mrv">${esc(t(it.grp||'기타'))}</b>`}</div>
+        ?`<input list="grpList" value="${esc(keyShow(it.grp||'기타'))}" style="width:130px" onchange="mrGrpSet(this.value,'기타')">`
+        :`<b class="mrv">${esc(keyShow(it.grp||'기타'))}</b>`}</div>
       ${mCycleRow(it)}
       ${mLastRow(it, s)}
       ${gearPickRow(it, 'maint')}
@@ -25955,8 +26051,8 @@ function openMR(kind, id){
         :`<span class="st ${RP_K[it.status]||'none'}">${RP_LABEL[it.status]}</span>`}
         <span class="mrv2">${esc(t('발견'))} ${it.created||'—'}${it.doneDate?' · '+esc(t('완료'))+' '+it.doneDate:''}</span></div>
       <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
-        ?`<input list="grpList" value="${esc(it.grp||'')}" style="width:130px" placeholder="${esc(t('엔진/전기…'))}" onchange="mrField('grp',this.value.trim())">`
-        :`<b class="mrv">${esc(it.grp||'—')}</b>`}</div>`
+        ?`<input list="grpList" value="${esc(keyShow(it.grp))}" style="width:130px" placeholder="${esc(t('엔진/전기…'))}" onchange="mrGrpSet(this.value,'')">`
+        :`<b class="mrv">${esc(keyShow(it.grp) || '—')}</b>`}</div>`
       + gearPickRow(it, 'repair')
       // ★ 고친 뒤에 어떻게 고쳤는지 남기는 자리. 여기서 바로 간다.
       + (mlogForRepair(it.id).length
@@ -25997,7 +26093,12 @@ function openMR(kind, id){
       //   아직 있지도 않은 숫자를 빈 칸으로 늘어놓으면 뭘 적어야 하나 헷갈린다.
       //   출항하면 [출항했습니다] 를 눌러 진짜 항해일지가 되고, 그때 다 나온다.
       + (isPlan(it)
-        ? tf('출발지','from',it.from) + tf('도착지(예정)','to',it.to)
+        // ★★ 4.111 — 예정에는 시각 칸이 없었다 (사장님 지적: 「출항하는 거는 시간을
+        //   정확히 적어야 되잖아. 시간이 없네」). 날짜만으로는 손님도 크루도 못 맞춘다.
+        //   ★ 나가면 planStart 가 이 칸을 **실제 출항 시각**으로 덮어쓴다. 그게 맞다 —
+        //     항해일지에 남는 것은 잡아 둔 시각이 아니라 진짜 나간 시각이다.
+        ? tf('출항 시각','timeOut',it.timeOut,'time','')
+          + tf('출발지','from',it.from) + tf('도착지(예정)','to',it.to)
         : (''
       // 낚시배일 때만 물때와 조과가 붙는다. 요트·보트 항해일지는 그대로다.
       + (isFishing() ? tideRow(it) + catchBox(it) : '')
@@ -26051,16 +26152,34 @@ function openMR(kind, id){
         ))
       + (it.weather ? tf('날씨(옛기록)','weather',it.weather) : '');
   } else if(kind==='run'){
-    body = tf('날짜','date',it.date,'date','')
-      + durRow('가동시간', 'hours', it.hours)
-      + `<div class="mrrow"><span class="mrlbl">${esc(t('시각'))}</span>${unlocked
-          ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.time||''))}" onchange="hmChange(this, v => mrField('time', v))">`
-          :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
-      + `<div class="mrrow"><span class="mrlbl">${esc(t('목적'))}</span>${unlocked
+    // ★ 돌고 있는 동안에는 「지금 껐습니다」 하나만 크게 보여 준다.
+    //   그 순간 사람이 할 일은 그것뿐이다. 가동시간 칸을 같이 보여 주면 손으로 적으려 든다.
+    const 도는중 = runOn(it);
+    body = 도는중
+      ? runOnBox(it)
+        + tf('날짜','date',it.date,'date','')
+        + `<div class="mrrow"><span class="mrlbl">${esc(t('켠 시각'))}</span>${unlocked
+            ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.time||''))}" onchange="hmChange(this, v => runTimeSet('time', v))">`
+            :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
+      : tf('날짜','date',it.date,'date','')
+        + durRow('가동시간', 'hours', it.hours)
+        + `<div class="mrrow"><span class="mrlbl">${esc(t('켠 시각'))}</span>${unlocked
+            ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.time||''))}" onchange="hmChange(this, v => runTimeSet('time', v))">`
+            :`<b class="mrv">${it.time?esc(hm(it.time)):'—'}</b>`}</div>`
+        + `<div class="mrrow"><span class="mrlbl">${esc(t('끈 시각'))}</span>${unlocked
+            ?`<input class="tin logtime" inputmode="numeric" maxlength="5" placeholder="--:--" autocomplete="off" oninput="hmType(this)" value="${esc(hm(it.endTime||''))}" onchange="hmChange(this, v => runTimeSet('endTime', v))">
+              <span class="mrm" style="flex:1;color:#7b8794">${esc(t('적으시면 가동시간이 저절로 셈해집니다'))}</span>`
+            :`<b class="mrv">${it.endTime?esc(hm(it.endTime)):'—'}</b>`}</div>`
+        + (unlocked && !it.endTime && !it.hours
+            ? `<div class="mrrow edt"><button class="mrbtn" onclick="runResume('${esc(it.id)}')">${
+                 esc(t('아직 돌고 있습니다'))}</button></div>` : '');
+    // ★ 목적은 돌고 있을 때도 보여야 한다. 앞서 「돌고 있음」 갈래에서 빠져 있었다 —
+    //   엔진을 켜 놓고 무엇 때문에 켰는지 그 자리에서 적는 것이 자연스럽다.
+    body += `<div class="mrrow"><span class="mrlbl">${esc(t('목적'))}</span>${unlocked
           ?`<select onchange="mrField('purpose',this.value)" style="flex:1">${
               RUN_PURPOSES.map(x=>`<option value="${x}"${it.purpose===x?' selected':''}>${esc(t(x))}</option>`).join('')
             }</select>`
-          :`<b class="mrv">${esc(it.purpose||'—')}</b>`}</div>`;
+          :`<b class="mrv">${esc(keyShow(it.purpose) || '—')}</b>`}</div>`;
   } else if(kind==='fuel'){
     body = tf('날짜','date',it.date,'date','')
       // ★ 시각을 적어 두면 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
@@ -26974,7 +27093,7 @@ const KIND_LABEL = {maint:t('정기점검'), gear:t('장비'), mlog:t('정비수
 //     빈 칸은 사람이 채우지만, 틀린 번호는 그대로 믿는다.
 const CONTACT_BY_CC = {
   kr: [
-    {id:'ct01', name:t('해양경찰 긴급신고'), phone:'122', email:'', site:'', note:t('사고·구조 (해상 119)')},
+    {id:'ct01', name:t('해양경찰 긴급신고'), phone:'119', email:'', site:'', note:t('바다 사고도 119 (122 는 2016년 119 로 합쳐졌습니다)')},
     {id:'ct02', name:t('기상콜센터'), phone:'131', email:'', site:'https://www.weather.go.kr/w/special-report/overall.do', note:t('특보·해상예보')},
     {id:'ct03', name:t('원거리 수상레저 신고'), phone:'', email:'', site:'https://boat.kcg.go.kr', note:t('출항 전 신고')},
     {id:'ct04', name:t('해양수산부 민원'), phone:'044-200-5114', email:'', site:'https://www.mof.go.kr', note:t('선박 관련 행정')}
@@ -27067,8 +27186,14 @@ function openDrawer(){ document.getElementById('drawerOv').classList.add('open')
 const SCREEN_IDS = ['mrPanel','panel','formOv','hatPanelOv','trashView','helpOv'];
 
 // ★ 탭에 붙어 있는 내용들. 화면이 바뀌면 이것들은 '사라진다' (감추는 게 아니라 자리에서 빠진다).
+// ★★ 4.111 — 여기에 'calWrap' 이 빠져 있었다 (사장님 지적).
+//   「추가 이렇게 넣으면 화면이 바뀌는 게 아니라 그냥 달력에 아래로 나온다」
+//   화면을 갈아 끼울 때 **여기 적힌 것만** 자리에서 빠진다. 달력은 적혀 있지 않아
+//   그대로 남았고, 그 밑에 기록 창이 이어 붙었다.
+//   ★ 새 화면을 만들 때 여기 적는 것을 잊으면 같은 흠이 또 난다.
+//     그래서 tabtest 가 switchTab 이 켜는 칸과 이 목록을 맞대 본다.
 const TAB_CONTENT = ['searchWrap','stowTools','mrSub','mapWrap','listView','hint',
-  'homeWrap','weatherWrap','checkWrap','gearWrap','mlogWrap','repairWrap','fuelWrap','contactsWrap',
+  'homeWrap','weatherWrap','checkWrap','calWrap','gearWrap','mlogWrap','repairWrap','fuelWrap','contactsWrap',
   'mrMapWrap','voyageWrap','communityWrap','talkWrap','spotWrap','marketWrap',
   'exploreWrap','newsWrap'];
 window.TAB_CONTENT = TAB_CONTENT;
@@ -28503,6 +28628,29 @@ function tsub(key, vals){
   let out = t(key);
   for(const k in vals) out = out.split('{'+k+'}').join(String(vals[k] == null ? '' : vals[k]));
   return out;
+}
+// ── 저장해 둔 값을 화면에 낼 때
+//
+// ★ 왜 따로 두나 (4.110 — 작은삼촌이 잡아 주신 것)
+//   계통('엔진'·'선체·수중'), 배 종류, 엔진 가동 목적 같은 것은 **저장값이 한국어**다.
+//   그래야 배를 한국어로 만들었다가 일본어로 켜도 같은 것끼리 묶인다 — 열쇠이기 때문이다.
+//   그런데 화면에 낼 때 그 열쇠를 그대로 찍던 자리가 여럿 있었다.
+//   일본 사람이 정비 화면을 열면 「엔진 · 전기 · 선체·수중 · 안전장비」 가 한글로 보였다.
+//   메뉴에 한글이 섞이면 그 아래 내용은 아예 안 읽는다.
+//
+// ★ 문 하나로 만든다. 화면에 낼 때는 keyShow, 사람이 고른 것을 되돌릴 때는 keyBack.
+function keyShow(v){
+  const s = String(v == null ? '' : v).trim();
+  return s ? t(s) : '';
+}
+// 사람이 골라 적은 말을 다시 한국어 열쇠로 되돌린다.
+// ★ 이게 없으면 일본 사람이 계통 칸을 한 번 건드리는 순간 'エンジン' 이 새 계통으로 생겨
+//   같은 엔진인데 묶음이 둘로 갈라진다.
+function keyBack(v, list){
+  const s = String(v == null ? '' : v).trim();
+  const L = list || [];
+  for(let i = 0; i < L.length; i++) if(L[i] === s || t(L[i]) === s) return L[i];
+  return s;
 }
 // 사전이 얼마나 찼나 (0~1)
 function langCoverage(v){
@@ -31866,7 +32014,7 @@ function marketRowsHtml(){
             ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span> `:''}
             ${esc(trRow('market', m.id, 'title', m.title) || t('제목 없음'))}</div>
           <div class="fsub"><b style="color:#dfe8f2">${esc(priceText(m) || t('가격 미정'))}</b>
-            · ${esc(catName(m.cat))}${m.region?' · '+esc(m.region):''}
+            · ${esc(catName(m.cat))}${m.region?' · '+esc(t(m.region)):''}
             · ${esc(String(m.ts||'').slice(0,10))}</div>
         </div></div>`;
     }).join('');
@@ -31939,7 +32087,7 @@ async function openItem(id){
     <div class="postmeta">
       ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span>`:''}
       <span class="chip">${esc(catName(m.cat))}</span>
-      ${m.region?`<span class="chip">${esc(m.region)}</span>`:''}
+      ${m.region?`<span class="chip">${esc(t(m.region))}</span>`:''}
       ${(isAdmin() && m.by)
         ? `<span class="whoa" onclick="openPerson('${esc(m.by)}')">${esc(m.byName||'')}</span>`
         : esc(m.byName||'')}
@@ -31997,7 +32145,7 @@ function itemForm(){
 
     <div class="mrrow"><span class="mrlbl">${esc(t('가격'))}</span>
       <input id="mkPrice" type="number" inputmode="numeric" style="flex:1"
-        placeholder="${esc(t('숫자만'))}" value="${esc(String(d.price||''))}" ${(d.free||d.offer)?'disabled':''}> ${esc(t('원'))}</div>
+        placeholder="${esc(t('숫자만'))}" value="${esc(String(d.price||''))}" ${(d.free||d.offer)?'disabled':''}> ${esc(curNow())}</div>
     <div class="fchips" style="padding:0 12px 8px">
       <button class="tchip${d.free?' on':''}" onclick="itemSet('free',${d.free?'false':'true'})">${esc(t('무료 나눔'))}</button>
       <button class="tchip${d.offer?' on':''}" onclick="itemSet('offer',${d.offer?'false':'true'})">${esc(t('가격 제안 받기'))}</button></div>
@@ -33902,6 +34050,31 @@ const TIDE_WEST  = ['7물','8물','9물','10물','11물','12물','13물','조금
                     '1물','2물','3물','4물','5물','6물'];
 const TIDE_SOUTH = ['8물','9물','10물','11물','12물','13물','14물','조금',
                     '1물','2물','3물','4물','5물','6물','7물'];
+// ── 일본식 潮名 (4.110)
+//
+// ★ 왜 넣나 — 작은삼촌이 「일본어 번역이 많이 이상하다, 메뉴부터」 라고 하셨다.
+//   물때가 그중 제일 심했다. 「7물」 을 「7番潮」 로 옮겨 놓았는데,
+//   일본에는 그런 말이 없다. 일본은 大潮·中潮·小潮·長潮·若潮 다섯 가지로 부른다.
+//   낚싯배 타는 사람이 제일 먼저 보는 자리인데 거기가 뜻 없는 말이었다.
+//
+// ★ 지어낸 표가 아니다. 일본의 潮名은 음력일(月齢)로 정해지고,
+//   그 차례가 우리 물때와 **같은 15일 주기**다. 그래서 칸이 그대로 맞아떨어진다.
+//   (こよみのページ 「月齢と潮名」 https://koyomi8.com/doc/mlwa/200706260.html
+//    月齢 29~2 大潮 / 3~6 中潮 / 7~9 小潮 / 10 長潮 / 11 若潮 / 12~13 中潮 /
+//    14~17 大潮 / 18~21 中潮 / 22~24 小潮 / 25 長潮 / 26 若潮 / 27~28 中潮.
+//    月齢 + 1 = 음력일.)
+//   ★ 맞대 보면 우리 표와 어긋나지 않는다 — 여덟째 칸(음력 8·23일)이 일본은 小潮,
+//     우리는 「조금」 이고, 열다섯째 칸(음력 15·30일)이 일본은 大潮, 우리는 「사리」 다.
+//   ★★ 일본에는 **관에서 정한 표가 없다.** 気象庁의 조석표(潮位表)에는 潮名 칸이 아예 없고
+//      朔·望·上弦·下弦 만 적혀 있다. 그래서 집집마다 하루씩 어긋난다 —
+//      こよみのページ 도 「気象庁방식·MIRC방식·이 집 방식이 조금씩 다르고,
+//      무엇이 맞고 틀리다고 말하기 어렵다」 고 적어 두었다.
+//      실제로 어떤 낚시 사이트는 이 표보다 뒷보름 大潮 를 하루 뒤로 잡는다.
+//   ★ 그래서 이 표는 **朔(음력 1일)과 望(음력 15·16일)을 가운데 두고 앞뒤 대칭**으로 잡았다.
+//     大潮 가 음력 30·1·2·3 과 15·16·17·18 — 물이 제일 많이 드나드는 날이 朔望 이라는
+//     물리하고 어긋나지 않는 자리다. 화면에도 「자료마다 하루쯤 다를 수 있다」 고 적어 둔다.
+const TIDE_JP = ['大潮','大潮','大潮','中潮','中潮','中潮','中潮','小潮','小潮','小潮',
+                 '長潮','若潮','中潮','中潮','大潮'];
 function tideIdx(ld){
   const n = Number(ld);
   if(!n || n < 1) return -1;
@@ -33910,28 +34083,36 @@ function tideIdx(ld){
 function tideName(dateStr, style){
   const i = tideIdx(lunarDay(dateStr));
   if(i < 0) return '';
+  // ★ 일본식은 이미 일본말이다. 사전을 거치면 안 된다.
+  if(style === 'jp') return TIDE_JP[i];
   return t((style === 'south' ? TIDE_SOUTH : TIDE_WEST)[i]);
 }
 // 사리(음력 15·30일)인가 조금(음력 8·23일)인가. 두 방식이 같다.
-function tideMark(dateStr){
+// ★ 일본식은 그 자리가 이미 大潮·小潮 라서 또 붙이면 「大潮 大潮」 가 된다. 안 붙인다.
+function tideMark(dateStr, style){
+  const st = style || ((typeof tideStyle === 'function') ? tideStyle() : 'west');
+  if(st === 'jp') return '';
   const i = tideIdx(lunarDay(dateStr));
   if(i === 14) return t('사리');
   if(i === 7)  return t('조금');
   return '';
 }
+const TIDE_STYLES = ['west','south','jp'];
 function tideStyle(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  return (b && b.tideStyle === 'south') ? 'south' : 'west';
+  if(b && TIDE_STYLES.indexOf(b.tideStyle) >= 0) return b.tideStyle;
+  // ★ 정한 적이 없으면 쓰는 말을 따른다 — 일본어로 켠 사람에게 「7물」 은 아무 뜻이 없다.
+  return (typeof langNow === 'function' && langNow() === 'ja') ? 'jp' : 'west';
 }
 function setTideStyle(v){
   const b = curBoat(); if(!b) return;
-  b.tideStyle = (v === 'south') ? 'south' : 'west';
+  b.tideStyle = TIDE_STYLES.indexOf(v) >= 0 ? v : 'west';
   save(); schedulePush(); openMR('voyage', mrOpenId);
 }
 function tideRow(it){
   if(!it || !it.date) return '';
   const st = tideStyle();
-  const nm = tideName(it.date, st), mk = tideMark(it.date);
+  const nm = tideName(it.date, st), mk = tideMark(it.date, st);
   return `<div class="mrrow"><span class="mrlbl">${esc(t('물때'))}</span>
       <b class="mrv">${esc(nm || '—')}</b>
       ${mk?`<span class="chip notice">${esc(mk)}</span>`:''}
@@ -33939,8 +34120,9 @@ function tideRow(it){
     + (unlocked
         ? `<div class="mrrow"><span class="mrlbl"></span>
              <button class="tchip${st==='west'?' on':''}" onclick="setTideStyle('west')">${esc(t('서해식'))}</button>
-             <button class="tchip${st==='south'?' on':''}" onclick="setTideStyle('south')">${esc(t('남해식'))}</button></div>
-           <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(t('지역마다 부르는 법이 다릅니다. 서해는 조금 다음이 무시, 남해는 바로 1물입니다.'))}<br>${esc(t('달의 삭 시각으로 음력일을 구해 정합니다.'))}</div>`
+             <button class="tchip${st==='south'?' on':''}" onclick="setTideStyle('south')">${esc(t('남해식'))}</button>
+             <button class="tchip${st==='jp'?' on':''}" onclick="setTideStyle('jp')">${esc(t('일본식'))}</button></div>
+           <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(t('지역마다 부르는 법이 다릅니다. 서해는 조금 다음이 무시, 남해는 바로 1물입니다.'))}<br>${esc(t('일본은 大潮·中潮·小潮·長潮·若潮 다섯 가지로 부릅니다. 부르는 표가 관에 없어 자료마다 하루쯤 다를 수 있습니다.'))}<br>${esc(t('달의 삭 시각으로 음력일을 구해 정합니다.'))}</div>`
         : '');
 }
 
@@ -33991,20 +34173,22 @@ const CAL_KINDS = {
 // ★★ 이 함수는 읽기만 한다. 여기서 save 를 부르면 안 된다 — caltest 가 지킨다.
 function calItems(from, to){
   const out = [];
-  const add = (date, kind, id, title) => {
+  // ★ 4.111 — 시각도 함께 담는다. 예정은 몇 시에 나가는지가 날짜만큼 중요하다.
+  const add = (date, kind, id, title, time) => {
     const d = String(date == null ? '' : date).slice(0, 10);
     if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
     if(from && d < from) return;
     if(to   && d > to)   return;
     out.push({ date:d, kind, id:String(id),
                title:String(title == null ? '' : title),
+               time:/^\d{1,2}:\d{2}$/.test(String(time || '')) ? String(time) : '',
                color:CAL_KINDS[kind].c });
   };
   // ── 예정 · 항해일지
   (Array.isArray(voyage) ? voyage : []).forEach(v => {
     if(!v) return;
     const k = isPlan(v) ? 'plan' : 'voyage';
-    add(v.date, k, v.id, String(v.title || '').trim() || t(CAL_KINDS[k].n));
+    add(v.date, k, v.id, String(v.title || '').trim() || t(CAL_KINDS[k].n), v.timeOut);
   });
   // ── 정기점검 — **다음 할 날**과 **지난에 한 날들**을 다 올린다.
   //    다음 할 날만 올리면 앞일만 보이고, 한 날만 올리면 앞일이 안 보인다. 둘 다 필요하다.
@@ -34350,7 +34534,7 @@ function renderCal(){
   if(calSel){
     const its = byDay[calSel] || [];
     let mark = '';
-    try{ mark = (typeof tideMark === 'function' ? tideMark(calSel) : '') || ''; }catch(_){}
+    try{ mark = (typeof tideMark === 'function' ? tideMark(calSel, st) : '') || ''; }catch(_){}
     let nm = '';
     try{ nm = tideName(calSel, st) || ''; }catch(_){}
     const selDow = (() => { const q = calSel.split('-').map(Number);
@@ -34363,6 +34547,7 @@ function renderCal(){
       ? its.map(r => `<div class="cdrow" onclick="calGo('${r.kind}','${String(r.id).replace(/'/g, "\\'")}')">
              <span class="cdbar" style="background:${r.color}"></span>
              <span class="cdk">${esc(t(CAL_KINDS[r.kind].n))}</span>
+             ${r.time ? `<span class="cdhm">${esc(hm(r.time))}</span>` : ''}
              <span class="cdt">${esc(r.title)}</span>
              <button class="cdcal"
                onclick="event.stopPropagation();calPhone(${rows.indexOf(r)})">${
@@ -36079,7 +36264,14 @@ const RUN_PURPOSES = ['항해','충전','시운전','이동','기타'];
 // (계기판 아워미터가 없으므로 앱 사용 시작 시점부터의 누적값)
 function engineHours(){
   const fromVoyage = voyage.reduce((s,v)=> s + (parseFloat(v.engineH)||0), 0);
-  const fromRun    = runs.reduce((s,r)=> s + (parseFloat(r.hours)||0), 0);
+  // ★ 지금 돌고 있는 것도 센다. 안 세면 정기점검이 「아직 멀었다」 고 거짓말한다.
+  const fromRun = runs.reduce((s,r)=>{
+    if(typeof runOn === 'function' && runOn(r)){
+      const m = runMins(r);
+      return s + (m != null ? m / 60 : 0);
+    }
+    return s + (parseFloat(r.hours) || 0);
+  }, 0);
   return { total: fromVoyage + fromRun, voyage: fromVoyage, run: fromRun };
 }
 
@@ -36330,13 +36522,17 @@ function renderFuel(){
   L.innerHTML = head + sub + (rows.map(x=> x.k==='fuel'
     ? `<div class="mr" onclick="openMR('fuel','${x.o.id}')">
         <div class="ct"><div class="cn">⛽ ${x.o.liters?fmtNum(parseFloat(x.o.liters))+' L':'—'}${x.o.full?` <span class="chip">${esc(t('만탱크'))}</span>`:''}</div>
-        <span class="chip nchip">${x.o.cost?Number(x.o.cost).toLocaleString()+esc(t('원')):''}</span></div>
+        <span class="chip nchip">${x.o.cost?Number(x.o.cost).toLocaleString()+esc(curOf(x.o)):''}</span></div>
         <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
       </div>`
     : `<div class="mr" onclick="openMR('run','${x.o.id}')">
-        <div class="ct"><div class="cn">⚙ ${x.o.hours?x.o.hours+' '+esc(t('시간')):'—'}</div>
-        <span class="chip">${esc(x.o.purpose||t('기타'))}</span></div>
-        <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
+        <div class="ct"><div class="cn">⚙ ${runOn(x.o)
+            ? esc(durText((runMins(x.o) || 0) / 60) || '0분')
+            : (x.o.hours ? esc(durText(x.o.hours) || (x.o.hours + ' ' + t('시간'))) : '—')}</div>
+        ${runOn(x.o) ? `<span class="chip warn">${esc(t('돌고 있음'))}</span>` : ''}
+        <span class="chip">${esc(keyShow(x.o.purpose) || t('기타'))}</span></div>
+        <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${
+          x.o.endTime?' → '+esc(hm(x.o.endTime)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
       </div>`
   ).join('') || `<div class="mrnone">${esc(t('기록이 없습니다. 주유와 엔진 가동을 기록하면 소비량과 잔량이 계산됩니다.'))}</div>`);
 }
@@ -36349,10 +36545,122 @@ function addFuel(){
   fuel.push(f); saveMR(); renderFuel(); openMR('fuel', f.id);
 }
 
+// ══════════════════════════════════════════════════════════════
+// ★★ 엔진 켜고 끄기 (4.109 — 사장님이 정하신 것)
+//
+//   「지금은 처음에 몇 시부터 한지는 들어가는데, 나중에 얼마나 돌렸는지는
+//    계산해 가지고 넣어야 돼. 그게 조금 그렇네.」
+//
+//   ★ 여태 앱이 켠 시각만 찍어 주고, 끈 시각과 가동시간은 사람이 셈해서 넣었다.
+//     엔진 시간은 정기점검 주기의 근거(engNow)라 틀리면 정비 때를 놓친다.
+//     그런데 배에서 내려와 셈을 하고 앉아 있을 사람이 없다. 앱이 해야 하는 일이다.
+//
+//   ★ 어떻게 재나 — 타이머를 돌리지 않는다. 폰이 잠들거나 앱이 꺼지면 타이머는 죽는다.
+//     **켠 때와 끈 때를 적어 두고 뺀다.** 그러면 몇 시간이 지나도, 앱을 껐다 켜도 맞는다.
+//
+//   ★ 자정을 넘기면 — 끈 시각이 켠 시각보다 앞서면 다음 날로 본다.
+//     엔진을 하루 넘게 돌리는 일은 항해 중에 실제로 있다. 끝난 날짜를 따로 들고 있는다.
+//
+//   ★ 손으로 적은 가동시간을 함부로 덮지 않는다. 끈 시각이 있을 때만 셈해서 넣는다.
+// ══════════════════════════════════════════════════════════════
+const RUN_MAXH = 72;                 // 이보다 오래 「돌고 있음」이면 끄는 것을 잊은 것이다
+function runOn(it){ return !!(it && it.on); }
+// 켠 때 · 끈 때를 진짜 시각으로 (없으면 null)
+function runAt(dateStr, hhmm){
+  const d = String(dateStr || ''), t2 = hm(hhmm || '');
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d) || !/^\d{2}:\d{2}$/.test(t2)) return null;
+  const x = new Date(d + 'T' + t2 + ':00');
+  return isFinite(x.getTime()) ? x : null;
+}
+// 이 기록이 몇 분인가. 돌고 있으면 **지금까지**, 껐으면 켠 때~끈 때.
+function runMins(it, now){
+  const a = runAt(it && it.date, it && it.time);
+  if(!a) return null;
+  if(runOn(it)){
+    const n = now || new Date();
+    return Math.max(0, Math.round((n - a) / 60000));
+  }
+  const b = runAt((it && it.endDate) || (it && it.date), it && it.endTime);
+  if(!b) return null;
+  let m = Math.round((b - a) / 60000);
+  // 끈 시각이 켠 시각보다 앞서면 자정을 넘긴 것이다 (끝난 날짜를 안 적었을 때)
+  if(m < 0 && !(it && it.endDate)) m += 1440;
+  return m >= 0 ? m : null;
+}
+// 셈한 가동시간을 기록에 넣는다. ★ 문 하나 — 시각이 바뀌는 자리는 다 여기를 지난다.
+function runSync(it){
+  if(!it || runOn(it)) return;
+  const m = runMins(it);
+  if(m == null) return;
+  it.hours = Math.round((m / 60) * 100) / 100;
+}
+// 엔진을 켠다 — 켠 시각을 앱이 찍는다
 function addRun(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
-  const r = {id:newId(), date:today(), time:nowHM(), hours:'', purpose:'충전', note:''};
+  const r = {id:newId(), date:today(), time:nowHM(), endDate:'', endTime:'',
+             on:true, hours:'', purpose:'충전', note:''};
   runs.push(r); saveMR(); renderFuel(); openMR('run', r.id);
+}
+// 엔진을 끈다 — 끈 시각을 찍고 가동시간을 셈해 넣는다
+function runStop(id){
+  if(!unlocked) return;
+  const it = runs.find(x => String(x.id) === String(id));
+  if(!it || !runOn(it)) return;
+  it.endDate = today();
+  it.endTime = nowHM();
+  it.on = false;
+  runSync(it);
+  saveMR();
+  if(typeof schedulePush === 'function') schedulePush();
+  renderFuel();
+  openMR('run', it.id);
+  const m = runMins(it);
+  if(m != null) tell(tsub('엔진을 껐습니다 — {v} 돌렸습니다', { v: durText(m / 60) }), { kind:'good' });
+}
+// 다시 켜기 — 잘못 껐을 때
+function runResume(id){
+  if(!unlocked) return;
+  const it = runs.find(x => String(x.id) === String(id));
+  if(!it) return;
+  it.on = true; it.endDate = ''; it.endTime = ''; it.hours = '';
+  saveMR();
+  if(typeof schedulePush === 'function') schedulePush();
+  renderFuel(); openMR('run', it.id);
+}
+// 시각 칸을 고치면 가동시간을 다시 셈한다
+function runTimeSet(key, v){
+  const it = getMR('run', mrOpenId); if(!it) return;
+  it[key] = v;
+  runSync(it);
+  saveMR();
+  if(typeof schedulePush === 'function') schedulePush();
+  renderFuel(); openMR('run', mrOpenId);
+}
+// 지금 돌고 있는 것들
+function runsOn(){ return (Array.isArray(runs) ? runs : []).filter(runOn); }
+// 돌고 있을 때 기록 창 맨 위에 놓는 틀.
+// ★ 겹겹이 낀 틀문자열로 짜지 않는다 — 사전 검사기가 못 읽는다. 줄을 이어 붙인다.
+// ★ 보기 전용이어도 단추를 **감추지 않는다.** 감추면 기능이 없는 줄 안다 (앱의 규칙).
+//   눌렀을 때 「편집 중으로 바꿀까요」 를 묻고 이어서 끈다.
+function runOnBox(it){
+  if(!it) return '';
+  const 분 = runMins(it);
+  const 오래 = 분 != null && 분 > RUN_MAXH * 60;
+  const 안내 = tsub('{d} {t} 부터', { d: it.date || '', t: hm(it.time || '') });
+  let h = '<div class="runon">';
+  h += '<div class="runlab">' + esc(t('엔진이 돌고 있습니다')) + '</div>';
+  h += '<div class="runbig">' + esc(분 != null ? (durText(분 / 60) || '0분') : '—') + '</div>';
+  h += '<div class="runsub">' + esc(안내) + '</div>';
+  if(오래) h += '<div class="runwarn">'
+              + esc(t('하루가 넘었습니다. 끄는 것을 잊으셨다면 시각을 고쳐 주세요.')) + '</div>';
+  h += '<button class="mrbtn ok runstop" onclick="runStopUI(\'' + esc(it.id) + '\')">'
+     + esc(t('지금 껐습니다')) + '</button>';
+  h += '</div>';
+  return h;
+}
+// 단추가 부르는 자리. 보기 전용이면 먼저 풀고 이어서 끈다.
+function runStopUI(id){
+  needEdit('엔진 가동을 마칩니다.', () => runStop(id));
 }
 
 // ===== 장비 대장 (STEP 4) =====
@@ -37421,7 +37729,7 @@ function renderMLog(){
     const tags = [];
     if(n) tags.push(tsub('{n}단계', { n }));
     if(x.work) tags.push(durText(x.work));
-    if(x.cost) tags.push(Number(String(x.cost).replace(/[^0-9.]/g,'')||0).toLocaleString() + t('원'));
+    if(x.cost) tags.push(Number(String(x.cost).replace(/[^0-9.]/g,'')||0).toLocaleString() + curOf(x));
     if(x.photos && x.photos.length) tags.push(tsub('사진 {n}', { n:x.photos.length }));
     return `<div class="mr gitem" onclick="openMR('mlog','${x.id}')">
       <div class="ct"><div class="cn">${esc(mlogTitle(x))}</div>
@@ -37744,8 +38052,8 @@ function howBlock(it){
       : `<b class="mrv">${it.hard ? howHardText(it.hard) : '—'}</b>`}</div>`;
   h += durRow('걸린 시간', 'work', it.work);
   h += `<div class="mrrow"><span class="mrlbl">${esc(t('든 돈'))}</span>${unlocked
-      ? `<input type="text" inputmode="numeric" value="${esc(String(it.cost||''))}" style="width:120px" onchange="mrField('cost',this.value)"> ${esc(t('원'))}`
-      : `<b class="mrv">${it.cost ? esc(String(it.cost)) + esc(t('원')) : '—'}</b>`}</div>`;
+      ? `<input type="text" inputmode="numeric" value="${esc(String(it.cost||''))}" style="width:120px" onchange="mrField('cost',this.value)"> ${esc(curNow())}`
+      : `<b class="mrv">${it.cost ? esc(String(it.cost)) + esc(curOf(it)) : '—'}</b>`}</div>`;
   h += `<div class="mrrow"><span class="mrlbl">${esc(t('부품·공구'))}</span>${unlocked
       ? `<input type="text" value="${esc(String(it.used||''))}" style="flex:1" placeholder="${esc(t('임펠러 A-3 · 육각렌치 6mm'))}" onchange="mrField('used',this.value)">`
       : `<b class="mrv">${esc(String(it.used||'—'))}</b>`}</div>`;
@@ -37889,6 +38197,50 @@ function mobLog(){
     saveMR();
   }catch(e){}
 }
+// ── 사람이 빠졌을 때 어디로 거나 (4.110)
+//
+// ★ 4.109 까지 이 단추는 어디서 누르든 **122** 로 걸었다. 두 가지가 틀렸다.
+//   ① 한국의 해양 긴급신고 122 는 2016년 긴급신고 통합으로 **119** 에 합쳐졌다.
+//      (대한민국 정책브리핑 「신고 전화, 119·112·110 기억하세요」
+//       korea.kr/news/policyNewsView.do?newsId=148906821)
+//   ② 일본에서 122 를 누르면 아무 데도 안 닿는다. 바다의 사건·사고는 **118** 이다.
+//      (海上保安庁 kaiho.mlit.go.jp/doc/tel118.html)
+//
+// ★ 어느 나라인지는 **지금 있는 자리**로 잰다 — 쓰는 말이 아니다.
+//   한국말을 쓰는 분이 일본 바다에서 사람을 빠뜨릴 수 있다. 그때 필요한 번호는 118 이다.
+//   자리를 모르면 그때만 쓰는 말로 짐작하고, 그것도 모르면 112 를 쓴다
+//   (112 는 GSM 표준 긴급번호라 어느 나라에서든 그 나라 긴급기관으로 이어진다).
+const SOS_BY_CC = {
+  kr: { n:'119', t:'해경 119' },
+  jp: { n:'118', t:'해상보안청 118' },
+  ru: { n:'112', t:'긴급 112' }
+};
+function sosCc(){
+  // ★ 자리를 두 군데서 찾는다 — ① 사람이 빠진 그 자리, ② 없으면 지금 배가 있는 자리.
+  //   ①이 먼저다. 사람이 빠진 바다가 어느 나라 바다인지가 걸어야 할 번호를 정한다.
+  const 자리 = [];
+  try{ if(typeof mobAt !== 'undefined' && mobAt && mobAt.lat != null) 자리.push(mobAt); }catch(_){}
+  try{ const k = mobLastKnown(); if(k && k.lat != null) 자리.push(k); }catch(_){}
+  for(let i = 0; i < 자리.length; i++){
+    try{
+      const c = countryOf({ lat:자리[i].lat, lon:자리[i].lon });
+      if(SOS_BY_CC[c]) return c;
+    }catch(_){}
+  }
+  try{
+    const c = ccFromLang(langNow());
+    if(SOS_BY_CC[c]) return c;
+  }catch(_){}
+  return '';
+}
+function sosInfo(){ return SOS_BY_CC[sosCc()] || { n:'112', t:'긴급 112' }; }
+function mobSosPaint(){
+  const a = document.getElementById('mobSos');
+  if(!a) return;
+  const s = sosInfo();
+  a.setAttribute('href', 'tel:' + s.n);
+  a.textContent = t(s.t);
+}
 function mobClose(){
   mobAt = null;
   if(mobTimer){ clearInterval(mobTimer); mobTimer = null; }
@@ -37900,6 +38252,7 @@ function mobPaint(){
   if(!el) return;
   if(!mobAt){ el.style.display = 'none'; return; }
   el.style.display = 'flex';
+  mobSosPaint();
   const b = document.getElementById('mobBody');
   if(!b) return;
   const at = new Date(mobAt.at);
@@ -39108,7 +39461,8 @@ const JP_PREF = {
 function spotRegionName(r){
   const k = String(r || '');
   if(!k) return '';
-  return JP_PREF[k] ? t(JP_PREF[k]) : k;
+  // ★ 한국 지역 이름('전남'·'경북'…)도 사전에 있다. 그대로 찍으면 일본 화면에 한글이 남는다.
+  return JP_PREF[k] ? t(JP_PREF[k]) : t(k);
 }
 // ★★★ 해역 이름 — 気象庁 「地方海上予報区」 48곳을 네 말로 다 낸다 (사장님 지적, 5.00)
 //

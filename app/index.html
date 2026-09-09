@@ -12624,6 +12624,15 @@ function tblNorm(x){
   rows = rows.slice(0, TBL_MAX_ROW).map(r =>
     (Array.isArray(r) ? r : [r]).slice(0, TBL_MAX_COL)
       .map(c => String(c == null ? '' : c)));
+  // ★★★ 4.119 — 클라우드에서 온 표는 **눕혀서** 온다.
+  //   파이어스토어는 「배열 안의 배열」 을 못 담는다 (사장님 오류, 2026-09-09) —
+  //   「setDoc() called with invalid data. Nested arrays are not supported」
+  //   그래서 올릴 때 {w, cells} 로 눕혀 보내고, 받을 때 여기서 도로 세운다.
+  if(!rows.length && Array.isArray(v.cells)){
+    const w = Math.max(1, Math.min(TBL_MAX_COL, Number(v.w) || 1));
+    for(let i = 0; i < v.cells.length && rows.length < TBL_MAX_ROW; i += w)
+      rows.push(v.cells.slice(i, i + w).map(c => String(c == null ? '' : c)));
+  }
   // 칸 수를 줄마다 맞춘다 — 들쭉날쭉하면 표가 아니라 무너진 격자가 된다
   const w = rows.reduce((m, r) => Math.max(m, r.length), 0);
   rows = rows.map(r => { const o = r.slice(); while(o.length < w) o.push(''); return o; });
@@ -12643,6 +12652,40 @@ function tblHtml(x, cls, edit){
     `<tr>${r.map(c => cell(c, T.head && i === 0)).join('')}</tr>`).join('');
   // ★ 넓은 표는 폰 화면을 옆으로 밀지 않고 **표만** 옆으로 밀리게 한다
   return `<div class="pbtwrap"><table class="${cls || 'pbtable'}">${body}</table></div>`;
+}
+// ★★★ 4.119 — 표를 파이어스토어가 받을 수 있는 꼴로 눕힌다.
+//
+//   사장님 오류, 2026-09-09 —
+//   「Function setDoc() called with invalid data. Nested arrays are not supported
+//     (found in document series/smtsuhb9n5m8r)」
+//
+//   까닭: 표는 rows:[[칸,칸],[칸,칸]] 이다 — **배열 안의 배열**.
+//   파이어스토어는 이것을 못 담는다. 그래서 표가 든 글은 **하나도 안 올라갔다.**
+//   폰 안에는 멀쩡히 있는데 올리기만 하면 튕겼으니, 사장님은 「왜 안올라가지?」 로 겪으셨다.
+//
+//   고침 — 올릴 때만 한 줄로 눕힌다. 앱 안에서 쓰는 모양은 그대로 rows 다.
+//   도로 세우는 일은 tblNorm 한 곳이 한다 (문 하나).
+function tblPack(x){
+  const T = tblNorm(x);
+  const w = (T.rows[0] || []).length || 1;
+  const cells = [];
+  T.rows.forEach(r => { for(let i = 0; i < w; i++) cells.push(String(r[i] == null ? '' : r[i])); });
+  return { t:'table', head:T.head, w:w, cells:cells };
+}
+// 파이어스토어로 나가는 것은 전부 이것을 지난다 — 배열 안의 배열이 안 나가게.
+// ★ increment()·arrayUnion() 같은 **파이어스토어의 특별한 값은 손대지 않는다.**
+//   그것까지 베끼면 「1 더하기」 가 그냥 객체가 되어 숫자가 망가진다.
+function fsSafe(v){
+  if(Array.isArray(v)) return v.map(fsSafe);
+  if(v && typeof v === 'object'){
+    const p = Object.getPrototypeOf(v);
+    if(p !== Object.prototype && p !== null) return v;      // 특별한 값 · Date 따위
+    if(v.t === 'table' && (Array.isArray(v.rows) || Array.isArray(v.cells))) return tblPack(v);
+    const o = {};
+    for(const k in v) if(Object.prototype.hasOwnProperty.call(v, k)) o[k] = fsSafe(v[k]);
+    return o;
+  }
+  return v;
 }
 // 표 → 글자 (본문·찾기·번역에 실려 나가는 모양)
 function tblText(x){
@@ -22847,7 +22890,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.118';
+const APP_VER = '4.119';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -42779,8 +42822,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             getCountFromServer, increment, deleteField, arrayUnion, arrayRemove } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
     // ★ 저장과 읽기는 전부 이 문 하나를 지난다 (netWait 설명 참고).
-    const setDoc    = (...a)=> netWait(_setDoc(...a),    NET_SEC);
-    const updateDoc = (...a)=> netWait(_updateDoc(...a), NET_SEC);
+    // ★ 4.119 — 나가는 자료는 여기서 한 번 훑는다 (fsSafe). 표의 「배열 안의 배열」 을 눕힌다.
+    const setDoc    = (...a)=> netWait(_setDoc(a[0],    fsSafe(a[1]), ...a.slice(2)), NET_SEC);
+    const updateDoc = (...a)=> netWait(_updateDoc(a[0], fsSafe(a[1]), ...a.slice(2)), NET_SEC);
     const deleteDoc = (...a)=> netWait(_deleteDoc(...a), NET_SEC);
     const getDocs   = (...a)=> netWait(_getDocs(...a),   NET_READ);
     const getDoc    = (...a)=> netWait(_getDoc(...a),    NET_READ);

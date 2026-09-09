@@ -899,6 +899,42 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .tellov{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;
   background:rgba(3,10,17,.72);padding:22px}
 .tellov.open{display:flex}
+/* ══ 4.120 — 「할 일」 칸 (사장님 지적, 2026-09-09) ══
+   「위에 또는 아래만 버튼이 있으면 존나 위로 다시 올라가야한다던지 아래로 다시내려와야한다던지」
+   ★ 머리줄이 안 흘러가게 붙여 두고, 할 일은 거기 모은다.
+     하나면 그대로 단추, 여럿이면 [⋯] 하나로 모아 아래에서 올라오는 칸에 보여 준다.
+   ★ 손가락으로 누르는 칸은 크게 — 배 위에서 흔들리며 누른다. */
+.actov{align-items:flex-end;padding:0}
+.actbox{width:100%;max-width:520px;margin:0 auto;
+  background:var(--sf,#15171B);border-top:1px solid var(--bd,#1B2E3E);
+  border-radius:18px 18px 0 0;padding:10px 14px calc(14px + env(safe-area-inset-bottom));
+  box-shadow:0 -10px 34px rgba(0,0,0,.5);max-height:80vh;display:flex;flex-direction:column}
+/* 잡는 손잡이 — 아래에서 올라온 칸이라는 것을 알려 준다 (글자를 안 쓴다) */
+.acttit{width:38px;height:4px;border-radius:999px;background:var(--bd,#1B2E3E);
+  margin:4px auto 12px}
+.actlist{overflow:auto;display:flex;flex-direction:column;gap:8px}
+.actlist button{min-height:52px;padding:14px 16px;font-size:15.5px;font-weight:700;
+  border-radius:12px;cursor:pointer;text-align:left;
+  background:var(--sf2,#0E1B26);border:1px solid var(--bd,#1B2E3E);color:var(--th,#f1f7fc)}
+.actlist button:active{background:var(--acs,#16344C)}
+.actlist button.warn{color:#E08A8A;border-color:#5A3030}
+.actcancel{min-height:50px;margin-top:10px;border-radius:12px;cursor:pointer;
+  font-size:15px;font-weight:700;background:none;border:1px solid var(--bd,#1B2E3E);color:#C4C8CD}
+/* ★ 머리줄을 붙여 둔다 — 아무리 긴 글이라도 할 일 단추가 손에 닿는다.
+   ★ 이베이도 같은 길을 쓴다: 할 일 줄은 붙여 두고 글이 그 밑으로 흐른다.
+   ★ 붙는 자리는 앱 머리줄 **바로 밑**이다 (--hdrH). 0 으로 두면 앱 이름줄에 가려 반쯤 잘린다.
+   ★ 바탕은 ::before 로 좌우까지 넓힌다 — 화면마다 옆 여백이 달라(16px·20px)
+     음수 여백으로 맞추면 한쪽 화면에서 반드시 어긋난다. */
+#mrPanel .mrhead, #mrPanel > .mrtop{position:sticky;top:var(--stickyTop,var(--hdrH,56px));z-index:6;
+  padding-top:10px;padding-bottom:10px}
+#mrPanel .mrhead::before, #mrPanel > .mrtop::before{
+  content:'';position:absolute;left:-24px;right:-24px;top:0;bottom:0;z-index:-1;
+  background:var(--sf2,#0E1B26);border-bottom:1px solid var(--bd,#1B2E3E)}
+#mrPanel > .mrtop{flex-wrap:wrap;gap:6px;justify-content:flex-start}
+#mrPanel > .mrtop > b{margin-right:auto}
+#mrPanel .mrhead .acthead{margin-left:auto}
+/* 붙여 둔 줄이 화면을 너무 먹으면 안 된다 — 단추는 작게 */
+#mrPanel > .mrtop .mrbtn{padding:6px 10px;font-size:12px}
 /* ── 표 (4.113) — 읽는 화면·편집기·고치는 창이 모두 이 모양 하나를 쓴다 */
 /* ★ 넓은 표는 **표만** 옆으로 밀리게 한다. 화면 몸통이 밀리면 앱이 고장 난 것으로 보인다. */
 .pbtwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0;
@@ -2312,6 +2348,11 @@ header{padding-top:var(--sat)}
   <input class="tellinp" id="tellInp" autocomplete="off">
   <div class="tellbtns" id="tellBtns"></div>
 </div></div>
+<div id="actOv" class="tellov actov"><div class="actbox">
+  <div class="acttit"></div>
+  <div class="actlist" id="actList"></div>
+  <button class="actcancel" onclick="actClose()" id="actCancel" aria-label="닫기">닫기</button>
+</div></div>
 <input type="file" id="howPhotoFile" accept="image/*" style="display:none" onchange="howPhotoPick(event)">
 
 <div id="mobOv" class="mobov"><div class="mobbox">
@@ -2380,7 +2421,7 @@ const I18N = {
     '알 수 없는 오류':'Something went wrong',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'Recording stopped in {n} [[place|places]] — those stretches are dotted.',
-    '폰이 위치를 한동안 안 준 것입니다. 그 사이 지나온 길은 앱이 모릅니다.':'The phone stopped sending your position for a while. The app does not know the route in between.',
+    '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'The dotted line joins the last position received to the next one received.',
     // ★ 나라현(奈良) — 「나라(국가)」 와 글자가 같아 부딪혔던 것을 가른 이름 (4.115)
     '나라현':'Nara',
     // ── 자리 가르기 (4.115) — 한 낱말이 두 화면에서 다른 뜻이던 것
@@ -3022,6 +3063,10 @@ const I18N = {
     '이 장비의 사용기':'This gear\'s reviews',
     '이 장비의 부품':'This gear\'s parts',
     '이 장비 같은 기록':'Records that look like this gear',
+    '더 갈 수 있는 시간':'Run time left',
+    '만탱크 뒤 가동':'Since last full tank',
+    '{d} 만탱크 뒤로 {L}L 를 더 넣으셨습니다.':'You have added {L} L since the {d} full tank.',
+    '1/3 을 남기려면 {h} 안에 돌아오시는 것이 좋습니다 — 뱃사람들이 쓰는 어림입니다.':'To keep a third in reserve, plan to be back within {h} — a rule of thumb among boaters.',
     '제목줄':'Header row',
     '고른 것만 매답니다. 매단 뒤에도 되돌릴 수 있습니다.':'Only what you tick gets attached. You can undo it afterwards.',
     '고른 것 매달기':'Attach ticked',
@@ -5623,7 +5668,7 @@ const I18N = {
     '알 수 없는 오류':'Что-то пошло не так',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'Запись прерывалась: {n} [[раз|раза|раз]] — эти участки показаны пунктиром.',
-    '폰이 위치를 한동안 안 준 것입니다. 그 사이 지나온 길은 앱이 모릅니다.':'Телефон какое-то время не передавал координаты. Пройденный за это время путь приложению неизвестен.',
+    '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'Пунктир соединяет последнюю полученную точку со следующей.',
     // ★ 나라현(奈良) — 「나라(국가)」 와 글자가 같아 부딪혔던 것을 가른 이름 (4.115)
     '나라현':'Нара',
     // ── 자리 가르기 (4.115) — 한 낱말이 두 화면에서 다른 뜻이던 것
@@ -6265,6 +6310,10 @@ const I18N = {
     '이 장비의 사용기':'Отзывы об этом снаряжении',
     '이 장비의 부품':'Запчасти этого снаряжения',
     '이 장비 같은 기록':'Записи, похожие на это снаряжение',
+    '더 갈 수 있는 시간':'Остаток хода',
+    '만탱크 뒤 가동':'С полного бака',
+    '{d} 만탱크 뒤로 {L}L 를 더 넣으셨습니다.':'После полного бака {d} долито ещё {L} л.',
+    '1/3 을 남기려면 {h} 안에 돌아오시는 것이 좋습니다 — 뱃사람들이 쓰는 어림입니다.':'Чтобы оставить треть в запасе, лучше вернуться в пределах {h} — распространённое правило у моряков.',
     '제목줄':'Строка заголовка',
     '고른 것만 매답니다. 매단 뒤에도 되돌릴 수 있습니다.':'Прикрепляется только отмеченное. Потом это можно отменить.',
     '고른 것 매달기':'Прикрепить отмеченное',
@@ -8877,7 +8926,7 @@ const I18N = {
     '알 수 없는 오류':'不明なエラーが発生しました',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'記録が{n}か所で途切れました — その区間は点線です。',
-    '폰이 위치를 한동안 안 준 것입니다. 그 사이 지나온 길은 앱이 모릅니다.':'スマホがしばらく位置情報を送りませんでした。その間に通った航路はアプリには分かりません。',
+    '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'点線は、最後に受け取った位置と次に受け取った位置を結んだ線です。',
     // ★ 나라현(奈良) — 「나라(국가)」 와 글자가 같아 부딪혔던 것을 가른 이름 (4.115)
     '나라현':'奈良',
     // ── 자리 가르기 (4.115) — 한 낱말이 두 화면에서 다른 뜻이던 것
@@ -9563,6 +9612,10 @@ const I18N = {
     '이 장비의 사용기':'この装備のパーツレビュー',
     '이 장비의 부품':'この装備の部品',
     '이 장비 같은 기록':'この装備のものらしい記録',
+    '더 갈 수 있는 시간':'航行可能時間',
+    '만탱크 뒤 가동':'満タン後の稼働',
+    '{d} 만탱크 뒤로 {L}L 를 더 넣으셨습니다.':'{d} の満タン後に{L}Lを追加されています。',
+    '1/3 을 남기려면 {h} 안에 돌아오시는 것이 좋습니다 — 뱃사람들이 쓰는 어림입니다.':'1/3を残すには{h}以内に戻るのが目安です — 船乗りの経験則です。',
     '제목줄':'見出し行',
     '고른 것만 매답니다. 매단 뒤에도 되돌릴 수 있습니다.':'チェックしたものだけを紐づけます。あとで元に戻せます。',
     '고른 것 매달기':'チェックしたものを紐づける',
@@ -16156,7 +16209,7 @@ function openFleet(){
           </div>
           <div class="fbtns">
             <button class="minib blu" onclick="openBoatInfo('${b.id}')">${esc(t('정보'))}</button>
-            ${del ? `<button class="minib red" onclick="askDelBoat('${b.id}')">${esc(t('삭제'))}</button>` : ''}
+            ${del ? `<button class="minib red edt" onclick="askDelBoat('${b.id}')">${esc(t('삭제'))}</button>` : ''}
           </div>
         </div>`;
       }).join('')
@@ -17655,7 +17708,7 @@ async function renderTalk(){
     + (talkSort === 'likeN'
         ? `<div class="mrnone" style="text-align:left">${esc(t('도움됐어요가 눌린 순서입니다. 아주 오래된 글은 여기 안 나올 수 있습니다.'))}</div>` : '')
     + `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-        <button class="mrbtn ok" onclick="writeTalk()">${esc(t('글쓰기'))}</button></div>`
+        <button class="mrbtn ok edt" onclick="writeTalk()">${esc(t('글쓰기'))}</button></div>`
     + (rows || `<div class="mrnone">${esc(t('아직 글이 없습니다. 첫 글을 써 보세요.'))}</div>`)
     + listFoot('talk', 'talkMore');
 }
@@ -18383,15 +18436,25 @@ async function openTalk(id){
         ${(mine || isAdmin('postDel'))?`<button class="ckdel" onclick="delTalkComment('${jsq(po.id)}','${jsq(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
+  // ★ 4.120 — 할 일은 머리줄에 모은다 (긴 글에서도 손에 닿게)
+  const 내글 = String(po.by) === String(meUid());
+  const 할일 = actSet([
+    내글 ? { name:'고치기', edit:true, run:() => writeTalk(po.id) } : null,
+    canDelTalk(po) ? { name:'지우기', edit:true, warn:true, run:() => delTalk(po.id) } : null,
+    { name:'댓글 쓰기', run: () => writeTalkComment(po.id) },
+    { name:'신고', run: () => reportTalk(po.id) },
+    (po.by && String(po.by) !== String(meUid() || ''))
+      ? { name:'이 사람 차단', run: () => mutePersonUI(po.by, po.byName || '') } : null
+  ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',po.title))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
+      ${할일}<button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
       ${po.region?`<span class="chip">${esc(t(po.region))}</span>`:''}
       ${(isAdmin() && po.by)
         ? `<span class="whoa" onclick="openPerson('${jsq(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
         : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
       · ${esc(String(po.ts||'').slice(0,10))}
-      ${String(po.by)===String(meUid())?`<button class="minib blu" style="margin-left:auto" onclick="writeTalk('${jsq(po.id)}')">${esc(t('고치기'))}</button>`:''}</div>
+</div>
     ${trBar('community', po.id, (po.title||'') + ' ' + (po.body||''),
         all.map(c=>String(c.text||'')).join(' '))}
     ${po.hidden?`<div class="hwarn">${esc(t('신고가 쌓여 목록에서 내려간 글입니다.'))}</div>`:''}
@@ -18402,12 +18465,7 @@ async function openTalk(id){
         ${esc(RIDE_LAW)}</div>` : ''}
     <div class="mrrow" style="gap:8px;padding:12px">
       ${likeBtn('talk', po.id, po.likeN)}
-      <span style="flex:1"></span>
-      <button class="mrbtn" onclick="reportTalk('${jsq(po.id)}')">${esc(t('신고'))}</button>
-      ${po.by && String(po.by) !== String(meUid()||'')
-        ? `<button class="mrbtn" onclick="mutePersonUI('${jsq(po.by)}', '${jsq(po.byName||'')}')">${esc(t('이 사람 차단'))}</button>` : ''}
-      ${canDelTalk(po)?`<button class="mrbtn warn" onclick="delTalk('${jsq(po.id)}')">${esc(t('지우기'))}</button>`:''}
-    </div>
+      <span style="flex:1"></span></div>
     <div class="ghead"><b>${esc(t('댓글'))}</b><span class="gcnt">${all.length}</span></div>
     ${cs}
     <div class="mrrow" style="padding:12px">
@@ -19824,9 +19882,9 @@ function openIntro(){
     const body = introInner(x, { flat:true });
     return `<div class="introrow">${body}${unlocked ? `
       <div class="introbtns">
-        <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
-        <button class="minib" onclick="moveIntro(${i},1)">↓</button>
-        <button class="minib red" onclick="delIntro(${i})">${esc(t('지우기'))}</button>
+        <button class="minib edt" onclick="moveIntro(${i},-1)">↑</button>
+        <button class="minib edt" onclick="moveIntro(${i},1)">↓</button>
+        <button class="minib red edt" onclick="delIntro(${i})">${esc(t('지우기'))}</button>
       </div>` : ''}</div>`;
   }).join('');
   const P = document.getElementById('mrPanel');
@@ -20086,7 +20144,7 @@ function openBoard(){
         ? `<div class="mrnone">${esc(tsub("'{q}' 로 찾은 글이 없습니다", { q: postQ.trim() }))}</div>`
         : `<div class="mrnone">${esc(t('아직 글이 없습니다'))}</div>`))
     + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
-        <button class="mrbtn big" onclick="writePost()">${esc(t('+ 글쓰기'))}</button></div>` : '');
+        <button class="mrbtn big edt" onclick="writePost()">${esc(t('+ 글쓰기'))}</button></div>` : '');
   showPanel(P); boatKeepTabs('board');
 }
 function writePost(id){
@@ -20168,12 +20226,17 @@ function openPost(id){
       <div class="cmtbody">${esc(c.text).replace(/\n/g,'<br>')}</div></div>`;
   }).join('');
   const P = document.getElementById('mrPanel');
+  // ★ 4.120 — 할 일은 머리줄에 모은다
+  const 할일 = actSet([
+    canEditPost(b, p) ? { name:'고치기', edit:true, run:() => writePost(p.id) } : null,
+    can(b, 'board', 'write') ? { name:'댓글 쓰기', run:() => writeComment(p.id) } : null
+  ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(p.title)}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoard()">${esc(t('목록'))}</button></div>
+      ${할일}<button class="tab" onclick="openBoard()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip${p.kind==='notice'?' notice':''}">${esc(kn)}</span>
       ${p.pub?`<span class="chip">${esc(t('공개'))}</span>`:''}
       ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
-      ${canEditPost(b,p)?`<button class="minib blu" style="margin-left:auto" onclick="writePost('${jsq(p.id)}')">${esc(t('고치기'))}</button>`:''}</div>
+</div>
     ${(Array.isArray(p.blocks) && p.blocks.length)
       ? renderBlocks(p.blocks, `postPhotos('${esc(p.id)}')`)
       : `<div class="postbody">${esc(p.body||'').replace(/\n/g,'<br>')}</div>`
@@ -20640,7 +20703,7 @@ function openRanks(){
         <div class="fsub">${esc(rankSummary(r))}</div></div>
       <div class="fbtns">
         ${(r.owner && myPos(b)===0) || !locked
-          ? `<button class="minib blu" onclick="editRankUI('${jsq(r.id)}')">${esc(t('고치기'))}</button>` : ''}
+          ? `<button class="minib blu edt" onclick="editRankUI('${jsq(r.id)}')">${esc(t('고치기'))}</button>` : ''}
       </div></div>`;
   }).join('');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('등급 설정'))}</b><span style="flex:1"></span>
@@ -21061,9 +21124,9 @@ function openBoat(tab){
       const inner = introInner(x, { flat:true });
       return `<div class="introrow">${inner}${canEd ? `
         <div class="introbtns">
-          <button class="minib" onclick="moveIntro(${i},-1)">↑</button>
-          <button class="minib" onclick="moveIntro(${i},1)">↓</button>
-          <button class="minib red" onclick="delIntro(${i})">${esc(t('지우기'))}</button>
+          <button class="minib edt" onclick="moveIntro(${i},-1)">↑</button>
+          <button class="minib edt" onclick="moveIntro(${i},1)">↓</button>
+          <button class="minib red edt" onclick="delIntro(${i})">${esc(t('지우기'))}</button>
         </div>` : ''}</div>`;
     }).join('');
     // ★ 꼬리표(<b>)가 든 문장은 통째로 사전에 넣는다. 낱말로 쪼개 이으면
@@ -22890,7 +22953,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.119';
+const APP_VER = '4.120';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -25014,7 +25077,7 @@ function renderPanelItems(){
     + (pickOn ? `<div class="pickbar">
         <button onclick="pickMove()">${esc(t('이동'))}</button>
         <button onclick="pickMerge()">${esc(t('합침'))}</button>
-        <button class="warn" onclick="itemDropAsk([...pickSet])">${esc(t('지우기'))}</button>
+        <button class="warn edt" onclick="itemDropAsk([...pickSet])">${esc(t('지우기'))}</button>
         <button onclick="pickEnd()">${esc(t('취소'))}</button></div>` : '');
   bindHold(); pickSync(); pformPlace();
   const st = strayItems().length;
@@ -26959,7 +27022,7 @@ function openMR(kind, id){
                //   9/9 항해는 40분 동안 한 점도 안 들어왔다. 그 사이는 앱이 모르는 길이다.
                return g ? `<div class="mrnone" style="text-align:left;color:var(--yel,#D9AE63)">${
                  esc(tsub('기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.', { n: g }))}<br>${
-                 esc(t('폰이 위치를 한동안 안 준 것입니다. 그 사이 지나온 길은 앱이 모릅니다.'))}</div>` : ''; })()}
+                 esc(t('점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.'))}</div>` : ''; })()}
              <div class="mrnone" style="text-align:left">${esc(t('기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.'))}<br>
                ${esc(t('지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)'))}</div>`
           : `<div class="trkempty">${esc(t('위치를 남기면 이곳에 항적이 표시됩니다'))}<br>
@@ -27059,8 +27122,12 @@ function openMR(kind, id){
                 esc(t('선박검사·보험처럼 며칠 만에 못 받는 서류는 넉넉히 잡아 두세요.'))}</div>`
           : '');
   }
+  // ★ 4.120 — 이 기록에서 할 수 있는 일을 머리줄에 모은다.
+  //   긴 기록(사진 여러 장 붙은 정비수첩 같은 것)에서 맨 아래까지 내려가지 않아도 닿는다.
+  const 할일 = actSet(mrActs(kind, it));
   P.innerHTML = `
     <div class="mrtop"><b>${TITLES[kind]||''}</b>
+      ${할일}
       ${unlocked
         ? `<button class="mrbtn ok" onpointerdown="mrHoldClose()" onclick="mrSaveClose()">${esc(t('저장 후 닫기'))}</button>
            <button class="mrbtn warn" id="mrRevertBtn" style="${mrDirty()?'':'display:none'}"
@@ -27075,9 +27142,7 @@ function openMR(kind, id){
     <div class="mrrow edt">
       <button class="mrbtn" onclick="document.getElementById('mrCam').click()">${esc(t('촬영'))}</button>
       <button class="mrbtn" onclick="document.getElementById('mrFile').click()">${esc(t('앨범'))}</button></div>`:''}
-    ${pinBtns}
-    <div class="mrrow edt" style="justify-content:flex-end">
-      <button class="mrbtn warn" onclick="mrDelete()">${esc(t('삭제'))}</button></div>`;
+    ${pinBtns}`;
   showPanel(P);
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
   // ★ 점이 하나도 없어도 켠다. 지도가 보는 곳이자 적는 곳이라 늘 있어야 한다.
@@ -28360,7 +28425,7 @@ function askText(title, value, ph){
     input: { value: value == null ? '' : value, ph: ph || '' },
     btns: [{ name: t('취소'), v: null }, { name: t('확인'), v: true, kind: 'ok' }] });
 }
-const OVERLAY_IDS = ['tellOv','photoView','recPick','dgPick','drawerOv','pmOv'];
+const OVERLAY_IDS = ['tellOv','actOv','photoView','recPick','dgPick','drawerOv','pmOv'];
 const OVERLAY_STACK = [];
 window.OVERLAY_STACK = OVERLAY_STACK;
 function overlayPush(id){
@@ -28383,6 +28448,7 @@ function closeTopOverlay(){
     dgPick:    ()=>closeDgPick(),
     drawerOv:  ()=>closeDrawer(),
     tellOv:    ()=>tellClose(),
+    actOv:     ()=>actClose(),
     pmOv:      ()=>pmClose()
   };
   try{ if(F[id]){ F[id](); return true; } }catch(_){}
@@ -28456,6 +28522,11 @@ function showPanel(P){
   P.classList.add('open', 'full');
   const t = P.querySelector('.mrhead > b, .mrtop > b');
   if(t) setHeadTitle(String(t.textContent || '').trim());
+  // ★★★ 4.120 — 머리줄 높이를 **한 번 더** 잰다.
+  //   화면이 뜨면 머리줄의 아랫줄들이 접힌다(body.panelfull). 접히기 전에 잰 값을 쓰면
+  //   붙여 두는 줄이 207px 자리에 가서 화면 한복판에 떠 있게 된다.
+  //   그림이 다 그려진 다음에 재야 맞다.
+  try{ requestAnimationFrame(measureHeader); }catch(_){ measureHeader(); }
   ['tabHome','tabBoat','tabVoyage','tabCommunity'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.classList.remove('on');
   });
@@ -28492,8 +28563,13 @@ function restorePanel(){
 }
 function measureHeader(){
   const h = document.querySelector('header .hrow') || document.querySelector('header');
-  if(!h) return;
-  document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px');
+  if(h) document.documentElement.style.setProperty('--hdrH', h.offsetHeight + 'px');
+  // ★★★ 4.120 — 붙여 두는 줄은 **머리줄 전체** 밑에 붙어야 한다.
+  //   --hdrH 는 .hrow 만 잰 값이다(47px). 머리줄이 실제로 87px 일 때 그 값을 쓰면
+  //   붙여 둔 줄의 위 40px 이 머리줄에 가려서, 보이기는 하는데 **눌리지 않는다.**
+  //   (검사에서 elementFromPoint 로 실제로 잡아 보고 알았다.)
+  const hd = document.querySelector('header');
+  if(hd) document.documentElement.style.setProperty('--stickyTop', hd.offsetHeight + 'px');
 }
 window.addEventListener('resize', measureHeader);
 function paintMenuPerms(){
@@ -29217,7 +29293,7 @@ function planWhoPaint(){
                 esc(tsub('{n}명', { n:String(x.who.length) }))}</span></span>
             <button class="mrbtn" onclick="planWhoAdd(${esc(JSON.stringify(x.who))})">${
               esc(t('더하기'))}</button>
-            <button class="mrbtn warn" onclick="planWhoDelSet('${jsq(x.id)}')">${
+            <button class="mrbtn warn edt" onclick="planWhoDelSet('${jsq(x.id)}')">${
               esc(t('지우기'))}</button></div>`).join('') : '')
     + `<div class="notilbl">${esc(t('배 명부'))}</div>`
     + (uids.length
@@ -32883,7 +32959,7 @@ async function renderMarket(){
         placeholder="${esc(t('물건 이름 · 내용으로 찾기'))}"
         oninput="marketFilter(this.value)" autocomplete="off"></div>
     <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-      <button class="mrbtn ok" onclick="writeItem()">${esc(t('+ 팔 물건 올리기'))}</button></div>
+      <button class="mrbtn ok edt" onclick="writeItem()">${esc(t('+ 팔 물건 올리기'))}</button></div>
     <div id="marketRows">` + marketRowsHtml() + `</div>`;
 }
 function marketRowsHtml(){
@@ -32990,7 +33066,7 @@ async function openItem(id){
         ? `<span class="whoa" onclick="openPerson('${jsq(m.by)}')">${esc(m.byName||'')}</span>`
         : esc(m.byName||'')}
       · ${esc(String(m.ts||'').slice(0,10))}
-      ${mine?`<button class="minib blu" style="margin-left:auto" onclick="writeItem('${jsq(m.id)}')">${esc(t('고치기'))}</button>`:''}</div>
+      ${mine?`<button class="minib blu edt" style="margin-left:auto" onclick="writeItem('${jsq(m.id)}')">${esc(t('고치기'))}</button>`:''}</div>
     ${trBar('market', m.id, (m.title||'') + ' ' + (m.note||''))}
     ${m.hidden?`<div class="hwarn">${esc(t('신고가 쌓여 목록에서 내려간 글입니다.'))}</div>`:''}
     <div class="mrrow"><span class="mrlbl">${esc(t('가격'))}</span>
@@ -33010,7 +33086,7 @@ async function openItem(id){
       ${likeBtn('market', m.id, m.likeN)}
       <span style="flex:1"></span>
       <button class="mrbtn" onclick="reportItem('${jsq(m.id)}')">${esc(t('신고'))}</button>
-      ${canDelItem(m)?`<button class="mrbtn warn" onclick="delItem('${jsq(m.id)}')">${esc(t('지우기'))}</button>`:''}
+      ${canDelItem(m)?`<button class="mrbtn warn edt" onclick="delItem('${jsq(m.id)}')">${esc(t('지우기'))}</button>`:''}
     </div>
     ${marketNotice()}`;
   showPanel(P);
@@ -33952,7 +34028,7 @@ async function renderSpots(){
         oninput="spotFilter(this.value)" autocomplete="off"></div>`
     // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 감춘다.
     + (off ? '' : `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-      <button class="mrbtn ok" onclick="writeSpot()">${esc(t('+ 정박지 올리기'))}</button></div>`)
+      <button class="mrbtn ok edt" onclick="writeSpot()">${esc(t('+ 정박지 올리기'))}</button></div>`)
     + spotViewBar()
     + (spotView === 'map'
         ? mapBox('spotsMap','58vh') + spotMapFoot()
@@ -34365,7 +34441,7 @@ async function openSpot(id){
     <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
       ${s.region?`<span class="chip">${esc(spotRegionName(s.region))}</span>`:''}
       ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
-      ${canEditSpot(s)?`<button class="minib blu" style="margin-left:auto" onclick="writeSpot('${jsq(s.id)}')">${esc(t('고치기'))}</button>`:''}</div>
+      ${canEditSpot(s)?`<button class="minib blu edt" style="margin-left:auto" onclick="writeSpot('${jsq(s.id)}')">${esc(t('고치기'))}</button>`:''}</div>
     ${s.seed ? '' : trBar('spots', s.id, (s.name||'') + ' ' + (s.note||''),
         (spotCmts[String(s.id)]||[]).map(c=>String(c.text||'')).join(' '))}
     ${s.hidden?`<div class="hwarn">${esc(t('신고가 쌓여 목록에서 내려간 자리입니다.'))}</div>`:''}
@@ -34379,7 +34455,7 @@ async function openSpot(id){
           esc(s.byName && s.byName !== SPOT_SEED_FROM ? '' : t('이름과 자리만 들어 있습니다.'))}
         ${s.plan ? `<br>${t('국가 마리나 <b>계획 단계</b>로 잡힌 곳입니다 — 가시기 전에 확인해 주세요.')}` : ''}
         <br>${esc(t('다녀오셨으면 수심 · 바닥 · 트인 방향을 채워 주세요.'))}
-        ${meUid() ? `<div style="margin-top:10px"><button class="mrbtn ok" onclick="writeSpot('${jsq(s.id)}')">${esc(t('내용 채우기'))}</button></div>` : ''}
+        ${meUid() ? `<div style="margin-top:10px"><button class="mrbtn ok edt" onclick="writeSpot('${jsq(s.id)}')">${esc(t('내용 채우기'))}</button></div>` : ''}
       </div>` : ''}
     ${sh ? `<div class="hwarn">${esc(sh)}</div>` : ''}
     ${row(t('수심'), spotDepthText(s))}
@@ -36129,7 +36205,7 @@ function logRows(it){
     //   고칠 때는 아래에서 고치는 값을 되풀이하지 않는다.
     const 머리 = unlocked
       ? `<div class="legh"><span class="ldot"></span>${esc(t('중간 기록'))}
-           <span class="lsub"><button class="minib" onclick="logDel('${g.id}')">${
+           <span class="lsub"><button class="minib edt" onclick="logDel('${g.id}')">${
              esc(t('삭제'))}</button></span></div>`
       : `<div class="legh"><span class="ldot"></span>${esc(g.time ? hm(g.time) : t('시각 없음'))}
            <span style="font-size:13.5px;font-weight:700;color:#9ed0f5">${esc(t(g.kind||''))}</span>
@@ -36496,6 +36572,11 @@ function mapPaint(full){
     //   두 동강 난 것처럼 보여 그것대로 고장으로 읽힌다.
     const dd = LINE.map((p,i)=> ((i && !p.brk) ? 'L' : 'M')
                               + sx(p).toFixed(1)+' '+sy(p).toFixed(1)).join(' ');
+    // ★★★ 4.120 — 끊긴 데도 **이어져 있다는 것이 보여야 한다** (사장님 지적, 2026-09-09).
+    //   「점선이 너무 연하다 존나 좆도 안보임. 그래도 뭔가 연결되어는 있다는 인상을줘야지」
+    //   맞다. 여태 흐리기 .35 에 짧은 점(4/7)이라 바탕에 묻혔다.
+    //   이제 흰 밑줄을 깔고 그 위에 굵은 점선(10/8)을 얹는다 — 이은 선과 굵기·색이 같되
+    //   점선이라 「여기는 받은 자리끼리 이은 것」 이 한눈에 보인다.
     const 끊긴데 = [];
     for(let i = 1; i < LINE.length; i++){
       if(!LINE[i].brk) continue;
@@ -36503,8 +36584,11 @@ function mapPaint(full){
                 +'L'+sx(LINE[i]).toFixed(1)+' '+sy(LINE[i]).toFixed(1));
     }
     h += `<svg class="mov" width="${W}" height="${H}">
-      ${끊긴데.length ? `<path d="${끊긴데.join(' ')}" fill="none" stroke="#ff5a3c"
-            stroke-width="2" opacity=".35" stroke-dasharray="4 7" stroke-linecap="round"/>` : ''}
+      ${끊긴데.length ? `
+        <path d="${끊긴데.join(' ')}" fill="none" stroke="#fff" stroke-width="5"
+              opacity=".28" stroke-dasharray="10 8" stroke-linecap="round"/>
+        <path d="${끊긴데.join(' ')}" fill="none" stroke="#ff5a3c" stroke-width="3"
+              opacity=".95" stroke-dasharray="10 8" stroke-linecap="round"/>` : ''}
       <path d="${dd}" fill="none" stroke="#fff" stroke-width="5.5" opacity=".5"
             stroke-linecap="round" stroke-linejoin="round"/>
       <path d="${dd}" fill="none" stroke="#ff5a3c" stroke-width="3"
@@ -37035,7 +37119,7 @@ function posLine(it, key){
   const btn = unlocked
     ? `<button class="minib grn" onclick="posHere('${key}')">${p?t('다시'):t('지금 여기')}</button>`
       + `<button class="minib blu" onclick="posPick('${key}')">${esc(t('지도에서'))}</button>`
-      + (p ? `<button class="minib" onclick="posClear('${key}')">${esc(t('지우기'))}</button>` : '')
+      + (p ? `<button class="minib edt" onclick="posClear('${key}')">${esc(t('지우기'))}</button>` : '')
     : '';
   const info = p
     ? `📍 ${fmtDeg(p.lat,['N','S'])} ${fmtDeg(p.lon,['E','W'])}${p.acc?` <span style="color:#7b8794">±${Math.round(p.acc)}m</span>`:''}`
@@ -37410,6 +37494,54 @@ function fuelStats(){
   return {cnt:arr.length, l, w, y};
 }
 
+// ══════════════════════════════════════════════════════════════
+// ★★★ 4.120 — 연료 화면 여섯 칸을 다시 짰다 (사장님 지적, 2026-09-09)
+//
+//   「여기 만탱크 이후 얼마나 엔진 가동했는지가 안나오네.
+//    그냥 6개 목록 니가 존나 생각없이 넣은것 같은데 잔량추정이랑 리터당시간 빼고는
+//    존나 깊게 필요한 항목이 아닐 수도 있는데 다른 어플이랑 여러 자료들 먼저 찾아본다음에」
+//
+//   맞는 지적이다. 여섯 칸 가운데 셋이 「2026 주유 5 · 2026 주유량 63 · 2026 연료비 —」 였다.
+//   해마다 몇 번 넣었나는 배를 띄우기 전에 아무 소용이 없는 수다. 칸만 차지했다.
+//
+// ★ 찾아본 것 (배 타는 사람들이 실제로 적는 것)
+//   · Trawler Forum 「Share your fuel log sheet」 — 실제로 적는 칸은
+//     날짜 · **총 가동시간과 지난 주유 뒤 가동시간** · 넣은 양 · 시간당 소비 · RPM · 속력.
+//     ★ 「지난 주유 뒤 가동시간」 은 배 타는 사람이 원래 적는 칸이다. 우리 앱에만 없었다.
+//   · 같은 글에서 **연료비는 빼라**고 한다 — "I would leave out the fuel cost.
+//     It's of no benefit, prices always change." 우리도 뺀다.
+//   · 거리당 연비(NM/gal)도 조류·바람·물결에 따라 흔들려 못 믿는다고 한다. 안 넣는다.
+//   · Premium Boat Care(항해 계획) — 기름은 **탱크 용량이 아니라 실제 쓸 수 있는 양**으로 세고,
+//     「1/3 은 남기고 돌아온다」 가 널리 쓰는 어림이다. 칸으로 만들지 않고 아래 글로 적는다.
+//
+// ★ 그래서 남긴 것 — 다섯 칸. 모두 **배를 띄우기 전에 쓰는 수**다.
+//     잔량 추정 · 더 갈 수 있는 시간 · L/시간 · 만탱크 뒤 가동 · 총 가동시간
+//   ★ 「올해 몇 번 넣었나 · 얼마 썼나」 는 뺐다. 기록 목록에 다 있다.
+
+// 마지막 만탱크 뒤로 엔진을 몇 시간 돌렸나 (없으면 null)
+// ★ fuelLeft 의 since 와 다르다 — 그쪽은 사람이 「지금 잔량」 을 적었으면 그때부터 센다.
+//   이 칸은 이름 그대로 **만탱크 뒤**라야 한다. 이름과 다른 수를 보여 주면 안 된다.
+function fuelSinceFull(){
+  const arr = (typeof fuel !== 'undefined' && Array.isArray(fuel) ? fuel : [])
+                .filter(f => f && f.date).sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
+  const fulls = arr.filter(f => f.full);
+  const full = fulls[fulls.length - 1];
+  if(!full) return null;
+  const h = engineHours().total - hoursBeforeFill(full);
+  if(!(h >= 0)) return null;
+  // 만탱크 뒤로 더 넣은 기름도 알려 준다 — 「만탱크 뒤 8시간, 그 사이 20L 더 넣음」
+  const kf = fuelKey(full);
+  const 더 = arr.filter(f => fuelKey(f) > kf).reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
+  return { h, date: String(full.date || ''), added: 더 };
+}
+// 남은 기름으로 더 돌릴 수 있는 시간 (없으면 null)
+// ★ 사람은 리터가 아니라 **시간**으로 셈한다 — 「두 시간이면 닿는다」
+function fuelHoursLeft(){
+  const left = fuelLeft();
+  const lph = fuelLphSet() || (fuelRate() ? fuelRate().avg : null);
+  if(!left || !(lph > 0)) return null;
+  return left.left / lph;
+}
 function renderFuel(){
   const L = document.getElementById('fuelList');
   const st = fuelStats(), eh = engineHours(), rate = fuelRate(), left = fuelLeft();
@@ -37424,17 +37556,19 @@ function renderFuel(){
   const 내lph = fuelLphSet(), 내잔 = fuelMark();
   const lphShow = 내lph || (rate ? rate.avg : null);
   const 손 = on => on ? `<i class="mine">${esc(t('내가 적음'))}</i>` : '';
+  // ★ 4.120 — 배를 띄우기 전에 쓰는 수만 남겼다. 까닭은 fuelSinceFull 위의 글에 적었다.
+  const 만탱 = fuelSinceFull(), 갈시간 = fuelHoursLeft();
   const head = `<div class="statrow">
-      <div class="stat"><b>${esc(durText(eh.total) || '0분')}</b><span>${esc(t('총 가동시간'))}</span></div>
-      <div class="stat tapstat" onclick="fuelEditLph()"><b>${lphShow? lphShow.toFixed(1) : '—'}</b>
-        <span>${esc(t('L/시간'))}${손(!!내lph)}</span></div>
       <div class="stat tapstat" onclick="fuelEditLeft()"><b>${left? Math.round(left.left) : '—'}</b>
         <span>${esc(t('잔량 추정 L'))}${손(!!내잔)}</span></div>
+      <div class="stat"><b>${갈시간 != null ? durText(갈시간) : '—'}</b>
+        <span>${esc(t('더 갈 수 있는 시간'))}</span></div>
+      <div class="stat tapstat" onclick="fuelEditLph()"><b>${lphShow? lphShow.toFixed(1) : '—'}</b>
+        <span>${esc(t('L/시간'))}${손(!!내lph)}</span></div>
     </div>
     <div class="statrow">
-      <div class="stat"><b>${st.cnt}</b><span>${st.y} ${esc(t('주유'))}</span></div>
-      <div class="stat"><b>${fmtNum(st.l)}</b><span>${st.y} ${esc(t('주유량 L'))}</span></div>
-      <div class="stat"><b>${st.w? Math.round(st.w/10000)+esc(t('만')) : '—'}</b><span>${st.y} ${esc(t('연료비'))}</span></div>
+      <div class="stat"><b>${만탱 ? durText(만탱.h) : '—'}</b><span>${esc(t('만탱크 뒤 가동'))}</span></div>
+      <div class="stat"><b>${esc(durText(eh.total) || '0분')}</b><span>${esc(t('총 가동시간'))}</span></div>
     </div>
     <div class="mrnone" style="text-align:left;padding-top:0">${
       esc(t('L/시간과 잔량은 눌러서 고칠 수 있습니다.'))}</div>`;
@@ -37442,6 +37576,16 @@ function renderFuel(){
   const notes = [];
   if(eh.total > 0)
     notes.push(esc(tsub('항해 {v}h · 단독가동 {r}h', { v: eh.voyage.toFixed(1), r: eh.run.toFixed(1) })));
+  // ★ 4.120 — 만탱크 뒤에 더 넣은 기름이 있으면 밝힌다. 안 밝히면
+  //   「만탱크 뒤 8시간인데 왜 잔량이 늘었지?」 가 된다.
+  if(만탱 && 만탱.added > 0)
+    notes.push(esc(tsub('{d} 만탱크 뒤로 {L}L 를 더 넣으셨습니다.',
+      { d: 만탱.date, L: fmtNum(만탱.added) })));
+  // ★ 「1/3 은 남기고 돌아온다」 — 배 타는 사람들이 널리 쓰는 어림이다.
+  //   칸으로 만들면 자리만 먹는다. 갈 수 있는 시간이 나올 때만 한 줄로 적는다.
+  if(갈시간 != null && 갈시간 > 0)
+    notes.push(esc(tsub('1/3 을 남기려면 {h} 안에 돌아오시는 것이 좋습니다 — 뱃사람들이 쓰는 어림입니다.',
+      { h: durText(갈시간 * 2 / 3) })));
   if(내lph)
     notes.push(esc(tsub('L/시간은 {v} 로 적어 두셨습니다.', { v: 내lph.toFixed(1) }))
       + (rate ? ' ' + esc(tsub('앱이 셈한 값은 {v} 입니다.', { v: rate.avg.toFixed(1) })) : '')
@@ -37973,6 +38117,77 @@ function gearMakeFor(id, kind){
   openMR(kind, id);
 }
 // ══════════════════════════════════════════════════════════════
+// ★★★ 「할 일」 — 이 화면에서 할 수 있는 일 (4.120)
+//
+//   사장님 지적, 2026-09-09 —
+//   「어떤 게시물이나 뭐 등록할때 위에 또는 아래만 버튼이 있으면 존나 씨발
+//    위로 다시 올라가야한다던지 아래로 다시내려와야한다던지 해서 존나 빡쎄거든?
+//    이런 연제 게시글뿐만 아니라 정비수첩이나 이런것들도 좆빡쎌껄」
+//
+//   맞는 말씀이다. 긴 글을 읽다가 고치려면 끝까지 내려가야 했고, 다 고치고 나면
+//   다시 올라와야 했다. 글이 길수록 나빠지는 짜임새다.
+//
+// ★ 다른 앱들은 어떻게 하나 (찾아봤다)
+//   · 이베이 — 할 일 줄을 화면에 **붙여 둔다**(sticky). 글은 그 밑으로 흐른다.
+//   · 스매싱 매거진(UX 지침) — 붙여 두는 줄은 **다섯 개를 넘기지 말 것**,
+//     누르는 자리는 손가락에 맞게 크게 할 것. 폼에서는 자판이 화면의 60% 를 먹으니
+//     붙여 둔 줄이 방해가 된다 → **읽는 화면에만** 붙인다. (폼은 이미 아래 단추가 붙어 있다.)
+//   · 네이버·카카오·노션·미디엄 같은 글 앱 — 머리줄에 [⋯] 하나를 두고
+//     고치기·지우기를 그 안에 모은다. 자리를 안 먹고 개수도 안 탄다.
+//
+// ★ 그래서 뱃일은 — 머리줄을 붙여 두고(sticky), 할 일을 거기 모은다.
+//     하나면 그대로 단추. 여럿이면 [⋯] 하나로 모아 아래에서 올라오는 칸에 보여 준다.
+//   ★ 자리를 새로 안 먹는다 — 머리줄은 이미 있던 줄이다.
+//   ★ 「보기 전용」 일 때 고치는 일은 아예 안 보인다 (edit:true 로 적어 둔 것).
+//     — 사장님 지적 「보기 전용인데 왜 고치기 지우기가 나오냐?」
+let ACT_LIST = [];
+// 이 화면에서 할 수 있는 일을 적어 둔다. 그리는 자리마다 한 번 부르고, 돌려주는 것을 머리줄에 넣는다.
+//   [{ name:'고치기', run:()=>writeSeries(x.id), warn:true, edit:true }]
+//   edit:true — 고치는 일이다. 보기 전용일 때는 안 보인다.
+function actSet(list){
+  ACT_LIST = (list || []).filter(a =>
+    a && a.name && typeof a.run === 'function' && (!a.edit || unlocked));
+  return actHead();
+}
+function actHead(){
+  if(!ACT_LIST.length) return '';
+  // 하나뿐이면 [⋯] 뒤에 숨기지 않는다 — 한 번 누를 것을 두 번 누르게 하지 않는다.
+  if(ACT_LIST.length === 1){
+    const a = ACT_LIST[0];
+    return `<button class="tab acthead${a.warn ? ' warn' : ''}" onclick="actRun(0)">${
+      esc(t(a.name))}</button>`;
+  }
+  return `<button class="tab acthead" onclick="actOpen()">⋯</button>`;
+}
+function actOpen(){
+  if(!ACT_LIST.length) return;
+  const L = document.getElementById('actList');
+  const C = document.getElementById('actCancel');
+  if(!L) return;
+  // ★ 제목을 안 단다. 「할 일」 은 이미 **하실 일(Tasks)** 로 쓰고 있는 말이라
+  //   같은 말을 두 뜻으로 쓰면 영어·러시아말에서 반드시 어긋난다.
+  //   단추 이름만 보아도 무엇을 하는 칸인지 안다.
+  if(C) C.textContent = t('닫기');
+  L.innerHTML = ACT_LIST.map((a, i) =>
+    `<button class="${a.warn ? 'warn' : ''}" onclick="actRun(${i})">${esc(t(a.name))}</button>`).join('');
+  const ov = document.getElementById('actOv');
+  if(ov) ov.classList.add('open');
+  try{ overlayPush('actOv'); }catch(_){}
+}
+function actClose(){
+  const ov = document.getElementById('actOv');
+  if(ov) ov.classList.remove('open');
+  try{ overlayPop('actOv'); }catch(_){}
+  return true;
+}
+function actRun(i){
+  const a = ACT_LIST[i];
+  if(!a) return;
+  actClose();
+  try{ a.run(); }catch(e){}
+}
+
+// ══════════════════════════════════════════════════════════════
 // ★★ 나중에 넣은 장비에 **이미 있던 기록**을 매단다 (4.118)
 //
 //   사장님 지적, 2026-09-09 —
@@ -38238,6 +38453,21 @@ function gearTieBlock(g){
            esc(t('고른 것 매달기'))}</button></div>`;
 }
 
+// ★★★ 4.120 — 기록 창의 「할 일」 은 여기서 한 번만 정한다 (문 하나).
+//   화면마다 따로 적으면 한 화면은 반드시 빠뜨린다.
+//   edit:true 인 것은 「보기 전용」 일 때 아예 안 나온다.
+function mrActs(kind, it){
+  const a = [];
+  if(kind === 'gear' && it){
+    a.push({ name:'+ 정비수첩',  edit:true, run:() => addMlogForGear(it.id) });
+    a.push({ name:'+ 정기점검',  edit:true, run:() => addMaintForGear(it.id) });
+    a.push({ name:'+ 고장',      edit:true, run:() => addRepairForGear(it.id) });
+    a.push({ name:'+ 제품 리뷰', edit:true, run:() => addReviewForGear(it.id) });
+    if(!isRetired(it)) a.push({ name:'교체', edit:true, run:() => gearReplace() });
+  }
+  a.push({ name:'삭제', edit:true, warn:true, run:() => mrDelete() });
+  return a;
+}
 // ── 장비 상세
 function gearBody(it){
   const sys  = gearSysOf(it);
@@ -38314,12 +38544,9 @@ function gearBody(it){
         `<button class="mrbtn gbtn" onclick="openMR('review','${r.id}')">${esc(rvTitle(r))}<span class="st">${
           Number(r.stars) ? esc(rvStarText(r.stars)) : ''}</span></button>`)
     + gearTieBlock(it)
-    + `<div class="mrrow edt" style="flex-wrap:wrap;gap:6px">
-        <button class="mrbtn" onclick="addMlogForGear('${it.id}')">${esc(t('+ 정비수첩'))}</button>
-        <button class="mrbtn" onclick="addMaintForGear('${it.id}')">${esc(t('+ 정기점검'))}</button>
-        <button class="mrbtn warn" onclick="addRepairForGear('${it.id}')">${esc(t('+ 고장'))}</button>
-        <button class="mrbtn" onclick="addReviewForGear('${it.id}')">${esc(t('+ 제품 리뷰'))}</button>
-        ${isRetired(it) ? '' : `<button class="mrbtn" onclick="gearReplace()">${esc(t('교체'))}</button>`}</div>`
+    // ★ 4.120 — + 단추들은 머리줄 [⋯] 로 옮겼다 (mrActs). 여기 두면 목록을
+    //   다 지나 내려와야 눌린다 — 기록이 쌓일수록 나빠지는 짜임새다.
+    + ''
     + gearHistBlock(it)
     + hung('이 장비의 부품', pts, x => `<div class="mr gitem" onclick="gearGoItem(${x.id})">
           <div class="ct"><div class="cn">${esc(x.name||'')}</div>${
@@ -41177,7 +41404,7 @@ async function seriesHtml(){
   // 연재자면 올리는 단추, 아니면 신청하는 길. 빈자리로 두면 어떻게 끼는지 알 수 없다.
   const add = can
     ? `<div class="mrrow" style="justify-content:flex-end;padding:8px 0">
-         <button class="mrbtn ok" onclick="writeSeries()">${esc(t('+ 연재 글 올리기'))}</button></div>`
+         <button class="mrbtn ok edt" onclick="writeSeries()">${esc(t('+ 연재 글 올리기'))}</button></div>`
     : seriesApplyHtml();
   if(!rows.length){
     return add + `<div class="mrnone" style="text-align:left">${esc(t('아직 올라온 연재가 없습니다.'))}</div>`;
@@ -41312,8 +41539,13 @@ async function openSeries(id){
   if(!x) return;
   const P = document.getElementById('mrPanel');
   const tv = trView('series', x.id);
+  // ★ 4.120 — 할 일은 머리줄에 모은다. 긴 글 끝까지 내려가지 않아도 닿는다.
+  const 할일 = actSet([
+    { name:'고치기', edit:true, run:() => writeSeries(x.id) },
+    { name:'지우기', edit:true, warn:true, run:() => delSeries(x.id) }
+  ].filter(a => a.name === '고치기' ? canEditSeries(x) : canDelSeries(x)));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',x.title))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat()">${esc(t('목록'))}</button></div>
+      ${할일}<button class="tab" onclick="closeBoat()">${esc(t('목록'))}</button></div>
     <div class="postmeta">${x.no?`<span class="chip">${esc(tsub('{n}편', { n: x.no }))}</span>`:''}
       ${[esc(x.author||''), esc(x.source||''),
          x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
@@ -41324,9 +41556,6 @@ async function openSeries(id){
       ${x.link?`<div class="wxfoot"><a href="${esc(x.link)}" target="_blank" rel="noopener">${esc(x.link)}</a></div>`:''}
       <div class="wxfoot">${esc(t('저작권자 허락을 받아 옮겼습니다. 무단 전재를 금합니다.'))}</div></div>`}
     ${renderBlocks(tv ? trBlocks(seriesBody(x), tv.body) : seriesBody(x), `seriesPhotos('${esc(x.id)}')`)}
-    ${(canEditSeries(x)||canDelSeries(x))?`<div class="mrrow" style="gap:8px;justify-content:flex-end;padding:18px 0 24px">
-        ${canEditSeries(x)?`<button class="mrbtn" onclick="writeSeries('${jsq(x.id)}')">${esc(t('고치기'))}</button>`:''}
-        ${canDelSeries(x)?`<button class="mrbtn warn" onclick="delSeries('${jsq(x.id)}')">${esc(t('지우기'))}</button>`:''}</div>`:''}
     ${seriesAlso(x)}`;
   showPanel(P);
 }
@@ -41885,8 +42114,8 @@ function wxSpotRows(){
         <div class="fsub">${s2.lat!=null?s2.lat.toFixed(4)+', '+s2.lon.toFixed(4):'—'}</div>
       </div>
       <div class="fbtns">
-        <button class="minib blu" onclick="wxEditSpot('${jsq(s2.id)}')">${esc(t('고치기'))}</button>
-        <button class="minib red" onclick="wxDelSpot('${jsq(s2.id)}')">${esc(t('지우기'))}</button>
+        <button class="minib blu edt" onclick="wxEditSpot('${jsq(s2.id)}')">${esc(t('고치기'))}</button>
+        <button class="minib red edt" onclick="wxDelSpot('${jsq(s2.id)}')">${esc(t('지우기'))}</button>
       </div></div>`;
   }).join('');
 }

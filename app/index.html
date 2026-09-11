@@ -2327,7 +2327,7 @@ header{padding-top:var(--sat)}
 <input type="file" id="vphCam" accept="image/*" capture="environment" style="display:none" onchange="vphFilePick(event)">
 <input type="file" id="vphFile" accept="image/*" multiple style="display:none" onchange="vphFilePick(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
-<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="계류장">계류장</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
+<div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="계류장">계류장</button><button class="ditem" id="dCrewCv" onclick="closeDrawer();crewCvExport()" data-t="내 승선 이력">내 승선 이력</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 새로 받기">앱 새로 받기</button><div class="dver" id="dVer"></div></aside></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="내 배">내 배</span></button><button id="tabOthers" onclick="switchTab('others')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20l-2 3H4z"/><path d="M5 18v-6h9v6"/><path d="M14 12l4 6"/><path d="M9.5 12V8"/></svg><span data-t="남의 배">남의 배</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 <button id="mobFab" class="mobfab" onclick="mobMark()" aria-label="사람 빠짐"><i></i><span data-t="사람 빠짐">사람 빠짐</span></button>
 
@@ -5275,6 +5275,63 @@ const I18N = {
 
     // ── 4.17
     '뱃일 — 항해 기록 중':'Baetnil — recording your voyage',
+    '배에 들어가시면 탄 항해가 「내 승선 이력」 으로 쌓입니다.':'Once you join a boat, the passages you sail build up as your sea time record.',
+    '언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑을 수 있습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 옵니다.':'One sheet showing when you sailed, on which boat, and how many miles. You do not write it yourself: it comes straight from the boat logs.',
+    '선장':'Skipper',
+    '탄 사람':'Who was aboard',
+    '여기서 고른 사람은 자기 앱에서 「내 승선 이력」 으로 셈합니다. 명부에 없는 손님은 아래 「동승」 에 이름으로 적어 두세요.':'Anyone picked here counts it in their own app under My sea time. For guests who are not on the crew list, write their names under Crew aboard below.',
+    '내 승선 이력':'My sea time',
+    '바다에 있던 날':'Days at sea',
+    '총 항해 시간':'Total hours under way',
+    '탄 배':'Boats sailed',
+    '선장으로 나간 항해':'Passages as skipper',
+    '야간 항해':'Night passages',
+    '60해리 넘는 항해':'Passages over 60 NM',
+    '이 기록은 스스로 적은 것이 아닙니다. 배의 항해일지에서 그대로 가져온 것이고, 「탄 사람」 은 그 배에서 골라 준 것입니다.':'This record was not written by the holder. It is taken straight from the boat logs, and who was aboard was set on each boat.',
+    '야간은 출항이나 입항이 20시 뒤이거나 05시 앞인 항해를 셈한 어림입니다. 해 뜨고 지는 시각으로 셈한 것이 아닙니다.':'Night is an approximation: passages where departure or arrival falls after 20:00 or before 05:00. It is not calculated from sunset and sunrise.',
+    '자격 심사에 내실 때는 그 기관이 정한 서식을 함께 확인해 주세요.':'If you submit this for a certificate, check the form that the authority requires as well.',
+    '내 승선 이력을 뽑으려면 먼저 로그인해 주세요.':'Please sign in first to produce your sea time record.',
+    '승선 이력을 만들지 못했습니다.':'Could not build the sea time record.',
+    '아직 탄 것으로 적힌 항해가 없습니다.':'No passages list you as aboard yet.',
+    '선장님이 항해일지의 「탄 사람」 에서 골라 주시면 여기에 쌓입니다.':'Once a skipper picks you under Who was aboard in the boat log, it builds up here.',
+    '내 승선 이력을 뽑았습니다.\n\n열어서 [인쇄] 를 누르면 PDF 로 저장됩니다.':'Your sea time record is ready.\n\nOpen it and press Print to save it as a PDF.',
+    '내 승선 이력 뽑기':'Produce my sea time record',
+    '내가 언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'One sheet showing when you sailed, on which boat, and how many miles. You do not write it yourself: it is taken straight from the boat logs.',
+    '구간':'Passage',
+    '역할':'Role',
+    '야간':'Night',
+    '선장님께 참여 코드를 받아 오세요.':'Ask the skipper for the join code.',
+    '바람·돌풍·파고·물때가 이 자리 기준으로 나옵니다':'Wind, gusts, waves and tides are shown for this spot',
+    '배가 없어도 그대로 쓰실 수 있습니다':'You can use this without owning a boat',
+    '같이 탈 사람을 찾는 배들입니다':'These are boats looking for people to sail with',
+    '자리를 내놓은 배들을 볼 수 있습니다':'You can see boats with a spare berth going',
+    '선장님께 참여 코드를 받아 넣으시면 그 배의 정비수첩과 항해일지를 함께 쓰십니다':'Get the join code from the skipper, enter it, and you share the maintenance log and voyage log of that boat',
+    '배가 생기시면 그때 등록하시면 됩니다. 여기까지는 배가 없어도 다 쓰십니다.':'Register a boat when you get one. Everything up to here works without one.',
+    '탈 자리 찾아보기':'Look for a spot on a boat',
+    '타는 배에 들어가기':'Join the boat you sail on',
+    '날씨 보기':'See the weather',
+    '보러 가기':'Go and look',
+    '코드 넣기':'Enter the code',
+    '첫 걸음을 다 하셨습니다':'You have taken every first step',
+    '이제 뱃일이 이 배를 압니다.':'Baetnil knows this boat now.',
+    '다음은 나가실 때입니다 — 출항을 적으면 항적이 지도에 남습니다.':'Next comes the day you sail — log a departure and the track stays on the map.',
+    '알겠습니다':'Got it',
+    '정기점검 {n}건과 출항 전 점검 {m}건이 함께 들어와 있습니다':'{n} scheduled [[check|checks]] and {m} pre-departure [[check|checks]] came with it',
+    '{p} — 날씨와 물때가 이 자리 기준입니다':'{p} — weather and tides are shown for this spot',
+    '날씨와 물때가 이 자리 기준으로 나옵니다':'Weather and tides are shown for this spot',
+    '지도에서 한 번 찍어 주시면 됩니다':'Just tap the spot once on the map',
+    '{d}/{n} — 나갈 때마다 이 표를 쓰시면 됩니다':'{d}/{n} — use this list every time you head out',
+    '적을 것은 없습니다. 눌러서 넘기기만 하시면 됩니다':'Nothing to type. Just tap your way through',
+    '{n}건 — 다음에도 그대로 따라 하실 수 있습니다':'{n} [[entry|entries]] — next time you can follow it step by step',
+    '사진 한 장과 한 줄이면 됩니다. 지난 일이어도 좋습니다':'One photo and one line is enough. Something you did a while ago is fine',
+    '여기까지가 이 앱의 전부입니다. 나머지는 쌓이면서 저절로 됩니다.':'That is the whole app. The rest builds up on its own.',
+    '적어 두신 것이 {n}건이 되었습니다.':'You have {n} [[entry|entries]] on record now.',
+    '이제 장비·정비·수리·항해가 종이 한 장으로 나옵니다. 배를 넘길 때 그대로 드리면 됩니다.':'Your gear, maintenance, repairs and voyages now come out as a single sheet. Hand it over as is when you sell the boat.',
+    '배 매인 자리 잡기':'Set where the boat is moored',
+    '출항 전 점검 한 번 해 보기':'Run a pre-departure check once',
+    '자리 잡기':'Set the spot',
+    '이 폰의 배터리 절전에 뱃일이 들어 있습니다.':'Baetnil is on the battery saver list on this phone.',
+    '절전 목록에서 빼 두시면 화면을 꺼도 항적이 더 확실하게 남습니다. 한 번만 해 두시면 됩니다.':'Take it off that list and the track survives the screen going off more reliably. You only need to do this once.',
     '화면을 끈 {m}분 동안 위치가 한 번도 안 들어왔습니다.':'No location arrived at all during the {m} minutes the screen was off.',
     '이 폰이 뱃일을 재우고 있습니다. 그대로 두면 화면을 끌 때마다 항적이 끊깁니다.':'This phone is putting Baetnil to sleep. Left as is, the track will break every time the screen goes off.',
     '고치는 법 보기':'How to fix it',
@@ -8584,6 +8641,63 @@ const I18N = {
 
     // ── 4.17
     '뱃일 — 항해 기록 중':'Baetnil — идёт запись похода',
+    '배에 들어가시면 탄 항해가 「내 승선 이력」 으로 쌓입니다.':'Как только вы вступите на судно, пройденные переходы начнут накапливаться как ваш морской стаж.',
+    '언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑을 수 있습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 옵니다.':'Один лист: когда, на каком судне и сколько миль вы прошли. Вы не пишете это сами — данные идут прямо из судовых журналов.',
+    '선장':'Капитан',
+    '탄 사람':'Кто был на борту',
+    '여기서 고른 사람은 자기 앱에서 「내 승선 이력」 으로 셈합니다. 명부에 없는 손님은 아래 「동승」 에 이름으로 적어 두세요.':'У отмеченных здесь это засчитается в их приложении в разделе Мой стаж. Гостей, которых нет в списке экипажа, впишите ниже в поле Экипаж на борту.',
+    '내 승선 이력':'Мой морской стаж',
+    '바다에 있던 날':'Дней в море',
+    '총 항해 시간':'Всего часов в пути',
+    '탄 배':'Судов',
+    '선장으로 나간 항해':'Выходов капитаном',
+    '야간 항해':'Ночных переходов',
+    '60해리 넘는 항해':'Переходов свыше 60 миль',
+    '이 기록은 스스로 적은 것이 아닙니다. 배의 항해일지에서 그대로 가져온 것이고, 「탄 사람」 은 그 배에서 골라 준 것입니다.':'Эта запись составлена не владельцем стажа. Она взята напрямую из судовых журналов, а состав на борту отмечался на самом судне.',
+    '야간은 출항이나 입항이 20시 뒤이거나 05시 앞인 항해를 셈한 어림입니다. 해 뜨고 지는 시각으로 셈한 것이 아닙니다.':'Ночь считается приблизительно: переходы, где отход или приход приходится после 20:00 либо до 05:00. Это не расчёт по заходу и восходу солнца.',
+    '자격 심사에 내실 때는 그 기관이 정한 서식을 함께 확인해 주세요.':'Если подаёте это для получения квалификации, сверьтесь также с формой, которую требует ведомство.',
+    '내 승선 이력을 뽑으려면 먼저 로그인해 주세요.':'Чтобы получить справку о стаже, сначала войдите в аккаунт.',
+    '승선 이력을 만들지 못했습니다.':'Не удалось составить справку о стаже.',
+    '아직 탄 것으로 적힌 항해가 없습니다.':'Пока нет переходов, где вы отмечены на борту.',
+    '선장님이 항해일지의 「탄 사람」 에서 골라 주시면 여기에 쌓입니다.':'Как только капитан отметит вас в судовом журнале в разделе Кто был на борту, записи начнут накапливаться здесь.',
+    '내 승선 이력을 뽑았습니다.\n\n열어서 [인쇄] 를 누르면 PDF 로 저장됩니다.':'Справка о стаже готова.\n\nОткройте её и нажмите Печать, чтобы сохранить в PDF.',
+    '내 승선 이력 뽑기':'Получить справку о стаже',
+    '내가 언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'Один лист: когда, на каком судне и сколько миль вы прошли. Вы не пишете это сами — данные берутся прямо из судовых журналов.',
+    '구간':'Переход',
+    '역할':'Роль',
+    '야간':'Ночь',
+    '선장님께 참여 코드를 받아 오세요.':'Попросите у капитана код для вступления.',
+    '바람·돌풍·파고·물때가 이 자리 기준으로 나옵니다':'Ветер, порывы, волна и приливы показываются для этого места',
+    '배가 없어도 그대로 쓰실 수 있습니다':'Этим можно пользоваться и без своего судна',
+    '같이 탈 사람을 찾는 배들입니다':'Это суда, которые ищут людей для выхода',
+    '자리를 내놓은 배들을 볼 수 있습니다':'Можно посмотреть суда со свободным местом',
+    '선장님께 참여 코드를 받아 넣으시면 그 배의 정비수첩과 항해일지를 함께 쓰십니다':'Получите код у капитана, введите его — и вы вместе ведёте журнал обслуживания и судовой журнал этого судна',
+    '배가 생기시면 그때 등록하시면 됩니다. 여기까지는 배가 없어도 다 쓰십니다.':'Появится судно — тогда и зарегистрируете. Всё до этого работает и без него.',
+    '탈 자리 찾아보기':'Найти место на судне',
+    '타는 배에 들어가기':'Вступить на судно, где вы ходите',
+    '날씨 보기':'Посмотреть погоду',
+    '보러 가기':'Перейти и посмотреть',
+    '코드 넣기':'Ввести код',
+    '첫 걸음을 다 하셨습니다':'Вы прошли все первые шаги',
+    '이제 뱃일이 이 배를 압니다.':'Теперь Baetnil знает это судно.',
+    '다음은 나가실 때입니다 — 출항을 적으면 항적이 지도에 남습니다.':'Дальше — выход в море: отметьте отход, и трек останется на карте.',
+    '알겠습니다':'Понятно',
+    '정기점검 {n}건과 출항 전 점검 {m}건이 함께 들어와 있습니다':'Вместе с ним добавлено {n} [[пункт|пункта|пунктов]] обслуживания и {m} [[пункт|пункта|пунктов]] проверки перед выходом',
+    '{p} — 날씨와 물때가 이 자리 기준입니다':'{p} — погода и приливы показываются для этого места',
+    '날씨와 물때가 이 자리 기준으로 나옵니다':'Погода и приливы показываются для этого места',
+    '지도에서 한 번 찍어 주시면 됩니다':'Достаточно один раз отметить точку на карте',
+    '{d}/{n} — 나갈 때마다 이 표를 쓰시면 됩니다':'{d}/{n} — пользуйтесь этим списком перед каждым выходом',
+    '적을 것은 없습니다. 눌러서 넘기기만 하시면 됩니다':'Писать ничего не нужно — просто отмечайте пункты',
+    '{n}건 — 다음에도 그대로 따라 하실 수 있습니다':'{n} [[запись|записи|записей]] — в следующий раз можно повторить шаг за шагом',
+    '사진 한 장과 한 줄이면 됩니다. 지난 일이어도 좋습니다':'Хватит одного фото и одной строки. Подойдёт и то, что делали давно',
+    '여기까지가 이 앱의 전부입니다. 나머지는 쌓이면서 저절로 됩니다.':'Это и есть всё приложение. Остальное набирается само.',
+    '적어 두신 것이 {n}건이 되었습니다.':'У вас уже {n} [[запись|записи|записей]].',
+    '이제 장비·정비·수리·항해가 종이 한 장으로 나옵니다. 배를 넘길 때 그대로 드리면 됩니다.':'Теперь оборудование, обслуживание, ремонты и походы выходят одним листом. При продаже судна передайте его как есть.',
+    '배 매인 자리 잡기':'Отметить стоянку судна',
+    '출항 전 점검 한 번 해 보기':'Пройти проверку перед выходом',
+    '자리 잡기':'Отметить место',
+    '이 폰의 배터리 절전에 뱃일이 들어 있습니다.':'Baetnil в списке энергосбережения этого телефона.',
+    '절전 목록에서 빼 두시면 화면을 꺼도 항적이 더 확실하게 남습니다. 한 번만 해 두시면 됩니다.':'Уберите его из этого списка — и трек надёжнее сохранится при выключенном экране. Достаточно сделать один раз.',
     '화면을 끈 {m}분 동안 위치가 한 번도 안 들어왔습니다.':'За {m} мин. с выключенным экраном не пришло ни одной точки.',
     '이 폰이 뱃일을 재우고 있습니다. 그대로 두면 화면을 끌 때마다 항적이 끊깁니다.':'Этот телефон усыпляет Baetnil. Если оставить так, трек будет обрываться каждый раз при выключении экрана.',
     '고치는 법 보기':'Как это исправить',
@@ -11834,6 +11948,63 @@ const I18N = {
     '지금은 위치정보 수집에 동의하신 상태입니다.':'現在は位置情報の収集に同意されている状態です。',
     '나중에 「지금 여기」 를 누르시면 그 자리에서 다시 여쭙습니다.':'後で「現在地」を押されたときに、その場で改めてお伺いします。',
     '뱃일 — 항해 기록 중':'Baetnil — 航海記録中',
+    '배에 들어가시면 탄 항해가 「내 승선 이력」 으로 쌓입니다.':'船に入ると、乗った航海が「乗船履歴」として溜まっていきます。',
+    '언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑을 수 있습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 옵니다.':'いつ・どの船で・何海里行ったかを一枚で出せます。自分で書くのではなく、船の航海日誌からそのまま来ます。',
+    '선장':'船長',
+    '탄 사람':'乗っていた人',
+    '여기서 고른 사람은 자기 앱에서 「내 승선 이력」 으로 셈합니다. 명부에 없는 손님은 아래 「동승」 에 이름으로 적어 두세요.':'ここで選んだ人は、自分のアプリの「乗船履歴」に数えられます。名簿にないお客さんは、下の「同乗」に名前で書いておいてください。',
+    '내 승선 이력':'乗船履歴',
+    '바다에 있던 날':'海に出た日数',
+    '총 항해 시간':'航海時間の合計',
+    '탄 배':'乗った船',
+    '선장으로 나간 항해':'船長として出た航海',
+    '야간 항해':'夜間航海',
+    '60해리 넘는 항해':'60海里を超える航海',
+    '이 기록은 스스로 적은 것이 아닙니다. 배의 항해일지에서 그대로 가져온 것이고, 「탄 사람」 은 그 배에서 골라 준 것입니다.':'この記録は本人が書いたものではありません。船の航海日誌からそのまま取ったもので、乗っていた人は船の側で選ばれたものです。',
+    '야간은 출항이나 입항이 20시 뒤이거나 05시 앞인 항해를 셈한 어림입니다. 해 뜨고 지는 시각으로 셈한 것이 아닙니다.':'夜間は、出港または入港が20時以降か5時より前の航海を数えた目安です。日の出・日の入り時刻で計算したものではありません。',
+    '자격 심사에 내실 때는 그 기관이 정한 서식을 함께 확인해 주세요.':'資格審査に出すときは、その機関が定める様式もあわせてご確認ください。',
+    '내 승선 이력을 뽑으려면 먼저 로그인해 주세요.':'乗船履歴を出すには、まずログインしてください。',
+    '승선 이력을 만들지 못했습니다.':'乗船履歴を作れませんでした。',
+    '아직 탄 것으로 적힌 항해가 없습니다.':'まだ乗ったと記録された航海がありません。',
+    '선장님이 항해일지의 「탄 사람」 에서 골라 주시면 여기에 쌓입니다.':'船長さんが航海日誌の「乗っていた人」で選んでくださると、ここに溜まっていきます。',
+    '내 승선 이력을 뽑았습니다.\n\n열어서 [인쇄] 를 누르면 PDF 로 저장됩니다.':'乗船履歴を出しました。\n\n開いて[印刷]を押すとPDFで保存できます。',
+    '내 승선 이력 뽑기':'乗船履歴を出す',
+    '내가 언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'いつ・どの船で・何海里行ったかを一枚にまとめます。自分で書くのではなく、船の航海日誌からそのまま取ってきます。',
+    '구간':'区間',
+    '역할':'役割',
+    '야간':'夜間',
+    '선장님께 참여 코드를 받아 오세요.':'船長さんに参加コードをもらってください。',
+    '바람·돌풍·파고·물때가 이 자리 기준으로 나옵니다':'風・突風・波高・潮がこの場所を基準に表示されます',
+    '배가 없어도 그대로 쓰실 수 있습니다':'船がなくてもそのまま使えます',
+    '같이 탈 사람을 찾는 배들입니다':'一緒に乗る人を探している船です',
+    '자리를 내놓은 배들을 볼 수 있습니다':'空きのある船を見ることができます',
+    '선장님께 참여 코드를 받아 넣으시면 그 배의 정비수첩과 항해일지를 함께 쓰십니다':'船長さんに参加コードをもらって入れると、その船の整備手帳と航海日誌を一緒に使えます',
+    '배가 생기시면 그때 등록하시면 됩니다. 여기까지는 배가 없어도 다 쓰십니다.':'船ができたらそのとき登録すれば大丈夫です。ここまでは船がなくても全部使えます。',
+    '탈 자리 찾아보기':'乗る席を探してみる',
+    '타는 배에 들어가기':'乗っている船に入る',
+    '날씨 보기':'天気を見る',
+    '보러 가기':'見に行く',
+    '코드 넣기':'コードを入れる',
+    '첫 걸음을 다 하셨습니다':'最初の一歩をすべて終えました',
+    '이제 뱃일이 이 배를 압니다.':'これでBaetnilがこの船を知りました。',
+    '다음은 나가실 때입니다 — 출항을 적으면 항적이 지도에 남습니다.':'次は出港のときです — 出港を記録すると航跡が地図に残ります。',
+    '알겠습니다':'わかりました',
+    '정기점검 {n}건과 출항 전 점검 {m}건이 함께 들어와 있습니다':'定期点検{n}件と発航前検査{m}件が一緒に入っています',
+    '{p} — 날씨와 물때가 이 자리 기준입니다':'{p} — 天気と潮はこの場所を基準に表示されます',
+    '날씨와 물때가 이 자리 기준으로 나옵니다':'天気と潮はこの場所を基準に表示されます',
+    '지도에서 한 번 찍어 주시면 됩니다':'地図で一度タップするだけです',
+    '{d}/{n} — 나갈 때마다 이 표를 쓰시면 됩니다':'{d}/{n} — 出るたびにこの表を使ってください',
+    '적을 것은 없습니다. 눌러서 넘기기만 하시면 됩니다':'書くことはありません。タップして進むだけです',
+    '{n}건 — 다음에도 그대로 따라 하실 수 있습니다':'{n}件 — 次も同じようにたどれます',
+    '사진 한 장과 한 줄이면 됩니다. 지난 일이어도 좋습니다':'写真一枚と一行で十分です。前にやったことでもかまいません',
+    '여기까지가 이 앱의 전부입니다. 나머지는 쌓이면서 저절로 됩니다.':'ここまででこのアプリの全部です。あとは溜まるにつれて自然にできます。',
+    '적어 두신 것이 {n}건이 되었습니다.':'記録が{n}件になりました。',
+    '이제 장비·정비·수리·항해가 종이 한 장으로 나옵니다. 배를 넘길 때 그대로 드리면 됩니다.':'これで装備・整備・修理・航海が紙一枚になります。船を譲るときにそのまま渡せます。',
+    '배 매인 자리 잡기':'係留場所を決める',
+    '출항 전 점검 한 번 해 보기':'発航前検査を一度やってみる',
+    '자리 잡기':'場所を決める',
+    '이 폰의 배터리 절전에 뱃일이 들어 있습니다.':'このスマホの省電力リストにBaetnilが入っています。',
+    '절전 목록에서 빼 두시면 화면을 꺼도 항적이 더 확실하게 남습니다. 한 번만 해 두시면 됩니다.':'そのリストから外しておくと、画面を消しても航跡がより確実に残ります。一度だけで済みます。',
     '화면을 끈 {m}분 동안 위치가 한 번도 안 들어왔습니다.':'画面を消していた{m}分の間、位置が一度も届きませんでした。',
     '이 폰이 뱃일을 재우고 있습니다. 그대로 두면 화면을 끌 때마다 항적이 끊깁니다.':'このスマホがBaetnilをスリープさせています。このままだと画面を消すたびに航跡が途切れます。',
     '고치는 법 보기':'直し方を見る',
@@ -15723,6 +15894,45 @@ function bgGeo(){
   try{ return (window.Capacitor && window.Capacitor.Plugins
                && window.Capacitor.Plugins.BackgroundGeolocation) || null; }catch(e){ return null; }
 }
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.125 — 기록하는 동안 CPU 를 깨워 둔다 (사장님 지적, 2026-09-10)
+//   「그럼 단순히 항적 끊기면 귀찮게 유저한테 알림이나 보내고 끝낸다는 뜻인가?」
+//
+//   ★ 맞는 지적이었다. 4.124 는 **재기만** 했지 고치지 않았다.
+//     그래서 부품 소스를 열어 보고 진짜 까닭을 찾았다 —
+//
+//     @capacitor-community/background-geolocation 1.2.26 은
+//     ① 웨이크락을 **하나도 안 잡는다** (BackgroundGeolocationService.java)
+//     ② 받은 자리를 **쌓아 두지 않는다** — 곧바로 웹뷰의 자바스크립트로 넘긴다
+//
+//     그래서 화면을 끄면 안드로이드가 웹뷰의 자바스크립트를 얼리고,
+//     **전경 서비스는 살아 있는데도** 넘겨받을 쪽이 자고 있어서 그 자리들이 버려진다.
+//     알림이 떠 있어도 그렇다. 사장님 항적 14:10~14:30 이 이것이다.
+//
+//   ★ 달리기 기록 앱(스트라바·OsmAnd)이 다 하는 그대로 한다 — PARTIAL_WAKE_LOCK.
+//     화면은 그대로 꺼져 있고 CPU 만 깨어 있다.
+//   ★ 값은 배터리다. 그래서 **출항부터 입항까지만** 잡고 바로 놓는다 (trkStop).
+function wakeP(){
+  try{ return (window.Capacitor && window.Capacitor.Plugins
+               && window.Capacitor.Plugins.BaetnilWake) || null; }catch(e){ return null; }
+}
+async function trkAwakeOn(){
+  const W = wakeP(); if(!W) return false;
+  try{ const r = await W.keepAwake(); return !!(r && r.held); }catch(_){ return false; }
+}
+async function trkAwakeOff(){
+  const W = wakeP(); if(!W) return;
+  try{ await W.letSleep(); }catch(_){}
+}
+// 이 폰이 배터리 절전에서 빠져 있나 — 못 물어보는 폰에서는 「그렇다」 로 본다(겁주지 않는다)
+async function trkBatteryFree(){
+  const W = wakeP(); if(!W) return true;
+  try{ const r = await W.batteryFree(); return !(r && r.free === false); }catch(_){ return true; }
+}
+async function trkOpenBattery(){
+  const W = wakeP(); if(!W) return false;
+  try{ await W.openBattery(); return true; }catch(_){ return false; }
+}
 // ★ 앱이 죽어도 기록 중이던 것이 남아야 한다. 배 위에서 앱이 한 번 꺼지면
 //   그 항해 항적을 통째로 잃는다.
 function trkKeep(){
@@ -16294,9 +16504,26 @@ async function trkStart(vid){
     return '위치를 받지 못했습니다. 폰의 위치 기능이 켜져 있는지 확인해 주세요.';
   }
   mobFabSync();
+  // ★★★ 4.125 — 여기서 CPU 를 깨워 둔다. 이것이 화면을 꺼도 기록이 이어지게 하는 **그것**이다.
+  //   못 잡아도 막지 않는다 — 옛 판 앱(부품 없는 판)에서도 기록은 되어야 한다.
+  try{ await trkAwakeOn(); }catch(_){}
   trkWatchStart();                            // ★ 4.117 — 위치가 끊기면 화면에 밝힌다
   try{ setSync(t('항적 기록을 시작했습니다')); }catch(e){}
+  // ★ 배터리 절전은 **나가기 전에** 짚어 준다. 다녀와서 아는 것은 이미 늦다.
+  try{ trkBatteryAsk(); }catch(_){}
   return '';
+}
+// ★ 절전에 걸려 있으면 딱 한 번, 나가기 전에 묻는다. 걸려 있지 않으면 아무 말도 안 한다.
+//   ★ 웨이크락을 잡고 있으면 절전은 두 번째 문제다 — 그래서 이것은 「경고」 가 아니라 「한 번의 권유」다.
+const TRK_BAT_ASKED = 'bt_batasked';
+async function trkBatteryAsk(){
+  try{ if(localStorage.getItem(TRK_BAT_ASKED) === 'done') return; }catch(_){}
+  if(await trkBatteryFree()) return;                    // 이미 빠져 있다 — 조용히 둔다
+  try{ localStorage.setItem(TRK_BAT_ASKED, 'done'); }catch(_){}
+  const yes = await ask(t('이 폰의 배터리 절전에 뱃일이 들어 있습니다.') + '\n\n'
+    + t('절전 목록에서 빼 두시면 화면을 꺼도 항적이 더 확실하게 남습니다. 한 번만 해 두시면 됩니다.'),
+    { ok: t('설정 열기'), cancel: t('나중에') });
+  if(yes) trkOpenBattery();
 }
 // 켜고, 안 되면 왜 안 되는지 말한다. 부르는 자리는 전부 이것을 쓴다 — 문 하나.
 async function trkStartSay(vid, quiet){
@@ -16314,6 +16541,9 @@ async function trkStopSay(){
 
 async function trkStop(){
   const cur = trkNow;
+  // ★★★ 4.125 — 놓는 것을 잊으면 배터리를 항해가 끝난 뒤에도 계속 먹는다.
+  //   켜는 자리는 하나(trkStart), 놓는 자리도 하나(여기)다.
+  try{ await trkAwakeOff(); }catch(_){}
   trkWatchStop();                              // ★ 4.117
   trkNow = null; trkKeep(); mobFabSync(); trkSmoothReset();
   if(!cur) return null;
@@ -16349,6 +16579,8 @@ function trkResume(){
   trkNow.id = null;
   trkSmoothReset();
   trkAttach();
+  // ★ 앱이 한 번 죽었다 살아나면 웨이크락도 같이 풀려 있다. 다시 잡는다.
+  try{ trkAwakeOn(); }catch(_){}
 }
 
 // ★ 위치를 읽는 단 하나의 문.
@@ -17192,6 +17424,84 @@ function tripKindRow(it){
             esc(tsub('출발항에서 {n}해리를 넘습니다. 원거리 수상레저활동 신고 대상입니다 (해양경찰서).',
                      { n: TRIP_FAR_NM }))}</div>`
         : '');
+}
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.126 — 「탄 사람」 과 「선장」 을 명부에서 고른다 (사장님 지적, 2026-09-10)
+//   「크루원한테도 뭔가 있어야 될 것 같긴 하다」
+//
+// ★ 왜 이름 칸(동승)만으로는 안 되나
+//   동승 칸은 글자다. 「철수, 영희」 라고 적어 두면 그 철수가 이 앱의 누구인지 앱은 모른다.
+//   그래서 크루 쪽에서 「내가 몇 번 탔나」 를 셀 수가 없었다.
+//   ★ 명부에서 고르면 uid 가 붙는다. 그때부터 그 사람 앱이 스스로 셀 수 있다.
+//
+// ★ 왜 이것이 값이 있나 — 찾아본 것
+//   · RYA 개인 항해일지(영국)는 자격 심사에 쓰인다. 요건이 숫자로 못 박혀 있다 —
+//     요트마스터 오프쇼어: 50일 · 2,500해리 · 60해리 넘는 항해 5회(그중 야간 2회·선장 2회).
+//     ★ 그리고 규칙 하나가 제일 무겁다 — **「선장이 모든 줄에 서명한다」.**
+//       서명 없는 줄은 심사에서 값이 거의 없고, 나중에 몰아서 받은 서명은 의심을 산다.
+//   · 한국도 같은 결이다. 소형선박조종사 면허는 2톤 이상 배에서 2년 운항경력을 요구하고,
+//     그 경력은 배 임자가 확인해 주는 서류로 증명한다.
+//
+// ★★★ 이 앱의 자리 — **서명이 구조로 이미 되어 있다.**
+//   항해일지를 적는 사람은 그 배 사람이고, 크루는 그 배의 명부에 든 사람이다.
+//   그러니 크루의 승선 기록은 **크루가 적은 것이 아니라 배가 적은 것**이다.
+//   혼자 쓰는 항해 기록 앱은 이것을 못 한다. 여기서만 되는 것이다.
+//   ★ 그래서 크루가 스스로 「탔다」 고 적어 넣는 길은 안 만든다. 만들면 그 순간 값이 없어진다.
+function boatCrewList(b){
+  const nm = (b && b.memberNames) || {};
+  return Object.keys((b && b.members) || {}).map(uid => ({
+    uid, name: nm[uid] || t('이름 미등록'),
+    rank: (rankOf(b, b.members[uid]) || {}).name || ''
+  })).sort((a, c) => String(a.name).localeCompare(String(c.name), 'ko'));
+}
+// 이 항해에 탄 것으로 적힌 사람들 (uid 목록)
+function voyCrewIds(v){ return Array.isArray(v && v.crewIds) ? v.crewIds.map(String) : []; }
+// 이 항해의 선장 (안 고르면 배 임자)
+function voySkipper(v, b){
+  const s = v && v.skipper;
+  if(s) return String(s);
+  const own = Object.keys((b && b.members) || {})
+    .find(uid => { const r = rankOf(b, b.members[uid]); return r && r.owner; });
+  return own || '';
+}
+function voyCrewSet(vid, uid, on){
+  const it = getMR('voyage', vid); if(!it || !unlocked) return;
+  const a = voyCrewIds(it).filter(x => x !== String(uid));
+  if(on) a.push(String(uid));
+  it.crewIds = a;
+  saveMR();
+  try{ schedulePush(); }catch(_){}
+  openMR('voyage', vid);
+}
+function voySkipperSet(vid, uid){
+  const it = getMR('voyage', vid); if(!it || !unlocked) return;
+  it.skipper = String(uid || '');
+  saveMR();
+  try{ schedulePush(); }catch(_){}
+  openMR('voyage', vid);
+}
+function crewPickRow(it){
+  const b = curBoat();
+  const list = boatCrewList(b);
+  // 혼자 쓰는 배에는 이 줄을 안 낸다 — 고를 사람이 나뿐이면 묻는 것이 성가시다.
+  if(list.length < 2) return '';
+  const 탄사람 = voyCrewIds(it);
+  const 선장 = voySkipper(it, b);
+  const 줄 = `<div class="mrrow"><span class="mrlbl">${esc(t('선장'))}</span>${unlocked
+      ? `<select style="flex:1" onchange="voySkipperSet('${jsq(String(it.id))}', this.value)">${
+          list.map(m => `<option value="${esc(m.uid)}"${선장 === m.uid ? ' selected' : ''}>${
+            esc(m.name)}</option>`).join('')}</select>`
+      : `<b class="mrv">${esc((list.find(m => m.uid === 선장) || {}).name || '—')}</b>`}</div>`;
+  return 줄
+    + `<div class="mrrow"><span class="mrlbl">${esc(t('탄 사람'))}</span></div>`
+    + list.map(m => `<label class="gtierow mrrow">
+         <input type="checkbox" class="gtie"${탄사람.indexOf(m.uid) >= 0 ? ' checked' : ''}${
+           unlocked ? '' : ' disabled'}
+           onchange="voyCrewSet('${jsq(String(it.id))}','${jsq(m.uid)}', this.checked)">
+         <b class="mrv" style="flex:1">${esc(m.name)}</b>${
+         m.rank ? `<span class="chip">${esc(t(m.rank))}</span>` : ''}</label>`).join('')
+    + `<div class="mrm" style="padding:0 14px 8px;color:#7b8794">${
+        esc(t('여기서 고른 사람은 자기 앱에서 「내 승선 이력」 으로 셈합니다. 명부에 없는 손님은 아래 「동승」 에 이름으로 적어 두세요.'))}</div>`;
 }
 // ── 위치 공개 단계 줄
 //   ★ 이 기능의 급소. 낚시하는 사람은 자리를 안 알려 준다.
@@ -23333,7 +23643,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.124';
+const APP_VER = '4.127';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26706,22 +27016,62 @@ function introLines(list){
 //   ★ ③ 이 「첫 값」 이다 — 적은 것이 종이 한 장이 되어 나오는 순간.
 //     여기까지 오면 「왜 적어야 하나」 에 앱이 스스로 답한 것이다.
 // ★ 다 하면 사라진다. 그만 보겠다면 그때도 사라진다. 계속 따라다니지 않는다.
-const START_KEY = 'bt_start';
-const START_CV  = 'bt_cvdone';
+const START_KEY  = 'bt_start';
+const START_CV   = 'bt_cvdone';
+const START_MARK = 'bt_startmark';   // 한 번 한 것은 한 것이다 (점검은 주기마다 지워지므로)
+const START_END  = 'bt_startend';    // 마무리 말을 한 번 했다
+function startMark(k){
+  try{ const o = JSON.parse(localStorage.getItem(START_MARK) || '{}');
+       if(o[k]) return; o[k] = 1; localStorage.setItem(START_MARK, JSON.stringify(o)); }catch(_){}
+}
+function startMarked(k){
+  try{ return !!JSON.parse(localStorage.getItem(START_MARK) || '{}')[k]; }catch(_){ return false; }
+}
 function startState(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   const 배 = !!b;
-  let 정비 = false, 이력 = false;
+  const 자리 = !!(b && b.lat != null && b.lon != null);
+  let 정기N = 0, 점검N = 0, 점검한N = 0, 정비N = 0;
+  try{ 정기N = maintRows().length; }catch(_){}
   try{
-    정비 = (mlogRows().length > 0)
-        || maintRows().some(m => m && (m.lastDate || (m.history || []).length));
+    const ls = ckLists();
+    const cur = ls.find(x => String(x.id) === String(ckCurId() || '')) || ls[0];
+    if(cur){
+      const its = ckItems(cur.id);
+      const done = ckDone(cur.id, cur.cycle) || [];
+      점검N   = its.length;
+      점검한N = its.filter(x => done.indexOf(String(x.id)) >= 0).length;
+    }
   }catch(_){}
-  try{ 이력 = localStorage.getItem(START_CV) === '1'; }catch(_){}
-  return { 배, 정비, 이력, n: [배, 정비, 이력].filter(Boolean).length };
+  try{
+    정비N = mlogRows().length
+      + maintRows().filter(m => m && (m.lastDate || (m.history || []).length)).length;
+  }catch(_){}
+  // ★ 한 번 해 본 것은 그대로 한 것으로 둔다.
+  //   점검은 주기가 돌면 체크가 지워진다. 그때 걸음이 되돌아가면 사람은 「내가 뭘 잘못했나」 한다.
+  if(자리)      startMark('port');
+  if(점검한N > 0) startMark('ck');
+  if(정비N > 0)  startMark('mlog');
+  const 점검 = startMarked('ck'), 정비 = startMarked('mlog');
+  const 자리다 = 자리 || startMarked('port');
+  return { 배, 자리:자리다, 점검, 정비, 정기N, 점검N, 점검한N, 정비N,
+           항구: (b && b.port) || '',
+           n: [배, 자리다, 점검, 정비].filter(Boolean).length };
 }
 function startSkip(){
   try{ localStorage.setItem(START_KEY, 'hide'); }catch(_){}
   try{ renderHome(); }catch(_){}
+}
+function startEndClose(){
+  try{ localStorage.setItem(START_END, 'done'); }catch(_){}
+  try{ renderHome(); }catch(_){}
+}
+function startGoPort(){
+  if(!unlocked){ tell(t('먼저 오른쪽 위 [보기 전용] 을 [편집 중] 으로 바꿔 주세요.')); return; }
+  try{ openPortPick(); }catch(_){}
+}
+function startGoCheck(){
+  try{ switchTab('home'); setHomeSub('check'); }catch(_){}
 }
 function startGoMlog(){
   if(!unlocked){ tell(t('먼저 오른쪽 위 [보기 전용] 을 [편집 중] 으로 바꿔 주세요.')); return; }
@@ -26731,28 +27081,198 @@ function startGoMlog(){
 function startGoDocs(){
   try{ docSub = 'docs'; setBoatSubTab('docs'); }catch(_){}
 }
-// 첫 화면 맨 위에 붙는 칸. 배가 있고, 아직 다 안 했고, 그만 보겠다고 안 했을 때만.
-function startCard(){
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.125 — 첫 걸음을 다시 짰다 (사장님 지적, 2026-09-10)
+//
+//   「마지막 3단계가 이력서 뽑기인데 이거 너무 이른 거 아니냐?
+//    아무런 정보도 아직 입력 안 시켰는데 바로 이력서를 뽑게 만든다고?
+//    뭔가 한 단계 한 단계 끝날 때마다 사용자가 그걸 하고 나서
+//    성취감을 느끼는 걸 유도하는 게 좋을 텐데」
+//
+// ★ 맞는 지적이었다. 세 걸음의 마지막 보상이 **빈 종이**였다.
+//   배 이력서는 쌓인 것이 있어야 값이 나오는 것인데, 첫날에는 쌓인 것이 없다.
+//   게다가 배 이력서는 「배를 넘길 때 쓰는 것」 이라 첫날 사람에게는 쓸 데가 없다.
+//
+// ★ 다른 앱들은 어떻게 하나 (찾아보고 그대로 따랐다)
+//   · **이미 채워 두고 시작한다** — 아사나는 빈 화면 대신 짜여 있는 본보기를 준다.
+//     빈 화면은 사람이 떠나는 자리다. 채워 두면 그 자리가 출발선이 된다.
+//   · **먼저 온 걸음은 이미 체크되어 있게 둔다**(endowed progress) — 「이미 하나 했다」 는
+//     느낌이 나머지를 끝내게 만든다. 빈 칸 셋보다 채워진 칸 하나가 세다.
+//   · 걸음마다 **눈에 보이는 결과**가 있어야 한다.
+//
+// ★ 그런데 이 앱은 **이미 채워 두고 시작하고 있었다.** 아무도 그걸 말해 주지 않았을 뿐이다 —
+//   배를 등록하는 순간 선종에 맞는 정기점검 16건과 출항 전 점검 10건이 깔린다(maintDefaults·checkDefaults).
+//   그래서 첫 걸음의 첫 줄이 그것을 **알려 주는 자리**가 된다. 사람이 한 일이 아니라
+//   앱이 해 둔 일을 보여 주는 것 — 그것이 이 앱이 무엇을 하는 곳인지 한 줄로 말해 준다.
+//
+// ★ 그래서 걸음은 넷이고, **다 선착장에 앉아서 십 분 안에 되는 것**만 남겼다.
+//   ① 배 등록 (이미 끝나 있다)   ② 배 매인 자리 잡기   ③ 출항 전 점검 한 번   ④ 정비 한 건
+//   ★ 값이 싼 것부터다. ②는 지도 한 번 찍기, ③은 누르기만, ④에서 처음으로 글을 쓴다.
+//   ★ 걸음이 끝난 줄은 ✓ 만 남기지 않는다. **그 사람의 숫자**를 적는다 —
+//     「10/10」·「정비 1건」. 그것이 성취다. 체크표시는 성취가 아니다.
+//   ★ 배 이력서는 걸음에서 뺐다. 쌓인 것이 셋을 넘으면 그때 따로 권한다(cvOfferCard).
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.125 — **배가 없는 사람**의 첫 걸음 (사장님 지적, 2026-09-10)
+//   「배를 가진 사람들은 되는데 배가 없는 사람들은 어떡하지? 그냥 크루들 있잖아」
+//
+// ★ 맞는 지적이었다. 첫 걸음은 배가 있어야만 떴다. 크루는 「배 등록하기」 만 보고 만다.
+//   그런데 이 앱에서 크루가 할 수 있는 일이 이미 셋이나 있다 —
+//     · 지금 있는 곳 바람·물때 보기        (배가 없어도 그대로 쓴다)
+//     · 「같이 타기」 에서 탈 자리 찾기      (배 둘러보기 안에 있다)
+//     · 참여 코드로 타는 배에 들어가기      (들어가면 그 배 기록을 함께 쓴다)
+//   아무도 그 셋을 알려 주지 않았을 뿐이다.
+//
+// ★ 걸음이 셋인 까닭 — 크루는 등록할 배가 없으므로 「이미 끝난 첫 걸음」 을 만들 수 없다.
+//   대신 제일 싼 것(날씨 자리)을 맨 앞에 둔다. 누르면 바로 화면이 채워진다.
+// ★ 배에 들어가는 순간 이 칸은 사라지고 배 가진 사람의 걸음으로 바뀐다 — 저절로 그렇게 된다.
+//
+// ★ 아직 없는 것 (사장님께 여쭐 것) — 크루의 「배 이력서」 에 해당하는 것,
+//   곧 **내가 몇 번 어디를 탔나(승선 이력)** 가 이 앱에 없다.
+//   크루에게는 그것이 남는 것이다. 만들지 안 만들지는 사장님이 정하실 일이라 여기서는 안 지었다.
+const CREW_MARK = 'bt_crewmark';
+function crewMark(k){
+  try{ const o = JSON.parse(localStorage.getItem(CREW_MARK) || '{}');
+       if(o[k]) return; o[k] = 1; localStorage.setItem(CREW_MARK, JSON.stringify(o)); }catch(_){}
+}
+function crewMarked(k){
+  try{ return !!JSON.parse(localStorage.getItem(CREW_MARK) || '{}')[k]; }catch(_){ return false; }
+}
+function crewGoRide(){
+  crewMark('ride');
+  // ★ 「같이 타기」 는 글판의 말머리 하나다(TALK_KINDS 의 ride). 따로 있는 화면이 아니다.
+  //   그래서 글판을 열고 그 말머리만 걸러 준다 — 크루가 스스로 찾아 들어가지 않아도 되게.
+  try{ switchTab('community'); setComSub('talk'); }catch(_){}
+  try{ setTalkKind('ride'); }catch(_){}
+}
+function crewGoJoin(){
+  try{ joinByCode(); }catch(_){ try{ tell(t('선장님께 참여 코드를 받아 오세요.')); }catch(__){} }
+}
+function crewState(){
+  let 날씨 = false;
+  try{ 날씨 = !!(typeof wxCur !== 'undefined' && wxCur && wxCur.lat != null); }catch(_){}
+  if(날씨) crewMark('wx');
+  const 자리 = crewMarked('wx');
+  const 타기 = crewMarked('ride');
+  return { 날씨:자리, 타기, n: [자리, 타기].filter(Boolean).length };
+}
+function crewCard(){
   let 숨김 = false;
   try{ 숨김 = localStorage.getItem(START_KEY) === 'hide'; }catch(_){}
-  const S = startState();
-  if(숨김 || !S.배 || S.n >= 3) return '';
+  if(숨김) return '';
+  const S = crewState();
   const 줄 = (된것, 이름, 곁, 단추) =>
     `<div class="stprow${된것 ? ' on' : ''}">
        <span class="stpmk">${된것 ? '✓' : ''}</span>
-       <div class="stpb"><b>${esc(t(이름))}</b><span>${esc(t(곁))}</span></div>
+       <div class="stpb"><b>${esc(t(이름))}</b><span>${esc(곁)}</span></div>
        ${(!된것 && 단추) ? 단추 : ''}</div>`;
-  const 다음 = !S.정비 ? 'mlog' : 'cv';
+  const 단추 = (fn, 말) => `<button class="minib blu" onclick="${fn}">${esc(t(말))}</button>`;
+  const 다음 = !S.날씨 ? 'wx' : !S.타기 ? 'ride' : 'join';
   return `<div class="hcard intro">
       <div class="hct"><b>${esc(t('첫 걸음'))}</b><span class="gcnt">${S.n}/3</span></div>`
-    + 줄(S.배, '배 등록', '끝났습니다', '')
-    + 줄(S.정비, '정비 한 건 남기기', '오늘 한 일이든 지난 일이든 좋습니다',
-        다음 === 'mlog' ? `<button class="minib blu" onclick="startGoMlog()">${esc(t('기록하기'))}</button>` : '')
-    + 줄(S.이력, '배 이력서 뽑아 보기', '적은 것이 종이 한 장이 됩니다',
-        다음 === 'cv' ? `<button class="minib blu" onclick="startGoDocs()">${esc(t('뽑아 보기'))}</button>` : '')
+    + 줄(S.날씨, '지금 있는 곳 날씨 보기',
+        S.날씨 ? t('바람·돌풍·파고·물때가 이 자리 기준으로 나옵니다')
+               : t('배가 없어도 그대로 쓰실 수 있습니다'),
+        다음 === 'wx' ? 단추('homeUseGPS()', '날씨 보기') : '')
+    + 줄(S.타기, '탈 자리 찾아보기',
+        S.타기 ? t('같이 탈 사람을 찾는 배들입니다')
+               : t('자리를 내놓은 배들을 볼 수 있습니다'),
+        다음 === 'ride' ? 단추('crewGoRide()', '보러 가기') : '')
+    + 줄(false, '타는 배에 들어가기',
+        t('선장님께 참여 코드를 받아 넣으시면 그 배의 정비수첩과 항해일지를 함께 쓰십니다'),
+        다음 === 'join' ? 단추('crewGoJoin()', '코드 넣기') : '')
+    // ★★★ 4.126 — 크루에게 **남는 것**이 무엇인지 여기서 말해 준다 (사장님 지적).
+    //   배 가진 사람에게 배 이력서가 있듯, 크루에게는 승선 이력이 남는다.
+    //   「탈 자리를 찾아라」 로 끝나면 크루에게 이 앱은 게시판일 뿐이다.
+    + `<div class="introsay" style="margin-top:10px">${
+        esc(t('배에 들어가시면 탄 항해가 「내 승선 이력」 으로 쌓입니다.'))}</div>
+      <div class="hmute" style="margin-top:4px">${
+        esc(t('언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑을 수 있습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 옵니다.'))}</div>`
     + `<div class="hmute" style="margin-top:10px">${
-        esc(t('이 셋이면 이 앱이 무엇인지 다 보신 것입니다.'))}
+        esc(t('배가 생기시면 그때 등록하시면 됩니다. 여기까지는 배가 없어도 다 쓰십니다.'))}
         <button class="stpskip" onclick="startSkip()">${
+        esc(t('그만 보기'))}</button></div></div>`;
+}
+function startCard(){
+  let 숨김 = false;
+  try{ 숨김 = localStorage.getItem(START_KEY) === 'hide'; }catch(_){}
+  if(숨김) return '';
+  const S = startState();
+  if(!S.배) return crewCard();      // ★ 배가 없는 사람에게는 크루의 걸음을 보여 준다
+  // ★ 다 하셨으면 조용히 사라지지 않는다. 마무리 말을 **한 번** 하고 사라진다.
+  //   끝난 것을 말해 주지 않으면 사람은 끝냈다는 것을 모른다.
+  if(S.n >= 4){
+    let 했나 = false;
+    try{ 했나 = localStorage.getItem(START_END) === 'done'; }catch(_){}
+    if(했나) return '';
+    return `<div class="hcard intro">
+        <div class="hct"><b>${esc(t('첫 걸음을 다 하셨습니다'))}</b><span class="gcnt">4/4</span></div>
+        <div class="introsay">${esc(t('이제 뱃일이 이 배를 압니다.'))}</div>
+        <div class="hmute">${esc(t('다음은 나가실 때입니다 — 출항을 적으면 항적이 지도에 남습니다.'))}</div>
+        <div class="mrrow" style="padding:12px 0 2px">
+          <button class="mrbtn ok" style="width:100%" onclick="startEndClose()">${
+            esc(t('알겠습니다'))}</button></div></div>`;
+  }
+  const 줄 = (된것, 이름, 곁, 단추) =>
+    `<div class="stprow${된것 ? ' on' : ''}">
+       <span class="stpmk">${된것 ? '✓' : ''}</span>
+       <div class="stpb"><b>${esc(t(이름))}</b><span>${esc(곁)}</span></div>
+       ${(!된것 && 단추) ? 단추 : ''}</div>`;
+  const 단추 = (fn, 말) => `<button class="minib blu" onclick="${fn}">${esc(t(말))}</button>`;
+  // ★ 다음에 할 것 **하나에만** 단추를 둔다. 넷 다 달아 두면 할 일 목록이 되어 버린다.
+  const 다음 = !S.자리 ? 'port' : !S.점검 ? 'ck' : 'mlog';
+  return `<div class="hcard intro">
+      <div class="hct"><b>${esc(t('첫 걸음'))}</b><span class="gcnt">${S.n}/4</span></div>`
+    // ① 이미 끝나 있다. 그리고 **앱이 해 둔 일**을 여기서 알려 준다.
+    + 줄(true, '배 등록',
+        tsub('정기점검 {n}건과 출항 전 점검 {m}건이 함께 들어와 있습니다', { n:S.정기N, m:S.점검N }), '')
+    + 줄(S.자리, '배 매인 자리 잡기',
+        S.자리 ? (S.항구 ? tsub('{p} — 날씨와 물때가 이 자리 기준입니다', { p:S.항구 })
+                        : t('날씨와 물때가 이 자리 기준으로 나옵니다'))
+               : t('지도에서 한 번 찍어 주시면 됩니다'),
+        다음 === 'port' ? 단추('startGoPort()', '자리 잡기') : '')
+    + 줄(S.점검, '출항 전 점검 한 번 해 보기',
+        S.점검 ? tsub('{d}/{n} — 나갈 때마다 이 표를 쓰시면 됩니다', { d:S.점검한N, n:S.점검N })
+               : t('적을 것은 없습니다. 눌러서 넘기기만 하시면 됩니다'),
+        다음 === 'ck' ? 단추('startGoCheck()', '점검하기') : '')
+    + 줄(S.정비, '정비 한 건 남기기',
+        S.정비 ? tsub('{n}건 — 다음에도 그대로 따라 하실 수 있습니다', { n:S.정비N })
+               : t('사진 한 장과 한 줄이면 됩니다. 지난 일이어도 좋습니다'),
+        다음 === 'mlog' ? 단추('startGoMlog()', '기록하기') : '')
+    + `<div class="hmute" style="margin-top:10px">${
+        esc(t('여기까지가 이 앱의 전부입니다. 나머지는 쌓이면서 저절로 됩니다.'))}
+        <button class="stpskip" onclick="startSkip()">${
+        esc(t('그만 보기'))}</button></div></div>`;
+}
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.125 — 배 이력서는 **쌓인 뒤에** 권한다 (사장님 지적)
+//   첫날에 권하면 빈 종이가 나온다. 빈 종이는 「이 앱 별거 없네」 가 된다.
+//   적어 두신 것이 셋을 넘으면 그때 한 번 알려 드린다 — 그때는 진짜 볼 것이 있다.
+const CV_OFFER_MIN  = 3;
+const CV_OFFER_HIDE = 'bt_cvoff';
+function cvOfferSkip(){
+  try{ localStorage.setItem(CV_OFFER_HIDE, 'hide'); }catch(_){}
+  try{ renderHome(); }catch(_){}
+}
+function cvOfferCard(){
+  try{ if(localStorage.getItem(CV_OFFER_HIDE) === 'hide') return ''; }catch(_){}
+  try{ if(localStorage.getItem(START_CV) === '1') return ''; }catch(_){}   // 이미 뽑아 보셨다
+  if(!curBoat()) return '';
+  let n = 0;
+  try{
+    n = mlogRows().length
+      + (typeof repair !== 'undefined' ? repair.length : 0)
+      + (typeof voyage !== 'undefined' ? voyage.filter(v => v && !v.plan).length : 0)
+      + maintRows().filter(m => m && (m.lastDate || (m.history || []).length)).length;
+  }catch(_){}
+  if(n < CV_OFFER_MIN) return '';
+  return `<div class="hcard intro">
+      <div class="hct"><b>${esc(t('배 이력서'))}</b><span class="gcnt">${n}</span></div>
+      <div class="introsay">${esc(tsub('적어 두신 것이 {n}건이 되었습니다.', { n }))}</div>
+      <div class="hmute">${esc(t('이제 장비·정비·수리·항해가 종이 한 장으로 나옵니다. 배를 넘길 때 그대로 드리면 됩니다.'))}</div>
+      <div class="mrrow" style="padding:12px 0 2px">
+        <button class="mrbtn ok" style="width:100%" onclick="startGoDocs()">${
+          esc(t('뽑아 보기'))}</button></div>
+      <div class="hmute" style="margin-top:8px"><button class="stpskip" onclick="cvOfferSkip()">${
         esc(t('그만 보기'))}</button></div></div>`;
 }
 function introCard(){
@@ -26797,7 +27317,14 @@ function renderHome(){
   //   사람이 빠지는 것은 어느 화면을 보고 있든 일어나므로 화면에 떠 있어야 한다.
 
   // ★ 4.122 — 첫 걸음이 제일 위다. 배를 막 등록한 사람에게는 이것이 다음 할 일이다.
-  out += startCard();
+  // ★★★ 4.125 — 배가 **없는** 사람은 다르다. 소개 칸을 먼저 보여 준다.
+  //   까닭 — 배가 없는 사람에는 두 갈래가 섞여 있다:
+  //     · 아직 배를 등록만 안 한 선주   → 「배 등록하기」 가 첫 단추여야 한다
+  //     · 배가 없는 크루               → 크루의 걸음이 필요하다
+  //   앱은 그 둘을 가릴 수 없다. 그래서 **차례로** 푼다 —
+  //   소개 두 칸(배 등록하기가 첫 단추)이 먼저, 크루의 걸음은 그 밑.
+  //   사장님이 정하신 「배 가진 사람 먼저」 를 깨지 않으면서 크루도 빈손으로 안 보낸다.
+  if(b){ out += startCard(); out += cvOfferCard(); }
 
   // ★ 홈 화면에 추가 안내가 그다음이다. 이걸 안 하면 다음에 다시 안 온다.
   out += installCard();
@@ -26810,6 +27337,7 @@ function renderHome(){
   //   '이거 나한테 필요하겠다' 를 느껴야 하는데 느낄 거리가 없었다.
   if(!b){
     out += introCard();
+    out += startCard();      // ★ 배가 없으면 여기서 크루의 걸음이 나온다 (startCard 안에서 갈린다)
   }
 
   // ── 날씨와 출항 판단
@@ -26861,7 +27389,10 @@ function renderHome(){
         out += homeCard(esc(t('물때')), nx.map(x=>{
           const d = new Date(x.t);
           const hm2 = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-          return `<div class="hrow2">${esc(x.hi ? t('만조') : t('간조'))} <b>${hm2}</b>`
+          // ★ 4.127 — 가리지 못한 점(점이 하나뿐일 때)은 「물때」 라고만 적는다.
+          //   모르면서 「간조」 라고 적는 것이 사장님이 잡아 주신 그것이다.
+          const 이름 = (x.hi === true) ? t('만조') : (x.hi === false) ? t('간조') : t('물때');
+          return `<div class="hrow2">${esc(이름)} <b>${hm2}</b>`
                + ` · ${(x.v*100).toFixed(0)}cm</div>`;
         }).join(''), "setHomeSub('weather')", t('자세히'));
       }
@@ -27438,6 +27969,7 @@ function openMR(kind, id){
       // ★ 4.70 — 동승만 화면 맨 아래에 혼자 떨어져 있었다. (사장님 지적)
       //   제목·공개·날짜·종류·위치공개가 다 위에 모여 있는데 이것만 저 아래였다.
       //   사람 이야기라 「같이 타기」 옆이 제자리다.
+      + crewPickRow(it)
       + tf('동승','crew',it.crew)
       + planNotiBox(it)
       // ★ 예정 항해에는 '나간 뒤' 칸(도착·거리·시간·항적)을 안 보여 준다.
@@ -29075,6 +29607,9 @@ function paintMenuPerms(){
   const set = (id, on) => { const el = document.getElementById(id); if(el) el.style.display = on ? '' : 'none'; };
   set('dBoard', !!b && can(b,'board','view'));
   set('dTasks', !!b && can(b,'task','view'));
+  // ★ 4.126 — 내 승선 이력은 **로그인한 사람**에게만 뜻이 있다 (uid 로 셈한다).
+  //   배가 없는 크루도 여기로 닿는다 — 그래서 서랍에 둔다. 배가 있으면 문서 화면에도 있다.
+  set('dCrewCv', !!meUid());
 }
 // 저장된 파일이 지금 앱과 어긋나면 화면 맨 위에 띠를 띄운다.
 // 서랍을 열어봐야만 알 수 있으면 아무도 모른다 —
@@ -39192,6 +39727,179 @@ ${칸('문서', ['종류','이름','만료일'], 문서몸)}
 </body></html>`;
 }
 
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 4.126 — 내 승선 이력 (사장님 지적, 2026-09-10)
+//   「크루원한테도 뭔가 있어야 될 것 같긴 하다」
+//
+// ★ 배 가진 사람에게는 배 이력서가 남는다. 크루에게 그에 해당하는 것이 이것이다.
+//
+// ★ 찾아본 것 — 이 종이가 실제로 쓰이는 자리
+//   · 영국 RYA 개인 항해일지는 자격 심사에 그대로 쓰인다. 요건이 숫자로 못 박혀 있다 —
+//     데이스키퍼: 15일 · 300해리 · 6시간 넘는 항해 2회
+//     요트마스터 오프쇼어: 50일 · 2,500해리 · 60해리 넘는 항해 5회
+//                          (그중 야간 2회 · 선장으로 2회), 절반 이상은 24m 미만 배에서
+//     ★ 그리고 **선장이 모든 줄에 서명한다.** 서명 없는 줄은 값이 거의 없다.
+//   · 한국 소형선박조종사 면허는 2톤 이상 배에서 2년 운항경력을 요구하고,
+//     그 경력은 배 임자가 확인해 주는 서류로 증명한다.
+//   ★ 그래서 이 종이가 세는 것은 그 요건과 같은 것들이다 — 날짜·배·마일·시간·역할.
+//
+// ★★★ 이 앱만 할 수 있는 것 — **서명이 구조로 되어 있다.**
+//   이 줄들은 크루가 적은 것이 아니다. **배가 적은 것**이다.
+//   항해일지를 쓴 사람은 그 배 사람이고, 크루는 그 배 명부에 들어 있고,
+//   「탄 사람」 은 그 배에서 골라 준 것이다. 크루가 스스로 적어 넣는 길은 만들지 않았다 —
+//   만드는 순간 이 종이의 값이 없어진다.
+//
+// ★ 여러 배를 탄다. 그래서 **내가 든 배를 다 훑는다** — 기록은 배마다 따로 있으므로
+//   그 배의 자리(voyage@배번호)를 하나씩 열어 본다.
+async function crewVoys(){
+  const uid = meUid();
+  if(!uid) return [];
+  const out = [];
+  for(const b of (typeof boats !== 'undefined' ? boats : [])){
+    if(!b || !b.members || !b.members[uid]) continue;
+    let vs = [];
+    try{
+      // 지금 보고 있는 배는 이미 메모리에 있다. 다른 배는 그 자리에서 읽는다.
+      vs = (String(b.id) === String(currentBoatId) && typeof voyage !== 'undefined')
+             ? voyage : (await idbGet('voyage@' + b.id)) || [];
+    }catch(_){ vs = []; }
+    (Array.isArray(vs) ? vs : []).forEach(v => {
+      if(!v || isPlan(v) || !v.date) return;
+      const 탄사람 = voyCrewIds(v);
+      const 선장 = voySkipper(v, b);
+      // ★ 골라 준 적이 없는 옛 항해는 **선장만** 센다.
+      //   안 그러면 명부에 든 사람 모두가 안 탄 항해까지 타 버린다 — 그건 거짓 기록이다.
+      const 탔나 = 탄사람.length ? (탄사람.indexOf(String(uid)) >= 0)
+                                 : (String(선장) === String(uid));
+      if(!탔나) return;
+      const h = parseFloat(v.hours);
+      out.push({
+        date: String(v.date).slice(0, 10),
+        boat: b.name || '', type: (typeof BOAT_TYPES !== 'undefined' ? (BOAT_TYPES[b.type] || '') : ''),
+        loa: (b.spec && b.spec.loa) || '',
+        from: v.from || '', to: v.to || '',
+        nm: (parseFloat(v.nm) > 0) ? parseFloat(v.nm) : 0,
+        hours: isFinite(h) ? h : 0,
+        skipper: String(선장) === String(uid),
+        night: voyNight(v),
+        title: v.title || ''
+      });
+    });
+  }
+  return out.sort((a, c) => String(c.date).localeCompare(String(a.date)));
+}
+// ★ 야간 항해인가 — 출항이나 입항이 해 진 뒤/뜨기 전이면 야간으로 본다.
+//   ★ 해 뜨고 지는 시각을 여기서 셈하지 않는다. 위도·계절마다 달라 틀리기 쉽고,
+//     틀린 숫자를 자격 서류에 적으면 그것이 제일 나쁘다.
+//     대신 **누구나 같은 눈으로 볼 수 있는 기준**을 쓴다 — 20시 뒤이거나 05시 앞.
+//     ★ 이것은 어림이다. 종이 아래에 그렇게 적어 둔다.
+function voyNight(v){
+  const 밤 = t => {
+    const m = String(t || '').match(/^(\d{1,2}):(\d{2})/);
+    if(!m) return false;
+    const h = +m[1];
+    return h >= 20 || h < 5;
+  };
+  return 밤(v && v.timeOut) || 밤(v && v.timeIn);
+}
+function crewSum(rows){
+  const 배들 = {};
+  rows.forEach(r => { if(r.boat) 배들[r.boat] = 1; });
+  const 날들 = {};
+  rows.forEach(r => { if(r.date) 날들[r.date] = 1; });
+  return {
+    n: rows.length,
+    days: Object.keys(날들).length,
+    boats: Object.keys(배들).length,
+    nm: rows.reduce((s, r) => s + r.nm, 0),
+    hours: rows.reduce((s, r) => s + r.hours, 0),
+    skipper: rows.filter(r => r.skipper).length,
+    night: rows.filter(r => r.night).length,
+    long: rows.filter(r => r.nm >= 60).length,     // RYA 가 세는 「60해리 넘는 항해」
+    six: rows.filter(r => r.hours >= 6).length     // 데이스키퍼가 세는 「6시간 넘는 항해」
+  };
+}
+function crewCvHtml(rows, S){
+  const E = esc;
+  const 이름 = meName();
+  const 수 = n => (Math.round(n * 10) / 10);
+  const 몸 = rows.map(r => `<tr>
+      <td>${E(r.date)}</td>
+      <td><b>${E(r.boat)}</b>${r.type ? `<div class="sub">${E(t(r.type))}${
+          r.loa ? ' · ' + E(r.loa) + ' m' : ''}</div>` : ''}</td>
+      <td>${E([r.from, r.to].filter(Boolean).join(' → ') || r.title || '—')}</td>
+      <td>${r.nm ? E(String(수(r.nm))) : '—'}</td>
+      <td>${r.hours ? E(durText(r.hours) || String(수(r.hours))) : '—'}</td>
+      <td>${E(r.skipper ? t('선장') : t('크루'))}</td>
+      <td>${r.night ? '●' : ''}</td></tr>`).join('');
+  return `<!doctype html><html lang="${E(langNow())}"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${E(이름)} — ${E(t('내 승선 이력'))}</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:26px 22px 60px;max-width:900px;margin:0 auto;background:#fff;color:#16202b;
+    font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  h1{font-size:23px;margin:0 0 2px;letter-spacing:-.01em}
+  .meta{color:#5b6b7c;font-size:12.5px;margin:0 0 18px}
+  h2{font-size:15px;margin:30px 0 8px;padding-bottom:6px;border-bottom:2px solid #16202b}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  table.g th{background:#f1f4f7;text-align:left;font-weight:700;font-size:12px;
+    padding:7px 9px;border:1px solid #d6dde5;white-space:nowrap}
+  table.g td{padding:7px 9px;border:1px solid #d6dde5;vertical-align:top}
+  table.g tbody tr:nth-child(even){background:#fafbfc}
+  .sub{color:#5b6b7c;font-size:11.5px;margin-top:2px}
+  .none{color:#7b8794;font-size:13px;margin:4px 0 0}
+  .sum{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 0}
+  .sum div{flex:1 1 120px;border:1px solid #d6dde5;border-radius:9px;padding:10px 12px}
+  .sum b{display:block;font-size:19px;letter-spacing:-.01em}
+  .sum span{color:#5b6b7c;font-size:11.5px}
+  .foot{margin-top:34px;padding-top:12px;border-top:1px solid #d6dde5;
+    color:#5b6b7c;font-size:11.5px;line-height:1.7}
+  @media print{ body{padding:0;max-width:none} h2{break-after:avoid}
+    tr{break-inside:avoid} .noprint{display:none} }
+  .noprint{margin:0 0 20px}
+  .noprint button{font:inherit;font-weight:700;padding:10px 16px;border-radius:9px;
+    border:1px solid #16202b;background:#16202b;color:#fff;cursor:pointer}
+</style></head><body>
+<div class="noprint"><button onclick="window.print()">${E(t('인쇄 · PDF 로 저장'))}</button></div>
+<h1>${E(이름)}</h1>
+<div class="meta">${E(t('내 승선 이력'))} · ${E(t('뽑은 날'))} ${E(String(new Date().toISOString()).slice(0,10))}</div>
+<div class="sum">
+  <div><b>${S.days}</b><span>${E(t('바다에 있던 날'))}</span></div>
+  <div><b>${E(String(Math.round(S.nm)))}</b><span>${E(t('총 항해거리 NM'))}</span></div>
+  <div><b>${E(durText(S.hours) || '0')}</b><span>${E(t('총 항해 시간'))}</span></div>
+  <div><b>${S.boats}</b><span>${E(t('탄 배'))}</span></div>
+  <div><b>${S.skipper}</b><span>${E(t('선장으로 나간 항해'))}</span></div>
+  <div><b>${S.night}</b><span>${E(t('야간 항해'))}</span></div>
+  <div><b>${S.long}</b><span>${E(t('60해리 넘는 항해'))}</span></div>
+</div>
+<h2>${E(t('항해'))}</h2>
+${몸 ? `<table class="g"><thead><tr>${
+  ['날짜','배','구간','거리 NM','시간','역할','야간'].map(h => `<th>${E(t(h))}</th>`).join('')
+}</tr></thead><tbody>${몸}</tbody></table>`
+     : `<p class="none">${E(t('적어 둔 것이 없습니다.'))}</p>`}
+<div class="foot">
+  ${E(t('이 기록은 스스로 적은 것이 아닙니다. 배의 항해일지에서 그대로 가져온 것이고, 「탄 사람」 은 그 배에서 골라 준 것입니다.'))}<br>
+  ${E(t('야간은 출항이나 입항이 20시 뒤이거나 05시 앞인 항해를 셈한 어림입니다. 해 뜨고 지는 시각으로 셈한 것이 아닙니다.'))}<br>
+  ${E(t('자격 심사에 내실 때는 그 기관이 정한 서식을 함께 확인해 주세요.'))}<br>
+  ${E(t('뱃일에서 뽑았습니다.'))} baetnil.com
+</div>
+</body></html>`;
+}
+async function crewCvExport(){
+  if(!meUid()){ tell(t('내 승선 이력을 뽑으려면 먼저 로그인해 주세요.')); return; }
+  let rows = [];
+  try{ rows = await crewVoys(); }
+  catch(e){ tell(t('승선 이력을 만들지 못했습니다.') + '\n\n' + String((e && e.message) || e), { kind:'bad' }); return; }
+  if(!rows.length){ tell(t('아직 탄 것으로 적힌 항해가 없습니다.') + '\n\n'
+      + t('선장님이 항해일지의 「탄 사람」 에서 골라 주시면 여기에 쌓입니다.')); return; }
+  const S = crewSum(rows);
+  const 이름 = String(meName()).replace(/[\\/:*?"<>|]/g, '').trim() || 'crew';
+  const err = await saveFile(이름 + '-' + String(new Date().toISOString()).slice(0,10) + '.html',
+                             'text/html', crewCvHtml(rows, S));
+  if(err) tell(t('파일로 저장하지 못했습니다.') + '\n\n' + err, { kind:'bad' });
+  else tell(t('내 승선 이력을 뽑았습니다.\n\n열어서 [인쇄] 를 누르면 PDF 로 저장됩니다.'), { kind:'good' });
+}
 // 뽑기 — 파일로 저장한다 (앱에서는 「어디에 넣을까」 를 묻는다)
 async function cvExport(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
@@ -40714,7 +41422,16 @@ function renderContacts(){
         <span class="chip">${esc(t('한 장'))}</span></div>
       <div class="mrm">${esc(t('장비 · 정비 · 수리 · 항해를 한 장으로 뽑습니다. 배를 팔거나 넘길 때 그대로 드리면 됩니다.'))}</div>
     </div>`;
-  L.innerHTML = docBar() + 이력서 +
+  // ★★★ 4.126 — 내 승선 이력. 배 이력서 바로 밑이다 (사장님 지적).
+  //   「크루원한테도 뭔가 있어야 될 것 같긴 하다」
+  //   배 이력서는 **배**의 종이고, 이것은 **사람**의 종이다. 짝이라 나란히 둔다.
+  //   ★ 크루도 배 명부에 들면 이 화면에 닿는다 — 따로 숨기지 않는다.
+  const 승선 = `<div class="mr" onclick="crewCvExport()">
+      <div class="ct"><div class="cn">${esc(t('내 승선 이력 뽑기'))}</div>
+        <span class="chip">${esc(t('한 장'))}</span></div>
+      <div class="mrm">${esc(t('내가 언제 어느 배를 타고 몇 해리를 갔는지 한 장으로 뽑습니다. 스스로 적는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.'))}</div>
+    </div>`;
+  L.innerHTML = docBar() + 이력서 + 승선 +
     (ds.map(d=>{ const dd = vdocDue(d); return `<div class="mr" onclick="openMR('vdoc','${d.id}')">
         <div class="ct"><div class="cn">${esc(d.title||'—')}</div>${
           dd.k==='late' ? `<span class="chip" style="background:#F05B52;color:#fff">${esc(tsub('{n}일 지남',{n:-dd.days}))}</span>`
@@ -42796,7 +43513,8 @@ function tidePoints(){
     d.setHours(hh||0, mm||0, 0, 0);
     return { t: d.getTime(), v: Number(r.cm)/100 };
   }).sort((a,b)=>a.t-b.t);
-  return { stale:false, date:raw.date, pts };
+  // ★ 4.127 — 손으로 넣은 것도 만조·간조를 가려 준다 (이웃과 견준다). 문은 하나다.
+  return { stale:false, date:raw.date, pts: tideHiLo(pts) };
 }
 
 function tideInput(){
@@ -43172,18 +43890,45 @@ function wxSelMove(d){ if(wxSel!=null){ wxSel += d*3600e3; renderWxSel(); } }
 
 // 전체 조위 포인트 (관측지점의 보유 일수 전부 — 15일 탐색용)
 // 관측지점 하나의 만조·간조를 시각·높이(m) 점으로 편다.
+// ★★★ 4.127 — 만조인지 간조인지를 **점에 함께 달아 준다** (사장님 지적, 2026-09-10)
+//   「하나는 만조인 거 같은데 왜 둘 다 간조라고 썼냐?」
+//
+// ★ 무엇이 틀렸나 — 자료는 처음부터 갈라져 있었다. 관측소 자료의 day.h 는 만조,
+//   day.l 은 간조다. 그런데 점으로 바꾸는 이 자리에서 **그 구분을 버리고**
+//   {t, v} 만 담았다. 그려 주는 쪽은 x.hi 를 보는데 그 칸이 아예 없으니
+//   늘 거짓이 되어 **331cm 도 「간조」** 라고 적혔다.
+//   ★ 자료가 아는 것을 앱이 버린 것이다. 사람 눈에는 331cm 와 17cm 가 나란히
+//     「간조」 라고 적혀 있으니, 앱이 물때를 모른다고 읽힌다.
+//
+// ★ 고치는 자리는 여기 하나다 — 점을 만드는 문. 여기서 달아 주면 그리는 쪽은 그대로 둔다.
 function tidePtsOf(sp){
   if(!sp || !sp.days) return [];
   const pts = [];
   sp.days.forEach(day=>{
-    const mk = r => { const [hh,mm]=String(r.t).split(':').map(Number);
+    const mk = (r, hi) => { const [hh,mm]=String(r.t).split(':').map(Number);
       const d=new Date(day.d+'T00:00:00'); d.setHours(hh,mm,0,0);
-      return {t:d.getTime(), v:r.v/100}; };
-    (day.h||[]).forEach(r=>pts.push(mk(r)));
-    (day.l||[]).forEach(r=>pts.push(mk(r)));
+      return {t:d.getTime(), v:r.v/100, hi:!!hi}; };
+    (day.h||[]).forEach(r=>pts.push(mk(r, true)));    // h = 만조
+    (day.l||[]).forEach(r=>pts.push(mk(r, false)));   // l = 간조
   });
   pts.sort((a,b)=>a.t-b.t);
-  return pts;
+  return tideHiLo(pts);
+}
+// ★ 손으로 넣은 물때에는 만조·간조 구분이 아예 없다 (시각과 높이만 적는다).
+//   그때는 **이웃과 견주어** 가른다 — 앞뒤보다 높으면 만조, 낮으면 간조다.
+//   물때는 높낮이가 번갈아 오므로 이 셈이 맞다.
+//   ★ 이미 달려 있는 점은 건드리지 않는다. 관측소 자료가 언제나 이긴다.
+function tideHiLo(pts){
+  const a = Array.isArray(pts) ? pts : [];
+  a.forEach((p, i) => {
+    if(!p || typeof p.hi === 'boolean') return;
+    const 앞 = a[i-1], 뒤 = a[i+1];
+    if(앞 && 뒤)      p.hi = (p.v >= 앞.v && p.v >= 뒤.v);
+    else if(앞)       p.hi = (p.v > 앞.v);
+    else if(뒤)       p.hi = (p.v > 뒤.v);
+    // 점이 하나뿐이면 가릴 길이 없다 — 아는 척하지 않고 그냥 둔다(undefined).
+  });
+  return a;
 }
 function allTidePts(){
   const sp = nearestTideSpot(); if(!sp) return null;

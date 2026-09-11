@@ -2488,6 +2488,9 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '항적 {n}개에서 잰 거리입니다':'Measured from {n} track points',
+    '찍어 둔 자리 {n}곳을 직선으로 이은 길이입니다 — 실제 항로보다 짧습니다':'Straight lines between {n} marked positions — shorter than the route actually sailed',
+    '항적 {p}개에서 잰 {v} NM':'{v} NM measured from {p} track points',
     '나가기 전 검사부터 정비와 항해까지':'From the pre-departure check to maintenance and voyages',
     '나가기 전 검사는 법으로 정해진 의무입니다.':'The pre-departure check is required by law.',
     '나갈 때마다 목록으로. 한 일은 그 날짜 그대로 남습니다':'A checklist every time you go out. What you did stays under that date',
@@ -5884,6 +5887,9 @@ const I18N = {
     '정기점검·수리 화면의 「+ 정비수첩」 을 누르면 그 항목에 붙은 채로 시작합니다.':'Tap + Maintenance log on a scheduled check or a repair and it starts attached to that item.',
   },
   ru: {
+    '항적 {n}개에서 잰 거리입니다':'Измерено по {n} точкам трека',
+    '찍어 둔 자리 {n}곳을 직선으로 이은 길이입니다 — 실제 항로보다 짧습니다':'Прямые между {n} отмеченными точками — короче реального пути',
+    '항적 {p}개에서 잰 {v} NM':'{v} NM по {p} точкам трека',
     '나가기 전 검사부터 정비와 항해까지':'От проверки перед выходом до обслуживания и рейсов',
     '나가기 전 검사는 법으로 정해진 의무입니다.':'Проверка перед выходом требуется по закону.',
     '나갈 때마다 목록으로. 한 일은 그 날짜 그대로 남습니다':'Список при каждом выходе. Сделанное остаётся с той же датой',
@@ -9291,6 +9297,9 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '항적 {n}개에서 잰 거리입니다':'航跡{n}点から測った距離です',
+    '찍어 둔 자리 {n}곳을 직선으로 이은 길이입니다 — 실제 항로보다 짧습니다':'記録した{n}地点を直線で結んだ長さです — 実際の航路より短くなります',
+    '항적 {p}개에서 잰 {v} NM':'航跡{p}点から測った {v} NM',
     '나가기 전 검사부터 정비와 항해까지':'発航前検査から、整備、航海まで',
     '나가기 전 검사는 법으로 정해진 의무입니다.':'発航前検査は法律で定められた義務です。',
     '나갈 때마다 목록으로. 한 일은 그 날짜 그대로 남습니다':'出るたびにチェックリストで。行ったことはその日付のまま残ります',
@@ -20036,7 +20045,8 @@ function expRowsHtml(){
     const by = `<div class="fsub">${esc([boatShowName(b), boatShowPort(b)].filter(Boolean).join(' · '))}</div>`;
     if(kind === 'voyage'){
       const nm = trIn('voyage', r.id, 'title', pubVoyName(r) || r.date || '', b.id);
-      const sub = [r.date, r.nm ? r.nm + ' NM' : '', r.kind ? t(r.kind) : ''].filter(Boolean).join(' · ');
+      const 거리 = voyNmNum(r);
+      const sub = [r.date, 거리 ? (Math.round(거리*10)/10) + ' NM' : '', r.kind ? t(r.kind) : ''].filter(Boolean).join(' · ');
       return `<div class="fleet" onclick="expOpen('${jsq(b.id)}','voyage','${jsq(String(r.id))}')">
         <div class="fmain"><div class="fname">${esc(nm)}
           ${(r.photos||[]).length?`<span class="chip">${esc(tsub('사진 {n}',{n:(r.photos||[]).length}))}</span>`:''}</div>
@@ -23789,7 +23799,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.129';
+const APP_VER = '4.130';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -28260,9 +28270,17 @@ function openMR(kind, id){
       // ★★★ 4.99 — 항해 전체를 말하는 숫자들도 제 묶음을 갖는다.
       //   출발·도착 칸 바로 밑에 아무 이름표 없이 붙어 있으면 「도착의 거리」 로 읽힌다.
       + `<div class="secl">${esc(t('이 항해'))}</div>`
-      + `<div class="mrrow"><span class="mrlbl">${esc(t('거리'))}</span>${unlocked
-          ?`<input type="number" step="0.1" value="${esc(String(it.nm||''))}" style="width:90px" onchange="mrField('nm',this.value)"> NM`
-          :`<b class="mrv">${it.nm?it.nm+' NM':'—'}</b>`}</div>`
+      + (() => { const D = voyNm(it);
+          const 값 = D ? (Math.round(D.nm * 10) / 10) : null;
+          const 어디 = !D ? ''
+            : D.from === 'track' ? tsub('항적 {n}개에서 잰 거리입니다', { n: D.pts })
+            : D.from === 'marks' ? tsub('찍어 둔 자리 {n}곳을 직선으로 이은 길이입니다 — 실제 항로보다 짧습니다', { n: D.pts })
+            : '';
+          return `<div class="mrrow"><span class="mrlbl">${esc(t('거리'))}</span>${unlocked
+              ? `<input type="number" step="0.1" value="${esc(String(it.nm||''))}" placeholder="${
+                  esc(값 == null ? '' : String(값))}" style="width:90px" onchange="mrField('nm',this.value)"> NM`
+              : `<b class="mrv">${값 == null ? '—' : esc(String(값)) + ' NM'}</b>`}</div>`
+            + (어디 ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(어디)}</div>` : ''); })()
       + suggestRow(it, 'nm')
       + durRow('항해 시간', 'hours', it.hours,
           unlocked ? ` <button class="minib blu" onclick="fillSailHours()">${esc(t('출발·도착에서 계산'))}</button>` : '')
@@ -30156,7 +30174,8 @@ function voyStats(){
   const y = String(new Date().getFullYear());
   // ★ 예정 항해는 아직 안 나간 것이다. 올해 항해 수에 넣으면 거짓말이 된다.
   const arr = voyage.filter(v=>!isPlan(v) && (v.date||'').startsWith(y));
-  const nm = arr.reduce((s,v)=>s+(parseFloat(v.nm)||0),0);
+  // ★ 4.130 — 안 적은 항해도 항적에서 잰 거리로 센다
+  const nm = arr.reduce((s,v)=>s+voyNmNum(v),0);
   const eh = arr.reduce((s,v)=>s+(parseFloat(v.engineH)||0),0);
   return {cnt:arr.length, nm, eh, y};
 }
@@ -38454,6 +38473,60 @@ function mapBar(text, btns){
 // ── 거리·엔진시간 자동 계산
 // 저장된 위치를 순서대로 이어 잰다. 직선 합이라 실제 항로보다 짧게 나온다 —
 // 그래서 덮어쓰지 않고 "제안"만 하고, 직접 적은 값은 건드리지 않는다.
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.130 — 항해 거리는 **앱이 잰다** (사장님 지적, 2026-09-11)
+//   「근데 여기 왜 거리 안 나오냐? 알아서 자동으로 거리도 나와야 하는 거 아니냐」
+//
+//   사장님의 9/3 항해를 앱에서 직접 재 봤다.
+//     · 항적 점 35개 → 실제로 간 거리 5.95 NM
+//     · 손으로 찍은 점 5개의 직선 합 → 3.78 NM (37% 짧다)
+//     · 화면에 적힌 거리 → 「—」
+//
+//   거리는 사람이 손으로 적는 칸이었다. 앱은 [넣기] 단추로 제안만 했고, 그 제안마저
+//   **항적을 안 보고** 손으로 찍은 점을 직선으로 이었다. 보기 전용에서는 제안도 없었다.
+//
+//   ★ 이게 화면만의 일이 아니다 — 배 이력서의 「총 항해거리」, 승선 이력의 「총 항해거리」와
+//     RYA 60해리 항해 셈이 전부 이 칸을 본다. 안 적은 항해는 **0 해리**로 세어졌다.
+//     「스스로 적는 것이 아니라 배의 항해일지에서 그대로 가져옵니다」 가 거짓말이 되는 자리다.
+//
+//   ★ 차례가 뜻이다.
+//     ① 사람이 적은 것이 있으면 그것 — 앱이 사람 손을 덮지 않는다.
+//     ② 없으면 **항적**에서 잰다 — 앱이 가진 것 중 제일 정확하다.
+//     ③ 항적도 없으면 손으로 찍은 점의 직선 합 — 짧게 나오므로 그렇게 밝힌다.
+//     ④ 아무것도 없으면 **null**. 지어내지 않는다.
+// ══════════════════════════════════════════════════════════════════════
+function voyNm(it){
+  if(!it) return null;
+  const 적은것 = String(it.nm == null ? '' : it.nm).trim();
+  if(적은것){
+    const n = parseFloat(적은것);
+    if(isFinite(n) && n > 0) return { nm: n, from: 'typed', pts: 0 };
+  }
+  const 재기 = (arr, 뽑기) => {
+    if(!arr || arr.length < 2) return 0;
+    let km = 0;
+    for(let i = 1; i < arr.length; i++){
+      const a = 뽑기(arr[i-1]), b = 뽑기(arr[i]);
+      if(!a || !b) continue;
+      km += hav(a[0], a[1], b[0], b[1]);
+    }
+    return km;
+  };
+  const 항적 = (typeof trkRaw === 'function') ? trkRaw(it) : (Array.isArray(it.trk) ? it.trk : []);
+  if(항적 && 항적.length >= 2){
+    const km = 재기(항적, p => (p && typeof p.la === 'number') ? [p.la, p.lo]
+                            : (p && typeof p.lat === 'number') ? [p.lat, p.lon] : null);
+    if(km > 0) return { nm: km / 1.852, from: 'track', pts: 항적.length };
+  }
+  const 손점 = (typeof trkPoints === 'function') ? trkPoints(it) : [];
+  if(손점 && 손점.length >= 2){
+    const km = 재기(손점, p => (p && typeof p.lat === 'number') ? [p.lat, p.lon] : null);
+    if(km > 0) return { nm: km / 1.852, from: 'marks', pts: 손점.length };
+  }
+  return null;
+}
+// 숫자 하나만 필요한 자리 (종이·셈)
+function voyNmNum(it){ const r = voyNm(it); return r ? r.nm : 0; }
 function navDistance(it){
   const pts = trkPoints(it);
   if(pts.length < 2) return null;
@@ -38492,10 +38565,13 @@ function suggestRow(it, kind){
   if(!unlocked) return '';
   if(kind === 'nm'){
     if(String(it.nm||'').trim()) return '';
-    const d = navDistance(it);
-    if(!d) return '';
+    // ★ 4.130 — 제안도 항적을 본다. 손으로 찍은 점 몇 개의 직선 합은 실제보다 짧다.
+    const d = voyNm(it);
+    if(!d || d.from === 'typed') return '';
     const v = d.nm.toFixed(1);
-    return `<div class="posrow"><span style="color:#7b8794">${esc(tsub('위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다', { p: d.pts, v: v }))}</span>`
+    return `<div class="posrow"><span style="color:#7b8794">${esc(d.from === 'track'
+        ? tsub('항적 {p}개에서 잰 {v} NM', { p: d.pts, v: v })
+        : tsub('위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다', { p: d.pts, v: v }))}</span>`
          + `<button class="minib grn" onclick="navFill('nm','${v}')">${esc(t('넣기'))}</button></div>`;
   }
   if(String(it.engineH||'').trim()) return '';
@@ -39951,7 +40027,7 @@ function cvData(){
   const 날짜 = vs.map(v => String(v.date)).sort();
   const 항해 = {
     n: vs.length, from: 날짜[0] || '', to: 날짜[날짜.length - 1] || '',
-    nm: vs.reduce((s, v) => s + (parseFloat(v.nm) || 0), 0),
+    nm: vs.reduce((s, v) => s + voyNmNum(v), 0),   // ★ 4.130 — 항적에서 잰 거리도 센다
     h:  vs.reduce((s, v) => s + (parseFloat(v.engineH) || 0), 0)
   };
   const 문서 = ((typeof vdocs !== 'undefined' && Array.isArray(vdocs)) ? vdocs : [])
@@ -40138,7 +40214,7 @@ async function crewVoys(){
         boat: b.name || '', type: (typeof BOAT_TYPES !== 'undefined' ? (BOAT_TYPES[b.type] || '') : ''),
         loa: (b.spec && b.spec.loa) || '',
         from: v.from || '', to: v.to || '',
-        nm: (parseFloat(v.nm) > 0) ? parseFloat(v.nm) : 0,
+        nm: voyNmNum(v),                      // ★ 4.130 — 안 적었으면 항적에서 잰다
         hours: isFinite(h) ? h : 0,
         skipper: String(선장) === String(uid),
         night: voyNight(v),

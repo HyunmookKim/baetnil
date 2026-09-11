@@ -18716,7 +18716,12 @@ const SVG_APPLE = '<svg viewBox="0 0 170 170" aria-hidden="true"><path fill="#ff
 //   파이어베이스 콘솔에 넣어야 켜진다. 그 전에 단추를 보여 주면 눌러도 아무 일이 없다 —
 //   못 하는 일을 할 수 있는 것처럼 두는 것이 이 앱에서 제일 싫어하는 조용한 거짓말이다.
 //   ★★ 아이폰 앱을 스토어에 내기 전에는 반드시 true 로 바꿔야 한다 (심사규정 4.8).
-const APPLE_LOGIN = false;
+// ★★★ 4.131 — 켰다 (2026-09-11). 애플 쪽 셋과 파이어베이스 넷을 다 채웠다.
+//   App ID kr.baetnil.app (Sign in with Apple 켬) · Services ID kr.baetnil.signin
+//   Key CPRGAXM824 · Team KM7T983F29 · 되돌아올 자리 baetnil.firebaseapp.com/__/auth/handler
+//   ★ 안드로이드에도 낸다 — 안드로이드 쓰는 사람도 애플 아이디를 쓴다 (사장님 지적).
+//     아이폰에서만 필요한 것은 **스토어 규정**(4.8)이지, 사람이 그렇다는 뜻이 아니다.
+const APPLE_LOGIN = true;
 // ★ 로그인 단추를 만드는 문 하나. 첫 화면과 계정 화면이 같이 쓴다.
 //   따로 그리면 한쪽만 고치고 다른 쪽을 잊는다 — 전에 여러 번 그랬다.
 function loginBtns(){
@@ -23799,7 +23804,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.130';
+const APP_VER = '4.131';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

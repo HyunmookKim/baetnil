@@ -251,6 +251,12 @@ body.locked .trestore, body.locked .tdelp{display:none}
 body{background:#0a1628;color:#e8eef5;min-height:100vh;
   font-family:'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif;
   font-optical-sizing:auto;letter-spacing:-.012em}
+/* ★★★ 4.134 — 여기에 html,body{overflow-x:hidden} 을 넣었다가 **걷어냈다.**
+   가로로 밀리는 것을 막으려던 빗장인데, 그것을 걸면 몸통이 스크롤 칸이 되어
+   **position:sticky 가 통째로 죽는다** — 기록 창의 머리줄과 「할 일」 단추가
+   맨 아래로 밀면 사라졌다(actlive 가 잡았다).
+   ★ 가로로 넘치는 것은 **넘치는 그 칸을 고쳐서** 막는다(.trashBox 처럼).
+     덮는 빗장을 걸지 않는다. widelive.js 가 화면마다 칸을 재서 지킨다. */
 header{border-bottom:1px solid #1e3a5a;background:#081020;position:sticky;top:0;z-index:20}
 .hrow{padding:10px 16px 6px;display:flex;align-items:center;justify-content:space-between}
 .sub{font-size:10px;letter-spacing:2px;color:#4a8ab5;text-transform:uppercase}
@@ -548,10 +554,18 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 #dgPickEmpty{padding:40px 20px;text-align:center;color:#8a97a8;font-size:13.5px}
 .trashBox{background:#0a1828;border:1px solid #2a5a8a;border-radius:12px;width:min(560px,100%);max-height:84vh;display:flex;flex-direction:column}
 .trashHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:#c8dff0}
-#trashBody{padding:10px 14px;overflow:auto}
+#trashBody{padding:10px 14px;overflow:auto;min-width:0}
 /* ★ 4.132 — 휴지통 안 갈래 칩. 줄을 내려도 위에 붙어 있어야 지금 어느 갈래인지 안다. */
 #trashBody .trchips{position:sticky;top:-10px;z-index:2;background:#0a1828;
-  padding:8px 0 6px;margin:-10px 0 2px}
+  padding:8px 0 6px;margin:-10px 0 2px;min-width:0}
+/* ★★★ 4.134 — 휴지통이 화면보다 넓어져 가로로 잘리던 것 (사장님 지적, 2026-09-12)
+     390짜리 화면에 상자가 515로 그려졌다. 줄 이름이 왼쪽으로 잘려 보였다.
+   ★ 왜 — 갈래 칩 줄(.tfilt)은 줄바꿈을 안 한다(nowrap). 그래서 그 줄의 **최소 너비**가
+     칩을 한 줄에 다 편 만큼(447px)이 된다. #trashView 는 flex 라 그 안의 상자는
+     기본값(min-width:auto) 때문에 제 내용보다 작아지지 않는다 — 상자가 그만큼 벌어졌다.
+     칩이 많을수록 더 벌어진다. 갈래를 나눈 4.132 에서 제가 만든 흠이다.
+   ★ 고치는 법 — 상자와 그 안이 **스스로 작아질 수 있게** 한다. 칩 줄은 제 안에서 옆으로 민다. */
+.trashBox{min-width:0;max-width:100%}
 .trow{display:flex;align-items:center;gap:6px;background:#0c1e30;border:1px solid #1a3a5a;border-radius:7px;padding:8px 10px;margin-bottom:7px}
 .trestore{background:#13351f;border:1px solid #2faa6a;border-radius:5px;color:#7aefaa;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap}
 .tdelp{background:none;border:1px solid #5a2a2a;border-radius:5px;color:#c87a7a;font-size:12px;padding:6px 10px;cursor:pointer;white-space:nowrap}
@@ -576,10 +590,35 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 /* ===== 탭바/정기점검/수리목록 ===== */
 body{padding-bottom:62px}
 #tabbar{position:fixed;bottom:0;left:0;right:0;background:#081020;border-top:1px solid #1e3a5a;display:flex;z-index:60}
+/* ══════════════════════════════════════════════════════════════════════
+   ★★★ 4.134 — 「새로 쓰는 것」 은 어느 화면에서나 같은 자리에 (사장님이 정하신 것)
+   자리와 크기는 대한민국 정부 디자인 시스템(KRDS)과 머티리얼을 그대로 따른다 —
+     · 우측 하단, 아래 탭줄과 안 겹치게 그 **위**
+     · 한 화면에 하나. 할 일이 둘 이상이면 **확장형**(눌러서 펼침), 셋 이하
+     · 지우기·정리에는 안 쓴다
+   ★ 탭줄 높이는 기기마다 다르다(안전 영역). 재서 --tabh 에 넣는다 — 숫자를 박지 않는다. */
+.fab{position:fixed;right:16px;bottom:calc(var(--tabh,62px) + 16px);
+  width:56px;height:56px;border-radius:28px;border:none;
+  background:var(--ac,#8ec5f0);color:var(--acd,#08131F);
+  font-size:30px;line-height:56px;font-weight:300;font-family:inherit;
+  padding:0;text-align:center;box-shadow:0 6px 18px #0009;z-index:55;cursor:pointer;
+  transition:transform .16s ease}
+.fab i{display:block;font-style:normal;transition:transform .16s ease}
+.fab.open i{transform:rotate(45deg)}
+.fabwrap{position:fixed;right:16px;bottom:calc(var(--tabh,62px) + 16px + 56px + 12px);
+  z-index:55;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fabitem{display:flex;align-items:center;gap:0;border:none;cursor:pointer;font-family:inherit;
+  height:44px;padding:0 18px;border-radius:22px;font-size:14px;font-weight:700;
+  background:var(--sf2,#17191D);color:var(--th,#E8F2FA);
+  border:1px solid var(--bd,#2A3B4C);box-shadow:0 4px 12px #0007;white-space:nowrap}
+.fabitem:active{background:var(--acs,#1B3345)}
+.fabscrim{position:fixed;inset:0;background:#000a;z-index:54}
 #tabbar button{flex:1;background:none;border:none;color:#8FB6D2;font-size:11px;padding:6px 0 9px;cursor:pointer}
 #tabbar button.on{color:#9ed0f5}
 #tabbar .ti{display:block;font-size:19px;margin-bottom:1px}
 .mrhead{display:flex;gap:6px;align-items:center;padding:10px 14px 4px}
+/* ★ 4.134 — 머리줄 오른쪽 단추 덩이. 줄이 바뀌어도 서로 떨어지지 않는다. */
+.hend{display:flex;gap:6px;align-items:center;flex:none}
 .mr{background:#0c1e30;border:1px solid #1e4060;border-radius:9px;margin:7px 14px;padding:9px 12px;cursor:pointer}
 .mrt{display:flex;align-items:center;gap:8px}
 .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -2289,31 +2328,30 @@ header{padding-top:var(--sat)}
     <button class="tab" id="gearTabM" onclick="setGearSub('maint')" data-t="정기점검">정기점검</button>
     <button class="tab" id="gearTabR" onclick="setGearSub('review')" data-t="리뷰">리뷰</button>
     <span style="flex:1"></span>
-    <button class="tab" id="gearViewBtn" onclick="mrToggleView(gearScreenKind())" data-t="도면">도면</button>
-    <button class="tab edt" id="gearAddBtn2" onclick="addBoatReview()" style="display:none" data-t="+ 배 리뷰">+ 배 리뷰</button>
-    <button class="tab edt" id="gearAddBtn" onclick="gearAdd()" data-t="+ 추가">+ 추가</button>
+    <!-- ★ 4.134 — 「+ 추가」·「+ 배 리뷰」 는 오른쪽 아래 플로팅으로 갔다.
+         여기 남는 것은 화면을 바꾸는 도구(도면/목록)뿐이다. -->
+    <span class="hend">
+      <button class="tab" id="gearViewBtn" onclick="mrToggleView(gearScreenKind())" data-t="도면">도면</button>
+    </span>
   </div>
   <div id="gearList"></div>
   <div id="maintList" style="display:none"></div>
   <div id="rvList" style="display:none"></div>
 </div>
 <div id="repairWrap" style="display:none">
+  <!-- ★ 4.134 — 「도면」·「완료된 수리」 는 갈래 띠(mntBar3) 안으로 들어갔다.
+       단추 하나짜리 줄이 아래에 또 생기지 않게. -->
   <div id="mntBar3"></div>
-  <div class="mrhead">
-    <button class="tab" id="repairViewBtn" onclick="mrToggleView('repair')" data-t="도면">도면</button>
-    <button class="tab" id="repairDoneBtn" onclick="toggleDone()" style="display:none" data-t="완료된 수리">완료된 수리</button>
-    <span style="flex:1"></span>
-  </div>
   <div id="repairList"></div>
 </div>
 <div id="weatherWrap" style="display:none"><div id="weatherList"></div></div>
 <div id="voyageWrap" style="display:none">
-  <div class="mrhead"><span style="flex:1"></span><button class="tab edt" onclick="addPlan()" data-t="+ 예정">+ 예정</button><button class="tab edt" onclick="addVoyage()" data-t="+ 기록">+ 기록</button></div>
+  <!-- ★ 4.134 — 「+ 예정」·「+ 기록」 은 오른쪽 아래 플로팅으로 갔다 -->
   <div id="voyageList"></div>
 </div>
 <div id="fuelWrap" style="display:none">
   <div id="mntBar4"></div>
-  <div class="mrhead"><span style="flex:1"></span><button class="tab edt" onclick="addRun()" data-t="+ 엔진가동">+ 엔진가동</button><button class="tab edt" onclick="addFuel()" data-t="+ 주유">+ 주유</button></div>
+  <!-- ★ 4.134 — 「+ 주유」·「+ 엔진가동」 은 오른쪽 아래 플로팅으로 갔다 -->
   <div id="fuelList"></div>
 </div>
 <div id="newsWrap" style="display:none">
@@ -2358,6 +2396,7 @@ header{padding-top:var(--sat)}
 <input type="file" id="vphFile" accept="image/*" multiple style="display:none" onchange="vphFilePick(event)">
 <div id="hatPanelOv" onclick="hatClose()"><div id="hatPanelBody" onclick="event.stopPropagation()"></div></div>
 <div id="drawerOv" onclick="closeDrawer()"><aside id="drawer" onclick="event.stopPropagation()"><div class="dhead">뱃일 <button class="dclose" onclick="closeDrawer()">&#10005;</button></div><button class="ditem" id="acctBtn" onclick="closeDrawer();openAccount()" data-t="로그인">로그인</button><button class="ditem" onclick="closeDrawer();openBoat()" data-t="계류장">계류장</button><button class="ditem" id="dCrewCv" onclick="closeDrawer();crewCvExport()" data-t="내 승선 이력">내 승선 이력</button><button class="ditem" id="dAdmin" style="display:none" onclick="closeDrawer();openAdmin()" data-t="운영자">운영자</button><div class="ddiv"></div><button class="ditem" onclick="closeDrawer();openSettings()" data-t="설정">설정</button><button class="ditem" onclick="closeDrawer();openSupport()" data-t="고객센터 · 건의하기">고객센터 · 건의하기</button><button class="ditem" id="insBtn" style="display:none" onclick="closeDrawer();openInstall()" data-t="홈 화면에 추가">홈 화면에 추가</button><div class="ddiv"></div><button class="ditem" id="reloadBtn" onclick="closeDrawer();forceReload()" data-t="앱 업데이트">앱 업데이트</button><div class="dver" id="dVer"></div></aside></div>
+<div id="fabHost"></div>
 <nav id="tabbar"><button id="tabHome" onclick="switchTab('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/></svg><span data-t="오늘">오늘</span></button><button id="tabBoat" onclick="switchTab('boat')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18l-2.5 4H5.5z"/><path d="M5 17V9h14v8"/><path d="M12 9V3"/></svg><span data-t="내 배">내 배</span></button><button id="tabOthers" onclick="switchTab('others')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20l-2 3H4z"/><path d="M5 18v-6h9v6"/><path d="M14 12l4 6"/><path d="M9.5 12V8"/></svg><span data-t="남의 배">남의 배</span></button><button id="tabCommunity" onclick="switchTab('community')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-t="커뮤니티">커뮤니티</span></button></nav>
 <button id="mobFab" class="mobfab" onclick="mobMark()" aria-label="사람 빠짐"><i></i><span data-t="사람 빠짐">사람 빠짐</span></button>
 
@@ -2631,7 +2670,7 @@ const I18N = {
     '+ 정비수첩 — 어떻게 고쳤는지 남기기':'+ Maintenance log — record how you fixed it',
     '…':'…',
     '내 배에서만':'On my boat only',
-    '배에 <b>달려 있는 것</b>을 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'This is where you list <b>what is fitted to the boat</b> — engine, winch, plotter, bilge pump.',
+    '배에 <b>설치된 장비</b>를 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'This is where you list <b>what is fitted to the boat</b> — engine, winch, plotter, bilge pump.',
     '제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.':'Write the maker, model and serial once and you never have to look them up again when buying parts or booking a repair.',
     '장비마다 정비·수리 기록이 연결되고, 도면에 자리를 찍어 둘 수 있습니다.':'Maintenance and repair records hang off each item, and you can pin its place on the plan.',
     '첫 장비 추가하기':'Add your first piece of gear',
@@ -2659,7 +2698,7 @@ const I18N = {
     '산 값':'Price paid',
     '숫자만 넣어 주세요.':'Numbers only, please.',
     '예: 120000':'e.g. 120000',
-    '배에 <b>달아 본 물건</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'This is where you write how <b>things you have fitted</b> worked out — impellers, filters, rope, paint.',
+    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'This is where you write how <b>things you have fitted</b> worked out — impellers, filters, rope, paint.',
     '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'Write the maker and model and you gather in one place with everyone using the same thing.',
     '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'Few people have the same boat, but thousands use the same engine or the same winch.',
     '첫 리뷰 쓰기':'Write your first review',
@@ -2679,7 +2718,7 @@ const I18N = {
     '타 보니':'How she sails',
     '써 보니':'How it went',
     '바다에서 어떤지, 살림은 어떤지, 관리는 어떤지':'How she is at sea, how she is to live on, how she is to look after',
-    '달기는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'Was it easy to fit, how does it sound, how long does it last',
+    '설치는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'Was it easy to fit, how does it sound, how long does it last',
     '여기가 비어 있으면 광고 글처럼 보입니다':'If this is empty it reads like an advert',
     '산 값(배)':'Price paid (boat)',
     '값 공개':'Show the price',
@@ -2957,8 +2996,8 @@ const I18N = {
     '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'The old one is not deleted — it stays in Replacement history.',
     '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Moves to the new one — {a} scheduled checks, {b} parts, system, type, plan pin',
     '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'Stays with the old one — {n} [[repair|repairs]], maker, model, serial number, photos',
-    '{a} ~ {b} 에 달려 있던 장비입니다.':'This was fitted from {a} to {b}.',
-    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'The one fitted now is above, in Replacement history.',
+    '{a} ~ {b} 에 설치돼 있던 장비입니다.':'This was fitted from {a} to {b}.',
+    '지금 설치된 것은 교체 이력 위쪽에 있습니다.':'The one fitted now is above, in Replacement history.',
     '이상 없음':'No faults',
     '{n}장':'{n} [[photo|photos]]',
     '{a}MB / {b}MB':'{a} MB of {b} MB',
@@ -3071,7 +3110,7 @@ const I18N = {
     '앞으로 나갈 항해':'Upcoming voyages',
     '지난 항해':'Past voyages',
     '찾은 항해가 없습니다.':'No voyages found.',
-    '기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.':'No voyages recorded yet. Tap [+ Record] above to start one.',
+    '기록된 항해가 없습니다. 오른쪽 아래 [+] 를 눌러 시작해 보세요.':'No voyages recorded yet. Tap [+] at the bottom right to start one.',
     '아직 나가지 않은 항해입니다':'This voyage has not started yet',
     '출항했습니다':'We have departed',
     '구하면 게시판에 올라갑니다':'Once you ask, it is posted in Talk',
@@ -3452,6 +3491,10 @@ const I18N = {
     '저장 후 닫기':'Save and close',
     '메모':'Note',
     '삭제':'Delete',
+    '+ 장비':'+ Gear',
+    '+ 연락처':'+ Contact',
+    '+ 문서':'+ Document',
+    '새로 쓰기':'New',
     '{what} 은(는) 이 배에서 적을 권한이 없어 올리지 못했습니다.':'Could not upload {what} — you have no permission to write it on this boat.',
     '적어 두신 것은 이 기기에 그대로 있습니다.':'What you wrote is still here on this device.',
     '선주가 등급을 올려 주면 그때 올라갑니다.':'It will upload once the owner raises your rank.',
@@ -4944,7 +4987,7 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Tap the directions this berth is <b>open to</b>. Wind from those bearings makes the boat roll, or worse.',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Only <b>approved contributors</b> may post a series. This is a place for reprinting other people\'s writing, which is why.',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Tap <b>[Add]</b> at the top right',
-    '올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.':'<b>Other people\'s comments</b> on your posts go with the post.',
+    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'<b>Other people\'s comments</b> on your posts go with the post.',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'Our tides run large. A sounder reading is relative to <b>the moment you measured</b>, so writing it down as it is will ground you at low water.',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'The weather, tides and depths in this app are <b>for reference</b>. Whether to sail and where to lie is your judgement and your responsibility. (Terms, article 6)',
     '이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'There is no tide data for this place and time, so it <b>cannot be converted</b>.',
@@ -5677,7 +5720,7 @@ const I18N = {
     '자동팽창식 구명환':'Self-inflating lifebuoy',
     '빌지 알람':'Bilge alarm',
     '장비를 넣습니다.':'This adds gear.',
-    '갓 달았음':'Just fitted',
+    '설치한 지 얼마 안 됨':'Just fitted',
     '1년 미만':'Under a year',
     '1~3년':'1–3 years',
     '3년 넘게':'Over 3 years',
@@ -6032,7 +6075,7 @@ const I18N = {
     '+ 정비수첩 — 어떻게 고쳤는지 남기기':'+ Журнал работ — как починили',
     '…':'…',
     '내 배에서만':'Только на моём судне',
-    '배에 <b>달려 있는 것</b>을 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'Здесь перечисляется <b>то, что установлено на судне</b> — двигатель, лебёдка, плоттер, помпа.',
+    '배에 <b>설치된 장비</b>를 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'Здесь перечисляется <b>то, что установлено на судне</b> — двигатель, лебёдка, плоттер, помпа.',
     '제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.':'Запишите марку, модель и серийный номер один раз — и больше не придётся искать.',
     '장비마다 정비·수리 기록이 연결되고, 도면에 자리를 찍어 둘 수 있습니다.':'К каждому пункту привязываются записи, а место можно отметить на плане.',
     '첫 장비 추가하기':'Добавить первое',
@@ -6060,7 +6103,7 @@ const I18N = {
     '산 값':'Цена покупки',
     '숫자만 넣어 주세요.':'Только цифры.',
     '예: 120000':'напр. 120000',
-    '배에 <b>달아 본 물건</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'Здесь пишут, как показали себя <b>установленные вещи</b> — крыльчатки, фильтры, трос, краска.',
+    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'Здесь пишут, как показали себя <b>установленные вещи</b> — крыльчатки, фильтры, трос, краска.',
     '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'Укажите марку и модель — и вы окажетесь рядом с теми, кто использует то же самое.',
     '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'Одинаковых лодок мало, но тысячи используют тот же двигатель или лебёдку.',
     '첫 리뷰 쓰기':'Написать первый отзыв',
@@ -6080,7 +6123,7 @@ const I18N = {
     '타 보니':'Как ходит',
     '써 보니':'Как показало себя',
     '바다에서 어떤지, 살림은 어떤지, 관리는 어떤지':'Как в море, как жить на борту, как обслуживать',
-    '달기는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'Легко ли ставить, как звучит, сколько служит',
+    '설치는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'Легко ли ставить, как звучит, сколько служит',
     '여기가 비어 있으면 광고 글처럼 보입니다':'Если пусто — похоже на рекламу',
     '산 값(배)':'Цена покупки (судно)',
     '값 공개':'Показывать цену',
@@ -6358,8 +6401,8 @@ const I18N = {
     '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'Старое не удаляется — оно останется в истории замен.',
     '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'Переходит к новому — регламент: {a}, деталей: {b}, система, тип, метка на плане',
     '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'Остаётся у старого — ремонтов: {n}, производитель, модель, серийный номер, фото',
-    '{a} ~ {b} 에 달려 있던 장비입니다.':'Было установлено с {a} по {b}.',
-    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'Установленное сейчас — выше, в истории замен.',
+    '{a} ~ {b} 에 설치돼 있던 장비입니다.':'Было установлено с {a} по {b}.',
+    '지금 설치된 것은 교체 이력 위쪽에 있습니다.':'Установленное сейчас — выше, в истории замен.',
     '이상 없음':'Неисправностей нет',
     '{n}장':'{n} фото',
     '{a}MB / {b}MB':'{a} МБ из {b} МБ',
@@ -6472,7 +6515,7 @@ const I18N = {
     '앞으로 나갈 항해':'Предстоящие выходы',
     '지난 항해':'Прошлые выходы',
     '찾은 항해가 없습니다.':'Выходы не найдены.',
-    '기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.':'Записей о выходах пока нет. Нажмите [+ Запись] сверху.',
+    '기록된 항해가 없습니다. 오른쪽 아래 [+] 를 눌러 시작해 보세요.':'Записей о выходах пока нет. Нажмите [+] справа внизу.',
     '아직 나가지 않은 항해입니다':'Этот выход ещё не начался',
     '출항했습니다':'Мы вышли',
     '구하면 게시판에 올라갑니다':'Как только начнёте искать, объявление появится на форуме',
@@ -6852,6 +6895,10 @@ const I18N = {
     '저장 후 닫기':'Сохранить и закрыть',
     '메모':'Заметка',
     '삭제':'Удалить',
+    '+ 장비':'+ Снаряжение',
+    '+ 연락처':'+ Контакт',
+    '+ 문서':'+ Документ',
+    '새로 쓰기':'Создать',
     '{what} 은(는) 이 배에서 적을 권한이 없어 올리지 못했습니다.':'Не удалось отправить «{what}» — у вас нет прав на запись на этом судне.',
     '적어 두신 것은 이 기기에 그대로 있습니다.':'Записанное осталось на этом устройстве.',
     '선주가 등급을 올려 주면 그때 올라갑니다.':'Оно отправится, когда владелец повысит вашу роль.',
@@ -8345,7 +8392,7 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Отметьте направления, которым эта стоянка <b>открыта</b>. Ветер оттуда раскачивает судно или создаёт опасность.',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Серии могут публиковать <b>только одобренные авторы</b>. Это место для перепечатки чужих текстов, поэтому так.',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Нажмите <b>[Добавить]</b> вверху справа',
-    '올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.':'<b>Чужие комментарии</b> к вашим записям исчезнут вместе с записью.',
+    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'<b>Чужие комментарии</b> к вашим записям исчезнут вместе с записью.',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'У нас большие приливы. Показание эхолота отсчитывается от <b>момента замера</b>, поэтому, записав его как есть, в малую воду сядете на грунт.',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'Погода, приливы и глубины в этом приложении — <b>справочные сведения</b>. Решение о выходе и о месте стоянки, как и ответственность за него, остаются за пользователем. (Условия, ст. 6)',
     '이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'Для этого места и времени нет данных об уровне, поэтому <b>пересчитать нельзя</b>.',
@@ -9078,7 +9125,7 @@ const I18N = {
     '자동팽창식 구명환':'Самонадувающийся спасательный круг',
     '빌지 알람':'Сигнализация трюма',
     '장비를 넣습니다.':'Это добавит оборудование.',
-    '갓 달았음':'Только установлено',
+    '설치한 지 얼마 안 됨':'Только установлено',
     '1년 미만':'Менее года',
     '1~3년':'1–3 года',
     '3년 넘게':'Более 3 лет',
@@ -9443,7 +9490,7 @@ const I18N = {
     '+ 정비수첩 — 어떻게 고쳤는지 남기기':'+ 整備手帳 — どう直したかを残す',
     '…':'…',
     '내 배에서만':'マイボートのみ',
-    '배에 <b>달려 있는 것</b>을 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'船に<b>付いているもの</b>を書き留めておく場所です — エンジン、ウインチ、プロッター、ビルジポンプ。',
+    '배에 <b>설치된 장비</b>를 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.':'船に<b>付いているもの</b>を書き留めておく場所です — エンジン、ウインチ、プロッター、ビルジポンプ。',
     '제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.':'メーカー・モデル・シリアル番号を一度書いておけば、部品を買うときも修理を頼むときも探し直さずに済みます。',
     '장비마다 정비·수리 기록이 연결되고, 도면에 자리를 찍어 둘 수 있습니다.':'装備ごとに整備・修理の記録がぶら下がり、図面に場所をピンで留められます。',
     '첫 장비 추가하기':'最初の装備を追加',
@@ -9471,7 +9518,7 @@ const I18N = {
     '산 값':'購入価格',
     '숫자만 넣어 주세요.':'数字だけ入れてください。',
     '예: 120000':'例: 120000',
-    '배에 <b>달아 본 물건</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'船に<b>付けてみたもの</b>がどうだったかを書く場所です — インペラー、フィルター、ロープ、塗料。',
+    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'船に<b>付けてみたもの</b>がどうだったかを書く場所です — インペラー、フィルター、ロープ、塗料。',
     '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'メーカーとモデルを書くと、同じものを使う人たちと同じ場所に集まります。',
     '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'同じ船を持つ人はまれでも、同じエンジン・同じウインチを使う人は何千人もいます。',
     '첫 리뷰 쓰기':'最初のレビューを書く',
@@ -9491,7 +9538,7 @@ const I18N = {
     '타 보니':'乗ってみて',
     '써 보니':'使ってみて',
     '바다에서 어떤지, 살림은 어떤지, 관리는 어떤지':'海ではどうか、居住性はどうか、手入れはどうか',
-    '달기는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'取付は楽だったか、音はどうか、どれくらい持つか',
+    '설치는 쉬웠는지, 소리는 어떤지, 얼마나 가는지':'取付は楽だったか、音はどうか、どれくらい持つか',
     '여기가 비어 있으면 광고 글처럼 보입니다':'ここが空だと広告のように見えます',
     '산 값(배)':'購入価格（船）',
     '값 공개':'価格の公開',
@@ -9813,8 +9860,8 @@ const I18N = {
     '지난 장비는 지우지 않고 「교체 이력」에 남습니다.':'前の装備は削除されず、「交換履歴」に残ります。',
     '새 장비로 옮겨 가는 것 — 정기점검 {a}건 · 부품 {b}개 · 계통 · 종류 · 도면 핀':'新しい装備へ移るもの — 定期点検 {a}件 ・ 部品 {b}個 ・ 系統 ・ 種類 ・ 図面のピン',
     '지난 장비에 남는 것 — 수리 {n}건 · 제조사 · 모델 · 일련번호 · 사진':'前の装備に残るもの — 修理 {n}件 ・ メーカー ・ モデル ・ シリアル番号 ・ 写真',
-    '{a} ~ {b} 에 달려 있던 장비입니다.':'{a} ~ {b} に取り付けられていた装備です。',
-    '지금 달려 있는 것은 교체 이력 위쪽에 있습니다.':'今取り付けられているものは、交換履歴の上にあります。',
+    '{a} ~ {b} 에 설치돼 있던 장비입니다.':'{a} ~ {b} に取り付けられていた装備です。',
+    '지금 설치된 것은 교체 이력 위쪽에 있습니다.':'今取り付けられているものは、交換履歴の上にあります。',
     '이상 없음':'異常なし',
     '{n}장':'{n}枚',
     '{a}MB / {b}MB':'{a}MB / {b}MB',
@@ -9926,7 +9973,7 @@ const I18N = {
     '앞으로 나갈 항해':'これからの航海',
     '지난 항해':'過去の航海',
     '찾은 항해가 없습니다.':'該当する航海がありません。',
-    '기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.':'記録された航海がありません。上の[+ 記録]を押して始めてみてください。',
+    '기록된 항해가 없습니다. 오른쪽 아래 [+] 를 눌러 시작해 보세요.':'記録された航海がありません。右下の[+]を押して始めてみてください。',
     '아직 나가지 않은 항해입니다':'まだ出港していない航海です',
     '출항했습니다':'出港しました',
     '구하면 게시판에 올라갑니다':'募集すると掲示板に載ります',
@@ -10303,6 +10350,10 @@ const I18N = {
     '저장 후 닫기':'保存して閉じる',
     '메모':'メモ',
     '삭제':'削除',
+    '+ 장비':'+ 装備',
+    '+ 연락처':'+ 連絡先',
+    '+ 문서':'+ 書類',
+    '새로 쓰기':'新しく書く',
     '{what} 은(는) 이 배에서 적을 권한이 없어 올리지 못했습니다.':'「{what}」はこの船で書く権限がないため、アップロードできませんでした。',
     '적어 두신 것은 이 기기에 그대로 있습니다.':'書かれたものはこの端末にそのまま残っています。',
     '선주가 등급을 올려 주면 그때 올라갑니다.':'船主が役割を上げてくれれば、そのときアップロードされます。',
@@ -11755,7 +11806,7 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'ここで <b>開けている</b> 方向を押してください。その方向から風が吹くと船が揺れたり危険になったりします。',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'連載は <b>許可を受けた方だけ</b> が投稿できます。他の方の文章を転載する場所だからです。',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'右上の <b>[追加]</b> を押します',
-    '올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.':'投稿された記事についた <b>他の方のコメント</b> も記事と一緒に消えます。',
+    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'投稿された記事についた <b>他の方のコメント</b> も記事と一緒に消えます。',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'韓国の海は潮汐の差が大きいです。水深計の値は <b>測ったその時</b> が基準なので、そのまま記入すると干潮時に座礁します。',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 자리의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'このアプリの天気・潮汐・水深は <b>参考資料</b> です。出港の可否と係留場所の判断および責任は利用者にあります。（利用規約第6条）',
     '이 자리·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'この場所・この時刻は潮位データがないため <b>換算できません</b>。',
@@ -12396,7 +12447,7 @@ const I18N = {
     '자동팽창식 구명환':'自動膨張式救命浮環',
     '빌지 알람':'ビルジ警報',
     '장비를 넣습니다.':'装備を追加します。',
-    '갓 달았음':'取り付けたばかり',
+    '설치한 지 얼마 안 됨':'取り付けたばかり',
     '1년 미만':'1年未満',
     '1~3년':'1〜3年',
     '3년 넘게':'3年以上',
@@ -15497,7 +15548,7 @@ async function openWipe(){
     + (guest.length ? `<div class="mrnone" style="text-align:left">
         ${tsub('<b>남의 배 {n}척</b>에 참여 중입니다 —', { n: guest.length })}
         ${esc(guest.map(b=>b.name).join(', '))}<br>${esc(t('그 배의 기록은 지워지지 않습니다. 다만 명부에 제 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 하시는 편이 깔끔합니다.'))}</div>` : '')
-    + `<div class="mrnone" style="text-align:left">${t('올려 두신 글에 달린 <b>남의 댓글</b>은 글과 함께 사라집니다.')}<br>${esc(t('법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
+    + `<div class="mrnone" style="text-align:left">${t('올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.')}<br>${esc(t('법이 보관하라고 정한 기록은 그 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
       <div class="mrrow" style="justify-content:center;padding:16px 12px">
         <button class="mrbtn big warn" onclick="askWipe()">${esc(t('계정 삭제'))}</button></div>`;
   showPanel(P);
@@ -21094,8 +21145,8 @@ function openBoard(){
     + (rows || (postQ.trim()
         ? `<div class="mrnone">${esc(tsub("'{q}' 로 찾은 글이 없습니다", { q: postQ.trim() }))}</div>`
         : `<div class="mrnone">${esc(t('아직 글이 없습니다'))}</div>`))
-    + (write ? `<div class="mrrow" style="justify-content:center;padding:14px 12px">
-        <button class="mrbtn big edt" onclick="writePost()">${esc(t('+ 글쓰기'))}</button></div>` : '');
+    // ★ 4.134 — 「+ 글쓰기」 는 오른쪽 아래 플로팅으로 갔다 (어느 화면에서나 같은 자리)
+    ;
   showPanel(P); boatKeepTabs('board');
 }
 function writePost(id){
@@ -22779,6 +22830,7 @@ function toggleLock(){
   localStorage.setItem('bt_unlocked', unlocked ? '1' : '0');
   applyLock();
   repaintNow();            // ★ 지금 보고 있는 화면을 바로 다시 그린다
+  if(typeof paintFab === 'function') paintFab();   // 보기 전용이면 새로 쓰는 단추도 사라진다
   if(unlocked && typeof cloudSeedCheck === 'function') cloudSeedCheck();
 }
 // ── 지금 화면 다시 그리기
@@ -23980,7 +24032,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.133';
+const APP_VER = '4.134';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -25244,7 +25296,7 @@ function stowZoomBind(){
   }, {passive:false});
   window.addEventListener('resize', ()=>{ if(mapTouched){ mapClamp(); mapApply(false); } });
 }
-function closePanel(){ selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
+function closePanel(){ if(typeof paintFab === 'function') setTimeout(paintFab, 0); selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
 
 // ── 물품을 어느 장비 것인지 잇는 칸
 // ★ 장비가 하나도 없으면 줄을 통째로 감춘다. 고를 것이 없는 고르기 칸은
@@ -27126,14 +27178,21 @@ function mntBar(){
   // ★ 4.70 — 「+ 추가」 가 없었다. 첫 건은 빈 화면의 「첫 정비수첩 쓰기」 로 만들 수 있는데,
   //   한 건이라도 생기면 그 안내가 사라져서 **두 번째를 만들 길이 없어졌다.** (사장님 지적)
   //   문서 화면(docBar)이 이미 오른쪽 끝에 「+ 추가」 를 달고 있다. 같은 자리, 같은 모양으로 붙인다.
-  const add = { mlog:['+ 정비수첩','addMlog()'],
-                repair:['+ 고장','repairAdd()'] }[mntSub];
+  // ★★★ 4.134 — 「도면」 단추가 갈래 띠 **아래 줄에 혼자** 떨어져 있었다 (사장님 지적).
+  //   수리 화면만 제 도구줄을 따로 하나 더 갖고 있어서, 단추 하나짜리 줄이 생겼다.
+  //   같은 줄에 들인다. 「완료된 수리」 는 도면을 볼 때만 뜻이 있으므로 그때만 붙인다.
+  const 도면쪽 = (mntSub === 'repair')
+    ? `<button class="tab" onclick="mrToggleView('repair')">${
+         esc(repairView === 'map' ? t('목록') : t('도면'))}</button>`
+      + (repairView === 'map'
+          ? `<button class="tab${showDone ? ' on' : ''}" onclick="toggleDone()">${esc(t('완료된 수리'))}</button>` : '')
+    : '';
   return `<div class="tfilt" style="align-items:center">` + MNT_SUBS.map(x =>
       `<button class="tchip${x.k === mntSub ? ' on' : ''}" onclick="setMntSub('${x.k}')">${
         esc(t(x.n))}</button>`).join('')
-    + (add ? `<span style="flex:1"></span>`
-           + `<button class="tab edt" onclick="needEdit('${jsq(tsub('{what}을(를) 넣습니다.', { what: t(add[0].replace('+ ','')) }))}', ()=>${add[1]})">${
-               esc(t(add[0]))}</button>` : '')
+    // ★ 4.134 — 「+ 정비수첩」·「+ 고장」 은 오른쪽 아래 플로팅으로 갔다.
+    //   여기 남는 것은 화면을 바꾸는 도구(도면/목록·완료된 수리)뿐이다.
+    + (도면쪽 ? `<span style="flex:1"></span>` + 도면쪽 : '')
     + `</div>`;
 }
 // 밀린 정기점검이 있으면 갈래 이름 옆에 수를 붙인다 — 다른 갈래를 보고 있어도 보이게.
@@ -27334,6 +27393,131 @@ function setComSub(k){
   try{ localStorage.setItem('bt_comsub', comSub); }catch(_){}
   switchTab('community');
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.134 — 「새로 쓰는 것」 은 어느 화면에서나 오른쪽 아래 한 자리에서 (사장님이 정하신 것)
+//
+//   사장님 말씀: 「탭이랑 새로 쓰는 단추가 구분이 안 된다」
+//                「하나만 고치지 말고 각각의 창의 특성에 맞게 … 하나도 빼놓지 말고」
+//
+//   ★ 무엇이 잘못이었나 — 탭도 단추도 같은 회색 알약이라, 어느 것이 화면을 바꾸고
+//     어느 것이 새로 쓰는 것인지 알 수가 없었다. 게다가 그 단추가 화면마다 다른 자리에
+//     다른 개수로 붙어 있어서, 처음 쓰는 사람은 매번 다시 찾아야 했다.
+//
+//   ★ 잣대 (내가 정한 것이 아니라 찾은 것)
+//     · KRDS — 「자주 쓰는 **단일 행동**이 있으면 플로팅」, 「둘 이상이면 **확장형**, 셋 이하」,
+//               「**우측 하단**, 탭바와 안 겹치게」
+//     · 머티리얼 — 「한 화면에 **하나만**」, 「**버리기·사소한 일·도구줄에 있어야 할 조작**에는 쓰지 마라」
+//
+//   ★ 그래서 **안 옮긴 것**이 있다. 「어디에?」 가 붙는 것들이다 —
+//     적재표(어느 칸에), 달력(어느 날에), 장비 카드(어느 장비에).
+//     그것을 떼어 내 오른쪽 아래로 보내면 그 「어디에」 가 사라진다.
+//     체크리스트의 「+ 항목 추가」 는 줄 하나 더하기라 머티리얼이 말하는 사소한 일이다.
+//
+//   ★ 되돌리는 길 — FAB_ON 을 false 로 두면 예전 모양으로 돌아간다.
+const FAB_ON = true;
+
+// 이 화면에서 새로 쓰는 것이 무엇인가 — **여기 한 곳에서만** 정한다 (문 하나)
+//   [보여 줄 이름, 누르면 할 일]
+function fabActs(){
+  if(!FAB_ON) return [];
+  if(!unlocked) return [];                       // 보기 전용이면 새로 쓸 일이 없다
+  const t = (typeof curTab !== 'undefined') ? curTab : '';
+  if(t === 'boat'){
+    const b = (typeof boatSubTab !== 'undefined') ? boatSubTab : '';
+    // 적재표는 뺀다 — 「어느 칸에 넣나」 가 먼저다. 칸을 고르는 화면에서 넣는다.
+    if(b === 'maint'){
+      if(mntSub === 'mlog')   return [['+ 정비수첩', 'addMlog()']];
+      // 도면을 보고 있으면 자리부터 찍게 한다 — 옛 단추가 하던 일 그대로다
+      if(mntSub === 'repair') return [['+ 고장', 'repairAdd()']];
+      if(mntSub === 'fuel')   return [['+ 주유', 'addFuel()'], ['+ 엔진가동', 'addRun()']];
+      return [];
+    }
+    if(b === 'gear'){
+      if(gearView === 'review'){
+        const 배 = (typeof brRows === 'function' && !brRows().length);
+        return 배 ? [['+ 제품 리뷰', 'addReview()'], ['+ 배 리뷰', 'addBoatReview()']]
+                  : [['+ 제품 리뷰', 'addReview()']];
+      }
+      if(gearView === 'maint') return [['+ 정기점검', 'gearAdd()']];
+      return [['+ 장비', 'gearAdd()']];
+    }
+    if(b === 'voyage') return [['+ 기록', 'addVoyage()'], ['+ 예정', 'addPlan()']];
+    if(b === 'docs')   return (typeof docSub !== 'undefined' && docSub === 'contact')
+                             ? [['+ 연락처', 'addContact()']] : [['+ 문서', 'addVdoc()']];
+    return [];
+  }
+  if(t === 'community'){
+    if(comSub === 'talk')   return [['+ 글쓰기', 'writePost()']];
+    if(comSub === 'market') return [['+ 팔 물건 올리기', 'writeItem()']];
+    if(comSub === 'spots'){
+      // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 안 띄운다.
+      const 끊김 = (typeof navigator !== 'undefined') && navigator.onLine === false;
+      return 끊김 ? [] : [['+ 정박지 올리기', 'writeSpot()']];
+    }
+    return [];
+  }
+  // ★ 연재 갈래의 열쇠는 'sr' 이다 ('series' 가 아니다 — 실제 코드를 보고 맞췄다)
+  if(homeSub === 'news' && newsSub === 'sr'
+     && typeof canSeries === 'function' && canSeries())
+    return [['+ 연재 글 올리기', 'writeSeries()']];
+  return [];
+}
+
+let fabOpen = false;
+// 앞에 뜬 화면·창이 있으면 단추를 감춘다 — 창 위에 떠다니면 안 된다
+function fabBlocked(){
+  try{
+    if(document.body.classList.contains('panelfull')) return true;
+    if(typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length) return true;
+    const 뜬것 = ['mrPanel','panel','formOv','hatPanelOv','trashView','helpOv',
+                 'tellOv','actOv','photoView','recPick','dgPick','drawerOv','pmOv'];
+    for(const id of 뜬것){
+      const e = document.getElementById(id);
+      if(!e) continue;
+      if(e.classList && e.classList.contains('open')) return true;
+      const d = getComputedStyle(e).display;
+      if(d && d !== 'none') return true;
+    }
+  }catch(_){}
+  return false;
+}
+function fabClose(){ fabOpen = false; paintFab(); }
+function fabTap(){
+  const acts = fabActs();
+  if(acts.length === 1){ fabRun(0); return; }
+  fabOpen = !fabOpen; paintFab();
+}
+function fabRun(i){
+  const acts = fabActs();
+  const a = acts[i];
+  fabOpen = false; paintFab();
+  if(!a) return;
+  try{ (new Function(a[1]))(); }catch(e){ try{ console.error(e); }catch(_){} }
+}
+function paintFab(){
+  const host = document.getElementById('fabHost');
+  if(!host) return;
+  // 탭줄 높이를 재서 넣는다 — 기기마다 다르다(안전 영역). 숫자를 박지 않는다.
+  try{
+    const tb = document.getElementById('tabbar');
+    if(tb) document.documentElement.style.setProperty('--tabh',
+      Math.round(tb.getBoundingClientRect().height) + 'px');
+  }catch(_){}
+  const acts = fabActs();
+  if(!acts.length || fabBlocked()){ host.innerHTML = ''; fabOpen = false; return; }
+  const 펼침 = fabOpen && acts.length > 1;
+  host.innerHTML =
+      (펼침 ? `<div class="fabscrim" onclick="fabClose()"></div>` : '')
+    // ★ 위로 쌓이므로 **거꾸로** 그린다 — 첫째 할 일이 단추에 제일 가깝게 (엄지가 먼저 닿는 자리)
+    + (펼침 ? `<div class="fabwrap">` + acts.map((a, i) =>
+        `<button class="fabitem" onclick="fabRun(${i})">${esc(t(a[0]))}</button>`)
+        .reverse().join('')
+        + `</div>` : '')
+    + `<button class="fab${펼침 ? ' open' : ''}" onclick="fabTap()"
+         aria-label="${esc(t(acts.length === 1 ? acts[0][0] : '새로 쓰기'))}"><i>+</i></button>`;
+}
+
 function switchTab(t){
   mobFabSync();   // 탭을 옮겨도 항해 중이면 단추가 따라온다
   // 열려 있던 화면(내 배·게시판 등)을 닫고 그 자리로 간다.
@@ -27422,6 +27606,7 @@ function switchTab(t){
   measureHeader();
 
   renderCurrent();
+  paintFab();         // ★ 화면이 바뀌면 「새로 쓰는 것」도 바뀐다
   navMark();          // ★ 지나온 자리를 적는다 (뒤로 가기가 이것을 쓴다)
 }
 // ★ 지금 보고 있는 화면의 '내용만' 다시 그린다.
@@ -28164,11 +28349,10 @@ function renderMR(){
   const isMap = repairView==='map';
   document.getElementById('mrMapWrap').style.display = isMap?'':'none';
   document.getElementById('repairList').style.display = !isMap?'':'none';
-  document.getElementById('repairViewBtn').textContent = isMap?t('목록'):t('도면');
-  // 「완료된 수리」 스위치는 도면을 보고 있을 때만 나온다 —
-  // 목록에는 이미 접히는 묶음으로 그 자리가 있다.
-  const db = document.getElementById('repairDoneBtn');
-  if(db){ db.style.display = isMap ? '' : 'none'; db.classList.toggle('on', !!showDone); }
+  // ★ 4.134 — 단추가 갈래 띠 안으로 갔다. 띠를 다시 그리면 글자도 상태도 함께 맞는다.
+  //   「완료된 수리」 스위치는 도면을 보고 있을 때만 나온다 —
+  //   목록에는 이미 접히는 묶음으로 그 자리가 있다.
+  if(typeof paintMntBar === 'function') paintMntBar();
   if(isMap) setMapKind(mrMapKind);
   else renderRepairList();
   if(typeof pinBannerSync === 'function') pinBannerSync();
@@ -29795,6 +29979,7 @@ function screenPop(id){
     }
     try{ restorePanel(); }catch(_){}
   }
+  if(typeof paintFab === 'function') setTimeout(paintFab, 0);   // 화면이 닫히면 단추가 돌아온다
 }
 // 여는 곳·닫는 곳이 수십 군데다. 한 곳이라도 빠지면 거기서 앞창이 다시 생긴다.
 // 그래서 부르는 쪽을 고치지 않고, 화면이 켜지고 꺼지는 것을 스스로 지켜본다.
@@ -30145,6 +30330,7 @@ function showPanel(P){
   if(!P) return;
   panelMapHide(true);
   measureHeader();
+  if(typeof paintFab === 'function') setTimeout(paintFab, 0);   // 화면이 뜨면 단추는 숨는다
   // (발자국은 screenPush 한 군데에서 남긴다. 여기서 또 남기면 두 칸이 쌓인다.)
   P.classList.add('open', 'full');
   const t = P.querySelector('.mrhead > b, .mrtop > b');
@@ -30602,7 +30788,7 @@ function renderVoyage(){
     : '';
   L.innerHTML = head + qbox + planBox + (past.map(row).join('') || (voyQ.trim()
         ? `<div class="mrnone">${esc(t('찾은 항해가 없습니다.'))}</div>`
-        : `<div class="mrnone">${esc(t('기록된 항해가 없습니다. 위 [+ 기록]을 눌러 시작해 보세요.'))}</div>`));
+        : `<div class="mrnone">${esc(t('기록된 항해가 없습니다. 오른쪽 아래 [+] 를 눌러 시작해 보세요.'))}</div>`));
 }
 // ── 항적 기록 칸 (앱에서, 이 항해를 기록하고 있을 때만 보인다)
 // ★ 켜졌는지 꺼졌는지 화면에 표시가 없으면, 배에서 몇 시간 뒤에야 안 그려진 걸 안다.
@@ -34642,8 +34828,6 @@ async function renderMarket(){
     <div class="qbox"><input id="mkQ" value="${esc(marketQ)}"
         placeholder="${esc(t('물건 이름 · 내용으로 찾기'))}"
         oninput="marketFilter(this.value)" autocomplete="off"></div>
-    <div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-      <button class="mrbtn ok edt" onclick="writeItem()">${esc(t('+ 팔 물건 올리기'))}</button></div>
     <div id="marketRows">` + marketRowsHtml() + `</div>`;
 }
 function marketRowsHtml(){
@@ -35712,8 +35896,8 @@ async function renderSpots(){
         placeholder="${esc(t('정박지 이름 · 지역으로 찾기'))}"
         oninput="spotFilter(this.value)" autocomplete="off"></div>`
     // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 감춘다.
-    + (off ? '' : `<div class="mrrow" style="justify-content:flex-end;padding:8px 12px">
-      <button class="mrbtn ok edt" onclick="writeSpot()">${esc(t('+ 정박지 올리기'))}</button></div>`)
+    // ★ 4.134 — 「+ 정박지 올리기」 는 오른쪽 아래 플로팅으로 갔다.
+    //   ★ 오프라인에서는 올릴 수가 없다 — 그때는 플로팅도 안 뜬다 (fabActs 가 본다).
     + spotViewBar()
     + (spotView === 'map'
         ? mapBox('spotsMap','58vh') + spotMapFoot()
@@ -39864,7 +40048,7 @@ function renderGear(){
   if(!rows.length){
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('장비'))}</b>
-      <div>${t('배에 <b>달려 있는 것</b>을 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.')}<br>
+      <div>${t('배에 <b>설치된 장비</b>를 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.')}<br>
         ${esc(t('제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.'))}</div>
       <div class="emptysub">${esc(t('장비마다 정비·수리 기록이 연결되고, 도면에 자리를 찍어 둘 수 있습니다.'))}</div>
       <button class="mrbtn" onclick="needEdit('장비를 넣습니다.', addGear)">${esc(t('첫 장비 추가하기'))}</button>
@@ -40867,8 +41051,8 @@ function gearHistBlock(it){
   // ① 이 장비가 언제부터 언제까지인가 — 교체된 것이면 기간을 머리에 밝힌다
   if(isRetired(it)){
     out += `<div class="mrnone" style="text-align:left">${
-      esc(tsub('{a} ~ {b} 에 달려 있던 장비입니다.', { a: sp.a || '?', b: sp.b || '?' }))}<br>${
-      esc(t('지금 달려 있는 것은 교체 이력 위쪽에 있습니다.'))}</div>`;
+      esc(tsub('{a} ~ {b} 에 설치돼 있던 장비입니다.', { a: sp.a || '?', b: sp.b || '?' }))}<br>${
+      esc(t('지금 설치된 것은 교체 이력 위쪽에 있습니다.'))}</div>`;
   }
 
   // ② 교체 이력 — 거슬러 올라간 줄. 누르면 그 장비가 열린다.
@@ -40927,7 +41111,7 @@ function gearHistBlock(it){
 const RV_STARS = 5;
 // 얼마나 써 봤나 — 개월을 치게 하면 아무도 안 채운다. 고르게 한다.
 const RV_USED = [
-  { k:'new',  n:'갓 달았음' },
+  { k:'new',  n:'설치한 지 얼마 안 됨' },
   { k:'y1',   n:'1년 미만' },
   { k:'y3',   n:'1~3년' },
   { k:'y3up', n:'3년 넘게' }
@@ -41071,7 +41255,7 @@ function renderReviews(){
   if(!rows.length){
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('부품 리뷰'))}</b>
-      <div>${t('배에 <b>달아 본 물건</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.')}<br>
+      <div>${t('배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.')}<br>
         ${esc(t('제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.'))}</div>
       <div class="emptysub">${esc(t('같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.'))}</div>
       <button class="mrbtn" onclick="needEdit('리뷰를 씁니다.', ()=>addReview())">${esc(t('첫 리뷰 쓰기'))}</button>
@@ -41195,7 +41379,7 @@ function rvBody(it){
     <div class="mrrow"><span class="mrlbl">${esc(isB ? t('타 보니') : t('써 보니'))}</span>${unlocked
       ? `<textarea rows="4" style="flex:1" placeholder="${esc(isB
            ? t('바다에서 어떤지, 살림은 어떤지, 관리는 어떤지')
-           : t('달기는 쉬웠는지, 소리는 어떤지, 얼마나 가는지'))}" onchange="mrField('text',this.value)">${esc(it.text||'')}</textarea>`
+           : t('설치는 쉬웠는지, 소리는 어떤지, 얼마나 가는지'))}" onchange="mrField('text',this.value)">${esc(it.text||'')}</textarea>`
       : `<span class="mrv" style="flex:1;white-space:pre-wrap">${esc(it.text||'—')}</span>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('아쉬운 점'))}</span>${unlocked
       ? `<textarea rows="2" style="flex:1" placeholder="${esc(t('여기가 비어 있으면 광고 글처럼 보입니다'))}" onchange="mrField('bad',this.value)">${esc(it.bad||'')}</textarea>`
@@ -41489,6 +41673,7 @@ function setGearSub(k){
   gearView = GEAR_SUBS.indexOf(k) >= 0 ? k : 'gear';
   try{ localStorage.setItem('bt_gearsub', gearView); }catch(_){}
   renderGearWrap();
+  if(typeof paintFab === 'function') paintFab();
   if(typeof navMark === 'function') navMark();   // 이것도 「자리」 다
 }
 // ★ 그리는 일은 여기 한 곳에서 한다. 두 곳에서 그리면 단추와 화면이 어긋난다.
@@ -42220,6 +42405,7 @@ function setDocSub(k){
   docSub = DOC_SUBS.some(x => x.k === k) ? k : 'docs';
   try{ localStorage.setItem('bt_docsub', docSub); }catch(_){}
   renderContacts();
+  if(typeof paintFab === 'function') paintFab();
 }
 // ★ 갈래 이름을 띠에 한 번 쓰고, 아래에 또 제목으로 쓰지 않는다.
 //   「문서」 바로 밑에 또 「문서」 가 나오면 줄만 잡아먹는다.
@@ -43530,6 +43716,7 @@ function setNewsSub(k){
   trNewsOn = false;          // 갈래를 옮기면 원어부터 보여 준다
   try{ localStorage.setItem('bt_newssub', k); }catch(_){}
   renderNews();
+  if(typeof paintFab === 'function') paintFab();
 }
 // 마지막으로 뉴스를 본 시각 — 그 뒤에 올라온 것에 '새로' 를 붙인다
 function newsSeenAt(){
@@ -43732,10 +43919,9 @@ async function seriesHtml(){
   const rows = await loadSeries();
   const can = canSeries();
   // 연재자면 올리는 단추, 아니면 신청하는 길. 빈자리로 두면 어떻게 끼는지 알 수 없다.
-  const add = can
-    ? `<div class="mrrow" style="justify-content:flex-end;padding:8px 0">
-         <button class="mrbtn ok edt" onclick="writeSeries()">${esc(t('+ 연재 글 올리기'))}</button></div>`
-    : seriesApplyHtml();
+  // ★ 4.134 — 「+ 연재 글 올리기」 는 오른쪽 아래 플로팅으로 갔다.
+  //   연재자가 아닌 분에게는 여기 신청하는 길만 남는다.
+  const add = can ? '' : seriesApplyHtml();
   if(!rows.length){
     return add + `<div class="mrnone" style="text-align:left">${esc(t('아직 올라온 연재가 없습니다.'))}</div>`;
   }

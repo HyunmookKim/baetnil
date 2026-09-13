@@ -23357,6 +23357,9 @@ async function cloudPull(){
   pullDone = true;
   lastPullAt = Date.now();
   cloudSeeded = !!r.seeded;
+  // ★★★ 4.135 — 받아온 줄이 옛 판이면 list 가 없다. 제자리로 되돌리고 **올린다**.
+  //   올리지 않으면 다음 받아오기에 또 지워진다 (CK_HOME 설명 참고).
+  try{ if(ckRepair()){ saveLocal(); pushWanted = true; } }catch(_){}
   if(pushWanted){ pushWanted = false; schedulePush(); }
   if(r.seeded){
     // ★ 여기도 갈아치우면 안 된다 — 적재표가 제일 크고 제일 자주 고친다
@@ -24032,7 +24035,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.134';
+const APP_VER = '4.135';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29844,6 +29847,37 @@ const CHECK_DEFAULTS = [
   {id:'c36', list:'kl3', label:t('육상전원·전선 상태')},
 ];
 
+// ★★★ 4.135 — 제자리를 잃은 점검 항목을 원래 목록으로 되돌린다 (사장님 지적, 2026-09-13)
+//
+//   ★ 무슨 일이 있었나 — 화면의 제목과 내용이 어긋났다
+//     사장님 폰에서 「정박 중 점검」을 열면 「기상·풍속·파고 확인」 같은 **출항 전** 항목이
+//     그 안에 섞여 있었다. 개수도 맞지 않았다.
+//
+//   ★ 까닭
+//     ① 옛 판은 체크리스트가 목록 없이 한 줄이었다. 새 판으로 올라올 때
+//        ensureCheckLists() 가 그 줄들에 list='kl1' 을 적어 준다.
+//        그런데 그 고침이 **이 기기에만** 남았다 — 클라우드에는 list 없는 옛 줄이 그대로다.
+//     ② 다음에 받아올 때 keepMine() 이 줄을 **통째로** 갈아끼우면서 list 를 도로 지웠다.
+//        ensureCheckLists() 는 「목록이 이미 있으니 할 일 없다」 며 다시 손대지 않는다. 영영 그대로다.
+//     ③ ckItems() 가 list 없는 항목을 **맨 앞 목록**에 얹고 있었다. 받아오기가 줄 차례를
+//        뒤섞으므로 기기마다 맨 앞이 달랐다 — 사장님 폰은 「정박 중 점검」이 맨 앞이었다.
+//
+//   ★ 고치는 법 — 문 하나
+//     ① 기본 항목은 아이디로 제자리를 안다 (CK_HOME). 거기로 되돌린다.
+//     ② 그 밖의 것은 아무 목록에나 얹지 않고 「미분류」로 둔다.
+//     ③ 고친 것은 저장하고 **올린다**. 안 올리면 다음 받아오기에 또 지워진다.
+//     ④ 목록 차례를 기기마다 같게 둔다 (CK_ORDER).
+const CK_HOME = (function(){
+  const m = {}; let cur = null;
+  CHECK_DEFAULTS.forEach(r=>{
+    if(!r) return;
+    if(r.typ === 'list'){ cur = String(r.id); return; }
+    m[String(r.id)] = String(r.list || cur || '');
+  });
+  return m;
+})();
+const CK_ORDER = ['kl1','kl2','kl3'];
+
 // ----- 서랍 -----
 function openDrawer(){ document.getElementById('drawerOv').classList.add('open');   paintVer();
   paintMenuPerms();
@@ -32316,6 +32350,7 @@ function setupSave(){
   //   ★ 이미 있는 기록은 절대 안 건드린다 (사장님이 정하신 것 0).
   try{ if(!contacts || !contacts.length) contacts = contactDefaults(); }catch(_){}
   try{ if(!checkt  || !checkt.length)  checkt  = checkDefaults(); }catch(_){}
+  try{ ckRepair(); }catch(_){}
   try{ sysSave(); }catch(_){}
   location.reload();
 }
@@ -42503,7 +42538,26 @@ function addVdoc(){
 
 const CK_CYCLES = { d:t('날마다 초기화'), w:t('주마다 초기화'), n:t('직접 초기화') };
 
-function ckLists(){ return checkt.filter(c=>c && c.typ==='list'); }
+function ckLists(){
+  // ★ 받아오기가 줄 차례를 뒤섞는다. 기기마다 같은 차례로 보이게 한다.
+  const ls = checkt.filter(c=>c && c.typ==='list');
+  const k = l => { const i = CK_ORDER.indexOf(String(l.id)); return i < 0 ? CK_ORDER.length : i; };
+  return ls.map((l,i)=>({l,i})).sort((a,b)=> (k(a.l)-k(b.l)) || (a.i-b.i)).map(x=>x.l);
+}
+// 제자리를 잃은 기본 항목을 원래 목록으로 되돌린다. 고쳤으면 true.
+function ckRepair(){
+  const ids = new Set(checkt.filter(c=>c && c.typ==='list').map(l=>String(l.id)));
+  if(!ids.size) return false;
+  let 고침 = false;
+  checkt.forEach(c=>{
+    if(!c || c.typ === 'list') return;
+    const now = c.list ? String(c.list) : '';
+    if(now && ids.has(now)) return;                 // 제자리에 있다
+    const home = CK_HOME[String(c.id)];             // 기본 항목만 제자리를 안다
+    if(home && ids.has(home) && now !== home){ c.list = home; 고침 = true; }
+  });
+  return 고침;
+}
 
 // 초기화 기준이 되는 기간 열쇠. 이 값이 바뀌면 체크가 저절로 풀린다.
 function ckPeriod(cycle){
@@ -42541,7 +42595,8 @@ function ckSetDone(listId, cycle, ids){
 // 목록이 하나도 없는 예전 형식을 새 형식으로 옮긴다.
 // 쓰던 항목은 그대로 '출항 전'에 들어가고, 나머지 목록만 새로 붙는다.
 function ensureCheckLists(){
-  if(checkt.some(c=>c && c.typ==='list')) return false;
+  // ★ 목록이 이미 있어도 그냥 돌아가면 안 된다 — 제자리를 잃은 항목이 있을 수 있다.
+  if(checkt.some(c=>c && c.typ==='list')) return ckRepair();
   const olds = checkt.filter(c=>c && c.typ!=='list');
   const def  = checkDefaults();
   if(olds.length){
@@ -42563,22 +42618,19 @@ function ensureCheckLists(){
   return true;
 }
 
-// 목록에 속한 항목. list 값이 없는 항목은 첫 목록에 넣어 준다.
+// 목록에 속한 항목.
+// ★ 4.135 — 전에는 list 값이 없는 항목을 **맨 앞 목록**에 얹었다. 그래서 출항 전 항목이
+//   정박 중 점검 안에 들어가 보였다. 이제 적힌 자리에만 넣는다.
 function ckItems(listId){
-  const ls  = ckLists(); if(!ls.length) return [];
-  const ids = ls.map(l=>String(l.id));
-  const first = String(ls[0].id);
-  return checkt.filter(c=>{
-    if(!c || c.typ==='list') return false;
-    const l = c.list ? String(c.list) : first;
-    return ids.includes(l) && l === String(listId);
-  });
+  const want = String(listId);
+  return checkt.filter(c => c && c.typ!=='list' && c.list && String(c.list) === want);
 }
 
-// 목록이 지워져서 갈 곳을 잃은 항목. 지우지 않고 '미분류'로 보여 준다.
+// 갈 곳을 잃은 항목. 지우지 않고 '미분류'로 보여 준다.
+// ★ 4.135 — list 가 **아예 없는** 것도 여기 넣는다. 전에는 빠져서 조용히 남의 목록에 섞였다.
 function ckOrphans(){
   const ids = ckLists().map(l=>String(l.id));
-  return checkt.filter(c=>c && c.typ!=='list' && c.list && !ids.includes(String(c.list)));
+  return checkt.filter(c => c && c.typ!=='list' && !(c.list && ids.includes(String(c.list))));
 }
 
 let ckCur = null;

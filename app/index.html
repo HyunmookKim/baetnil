@@ -125,7 +125,7 @@
 .emptybox{border:1px dashed #2A3B4C;border-radius:12px;padding:22px 16px;margin:6px 0;
   text-align:center;background:#0E1620;line-height:1.85}
 .emptybox > b{display:block;font-size:15px;color:#DFE6EE;margin-bottom:10px}
-.emptybox > div{font-size:12.5px;color:#9AA8B6}
+.emptybox > div{font-size:12.5px;color:#9AA8B6;text-wrap:pretty}
 .emptybox b{color:#C6D3DF}
 .emptybox .emptysub{font-size:11.5px;color:#93AABD;margin-top:8px}
 .emptybox .mrbtn{margin-top:14px}
@@ -250,7 +250,12 @@ body.locked .trestore, body.locked .tdelp{display:none}
 }
 body{background:#0a1628;color:#e8eef5;min-height:100vh;
   font-family:'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif;
-  font-optical-sizing:auto;letter-spacing:-.012em}
+  font-optical-sizing:auto;letter-spacing:-.012em;
+  /* ★★★ 4.136 — 한글이 낱말 가운데서 잘리지 않게 한다 (사장님 지적, 2026-09-13)
+     기본값이면 한글은 글자 아무 데서나 끊긴다 — 「맡길 때 / 도」, 「남깁 / 니다」 처럼
+     읽다가 걸린다. keep-all 은 띄어쓰기(어절)에서만 끊는다. 한국 사이트가 쓰는 방식이다.
+     혼자서는 긴 낱말이 칸을 넘으니 break-word 를 함께 둔다 — 넘칠 때만 끊는다. */
+  word-break:keep-all;overflow-wrap:break-word}
 /* ★★★ 4.134 — 여기에 html,body{overflow-x:hidden} 을 넣었다가 **걷어냈다.**
    가로로 밀리는 것을 막으려던 빗장인데, 그것을 걸면 몸통이 스크롤 칸이 되어
    **position:sticky 가 통째로 죽는다** — 기록 창의 머리줄과 「할 일」 단추가
@@ -2657,7 +2662,7 @@ const I18N = {
     '아직 공개된 배 리뷰가 없습니다':'No boat reviews shared yet',
     '찾는 것이 없습니다':'Nothing found',
     '내 정비 기록에 「정비 절차」를 적고 공개를 켜면 여기에 실립니다.':'Write the steps in your own maintenance record and turn sharing on — it appears here.',
-    '위의 「쓰기」를 눌러 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「부품 리뷰」를 켜면 여기에 실립니다.':'Tap Write above to leave your first review. Turn on product reviews in the boat sharing settings and it appears here.',
+    '위에 있는 쓰기 단추로 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「제품 리뷰」를 켜면 여기에 실립니다.':'Use the write button above to leave your first review. Turn on Product review in the boat sharing settings and it appears here.',
     '배 공개 설정에서 「항해일지」를 켜면 여기에 실립니다.':'Turn on the logbook in the boat sharing settings and it appears here.',
     '부품 리뷰':'Product reviews',
     '눌러서 절차 보기':'Tap to see the steps',
@@ -2698,9 +2703,9 @@ const I18N = {
     '산 값':'Price paid',
     '숫자만 넣어 주세요.':'Numbers only, please.',
     '예: 120000':'e.g. 120000',
-    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'This is where you write how <b>things you have fitted</b> worked out — impellers, filters, rope, paint.',
-    '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'Write the maker and model and you gather in one place with everyone using the same thing.',
-    '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'Few people have the same boat, but thousands use the same engine or the same winch.',
+    '배에서 <b>써 본 제품</b>의 성능과 내구성을 기록하는 곳입니다 — 임펠러, 필터, 로프, 도료.':'Where you record the performance and durability of the <b>products you have used</b> on the boat — impellers, filters, rope, paint.',
+    '제조사와 모델을 적으면 그 제품으로 찾을 수 있습니다.':'Add the maker and model and you can search by that product.',
+    '장비를 열고 「+ 제품 리뷰」 를 누르면 제조사·모델이 그대로 채워집니다.':'Open a piece of gear and tap + Product review — the maker and model are filled in for you.',
     '첫 리뷰 쓰기':'Write your first review',
     '내 배 리뷰 쓰기':'Review my boat',
     '제품':'Product',
@@ -2709,8 +2714,8 @@ const I18N = {
     '해당하는 리뷰가 없습니다':'No reviews match',
     '이 배 자체에 대한 리뷰입니다. 배를 사려는 사람이 제일 먼저 찾는 글입니다.':'A review of the boat itself. This is the first thing someone looking to buy reads.',
     'First 45f5, Sun Odyssey 449 …':'First 45f5, Sun Odyssey 449 …',
-    '적으면 같은 물건 쓰는 사람과 만납니다':'Write it and you meet others using the same thing',
-    '모델을 안 적어도 됩니다 — 종류와 계통으로는 그대로 모입니다.':'You need not write the model — it still gathers by type and system.',
+    'Jabsco 22405, Racor 500FG …':'Jabsco 22405, Racor 500FG …',
+    '모델을 안 적어도 됩니다 — 종류와 계통으로 찾을 수 있습니다.':'The model is optional — it can still be found by type and system.',
     '별점':'Rating',
     '또 살까':'Buy again',
     '탄 기간':'Sailed for',
@@ -3162,7 +3167,7 @@ const I18N = {
     '차단한 사람이 없습니다':'You have not blocked anyone',
     '차단한 사람의 글을 다시 봅니다':'Unblock people to see their posts again',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'You can undo this any time — Settings › Blocked people',
-    '+ 배 리뷰':'+ Boat review',
+    '+ 내 배 리뷰':'+ Review my boat',
     '어느 장비 것':'Which gear',
     '「{name}」 도면을 지웁니다.':'Delete the plan "{name}".',
     '「{name}」 도면을 지웠습니다.':'Deleted the plan "{name}".',
@@ -5729,8 +5734,8 @@ const I18N = {
     '유로':'EUR',
     '리뷰를 씁니다.':'This writes a product review.',
     '배 리뷰를 씁니다.':'This writes a boat review.',
-    '이 배 리뷰가 나 말고 {n}건 있습니다.':'There are {n} other reviews of this boat.',
-    '이 제품 리뷰가 나 말고 {n}건 있습니다.':'There are {n} other reviews of this product.',
+    '이 배 리뷰가 {n}건 더 있습니다.':'There are {n} other reviews of this boat.',
+    '이 제품 리뷰가 {n}건 더 있습니다.':'There are {n} other reviews of this product.',
     '이 배의 첫 리뷰입니다.':'This is the first review of this boat.',
     '이 제품의 첫 리뷰입니다.':'This is the first review of this product.',
     '갓 샀음':'Just bought',
@@ -6062,7 +6067,7 @@ const I18N = {
     '아직 공개된 배 리뷰가 없습니다':'Пока нет отзывов о судах',
     '찾는 것이 없습니다':'Ничего не найдено',
     '내 정비 기록에 「정비 절차」를 적고 공개를 켜면 여기에 실립니다.':'Опишите шаги в своей записи и включите публикацию — она появится здесь.',
-    '위의 「쓰기」를 눌러 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「부품 리뷰」를 켜면 여기에 실립니다.':'Нажмите «Написать» выше. Включите отзывы в настройках публикации судна — они появятся здесь.',
+    '위에 있는 쓰기 단추로 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「제품 리뷰」를 켜면 여기에 실립니다.':'Нажмите кнопку записи выше и оставьте первый отзыв. Включите «Отзыв о товаре» в настройках доступа судна — и он появится здесь.',
     '배 공개 설정에서 「항해일지」를 켜면 여기에 실립니다.':'Включите судовой журнал в настройках публикации — он появится здесь.',
     '부품 리뷰':'Отзывы о деталях',
     '눌러서 절차 보기':'Нажмите, чтобы увидеть шаги',
@@ -6103,9 +6108,9 @@ const I18N = {
     '산 값':'Цена покупки',
     '숫자만 넣어 주세요.':'Только цифры.',
     '예: 120000':'напр. 120000',
-    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'Здесь пишут, как показали себя <b>установленные вещи</b> — крыльчатки, фильтры, трос, краска.',
-    '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'Укажите марку и модель — и вы окажетесь рядом с теми, кто использует то же самое.',
-    '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'Одинаковых лодок мало, но тысячи используют тот же двигатель или лебёдку.',
+    '배에서 <b>써 본 제품</b>의 성능과 내구성을 기록하는 곳입니다 — 임펠러, 필터, 로프, 도료.':'Здесь фиксируются рабочие качества и ресурс <b>товаров, которыми вы пользовались</b> на судне — крыльчатки, фильтры, тросы, краска.',
+    '제조사와 모델을 적으면 그 제품으로 찾을 수 있습니다.':'Укажите марку и модель — и сможете искать по этому товару.',
+    '장비를 열고 「+ 제품 리뷰」 를 누르면 제조사·모델이 그대로 채워집니다.':'Откройте оборудование и нажмите «+ Отзыв» — марка и модель заполнятся сами.',
     '첫 리뷰 쓰기':'Написать первый отзыв',
     '내 배 리뷰 쓰기':'Отзыв о своём судне',
     '제품':'Товар',
@@ -6114,8 +6119,8 @@ const I18N = {
     '해당하는 리뷰가 없습니다':'Подходящих отзывов нет',
     '이 배 자체에 대한 리뷰입니다. 배를 사려는 사람이 제일 먼저 찾는 글입니다.':'Отзыв о самом судне. Это первое, что читает покупатель.',
     'First 45f5, Sun Odyssey 449 …':'First 45f5, Sun Odyssey 449 …',
-    '적으면 같은 물건 쓰는 사람과 만납니다':'Укажите — и найдёте тех, у кого то же самое',
-    '모델을 안 적어도 됩니다 — 종류와 계통으로는 그대로 모입니다.':'Модель можно не писать — соберётся по типу и системе.',
+    'Jabsco 22405, Racor 500FG …':'Jabsco 22405, Racor 500FG …',
+    '모델을 안 적어도 됩니다 — 종류와 계통으로 찾을 수 있습니다.':'Модель указывать не обязательно — найти можно по типу и системе.',
     '별점':'Оценка',
     '또 살까':'Купить снова',
     '탄 기간':'Ходил(а)',
@@ -6567,7 +6572,7 @@ const I18N = {
     '차단한 사람이 없습니다':'Вы никого не заблокировали',
     '차단한 사람의 글을 다시 봅니다':'Разблокируйте, чтобы снова видеть их записи',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'Вернуть можно в любой момент — Настройки › Заблокированные',
-    '+ 배 리뷰':'+ Отзыв о судне',
+    '+ 내 배 리뷰':'+ Отзыв о своём судне',
     '어느 장비 것':'Какое снаряжение',
     '「{name}」 도면을 지웁니다.':'Удалить план «{name}».',
     '「{name}」 도면을 지웠습니다.':'План «{name}» удалён.',
@@ -9134,8 +9139,8 @@ const I18N = {
     '유로':'EUR',
     '리뷰를 씁니다.':'Это напишет отзыв о товаре.',
     '배 리뷰를 씁니다.':'Это напишет отзыв о судне.',
-    '이 배 리뷰가 나 말고 {n}건 있습니다.':'Ещё отзывов об этом судне: {n}.',
-    '이 제품 리뷰가 나 말고 {n}건 있습니다.':'Есть ещё {n} отзывов об этом товаре.',
+    '이 배 리뷰가 {n}건 더 있습니다.':'Ещё отзывов об этом судне: {n}.',
+    '이 제품 리뷰가 {n}건 더 있습니다.':'Есть ещё {n} отзывов об этом товаре.',
     '이 배의 첫 리뷰입니다.':'Это первый отзыв об этом судне.',
     '이 제품의 첫 리뷰입니다.':'Это первый отзыв об этом товаре.',
     '갓 샀음':'Только куплено',
@@ -9477,7 +9482,7 @@ const I18N = {
     '아직 공개된 배 리뷰가 없습니다':'公開された船のレビューはまだありません',
     '찾는 것이 없습니다':'見つかりません',
     '내 정비 기록에 「정비 절차」를 적고 공개를 켜면 여기에 실립니다.':'ご自分の整備記録に手順を書いて公開をオンにすると、ここに載ります。',
-    '위의 「쓰기」를 눌러 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「부품 리뷰」를 켜면 여기에 실립니다.':'上の「書く」から最初のレビューを残してみてください。船の公開設定で「パーツレビュー」をオンにすると、ここに載ります。',
+    '위에 있는 쓰기 단추로 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「제품 리뷰」를 켜면 여기에 실립니다.':'上の書くボタンから最初のレビューを残してみてください。船の公開設定で「パーツレビュー」をオンにすると、ここに載ります。',
     '배 공개 설정에서 「항해일지」를 켜면 여기에 실립니다.':'船の公開設定で「航海日誌」をオンにすると、ここに載ります。',
     '부품 리뷰':'パーツレビュー',
     '눌러서 절차 보기':'タップして手順を見る',
@@ -9518,9 +9523,9 @@ const I18N = {
     '산 값':'購入価格',
     '숫자만 넣어 주세요.':'数字だけ入れてください。',
     '예: 120000':'例: 120000',
-    '배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.':'船に<b>付けてみたもの</b>がどうだったかを書く場所です — インペラー、フィルター、ロープ、塗料。',
-    '제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.':'メーカーとモデルを書くと、同じものを使う人たちと同じ場所に集まります。',
-    '같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.':'同じ船を持つ人はまれでも、同じエンジン・同じウインチを使う人は何千人もいます。',
+    '배에서 <b>써 본 제품</b>의 성능과 내구성을 기록하는 곳입니다 — 임펠러, 필터, 로프, 도료.':'船で<b>使ってみた製品</b>の性能と耐久性を記録する場所です — インペラー、フィルター、ロープ、塗料。',
+    '제조사와 모델을 적으면 그 제품으로 찾을 수 있습니다.':'メーカーとモデルを書いておくと、その製品で探せます。',
+    '장비를 열고 「+ 제품 리뷰」 를 누르면 제조사·모델이 그대로 채워집니다.':'装備を開いて「+ パーツレビュー」を押すと、メーカー・モデルがそのまま入ります。',
     '첫 리뷰 쓰기':'最初のレビューを書く',
     '내 배 리뷰 쓰기':'自分の船のレビューを書く',
     '제품':'製品',
@@ -9529,8 +9534,8 @@ const I18N = {
     '해당하는 리뷰가 없습니다':'該当するレビューがありません',
     '이 배 자체에 대한 리뷰입니다. 배를 사려는 사람이 제일 먼저 찾는 글입니다.':'船そのもののレビューです。船を買おうとする人が最初に読む文章です。',
     'First 45f5, Sun Odyssey 449 …':'First 45f5, Sun Odyssey 449 …',
-    '적으면 같은 물건 쓰는 사람과 만납니다':'書くと同じものを使う人に出会えます',
-    '모델을 안 적어도 됩니다 — 종류와 계통으로는 그대로 모입니다.':'モデルを書かなくても構いません — 種類と系統ではそのまま集まります。',
+    'Jabsco 22405, Racor 500FG …':'Jabsco 22405, Racor 500FG …',
+    '모델을 안 적어도 됩니다 — 종류와 계통으로 찾을 수 있습니다.':'モデルは任意です — 種類と系統で探せます。',
     '별점':'評価',
     '또 살까':'また買うか',
     '탄 기간':'乗った期間',
@@ -10024,7 +10029,7 @@ const I18N = {
     '차단한 사람이 없습니다':'ブロックした人はいません',
     '차단한 사람의 글을 다시 봅니다':'ブロックを解除して投稿をまた見ます',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'いつでも元に戻せます。設定 › ブロックした人',
-    '+ 배 리뷰':'+ 船レビュー',
+    '+ 내 배 리뷰':'+ 自分の船のレビュー',
     '어느 장비 것':'どの装備のもの',
     '「{name}」 도면을 지웁니다.':'「{name}」の図面を削除します。',
     '「{name}」 도면을 지웠습니다.':'「{name}」の図面を削除しました。',
@@ -12456,8 +12461,8 @@ const I18N = {
     '유로':'ユーロ',
     '리뷰를 씁니다.':'製品レビューを書きます。',
     '배 리뷰를 씁니다.':'船のレビューを書きます。',
-    '이 배 리뷰가 나 말고 {n}건 있습니다.':'この船のレビューが自分のほかに {n} 件あります。',
-    '이 제품 리뷰가 나 말고 {n}건 있습니다.':'この製品のレビューが自分のほかに {n} 件あります。',
+    '이 배 리뷰가 {n}건 더 있습니다.':'この船のレビューがほかに {n} 件あります。',
+    '이 제품 리뷰가 {n}건 더 있습니다.':'この製品のレビューがほかに {n} 件あります。',
     '이 배의 첫 리뷰입니다.':'この船の最初のレビューです。',
     '이 제품의 첫 리뷰입니다.':'この製品の最初のレビューです。',
     '갓 샀음':'買ったばかり',
@@ -15207,8 +15212,31 @@ function seedLockersIfNeeded(){
 }
 
 // 칸이 사라진 물품. 지우지 않고 따로 세어 사용자에게 알린다.
+// ★★★ 4.135 — 갈 곳 잃은 물품을 **하나도 빠뜨리지 않고** 잡는다 (체크리스트와 같은 구멍)
+//   전에는 「lockerId 가 있는데 그 칸이 없어진 것」만 잡았다. 그래서
+//   **lockerId 가 아예 비어 버린 물품**은 어느 칸에도 안 나오고 여기에도 안 잡혀
+//   화면에서 통째로 사라졌다. 사람은 물건이 지워진 줄 안다.
+//   ★ 부모 상자가 없어진 아이도 같다 — 윗줄에도 안 나오고 상자 안에도 안 나왔다.
 function strayItems(list){
-  return (list||items).filter(i=>i && i.lockerId && !lockers.find(l=>String(l.id)===String(i.lockerId)));
+  const 칸 = new Set((lockers||[]).map(l=>String(l.id)));
+  const 산것 = new Set((items||[]).filter(i=>i && !i.gone).map(i=>String(i.id)));
+  return (list||items).filter(i=>{
+    if(!i || i.gone) return false;
+    if(!i.lockerId || !칸.has(String(i.lockerId))) return true;    // 칸을 잃었거나 칸이 없어졌다
+    if(i.parentId && !산것.has(String(i.parentId))) return true;   // 부모 상자가 없어졌다
+    return false;
+  });
+}
+// 부모 상자가 없어진 아이는 윗줄로 올린다. 고쳤으면 true.
+// ★ 되살리기(백업 복원)에서는 이미 이렇게 하고 있었는데, 받아오기에는 빠져 있었다.
+function itemRepair(){
+  const 산것 = new Set((items||[]).filter(i=>i && !i.gone).map(i=>String(i.id)));
+  let 고침 = false;
+  (items||[]).forEach(i=>{
+    if(!i || i.gone) return;
+    if(i.parentId && !산것.has(String(i.parentId))){ i.parentId = null; 고침 = true; }
+  });
+  return 고침;
 }
 
 let items = [];
@@ -20050,7 +20078,7 @@ function expWriteBtn(){
   if(k !== 'review' && k !== 'boatrv') return '';
   return `<div class="mrrow" style="padding:10px 14px 4px">
     <button class="mrbtn ok" style="width:100%" onclick="goWriteReview(${k === 'boatrv'})">${
-      esc(k === 'boatrv' ? t('+ 내 배 리뷰 쓰기') : t('+ 제품 리뷰 쓰기'))}</button></div>`;
+      esc(k === 'boatrv' ? t('+ 내 배 리뷰') : t('+ 제품 리뷰'))}</button></div>`;
 }
 async function openExplore(biz){
   exploreBiz = (biz === true);
@@ -20197,7 +20225,7 @@ function expRowsHtml(){
           kind === 'maint'
             ? esc(t('내 정비 기록에 「정비 절차」를 적고 공개를 켜면 여기에 실립니다.'))
             : ((kind === 'review' || kind === 'boatrv')
-                ? esc(t('위의 「쓰기」를 눌러 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「부품 리뷰」를 켜면 여기에 실립니다.'))
+                ? esc(t('위에 있는 쓰기 단추로 첫 리뷰를 남겨 보세요. 배 공개 설정에서 「제품 리뷰」를 켜면 여기에 실립니다.'))
                 : esc(t('배 공개 설정에서 「항해일지」를 켜면 여기에 실립니다.')))}</div>`);
   }
   // ★ 4.70 — 목록 제목부터 옮긴다 (사장님이 정하신 것).
@@ -20353,7 +20381,7 @@ function boatPageSecs(x){
   //   남이 보러 오는 것은 「어떻게 했나」 이고, 그건 정비수첩에 있다.
   return [['intro',t('배 소개')],['spec',t('제원')],['voyage',t('항해일지')],
           ['mlog',t('정비수첩')],
-          ['review',t('부품 리뷰')],
+          ['review',t('제품 리뷰')],
           ['gear',t('보유 장비')],['roster',t('구성원')],['board',t('게시판')],['phone',t('연락처')]]
          .filter(([k]) => has[k]);
 }
@@ -23359,7 +23387,7 @@ async function cloudPull(){
   cloudSeeded = !!r.seeded;
   // ★★★ 4.135 — 받아온 줄이 옛 판이면 list 가 없다. 제자리로 되돌리고 **올린다**.
   //   올리지 않으면 다음 받아오기에 또 지워진다 (CK_HOME 설명 참고).
-  try{ if(ckRepair()){ saveLocal(); pushWanted = true; } }catch(_){}
+  try{ if(ckRepair() | itemRepair()){ saveLocal(); pushWanted = true; } }catch(_){}
   if(pushWanted){ pushWanted = false; schedulePush(); }
   if(r.seeded){
     // ★ 여기도 갈아치우면 안 된다 — 적재표가 제일 크고 제일 자주 고친다
@@ -23551,7 +23579,7 @@ const COLL_NAME = {
   items:t('물품'), trash:t('휴지통'), lockers:t('수납칸'), shapes:t('도형'), dgimgs:t('도면 사진'),
   maint:t('정기점검'), repair:t('수리목록'), mrtrash:t('정비 휴지통'), voyage:t('항해일지'),
   fuel:t('연료 기록'), runs:t('엔진 가동'), contacts:t('연락처'), vdocs:t('문서'),
-  checkt:t('출항 전 점검'), posts:t('게시판'), reviews:t('부품 리뷰'), meta:t('배 정보')
+  checkt:t('출항 전 점검'), posts:t('게시판'), reviews:t('제품 리뷰'), meta:t('배 정보')
 };
 const COLL_PERM = {
   items:'stow', trash:'stow',
@@ -24035,7 +24063,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.135';
+const APP_VER = '4.136';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26393,7 +26421,9 @@ function renderList(){
 // 수납칸이 사라진 물품을 맨 아래에 따로 모아 보여 준다.
 // 조용히 감추면 사용자는 물품이 없어진 줄로 안다.
 function strayHTML(){
-  const top = sortItems(strayItems().filter(i=>!i.parentId));
+  // ★ 4.135 — 부모 상자가 없어진 아이도 여기서는 윗줄로 본다. 안 그러면 또 사라진다.
+  const 산것 = new Set((items||[]).filter(x=>x && !x.gone).map(x=>String(x.id)));
+  const top = sortItems(strayItems().filter(i=>!i.parentId || !산것.has(String(i.parentId))));
   if(!top.length) return '';
   let rows = '';
   top.forEach(it=>{
@@ -27439,7 +27469,7 @@ function fabActs(){
     if(b === 'gear'){
       if(gearView === 'review'){
         const 배 = (typeof brRows === 'function' && !brRows().length);
-        return 배 ? [['+ 제품 리뷰', 'addReview()'], ['+ 배 리뷰', 'addBoatReview()']]
+        return 배 ? [['+ 제품 리뷰', 'addReview()'], ['+ 내 배 리뷰', 'addBoatReview()']]
                   : [['+ 제품 리뷰', 'addReview()']];
       }
       if(gearView === 'maint') return [['+ 정기점검', 'gearAdd()']];
@@ -28445,7 +28475,7 @@ function renderMaintList(){
       <div>${t('엔진오일, 아연 아노드처럼 <b>주기가 정해진 정비</b>를 등록해 두는 곳입니다.')}<br>
         ${esc(t('마지막 점검일을 입력하면 다음 예정일과 남은 기간을 알려 드립니다.'))}</div>
       <div class="emptysub">${esc(t('기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.'))}</div>
-      ${true ? `<button class="mrbtn" onclick="needEdit('정비 항목을 넣습니다.', ()=>mrAdd('maint'))">${esc(t('첫 항목 추가하기'))}</button>` : ''}
+      ${true ? `<button class="mrbtn" onclick="needEdit('정비 항목을 넣습니다.', ()=>mrAdd('maint'))">${esc(t('+ 정기점검'))}</button>` : ''}
     </div>`;
     return;
   }
@@ -28525,7 +28555,7 @@ function renderRepairList(){
           <div>${esc(t('고장이나 손상을 발견했을 때 기록하는 곳입니다.'))}<br>
             <b>${esc(t('고장 → 진행 중 → 완료'))}</b> ${esc(t('순으로 상태를 바꿔 가며 관리합니다.'))}</div>
           <div class="emptysub">${esc(t('사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.'))}</div>
-          ${true ? `<button class="mrbtn" onclick="needEdit('수리 항목을 넣습니다.', ()=>mrAdd('repair'))">${esc(t('첫 항목 등록하기'))}</button>` : ''}
+          ${true ? `<button class="mrbtn" onclick="needEdit('수리 항목을 넣습니다.', ()=>mrAdd('repair'))">${esc(t('+ 고장'))}</button>` : ''}
         </div>`))
     // ★ 찾는 중에는 완료된 수리도 펼친다 — 걸렸는데 접혀 있으면 못 찾은 줄 안다
     //   (장비 계통을 펼치는 것과 같은 까닭이다)
@@ -40086,7 +40116,7 @@ function renderGear(){
       <div>${t('배에 <b>설치된 장비</b>를 적어 두는 곳입니다 — 엔진, 윈치, 플로터, 빌지펌프.')}<br>
         ${esc(t('제조사와 모델, 일련번호를 한 번 적어 두면 부품을 살 때도 수리를 맡길 때도 다시 안 찾아도 됩니다.'))}</div>
       <div class="emptysub">${esc(t('장비마다 정비·수리 기록이 연결되고, 도면에 자리를 찍어 둘 수 있습니다.'))}</div>
-      <button class="mrbtn" onclick="needEdit('장비를 넣습니다.', addGear)">${esc(t('첫 장비 추가하기'))}</button>
+      <button class="mrbtn" onclick="needEdit('장비를 넣습니다.', addGear)">${esc(t('+ 장비'))}</button>
     </div>`;
     return;
   }
@@ -41289,12 +41319,12 @@ function renderReviews(){
   const rows = rvAll();          // 제품 리뷰와 배 리뷰를 같이 보여 준다
   if(!rows.length){
     L.innerHTML = `<div class="emptybox">
-      <b>${esc(t('부품 리뷰'))}</b>
-      <div>${t('배에 <b>써 본 제품</b>이 어땠는지 적어 두는 곳입니다 — 임펠러, 필터, 로프, 도료.')}<br>
-        ${esc(t('제조사와 모델을 적으면 같은 물건을 쓰는 사람들과 같은 자리에 모입니다.'))}</div>
-      <div class="emptysub">${esc(t('같은 배를 가진 사람은 드물어도, 같은 엔진·같은 윈치를 쓰는 사람은 수천 명입니다.'))}</div>
-      <button class="mrbtn" onclick="needEdit('리뷰를 씁니다.', ()=>addReview())">${esc(t('첫 리뷰 쓰기'))}</button>
-      <button class="mrbtn" onclick="needEdit('배 리뷰를 씁니다.', addBoatReview)">${esc(t('내 배 리뷰 쓰기'))}</button>
+      <b>${esc(t('리뷰'))}</b>
+      <div>${t('배에서 <b>써 본 제품</b>의 성능과 내구성을 기록하는 곳입니다 — 임펠러, 필터, 로프, 도료.')}<br>
+        ${esc(t('제조사와 모델을 적으면 그 제품으로 찾을 수 있습니다.'))}</div>
+      <div class="emptysub">${esc(t('장비를 열고 「+ 제품 리뷰」 를 누르면 제조사·모델이 그대로 채워집니다.'))}</div>
+      <button class="mrbtn" onclick="needEdit('리뷰를 씁니다.', ()=>addReview())">${esc(t('+ 제품 리뷰'))}</button>
+      <button class="mrbtn" onclick="needEdit('배 리뷰를 씁니다.', addBoatReview)">${esc(t('+ 내 배 리뷰'))}</button>
     </div>`;
     return;
   }
@@ -41386,16 +41416,16 @@ function rvBody(it){
       : `<b class="mrv">${esc(it.maker||'—')}</b>`}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('모델'))}</span>${unlocked
       ? `<input value="${esc(it.model||'')}" style="flex:1" placeholder="${
-           esc(isB ? t('First 45f5, Sun Odyssey 449 …') : t('적으면 같은 물건 쓰는 사람과 만납니다'))}" onchange="mrField('model',this.value.trim())">`
+           esc(isB ? t('First 45f5, Sun Odyssey 449 …') : t('Jabsco 22405, Racor 500FG …'))}" onchange="mrField('model',this.value.trim())">`
       : `<b class="mrv">${esc(it.model||'—')}</b>`}</div>
     ${isB ? `<div class="mrrow"><span class="mrlbl">${esc(t('연식'))}</span>${unlocked
       ? `<input type="number" min="1900" max="2100" value="${esc(String(it.year||''))}" style="width:100px" onchange="mrField('year',this.value)">`
       : `<b class="mrv">${esc(String(it.year||'—'))}</b>`}</div>` : ''}
     ${key ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${
-        esc(mates ? tsub(isB ? '이 배 리뷰가 나 말고 {n}건 있습니다.' : '이 제품 리뷰가 나 말고 {n}건 있습니다.', { n: mates })
+        esc(mates ? tsub(isB ? '이 배 리뷰가 {n}건 더 있습니다.' : '이 제품 리뷰가 {n}건 더 있습니다.', { n: mates })
                   : t(isB ? '이 배의 첫 리뷰입니다.' : '이 제품의 첫 리뷰입니다.'))}</div>`
           : `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${
-        esc(t('모델을 안 적어도 됩니다 — 종류와 계통으로는 그대로 모입니다.'))}</div>`}
+        esc(t('모델을 안 적어도 됩니다 — 종류와 계통으로 찾을 수 있습니다.'))}</div>`}
     <div class="mrrow"><span class="mrlbl">${esc(t('별점'))}</span>${unlocked
       ? `<div class="rvstars">${[1,2,3,4,5].map(star).join('')}</div>
          ${Number(it.stars) ? `<button class="minib" onclick="mrField('stars',0)">${esc(t('초기화'))}</button>` : ''}`
@@ -41672,7 +41702,7 @@ function renderMLog(){
       <div>${t('<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.')}<br>
         ${esc(t('다음에 같은 일을 할 때 그대로 보고 따라 하면 됩니다.'))}</div>
       <div class="emptysub">${esc(t('정기점검·수리 화면의 「+ 정비수첩」 을 누르면 그 항목에 붙은 채로 시작합니다.'))}</div>
-      <button class="mrbtn" onclick="needEdit('정비수첩을 씁니다.', ()=>addMlog())">${esc(t('첫 정비수첩 쓰기'))}</button>
+      <button class="mrbtn" onclick="needEdit('정비수첩을 씁니다.', ()=>addMlog())">${esc(t('+ 정비수첩'))}</button>
     </div>`;
     return;
   }

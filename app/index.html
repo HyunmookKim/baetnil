@@ -4229,7 +4229,7 @@ const I18N = {
     '배 정보를 클라우드에 올리지 못했습니다.\n\n':'Could not upload the boat details to the cloud.\n\n',
     '배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.':'The owner\'s records are untouched. It can be listed again.',
     '배 삭제 확인':'Confirm deleting the boat',
-    '배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.':'An app for logging one boat\'s gear, maintenance and voyages, and sharing with other boat people.',
+    '배 한 척의 물품·정비·항해를 기록하고, 배 타는 사람들과 나누는 앱입니다.':'An app for logging one boat\'s gear, maintenance and voyages, and sharing with other boat people.',
     '배·엔진은 직접 가서 시운전까지 보고 판단하세요.\n\n':'For a boat or engine, go and see it and take a sea trial before you decide.\n\n',
     '배가 아직 정해지지 않았습니다 (배를 먼저 등록하거나 골라 주세요)':'No boat is selected yet (register or choose one first)',
     '배가 없습니다':'No boat',
@@ -5477,13 +5477,17 @@ const I18N = {
     '1. 항해 중에 「뱃일 — 항해 기록 중」 알림이 떠 있어야 합니다. 안 보이면 알림이 꺼진 것입니다.':'1. The \"Baetnil — recording your voyage\" notification must stay visible while you sail. If you cannot see it, notifications are off.',
     '2. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요. 이것이 제일 흔한 까닭입니다.':'2. Settings › Apps › Baetnil › Battery → set it to \"Unrestricted\". This is the most common cause.',
     '3. 삼성 폰이면 하나 더 — 설정 › 배터리 › 백그라운드 사용 제한 › 「사용하지 않는 앱 절전」 목록에서 뱃일을 빼 주세요.':'3. On Samsung phones, one more: Settings › Battery › Background usage limits › remove Baetnil from \"Sleeping apps\".',
-    '4. 설정 › 애플리케이션 › 뱃일 › 권한 › 위치 에 「항상 허용」 이 있으면 그것으로 바꿔 주세요.':'4. Settings › Apps › Baetnil › Permissions › Location — if \"Allow all the time\" is offered, choose it.',
     '항적이 끊기지 않게 하려면':'To keep the track from breaking',
     '화면을 끈 동안 위치가 안 들어온 적이 {n}번 있습니다 (모두 {m}분).':'Location stopped arriving while the screen was off {n} [[time|times]] ({m} minutes in total).',
     '3. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요.':'3. Settings › Apps › Baetnil › Battery → set it to \"Unrestricted\".',
     '안 바꾸면 화면을 끈 동안 폰이 뱃일을 재워서 항적이 끊깁니다.':'If you do not, the phone puts Baetnil to sleep while the screen is off and the track breaks.',
     '항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.':'Recording your track. It stops when you log your arrival.',
     '항적 기록을 시작했습니다':'Started recording the track',
+    '날씨·해상 예보 자료':'Weather and marine forecast data',
+    '알림이 꺼져 있습니다.\n\n「뱃일 — 항해 기록 중」 알림을 못 띄우면 화면을 끈 동안 위치가 안 들어옵니다.\n\n설정 › 애플리케이션 › 뱃일 › 알림 에서 켜 주세요.':'Notifications are off.\n\nWithout the \"Baetnil — recording voyage\" notification, no positions come in while the screen is off.\n\nTurn it on in Settings › Apps › Baetnil › Notifications.',
+    '항적 기록을 멈췄습니다':'Stopped recording the track',
+    '기록 중이던 항해가 없어져서 항적 기록을 멈췄습니다':'The voyage being recorded is gone, so track recording stopped',
+    '배를 바꿔서 항적 기록을 멈췄습니다':'Switched boats, so track recording stopped',
     '항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?':'To record your track, location permission must be set to "Always".\n\nOpen settings?',
   
 
@@ -7655,7 +7659,7 @@ const I18N = {
     '배 정보를 클라우드에 올리지 못했습니다.\n\n':'Не удалось выгрузить данные судна в облако.\n\n',
     '배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.':'Записи владельца не тронуты. Судно можно опубликовать снова.',
     '배 삭제 확인':'Подтверждение удаления судна',
-    '배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.':'Приложение для учёта вещей, обслуживания и походов одного судна и обмена опытом с другими.',
+    '배 한 척의 물품·정비·항해를 기록하고, 배 타는 사람들과 나누는 앱입니다.':'Приложение для учёта вещей, обслуживания и походов одного судна и обмена опытом с другими.',
     '배·엔진은 직접 가서 시운전까지 보고 판단하세요.\n\n':'Судно или двигатель обязательно осмотрите лично и проведите ходовые испытания.\n\n',
     '배가 아직 정해지지 않았습니다 (배를 먼저 등록하거나 골라 주세요)':'Судно ещё не выбрано (сначала зарегистрируйте или выберите его)',
     '배가 없습니다':'Судна нет',
@@ -8904,13 +8908,17 @@ const I18N = {
     '1. 항해 중에 「뱃일 — 항해 기록 중」 알림이 떠 있어야 합니다. 안 보이면 알림이 꺼진 것입니다.':'1. Во время похода должно висеть уведомление «Baetnil — идёт запись похода». Если его нет, уведомления отключены.',
     '2. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요. 이것이 제일 흔한 까닭입니다.':'2. Настройки › Приложения › Baetnil › Батарея → «Без ограничений». Это самая частая причина.',
     '3. 삼성 폰이면 하나 더 — 설정 › 배터리 › 백그라운드 사용 제한 › 「사용하지 않는 앱 절전」 목록에서 뱃일을 빼 주세요.':'3. На Samsung ещё одно: Настройки › Батарея › Ограничения фоновой работы › уберите Baetnil из «Спящие приложения».',
-    '4. 설정 › 애플리케이션 › 뱃일 › 권한 › 위치 에 「항상 허용」 이 있으면 그것으로 바꿔 주세요.':'4. Настройки › Приложения › Baetnil › Разрешения › Геоданные — если есть «Разрешить всегда», выберите это.',
     '항적이 끊기지 않게 하려면':'Чтобы трек не обрывался',
     '화면을 끈 동안 위치가 안 들어온 적이 {n}번 있습니다 (모두 {m}분).':'Точки переставали приходить при выключенном экране {n} [[раз|раза|раз]] (всего {m} мин.).',
     '3. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요.':'3. Настройки › Приложения › Baetnil › Батарея → «Без ограничений».',
     '안 바꾸면 화면을 끈 동안 폰이 뱃일을 재워서 항적이 끊깁니다.':'Иначе при выключенном экране телефон усыпит Baetnil и трек оборвётся.',
     '항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.':'Идёт запись трека. Остановится, когда вы отметите приход.',
     '항적 기록을 시작했습니다':'Запись трека начата',
+    '날씨·해상 예보 자료':'Данные о погоде и морском прогнозе',
+    '알림이 꺼져 있습니다.\n\n「뱃일 — 항해 기록 중」 알림을 못 띄우면 화면을 끈 동안 위치가 안 들어옵니다.\n\n설정 › 애플리케이션 › 뱃일 › 알림 에서 켜 주세요.':'Уведомления выключены.\n\nБез уведомления «Baetnil — идёт запись рейса» позиции не поступают, пока экран выключен.\n\nВключите их: Настройки › Приложения › Baetnil › Уведомления.',
+    '항적 기록을 멈췄습니다':'Запись трека остановлена',
+    '기록 중이던 항해가 없어져서 항적 기록을 멈췄습니다':'Записываемый рейс исчез — запись трека остановлена',
+    '배를 바꿔서 항적 기록을 멈췄습니다':'Судно изменено — запись трека остановлена',
     '항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?':'Чтобы записывать трек, разрешение на местоположение должно быть «Всегда».\n\nОткрыть настройки?',
   
 
@@ -11118,7 +11126,7 @@ const I18N = {
     '배 정보를 클라우드에 올리지 못했습니다.\n\n':'船の情報をクラウドにアップロードできませんでした。\n\n',
     '배 주인의 기록은 그대로입니다. 다시 올릴 수 있습니다.':'オーナーの記録はそのまま残ります。もう一度アップロードできます。',
     '배 삭제 확인':'船の削除の確認',
-    '배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.':'船1隻の備品・整備・航海を記録し、船に乗る人たちと分かち合うアプリです。',
+    '배 한 척의 물품·정비·항해를 기록하고, 배 타는 사람들과 나누는 앱입니다.':'船1隻の備品・整備・航海を記録し、船に乗る人たちと分かち合うアプリです。',
     '배·엔진은 직접 가서 시운전까지 보고 판단하세요.\n\n':'船・エンジンは、実際に足を運んで試運転まで見てから判断してください。\n\n',
     '배가 아직 정해지지 않았습니다 (배를 먼저 등록하거나 골라 주세요)':'船がまだ決まっていません（先に船を登録するか選んでください）',
     '배가 없습니다':'船がありません',
@@ -12269,13 +12277,17 @@ const I18N = {
     '1. 항해 중에 「뱃일 — 항해 기록 중」 알림이 떠 있어야 합니다. 안 보이면 알림이 꺼진 것입니다.':'1. 航海中は「Baetnil — 航海記録中」の通知が表示されている必要があります。見えない場合は通知がオフです。',
     '2. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요. 이것이 제일 흔한 까닭입니다.':'2. 設定 › アプリ › Baetnil › バッテリー → 「制限なし」にしてください。これが一番多い原因です。',
     '3. 삼성 폰이면 하나 더 — 설정 › 배터리 › 백그라운드 사용 제한 › 「사용하지 않는 앱 절전」 목록에서 뱃일을 빼 주세요.':'3. Galaxyならもう一つ — 設定 › バッテリー › バックグラウンド使用制限 › 「使用していないアプリをスリープ」からBaetnilを外してください。',
-    '4. 설정 › 애플리케이션 › 뱃일 › 권한 › 위치 에 「항상 허용」 이 있으면 그것으로 바꿔 주세요.':'4. 設定 › アプリ › Baetnil › 権限 › 位置情報 に「常に許可」があれば、それに変えてください。',
     '항적이 끊기지 않게 하려면':'航跡が途切れないようにするには',
     '화면을 끈 동안 위치가 안 들어온 적이 {n}번 있습니다 (모두 {m}분).':'画面を消している間に位置が届かなかったことが{n}回あります（合計{m}分）。',
     '3. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요.':'3. 設定 › アプリ › Baetnil › バッテリー → 「制限なし」にしてください。',
     '안 바꾸면 화면을 끈 동안 폰이 뱃일을 재워서 항적이 끊깁니다.':'変えないと、画面を消している間にスマホがBaetnilをスリープさせ、航跡が途切れます。',
     '항적을 기록하고 있습니다. 입항을 기록하면 멈춥니다.':'航跡を記録しています。入港を記録すると停止します。',
     '항적 기록을 시작했습니다':'航跡の記録を開始しました',
+    '날씨·해상 예보 자료':'天気・海上予報のデータ',
+    '알림이 꺼져 있습니다.\n\n「뱃일 — 항해 기록 중」 알림을 못 띄우면 화면을 끈 동안 위치가 안 들어옵니다.\n\n설정 › 애플리케이션 › 뱃일 › 알림 에서 켜 주세요.':'通知がオフになっています。\n\n「Baetnil — 航海を記録中」の通知が出せないと、画面を消している間は位置が入ってきません。\n\n設定 › アプリ › Baetnil › 通知 でオンにしてください。',
+    '항적 기록을 멈췄습니다':'航跡の記録を停止しました',
+    '기록 중이던 항해가 없어져서 항적 기록을 멈췄습니다':'記録中だった航海がなくなったため、航跡の記録を停止しました',
+    '배를 바꿔서 항적 기록을 멈췄습니다':'船を切り替えたため、航跡の記録を停止しました',
     '항적을 기록하려면 위치 권한을 「항상 허용」 으로 두셔야 합니다.\n\n설정을 여시겠습니까?':'航跡を記録するには位置情報の権限を「常に許可」にしていただく必要があります。\n\n設定を開きますか？',
     '묶지 않은 글':'まとめていない記事',
     '인터넷이 느려 끝내지 못했습니다. 연결을 확인하고 다시 눌러 주세요.':'インターネットが遅く、完了できませんでした。接続を確認してもう一度押してください。',
@@ -16127,7 +16139,7 @@ function openWelcome(){
   try{ localStorage.setItem('bt_welcome', 'done'); }catch(_){}
   const P = document.getElementById('mrPanel');
   P.innerHTML = `<div class="mrhead"><b>${esc(t('뱃일'))}</b><span style="flex:1"></span></div>
-    <div class="mrnone" style="text-align:left">${esc(t('배 한 척의 물품·정비·항해를 기록하고, 배 하는 사람들과 나누는 앱입니다.'))}<br><br>
+    <div class="mrnone" style="text-align:left">${esc(t('배 한 척의 물품·정비·항해를 기록하고, 배 타는 사람들과 나누는 앱입니다.'))}<br><br>
       <b>${esc(t('먼저 로그인해 주세요.'))}</b>${esc(t('로그인하면 쓰던 배와 기록을 그대로 불러오고, 휴대폰과 컴퓨터에서 같은 내용을 볼 수 있습니다.'))}</div>
     ${loginBtns()}
     <div class="mrnone" style="text-align:left"><button class="minib blu" onclick="openLegal('terms')">${esc(t('이용약관'))}</button>
@@ -16511,7 +16523,7 @@ const TRK_KEY  = 'bt_trk';
 const TRK_Q = 5;
 let trkKal = null;        // { la, lo, v, t }   v = 지금까지의 불확실함(m²)
 
-let trkNow = null;   // { vid, from, pts:[{la,lo,t}], id }
+let trkNow = null;   // { vid, boat, from, pts:[{la,lo,t}], id }
 
 function isNative(){
   try{ return !!(window.Capacitor && window.Capacitor.isNativePlatform
@@ -17032,8 +17044,13 @@ function trkWakeHelpText(){
   }
   return t('1. 항해 중에 「뱃일 — 항해 기록 중」 알림이 떠 있어야 합니다. 안 보이면 알림이 꺼진 것입니다.') + '\n'
        + t('2. 설정 › 애플리케이션 › 뱃일 › 배터리 → 「제한 없음」 으로 바꿔 주세요. 이것이 제일 흔한 까닭입니다.') + '\n'
-       + t('3. 삼성 폰이면 하나 더 — 설정 › 배터리 › 백그라운드 사용 제한 › 「사용하지 않는 앱 절전」 목록에서 뱃일을 빼 주세요.') + '\n'
-       + t('4. 설정 › 애플리케이션 › 뱃일 › 권한 › 위치 에 「항상 허용」 이 있으면 그것으로 바꿔 주세요.');
+       + t('3. 삼성 폰이면 하나 더 — 설정 › 배터리 › 백그라운드 사용 제한 › 「사용하지 않는 앱 절전」 목록에서 뱃일을 빼 주세요.');
+  // ★★★ 4.139 — 여기 있던 4번(「항상 허용」 으로 바꾸세요)을 뺐다.
+  //   뱃일에는 ACCESS_BACKGROUND_LOCATION 이 안 들어 있어서 안드로이드 설정에
+  //   그 선택지가 **아예 안 나온다.** 없는 것을 찾아 누르라고 적어 둔 것이다 —
+  //   화면이 거짓말을 한 것이다 (규칙 2번).
+  //   ★ 안 넣은 것은 뜻이 있어서다: 상시 알림(포그라운드 서비스)으로 기록하므로
+  //     그 권한 없이도 화면을 꺼도 기록된다. 권한을 더 달라고 하지 않는다.
 }
 async function trkWakeHelp(){
   const yes = await ask(t('항적이 끊기지 않게 하려면') + '\n\n' + trkWakeHelpText(),
@@ -17119,11 +17136,11 @@ async function trkStart(vid){
   if(!bgGeo())      return '이 판에는 항적 부품이 안 들어 있습니다. 앱을 새로 받아 주세요.';
   if(!await locMay(false)) return '로그인하고 위치 이용에 동의하셔야 항적을 기록합니다.';
   if(!await trkGuide()) return '';           // 사람이 그만두겠다고 한 것 — 말 안 한다
-  await trkAskNoti();                        // 알림이 막혀 있으면 기록이 시작도 안 된다
+  const 알림 = await trkAskNoti();           // 알림이 막혀 있으면 기록이 시작도 안 된다
   if(trkNow && String(trkNow.vid) === String(vid)) return '';
   if(trkNow) await trkStop();
   trkSmoothReset();
-  trkNow = { vid: String(vid), from: new Date().toISOString(), pts: [], id: null };
+  trkNow = { vid: String(vid), boat: String(currentBoatId || ''), from: new Date().toISOString(), pts: [], id: null };
   trkKeep();
   const ok = await trkAttach();
   if(!ok){
@@ -17136,6 +17153,12 @@ async function trkStart(vid){
   try{ await trkAwakeOn(); }catch(_){}
   trkWatchStart();                            // ★ 4.117 — 위치가 끊기면 화면에 밝힌다
   try{ setSync(t('항적 기록을 시작했습니다')); }catch(e){}
+  // ★★★ 4.139 — 알림을 거절했으면 **나가기 전에** 말한다.
+  //   여태는 물어만 보고, 거절해도 아무 말 없이 기록을 시작했다. 그러면 화면을 끈
+  //   동안 위치가 안 들어오고, 그것을 다녀와서야 안다 — 한 항해를 잃은 뒤다.
+  if(알림 === 'denied' && !trkIsIOS()){
+    try{ tell(t('알림이 꺼져 있습니다.\n\n「뱃일 — 항해 기록 중」 알림을 못 띄우면 화면을 끈 동안 위치가 안 들어옵니다.\n\n설정 › 애플리케이션 › 뱃일 › 알림 에서 켜 주세요.'), { big:true }); }catch(_){}
+  }
   // ★ 배터리 절전은 **나가기 전에** 짚어 준다. 다녀와서 아는 것은 이미 늦다.
   try{ trkBatteryAsk(); }catch(_){}
   return '';
@@ -17197,12 +17220,52 @@ async function trkStop(){
   return pts;
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 4.139 — 기록 중인 항해가 없어지면 항적도 멈춰야 한다 (사장님 지적)
+//
+//   항적은 「지금 기록 중인 항해」 하나에 매여 있다. 그런데 그 항해가 없어지는
+//   문은 여럿이다 — 휴지통으로 옮기기, 배 바꾸기, 배 지우기, 로그아웃,
+//   같은 폰에 다른 사람이 로그인.
+//   여태 그 어느 문도 항적을 안 멈췄다. 그래서 항해는 없는데 기록만 계속 돌았다:
+//   위치를 계속 읽어 배터리가 새고, 오른쪽 아래 「사람 빠짐」 단추가 켜진 채로
+//   굳고, 앱을 껐다 켜야 없어졌다.
+//
+//   문은 둘이다.
+//   ① trkStopFor — **지우기 전에** 부른다. 먼저 멈춰야 여태 모은 점이 그 항해에
+//      저장되고, 휴지통 사본에도 같이 들어간다. 순서가 뒤바뀌면 점을 통째로 잃는다.
+//   ② trkDropIfGone — 이미 없어진 뒤에 거는 **그물**이다. 자료를 다시 읽는 자리를
+//      모두가 지나가므로(loadBoatData) 그물은 거기 하나면 된다.
+// ══════════════════════════════════════════════════════════════════════
+async function trkStopFor(vid){
+  if(!trkNow || String(trkNow.vid) !== String(vid)) return false;
+  try{ await trkStop(); }catch(_){}
+  try{ snack('항적 기록을 멈췄습니다'); }catch(_){}
+  return true;
+}
+async function trkDropIfGone(){
+  if(!trkNow) return false;
+  const 다른배 = trkNow.boat != null && String(trkNow.boat) !== ''
+              && String(trkNow.boat) !== String(currentBoatId || '');
+  const 목록 = (typeof voyage !== 'undefined' && Array.isArray(voyage)) ? voyage : [];
+  const 없다 = !목록.some(v => v && String(v.id) === String(trkNow.vid));
+  if(!다른배 && !없다) return false;
+  try{ await trkStop(); }catch(_){}
+  try{ snack('기록 중이던 항해가 없어져서 항적 기록을 멈췄습니다', { kind:'bad' }); }catch(_){}
+  return true;
+}
+
 // 앱을 다시 켰을 때 — 기록 중이던 것이 있으면 이어 붙인다
-function trkResume(){
+// ★★★ 4.139 — 이 함수는 만들어만 놓고 **아무 데서도 부르지 않고 있었다.**
+//   그래서 배 위에서 앱이 한 번 꺼지면 그 뒤의 항적은 통째로 사라졌다.
+//   (localStorage 에 적어 두기는 계속 했는데, 읽는 사람이 없었다.)
+//   이제 앱을 켤 때 부른다 — 아래 initStorage().then(…) 안이다.
+async function trkResume(){
   if(!isNative()) return;
   trkLoad();
   mobFabSync();
   if(!trkNow) return;
+  // 앱이 꺼져 있는 사이에 그 항해가 없어졌을 수 있다 — 그러면 되살리지 않는다
+  if(await trkDropIfGone()) return;
   trkNow.id = null;
   trkSmoothReset();
   trkAttach();
@@ -17449,6 +17512,8 @@ async function askDelBoat(id){
 }
 // 확인이 끝난 뒤 실제로 지운다
 async function doDelBoat(id, mine){
+  // ★ 지금 배를 지우는데 그 배 항해를 기록 중이면 먼저 멈춘다 (4.139)
+  if(trkNow && String(id) === String(currentBoatId)){ try{ await trkStop(); }catch(_){} }
   await delBoatData(id);
   boats = boats.filter(x=>String(x.id)!==String(id));
   if(window.__delBoat){ try{ await window.__delBoat(id); }catch(_){} }
@@ -22418,6 +22483,8 @@ async function delBoatData(id){
 }
 async function switchBoat(id){
   if(String(id) === String(currentBoatId)){ openBoat('info'); return; }
+  // ★ 항적은 지금 배의 항해에만 적힌다. 바꾸기 전에 멈춰야 점이 남는다 (4.139)
+  if(trkNow){ try{ await trkStop(); snack('배를 바꿔서 항적 기록을 멈췄습니다', { kind:'bad' }); }catch(_){} }
   currentBoatId = String(id);
   window.currentBoatId = currentBoatId;
   // 새 배의 자료를 받기 전에는 올리지 않는다 (기본값으로 덮어쓰는 것을 막는다)
@@ -23081,6 +23148,10 @@ async function loadBoatData(){
   await markLoad();   // ★ 무엇이 아직 안 올라간 것인지 알아야 클라우드가 덮지 못한다
   // ★ 배를 바꾸면 정비 목록이 통째로 바뀐다. 알람도 그 배 것으로 다시 건다.
   try{ maintAlarmSoon(); }catch(_){}
+  // ★★★ 4.139 — 기록 중이던 항해가 이 기기에서 사라졌으면 여기서 멈춘다.
+  //   배 바꾸기·배 지우기·로그아웃·다른 사람 로그인 — 문은 여럿이지만
+  //   전부 이 자리를 지난다. 그물은 여기 하나면 된다.
+  try{ await trkDropIfGone(); }catch(_){}
 }
 
 async function initStorage(){
@@ -24437,7 +24508,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '4.138';
+const APP_VER = '5.0';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29492,6 +29563,10 @@ async function mrDelete(){
   const it = arr[i];
   const nm = (row==='gear' ? gearLabel(it) : row==='mlog' ? mlogTitle(it) : (row==='review' ? rvTitle(it) : '')) || it.name || it.title || (row==='voyage' ? voyName(it) : row==='fuel' ? tsub('{d} 주유', { d: it.date }) : row==='run' ? tsub('{d} 엔진가동', { d: it.date }) : t('항목'));
   if(!await ask(tsub('"{name}" 휴지통으로 옮길까? (휴지통에서 복원 가능)', {name:nm}), { ok: t('휴지통으로') })) return;
+  // ★★★ 4.139 — 항적을 기록 중인 항해를 지우면 **먼저 멈춘다.**
+  //   멈춰야 여태 모은 점이 그 항해에 저장되고, 아래에서 뜨는 휴지통 사본에도
+  //   같이 들어간다. 되돌리기를 누르면 항적까지 그대로 돌아온다.
+  if(row === 'voyage'){ try{ await trkStopFor(it.id); }catch(_){} }
   const 표 = row+'_'+it.id;
   mrTrash.push({id: 표, kind:row, data:deepCopy(it), delAt:new Date().toISOString()});
   arr.splice(i,1);
@@ -36734,7 +36809,8 @@ async function spotRevBack(id, rid){
 async function openSpot(id){
   const s = spotOf(id); if(!s) return;
   spotOpenId = id;
-  if(!s.seed && !spotCmts[String(id)]) await loadSpotCmts(id);
+  // ★★★ 4.139 — 관 자료 자리에도 이야기가 달린다. 그래서 seed 여도 불러온다.
+  if(!spotCmts[String(id)]) await loadSpotCmts(id);
   if(!s.seed && !spotRevs[String(id)]) await loadSpotRevs(id);
   const P = document.getElementById('mrPanel');
   const fac = SPOT_FAC.filter(f => (s.fac||{})[f.k]).map(f=>`<span class="chip">${f.name}</span>`).join('');
@@ -36796,7 +36872,7 @@ async function openSpot(id){
     </div>`}
     ${spotDisclaimer()}
     ${fromPk && fromPk.from ? `<div class="mrnone" style="text-align:left;font-size:11.5px">${esc(fromPk.from)}</div>` : ''}
-    ${s.seed ? '' : spotCmtHtml(s)}`;
+    ${spotCmtHtml(s)}`;
   showPanel(P);
   if(s.lat != null && s.lon != null){
     requestAnimationFrame(()=>{
@@ -36845,8 +36921,15 @@ function writeSpotComment(id){
   if(!window.__user){ tell(t('로그인해야 글을 남길 수 있습니다')); return; }
   if(myBan){ tell(banNotice()); return; }
   if(!window.__cmt){ tell(t('인터넷에 연결되어 있지 않습니다')); return; }
-  // ★ 관 자료에는 아직 클라우드에 문서가 없다. 댓글만 달면 어디에도 안 붙는다.
-  if(s.seed){ tell(t('아직 아무도 채우지 않은 자리입니다.\n\n먼저 [내용 채우기] 로 자리를 올려 주세요.'), { big:true }); return; }
+  // ★★★ 4.139 — 관 자료 자리에도 이야기를 남긴다 (사장님 지적)
+  //
+  //   여태는 「먼저 [내용 채우기] 로 자리를 올려 주세요」 라고 막았다.
+  //   쓰는 사람에게는 「왜 후기를 못 남기지」 였다. 다녀온 이야기를 남기려는 사람에게
+  //   정박지 등록부터 시키는 것은 순서가 거꾸로다.
+  //
+  //   ★ 막을 까닭이 없었다 — 이야기는 자리 문서 **밖의 방**(spots/{id}/comments)에
+  //     들어간다. 서버 규칙도 자리 문서가 있는지 안 본다. 앱만 막고 있었다.
+  //   ★ 나중에 누가 그 자리를 채우면 id 가 같으므로 이야기가 그대로 따라온다.
   openForm({
     filter: true,     // ★ 밖으로 나가는 글 — formOk 에서 거른다
     title:'다녀온 이야기', okText:'남기기',
@@ -36921,7 +37004,17 @@ function writeSpot(id){
   spotPickCtx = { id: id || null, draft: s ? JSON.parse(JSON.stringify(s)) : null };
   // ★ 자리를 못 옮기는 사람에게 「자리 찍기」를 먼저 내밀면 안 된다 —
   //   찍게 해 놓고 안 옮겨 주면 그것이 화면이 거짓말하는 것이다 (규칙 2번).
-  if(!canMoveSpot(s)) spotForm();
+  //
+  // ★★★ 4.139 — 자리를 **이미 아는 곳**이면 자리 찍기를 건너뛴다 (사장님 지적)
+  //
+  //   「내용 채우기」 를 눌렀는데 지도가 뜨고, 이미 맞는 자리를 또 찍으라고 했다.
+  //   관 자료 정박지는 좌표가 들어 있는 채로 온다. 운영자는 자리를 옮길 수 있으니
+  //   여태 무조건 지도부터 내밀었다 — 채우러 온 사람에게 엉뚱한 일을 시킨 것이다.
+  //
+  //   ★ 자리부터 찍는 것은 **자리를 아직 모르는 것(새로 올리는 것)** 뿐이다.
+  //     이미 자리가 있으면 내용부터 연다. 자리를 고치려면 그 화면의 「← 자리」 를 누른다.
+  const 자리있음 = !!(s && s.lat != null && s.lon != null);
+  if(!canMoveSpot(s) || 자리있음) spotForm();
   else spotPickPlace();
 }
 // 1단계 — 자리 찍기
@@ -45717,7 +45810,12 @@ async function renderWeather(){
       // ★ 4.68 — 나라 물때 자료는 출처를 밝혀야 쓸 수 있다.
       //   일본 기상청 자료는 政府標準利用規約 을 따르고, 그 조건이 「출처 표시」다.
       //   지도 저작권 표기를 지우면 안 되는 것과 같은 까닭이라 화면에서 빼지 않는다.
-      + tideFromLine();
+      + tideFromLine()
+      // ★★★ 4.139 — Open-Meteo 출처. **지우지 마십시오 — 면허(CC BY 4.0) 조건입니다.**
+      //   바람·물결·기온·해상 예보를 전부 여기서 받아옵니다. 지도 저작권 표기를
+      //   지우면 안 되는 것과 같은 까닭입니다.
+      + `<div class="wxfoot" style="padding:6px 16px 10px">${esc(t('날씨·해상 예보 자료'))} — `
+        + `<a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a> (CC BY 4.0)</div>`;
     // 초기 스크롤: 현재 시각 - 2h
     const sc = document.getElementById('wxScroll');
     if(sc) sc.scrollLeft = Math.max(0, (nowIdx-2)*COLW);
@@ -45945,6 +46043,9 @@ applyLang();
 applyLock();
 initStorage().then(()=>{
   ensureBoat(); applyAccount();
+  // ★★★ 4.139 — 기록 중이던 항적을 이어 붙인다. 여태 아무도 안 불러서
+  //   배 위에서 앱이 한 번 꺼지면 그 뒤가 통째로 빠졌다.
+  try{ trkResume(); }catch(_){}
   // ★ 배가 있으면 그 배 홈포트를 날씨 지점으로 잡아 둔다.
   //   전에는 배를 만들거나 바꿀 때만 잡았다. 앱을 다시 켜기만 하면
   //   오늘 화면 날씨 칸이 늘 「어디 날씨를 볼지 아직 정하지 않았습니다」 였다.

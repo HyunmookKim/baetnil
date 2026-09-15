@@ -693,6 +693,13 @@ body{padding-bottom:62px}
 .mrbtn{background:#14304a;border:1px solid #2a5a8a;border-radius:7px;color:#9ed0f5;padding:7px 11px;font-size:12px;cursor:pointer}
 .mrbtn.warn{border-color:#7a3030;color:#e08a8a}
 .mrbtn.ok{border-color:#2a6a4a;color:#7aefaa}
+/* ★★★ 5.0 — 도면 고르는 단추 셋 (사장님 지적)
+   여태 class="btn" 이었는데 **앱에 .btn 이라는 것이 없었다.** 그래서 브라우저 기본
+   단추(회색 네모)로 나왔다 — 앱 안에서 저것만 혼자 다른 세상 물건이었다.
+   앱이 이미 쓰는 .mrbtn 을 쓰고, 셋을 같은 너비로 세로로 세운다.
+   ★ 제일 흔히 고르는 「기본 도면에서 선택」 하나만 눈에 띄게 한다(.ok). */
+.dgpick{display:flex;flex-direction:column;gap:8px;max-width:280px;margin:14px auto 0}
+.dgpick .mrbtn{width:100%;justify-content:center;text-align:center}
 /* ══════════════════════════════════════════════════════════════════
    ★★★ 4.99 — 항해일지의 「한 자리」 칸 (사장님 지적)
      "중간기록 도착 뭐 이런것들 세부사항들이 칸밖에 있어서 매번 뭐가 뭔지 찾기 어렵다"
@@ -2296,9 +2303,11 @@ header{padding-top:var(--sat)}
     <svg id="shLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     <div id="fpNone" style="display:none;padding:60px 20px;text-align:center;color:#8a97a8">
       <span data-t="이 배의 평면도가 아직 없습니다.">이 배의 평면도가 아직 없습니다.</span><br>
-      <button class="btn" style="margin-top:12px" onclick="dgPickBuiltin('plan')" data-t="기본 도면에서 선택">기본 도면에서 선택</button>
-      <button class="btn" style="margin-top:8px" onclick="uploadDg('plan')" data-t="도면 사진 올리기">도면 사진 올리기</button>
-      <button class="btn" style="margin-top:8px" onclick="dgPickLib('plan')" data-t="공개 도면에서 선택">공개 도면에서 선택</button>
+      <div class="dgpick">
+        <button class="mrbtn big ok" onclick="dgPickBuiltin('plan')" data-t="기본 도면에서 선택">기본 도면에서 선택</button>
+        <button class="mrbtn big" onclick="uploadDg('plan')" data-t="도면 사진 올리기">도면 사진 올리기</button>
+        <button class="mrbtn big" onclick="dgPickLib('plan')" data-t="공개 도면에서 선택">공개 도면에서 선택</button>
+      </div>
     </div>
     <div class="mark" style="top:-2px;left:50%;transform:translateX(-50%)" data-t="▲ 선수">▲ 선수</div>
     <div class="mark" style="bottom:-15px;left:50%;transform:translateX(-50%)" data-t="선미 ▼">선미 ▼</div>
@@ -2788,6 +2797,8 @@ const I18N = {
 
     '오늘':'Today', '배':'Boat', '항해일지':'Logbook', '커뮤니티':'Community',
     '내 배':'My boat', '기본정보':'Basics', '제원':'Specs', '배소개':'About',
+    '계통별 요약':'By system',
+    '마지막 정비':'Last service',
     '회원명부':'Crew', '등급설정':'Ranks', '게시판':'Board', '할일':'Tasks',
     '가입신청':'Requests', '공개설정':'Sharing',
     '정박지':'Berths', '중고 장터':'Market', '배 둘러보기':'Boats', '뉴스':'News',
@@ -3096,7 +3107,7 @@ const I18N = {
     '풍속·파고 한계와 리프 풍속은 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'Wind and wave limits and reefing wind speeds are <b>filled in automatically</b> from the boat\'s length and type.',
     '풍속·파고 한계는 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'Wind and wave limits are <b>filled in automatically</b> from the boat\'s length and type.',
     '실제 배와 다를 수 있으니 겪어 보시고 고쳐 주세요.':'They may not match your boat — sail her and correct them.',
-    '제원은 계산에 쓰입니다. 비워 두면 그 계산만 건너뜁니다 — <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.':'Specs feed the calculations. Leave one blank and only that calculation is skipped — without <b>fuel tank</b> there is no range estimate, without <b>air draft</b> no bridge clearance check.',
+    '앱이 계산에 쓰는 것은 <b>연료 탱크</b>(잔량 추정) · <b>공기흘수</b>와 <b>교량 안전여유</b>(교량 통과) · <b>날씨 한계값</b>(출항 경고)입니다. 비워 두면 그 계산만 건너뜁니다. 나머지 제원은 <b>배 이력서</b>와 배 소개에 그대로 실립니다.':'The app calculates with <b>fuel tank</b> (range estimate), <b>air draft</b> and <b>bridge margin</b> (bridge clearance), and the <b>weather limits</b> (departure warnings). Leave one blank and only that calculation is skipped. The rest go into the <b>boat CV</b> and the boat profile as written.',
     '전장(LOA)':'Length overall (LOA)',
     '흘수':'Draft',
     '공기흘수':'Air draft',
@@ -3789,7 +3800,7 @@ const I18N = {
     '갱신':'Refresh',
     '거짓 정보':'False information',
     '건의':'Suggestion',
-    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고에 쓰입니다.':'The maximum number of people on the survey certificate. Used when filing a departure report.',
+    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고하실 때 쓰시는 숫자입니다.':'The maximum number of people on the survey certificate — the figure you use when filing a departure report.',
     '검색 결과 없음':'No results',
     '게시판을 볼 권한이 없습니다':'You do not have permission to view the board',
     '경기·인천':'Gyeonggi · Incheon',
@@ -4808,7 +4819,7 @@ const I18N = {
     '편집 모드에서 수정할 수 있습니다.':'You can edit this in editing mode.',
     '편집 모드에서 추가할 수 있습니다.':'You can add this in editing mode.',
     '평균 바람은 괜찮아도 돌풍이 이 값을 넘으면 위험합니다. 보통 한계 풍속보다 조금 높게 잡습니다.':'The mean wind may be fine, but gusts above this are dangerous. Usually set a little above the wind limit.',
-    '평소 다니는 속력입니다. 도착 시각과 연료 소모를 어림잡는 데 쓰입니다.':'The speed you normally run at. Used to estimate arrival time and fuel use.',
+    '평소 다니는 속력입니다. 배 이력서에 실립니다.':'The speed you normally run at. It goes into the boat CV.',
     '평소 조업하는 수심대입니다. 어군탐지와 채비 준비에 참고합니다.':'The depth band you usually fish. A reference for the sounder and for rigging up.',
     '포인트':'Fishing spot',
     '포인트에서 어종을 누르면 여기에 모입니다':'Tap a species at a fishing spot and it collects here',
@@ -5509,6 +5520,7 @@ const I18N = {
     // ── 4.21
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'Google sign-in is not available in this build.\nPlease sign in with email.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Google sign-in.\nPlease sign in with email.',
+    '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Apple sign-in.\nPlease sign in with email.',
   
 
     // ── 4.23
@@ -6219,6 +6231,8 @@ const I18N = {
 
     '오늘':'Сегодня', '배':'Судно', '항해일지':'Судовой журнал', '커뮤니티':'Сообщество',
     '내 배':'Моё судно', '기본정보':'Основное', '제원':'Характеристики', '배소개':'О судне',
+    '계통별 요약':'По системам',
+    '마지막 정비':'Последнее обслуживание',
     '회원명부':'Экипаж', '등급설정':'Роли', '게시판':'Доска', '할일':'Задачи',
     '가입신청':'Заявки', '공개설정':'Публикация',
     '정박지':'Стоянки', '중고 장터':'Барахолка', '배 둘러보기':'Суда', '뉴스':'Новости',
@@ -6527,7 +6541,7 @@ const I18N = {
     '풍속·파고 한계와 리프 풍속은 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'Пределы по ветру и волне и скорости взятия рифов <b>заполнены автоматически</b> по длине и типу судна.',
     '풍속·파고 한계는 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'Пределы по ветру и волне <b>заполнены автоматически</b> по длине и типу судна.',
     '실제 배와 다를 수 있으니 겪어 보시고 고쳐 주세요.':'Они могут не совпадать с вашим судном — походите и поправьте.',
-    '제원은 계산에 쓰입니다. 비워 두면 그 계산만 건너뜁니다 — <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.':'Характеристики нужны для расчётов. Пустое поле пропускает только свой расчёт — без <b>топливного бака</b> нет оценки остатка, без <b>надводного габарита</b> нет проверки мостов.',
+    '앱이 계산에 쓰는 것은 <b>연료 탱크</b>(잔량 추정) · <b>공기흘수</b>와 <b>교량 안전여유</b>(교량 통과) · <b>날씨 한계값</b>(출항 경고)입니다. 비워 두면 그 계산만 건너뜁니다. 나머지 제원은 <b>배 이력서</b>와 배 소개에 그대로 실립니다.':'Приложение считает по <b>топливному баку</b> (остаток), <b>надводному габариту</b> и <b>запасу под мостом</b> (проход мостов), и по <b>погодным пределам</b> (предупреждения о выходе). Пустое поле пропускает только свой расчёт. Остальные характеристики идут в <b>судовое резюме</b> и в профиль судна как есть.',
     '전장(LOA)':'Длина (LOA)',
     '흘수':'Осадка',
     '공기흘수':'Надводный габарит',
@@ -7219,7 +7233,7 @@ const I18N = {
     '갱신':'Обновить',
     '거짓 정보':'Недостоверные сведения',
     '건의':'Предложение',
-    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고에 쓰입니다.':'Максимальное число людей на борту по свидетельству. Используется при уведомлении о выходе.',
+    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고하실 때 쓰시는 숫자입니다.':'Максимальное число людей на борту по свидетельству — эту цифру вы указываете при уведомлении о выходе.',
     '검색 결과 없음':'Ничего не найдено',
     '게시판을 볼 권한이 없습니다':'Нет доступа к доске объявлений',
     '경기·인천':'Кёнгидо · Инчхон',
@@ -8238,7 +8252,7 @@ const I18N = {
     '편집 모드에서 수정할 수 있습니다.':'Изменить это можно в режиме правки.',
     '편집 모드에서 추가할 수 있습니다.':'Добавить это можно в режиме правки.',
     '평균 바람은 괜찮아도 돌풍이 이 값을 넘으면 위험합니다. 보통 한계 풍속보다 조금 높게 잡습니다.':'Средний ветер может быть в норме, но порывы выше этого значения опасны. Обычно ставят чуть выше предела по ветру.',
-    '평소 다니는 속력입니다. 도착 시각과 연료 소모를 어림잡는 데 쓰입니다.':'Ваша обычная скорость. Нужна для оценки времени прихода и расхода топлива.',
+    '평소 다니는 속력입니다. 배 이력서에 실립니다.':'Ваша обычная скорость. Попадает в судовое резюме.',
     '평소 조업하는 수심대입니다. 어군탐지와 채비 준비에 참고합니다.':'Глубины, на которых вы обычно ловите. Ориентир для эхолота и оснастки.',
     '포인트':'Точка лова',
     '포인트에서 어종을 누르면 여기에 모입니다':'Нажмите вид рыбы на точке лова — он соберётся здесь',
@@ -8940,6 +8954,7 @@ const I18N = {
     // ── 4.21
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'В этой сборке вход через Google недоступен.\nВойдите по электронной почте.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Google.\nВойдите по электронной почте.',
+    '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Apple.\nВойдите по электронной почте.',
   
 
     // ── 4.23
@@ -9666,6 +9681,8 @@ const I18N = {
     '내 배':'自分の船',
     '기본정보':'基本情報',
     '제원':'仕様',
+    '계통별 요약':'系統別のまとめ',
+    '마지막 정비':'最後の整備',
     '배소개':'船の紹介',
     '회원명부':'メンバー名簿',
     '등급설정':'役割の設定',
@@ -10012,7 +10029,7 @@ const I18N = {
     '풍속·파고 한계와 리프 풍속은 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'風速・波高の限界とリーフ風速は、船の長さと船種から<b>自動で入れた値</b>です。',
     '풍속·파고 한계는 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.':'風速・波高の限界は、船の長さと船種から<b>自動で入れた値</b>です。',
     '실제 배와 다를 수 있으니 겪어 보시고 고쳐 주세요.':'実際の船と異なる場合がありますので、乗ってみて修正してください。',
-    '제원은 계산에 쓰입니다. 비워 두면 그 계산만 건너뜁니다 — <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.':'スペックは計算に使われます。空欄にするとその計算だけを飛ばします — <b>燃料タンク</b>がなければ残量の推定を、<b>エアドラフト</b>がなければ橋の通過可否を計算しません。',
+    '앱이 계산에 쓰는 것은 <b>연료 탱크</b>(잔량 추정) · <b>공기흘수</b>와 <b>교량 안전여유</b>(교량 통과) · <b>날씨 한계값</b>(출항 경고)입니다. 비워 두면 그 계산만 건너뜁니다. 나머지 제원은 <b>배 이력서</b>와 배 소개에 그대로 실립니다.':'アプリが計算に使うのは<b>燃料タンク</b>（残量の推定）・<b>エアドラフト</b>と<b>橋の安全余裕</b>（橋の通過）・<b>天候の限界値</b>（出港の警告）です。空欄にするとその計算だけを飛ばします。ほかの仕様は<b>船の履歴書</b>と船の紹介にそのまま載ります。',
     '전장(LOA)':'全長（LOA）',
     '흘수':'喫水',
     '공기흘수':'エアドラフト',
@@ -10694,7 +10711,7 @@ const I18N = {
     '갱신':'更新',
     '거짓 정보':'虚偽の情報',
     '건의':'ご意見',
-    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고에 쓰입니다.':'船舶検査証書に記載された最大搭載人員です。出港届に使われます。',
+    '검사증서에 적힌 최대 승선 인원입니다. 출항 신고하실 때 쓰시는 숫자입니다.':'船舶検査証書に記載された最大搭載人員です。出港届を出すときに使う数字です。',
     '검색 결과 없음':'検索結果なし',
     '게시판을 볼 권한이 없습니다':'掲示板を見る権限がありません',
     '경기·인천':'京畿・仁川',
@@ -11694,7 +11711,7 @@ const I18N = {
     '편집 모드에서 수정할 수 있습니다.':'編集モードで修正できます。',
     '편집 모드에서 추가할 수 있습니다.':'編集モードで追加できます。',
     '평균 바람은 괜찮아도 돌풍이 이 값을 넘으면 위험합니다. 보통 한계 풍속보다 조금 높게 잡습니다.':'平均風速が問題なくても、突風がこの値を超えると危険です。通常は限界風速より少し高めに設定します。',
-    '평소 다니는 속력입니다. 도착 시각과 연료 소모를 어림잡는 데 쓰입니다.':'いつも航行する速力です。到着時刻と燃料消費を見積もるのに使います。',
+    '평소 다니는 속력입니다. 배 이력서에 실립니다.':'いつも航行する速力です。船の履歴書に載ります。',
     '평소 조업하는 수심대입니다. 어군탐지와 채비 준비에 참고합니다.':'いつも釣りをする水深帯です。魚群探知と仕掛けの準備の参考にします。',
     '포인트':'ポイント',
     '포인트에서 어종을 누르면 여기에 모입니다':'ポイントで魚種を押すと、ここにまとまります',
@@ -12297,6 +12314,7 @@ const I18N = {
     '로그인해야 하실 수 있습니다':'ログインが必要です',
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'このバージョンではGoogleログインは使えません。\nメールアドレスでログインしてください。',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Googleログインを完了できませんでした。\nメールアドレスでログインしてください。',
+    '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Appleログインを完了できませんでした。\nメールアドレスでログインしてください。',
     '한 번 더 누르면 앱이 닫힙니다':'もう一度押すとアプリが閉じます',
     '항적을 기록하려면 두 가지가 필요합니다.':'航跡を記録するには2つのことが必要です。',
     '1. 곧 위치를 물어봅니다 — 「앱을 사용하는 동안 허용」을 누르십시오.':'1. まもなく位置情報の許可を尋ねられます —「Appの使用中は許可」を押してください。',
@@ -15435,6 +15453,8 @@ let me = null;              // {uid, email, name} 또는 null
 let lastUid = null;
 window.__onAuth = async u => {
   me = u;
+  // ★★★ 5.0 — 다른 것을 읽기 **전에** 옮긴다. 늦으면 앞사람 칸을 한 번 읽고 만다.
+  try{ if(u) pMigrate(); }catch(_){}
   applyAccount();
   // 로그아웃하면 운영자 표시를 즉시 지운다
   if(!u){ adminMe = null; myBan = null; personCur = null; adminClaimTried = false;
@@ -15445,6 +15465,7 @@ window.__onAuth = async u => {
           //   맞는 말이 아니다. 로그인 안 한 상태의 말은 「오프라인 · 로컬」 이다.
           try{ setSync('오프라인 · 로컬'); }catch(_){}
           try{ dropGuestBoats(lastUid); }catch(_){}
+          try{ pWipeDevice(); }catch(_){}     // ★ 5.0 — 개인 칸도 같이 내린다
           lastUid = null; }
   if(u) lastUid = u.uid;
   // ★ 로그인해야 「누구에게 보낼지」가 정해진다. 로그인한 그때 이 폰을 등록한다.
@@ -15533,6 +15554,50 @@ function applyAccount(){
 //   ★ 이름을 정하는 문 하나. 차례가 뜻이다 —
 //     ① 사람이 앱에서 정한 이름  ② 계정에 있던 이름  ③ 메일 앞부분  ④ 이름 미등록
 // ══════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 5.0 — **사람에게 붙는 것은 계정마다 따로 담는다** (4.137 의 뿌리)
+//
+//   4.137 에서 「한 기기를 둘이 쓰면 앞사람 이름이 내 이름이 되던」 것을 고쳤는데
+//   그때는 **이름 한 칸만** 고쳤습니다. 뿌리는 그대로였습니다 —
+//   사람에게 붙는 것을 전부 **기기 한 칸**에 담고 있었습니다:
+//   숨긴 사람 · 숨긴 배 · 추천한 글 · 약관 동의 · 첫걸음 진행 · 위치 기록 …
+//   그래서 계정을 바꾸면 앞사람 것이 그대로 따라왔습니다.
+//   ★ 그중 **약관 동의**가 제일 나쁩니다 — 동의한 적 없는 사람을 동의한 것으로 만듭니다.
+//   ★ **위치 기록(확인자료)** 도 남의 것을 보여 주게 됩니다.
+//
+//   문은 하나입니다 — pKey(). 로그인했으면 계정 uid 를 뒤에 붙입니다.
+//   옛 칸은 로그인한 그 순간 **한 번만 옮겨 오고 지웁니다**(pMigrate).
+//   안 지우면 다음 사람이 또 그것을 물려받습니다 — 그것이 이 버그의 모양입니다.
+// ══════════════════════════════════════════════════════════════════════
+const PERSONAL_KEYS = ['bt_likes','bt_hidden','bt_hideby','bt_hidenm','bt_agree',
+                       'bt_loclog','bt_start','bt_cvdone','bt_startmark','bt_startend',
+                       'bt_crewmark','bt_cvoff','bt_market_ok','bt_talkreg','bt_seriesreq'];
+function pKey(k){
+  const u = (typeof me !== 'undefined' && me && me.uid) ? String(me.uid) : '';
+  return u ? (k + '_' + u) : k;
+}
+function pGet(k){ try{ return localStorage.getItem(pKey(k)); }catch(_){ return null; } }
+function pSet(k, v){ try{ localStorage.setItem(pKey(k), v); }catch(_){} }
+function pDel(k){ try{ localStorage.removeItem(pKey(k)); }catch(_){} }
+// 로그인한 그 순간 딱 한 번 — 기기 칸을 이 계정으로 옮기고 기기 칸은 지운다
+function pMigrate(){
+  const u = (typeof me !== 'undefined' && me && me.uid) ? String(me.uid) : '';
+  if(!u) return;
+  PERSONAL_KEYS.forEach(k=>{
+    try{
+      const 옛 = localStorage.getItem(k);
+      if(옛 == null) return;
+      if(localStorage.getItem(k + '_' + u) == null) localStorage.setItem(k + '_' + u, 옛);
+      localStorage.removeItem(k);      // ★ 반드시 지운다 — 남기면 다음 사람이 물려받는다
+    }catch(_){}
+  });
+}
+// 나갈 때 — 계정에 안 붙은 채 남아 있는 개인 칸을 치운다
+// ★ 알림 표(bt_pushtok)도 같이 지운다. 그 표는 나간 사람 계정에 매여 있어서,
+//   안 지우면 다음 사람 폰에서 앞사람에게 알림이 간다.
+function pWipeDevice(){
+  PERSONAL_KEYS.concat(['bt_pushtok']).forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
+}
 const MYNAME_KEY = 'bt_myname';
 // ★★★ 4.137 — 이름은 **기기가 아니라 계정에** 붙는다 (사장님 지적, 2026-09-13)
 //   「내 원래 계정으로 로그인 했는데 벌써 이름이 test로 바꿨구만」
@@ -16290,7 +16355,6 @@ function openBoatSetup(){
 //   앱 어디서도 navigator.geolocation 을 직접 부르지 않고 geoGet() 만 지나간다.
 //   자리를 새로 만들 때마다 기록 한 줄을 손으로 붙이는 방식은 반드시 한 곳을 빠뜨린다.
 //   loclogtest.js 가 직접 부르는 곳이 남아 있으면 이름을 대고 잡는다.
-const LG_KEY    = 'bt_loclog';
 const LG_KEEP_D = 180;      // 6개월 — 위치정보법 제16조 제2항
 // ★ 확인자료에 좌표까지 남길 것인가.
 //   법이 요구하는 것은 「썼다는 사실」 이라고 읽어 기본은 끔으로 두었다.
@@ -16316,11 +16380,11 @@ function lgPrune(rows, now){
 function lgLoad(){
   if(lgRows) return lgRows;
   let raw = [];
-  try{ raw = JSON.parse(localStorage.getItem(LG_KEY) || '[]'); }catch(e){ raw = []; }
+  try{ raw = JSON.parse(pGet('bt_loclog') || '[]'); }catch(e){ raw = []; }
   lgRows = lgPrune(raw, Date.now()).slice(0, LG_MAX);
   return lgRows;
 }
-function lgSave(){ try{ localStorage.setItem(LG_KEY, JSON.stringify(lgRows || [])); }catch(e){} }
+function lgSave(){ pSet('bt_loclog', JSON.stringify(lgRows || [])); }
 function lgReset(){ lgRows = null; }
 function lgList(){ return lgLoad().slice(); }
 
@@ -16408,7 +16472,7 @@ function locSet(on){
   try{ a = agreeState(); }catch(e){}
   const body = Object.assign({}, a || { ver: LEGAL_VER, at: new Date().toISOString() },
                              { loc: !!on, locAt: new Date().toISOString() });
-  try{ localStorage.setItem(AGREE_KEY, JSON.stringify(body)); }catch(e){}
+  pSet('bt_agree', JSON.stringify(body));
   try{ lgAdd('동의·철회', on ? '위치정보 수집에 동의' : '위치정보 수집 동의를 거둠'); }catch(e){}
   try{ pushAgree(); }catch(e){}
   return !!on;
@@ -18487,11 +18551,11 @@ const REPORT_REASONS = [
 //   배 숨기기와 같은 자리에 같은 방식으로 둔다 — 이 기기에만 저장한다.
 //   내가 안 보고 싶은 것이지 남에게 강요할 일이 아니다. 신고는 따로 있다.
 function hiddenPeople(){
-  try{ const v = JSON.parse(localStorage.getItem('bt_hideby') || '[]');
+  try{ const v = JSON.parse(pGet('bt_hideby') || '[]');
        return Array.isArray(v) ? v : []; }catch(_){ return []; }
 }
 function saveHiddenPeople(list){
-  try{ localStorage.setItem('bt_hideby', JSON.stringify(list)); }catch(_){}
+  pSet('bt_hideby', JSON.stringify(list));
 }
 function isMuted(uid){
   if(!uid) return false;
@@ -18560,25 +18624,25 @@ function openMuted(){
 }
 // 이름은 마지막에 본 것을 기억해 둔다 — 없으면 번호 뒷자리로 보여 준다
 function mutedName(uid){
-  try{ const m = JSON.parse(localStorage.getItem('bt_hidenm') || '{}');
+  try{ const m = JSON.parse(pGet('bt_hidenm') || '{}');
        return m[String(uid)] || ''; }catch(_){ return ''; }
 }
 function mutedNameKeep(uid, name){
   if(!uid || !name) return;
-  try{ const m = JSON.parse(localStorage.getItem('bt_hidenm') || '{}');
+  try{ const m = JSON.parse(pGet('bt_hidenm') || '{}');
        m[String(uid)] = String(name).slice(0, 40);
-       localStorage.setItem('bt_hidenm', JSON.stringify(m)); }catch(_){}
+       pSet('bt_hidenm', JSON.stringify(m)); }catch(_){}
 }
 function unmutePersonUI(uid){
   unmutePerson(uid);
   openMuted();
 }
 function hiddenBoats(){
-  try{ const v = JSON.parse(localStorage.getItem('bt_hidden') || '[]');
+  try{ const v = JSON.parse(pGet('bt_hidden') || '[]');
        return Array.isArray(v) ? v : []; }catch(_){ return []; }
 }
 function saveHidden(list){
-  try{ localStorage.setItem('bt_hidden', JSON.stringify(list)); }catch(_){}
+  pSet('bt_hidden', JSON.stringify(list));
 }
 function isHidden(id){
   return hiddenBoats().includes(String(id));
@@ -19604,15 +19668,14 @@ const LIKE_LABEL = { talk:t('도움됐어요'), post:t('도움됐어요'), spots
 //   목록 30개를 열면 900KB 다. 지금까지 줄여 온 것을 도로 까먹는다.
 //   숫자만 문서에 두고, 내가 눌렀는지는 내 폰에 둔다.
 //   기기를 바꾸면 다시 누를 수 있지만 그 정도는 감수할 만하다.
-const LIKE_KEY = 'bt_likes';
 function likedAll(){
-  try{ return JSON.parse(localStorage.getItem(LIKE_KEY) || '{}') || {}; }catch(_){ return {}; }
+  try{ return JSON.parse(pGet('bt_likes') || '{}') || {}; }catch(_){ return {}; }
 }
 function likedOn(kind, id){ return !!likedAll()[kind + ':' + id]; }
 function likedMark(kind, id, on){
   const o = likedAll(), k = kind + ':' + id;
   if(on) o[k] = 1; else delete o[k];
-  try{ localStorage.setItem(LIKE_KEY, JSON.stringify(o)); }catch(_){}
+  pSet('bt_likes', JSON.stringify(o));
 }
 // ★ 0이면 숫자를 아예 안 보인다.
 //   사람이 적을 때 '도움됐어요 0' 이 줄줄이 있으면 죽은 동네로 보인다.
@@ -19731,7 +19794,7 @@ function writeTalk(id){
   const po = id ? talkList.find(x=>String(x.id)===String(id)) : null;
   if(id && !po) return;
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  const lastReg = (function(){ try{ return localStorage.getItem('bt_talkreg') || ''; }catch(_){ return ''; } })();
+  const lastReg = (function(){ return pGet('bt_talkreg') || ''; })();
   openForm({
     title: po ? '글 수정' : '새 글',
     // ★★★ 4.103 — 「올리면 누구나 본다」 를 **올리기 전에** 말한다.
@@ -19763,7 +19826,7 @@ function writeTalk(id){
       const blocks = Array.isArray(v.doc) ? v.doc : [];
       const photos = blocks.filter(x=>x.t==='photo').map(x=>x.v);
       if(!blocks.length) return formErr('doc', '내용을 넣어 주세요');
-      try{ localStorage.setItem('bt_talkreg', v.region); }catch(_){}
+      pSet('bt_talkreg', v.region);
       // ★ 사진을 창고로 보내고 주소만 남긴다.
       //   글 안의 사진 자리(blocks)와 사진 목록(photos)이 같은 것을 가리켜야 하므로
       //   옛 주소 → 새 주소 짝을 만들어 둘 다 바꾼다. 한쪽만 바꾸면 사진이 사라진다.
@@ -22728,7 +22791,7 @@ function openBoat(tab){
         ? t('풍속·파고 한계와 리프 풍속은 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.')
         : t('풍속·파고 한계는 배 길이와 선종으로 <b>자동으로 채워 둔 값</b>입니다.')}
       ${esc(t('실제 배와 다를 수 있으니 겪어 보시고 고쳐 주세요.'))}<br>
-      ${t('제원은 계산에 쓰입니다. 비워 두면 그 계산만 건너뜁니다 — <b>연료 탱크</b>가 없으면 잔량 추정을, <b>공기흘수</b>가 없으면 교량 통과 여부를 계산하지 않습니다.')}</div>`;
+      ${t('앱이 계산에 쓰는 것은 <b>연료 탱크</b>(잔량 추정) · <b>공기흘수</b>와 <b>교량 안전여유</b>(교량 통과) · <b>날씨 한계값</b>(출항 경고)입니다. 비워 두면 그 계산만 건너뜁니다. 나머지 제원은 <b>배 이력서</b>와 배 소개에 그대로 실립니다.')}</div>`;
   }
   P.innerHTML = head + body;
   showPanel(P);
@@ -22831,11 +22894,11 @@ const BOAT_SPEC = {
   sailArea: { label:'메인세일 면적',   unit:'m²', help:'세일 주문이나 수리를 맡길 때 쓰입니다.', only:'sail' },
   mastH:    { label:'마스트 높이',     unit:'m',  help:'수면부터 마스트 끝까지입니다. 교량 통과 계산에 쓰이는 공기흘수와 함께 적어 두면 좋습니다.', only:'sail' },
   // ── 모터보트
-  cruiseKt: { label:'순항 속력',       unit:'kt', help:'평소 다니는 속력입니다. 도착 시각과 연료 소모를 어림잡는 데 쓰입니다.', only:'power' },
+  cruiseKt: { label:'순항 속력',       unit:'kt', help:'평소 다니는 속력입니다. 배 이력서에 실립니다.', only:'power' },
   burnLph:  { label:'순항 연료 소모',  unit:'L/h', help:'순항 속력에서 한 시간에 쓰는 연료입니다.', only:'power' },
   planeKt:  { label:'활주 시작 속력',  unit:'kt', help:'선체가 물 위로 뜨기 시작하는 속력입니다. 이 아래에서는 연비가 나쁩니다.', only:'power' },
   // ── 낚시·유어선
-  maxPax:   { label:'승선 정원',       unit:'명', help:'검사증서에 적힌 최대 승선 인원입니다. 출항 신고에 쓰입니다.', only:'fishing' },
+  maxPax:   { label:'승선 정원',       unit:'명', help:'검사증서에 적힌 최대 승선 인원입니다. 출항 신고하실 때 쓰시는 숫자입니다.', only:'fishing' },
   fishDepth:{ label:'주 조업 수심',    unit:'m',  help:'평소 조업하는 수심대입니다. 어군탐지와 채비 준비에 참고합니다.', only:'fishing' },
   anchorRope:{label:'앵커 로프 길이',  unit:'m',  help:'묘박할 수 있는 수심을 가늠합니다. 보통 수심의 5~7배가 필요합니다.', only:'fishing' },
   liveTank: { label:'활어창 용량',     unit:'L',  help:'살림통 총 용량입니다.', only:'fishing' },
@@ -28216,16 +28279,12 @@ function introLines(list){
 //   ★ ③ 이 「첫 값」 이다 — 적은 것이 종이 한 장이 되어 나오는 순간.
 //     여기까지 오면 「왜 적어야 하나」 에 앱이 스스로 답한 것이다.
 // ★ 다 하면 사라진다. 그만 보겠다면 그때도 사라진다. 계속 따라다니지 않는다.
-const START_KEY  = 'bt_start';
-const START_CV   = 'bt_cvdone';
-const START_MARK = 'bt_startmark';   // 한 번 한 것은 한 것이다 (점검은 주기마다 지워지므로)
-const START_END  = 'bt_startend';    // 마무리 말을 한 번 했다
 function startMark(k){
-  try{ const o = JSON.parse(localStorage.getItem(START_MARK) || '{}');
-       if(o[k]) return; o[k] = 1; localStorage.setItem(START_MARK, JSON.stringify(o)); }catch(_){}
+  try{ const o = JSON.parse(pGet('bt_startmark') || '{}');
+       if(o[k]) return; o[k] = 1; pSet('bt_startmark', JSON.stringify(o)); }catch(_){}
 }
 function startMarked(k){
-  try{ return !!JSON.parse(localStorage.getItem(START_MARK) || '{}')[k]; }catch(_){ return false; }
+  try{ return !!JSON.parse(pGet('bt_startmark') || '{}')[k]; }catch(_){ return false; }
 }
 function startState(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
@@ -28259,11 +28318,11 @@ function startState(){
            n: [배, 자리다, 점검, 정비].filter(Boolean).length };
 }
 function startSkip(){
-  try{ localStorage.setItem(START_KEY, 'hide'); }catch(_){}
+  pSet('bt_start', 'hide');
   try{ renderHome(); }catch(_){}
 }
 function startEndClose(){
-  try{ localStorage.setItem(START_END, 'done'); }catch(_){}
+  pSet('bt_startend', 'done');
   try{ renderHome(); }catch(_){}
 }
 function startGoPort(){
@@ -28329,13 +28388,12 @@ function startGoDocs(){
 // ★ 아직 없는 것 (사장님께 여쭐 것) — 크루의 「배 이력서」 에 해당하는 것,
 //   곧 **내가 몇 번 어디를 탔나(승선 이력)** 가 이 앱에 없다.
 //   크루에게는 그것이 남는 것이다. 만들지 안 만들지는 사장님이 정하실 일이라 여기서는 안 지었다.
-const CREW_MARK = 'bt_crewmark';
 function crewMark(k){
-  try{ const o = JSON.parse(localStorage.getItem(CREW_MARK) || '{}');
-       if(o[k]) return; o[k] = 1; localStorage.setItem(CREW_MARK, JSON.stringify(o)); }catch(_){}
+  try{ const o = JSON.parse(pGet('bt_crewmark') || '{}');
+       if(o[k]) return; o[k] = 1; pSet('bt_crewmark', JSON.stringify(o)); }catch(_){}
 }
 function crewMarked(k){
-  try{ return !!JSON.parse(localStorage.getItem(CREW_MARK) || '{}')[k]; }catch(_){ return false; }
+  try{ return !!JSON.parse(pGet('bt_crewmark') || '{}')[k]; }catch(_){ return false; }
 }
 function crewGoRide(){
   crewMark('ride');
@@ -28357,7 +28415,7 @@ function crewState(){
 }
 function crewCard(){
   let 숨김 = false;
-  try{ 숨김 = localStorage.getItem(START_KEY) === 'hide'; }catch(_){}
+  숨김 = pGet('bt_start') === 'hide';
   if(숨김) return '';
   const S = crewState();
   const 줄 = (된것, 이름, 곁, 단추) =>
@@ -28394,7 +28452,7 @@ function crewCard(){
 }
 function startCard(){
   let 숨김 = false;
-  try{ 숨김 = localStorage.getItem(START_KEY) === 'hide'; }catch(_){}
+  숨김 = pGet('bt_start') === 'hide';
   if(숨김) return '';
   const S = startState();
   // ★ 4.128 — 배가 없는 사람에게는 크루의 걸음. 다만 **고르는 줄에서 「타기만 합니다」**
@@ -28405,7 +28463,7 @@ function startCard(){
   //   끝난 것을 말해 주지 않으면 사람은 끝냈다는 것을 모른다.
   if(S.n >= 4){
     let 했나 = false;
-    try{ 했나 = localStorage.getItem(START_END) === 'done'; }catch(_){}
+    했나 = pGet('bt_startend') === 'done';
     if(했나) return '';
     return `<div class="hcard intro">
         <div class="hct"><b>${esc(t('첫걸음을 다 하셨습니다'))}</b><span class="gcnt">4/4</span></div>
@@ -28451,14 +28509,13 @@ function startCard(){
 //   첫날에 권하면 빈 종이가 나온다. 빈 종이는 「이 앱 별거 없네」 가 된다.
 //   적어 두신 것이 셋을 넘으면 그때 한 번 알려 드린다 — 그때는 진짜 볼 것이 있다.
 const CV_OFFER_MIN  = 3;
-const CV_OFFER_HIDE = 'bt_cvoff';
 function cvOfferSkip(){
-  try{ localStorage.setItem(CV_OFFER_HIDE, 'hide'); }catch(_){}
+  pSet('bt_cvoff', 'hide');
   try{ renderHome(); }catch(_){}
 }
 function cvOfferCard(){
-  try{ if(localStorage.getItem(CV_OFFER_HIDE) === 'hide') return ''; }catch(_){}
-  try{ if(localStorage.getItem(START_CV) === '1') return ''; }catch(_){}   // 이미 뽑아 보셨다
+  if(pGet('bt_cvoff') === 'hide') return '';
+  if(pGet('bt_cvdone') === '1') return '';   // 이미 뽑아 보셨다
   if(!curBoat()) return '';
   let n = 0;
   try{
@@ -29686,9 +29743,10 @@ function setMapKind(k, keepView){
     document.getElementById('mrMap').innerHTML =
       `<div style="padding:60px 20px;text-align:center;color:#8a97a8">`
       + esc(tsub('이 배의 {kind}가 아직 없습니다.', {kind: dgName(k)})) + `<br>`
-      + `<button class="btn" style="margin-top:12px" onclick="dgPickBuiltin('${k}')">${esc(t('기본 도면에서 선택'))}</button>`
-      + `<button class="btn" style="margin-top:8px" onclick="uploadDg('${k}')">${esc(t('도면 사진 올리기'))}</button>`
-      + `<button class="btn" style="margin-top:8px" onclick="dgPickLib('${k}')">${esc(t('공개 도면에서 선택'))}</button></div>`;
+      + `<div class="dgpick">`
+      + `<button class="mrbtn big ok" onclick="dgPickBuiltin('${k}')">${esc(t('기본 도면에서 선택'))}</button>`
+      + `<button class="mrbtn big" onclick="uploadDg('${k}')">${esc(t('도면 사진 올리기'))}</button>`
+      + `<button class="mrbtn big" onclick="dgPickLib('${k}')">${esc(t('공개 도면에서 선택'))}</button></div></div>`;
     return;
   }
   document.getElementById('mrMap').innerHTML =
@@ -34993,9 +35051,8 @@ function openLegal(k){
 
 // ── 동의
 // 동의한 판을 기억한다. 판이 올라가면 다시 받는다.
-const AGREE_KEY = 'bt_agree';
 function agreeState(){
-  try{ return JSON.parse(localStorage.getItem(AGREE_KEY) || 'null'); }catch(e){ return null; }
+  try{ return JSON.parse(pGet('bt_agree') || 'null'); }catch(e){ return null; }
 }
 function needAgree(){
   const a = agreeState();
@@ -35056,7 +35113,7 @@ function doAgree(){
     return;
   }
   const body = { ver: LEGAL_VER, at: new Date().toISOString(), loc: !!agreeChk.loc };
-  try{ localStorage.setItem(AGREE_KEY, JSON.stringify(body)); }catch(e){}
+  pSet('bt_agree', JSON.stringify(body));
   const next = agreeNext; agreeNext = null;
   if(typeof next === 'function') next();
   else openAccount();
@@ -35298,7 +35355,7 @@ function marketSafety(){
 // 처음 들어올 때 한 번은 눈으로 읽게 한다
 function marketFirstNotice(){
   let seen = false;
-  try{ seen = localStorage.getItem('bt_market_ok') === 'y'; }catch(_){}
+  seen = pGet('bt_market_ok') === 'y';
   if(seen) return;
   tell(t('중고 장터를 여시기 전에 알려 드립니다.\n\n')
     + t('뱃일은 거래의 당사자가 아닙니다. 자리를 빌려줄 뿐이고,\n')
@@ -35306,7 +35363,7 @@ function marketFirstNotice(){
     + t('물건을 보기 전에 돈부터 보내지 마세요.\n')
     + t('배·엔진은 직접 가서 시운전까지 보고 판단하세요.\n\n')
     + t('이상한 글은 신고해 주세요. 신고가 쌓이면 자동으로 내려갑니다.'), { big:true });
-  try{ localStorage.setItem('bt_market_ok', 'y'); }catch(_){}
+  pSet('bt_market_ok', 'y');
 }
 // 가격을 사람이 읽게
 function priceText(m){
@@ -41079,6 +41136,7 @@ function cvData(){
     .map(x => {
       const g = x.gearId ? gearOf(x.gearId) : null;
       return { date: x.date || '', title: mlogTitle(x), gear: g ? gearLabel(g) : '',
+               sys: g ? gearSysOf(g) : (x.grp ? keyShow(x.grp) : ''),
                work: (x.work != null && x.work !== '') ? Number(x.work) : null,
                cost: (parseFloat(x.cost) > 0) ? Number(x.cost) : null,
                cur: x.cur || '', used: x.used || '', steps: (x.how || []).length };
@@ -41088,6 +41146,7 @@ function cvData(){
     .map(r => {
       const g = r.gearId ? gearOf(r.gearId) : null;
       return { title: r.title || '', grp: keyShow(r.grp || '기타'), status: r.status || 'open',
+               sys: g ? gearSysOf(g) : keyShow(r.grp || '기타'),
                created: r.created || '', done: r.doneDate || '', gear: g ? gearLabel(g) : '' };
     });
   const vs = ((typeof voyage !== 'undefined' && Array.isArray(voyage)) ? voyage : [])
@@ -41109,6 +41168,17 @@ function cvData(){
       loa: boatSpec('loa'), draft: boatSpec('draft'),
       engine: boatSpec('engine'), fuelTank: boatSpec('fuelTank')
     },
+    // ★★★ 5.0 — 적어 두신 제원을 **전부** 이력서에 싣는다 (사장님 지적)
+    //   흘수·마스트 높이·메인세일 면적·순항 속력·승선 정원·앵커 로프·활어창·청수 탱크 …
+    //   열두 칸이 저장만 되고 아무 데도 안 쓰이고 있었다. 도움말은 쓴다고 말하고 있었다.
+    //   ★ 배를 남에게 설명하는 자리가 바로 이력서다. 여기에 실으면 그것이 쓰임이다.
+    specs: Object.keys(BOAT_SPEC).map(k=>{
+      const d = BOAT_SPEC[k];
+      const v = boatSpec(k);
+      if(v == null || String(v).trim() === '') return null;
+      if(['loa','draft','engine','fuelTank'].indexOf(k) >= 0) return null;   // 위 표에 이미 있다
+      return { label: d.label, v: String(v) + (d.unit ? ' ' + d.unit : '') };
+    }).filter(Boolean),
     hours: { total: eh.total, voyage: eh.voyage, run: eh.run },
     gear: 장비, maint: 점검, mlog: 수첩, repair: 수리, voy: 항해, docs: 문서
   };
@@ -41151,6 +41221,35 @@ function cvHtml(D){
   const 수리몸 = D.repair.map(r => `<tr>
       <td>${날(r.created)}</td><td><b>${E(r.title)}</b></td><td>${E(r.gear || r.grp)}</td>
       <td>${r.status === 'done' ? 날(r.done) : E(t('아직'))}</td></tr>`).join('');
+
+  // ★★★ 5.0 — 제원 (적어 두신 것만)
+  const 제원몸 = (D.specs || []).map(x => 줄(x.label, x.v)).join('');
+
+  // ★★★ 5.0 — 계통별 요약 한 줄 (사장님이 말씀하신 것)
+  //   「이 배의 기관 계통에 장비가 몇, 정비수첩이 몇, 수리가 몇, 마지막 정비가 언제」 —
+  //   이력서를 받아 보는 사람이 제일 먼저 알고 싶은 것이 이것이다.
+  //   ★ 없는 계통은 줄을 만들지 않는다. 0 만 늘어놓으면 읽을 것이 없다.
+  const 계통표 = {};
+  const 넣 = (계, f) => {
+    const k = String(계 || t('기타'));
+    계통표[k] = 계통표[k] || { gear:0, mlog:0, rep:0, open:0, last:'' };
+    f(계통표[k]);
+  };
+  D.gear.forEach(g => 넣(g.sys, o => { o.gear++; }));
+  D.mlog.forEach(x => 넣(x.sys, o => {
+    o.mlog++;
+    if(x.date && x.date > o.last) o.last = x.date;
+  }));
+  D.repair.forEach(r => 넣(r.sys || r.grp, o => {
+    o.rep++;
+    if(r.status !== 'done') o.open++;
+  }));
+  const 계통몸 = Object.keys(계통표).map(k => {
+    const o = 계통표[k];
+    return `<tr><td><b>${E(t(k))}</b></td><td>${o.gear || '—'}</td><td>${o.mlog || '—'}</td>
+      <td>${o.rep ? (o.rep + (o.open ? ' (' + t('아직') + ' ' + o.open + ')' : '')) : '—'}</td>
+      <td>${날(o.last)}</td></tr>`;
+  }).join('');
 
   const 문서몸 = D.docs.map(d => `<tr>
       <td>${E(d.kind || '—')}</td><td><b>${E(d.title)}</b></td><td>${날(d.expiry)}</td></tr>`).join('');
@@ -41216,6 +41315,11 @@ function cvHtml(D){
 </div>
 ${D.voy.from ? `<p class="none">${E(tsub('{a} ~ {b} 사이의 기록입니다.',
    { a: String(D.voy.from).slice(0,10), b: String(D.voy.to).slice(0,10) }))}</p>` : ''}
+
+${제원몸 ? `<h2>${E(t('제원'))}</h2><table class="k">${제원몸}</table>` : ''}
+${계통몸 ? `<h2>${E(t('계통별 요약'))}</h2><table class="g"><thead><tr>${
+    ['계통','장비','정비수첩','수리','마지막 정비'].map(h=>`<th>${E(t(h))}</th>`).join('')
+  }</tr></thead><tbody>${계통몸}</tbody></table>` : ''}
 
 ${칸('장비', ['계통','이름','제조사','모델','일련번호','설치일'], 장비몸)}
 ${칸('정기점검', ['계통','항목','주기','마지막 한 날','그때 엔진시간','지난 이력'], 점검몸)}
@@ -41410,7 +41514,7 @@ async function cvExport(){
   let D = null;
   try{ D = cvData(); }catch(e){ tell(t('이력서를 만들지 못했습니다.') + '\n\n' + String((e && e.message) || e), { kind:'bad' }); return; }
   const 이름 = String(b.name || 'boat').replace(/[\\/:*?"<>|]/g, '').trim() || 'boat';
-  try{ localStorage.setItem(START_CV, '1'); }catch(_){}   // ★ 뽑아 보신 것으로 친다
+  pSet('bt_cvdone', '1');   // ★ 뽑아 보신 것으로 친다
   // ★ 4.128 — 파일로 내리지 않고 그 자리에서 보여 준다 (사장님 지적).
   paperOpen(이름 + '-' + D.at, cvHtml(D));
 }
@@ -44844,6 +44948,31 @@ function wxStamp(){
     wxData._n  = H.time.length;
   }catch(e){}
 }
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 5.0 — 받아 둔 날씨를 **폰에 담아 둔다**
+//
+//   까닭 둘입니다.
+//   ① Open-Meteo 는 하루 10,000번까지 공짜입니다. 앱을 한 번 켤 때마다 **두 번**
+//      부르니 하루 5,000번 켜면 닿습니다. 일본에서 쓰기 시작하면 금방입니다.
+//      **예보는 한 시간에 한 번 새로 나옵니다.** 그 안에 또 부르는 것은 버리는 부름입니다.
+//   ② 담아 두면 **인터넷이 없을 때도 마지막 예보를 보여 줍니다.** 바다에서는 이게 큽니다.
+//      여태는 인터넷이 끊기면 날씨 칸이 통째로 비었습니다.
+//
+//   ★ 언제 것인지는 화면에 이미 적습니다(wxStamp) — 옛 자료를 새것인 척하지 않습니다.
+// ══════════════════════════════════════════════════════════════════════
+const WX_CACHE_KEY = 'wxcache';
+const WX_FRESH_MS  = 60 * 60 * 1000;        // 한 시간 안이면 다시 안 부른다
+const WX_KEEP_MS   = 12 * 60 * 60 * 1000;   // 못 받으면 반나절까지는 담아 둔 것을 쓴다
+async function wxCacheGet(key){
+  try{
+    const c = await idbGet(WX_CACHE_KEY);
+    if(c && c.key === key && c.w) return c;
+  }catch(_){}
+  return null;
+}
+function wxCachePut(key, d){
+  try{ idbSet(WX_CACHE_KEY, { key: key, at: Date.now(), w: d.w, m: d.m }).catch(()=>{}); }catch(_){}
+}
 // 앱을 열면 날씨를 한 번 받아 둔다.
 // ★ 예전에는 날씨·물때 탭을 눌러야 받아왔다. 그래서 오늘 탭이 비어 있었다.
 let wxEnsuring = false;
@@ -44851,13 +44980,31 @@ async function ensureWx(){
   if(wxEnsuring) return null;                       // 한 번에 하나만
   if(!wxCur) wxInit();
   if(!wxCur) return null;
-  const key = wxCur.lat + ',' + wxCur.lon;
+  // ★ 5.0 — 열쇠 모양을 자리별 날씨(wxPtKey)와 **똑같이** 맞춘다.
+  //   달라 두면 같은 자리를 두 번 받아 놓고 서로 못 알아본다.
+  const key = wxPtKey(wxCur.lat, wxCur.lon);
   if(wxData && wxData.key === key){ wxStamp(); return wxData; }
   wxEnsuring = true;
   try{
-    const d = await wxFetch(wxCur.lat, wxCur.lon);
-    wxData = { key, ...d };
-    wxStamp();
+    const c = await wxCacheGet(key);
+    // ① 담아 둔 것이 한 시간 안이면 그것을 쓴다 — 부르지 않는다
+    if(c && (Date.now() - (c.at || 0)) < WX_FRESH_MS){
+      wxData = { key: key, w: c.w, m: c.m };
+      wxStamp();
+    }else{
+      try{
+        const d = await wxFetch(wxCur.lat, wxCur.lon);
+        wxData = { key, ...d };
+        wxCachePut(key, d);
+        wxStamp();
+      }catch(e){
+        // ② 못 받았으면 담아 둔 것이라도 쓴다 (반나절까지). 빈 화면보다 낫다.
+        if(c && (Date.now() - (c.at || 0)) < WX_KEEP_MS){
+          wxData = { key: key, w: c.w, m: c.m };
+          wxStamp();
+        }
+      }
+    }
   }catch(e){ /* 인터넷이 없으면 조용히 넘어간다 */ }
   wxEnsuring = false;
   try{ if(typeof renderHome === 'function') renderHome(); }catch(e){}
@@ -44946,7 +45093,16 @@ async function wxAtPoint(lat, lon){
     WX_PT[k] = { w: wxData.w, m: wxData.m };
     return WX_PT[k];
   }
+  // ★ 5.0 — 담아 둔 것이 한 시간 안이면 그것을 쓴다 (C7)
+  try{
+    const c = await wxCacheGet(k);
+    if(c && (Date.now() - (c.at || 0)) < WX_FRESH_MS){
+      WX_PT[k] = { w: c.w, m: c.m };
+      return WX_PT[k];
+    }
+  }catch(_){}
   const d = await wxFetch(lat, lon);
+  wxCachePut(k, d);                       // ★ 5.0 — 폰에도 담아 둔다 (C7)
   const ks = Object.keys(WX_PT);
   if(ks.length >= WX_PT_MAX) delete WX_PT[ks[0]];
   WX_PT[k] = d;
@@ -46166,7 +46322,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     const getDoc    = (...a)=> netWait(_getDoc(...a),    NET_READ);
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, OAuthProvider, signOut, signInWithCredential,
-            createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser } =
+            createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser,
+            updateProfile } =
       await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
     const firebaseConfig = {
       apiKey: "AIzaSyAH1iM-ljsnTmzWmExfSqrMbILhVaJaITA",
@@ -46331,7 +46488,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       },
       // ★ 애플 로그인 — 파이어베이스 콘솔에서 켜야 돈다 (Services ID·Key ID·Team ID·.p8).
       //   안 켜진 상태로 부르면 auth/operation-not-allowed 가 온다.
+      //
+      // ★★★ 5.0 — **앱 안에서는 애플이 직접 물어보게 한다** (네이티브)
+      //
+      //   여태 앱에서도 웹 팝업(signInWithPopup)이었습니다. 구글은 이미 네이티브인데
+      //   애플만 웹이었습니다. 앱 화면의 주소는 http://localhost 라 돌아올 자리가 없고,
+      //   아이폰에서는 사파리 창이 한 번 떴다 사라지며 아무 일도 안 일어납니다.
+      //   구글에서 겪은 그 고장과 **똑같은 모양**입니다.
+      //
+      //   ★ 자격만 받아서 웹 쪽 파이어베이스에 넘깁니다(skipNativeAuth) —
+      //     그래야 지금까지 쓰던 파이어스토어 코드가 그대로 돕니다. 구글과 같은 방식입니다.
+      //   ★ 애플은 **rawNonce** 를 같이 넘겨야 자격을 받아 줍니다. 안 넘기면 거절합니다.
+      //   ★ 애플은 이름을 **맨 처음 한 번만** 줍니다. 그때 안 받아 두면 영영 못 받습니다.
+      //   ★ 부품이 없거나 네이티브가 안 되는 판이면 조용히 웹 방식으로 내려갑니다 —
+      //     막아 버리면 로그인할 길이 아예 없어집니다.
       async apple(){
+        if(isNative()){
+          const fa = (window.Capacitor && window.Capacitor.Plugins
+                      && window.Capacitor.Plugins.FirebaseAuthentication) || null;
+          if(fa){
+            try{
+              const r = await fa.signInWithApple({ skipNativeAuth: true, scopes: ['email','name'] });
+              const c = (r && r.credential) || {};
+              if(!c.idToken) throw new Error(t('애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
+              const prov = new OAuthProvider('apple.com');
+              await signInWithCredential(fauth, prov.credential({ idToken: c.idToken, rawNonce: c.nonce }));
+              try{
+                const nm = String((r && r.user && r.user.displayName) || '').trim();
+                if(nm && fauth.currentUser && !fauth.currentUser.displayName){
+                  await updateProfile(fauth.currentUser, { displayName: nm });
+                }
+              }catch(_){}
+              return;
+            }catch(e){
+              // 사람이 스스로 그만둔 것은 고장이 아니다 — 그대로 올린다
+              const msg = String((e && (e.code || e.message)) || '');
+              if(/cancel|1001|사용자/i.test(msg)) throw e;
+              // 그 밖의 까닭(부품이 안 붙은 판 등)이면 아래 웹 방식으로 내려간다
+            }
+          }
+        }
         const ap = new OAuthProvider('apple.com');
         ap.addScope('email'); ap.addScope('name');
         try{ await signInWithPopup(fauth, ap); }

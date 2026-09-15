@@ -2681,7 +2681,7 @@ const I18N = {
     '실제 항해와 접안은 반드시 공식 해도와 해당 시설에 확인하고 하십시오.': 'For actual passage and berthing, always check the official charts and the facility itself.',
     '자리(핀)는 운영자만 옮깁니다. 자리가 틀렸으면 다녀온 이야기로 알려 주세요.':'Only an admin can move the pin. If the position is wrong, please say so in the visit notes.',
     '공공 자료로 되돌리기': 'Restore official data',
-    "'{name}' 을 관 자료로 되돌릴까요?": "Restore '{name}' to the official data?",
+    "'{name}'을 공공 자료로 되돌릴까요?": "Restore '{name}' to the official data?",
     '채워 넣으신 내용이 없어지고, 공공 자료에 있는 이름과 자리만 남습니다.': 'What you filled in is removed; only the official name and position remain.',
     '내 배 선종':'My boat type',
     '+ 내 배 리뷰 쓰기':'+ Review my boat',
@@ -4188,6 +4188,11 @@ const I18N = {
     '물건과 거래에 대한 책임은 파는 분과 사는 분에게 있습니다.\n\n':'The seller and the buyer are responsible for the goods and the deal.\n\n',
     '물건을 보기 전에 돈부터 보내지 마세요.\n':'Never send money before you have seen the goods.\n',
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'No tide data yet. You can enter high and low water yourself.',
+    '관측소 없음':'No tide station',
+    '이 자리는 참고용 물때라 다리 통과를 계산하지 않습니다.':'This place only has an estimated tide, so bridge clearance is not calculated.',
+    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'An estimated tide has no chart datum. Enter high and low water yourself and it will be calculated.',
+    '참고용 물때를 쓰는 중입니다 — 정확한 값을 아시면 직접 입력하시면 그것을 씁니다.':'Using an estimated tide — if you know the real figures, enter them and they will be used.',
+    '이 자리의 물때는 전 세계 조석 모형으로 낸 <b>참고용</b>입니다 — 만조·간조 시각이 <b>30분쯤</b> 어긋날 수 있습니다. 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 쓰지 마십시오.</b>':'The tide here is <b>for reference only</b>, from a global tidal model — high and low water can be off by <b>about 30 minutes</b>. Heights are measured from <b>the lowest water of these few days</b>, so they are not chart datum. <b>Do not use them for bridge clearance or depth.</b>',
     '물때 자료를 받는 중…':'Fetching tide data…',
     '물어보기':'Ask a question',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Items, maintenance, repairs, logbook, documents, plans, board',
@@ -6115,7 +6120,7 @@ const I18N = {
     '실제 항해와 접안은 반드시 공식 해도와 해당 시설에 확인하고 하십시오.': 'Для фактического перехода и швартовки обязательно сверяйтесь с официальными картами и с самим объектом.',
     '자리(핀)는 운영자만 옮깁니다. 자리가 틀렸으면 다녀온 이야기로 알려 주세요.':'Метку может передвинуть только администратор. Если координаты неверны, напишите об этом в отзыве о посещении.',
     '공공 자료로 되돌리기': 'Вернуть официальные данные',
-    "'{name}' 을 관 자료로 되돌릴까요?": 'Вернуть «{name}» к официальным данным?',
+    "'{name}'을 공공 자료로 되돌릴까요?": 'Вернуть «{name}» к официальным данным?',
     '채워 넣으신 내용이 없어지고, 공공 자료에 있는 이름과 자리만 남습니다.': 'Заполненные вами сведения будут удалены; останутся только официальные название и координаты.',
     '내 배 선종':'Тип моего судна',
     '+ 내 배 리뷰 쓰기':'+ Отзыв о своём судне',
@@ -7621,6 +7626,11 @@ const I18N = {
     '물건과 거래에 대한 책임은 파는 분과 사는 분에게 있습니다.\n\n':'За товар и сделку отвечают продавец и покупатель.\n\n',
     '물건을 보기 전에 돈부터 보내지 마세요.\n':'Никогда не переводите деньги, не увидев товар.\n',
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'Данных о приливе пока нет. Полную и малую воду можно ввести вручную.',
+    '관측소 없음':'Нет поста наблюдений',
+    '이 자리는 참고용 물때라 다리 통과를 계산하지 않습니다.':'Здесь прилив только приблизительный, поэтому проход под мостом не считается.',
+    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'У приблизительного прилива нет нуля глубин. Введите полную и малую воду вручную — тогда расчёт будет.',
+    '참고용 물때를 쓰는 중입니다 — 정확한 값을 아시면 직접 입력하시면 그것을 씁니다.':'Используется приблизительный прилив — если знаете точные значения, введите их, и они будут использоваться.',
+    '이 자리의 물때는 전 세계 조석 모형으로 낸 <b>참고용</b>입니다 — 만조·간조 시각이 <b>30분쯤</b> 어긋날 수 있습니다. 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 쓰지 마십시오.</b>':'Прилив здесь <b>только для справки</b> — из глобальной приливной модели: полная и малая вода могут отличаться <b>примерно на 30 минут</b>. Высоты отсчитаны <b>от самой низкой воды за эти дни</b>, это не ноль глубин. <b>Не используйте их для мостов и глубин.</b>',
     '물때 자료를 받는 중…':'Получение данных о приливе…',
     '물어보기':'Задать вопрос',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Вещи, обслуживание, ремонт, судовой журнал, документы, планы, доска',
@@ -9559,7 +9569,7 @@ const I18N = {
     '실제 항해와 접안은 반드시 공식 해도와 해당 시설에 확인하고 하십시오.': '実際の航海と接岸は、必ず公式海図と当該施設に確認したうえで行ってください。',
     '자리(핀)는 운영자만 옮깁니다. 자리가 틀렸으면 다녀온 이야기로 알려 주세요.':'位置（ピン）は管理者だけが動かせます。位置が違う場合は、訪問の記録でお知らせください。',
     '공공 자료로 되돌리기': '公的資料に戻す',
-    "'{name}' 을 관 자료로 되돌릴까요?": '「{name}」を公的資料に戻しますか？',
+    "'{name}'을 공공 자료로 되돌릴까요?": '「{name}」を公的資料に戻しますか？',
     '채워 넣으신 내용이 없어지고, 공공 자료에 있는 이름과 자리만 남습니다.': '書き込まれた内容は消え、公的資料の名称と位置だけが残ります。',
     '내 배 선종':'自分の船の種類',
     '+ 내 배 리뷰 쓰기':'+ 自分の船のレビューを書く',
@@ -11094,6 +11104,11 @@ const I18N = {
     '물건과 거래에 대한 책임은 파는 분과 사는 분에게 있습니다.\n\n':'商品と取引の責任は、売る方と買う方にあります。\n\n',
     '물건을 보기 전에 돈부터 보내지 마세요.\n':'商品を見る前にお金を先に送らないでください。\n',
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'潮汐データがまだありません。満潮・干潮を手入力することもできます。',
+    '관측소 없음':'観測所なし',
+    '이 자리는 참고용 물때라 다리 통과를 계산하지 않습니다.':'ここは目安の潮汐しかないため、橋の通過は計算しません。',
+    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'目安の潮汐には海図基準面がありません。満潮・干潮を手入力していただければ計算します。',
+    '참고용 물때를 쓰는 중입니다 — 정확한 값을 아시면 직접 입력하시면 그것을 씁니다.':'目安の潮汐を使用中 — 正確な値がわかる場合は手入力すると、そちらを使います。',
+    '이 자리의 물때는 전 세계 조석 모형으로 낸 <b>참고용</b>입니다 — 만조·간조 시각이 <b>30분쯤</b> 어긋날 수 있습니다. 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 쓰지 마십시오.</b>':'ここの潮汐は世界の潮汐モデルで出した<b>参考用</b>です — 満潮・干潮の時刻が<b>30分ほど</b>ずれることがあります。高さは<b>この数日で最も低い水位を0</b>とした値で、海図基準面ではありません。<b>橋の通過と水深の判断には使わないでください。</b>',
     '물때 자료를 받는 중…':'潮汐データを取得中…',
     '물어보기':'質問する',
     '물품·정비·수리·항해일지·서류·도면·게시판':'備品・整備・修理・航海日誌・書類・図面・掲示板',
@@ -37390,7 +37405,7 @@ async function delSpot(id){
   //   묻는 말도 그렇게 적는다 — 여기서만 바르게 적고 물음이 옛말이면 소용없다.
   const 덧댐 = spotOverSeed(s);
   if(!await ask(
-      (덧댐 ? tsub("'{name}' 을 관 자료로 되돌릴까요?", {name:s.name}) + '\n\n'
+      (덧댐 ? tsub("'{name}'을 공공 자료로 되돌릴까요?", {name:s.name}) + '\n\n'
               + t('채워 넣으신 내용이 없어지고, 공공 자료에 있는 이름과 자리만 남습니다.')
             : tsub("'{name}' 을 지울까요?", {name:s.name}) + '\n\n' + t('되돌릴 수 없습니다.')),
       { ok: 덧댐 ? t('되돌리기') : t('삭제'), warn: true })) return;
@@ -45113,7 +45128,7 @@ async function wxFetch(lat, lon){
     + '&hourly=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility'
     + '&daily=sunrise,sunset&timezone=auto&forecast_days=5&wind_speed_unit=kn';
   const mar = 'https://marine-api.open-meteo.com/v1/marine?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
-    + '&hourly=wave_height,wave_period,wave_direction&timezone=auto&forecast_days=5';
+    + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
   const [a, b] = await Promise.all([
     fetchTimeout(base).then(r=>r.ok?r.json():null).catch(()=>null),
     fetchTimeout(mar).then(r=>r.ok?r.json():null).catch(()=>null),
@@ -45674,6 +45689,55 @@ function tideHiLo(pts){
   });
   return a;
 }
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 5.0 — 한국·일본 **밖**의 물때 (Open-Meteo 어림)
+//
+//   여태 관측소 자료가 없는 바다에서는 물때 칸이 통째로 비었습니다.
+//   Open-Meteo 해상 자료에 조위(sea_level_height_msl)가 들어 있어서,
+//   **날씨를 받을 때 같이 받아 옵니다 — 부르는 횟수는 안 늘어납니다.**
+//
+//   ★ 얼마나 맞는지 실제로 재 봤습니다 (여수·부산·인천·목포·완도·통영·서귀포, 7일).
+//     · 시각 — 사리에는 3~7분, 조금에는 20~35분 어긋납니다.
+//       지점마다 20~35분 **일정하게 빠릅니다**(치우침이 거의 고정).
+//     · 높이 — **기준면이 다릅니다.** Open-Meteo 는 평균해면(MSL),
+//       우리 물때표는 약최저저조위. 그 차이가 여수 +159cm, 인천 +443cm 로 지점마다 다릅니다.
+//     · 조차 — 지점에 따라 0.90~1.20배로 어긋납니다.
+//     · 동해처럼 조차가 10cm 안팎인 바다는 곡선이 거의 평평해 만조·간조가 안 잡힙니다.
+//
+//   ★ 그래서 정한 것
+//     · **관측소 자료가 있으면 그것이 언제나 이깁니다.** 한국·일본은 하나도 안 바뀝니다.
+//     · 높이는 **이 며칠 중 가장 낮은 물을 0** 으로 잡아 보여 줍니다. 평균해면 기준
+//       숫자를 그대로 내면 간조가 마이너스로 나와 읽는 사람이 헷갈립니다.
+//     · **다리 통과·수심 환산에는 절대 안 씁니다.** 기준면이 없으니 쓰면 안 됩니다.
+//     · 화면에 참고용이라고 적습니다 — 「앱은 숫자를 지어내지 않는다」 와 같은 규칙입니다.
+// ══════════════════════════════════════════════════════════════════════
+const OM_TIDE_MIN_RANGE = 0.30;   // 이만큼도 안 움직이면 물때라고 말하지 않는다 (동해)
+function omTidePts(){
+  try{
+    const H = wxData && wxData.m && wxData.m.hourly;
+    const V = H && H.sea_level_height_msl, T = H && H.time;
+    if(!V || !T || V.length < 12) return null;
+    const ex = [];
+    for(let i = 1; i < V.length - 1; i++){
+      const a = V[i-1], b = V[i], c = V[i+1];
+      if(a == null || b == null || c == null) continue;
+      const 만조 = (b > a && b >= c), 간조 = (b < a && b <= c);
+      if(!만조 && !간조) continue;
+      // 한 시간 간격이라 꼭짓점이 정시에 딱 오지 않는다. 포물선으로 그 사이를 잡는다.
+      // (모의로 재 보니 이 셈의 오차는 시각 0.2분·높이 0.03% 안이다 — 자료 자체의 차이가 훨씬 크다)
+      const den = a - 2*b + c;
+      const d = (den === 0) ? 0 : 0.5 * (a - c) / den;
+      const vv = b - 0.25 * (a - c) * d;
+      ex.push({ t: wxTs(T[i], wxData) + d * 3600e3, v: vv, hi: 만조 });
+    }
+    if(ex.length < 3) return null;
+    const 낮 = Math.min.apply(null, ex.map(x => x.v));
+    const 높 = Math.max.apply(null, ex.map(x => x.v));
+    if(높 - 낮 < OM_TIDE_MIN_RANGE) return null;   // 거의 안 움직인다 — 아는 척하지 않는다
+    ex.forEach(x => { x.v = x.v - 낮; });          // 이 며칠 중 가장 낮은 물을 0 으로
+    return ex;
+  }catch(_){ return null; }
+}
 function allTidePts(){
   const sp = nearestTideSpot(); if(!sp) return null;
   const pts = tidePtsOf(sp);
@@ -45718,6 +45782,10 @@ function tideSource(){
   const T = tidePoints();   // 수동 입력 폴백 (수집 전·해외)
   if(T && !T.stale && T.pts.length>=2)
     return { pts:T.pts, spot:{ name:'직접 입력', dist:null, days:[] }, manual:true };
+  // ★ 5.0 — 관측소도 없고 손으로 넣은 것도 없으면 **어림**을 쓴다.
+  //   est:true 를 달아 둔다 — 다리·수심 쪽이 이것을 보고 스스로 물러선다.
+  const E = omTidePts();
+  if(E) return { pts:E, spot:{ name:t('관측소 없음'), dist:null, days:[] }, est:true };
   return null;
 }
 
@@ -45923,6 +45991,12 @@ async function renderWeather(){
     if(quickClr>0 && !(ad>0)){
       bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${t('배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.')}<br>${esc(t('입력하지 않으면 통과 여부를 계산할 수 없습니다.'))}</div></div>`;
     }
+    else if(quickClr>0 && TA && TA.est){
+      // ★ 5.0 — 참고용 물때에는 해도 기준면이 없다. 여기서 숫자를 내면 그것을 믿고 배가 들어간다.
+      bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${
+        esc(t('이 자리는 참고용 물때라 다리 통과를 계산하지 않습니다.'))}<br>${
+        esc(t('참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.'))}</div></div>`;
+    }
     else if(quickClr>0 && TA){
       const tv = tideAt(bridgeT, TA.pts);
       if(tv!=null){
@@ -45954,7 +46028,8 @@ async function renderWeather(){
         ${bridgeResult}
         <div class="qcfg">${esc(t('배 높이'))} <b>${ad>0?ad.toFixed(2)+'m':t('미입력')}</b><button class="mrbtn edt" onclick="airDraftEdit()">${esc(t('변경'))}</button>${esc(t('· 여유'))}<b>${mg.toFixed(1)}m</b><button class="mrbtn edt" onclick="marginEdit()">${esc(t('변경'))}</button></div>
         ${!TA?`<div class="mrm">${esc(t('물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.'))}<button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`
-          :(TA.manual?`<div class="mrm">${esc(t('직접 입력한 만조·간조 사용 중'))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('수정'))}</button></div>`:'')}
+          :(TA.manual?`<div class="mrm">${esc(t('직접 입력한 만조·간조 사용 중'))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('수정'))}</button></div>`
+          :(TA.est?`<div class="mrm">${esc(t('참고용 물때를 쓰는 중입니다 — 정확한 값을 아시면 직접 입력하시면 그것을 씁니다.'))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`:''))}
       </div>`;
 
     L.innerHTML = head + wxAlertBox()
@@ -45962,7 +46037,9 @@ async function renderWeather(){
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline
       + bridgeCard
-      + `<div class="wxwarn">${t('조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.')}</div>`
+      + `<div class="wxwarn">${TA && TA.est
+          ? t('이 자리의 물때는 전 세계 조석 모형으로 낸 <b>참고용</b>입니다 — 만조·간조 시각이 <b>30분쯤</b> 어긋날 수 있습니다. 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 쓰지 마십시오.</b>')
+          : t('조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.')}</div>`
       // ★ 4.68 — 나라 물때 자료는 출처를 밝혀야 쓸 수 있다.
       //   일본 기상청 자료는 政府標準利用規約 을 따르고, 그 조건이 「출처 표시」다.
       //   지도 저작권 표기를 지우면 안 되는 것과 같은 까닭이라 화면에서 빼지 않는다.

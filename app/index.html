@@ -5516,6 +5516,8 @@ const I18N = {
 
     // ── 4.19
     '로그인하시거나, 지점을 직접 추가해 주세요.':'Sign in, or add a spot yourself.',
+    '위치정보 이용에 아직 동의하지 않으셨습니다.':'You have not yet agreed to the use of location information.',
+    '앱에서 동의하시거나, 지점을 직접 추가해 주세요.':'Agree in the app, or add a spot yourself.',
   
 
     // ── 4.20
@@ -8955,6 +8957,8 @@ const I18N = {
 
     // ── 4.19
     '로그인하시거나, 지점을 직접 추가해 주세요.':'Войдите или добавьте точку вручную.',
+    '위치정보 이용에 아직 동의하지 않으셨습니다.':'Вы ещё не дали согласие на использование данных о местоположении.',
+    '앱에서 동의하시거나, 지점을 직접 추가해 주세요.':'Согласитесь в приложении или добавьте точку вручную.',
   
 
     // ── 4.20
@@ -12326,6 +12330,8 @@ const I18N = {
     '연재 이름':'連載名',
     '예: 요트인을 위한 인공지능':'例：ヨット乗りのための人工知能',
     '로그인하시거나, 지점을 직접 추가해 주세요.':'ログインするか、地点を直接追加してください。',
+    '위치정보 이용에 아직 동의하지 않으셨습니다.':'位置情報の利用にまだ同意されていません。',
+    '앱에서 동의하시거나, 지점을 직접 추가해 주세요.':'アプリで同意されるか、地点を直接追加してください。',
     '로그인해야 하실 수 있습니다':'ログインが必要です',
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'このバージョンではGoogleログインは使えません。\nメールアドレスでログインしてください。',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Googleログインを完了できませんでした。\nメールアドレスでログインしてください。',
@@ -45987,18 +45993,32 @@ async function renderWeather(){
     //   그런데 화면은 '설정에서 위치 권한을 허용하시거나' 라고만 했다.
     //   그러면 사람은 설정에 들어가 권한을 켜 놓고도 안 되니 앱이 고장난 줄 안다.
     //   까닭이 다르면 하는 말도 단추도 달라야 한다.
-    const wxNoIn = (typeof locSignedIn === 'function') && !locSignedIn();
+    // ★★★ 5.0 — 까닭이 **셋**인데 둘로만 갈랐다.
+    //   앞서 로그인만 갈라 두고, 「앱 안에서 동의를 거절한」 사람에게도
+    //   「설정에서 위치 권한을 허용하시거나」 라고 말했다.
+    //   폰 설정은 멀줦한데 설정에 들어가 보라고 하는 것이라,
+    //   사람은 아무리 찾아도 고칠 것이 없어 앱이 고장난 줄 안다.
+    //   ── 바로 위 주석에 「까닭이 다르면 하는 말도 단추도 달라야 한다」 고 적어 놓고 이랬면 안 된다.
+    const wxNoIn  = (typeof locSignedIn === 'function') && !locSignedIn();
+    const wxNoYes = !wxNoIn && (typeof locOK === 'function') && !locOK();
+    const 말 = wxNoIn
+      ? esc(t('현재 위치는 로그인하신 분에게만 받습니다.')) + '<br>'
+        + esc(t('로그인하시거나, 지점을 직접 추가해 주세요.'))
+      : wxNoYes
+      ? esc(t('위치정보 이용에 아직 동의하지 않으셨습니다.')) + '<br>'
+        + esc(t('앱에서 동의하시거나, 지점을 직접 추가해 주세요.'))
+      : esc(t('현재 위치를 가져오지 못했습니다.')) + '<br>'
+        + esc(t('설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.'));
+    const 단추 = wxNoIn
+      ? `<button class="mrbtn ok" onclick="openAccount()">${esc(t('로그인'))}</button>`
+      : wxNoYes
+      ? `<button class="mrbtn ok" onclick="wxRetryGPS()">${esc(t('동의하기'))}</button>`
+      : `<button class="mrbtn" onclick="wxRetryGPS()">${esc(t('현재 위치 다시 시도'))}</button>`;
     L.innerHTML = `<div class="emptybox">
       <b>${esc(t('날씨 · 물때'))}</b>
-      <div>${wxNoIn
-        ? esc(t('현재 위치는 로그인하신 분에게만 받습니다.')) + '<br>'
-          + esc(t('로그인하시거나, 지점을 직접 추가해 주세요.'))
-        : esc(t('현재 위치를 가져오지 못했습니다.')) + '<br>'
-          + esc(t('설정에서 위치 권한을 허용하시거나, 지점을 직접 추가해 주세요.'))}</div>
+      <div>${말}</div>
       <div style="margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        ${wxNoIn
-          ? `<button class="mrbtn ok" onclick="openAccount()">${esc(t('로그인'))}</button>`
-          : `<button class="mrbtn" onclick="wxRetryGPS()">${esc(t('현재 위치 다시 시도'))}</button>`}
+        ${단추}
         <button class="mrbtn" onclick="needEdit('날씨 지점을 추가합니다.', wxAddSpot)">${esc(t('지점 직접 추가'))}</button>
       </div>
     </div>`;

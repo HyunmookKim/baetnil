@@ -23172,8 +23172,14 @@ function wxWarnings(now){
   const chk = (key, val, over, text, level) => {
     const lim = boatSpec(key);
     if(!(lim > 0)) return;                       // 기준 없음 → 판단 안 함
+    // ★ Number(null) 도 Number('') 도 0 이다.
+    //   그냥 Number 로 바꾸면 「자료 없음」이 「0」이 되어, 파주기 0초·시정 0km 로 읽힌다.
+    //   이 둘은 작을수록 나쁘다고 보는 값이라, 없는 위험을 지어내 경고가 뜬다.
+    //   뭍 가까운 자리나 바다 자료가 안 닿는 자리에서는 파주기가 실제로 null 로 온다.
+    //   앱은 숫자를 지어내지 않는다 — 자료가 없으면 아무 말도 하지 않는다.
+    if(val === null || val === undefined || val === '') return;   // 자료 없음 → 건너뜀
     const v = Number(val);
-    if(!isFinite(v)) return;                     // 값 없음 → 건너뜀
+    if(!isFinite(v)) return;                     // 숫자가 아님 → 건너뜀
     if(over ? (v > lim) : (v < lim)) out.push({ key, text, level, value:v, limit:lim });
   };
   // ★ 경고 글은 화면에 그대로 나간다. 여기서 사전을 거친다.
@@ -24691,7 +24697,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.0';
+const APP_VER = '5.1';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

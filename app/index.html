@@ -103,6 +103,8 @@
 .bwrow span{font-size:12px;color:#8a97a8}
 .bwrow.high b{color:#FF9A8A}
 .bwrow.mid b{color:#f0c98a}
+.bwrow.nodata b{color:#9fb6cc}
+.bwrow.nodata{background:#0e1f30}
 .bwrow.ok b{color:#7aefaa}
 .bwwhen{padding:8px 13px 0;color:#93AABD;font-size:11.5px}
 .mflt{font-size:12.5px;padding:6px 11px}
@@ -5295,6 +5297,8 @@ const I18N = {
     '파주기가 짧아 배가 심하게 흔들립니다':'Short wave period — the boat will roll hard',
     '시정이 정해 둔 기준보다 나쁩니다':'Visibility is worse than your limit',
     '조류가 정해 둔 한계를 넘었습니다':'Current is over your limit',
+    '{what} — 자료가 없어 판단하지 못했습니다':'{what} — no data, could not check',
+    '파도 값은 {km}km 바깥 바다에서 가져왔습니다':'Wave data taken from open water {km} km away',
     '바람 {n}kt':'Wind {n}kt',
     '오늘 클라우드 한도 다 씀 · 눌러서 확인':'Cloud allowance used up · tap for details',
     '권한이 없습니다 · 눌러서 확인':'No permission · tap for details',
@@ -8744,6 +8748,8 @@ const I18N = {
     '파주기가 짧아 배가 심하게 흔들립니다':'Короткий период волны — судно будет сильно качать',
     '시정이 정해 둔 기준보다 나쁩니다':'Видимость хуже вашего предела',
     '조류가 정해 둔 한계를 넘었습니다':'Течение сильнее вашего предела',
+    '{what} — 자료가 없어 판단하지 못했습니다':'{what} — нет данных, проверить не удалось',
+    '파도 값은 {km}km 바깥 바다에서 가져왔습니다':'Данные о волне взяты в море, в {km} км отсюда',
     '바람 {n}kt':'Ветер {n} уз',
     '오늘 클라우드 한도 다 씀 · 눌러서 확인':'Дневной лимит облака исчерпан · нажмите',
     '권한이 없습니다 · 눌러서 확인':'Нет прав · нажмите',
@@ -12178,6 +12184,8 @@ const I18N = {
     '파주기가 짧아 배가 심하게 흔들립니다':'波周期が短く、船が激しく揺れます',
     '시정이 정해 둔 기준보다 나쁩니다':'視程が設定した基準より悪いです',
     '조류가 정해 둔 한계를 넘었습니다':'潮流が設定した限界を超えました',
+    '{what} — 자료가 없어 판단하지 못했습니다':'{what} — 資料がなく判断できませんでした',
+    '파도 값은 {km}km 바깥 바다에서 가져왔습니다':'波の値は{km}km沖から取りました',
     '바람 {n}kt':'風 {n}kt',
     '오늘 클라우드 한도 다 씀 · 눌러서 확인':'本日のクラウド上限に到達・タップして確認',
     '권한이 없습니다 · 눌러서 확인':'権限がありません・タップして確認',
@@ -23098,9 +23106,18 @@ function boatWxCard(now, idx){
     : `<div class="bwrow ${rf >= 2 ? 'mid' : 'ok'}">
         <b>${rf === 0 ? t('리프 없이 갈 수 있는 바람입니다') : tsub('메인세일 {n}단 리프', { n: rf })}</b>
         <span>${esc(tsub('바람 {n}kt', {n:Math.round(now.wind)}))}</span></div>`;
-  if(!rows && !reef) return `<div class="bwcard ok">${when}<div class="bwrow ok">
+  // ★ 값이 안 들어온 칸은 「못 쟀다」고 그대로 적는다. 조용히 넘기지 않는다.
+  const ms = wxMissing(now);
+  const miss = ms.map(m=>`<div class="bwrow nodata">
+      <b>${esc(tsub('{what} — 자료가 없어 판단하지 못했습니다', { what: t(m.label) }))}</b>
+      <span>${esc(t('자료 없음'))}</span>
+    </div>`).join('');
+  const nearNote = (wxData && wxData.m && wxData.m._near && wxData.m._near.km > 0)
+    ? `<div class="bwwhen">${esc(tsub('파도 값은 {km}km 바깥 바다에서 가져왔습니다', { km: wxData.m._near.km }))}</div>` : '';
+  if(!rows && !reef && !miss) return `<div class="bwcard ok">${when}${nearNote}<div class="bwrow ok">
       <b>${esc(t('정해 둔 기준 안에 있습니다'))}</b><span>${esc(tsub('바람 {n}kt', {n:Math.round(now.wind||0)}))}</span></div></div>`;
-  return `<div class="bwcard${ws.some(w=>w.level==='high') ? ' bad' : ''}">${when}${reef}${rows}</div>`;
+  if(!rows && !reef) return `<div class="bwcard">${when}${nearNote}${miss}</div>`;
+  return `<div class="bwcard${ws.some(w=>w.level==='high') ? ' bad' : ''}">${when}${nearNote}${reef}${rows}${miss}</div>`;
 }
 // 배 길이와 선종에서 날씨 한계값을 어림잡아 준다.
 // 사람에게 열 개 넘는 숫자를 처음부터 적으라고 하면 아무도 안 적는다.
@@ -23189,6 +23206,27 @@ function wxWarnings(now){
   chk('maxPeriod',n.period, false, t('파주기가 짧아 배가 심하게 흔들립니다'),'mid');
   chk('minVis',   n.vis,    false, t('시정이 정해 둔 기준보다 나쁩니다'),   'mid');
   chk('maxCurrent',n.current,true, t('조류가 정해 둔 한계를 넘었습니다'),   'mid');
+  return out;
+}
+// ★★★ 기준은 넣어 두셨는데 **값이 안 들어온 칸**을 찾는다.
+//
+//   왜 있어야 하나 — 값이 없을 때 조용히 넘어가면 카드에 「정해 둔 기준 안에 있습니다」 가
+//   그대로 뜬다. 보는 사람은 **재 보고 괜찮다고 한 줄로 읽는다.** 실제로는 재 보지도 않았다.
+//   그 한 줄을 믿고 나갔다가 사고가 나면 앱 탓이다.
+//   자료가 없으면 **없다고 말한다.** 아무 말도 안 하는 것이 제일 나쁘다.
+const WX_LIMIT_KEYS = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCurrent'];
+const WX_LIMIT_VAL  = { maxWind:'wind', maxGust:'gust', maxWave:'wave',
+                        maxPeriod:'period', minVis:'vis', maxCurrent:'current' };
+function wxMissing(now){
+  const n = now || {};
+  const out = [];
+  WX_LIMIT_KEYS.forEach(key=>{
+    if(!(boatSpec(key) > 0)) return;                 // 기준을 안 넣으셨으면 말하지 않는다
+    const v = n[WX_LIMIT_VAL[key]];
+    if(v === null || v === undefined || v === '' || !isFinite(Number(v))){
+      out.push({ key, label: (BOAT_SPEC[key] && BOAT_SPEC[key].label) || key });
+    }
+  });
   return out;
 }
 function boatSpec(key){
@@ -45331,17 +45369,65 @@ async function wxAtPoint(lat, lon){
   WX_PT[k] = d;
   return d;
 }
+// ★★★ 파도 자료가 빈 자리 — 둘레 바다에서 가져온다
+//
+//   Open-Meteo 해상 모형은 뭍에 가까운 칸을 통째로 비워 둡니다. 항 안쪽에 배를 대 두면
+//   파고·파주기가 null 로 옵니다. 그때 「자료 없음」 이라고 적고 마는 것은 앱이 할 일을
+//   안 하는 것입니다 — 바로 바깥 바다 칸에는 값이 있고, 배가 나가는 곳은 그 바다입니다.
+//
+//   그래서 배 자리가 비어 있으면 **둘레를 넓혀 가며 값이 있는 첫 칸**을 씁니다.
+//   Open-Meteo 는 한 번 부를 때 좌표를 여러 개 받으므로 **부르는 횟수는 한 번 더일 뿐**입니다.
+//   (실제로 재 보니 서울 한복판에서도 41칸 가운데 10칸에 값이 있었습니다)
+//
+//   ★ 어디서 가져왔는지 화면에 적습니다. 배 자리의 값인 척하지 않습니다.
+const WX_RING_R = [0.05, 0.10, 0.20, 0.35, 0.60, 1.00];   // 도(°) — 대략 5·11·22·39·67·111km
+function wxRingPts(lat, lon){
+  const out = [];
+  const kx = Math.max(0.2, Math.cos(lat*Math.PI/180));
+  WX_RING_R.forEach(r=>{
+    for(let a=0;a<360;a+=45){
+      const rad = a*Math.PI/180;
+      out.push([ +(lat + r*Math.cos(rad)).toFixed(4), +(lon + r*Math.sin(rad)/kx).toFixed(4) ]);
+    }
+  });
+  return out;
+}
+function wxHasWave(m){
+  const H = m && m.hourly;
+  if(!H) return false;
+  const a = H.wave_height, b = H.wave_period;
+  return !!((a && a.some(v=>v!=null)) || (b && b.some(v=>v!=null)));
+}
+async function wxMarineNear(lat, lon){
+  const pts = wxRingPts(lat, lon);
+  const u = 'https://marine-api.open-meteo.com/v1/marine?latitude=' + pts.map(p=>p[0]).join(',')
+    + '&longitude=' + pts.map(p=>p[1]).join(',')
+    + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
+  const j = await fetchTimeout(u).then(r=>r.ok?r.json():null).catch(()=>null);
+  const arr = Array.isArray(j) ? j : (j ? [j] : []);
+  for(let i=0;i<arr.length;i++){
+    if(!wxHasWave(arr[i])) continue;
+    const o = arr[i];
+    o._near = { lat: pts[i][0], lon: pts[i][1], km: Math.round(hav(lat, lon, pts[i][0], pts[i][1])) };
+    return o;
+  }
+  return null;
+}
 async function wxFetch(lat, lon){
   const base = 'https://api.open-meteo.com/v1/forecast?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
     + '&hourly=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,visibility'
     + '&daily=sunrise,sunset&timezone=auto&forecast_days=5&wind_speed_unit=kn';
   const mar = 'https://marine-api.open-meteo.com/v1/marine?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
     + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
-  const [a, b] = await Promise.all([
+  const [a, b0] = await Promise.all([
     fetchTimeout(base).then(r=>r.ok?r.json():null).catch(()=>null),
     fetchTimeout(mar).then(r=>r.ok?r.json():null).catch(()=>null),
   ]);
   if(!a) throw new Error(t('날씨 데이터를 받지 못했습니다'));
+  let b = b0;
+  if(!wxHasWave(b)){
+    try{ const near = await wxMarineNear(lat, lon); if(near) b = near; }catch(_){}
+  }
   return { w:a, m:b };
 }
 

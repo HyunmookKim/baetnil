@@ -26,7 +26,9 @@ const PHOTO_HOSTS = ['firebasestorage.googleapis.com'];
 //     차지하면 정작 바다에서 못 본다. 그래서 **자리를 따로 판다.**
 const SEEN = 'baetnil-seen';     // 한 번 본 사진 (글판·장터·정박지·남의 배)
 const SEEN_KEEP = 200;
-const ASSETS = ['./','./index.html','./manifest.webmanifest','./font.woff2','./icon-192.png','./icon-512.png','./icon-180.png'];
+// ★ 5.6 — 파이어베이스를 앱 파일로 넣었다. 인터넷이 끊겨도 켜지려면 이것도 담아 둔다.
+const ASSETS = ['./','./index.html','./manifest.webmanifest','./font.woff2','./icon-192.png','./icon-512.png','./icon-180.png',
+  './firebase/app.js','./firebase/auth.js','./firebase/chunk-4EOZNMR2.js','./firebase/firestore.js','./firebase/functions.js','./firebase/storage.js'];
 const TILE_HOSTS = ['tile.openstreetmap.org','tiles.openseamap.org'];
 
 // ★ 왜 이렇게 하는가 (2.13 까지 실제로 겪은 사고)

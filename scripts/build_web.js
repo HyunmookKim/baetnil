@@ -128,6 +128,36 @@ function sweep(dir, keep){
 //     index.html 은 이제 「구워 낸 한국어 대문」 이다. 손으로 고치지 않는다.
 const FRONT_SRC = 'site.html';
 function bakeFront(){
+  // data-t 를 단 칸의 알맹이를 사전 값으로 통째로 갈아 끼운다.
+  // ★ 화면에서 돌아가는 자바스크립트는 els[i].innerHTML = d[k] 를 쓴다. 구운 판도 같아야 한다.
+  //   안에 <b> 같은 것이 들어 있으므로 여는 짝·닫는 짝을 세어서 제 짝을 찾는다.
+  function fillT(html, d){
+    const VOID = { br:1, img:1, input:1, meta:1, link:1, hr:1, source:1 };
+    let out = '', i = 0;
+    const re = /<([a-zA-Z0-9]+)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g;
+    let m;
+    while((m = re.exec(html))){
+      const tag = m[1], attrs = m[2];
+      const km = attrs.match(/\sdata-t="([^"]+)"/);
+      if(!km || VOID[tag.toLowerCase()] || /\/$/.test(attrs)) continue;
+      const key = km[1];
+      if(d[key] === undefined) continue;
+      // 제 짝인 닫는 표를 찾는다 (같은 이름이 안에 또 있으면 센다)
+      const sub = new RegExp('<(/?)' + tag + '(?:\\s|>|/)', 'gi');
+      sub.lastIndex = m.index + m[0].length;
+      let depth = 1, end = -1, s2;
+      while((s2 = sub.exec(html))){
+        if(s2[1]) { depth--; if(depth === 0){ end = s2.index; break; } }
+        else depth++;
+      }
+      if(end < 0) continue;
+      out += html.slice(i, m.index + m[0].length) + d[key];
+      i = end;
+      re.lastIndex = end;
+    }
+    return out + html.slice(i);
+  }
+
   let srcPath = path.join(OUT, FRONT_SRC);
   if(!fs.existsSync(srcPath)) srcPath = path.join(OUT, 'index.html');   // 아직 안 옮겼을 때
   if(!fs.existsSync(srcPath)) return 0;
@@ -146,9 +176,12 @@ function bakeFront(){
     if(!d){ console.log('※ 대문에 ' + L + ' 사전이 없습니다 — 건너뜁니다'); continue; }
     let out = html;
 
-    // 글자를 미리 채운다 — data-t 자리는 원래 비어 있다
-    out = out.replace(/(data-t="([^"]+)"[^>]*>)(<\/)/g,
-      (all, open, key, close) => (d[key] === undefined ? all : open + d[key] + close));
+    // 글자를 미리 채운다.
+    // ★ 4.99 — 예전에는 data-t 자리가 비어 있다고 보고 `>(</)` 만 갈아 끼웠다.
+    //   대문에 한국어를 그대로 적어 넣은 뒤로는 그 자리가 비어 있지 않아
+    //   일본어·영어·러시아어 판에 한국어가 1,161자 그대로 남았다.
+    //   이제는 자바스크립트가 하는 것과 똑같이(innerHTML) 알맹이를 통째로 갈아 끼운다.
+    out = fillT(out, d);
 
     // 머리
     out = out.replace('<html lang="ko">', '<html lang="' + L + '">');

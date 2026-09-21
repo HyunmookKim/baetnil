@@ -329,7 +329,7 @@ ${hre}
   <nav>${navDocs}</nav>
   <nav style="margin-top:8px">${navLang}</nav>
 </header>
-<pre>${esc(body)}</pre>
+<pre>${esc(body).replace(/\*\*([^*]+?)\*\*/g, '<b>$1</b>')}</pre>
 <footer>
   ${esc(LEGAL_FOOT[L] || LEGAL_FOOT.ko)} · <a href="${SITE}/${L === 'ko' ? '' : L + '/'}">${
     esc(LEGAL_OPEN[L] || LEGAL_OPEN.ko)}</a><br>

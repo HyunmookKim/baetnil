@@ -26060,8 +26060,13 @@ function updateHeader(){
 
 function openLocker(id){
   selected = id; inBox = null; editId = null; moveId = null; mergeId = null;
+  // ★ 5.7 — 4.138 에서 올라온 오류(updateHeader ← openLocker)의 뿌리.
+  //   적재표 화면이 아직(또는 이미) 없는데 불리면 칸마다 null 에 글을 넣다 앱이 죽었다.
+  //   화면이 없으면 열 것도 없다 — 고른 칸만 기억해 두고 돌아간다.
+  const panel = document.getElementById('panel');
+  if(!panel) return;
   updateHeader(); resetForm(); renderPanelItems();
-  document.getElementById('panel').classList.add('open');
+  panel.classList.add('open');
   refreshBoxes();
 }
 function openBox(boxId){
@@ -26259,13 +26264,15 @@ function gearSelVal(){
   return (v && typeof gearOf === 'function' && gearOf(v)) ? v : '';
 }
 function resetForm(){
-  document.getElementById('fName').value=''; document.getElementById('fQty').value='1'; document.getElementById('fUnit').value=''; document.getElementById('fMin').value=''; document.getElementById('fNote').value='';
+  // ★ 5.7 — 칸이 없을 때 앱이 죽지 않게 (4.138 오류와 같은 뿌리)
+  const val = (id, v) => { const e = document.getElementById(id); if(e) e.value = v; };
+  val('fName', ''); val('fQty', '1'); val('fUnit', ''); val('fMin', ''); val('fNote', '');
   gearSelSync('');
-  document.getElementById('fBox').checked=false; document.getElementById('fBox').disabled=false;
+  { const e = document.getElementById('fBox'); if(e){ e.checked = false; e.disabled = false; } }
   formPhotos = []; renderPhotoPreview();
   setTxt('formTitle', inBox ? '📦 내부 물품 추가' : '물품 추가');
   setTxt('addBtn', t('+ 추가'));
-  document.getElementById('cancelBtn').style.display='none';
+  { const e = document.getElementById('cancelBtn'); if(e) e.style.display = 'none'; }
 }
 
 // ★ 예전에는 320픽셀·품질 0.5 로 줄였다. 문서 안에 넣어야 해서 그럴 수밖에 없었다.
@@ -26283,6 +26290,7 @@ function pickPhoto(ev){
 }
 function renderPhotoPreview(){
   const p = document.getElementById('photoPrev');
+  if(!p) return;   // ★ 5.7 — 화면이 없을 때 죽지 않게
   p.innerHTML = formPhotos.length
     ? formPhotos.map((ph,i)=>`<span class="fp1"><img src="${ph}" onclick="pvOpen(formPhotos,${i})"><button class="rm" onclick="formPhotos.splice(${i},1);renderPhotoPreview()">✕</button></span>`).join('')
     : `<span style="font-size:11px;color:#2a4a6a">${esc(t('사진 없음'))}</span>`;

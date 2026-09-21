@@ -66,6 +66,8 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
    · Current position (GPS): received only with your permission, to show weather and tides.
      It is stored on your device only and is not sent to the server.
    · Home port, berth and voyage coordinates: values you mark on the map yourself; these are stored on the server.
+   · Weather and tide spots: when you are signed in, the spots you save are stored on the server so you can use them
+     on your other devices. Only you can see them — not even the operator. They are deleted with your account.
  Note: resident registration numbers, card numbers and bank account numbers are never collected.
 
 2. How it is collected
@@ -93,9 +95,9 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
  it through lawful process.
 
 6. Processing entrusted to others
- · Google LLC (Firebase Authentication, Cloud Firestore)
+ · Google LLC (USA) (Firebase Authentication, Cloud Firestore, Cloud Storage, Cloud Functions, Firebase Cloud Messaging, Google Cloud Translation)
    - What they do: sign-in processing, data storage
-   - Where the data is: Seoul region, Republic of Korea
+   - Where the data is: Cloud Firestore and Cloud Functions in the Seoul region, Republic of Korea. Firebase Authentication is processed only in data centres in the United States. Cloud Storage, Firebase Cloud Messaging and Google Cloud Translation may be processed in Google facilities in other countries.
  The processing agreement requires personal data to be handled securely.
 
 7. How it is destroyed
@@ -153,13 +155,13 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
 
 16. How to delete your account and your data
  · Inside the App: Drawer &gt; Account &gt; Leave
- · After you have removed the App: ask at **baetnil.com/delete.html**, or write to help@baetnil.com.
+ · After you have removed the App: ask at <b>baetnil.com/delete.html</b>, or write to help@baetnil.com.
  · When you leave, your account details and the records you made are deleted without delay.
  · Where something is bound up with another person's post - a comment you left on it - the
    name is removed and only the text stays, so that their post still makes sense.
 
 17. If you are outside the Republic of Korea
- · The App's servers are in **the Republic of Korea** (Google Cloud Firestore, Seoul region).
+ · The App's database is in <b>the Republic of Korea</b> (Google Cloud Firestore, Seoul region). Sign-in is processed in the United States.
    Wherever you are, what is stored on the server is handled in Korea.
  · Korea has the Personal Information Protection Act, supervised by the Personal Information
    Protection Commission (pipc.go.kr). The European Commission recognised Korea as providing
@@ -171,13 +173,13 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
 
 18. What leaves your device
  These are the only things the App sends off your device.
- · **Google Firebase** (sign-in and storage / Seoul, Korea) - sign-in details and the records
+ · <b>Google Firebase</b> (sign-in / USA, storage / Seoul, Korea) - sign-in details and the records
    you enter
- · **Weather and tide sources** - only **the coordinates of the point you are looking at.**
+ · <b>Weather and tide sources</b> - only <b>the coordinates of the point you are looking at.</b>
    Who asked is not sent. Korea Meteorological Administration and KHOA, the Japan
    Meteorological Agency, and any other body named on screen as the source
- · **Map images** - OpenStreetMap
- There is **no advertising, no analytics and nothing that follows what you do.**
+ · <b>Map images</b> - OpenStreetMap
+ There is <b>no advertising, no analytics and nothing that follows what you do.</b>
  The advertising identifier is not read.
 
 This policy applies from 4 September 2026. (Version 1.8)</pre>

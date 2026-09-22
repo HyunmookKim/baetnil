@@ -5558,6 +5558,8 @@ const I18N = {
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'Google sign-in is not available in this build.\nPlease sign in with email.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Google sign-in.\nPlease sign in with email.',
     '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Could not complete Apple sign-in.\nPlease sign in with email.',
+    '비밀번호 찾기':'Forgot password?',
+    '비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주세요.':'We sent a password reset email. Please check your inbox.',
   
 
     // ── 4.23
@@ -9017,6 +9019,8 @@ const I18N = {
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'В этой сборке вход через Google недоступен.\nВойдите по электронной почте.',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Google.\nВойдите по электронной почте.',
     '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Не удалось завершить вход через Apple.\nВойдите по электронной почте.',
+    '비밀번호 찾기':'Забыли пароль?',
+    '비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주세요.':'Мы отправили письмо для сброса пароля. Проверьте почту.',
   
 
     // ── 4.23
@@ -12404,6 +12408,8 @@ const I18N = {
     '이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.':'このバージョンではGoogleログインは使えません。\nメールアドレスでログインしてください。',
     '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Googleログインを完了できませんでした。\nメールアドレスでログインしてください。',
     '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.':'Appleログインを完了できませんでした。\nメールアドレスでログインしてください。',
+    '비밀번호 찾기':'パスワードをお忘れの場合',
+    '비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주세요.':'パスワード再設定メールを送信しました。受信トレイをご確認ください。',
     '한 번 더 누르면 앱이 닫힙니다':'もう一度押すとアプリが閉じます',
     '항적을 기록하려면 두 가지가 필요합니다.':'航跡を記録するには2つのことが必要です。',
     '1. 곧 위치를 물어봅니다 — 「앱을 사용하는 동안 허용」을 누르십시오.':'1. まもなく位置情報の許可を尋ねられます —「Appの使用中は許可」を押してください。',
@@ -14802,13 +14808,18 @@ function thumbOf(o, i){
   const k = i || 0;
   return ((o && o.thumbs) || [])[k] || ((o && o.photos) || [])[k] || '';
 }
+// ★ 6.0 — 부르는 곳 두 군데(장터·정박지 사진)가 await 로 받고 있었다. 그런데 이 문은
+//   콜백만 받고 아무것도 돌려주지 않아서 사진이 **한 장도 안 붙고** 오류(cb is not a function)만 났다.
+//   이제 콜백도 받고 Promise 도 돌려준다 — 어느 쪽으로 불러도 된다.
 function resizePhotos(list, cb){
-  const out = [];
-  const step = i => {
-    if(i >= list.length){ cb(out); return; }
-    resizePhoto(list[i], r=>{ if(r) out.push(r); step(i+1); });
-  };
-  step(0);
+  return new Promise(res => {
+    const out = [];
+    const step = i => {
+      if(i >= list.length){ try{ if(typeof cb === 'function') cb(out); }catch(_){} res(out); return; }
+      resizePhoto(list[i], r=>{ if(r) out.push(r); step(i+1); });
+    };
+    step(0);
+  });
 }
 
 // ===== 입력 화면 =====
@@ -16023,6 +16034,8 @@ function openAccount(){
       <div class="mrrow" style="gap:8px">
         <button class="mrbtn" style="flex:1" onclick="doEmail(false)">${esc(t('로그인'))}</button>
         <button class="mrbtn" style="flex:1" onclick="doEmail(true)">${esc(t('회원가입'))}</button></div>
+      <div class="mrrow" style="justify-content:flex-end;padding-top:0">
+        <button class="minib blu" onclick="doPwReset()">${esc(t('비밀번호 찾기'))}</button></div>
       <div id="acMsg" class="mrnone" style="text-align:left;display:none"></div>`;
   }
   showPanel(P);
@@ -16229,6 +16242,15 @@ async function doEmail(isNew){
     await pushAgree();
     openAccount();
   }catch(e){ acMsg(authMsg(e)); }
+}
+// ★ 6.0 — 비밀번호 찾기. 적어 둔 이메일로 재설정 메일을 보낸다.
+async function doPwReset(){
+  if(!window.__auth || !window.__auth.reset){ acMsg('로그인 기능을 준비 중입니다. 인터넷 연결을 확인해 주세요.'); return; }
+  const em = ((document.getElementById('acEm')||{}).value||'').trim();
+  if(!em){ acMsg('이메일을 입력해 주세요.'); return; }
+  acMsg('처리 중…');
+  try{ await window.__auth.reset(em); acMsg('비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주세요.'); }
+  catch(e){ acMsg(authMsg(e)); }
 }
 async function doSignOut(){
   if(!window.__auth) return;
@@ -17614,6 +17636,11 @@ async function trkStop(){
     const it = (typeof voyage !== 'undefined' ? voyage : []).find(v => String(v.id) === String(cur.vid));
     if(it){
       it.trk = pts;
+      // ★ 6.0 — 9/17 에 약속하고 안 했던 것: 받은 점·버린 점 수를 항해에 남긴다.
+      //   백업 하나로 「GPS 가 안 준 것」 과 「앱이 걸러 버린 것」 이 갈린다.
+      it.trkStat = { got: Number(cur.got) || 0, kept: (cur.pts || []).length,
+                     drop: Number(cur.drop) || 0, mock: Number(cur.mock) || 0,
+                     saved: pts.length };
       try{ saveMR(); }catch(e){}
       try{ schedulePush(); }catch(e){}
       try{ renderVoyage(); }catch(e){}
@@ -17693,15 +17720,40 @@ async function geoGet(why, ok, err, opts){
     if(typeof err === 'function') err({ code:1, message:'not allowed' });
     return;
   }
-  navigator.geolocation.getCurrentPosition(
-    p=>{
-      // ★ 실제로 받았을 때만 남긴다. 권한을 거절했으면 수집한 것이 없다.
-      try{ lgAdd('수집', why); }catch(e){}
-      if(typeof ok === 'function') ok(p);
-    },
-    e=>{ if(typeof err === 'function') err(e); },
-    opts
-  );
+  const got = p=>{
+    // ★ 실제로 받았을 때만 남긴다. 권한을 거절했으면 수집한 것이 없다.
+    try{ lgAdd('수집', why); }catch(e){}
+    if(typeof ok === 'function') ok(p);
+  };
+  // ★★★ 6.0 — 아이폰에서는 웹뷰의 위치를 쓰지 않는다.
+  //   웹뷰로 읽으면 아이폰은 앱 권한과 따로 「"localhost" would like to use your current location」 창을 또 띄운다.
+  //   (2026-09-22 시뮬레이터 검사 2회째 — 사진마다 그 창이 떠 있었고, 떠 있는 동안 애플 로그인 창도 못 떴다.)
+  //   그래서 아이폰에서는 앱 안의 부품(BaetnilTrack.once)이 코어로케이션으로 직접 한 번 읽는다.
+  //   받은 것은 웹과 같은 모양(coords·timestamp)으로 바꿔 넘긴다 — 부르는 쪽은 아무것도 안 바뀐다.
+  const IOSP = geoIosPlugin();
+  if(IOSP){
+    const o = opts || {};
+    IOSP.once({ high: !!o.enableHighAccuracy, timeout: +o.timeout || 15000, maxAge: +o.maximumAge || 0 })
+      .then(r=>got({
+        coords: { latitude: +r.lat, longitude: +r.lon, accuracy: (r.acc != null ? +r.acc : null),
+                  speed: (r.spd != null ? +r.spd : null), heading: (r.hdg != null ? +r.hdg : null),
+                  altitude: (r.alt != null ? +r.alt : null), altitudeAccuracy: null },
+        timestamp: +r.t || Date.now(),
+        simulated: !!r.sim
+      }))
+      .catch(e=>{ if(typeof err === 'function') err({ code: (+(e && e.code)) || 2, message: (e && e.message) || 'position unavailable' }); });
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(got, e=>{ if(typeof err === 'function') err(e); }, opts);
+}
+// 아이폰 앱일 때만 부품을 돌려준다. 안드로이드 웹뷰는 앱 권한을 그대로 쓰므로 창이 한 번 더 뜨지 않는다.
+function geoIosPlugin(){
+  try{
+    const C = window.Capacitor;
+    if(!C || !C.isNativePlatform || !C.isNativePlatform() || C.getPlatform() !== 'ios') return null;
+    const P = C.Plugins && C.Plugins.BaetnilTrack;
+    return (P && typeof P.once === 'function') ? P : null;
+  }catch(_){ return null; }
 }
 
 // 등록 화면의 지도에서 현재 위치를 잡는다
@@ -23283,7 +23335,8 @@ const BOAT_SPEC = {
 // 없는 값을 어림잡아 넣으면 잘못된 안심을 준다.
 function krCurrentKt(ts){
   if(!ts || !krCache) return null;
-  const sp = (typeof nearestTideSpot === 'function') ? nearestTideSpot() : null;
+  let sp = (typeof nearestTideSpot === 'function') ? nearestTideSpot() : null;
+  if(sp && typeof tideOfficialNear === 'function' && !tideOfficialNear(sp)) return null;   // ★ 6.0 — 먼 관측소 조류는 안 쓴다
   const rows = (sp && sp.cur) ? sp.cur : (krCache.cur || null);
   if(!Array.isArray(rows) || !rows.length) return null;
   // { d:'2026-08-11', t:'13:00', v:2.4 } 형태를 찾는다
@@ -24981,7 +25034,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.9';
+const APP_VER = '6.0';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -32642,7 +32695,8 @@ function notiQuietNow(now){
 async function notiAsk(){
   try{
     const P = window.Capacitor && window.Capacitor.Plugins
-              && (window.Capacitor.Plugins.PushNotifications || window.Capacitor.Plugins.LocalNotifications);
+              && (window.Capacitor.Plugins.FirebaseMessaging   // ★ 6.0 — 알림 부품을 하나로(파이어베이스). 아이폰에서 둘이 겹치면 안 된다
+                  || window.Capacitor.Plugins.PushNotifications || window.Capacitor.Plugins.LocalNotifications);
     if(!P) return 'unknown';
     let st = await P.checkPermissions();
     if(st && (st.receive === 'granted' || st.display === 'granted')) return 'granted';
@@ -38958,7 +39012,8 @@ function departNow(){
   it.timeOut = p(now.getHours())+':'+p(now.getMinutes());
   it.seed = false; saveMR();
   posHere('wxOut', it.id, true, () => wxCapture('wxOut', it.id));
-  try{ if(typeof trkStart === 'function') trkStart(it.id); }catch(e){}
+  // ★ 6.0 — 항적이 못 켜지면 까닭을 말해 준다 (예전에는 버려서 사람은 켜진 줄 알았다)
+  try{ if(typeof trkStartSay === 'function') trkStartSay(it.id); }catch(e){}
   renderVoyage(); openMR('voyage', it.id);
 }
 // ══════════════════════════════════════════════════════════════════════
@@ -45664,21 +45719,22 @@ async function ensureWx(){
   const key = wxPtKey(wxCur.lat, wxCur.lon);
   if(wxData && wxData.key === key){ wxStamp(); return wxData; }
   wxEnsuring = true;
+  // ★ 6.0 — 자리를 먼저 잡아 둔다. 담아 둔 것을 읽는 동안 지점이 바뀌면 열쇠와 날씨가 서로 다른 곳이 된다.
+  const wxLat0 = wxCur.lat, wxLon0 = wxCur.lon;
+  const wxSame = () => !!wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key;
   try{
     const c = await wxCacheGet(key);
     // ① 담아 둔 것이 한 시간 안이면 그것을 쓴다 — 부르지 않는다
     if(c && (Date.now() - (c.at || 0)) < WX_FRESH_MS){
-      wxData = { key: key, w: c.w, m: c.m };
-      wxStamp();
+      if(wxSame()){ wxData = { key: key, w: c.w, m: c.m }; wxStamp(); }
     }else{
       try{
-        const d = await wxFetch(wxCur.lat, wxCur.lon);
-        wxData = { key, ...d };
-        wxCachePut(key, d);
-        wxStamp();
+        const d = await wxFetch(wxLat0, wxLon0);
+        wxCachePut(key, d);                           // 그 자리의 날씨는 그 자리 열쇠로 담는다 — 맞는 것이다
+        if(wxSame()){ wxData = { key, ...d }; wxStamp(); }
       }catch(e){
         // ② 못 받았으면 담아 둔 것이라도 쓴다 (반나절까지). 빈 화면보다 낫다.
-        if(c && (Date.now() - (c.at || 0)) < WX_KEEP_MS){
+        if(c && (Date.now() - (c.at || 0)) < WX_KEEP_MS && wxSame()){
           wxData = { key: key, w: c.w, m: c.m };
           wxStamp();
         }
@@ -45934,6 +45990,7 @@ function tideAllSpots(){
 function tideFromLine(){
   try{
     const sp = nearestTideSpot();
+    if(!tideOfficialNear(sp)) return '';        // ★ 6.0 — 먼 관측소 물때를 안 쓰면 그 출처도 안 적는다
     const from = tideSpotFrom(sp);
     if(!sp || !from) return '';
     // 한국 자료는 이미 위 문장에 「국립해양조사원」 이 들어 있다 — 두 번 적지 않는다
@@ -46450,8 +46507,13 @@ function omTidePts(){
     return ex;
   }catch(_){ return null; }
 }
+// ★★★ 6.0 — 관(官) 물때표에도 거리 한도를 둔다 (아이폰 시뮬레이터 검사에서 드러남)
+//   여태 「관 물때표가 언제나 이긴다」 에 거리 한도가 없었다. 그래서 블라디보스토크에서도
+//   수백 km 떨어진 한국·일본 관측소의 물때가 그 자리 물때처럼 떴다. 조화상수·EOT20 점은
+//   한 번도 쓰이지 않았다. 조화상수와 같은 한도(HC_NEAR_KM)를 넘으면 관 물때표를 쓰지 않는다.
+function tideOfficialNear(sp){ return !!(sp && sp.dist != null && sp.dist <= HC_NEAR_KM); }
 function allTidePts(){
-  const sp = nearestTideSpot(); if(!sp) return null;
+  const sp = nearestTideSpot(); if(!sp || !tideOfficialNear(sp)) return null;
   const pts = tidePtsOf(sp);
   if(pts.length>=2) return { pts, spot:sp };
   return null;
@@ -46475,7 +46537,7 @@ function allTidePts(){
 //   사람이 넣을 것은 '잰 값' 하나뿐이다.
 function tideAtPlace(lat, lon, ts){
   const sp = nearestTideSpotAt(lat, lon);
-  if(sp){
+  if(sp && tideOfficialNear(sp)){
     const pts = tidePtsOf(sp);
     if(pts.length >= 2){
       const v = tideAt(ts, pts);
@@ -46780,6 +46842,18 @@ async function renderWeather(){
   if(!wxCur){ wxInit(); }
   await loadTide();
   await loadKr();
+  // ★★★ 6.0 — 보고 있는 **날씨 지점**이 그 나라 물이면 그 나라 물때도 받는다.
+  //   전에는 「기기가 지금 그 나라에 있거나 그 말을 쓸 때」 만 받았다(tidePackSync).
+  //   한국에 있는 사람이 도쿄 지점을 골라 두면 일본 물때표가 없어서,
+  //   예전에는 1000km 떨어진 한국 관측소 물때가 「도쿄 물때」 로 떴고(6.0 거리 한도 전),
+  //   거리 한도를 둔 뒤로는 아예 관 물때가 안 나왔다. (2026-09-22 시뮬레이터 검사 2회째)
+  //   그 지점을 사람이 골랐다는 것이 「거기 갈 것」 이라는 뜻이라, 그때만 받는다 — 한 번 받으면 기기에 남는다.
+  try{
+    if(wxCur && typeof spotPacksFor === 'function'){
+      tidePackLoadLocal();
+      for(const pk of spotPacksFor(wxCur.lat, wxCur.lon)){ await tidePackGet(pk); }
+    }
+  }catch(_){}
   // ★ 배가 한국 해역 밖일 때만 일본 자료를 받는다. 한국에 있는 배에는 부를 까닭이 없다.
   if(typeof boatOutsideKR === 'function' && boatOutsideKR()){
     await loadSeaJP();
@@ -46839,10 +46913,18 @@ async function renderWeather(){
 
   if(!wxData || wxData.key !== wxCur.lat+','+wxCur.lon){
     L.innerHTML = head + `<div class="mrnone" id="wxStatus">${esc(t('날씨 불러오는 중…'))}</div>`;
+    // ★★★ 6.0 — 받는 동안 다른 지점을 누르면 **앞 지점의 날씨가 뒤 지점 이름으로** 붙었다.
+    //   전에는 다 받은 뒤에야 그때의 wxCur 로 열쇠를 만들었다.
+    //   그 사이 사람이 여수 → 도쿄로 넘기면 여수 날씨·물때가 「도쿄」 로 저장되고 그대로 그려졌다.
+    //   (2026-09-22 시뮬레이터 검사 2회째 — 도쿄를 골랐는데 여수 물때가 떠 있었다.)
+    //   이제 부르기 전에 열쇠를 잡아 두고, 받고 나서 지점이 바뀌었으면 버리고 지금 지점으로 다시 그린다.
+    const wxKey0 = wxCur.lat+','+wxCur.lon;
     try{
       const d = await wxFetch(wxCur.lat, wxCur.lon);
-      wxData = { key: wxCur.lat+','+wxCur.lon, ...d };
+      if(!wxCur || (wxCur.lat+','+wxCur.lon) !== wxKey0) return renderWeather();
+      wxData = { key: wxKey0, ...d };
     }catch(e){
+      if(!wxCur || (wxCur.lat+','+wxCur.lon) !== wxKey0) return renderWeather();
       L.innerHTML = head + `<div class="mrnone">${esc(t('날씨를 불러오지 못했습니다.'))}<br>${esc(t('인터넷 연결을 확인한 뒤 다시 시도해 주세요.'))}<br><br><button class="tab" onclick="wxData=null;renderWeather()">${esc(t('다시 시도'))}</button></div>`;
       return;
     }
@@ -47454,7 +47536,7 @@ window.__boot = 'start';
     const { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect,
             GoogleAuthProvider, OAuthProvider, signOut, signInWithCredential,
             createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser,
-            updateProfile, initializeAuth, indexedDBLocalPersistence } =
+            updateProfile, initializeAuth, indexedDBLocalPersistence, sendPasswordResetEmail } =
       await 받기('firebase-auth', './firebase/auth.js');
     const firebaseConfig = {
       apiKey: "AIzaSyAH1iM-ljsnTmzWmExfSqrMbILhVaJaITA",
@@ -47596,6 +47678,14 @@ window.__boot = 'start';
       }
     };
 
+    // ★ 6.0 — 네이티브 로그인 부품이 대답을 안 하면(부품이 빌드에서 빠진 판 등) 화면이 영영 멈춘다.
+    //   5.7 아이폰이 실제로 그랬다(애플 부품이 안 만들어져 호출이 돌아오지 않음).
+    //   사람이 로그인 창에서 머무는 시간은 넉넉히 주고(3분), 그래도 대답이 없으면 멈추지 않고 알린다.
+    const nativeAuthWait = (p, who) => Promise.race([p, new Promise((_, rej) => setTimeout(() => {
+      console.warn('[baetnil-auth] ' + who + ' native: no answer');
+      rej(new Error(t(who === 'apple' ? '애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'
+                                      : '구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.')));
+    }, 180000))]);
     window.__auth = {
       async google(){
         // ★ 앱에서는 바깥 브라우저로 나가면 안 된다.
@@ -47616,7 +47706,7 @@ window.__boot = 'start';
           // ★ 부품이 안 들어간 판이면 바깥 브라우저로 보내지 않는다 —
           //   보내 봐야 아까 그 흰 화면이 또 뜬다. 무엇을 하면 되는지 말해 준다.
           if(!fa) throw new Error(t('이 버전에서는 구글 로그인이 안 됩니다.\n이메일로 로그인해 주세요.'));
-          const r = await fa.signInWithGoogle({ skipNativeAuth: true });
+          const r = await nativeAuthWait(fa.signInWithGoogle({ skipNativeAuth: true }), 'google');
           const idt = r && r.credential && r.credential.idToken;
           // 자격을 못 받았는데 조용히 넘어가면 사람은 로그인된 줄 안다
           if(!idt) throw new Error(t('구글 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
@@ -47645,15 +47735,14 @@ window.__boot = 'start';
       //     그래야 지금까지 쓰던 파이어스토어 코드가 그대로 돕니다. 구글과 같은 방식입니다.
       //   ★ 애플은 **rawNonce** 를 같이 넘겨야 자격을 받아 줍니다. 안 넘기면 거절합니다.
       //   ★ 애플은 이름을 **맨 처음 한 번만** 줍니다. 그때 안 받아 두면 영영 못 받습니다.
-      //   ★ 부품이 없거나 네이티브가 안 되는 판이면 조용히 웹 방식으로 내려갑니다 —
-      //     막아 버리면 로그인할 길이 아예 없어집니다.
+      //   ★ 6.0 — 앱 안에서는 웹 방식으로 내려가지 않습니다(아래 catch 참고). 웹 방식은 브라우저 전용입니다.
       async apple(){
         if(isNative()){
           const fa = (window.Capacitor && window.Capacitor.Plugins
                       && window.Capacitor.Plugins.FirebaseAuthentication) || null;
           if(fa){
             try{
-              const r = await fa.signInWithApple({ skipNativeAuth: true, scopes: ['email','name'] });
+              const r = await nativeAuthWait(fa.signInWithApple({ skipNativeAuth: true, scopes: ['email','name'] }), 'apple');
               const c = (r && r.credential) || {};
               if(!c.idToken) throw new Error(t('애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
               const prov = new OAuthProvider('apple.com');
@@ -47669,9 +47758,14 @@ window.__boot = 'start';
               // 사람이 스스로 그만둔 것은 고장이 아니다 — 그대로 올린다
               const msg = String((e && (e.code || e.message)) || '');
               if(/cancel|1001|사용자/i.test(msg)) throw e;
-              // 그 밖의 까닭(부품이 안 붙은 판 등)이면 아래 웹 방식으로 내려간다
+              // ★ 6.0 — 앱 안에서는 웹 방식으로 **내려가지 않는다.**
+              //   5.6 부터 앱은 initializeAuth 라 팝업·리디렉트 처리기가 없고, 있더라도
+              //   아이폰에서는 앱 화면을 통째로 로그인 페이지로 넘겨 돌아오지 못한다.
+              console.warn('[baetnil-auth] apple native: ' + msg);
+              throw new Error(t('애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
             }
           }
+          throw new Error(t('애플 로그인을 끝내지 못했습니다.\n이메일로 로그인해 주세요.'));
         }
         const ap = new OAuthProvider('apple.com');
         ap.addScope('email'); ap.addScope('name');
@@ -47683,6 +47777,8 @@ window.__boot = 'start';
       },
       async emailIn(em, pw){ await signInWithEmailAndPassword(fauth, em, pw); },
       async emailUp(em, pw){ await createUserWithEmailAndPassword(fauth, em, pw); },
+      // ★ 6.0 — 비밀번호를 잊은 사람이 돌아올 길이 아예 없었다.
+      async reset(em){ await sendPasswordResetEmail(fauth, em); },
       async out(){ await signOut(fauth); },
     };
     onAuthStateChanged(fauth, u=>{

@@ -1,0 +1,25 @@
+name: collect-metarea
+# 뱃일 5.10 — 먼 바다·러시아 극동 해상경보 (WMO METAREA XI · 일본 기상청 WWJP90). 6시간마다 새로 나온다.
+on:
+  schedule:
+    - cron: '25 */3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node scripts/collect_metarea.js app/warn-metarea11.json
+      - name: commit warn-metarea11.json
+        run: |
+          git config user.name "baetnil-bot"
+          git config user.email "bot@baetnil.com"
+          git add app/warn-metarea11.json
+          git commit -m "먼 바다 해상경보 (METAREA XI)" || echo nothing
+          git pull --rebase
+          git push

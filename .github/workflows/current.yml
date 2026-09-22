@@ -1,0 +1,31 @@
+name: collect-current
+# 조류(유속·유향) — 국립해양조사원 조류예보(시계열) 204곳 · 14일 · 1시간 간격
+# ★ 인증키는 비밀값 DATA_GO_KR_KEY (공공데이터포털). 개발계정 하루 10,000번 — 이 작업은 하루 약 2,900번
+on:
+  schedule:
+    - cron: '20 19 * * *'   # 매일 04:20 KST (물때 수집 20분 뒤 — 커밋이 안 부딪히게)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  current:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node ../scripts/collect_current.js
+        working-directory: app
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+      - name: commit current.json
+        run: |
+          git config user.name "news-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add app/current.json
+          git diff --cached --quiet && exit 0
+          git commit -m "조류 자동 수집"
+          git pull --rebase origin main
+          git push

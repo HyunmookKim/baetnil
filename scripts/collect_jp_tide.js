@@ -194,6 +194,71 @@ async function hatMap(){
   return out;
 }
 
+// ★★★ 5.10 — 지점표에 조화상수가 없는 지점(154곳 중 55곳)의 최고수면을 **그 지점의 한 해 매시 조위**로 셈한다.
+//   사장님 지시: 「반드시 찾아내라」 (2026-09-22)
+//   ★ 정의는 위와 똑같다 — 평균수면 + M2·S2·K1·O1 진폭의 합 (해상보안청).
+//   ★ 기상청 潮位表 텍스트에는 날마다 **매시 조위 24개**가 들어 있다(1~72칸). 한 해치면 8,760개.
+//     여기에 조화 분석(최소제곱)을 걸면 평균수면과 네 분조의 진폭이 나온다.
+//     한 해로는 K1·P1, S2·K2 가 갈리므로 여덟 분조(M2 S2 N2 K2 K1 O1 P1 Q1)를 같이 푼다.
+//   ★ 한 해치 진폭에는 달 궤도(18.6년) 탓의 절기 보정(f)이 들어 있다. 그 해 f 로 나눠 평균 진폭으로 되돌린다.
+//   ★ 지점표에 값이 있는 99곳에서 같은 셈을 해 보고 차이를 로그에 찍는다 — 검증 없이 쓰지 않는다.
+const HC_SPEED = { M2:28.9841042, S2:30.0, N2:28.4397295, K2:30.0821373, K1:15.0410686, O1:13.9430356, P1:14.9589314, Q1:13.3986609 };
+function nodalF(year){
+  // 그 해 가운데(7/2)의 달 승교점 황경 N (Meeus)
+  const T = (Date.UTC(year, 6, 2) - Date.UTC(2000, 0, 1, 12)) / (36525 * 864e5);
+  const N = (125.04452 - 1934.136261 * T) * Math.PI / 180;
+  const c = Math.cos, M2 = 1.0004 - 0.0373 * c(N) + 0.0002 * c(2*N);
+  return { M2, N2: M2, S2: 1, P1: 1,
+           K2: 1.0241 + 0.2863 * c(N) + 0.0083 * c(2*N) - 0.0015 * c(3*N),
+           K1: 1.0060 + 0.1150 * c(N) - 0.0088 * c(2*N) + 0.0006 * c(3*N),
+           O1: 1.0089 + 0.1871 * c(N) - 0.0147 * c(2*N) + 0.0014 * c(3*N),
+           Q1: 1.0089 + 0.1871 * c(N) - 0.0147 * c(2*N) + 0.0014 * c(3*N) };
+}
+function yearHourly(txt, code){
+  const out = [];   // [ms(JST 를 UTC 로 옮긴 값), cm]
+  txt.split(/\r?\n/).forEach(line => {
+    if(line.length < 80 || line.slice(78,80).trim() !== code) return;
+    const yy = Number(line.slice(72,74)), mo = Number(line.slice(74,76)), dd = Number(line.slice(76,78));
+    if(!(mo >= 1 && mo <= 12 && dd >= 1 && dd <= 31)) return;
+    for(let h = 0; h < 24; h++){
+      const v = num3(line.slice(h*3, h*3 + 3));
+      if(v === null) continue;
+      out.push([Date.UTC(2000 + yy, mo - 1, dd, h) - 9 * 3600e3, v]);
+    }
+  });
+  return out;
+}
+function solve(A, b){   // 가우스 소거 (작은 계)
+  const n = b.length;
+  for(let i = 0; i < n; i++){
+    let p = i; for(let r = i + 1; r < n; r++) if(Math.abs(A[r][i]) > Math.abs(A[p][i])) p = r;
+    [A[i], A[p]] = [A[p], A[i]]; [b[i], b[p]] = [b[p], b[i]];
+    for(let r = i + 1; r < n; r++){ const f = A[r][i] / A[i][i]; for(let c = i; c < n; c++) A[r][c] -= f * A[i][c]; b[r] -= f * b[i]; }
+  }
+  const x = new Array(n).fill(0);
+  for(let i = n - 1; i >= 0; i--){ let s = b[i]; for(let c = i + 1; c < n; c++) s -= A[i][c] * x[c]; x[i] = s / A[i][i]; }
+  return x;
+}
+function hatFromHourly(pts, year){
+  if(pts.length < 24 * 300) return null;          // 거의 한 해치가 있어야 분조가 갈린다
+  const names = Object.keys(HC_SPEED), n = 1 + names.length * 2;
+  const A = Array.from({ length: n }, () => new Array(n).fill(0)), b = new Array(n).fill(0);
+  const t0 = pts[0][0];
+  const row = new Array(n);
+  for(const [ms, v] of pts){
+    const th = (ms - t0) / 3600e3;
+    row[0] = 1;
+    names.forEach((c, k) => { const w = HC_SPEED[c] * Math.PI / 180 * th; row[1 + 2*k] = Math.cos(w); row[2 + 2*k] = Math.sin(w); });
+    for(let i = 0; i < n; i++){ b[i] += row[i] * v; for(let j = 0; j < n; j++) A[i][j] += row[i] * row[j]; }
+  }
+  const x = solve(A, b);
+  const f = nodalF(year);
+  const amp = {};
+  names.forEach((c, k) => { amp[c] = Math.hypot(x[1 + 2*k], x[2 + 2*k]) / f[c]; });
+  const hat = (x[0] + amp.M2 + amp.S2 + amp.K1 + amp.O1) / 100;
+  return (hat > 0 && hat < 12) ? Math.round(hat * 100) / 100 : null;
+}
+
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 
 (async () => {
@@ -207,16 +272,19 @@ const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
 
   // ★ 최고수면은 한 번만 받아 온다 (지점마다 부르면 표를 154번 받는다)
   const HAT = await hatMap();
+  const HATCHK = [], HATFIT = [];
   console.log(`최고수면 ${Object.keys(HAT).length}지점`);
 
   const spots = [], miss = [];
   for(const [code, name, lat, lon] of ST){
     const days = [];
+    let yearTxt = '';
     try{
       for(const y of years){
         const r = await fetch(`${BASE}/${y}/${code}.txt`);
         if(!r.ok){ if(y === years[0]) throw new Error('HTTP ' + r.status); continue; }
         const txt = await r.text();
+        if(y === years[0]) yearTxt = txt;
         txt.split(/\r?\n/).forEach(line => {
           const p = parseLine(line);
           if(!p || !want.has(p.d)) return;
@@ -232,17 +300,40 @@ const ymd = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
     days.sort((a,b)=> a.d.localeCompare(b.d));
     const row = { id: 'jp_' + code, name, lat, lon, days };
     // ★ 못 구한 지점은 아예 안 싣는다. 「없음」 이 「0」 으로 읽히면 안 된다.
-    if(HAT[code] != null) row.hat = HAT[code];
+    // ★ 5.10 — 지점표에 없으면 한 해 매시 조위로 셈한다. 표에 있는 곳은 검증에 쓴다.
+    let fit = null;
+    try{ fit = yearTxt ? hatFromHourly(yearHourly(yearTxt, code), Number(years[0])) : null; }catch(_){ fit = null; }
+    if(HAT[code] != null){
+      row.hat = HAT[code];
+      if(fit != null) HATCHK.push({ code, name, table: HAT[code], fit, d: Math.round((fit - HAT[code]) * 100) });
+    } else if(fit != null){
+      row.hat = fit; row.hatFit = 1;
+      HATFIT.push(code + ' ' + name + ' ' + fit);
+    }
     spots.push(row);
     await sleep(GAP_MS);
   }
 
+  if(HATCHK.length){
+    const ds = HATCHK.map(x => Math.abs(x.d)).sort((a, b) => a - b);
+    const med = ds[Math.floor(ds.length / 2)], mx = ds[ds.length - 1];
+    console.log(`최고수면 셈 검증 — 표에 있는 ${HATCHK.length}곳: 차이 중앙값 ${med}cm · 가장 큰 차이 ${mx}cm`);
+    HATCHK.filter(x => Math.abs(x.d) >= 5).forEach(x => console.log(`  ${x.code} ${x.name} 표 ${x.table} · 셈 ${x.fit} · ${x.d}cm`));
+    // ★ 검증이 나쁘면 셈한 값을 싣지 않는다 (지어내지 않는다)
+    if(med > 5 || mx > 20){
+      console.error('★ 셈한 최고수면이 표와 너무 달라 싣지 않습니다');
+      spots.forEach(x => { if(x.hatFit){ delete x.hat; delete x.hatFit; } });
+      HATFIT.length = 0;
+    }
+  }
+  console.log(`한 해 매시 조위로 셈해 채운 최고수면 ${HATFIT.length}곳`); HATFIT.forEach(x => console.log('  ' + x));
   if(!spots.length){ console.error('★ 실패: 한 지점도 못 받았습니다'); process.exit(1); }
   const data = {
     updated: new Date().toISOString(),
     source: SRC,
     note: '기상청(気象庁) 潮位表 자료입니다. 해뜸·해짐은 앱이 계산한 값입니다. '
-        + 'hat 은 最高水面(略最高高潮面) — 평균수면 + M2·S2·K1·O1 진폭의 합. 다리 통과 높이의 기준면입니다.',
+        + 'hat 은 最高水面(略最高高潮面) — 평균수면 + M2·S2·K1·O1 진폭의 합. 다리 통과 높이의 기준면입니다. '
+        + 'hatFit 이 붙은 지점은 지점표에 조화상수가 없어 그 해 매시 조위를 조화 분석해 같은 정의로 셈한 값입니다.',
     hatCount: spots.filter(x => x.hat != null).length,
     count: spots.length,
     spots

@@ -1,0 +1,53 @@
+name: eot20-coast
+# 뱃일 5.10 — 전 세계 해안 조석 조화상수 (EOT20) 뽑기. 손으로 한 번 돌린다.
+on:
+  workflow_dispatch:
+    inputs:
+      space_km: { description: '점 사이 거리(km)', default: '20' }
+      near_km:  { description: '관측소가 이 안에 있으면 뺌(km)', default: '30' }
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install numpy netCDF4
+      - name: EOT20 받기 (SEANOE, CC BY 4.0)
+        run: |
+          mkdir -p /tmp/eot && cd /tmp/eot
+          curl -L --retry 5 -o eot20.zip https://www.seanoe.org/data/00683/79489/data/85762.zip
+          ls -la eot20.zip
+          unzip -l eot20.zip | head -60
+          unzip -q eot20.zip '*ocean_tides*' || unzip -q eot20.zip
+          find /tmp/eot -name '*ocean_eot20.nc' | head -30
+          # 안에 zip 이 또 있으면 푼다
+          for z in $(find /tmp/eot -name '*.zip' ! -name eot20.zip); do unzip -q -o "$z" -d "$(dirname "$z")"; done
+          find /tmp/eot -name '*_ocean_eot20.nc' | wc -l
+          rm -f eot20.zip
+      - name: 해안 점 뽑기
+        env:
+          SPACE_KM: ${{ github.event.inputs.space_km }}
+          NEAR_KM: ${{ github.event.inputs.near_km }}
+        run: python scripts/eot20_points.py /tmp/eot /tmp/eot20_pts.json
+      - name: 19년 LAT·HAT 셈 (네 갈래로 나눠서)
+        run: |
+          cd scripts
+          for k in 0 1 2 3; do node eot20_lat.js /tmp/eot20_pts.json /tmp/eot20_$k.json $k 4 > /tmp/lat_$k.log 2>&1 & done
+          wait
+          tail -2 /tmp/lat_*.log
+          node -e "const f=require('fs');let a=[];for(let k=0;k<4;k++)a=a.concat(JSON.parse(f.readFileSync('/tmp/eot20_'+k+'.json')));a.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);f.mkdirSync('../data',{recursive:true});f.writeFileSync('../data/eot20_coast.json',JSON.stringify({source:'EOT20 (Hart-Davis et al. 2021, DGFI-TUM, SEANOE, doi:10.17882/79489, CC BY 4.0)',made:new Date().toISOString(),pts:a}));console.log('pts',a.length)"
+          ls -la ../data
+      - name: 올리기
+        run: |
+          git config user.name "baetnil-bot"
+          git config user.email "bot@baetnil.com"
+          git add data/eot20_coast.json
+          git commit -m "EOT20 해안 조화상수 (LAT·HAT 19년 셈)" || echo nothing
+          git pull --rebase
+          git push

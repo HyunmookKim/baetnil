@@ -1,0 +1,30 @@
+name: spot-check
+# 정박지 자리 전수 검수 — 지도(OSM)에 그대로 있나 · 자리가 같나 · 물가인가
+# 결과를 data/spot-check.md 에 적어 둔다 (사람이 눈으로 볼 목록)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '40 20 * * 1'   # 매주 화요일 05:40 KST
+permissions:
+  contents: write
+jobs:
+  spotcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/spot_check.js
+      - name: 결과 적기
+        run: |
+          git config user.name "news-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/spot-check.json data/spot-check.md
+          git diff --cached --quiet && exit 0
+          git commit -m "정박지 자리 검수"
+          git pull --rebase origin main
+          git push
+      - name: 요약
+        run: sed -n '1,40p' data/spot-check.md >> "$GITHUB_STEP_SUMMARY"

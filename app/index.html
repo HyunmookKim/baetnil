@@ -3138,6 +3138,29 @@ const I18N = {
     '메인세일 면적':'Mainsail area',
     '마스트 높이':'Mast height',
     '순항 속력':'Cruising speed',
+    '조류':'Current',
+    '태풍 경보':'Typhoon warning',
+    '폭풍 경보':'Storm warning',
+    '강풍 경보':'Gale warning',
+    '짙은 안개 경보':'Dense fog warning',
+    '해상 경보':'Marine warning',
+    '원문 보기 (WMO)':'Original text (WMO)',
+    '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'Source — WMO METAREA XI high seas warnings (issued by JMA, WWJP90)',
+    '먼바다 해상경보':'High seas warnings',
+    '먼바다 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'Could not get the high seas warnings right now — please check below',
+    '먼바다 해상경보 발효 중':'High seas warning in effect',
+    '바람 {a}~{b}kt':'Wind {a}–{b} kt',
+    '저장해 둔 자료':'saved copy',
+    '이 지점에 걸린 먼바다 경보는 없습니다':'No high seas warning covers this spot',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형 값을 <b>{ref}</b>({km}km)의 조화상수에 맞춰 <b>보정한 참고용</b> 물때입니다 (시각 {lag}분 · 조차 {k}배 보정). 높이는 그 지점의 기본수준면으로 옮긴 값이라 이 위치의 기준면과 다를 수 있습니다. <b>다리 통과와 수심 판단에는 사용하지 않습니다.</b>':'No tide station is close to this spot, so this is a <b>corrected reference</b> tide: the global tide-model value has been matched to the harmonic constants at <b>{ref}</b> ({km} km) (time corrected by {lag} min · range ×{k}). Heights are moved to that point\'s chart datum and may differ from the datum here. <b>Do not use it for bridge clearance or depth.</b>',
+    '조석 모형 값이라 {m}m 더 낮게 잡았습니다':'Tide-model value, so {m} m has been taken off to stay on the safe side',
+    '10km 안에 조류예보 지점이 없어 조류를 알 수 없습니다':'No tidal current station within 10 km, so the current is unknown',
+    '이 시각의 조류 예보가 아직 없습니다':'No current forecast for this time yet',
+    '바다에서 떨어진 위치(육지·강 안쪽)라 파도 예보가 없습니다':'This spot is away from the sea (inland or up a river), so there is no wave forecast',
+    '이 시각의 파도 예보가 없습니다':'No wave forecast for this time',
+    '이 시각의 시정 예보가 없습니다':'No visibility forecast for this time',
+    '이 시각의 예보가 없습니다':'No forecast for this time',
+    '조류 — {spot} 조류예보 지점({km}km) · 해양수산부 국립해양조사원 조류예보':'Current — {spot} current station ({km} km) · KHOA tidal current forecast (Ministry of Oceans and Fisheries, Korea)',
     '순항 연료 소모':'Fuel burn at cruise',
     '활주 시작 속력':'Planing speed',
     '승선 정원':'Maximum persons',
@@ -3794,7 +3817,7 @@ const I18N = {
     '가격 제안':'Open to offers',
     '가격 제안 받기':'Take offers',
     '가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기]를 눌러 주세요.':'Please enter a price.\n\nIf you are giving it away or have not fixed a price,\ntap [Free] or [Take offers].',
-    '가까운 조위 관측소':'Nearest tide station',
+    '가까운 조위관측소':'Nearest tide station',
     '가볍게 한 바퀴':'A short cruise',
     '가봤어요':'Been there',
     '갈치':'Hairtail',
@@ -4201,12 +4224,12 @@ const I18N = {
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'No tide data yet. You can enter high and low water yourself.',
     '관측소 없음':'No tide station',
     '이 위치는 참고용 물때라 다리 통과를 계산하지 않습니다.':'This place only has an estimated tide, so bridge clearance is not calculated.',
-    '이 위치는 가까이에 조위 관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'There is no tide station near here, so this tide is <b>for reference only</b>, from a global tidal model. Check the times and heights of high and low water <b>on the chart or in the local tide tables.</b> Heights are measured from <b>the lowest water of these few days</b>, so they are not chart datum. <b>Do not use them for bridge clearance or depth.</b>',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'The nearest tide station is {km} km away, so bridge clearance is not calculated.',
-    '{spot} 조위 관측소({km}km)의 조화상수로 셈한 물때입니다.':'Tide computed from the harmonic constants of {spot} tide station ({km} km away).',
-    '이 물때는 <b>{spot}</b> 조위 관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>해도 기준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'This tide is computed from the <b>harmonic constants</b> of <b>{spot}</b> tide station ({km} km away) — the same calculation hydrographic offices use to make tide tables. Heights are above that station&#39;s <b>chart datum</b>. Before passing under a bridge, <b>check the chart and VTS.</b>',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 기본수준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'There is no tide station near here, so this tide is <b>for reference only</b>, from a global tidal model. Check the times and heights of high and low water <b>on the chart or in the local tide tables.</b> Heights are measured from <b>the lowest water of these few days</b>, so they are not chart datum. <b>Do not use them for bridge clearance or depth.</b>',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'The nearest tide station is {km} km away, so bridge clearance is not calculated.',
+    '{spot} 조위관측소({km}km)의 조화상수로 셈한 물때입니다.':'Tide computed from the harmonic constants of {spot} tide station ({km} km away).',
+    '이 물때는 <b>{spot}</b> 조위관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>기본수준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'This tide is computed from the <b>harmonic constants</b> of <b>{spot}</b> tide station ({km} km away) — the same calculation hydrographic offices use to make tide tables. Heights are above that station&#39;s <b>chart datum</b>. Before passing under a bridge, <b>check the chart and VTS.</b>',
     '조위 조화상수':'Tide harmonic constants',
-    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'An estimated tide has no chart datum. Enter high and low water yourself and it will be calculated.',
+    '참고용 물때에는 기본수준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'An estimated tide has no chart datum. Enter high and low water yourself and it will be calculated.',
     '조석 모형으로 셈한 물때라 다리 통과를 계산하지 않습니다.':'This tide is computed from a tide model, so bridge clearance is not calculated.',
     '만조·간조를 직접 입력하시면 계산해 드립니다.':'Enter high and low water yourself and it will be calculated.',
     '위성 조석 모형(EOT20)의 {spot} 부근({km}km) 조화상수로 셈한 물때입니다.':'Tide computed from harmonic constants of the EOT20 satellite tide model near {spot} ({km} km away).',
@@ -5196,6 +5219,7 @@ const I18N = {
     '오키나와 동쪽 해상':'Sea east of Okinawa',
     '오키나와 남쪽 해상':'Sea south of Okinawa',
     '내 배 자리 {r}':'Your boat is in {r}',
+    '날씨 지점 {r}':'Weather spot is in {r}',
     '폭풍':'Storm',
     '짙은 안개':'Dense fog',
     '착빙':'Icing',
@@ -5900,7 +5924,7 @@ const I18N = {
     '{name}에게 알리기':'Notify {name}',
     '잰 값 {raw}m에서 그때 조위 {tide}m를 뺐습니다 · {spot} 조위 기준':'{tide} m of tide at that moment was subtracted from the measured {raw} m · based on tide at {spot}',
     '그 시각 조위 {v}m를 잰 값 {raw}m에서 뺍니다.':'The tide of {v} m at that time is subtracted from the measured {raw} m.',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'The nearest tide station is {km} km away. Check this against the charted depth.',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'The nearest tide station is {km} km away. Check this against the charted depth.',
     '저조위 기준 {v}':'{v} at chart datum',
     '음력 {d}일':'lunar day {d}',
     '위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다':'{v} NM as the sum of straight legs between {p} fixes · shorter than the real track',
@@ -6598,6 +6622,29 @@ const I18N = {
     '메인세일 면적':'Площадь грота',
     '마스트 높이':'Высота мачты',
     '순항 속력':'Крейсерская скорость',
+    '조류':'Течение',
+    '태풍 경보':'Предупреждение о тайфуне',
+    '폭풍 경보':'Штормовое предупреждение',
+    '강풍 경보':'Предупреждение о сильном ветре',
+    '짙은 안개 경보':'Предупреждение о густом тумане',
+    '해상 경보':'Морское предупреждение',
+    '원문 보기 (WMO)':'Исходный текст (ВМО)',
+    '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'Источник — предупреждения ВМО для открытого моря, METAREA XI (выпускает JMA, WWJP90)',
+    '먼바다 해상경보':'Предупреждения для открытого моря',
+    '먼바다 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'Сейчас не удалось получить предупреждения — проверьте по ссылке ниже',
+    '먼바다 해상경보 발효 중':'Действует предупреждение для открытого моря',
+    '바람 {a}~{b}kt':'Ветер {a}–{b} уз',
+    '저장해 둔 자료':'сохранённые данные',
+    '이 지점에 걸린 먼바다 경보는 없습니다':'Для этой точки предупреждений нет',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형 값을 <b>{ref}</b>({km}km)의 조화상수에 맞춰 <b>보정한 참고용</b> 물때입니다 (시각 {lag}분 · 조차 {k}배 보정). 높이는 그 지점의 기본수준면으로 옮긴 값이라 이 위치의 기준면과 다를 수 있습니다. <b>다리 통과와 수심 판단에는 사용하지 않습니다.</b>':'Рядом нет приливной станции, поэтому это <b>исправленный справочный</b> прилив: значение глобальной модели подогнано к гармоническим постоянным пункта <b>{ref}</b> ({km} км) (сдвиг времени {lag} мин · амплитуда ×{k}). Высоты приведены к нулю глубин того пункта и могут отличаться от здешнего. <b>Не используйте для прохода под мостом и оценки глубины.</b>',
+    '조석 모형 값이라 {m}m 더 낮게 잡았습니다':'Значение по модели приливов — для запаса вычтено {m} м',
+    '10km 안에 조류예보 지점이 없어 조류를 알 수 없습니다':'В радиусе 10 км нет станции течений — течение неизвестно',
+    '이 시각의 조류 예보가 아직 없습니다':'Прогноза течения на это время пока нет',
+    '바다에서 떨어진 위치(육지·강 안쪽)라 파도 예보가 없습니다':'Место удалено от моря (суша или река) — прогноза волн нет',
+    '이 시각의 파도 예보가 없습니다':'Прогноза волн на это время нет',
+    '이 시각의 시정 예보가 없습니다':'Прогноза видимости на это время нет',
+    '이 시각의 예보가 없습니다':'Прогноза на это время нет',
+    '조류 — {spot} 조류예보 지점({km}km) · 해양수산부 국립해양조사원 조류예보':'Течение — станция {spot} ({km} км) · прогноз приливных течений KHOA (Министерство океанов и рыболовства Кореи)',
     '순항 연료 소모':'Расход на крейсерской',
     '활주 시작 속력':'Скорость выхода на глиссирование',
     '승선 정원':'Число людей на борту (по свидетельству)',
@@ -7253,7 +7300,7 @@ const I18N = {
     '가격 제안':'Возможен торг',
     '가격 제안 받기':'Принимать предложения',
     '가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기]를 눌러 주세요.':'Укажите цену.\n\nЕсли отдаёте даром или цена не определена,\nнажмите [Даром] или [Принимать предложения].',
-    '가까운 조위 관측소':'Ближайший пост наблюдения за уровнем моря',
+    '가까운 조위관측소':'Ближайший пост наблюдения за уровнем моря',
     '가볍게 한 바퀴':'Короткая прогулка',
     '가봤어요':'Был здесь',
     '갈치':'Волосохвост',
@@ -7661,12 +7708,12 @@ const I18N = {
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'Данных о приливе пока нет. Полную и малую воду можно ввести вручную.',
     '관측소 없음':'Нет поста наблюдений',
     '이 위치는 참고용 물때라 다리 통과를 계산하지 않습니다.':'Здесь прилив только приблизительный, поэтому проход под мостом не считается.',
-    '이 위치는 가까이에 조위 관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'Поблизости нет поста наблюдений, поэтому этот прилив <b>только для справки</b> — из глобальной приливной модели. Время и высоту полной и малой воды <b>проверьте по карте или местным таблицам приливов.</b> Высоты отсчитаны <b>от самой низкой воды за эти дни</b>, это не ноль глубин. <b>Не используйте их для мостов и глубин.</b>',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'Ближайший пост наблюдений в {km} км, поэтому проход под мостом не считается.',
-    '{spot} 조위 관측소({km}km)의 조화상수로 셈한 물때입니다.':'Прилив рассчитан по гармоническим постоянным поста {spot} ({km} км).',
-    '이 물때는 <b>{spot}</b> 조위 관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>해도 기준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'Этот прилив рассчитан по <b>гармоническим постоянным</b> поста <b>{spot}</b> ({km} км) — так же, как гидрографические службы составляют таблицы приливов. Высоты отсчитаны от <b>нуля глубин</b> этого поста. Перед проходом под мостом <b>сверьтесь с картой и VTS.</b>',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 기본수준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'Поблизости нет поста наблюдений, поэтому этот прилив <b>только для справки</b> — из глобальной приливной модели. Время и высоту полной и малой воды <b>проверьте по карте или местным таблицам приливов.</b> Высоты отсчитаны <b>от самой низкой воды за эти дни</b>, это не ноль глубин. <b>Не используйте их для мостов и глубин.</b>',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'Ближайший пост наблюдений в {km} км, поэтому проход под мостом не считается.',
+    '{spot} 조위관측소({km}km)의 조화상수로 셈한 물때입니다.':'Прилив рассчитан по гармоническим постоянным поста {spot} ({km} км).',
+    '이 물때는 <b>{spot}</b> 조위관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>기본수준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'Этот прилив рассчитан по <b>гармоническим постоянным</b> поста <b>{spot}</b> ({km} км) — так же, как гидрографические службы составляют таблицы приливов. Высоты отсчитаны от <b>нуля глубин</b> этого поста. Перед проходом под мостом <b>сверьтесь с картой и VTS.</b>',
     '조위 조화상수':'Гармонические постоянные прилива',
-    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'У приблизительного прилива нет нуля глубин. Введите полную и малую воду вручную — тогда расчёт будет.',
+    '참고용 물때에는 기본수준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'У приблизительного прилива нет нуля глубин. Введите полную и малую воду вручную — тогда расчёт будет.',
     '조석 모형으로 셈한 물때라 다리 통과를 계산하지 않습니다.':'Прилив рассчитан по приливной модели, поэтому проход под мостом не считается.',
     '만조·간조를 직접 입력하시면 계산해 드립니다.':'Введите полную и малую воду вручную — тогда расчёт будет.',
     '위성 조석 모형(EOT20)의 {spot} 부근({km}km) 조화상수로 셈한 물때입니다.':'Прилив рассчитан по гармоническим постоянным спутниковой приливной модели EOT20 у пункта {spot} ({km} км).',
@@ -8657,6 +8704,7 @@ const I18N = {
     '오키나와 동쪽 해상':'Море к востоку от Окинавы',
     '오키나와 남쪽 해상':'Море к югу от Окинавы',
     '내 배 자리 {r}':'Судно находится в районе {r}',
+    '날씨 지점 {r}':'Точка погоды в районе {r}',
     '폭풍':'Шторм',
     '짙은 안개':'Густой туман',
     '착빙':'Обледенение',
@@ -9361,7 +9409,7 @@ const I18N = {
     '{name}에게 알리기':'Уведомить: {name}',
     '잰 값 {raw}m에서 그때 조위 {tide}m를 뺐습니다 · {spot} 조위 기준':'Из измеренных {raw} м вычтен уровень прилива {tide} м на тот момент · по уровенному посту {spot}',
     '그 시각 조위 {v}m를 잰 값 {raw}m에서 뺍니다.':'Уровень прилива {v} м на тот момент вычитается из измеренных {raw} м.',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'Ближайший уровенный пост в {km} км. Сверьте с глубиной на карте.',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'Ближайший уровенный пост в {km} км. Сверьте с глубиной на карте.',
     '저조위 기준 {v}':'{v} от нуля глубин',
     '음력 {d}일':'{d}-й лунный день',
     '위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다':'{v} м. миль как сумма прямых между {p} точками · короче реального пути',
@@ -10115,6 +10163,29 @@ const I18N = {
     '메인세일 면적':'メインセール面積',
     '마스트 높이':'マスト高',
     '순항 속력':'巡航速力',
+    '조류':'潮流',
+    '태풍 경보':'台風警報',
+    '폭풍 경보':'暴風警報',
+    '강풍 경보':'強風警報',
+    '짙은 안개 경보':'濃霧警報',
+    '해상 경보':'海上警報',
+    '원문 보기 (WMO)':'原文を見る（WMO）',
+    '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'出典 — WMO METAREA XI 全般海上警報（気象庁発表 WWJP90）',
+    '먼바다 해상경보':'全般海上警報',
+    '먼바다 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요':'全般海上警報を今は取得できませんでした — 下のリンクで確認してください',
+    '먼바다 해상경보 발효 중':'全般海上警報 発表中',
+    '바람 {a}~{b}kt':'風 {a}〜{b}kt',
+    '저장해 둔 자료':'保存済みのデータ',
+    '이 지점에 걸린 먼바다 경보는 없습니다':'この地点にかかる全般海上警報はありません',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형 값을 <b>{ref}</b>({km}km)의 조화상수에 맞춰 <b>보정한 참고용</b> 물때입니다 (시각 {lag}분 · 조차 {k}배 보정). 높이는 그 지점의 기본수준면으로 옮긴 값이라 이 위치의 기준면과 다를 수 있습니다. <b>다리 통과와 수심 판단에는 사용하지 않습니다.</b>':'近くに潮位観測所がないため、世界の潮汐モデルの値を<b>{ref}</b>（{km}km）の調和定数に合わせて<b>補正した参考用</b>の潮汐です（時刻 {lag}分・潮差 {k}倍を補正）。高さはその地点の基本水準面に移した値のため、この場所の基準面と異なる場合があります。<b>橋の通過と水深の判断には使わないでください。</b>',
+    '조석 모형 값이라 {m}m 더 낮게 잡았습니다':'潮汐モデルの値のため、{m}m 低く見積もりました',
+    '10km 안에 조류예보 지점이 없어 조류를 알 수 없습니다':'10km以内に潮流観測点がないため、潮流が分かりません',
+    '이 시각의 조류 예보가 아직 없습니다':'この時刻の潮流予報はまだありません',
+    '바다에서 떨어진 위치(육지·강 안쪽)라 파도 예보가 없습니다':'海から離れた場所（陸地・川の奥）のため、波の予報がありません',
+    '이 시각의 파도 예보가 없습니다':'この時刻の波の予報がありません',
+    '이 시각의 시정 예보가 없습니다':'この時刻の視程予報がありません',
+    '이 시각의 예보가 없습니다':'この時刻の予報がありません',
+    '조류 — {spot} 조류예보 지점({km}km) · 해양수산부 국립해양조사원 조류예보':'潮流 — {spot} 潮流予報地点（{km}km）・韓国 海洋水産部 国立海洋調査院 潮流予報',
     '순항 연료 소모':'巡航燃料消費',
     '활주 시작 속력':'プレーニング開始速力',
     '승선 정원':'乗船定員',
@@ -10760,7 +10831,7 @@ const I18N = {
     '가격 제안':'価格提案',
     '가격 제안 받기':'価格提案を受ける',
     '가격을 넣어 주세요.\n\n무료로 주시거나 값을 정하지 않으셨다면\n[무료 나눔] 또는 [가격 제안 받기]를 눌러 주세요.':'価格を入力してください。\n\n無料でお譲りする場合や価格を決めていない場合は\n[無料でお譲り] または [価格提案を受ける] を押してください。',
-    '가까운 조위 관측소':'近くの検潮所',
+    '가까운 조위관측소':'近くの検潮所',
     '가볍게 한 바퀴':'軽くひと回り',
     '가봤어요':'行きました',
     '갈치':'タチウオ',
@@ -11163,12 +11234,12 @@ const I18N = {
     '물때 자료가 아직 없습니다. 만조·간조를 직접 입력할 수도 있습니다.':'潮汐データがまだありません。満潮・干潮を手入力することもできます。',
     '관측소 없음':'観測所なし',
     '이 위치는 참고용 물때라 다리 통과를 계산하지 않습니다.':'ここは目安の潮汐しかないため、橋の通過は計算しません。',
-    '이 위치는 가까이에 조위 관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'ここは近くに検潮所がないため、世界の潮汐モデルで出した<b>参考用</b>の潮汐です。満潮・干潮の時刻と高さは<b>海図または現地の潮汐表でご確認ください。</b>高さは<b>この数日で最も低い水位を0</b>とした値で、海図基準面ではありません。<b>橋の通過と水深の判断には使わないでください。</b>',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'最寄りの検潮所が{km}km離れているため、橋の通過は計算しません。',
-    '{spot} 조위 관측소({km}km)의 조화상수로 셈한 물때입니다.':'{spot}検潮所（{km}km）の調和定数から計算した潮汐です。',
-    '이 물때는 <b>{spot}</b> 조위 관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>해도 기준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'この潮汐は<b>{spot}</b>検潮所（{km}km）の<b>調和定数</b>から計算したものです — 海洋官署が潮汐表を作るのと同じ計算です。高さはその検潮所の<b>海図基準面</b>からの高さです。橋の下を通る前には<b>海図とVTSでご確認ください。</b>',
+    '이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 기본수준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>':'ここは近くに検潮所がないため、世界の潮汐モデルで出した<b>参考用</b>の潮汐です。満潮・干潮の時刻と高さは<b>海図または現地の潮汐表でご確認ください。</b>高さは<b>この数日で最も低い水位を0</b>とした値で、海図基準面ではありません。<b>橋の通過と水深の判断には使わないでください。</b>',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.':'最寄りの検潮所が{km}km離れているため、橋の通過は計算しません。',
+    '{spot} 조위관측소({km}km)의 조화상수로 셈한 물때입니다.':'{spot}検潮所（{km}km）の調和定数から計算した潮汐です。',
+    '이 물때는 <b>{spot}</b> 조위관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>기본수준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'この潮汐は<b>{spot}</b>検潮所（{km}km）の<b>調和定数</b>から計算したものです — 海洋官署が潮汐表を作るのと同じ計算です。高さはその検潮所の<b>海図基準面</b>からの高さです。橋の下を通る前には<b>海図とVTSでご確認ください。</b>',
     '조위 조화상수':'潮汐調和定数',
-    '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'目安の潮汐には海図基準面がありません。満潮・干潮を手入力していただければ計算します。',
+    '참고용 물때에는 기본수준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.':'目安の潮汐には海図基準面がありません。満潮・干潮を手入力していただければ計算します。',
     '조석 모형으로 셈한 물때라 다리 통과를 계산하지 않습니다.':'潮汐モデルから計算した潮汐のため、橋の通過は計算しません。',
     '만조·간조를 직접 입력하시면 계산해 드립니다.':'満潮・干潮を手入力していただければ計算します。',
     '위성 조석 모형(EOT20)의 {spot} 부근({km}km) 조화상수로 셈한 물때입니다.':'衛星潮汐モデルEOT20の{spot}付近（{km}km）の調和定数から計算した潮汐です。',
@@ -12129,6 +12200,7 @@ const I18N = {
     '오키나와 동쪽 해상':'沖縄東方海上',
     '오키나와 남쪽 해상':'沖縄南方海上',
     '내 배 자리 {r}':'マイボートの位置 {r}',
+    '날씨 지점 {r}':'天気地点 {r}',
     '폭풍':'暴風',
     '짙은 안개':'濃霧',
     '착빙':'着氷',
@@ -12741,7 +12813,7 @@ const I18N = {
     '{name}에게 알리기':'{name} に知らせる',
     '잰 값 {raw}m에서 그때 조위 {tide}m를 뺐습니다 · {spot} 조위 기준':'測った {raw}m からその時の潮位 {tide}m を引きました・{spot} の潮位基準',
     '그 시각 조위 {v}m를 잰 값 {raw}m에서 뺍니다.':'その時刻の潮位 {v}m を、測った {raw}m から引きます。',
-    '가장 가까운 조위 관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'最寄りの検潮所が {km}km 離れています。海図の水深と併せてご確認ください。',
+    '가장 가까운 조위관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.':'最寄りの検潮所が {km}km 離れています。海図の水深と併せてご確認ください。',
     '저조위 기준 {v}':'最低水面基準 {v}',
     '음력 {d}일':'旧暦 {d} 日',
     '위치 {p}개 직선 합 {v} NM · 실제 항로보다 짧다':'位置 {p} 点の直線合計 {v} NM・実際の航路より短くなります',
@@ -16719,8 +16791,13 @@ async function locMay(quiet){
 //   ① 화면이 꺼져 있어도 된다 (이게 제일 크다)  ② 거리로 깨우기
 //   ③ 클라우드 전송은 입항 때 한 번 (점마다 보내면 신호 찾느라 더 먹는다)
 //   ④ 출항~입항 동안만
-const TRK_DIST = 50;      // m — 이만큼은 움직여야 한 점으로 담는다 (우리 문)
-const TRK_ASK  = 10;      // m — 폰에게는 이만큼마다 달라고 한다 (폰 문). 촘촘히 받아 우리가 고른다
+// ★★★ 5.10 — 50m → 10m (사장님 지침: 다른 내비게이션 앱이 하는 방식에 맞춘다)
+//   OsmAnd 기록 기본값은 「5초마다」 이고, 「최소 이동 거리」 는 5m 를 권한다.
+//   50m 로 두면 접안·계류처럼 천천히 짧게 움직이는 것이 안 남는다.
+//   대신 멈춰 있을 때 GPS 가 몇 m 씩 흔들리는 것은 칩 속도로 거른다 (TRK_STILL_MS).
+const TRK_DIST = 10;      // m — 이만큼은 움직여야 한 점으로 담는다 (우리 문)
+const TRK_STILL_MS = 0.3; // m/s (약 0.6노트) — 칩이 이보다 느리다고 하면 멈춰 있는 것으로 본다
+const TRK_ASK  = 5;       // m — 폰에게는 이만큼마다 달라고 한다 (폰 문). 촘촘히 받아 우리가 고른다 (5.10: 10→5, 저장 간격 10m 보다 촘촘히)
 const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가운데 점을 버린다
 const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
 const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라우드는 멈출 때 한 번)
@@ -16730,7 +16807,41 @@ const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라
 const TRK_GPS_ACC = 30;
 const TRK_ACC   = 60;     // m — 이보다 흐린 점은 안 받는다. GPS 는 보통 5~20m,
                           //     기지국·와이파이로 지어낸 자리는 1000m 를 넘는다
-const TRK_MAXKT = 20;     // 노트 — 이 배가 낼 수 없는 속도. 넘으면 튄 점이다
+// ★★★ 5.10 — 속도 한도(20노트·50노트)를 없앴다 (사장님 지적, 2026-09-22)
+//
+//   사장님: 「그럼 100키로 이상으로 주행하는 차들은 어떻게 네비를 찍냐?」
+//
+//   ★ 다른 내비게이션·기록 앱을 조사했다 (OsmAnd 기록 설정 문서, 안드로이드 위치 문서).
+//     정해진 최고 속도로 점을 자르는 앱은 없다. 그 앱들이 쓰는 것은 세 가지다.
+//       ① 위성(GPS)으로 잡은 위치만 쓴다. OsmAnd 는 항적이 흔들리면 위치 공급원을
+//          「Android API(GPS)」 로 바꾸라고 안내한다 — 기지국·와이파이 위치가 섞이지 않게.
+//       ② 정확도가 나쁜 위치는 안 받는다 (OsmAnd 「최소 정확도」).
+//       ③ 너무 가까운 위치는 안 받는다 (OsmAnd 「최소 이동 거리」).
+//   ★ 사장님 항적 백업으로 확인했다 (2026-09-20 백업, 항해 12개).
+//       8/28 — 정확도 기록이 없던 때. 중앙값 39노트, 최대 1,632노트 → 기지국 위치가 섞였다.
+//       8/30 — 정확도 36~60m 점이 몰린 구간에서만 40·123노트가 나왔다.
+//       9/02 이후 10개 항해 — 정확도로 거르기 시작한 뒤, 가장 빠른 구간이 19.4노트.
+//                               **속도 한도에 걸린 점이 한 개도 없다.**
+//     즉 이상한 위치의 원인은 「기지국·와이파이 위치」 였고, 속도 한도가 막은 것이 아니다.
+//   ★ 그래서 이렇게 바꾼다.
+//     · 안드로이드 쪽 기록 서비스가 기지국·와이파이 위치(NETWORK_PROVIDER)까지 받고 있었다 → 뺐다.
+//     · 가져온 위치 중 공급원이 network 인 것은 버린다.
+//     · 속도로는 「GPS 칩이 직접 잰 속도와 위치 이동이 맞지 않을 때」만 이상하다고 본다.
+//       칩이 시속 200km 라고 하면 시속 200km 로 움직인 위치는 그대로 받는다.
+//     · 칩 속도가 없는 옛 기록(8월, 정확도 기록도 없는 때)만 배 제원으로 판단한다.
+const TRK_SPD_X  = 1.5;   // 칩 속도 × 이 배 + 두 위치의 정확도 합 + TRK_SPD_PAD 보다 더 뛰면 이상한 위치
+const TRK_SPD_PAD = 30;   // m
+const TRK_SPD_GAP = 300;  // 초 — 이만큼 넘게 끊겼다 이어진 것은 속도로 판단하지 않는다 (끊긴 선으로 그린다)
+const TRK_SPD_WIN = 30;   // 초 — 칩 속도로 판단하는 것은 이만큼 안으로 이어 받은 두 위치뿐이다
+// 옛 기록(정확도·칩 속도가 둘 다 없는 위치)만 쓰는 값 — 그 배가 실제로 낼 수 있는 속도
+function trkOldMaxKt(){
+  let b = null;
+  try{ b = (typeof curBoat === 'function') ? curBoat() : null; }catch(_){ b = null; }
+  const sp = (b && b.spec) || {};
+  const fast = Math.max(Number(sp.cruiseKt) || 0, Number(sp.planeKt) || 0, Number(sp.maxKt) || 0) * 1.5;
+  const base = (b && b.type === 'sail') ? 20 : 50;
+  return Math.max(base, isFinite(fast) ? fast : 0);
+}
 const TRK_LOST  = 6;      // 연달아 이만큼 버리면 기준점을 다시 잡는다
 // ★★★ 4.99 — 「나갔다가 그대로 되돌아온」 점 (사장님 지적: 「아직도 하나 이상하게 찍힌거 있네」)
 //
@@ -16917,6 +17028,8 @@ async function trkBufDrain(){
         const q = arr[i];
         if(!q || !isFinite(q.la) || !isFinite(q.lo) || !isFinite(q.t)) continue;
         if(q.mk === 1){ trkNow.mock = (Number(trkNow.mock) || 0) + 1; continue; }
+        // ★ 5.10 — 기지국·와이파이로 잡은 위치는 받지 않는다 (서비스도 이제 GPS 만 받는다. 예전 버전이 남긴 줄 대비)
+        if(q.pv === 'network'){ trkNow.net = (Number(trkNow.net) || 0) + 1; continue; }
         const ac      = (q.ac == null ? NaN : Number(q.ac));
         const hasMove = (q.sp != null) || (q.br != null);
         const blurry  = !isFinite(ac) || ac > TRK_GPS_ACC;
@@ -16925,6 +17038,8 @@ async function trkBufDrain(){
         const p = { la: +Number(q.la).toFixed(5), lo: +Number(q.lo).toFixed(5),
                     t: new Date(Number(q.t)).toISOString() };
         if(isFinite(ac)) p.ac = Math.round(ac);
+        const qs = trkSpd(q);
+        if(isFinite(qs)) p.sp = Math.round(qs * 10) / 10;
         cand.push(p);
       }
       if(cand.length){
@@ -17120,9 +17235,12 @@ function trkWatchStop(){
 // ★ 고르개를 처음으로 되돌린다 (항해를 새로 시작할 때·오래 끊겼을 때)
 function trkSmoothReset(){ trkKal = null; }
 // ★ 떨림을 고른다. 사람이 누를 것은 없다 — 켜 두면 그냥 된다.
-function trkSmooth(la, lo, ac, tms){
+function trkSmooth(la, lo, ac, tms, spd){
   // ★ accuracy 를 안 주는 기기가 있다. 그때는 3m 로 본다 — 안 그러면 나누다 터진다.
   const acc = (isFinite(ac) && ac > 1) ? ac : 3;
+  // ★★★ 5.10 — 흔들림을 고르는 정도를 칩 속도에 맞춘다. 빠르게 움직일수록 앞 위치를 덜 믿는다.
+  //   고정값(5)만 쓰면 빠른 배·차량은 선이 실제 위치보다 뒤처진다.
+  const q = Math.max(TRK_Q, (isFinite(spd) && spd > 0) ? spd : 0);
   const now = isFinite(tms) ? tms : Date.now();
   if(!trkKal){ trkKal = { la, lo, v: acc * acc, t: now }; return { la, lo }; }
   const dt = (now - trkKal.t) / 1000;
@@ -17131,7 +17249,7 @@ function trkSmooth(la, lo, ac, tms){
   if(!isFinite(dt) || dt < 0 || dt > 120){
     trkKal = { la, lo, v: acc * acc, t: now }; return { la, lo };
   }
-  trkKal.v += dt * TRK_Q * TRK_Q;
+  trkKal.v += dt * q * q;
   trkKal.t = now;
   const K = trkKal.v / (trkKal.v + acc * acc);
   trkKal.la += K * (la - trkKal.la);
@@ -17186,10 +17304,16 @@ function trkPush(pos){
   }
   trkNow.blur = 0;
   // ★★★ 여기서 떨림을 고른다 (4.79). 고른 자리를 담는다 — 받은 그대로가 아니다.
-  const tms = Date.parse(pos.time || 0) || Date.now();
-  const sm  = trkSmooth(la, lo, ac, tms);
+  // ★ 5.10 — 부품은 time 을 밀리초 숫자로 준다. Date.parse(숫자) 는 NaN 이라 여태 늘 「지금」 을 썼다.
+  //   화면을 켠 채 곧바로 받을 때는 괜찮지만, 몰아서 들어오면 흔들림 고르기가 시간을 0초로 보고 선이 뒤처졌다.
+  const tms = (typeof pos.time === 'number' && isFinite(pos.time)) ? pos.time
+            : (Date.parse(pos.time || 0) || Date.now());
+  const spd = trkSpd({ sp: pos.speed });
+  const sm  = trkSmooth(la, lo, ac, tms, spd);
   const p = { la:+sm.la.toFixed(5), lo:+sm.lo.toFixed(5),
               t: new Date(pos.time || Date.now()).toISOString() };
+  // ★ 5.10 — GPS 칩이 잰 속도(m/s)를 남긴다. 이상한 위치인지 판단할 때 이것을 쓴다.
+  if(isFinite(spd)) p.sp = Math.round(spd * 10) / 10;
   // ★ 정확도를 점마다 남긴다. 이게 없으면 나중에 「왜 이렇게 됐나」를 물어도
   //   자료가 없어서 또 추측만 하게 된다 — 4.51 에서 실제로 그랬다.
   if(isFinite(ac)) p.ac = Math.round(ac);
@@ -17197,6 +17321,10 @@ function trkPush(pos){
   // ★ 폰이 걸러 주기로 했지만 믿지 않는다. 기기마다 다르고, 서 있을 때
   //   GPS 가 몇 미터씩 흔들리는 것을 다 담으면 정박 중에도 선이 자란다.
   if(last && hav(last.la, last.lo, p.la, p.lo) * 1000 < TRK_DIST * 0.6) return false;
+  // ★ 5.10 — 멈춰 있는데(칩 속도가 거의 0) 정확도 범위 안에서 흔들린 것은 담지 않는다.
+  //   OsmAnd 도 멈춰 있는 동안의 흔들림이 항적을 지그재그로 만든다고 안내한다.
+  if(last && isFinite(spd) && spd < TRK_STILL_MS
+     && hav(last.la, last.lo, p.la, p.lo) * 1000 < Math.max(TRK_DIST * 3, isFinite(ac) ? ac : 0)) return false;
   // ★ ② 또렷해도 이 배가 낼 수 없는 속도로 뛴 점은 버린다.
   //   오래 끊겼다 이어진 것은 시간도 그만큼 벌어져 있어 저절로 통과한다.
   //   다만 기준점 자체가 망가지면 영영 못 받으므로, 연달아 TRK_LOST 번 버리면
@@ -17229,11 +17357,30 @@ function trkTooFast(a, b){
   if(!a || !b) return false;
   const dt = (Date.parse(b.t) - Date.parse(a.t)) / 1000;
   // ★ 1초도 안 벌어진 두 점은 속도를 잴 수 없다. 기기가 시각을 뭉뚱그려 주기도 한다.
-  //   여기서 나눠 버리면 멀쩡한 점이 「몇만 노트」로 잡혀 버려진다. 그때는 재지 않는다
-  //   — 50m 문과 정확도 문이 그대로 막아 준다.
   if(!isFinite(dt) || dt < 1) return false;
+  // ★ 오래 끊겼다 이어진 것은 판단하지 않는다 — 그 사이에 무슨 일이 있었는지 모른다.
+  if(dt > TRK_SPD_GAP) return false;
   const m = hav(a.la, a.lo, b.la, b.lo) * 1000;
-  return (m / dt) * 1.94384 > TRK_MAXKT;      // m/s → 노트
+  const spA = trkSpd(a), spB = trkSpd(b);
+  const acA = Number(a.ac), acB = Number(b.ac);
+  if((isFinite(spA) || isFinite(spB)) && dt <= TRK_SPD_WIN){
+    // ★ GPS 칩이 직접 잰 속도(도플러)와 위치 이동이 맞는지 본다. 속도 한도는 없다.
+    //   ★ 몇 초 사이로 이어 받은 위치에만 쓴다. 칩 속도는 그 순간의 속도라, 몇 분 벌어진 두 점
+    //     (화면을 끈 동안 드문드문 받은 것)은 그 사이에 속도가 바뀌었을 수 있다 — 그때는 판단하지 않는다.
+    const v = Math.max(isFinite(spA) ? spA : 0, isFinite(spB) ? spB : 0);
+    const 여유 = (isFinite(acA) ? acA : 30) + (isFinite(acB) ? acB : 30) + TRK_SPD_PAD;
+    return m > v * dt * TRK_SPD_X + 여유;
+  }
+  // ★ 정확도가 있는 위치는 이미 정확도로 걸렀다. 속도로 다시 자르지 않는다.
+  if(isFinite(acA) || isFinite(acB)) return false;
+  // ★ 옛 기록(8월 초 — 정확도도 칩 속도도 없던 때)만 배가 낼 수 있는 속도로 본다.
+  return (m / dt) * 1.94384 > trkOldMaxKt();
+}
+// 위치에 담긴 칩 속도 (m/s). 없거나 음수(iOS 는 모르면 -1 을 준다)면 NaN
+function trkSpd(p){
+  if(!p || p.sp == null) return NaN;
+  const v = Number(p.sp);
+  return (isFinite(v) && v >= 0) ? v : NaN;
 }
 // ★ 나갔다가 그대로 되돌아온 점인가 (A → B → C 에서 B 를 본다)
 function trkBackTrack(a, b, c){
@@ -17323,7 +17470,7 @@ function trkClean1(a){
 }
 // ★ 한 번만 돌리면 부족하다 (4.52 — 사장님 8/28 항적으로 확인).
 //   기준점 자체가 튄 점이면 그 옆의 멀쩡한 점이 「빠르다」 로 몰려 살아남는다.
-//   더 버릴 것이 없을 때까지 되풀이한다. 한도(20노트)는 그대로다 — 낮추지 않는다.
+//   더 버릴 것이 없을 때까지 되풀이한다. (5.10 부터 속도 한도는 없다 — trkTooFast 참고)
 //   실제 자료: 137점(중앙 39kn·77NM) → 한 번 64점 → 되풀이 49점(최대 19.8kn·17NM).
 function trkClean(pts){
   let a = Array.isArray(pts) ? pts.slice() : [];
@@ -17346,12 +17493,12 @@ function trkQuality(pts){
     const m = hav(a[i-1].la, a[i-1].lo, a[i].la, a[i].lo) * 1000;
     const dt = (Date.parse(a[i].t) - Date.parse(a[i-1].t)) / 1000;
     nm += m / 1852;
-    if(dt > 0){ secs += dt; if((m / dt) * 1.94384 > TRK_MAXKT) bad++; }
+    if(dt > 0) secs += dt;
+    if(trkTooFast(a[i-1], a[i])) bad++;
   }
   const kt = secs > 0 ? nm / (secs / 3600) : 0;
   return { n: a.length, nm: Math.round(nm * 10) / 10,
-           kt: Math.round(kt * 10) / 10, bad: bad,
-           ok: bad === 0 && kt <= TRK_MAXKT };
+           kt: Math.round(kt * 10) / 10, bad: bad, ok: bad === 0 };
 }
 
 async function trkErr(err){
@@ -23331,9 +23478,66 @@ const BOAT_SPEC = {
   waterTank:{ label:'청수 탱크',       unit:'L',  help:'식수·생활용수 탱크의 총 용량입니다. 며칠 나가는 항해를 준비할 때 참고가 됩니다.' },
   engine:   { label:'엔진',            unit:'',   help:'제조사와 모델을 적어 두면 부품을 찾을 때 편합니다.', text:true },
 };
+// ═════════════════════════════════════════════════════════════════
+// ★★★ 5.10 — 조류 (해양수산부 국립해양조사원 조류예보 · 시계열)
+//
+//   사장님: 「무조건 자료 찾아내라」 (2026-09-22)
+//   ★ 여태 「한계 조류」 는 늘 「자료 없음」 이었다 — 조류 자료를 받는 곳이 아예 없었다.
+//   ★ 공공데이터포털 「해양수산부 국립해양조사원_조류예보(시계열)」 204곳을
+//     깃허브 작업(current.yml)이 매일 04:20 에 14일치씩 받아 current.json 으로 둔다.
+//     한 시간 간격 · 유속 cm/s · 유향 16방위. 공공누리 제1유형 — 출처를 화면에 적는다.
+//   ★ 거리는 10km 까지만 쓴다. 조류는 물길 모양에 따라 몇 km 만 달라져도 세기·방향이
+//     크게 바뀐다(좁은 수로 안과 밖). 멀리 떨어진 관측소 값을 우리 자리 값처럼 보여 주지 않는다.
+const CUR_NEAR_KM = 10;
+let curCache = null, curLoaded = false;
+async function loadCur(){
+  if(curLoaded) return curCache;
+  curLoaded = true;
+  try{
+    const r = await fetch(DATA_BASE + 'current.json?v=' + Date.now(), { cache:'no-store' });
+    if(r.ok){ const j = await r.json();
+      if(j && Array.isArray(j.spots)){ curCache = j; idbSet('curcache', j).catch(_=>{}); } }
+  }catch(_){}
+  if(!curCache){ try{ curCache = await idbGet('curcache'); }catch(_){} }
+  return curCache;
+}
+// 가장 가까운 조류예보 지점 (10km 안) — { s, dist } 또는 null
+function curNearAt(lat, lon){
+  if(!curCache || !Array.isArray(curCache.spots) || lat == null || lon == null) return null;
+  let best = null, bd = 1e9;
+  curCache.spots.forEach(s => {
+    if(s == null || !isFinite(s.la) || !isFinite(s.lo)) return;
+    const d = hav(lat, lon, s.la, s.lo);
+    if(d < bd){ bd = d; best = s; }
+  });
+  return (best && bd <= CUR_NEAR_KM) ? { s: best, dist: bd } : null;
+}
+function curNear(){ return wxCur ? curNearAt(wxCur.lat, wxCur.lon) : null; }
+// 16방위 → 흘러가는 쪽 각도(°)
+const CUR_DIR16 = ['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
+function curDirDeg(txt){ const i = CUR_DIR16.indexOf(String(txt || '').trim()); return i < 0 ? null : i * 22.5; }
+// 그 시각의 조류 — { kt, dir(°), txt } 또는 null. 자료의 시각은 한국 시간(KST)이다.
+function curAt(ts, near){
+  if(!near || !near.s || !ts) return null;
+  const k = new Date(ts + 9 * 3600e3);          // KST 로 옮겨 UTC 로 읽는다 — 폰 시간대와 상관없이
+  const day = k.getUTCFullYear() + '-' + String(k.getUTCMonth()+1).padStart(2,'0') + '-' + String(k.getUTCDate()).padStart(2,'0');
+  const h = k.getUTCHours();
+  const row = near.s.v && near.s.v[day];
+  if(!Array.isArray(row) || row[h] == null || !isFinite(Number(row[h]))) return null;
+  const dtx = near.s.dir && near.s.dir[day] ? near.s.dir[day][h] : null;
+  return { kt: Number(row[h]) * 0.0194384, dir: curDirDeg(dtx), txt: dtx || '' };
+}
+// 조류 방향 이름을 그 나라 말로 (16방위)
+function curDirName(txt){
+  const d = curDirDeg(txt);
+  if(d == null) return '';
+  return (typeof dirName === 'function') ? dirName(d) : txt;
+}
 // 조류 세기(kt). 수집 자료에 있으면 쓰고, 없으면 판단하지 않는다.
 // 없는 값을 어림잡아 넣으면 잘못된 안심을 준다.
 function krCurrentKt(ts){
+  // ★ 5.10 — 조류예보(시계열)가 10km 안에 있으면 그것을 쓴다.
+  try{ const nc = curNear(); if(nc){ const c = curAt(ts, nc); return c ? c.kt : null; } }catch(_){}
   if(!ts || !krCache) return null;
   let sp = (typeof nearestTideSpot === 'function') ? nearestTideSpot() : null;
   if(sp && typeof tideOfficialNear === 'function' && !tideOfficialNear(sp)) return null;   // ★ 5.10 — 먼 관측소 조류는 안 쓴다
@@ -23409,7 +23613,7 @@ function boatWxCard(now, idx){
   const ms = wxMissing(now);
   const miss = ms.map(m=>`<div class="bwrow nodata">
       <b>${esc(tsub('{what} — 자료가 없어 판단하지 못했습니다', { what: t(m.label) }))}</b>
-      <span>${esc(t('자료 없음'))}</span>
+      <span>${esc(m.why || t('자료 없음'))}</span>
     </div>`).join('');
   const nearNote = (wxData && wxData.m && wxData.m._near && wxData.m._near.km > 0)
     ? `<div class="bwwhen">${esc(tsub('파도 값은 {km}km 바깥 바다에서 가져왔습니다', { km: wxData.m._near.km }))}</div>` : '';
@@ -23523,10 +23727,27 @@ function wxMissing(now){
     if(!(boatSpec(key) > 0)) return;                 // 기준을 안 넣으셨으면 말하지 않는다
     const v = n[WX_LIMIT_VAL[key]];
     if(v === null || v === undefined || v === '' || !isFinite(Number(v))){
-      out.push({ key, label: (BOAT_SPEC[key] && BOAT_SPEC[key].label) || key });
+      out.push({ key, label: (BOAT_SPEC[key] && BOAT_SPEC[key].label) || key, why: wxMissWhy(key) });
     }
   });
   return out;
+}
+// ★★★ 5.10 — 「자료가 없어 판단하지 못했습니다」 만으로는 왜 없는지, 어떻게 하면 되는지 모른다 (사장님 지적).
+//   까닭을 하나씩 밝힌다. 자료를 지어내지는 않는다.
+function wxMissWhy(key){
+  try{
+    const M = wxData && wxData.m;
+    if(key === 'maxCurrent'){
+      return (typeof curNear === 'function' && !curNear())
+        ? t('10km 안에 조류예보 지점이 없어 조류를 알 수 없습니다') : t('이 시각의 조류 예보가 아직 없습니다');
+    }
+    if(key === 'maxWave' || key === 'maxPeriod'){
+      if(M && M._noSea) return t('바다에서 떨어진 위치(육지·강 안쪽)라 파도 예보가 없습니다');
+      return t('이 시각의 파도 예보가 없습니다');
+    }
+    if(key === 'minVis') return t('이 시각의 시정 예보가 없습니다');
+  }catch(_){}
+  return t('이 시각의 예보가 없습니다');
 }
 function boatSpec(key){
   const b = curBoat();
@@ -34287,7 +34508,7 @@ location: { title: '위치정보 이용약관', body: `
 
 제2조 (이용 목적)
  · 현재 위치에 맞는 바람·파고·물때·해상 특보를 보여 주기 위해
- · 배 홈포트에 가까운 조위 관측소를 골라, 잰 수심을 저조위 기준으로 바꾸기 위해
+ · 배 홈포트에 가까운 조위관측소를 골라, 잰 수심을 저조위 기준으로 바꾸기 위해
  · 배가 있는 해역의 특보만 골라 보여 주기 위해
  · 이용자가 지도에서 찍은 정박지 자리를 커뮤니티에 올리기 위해
  · 이용자가 남긴 항해 항로를 그리기 위해
@@ -37914,8 +38135,8 @@ async function spotDepthCalc(){
       <button class="mrbtn" onclick="spotDepthNow()">${esc(t('지금으로'))}</button></div>
 
     <div class="ghead"><b>${esc(t('환산'))}</b></div>
-    ${ TA ? `<div class="mrnone" style="text-align:left">${esc(t('가까운 조위 관측소'))}<b>${esc(nameFor(TA.spot.name||''))}</b> · ${TA.dist.toFixed(0)}km<br>${esc(tsub('그 시각 조위 {v}m를 잰 값 {raw}m에서 뺍니다.', { v: TA.v.toFixed(2), raw: c.raw.toFixed(1) }))}</div>
-      ${ TA.dist > 50 ? `<div class="mrnone" style="text-align:left;color:#E8B33C">${esc(tsub('가장 가까운 조위 관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.', { km: TA.dist.toFixed(0) }))}</div>` : '' }
+    ${ TA ? `<div class="mrnone" style="text-align:left">${esc(t('가까운 조위관측소'))}<b>${esc(nameFor(TA.spot.name||''))}</b> · ${TA.dist.toFixed(0)}km<br>${esc(tsub('그 시각 조위 {v}m를 잰 값 {raw}m에서 뺍니다.', { v: TA.v.toFixed(2), raw: c.raw.toFixed(1) }))}</div>
+      ${ TA.dist > 50 ? `<div class="mrnone" style="text-align:left;color:#E8B33C">${esc(tsub('가장 가까운 조위관측소가 {km}km 떨어져 있습니다. 해도 수심과 함께 확인해 주세요.', { km: TA.dist.toFixed(0) }))}</div>` : '' }
       <div class="mrrow" style="justify-content:center">
         <b style="font-size:30px;color:${col}">${esc(tsub('저조위 기준 {v}', { v: low == null ? '—' : low.toFixed(1) + 'm' }))}</b></div>
       ${ (low != null && low < 0) ? `<div class="mrnone" style="color:#F05B52">${esc(t('계산이 0보다 작습니다. 잰 값이나 잰 시각을 다시 봐 주세요.'))}</div>` : '' }`
@@ -44892,8 +45113,23 @@ function jwLine(z){
        + `<div class="jwsub">${esc(아래)}</div>`;
 }
 // 일본 해역에 있는 배에 보여 줄 칸. 아니면 '' 를 준다(한국 칸이 그대로 나온다).
+// ★★★ 5.10 — 날씨 화면에서는 **보고 있는 날씨 지점**의 해역 경보를 보여 준다 (사장님: 「일본 러시아꺼는 안하냐」)
+//   전에는 배가 일본 바다에 있을 때만 일본 경보를 보여 줬다. 한국에 배를 둔 사람이 도쿄·오사카 지점을 골라 보면
+//   바람은 도쿄 것인데 경보 칸은 한국 해역 것이 떴다. 바람과 경보가 같은 바다여야 한다.
+function wxSpotInJP(){
+  try{ return !!(wxCur && spotPackIn(SPOT_PACKS.find(p => p.k === 'jp'), wxCur.lat, wxCur.lon)); }catch(_){ return false; }
+}
+function seaHere(){
+  if(wxCur && isFinite(Number(wxCur.lat)) && isFinite(Number(wxCur.lon))){
+    const a = seaAt(Number(wxCur.lat), Number(wxCur.lon));
+    if(a) return { area: a, byWx: true };
+  }
+  const m = seaMine();
+  return m ? { area: m, byWx: false } : null;
+}
 function jwAlertBox(){
-  const area = seaMine();
+  const here = seaHere();
+  const area = here && here.area;
   if(!area) return '';
   const w = jwCache;
   const foot = `<a href="https://www.jma.go.jp/bosai/seawarning/" target="_blank" rel="noopener">${
@@ -44921,17 +45157,102 @@ function jwAlertBox(){
     //   내 배가 어느 해역인지는 아랫줄에 한 번만 밝힌다.
     return `<div class="wxbox warn"><b>${esc(t('일본 해상경보 발효 중'))}</b>${
       mine.map(z => jwLine(z)).join('')}
-      <div class="wxfoot">${esc(tsub('내 배 자리 {r}', { r: 해역 }))} · ${esc(t('읽음'))} ${esc(when)} · ${foot}</div>${src}</div>`;
+      <div class="wxfoot">${esc(tsub(here.byWx ? '날씨 지점 {r}' : '내 배 자리 {r}', { r: 해역 }))} · ${esc(t('읽음'))} ${esc(when)} · ${foot}</div>${src}</div>`;
   }
   return `<div class="wxbox"><b>${esc(t('일본 해상경보'))} · ${esc(해역)}</b>
     <div>${esc(t('이 해역에 발효 중인 일본 해상경보 없음'))}${
       남은 > 0 ? ' · ' + esc(tsub('다른 해역 {n}구역 발효 중', { n: 남은 })) : ''}</div>
     <div class="wxfoot">${esc(t('읽음'))} ${esc(when)} · ${foot}</div>${src}</div>`;
 }
+// ═════════════════════════════════════════════════════════════════
+// ★★★ 5.10 — 러시아 극동·먼 바다 해상경보 (WMO METAREA XI · 일본 기상청 WWJP90)
+//   사장님: 「일본 러시아꺼는 안하냐?」
+//   ★ 러시아 기상청(primgidromet.ru)은 러시아 밖에서 열리지 않는다 — 우리 수집기가 못 받는다.
+//   ★ GMDSS 체계에서 이 바다의 먼 바다 경보는 일본 기상청이 맡아 낸다(WWJP90). 동해 북부·타타르해협·
+//     오호츠크해·캄차카 앞바다까지 들어간다. 수집기(metarea.yml)가 3시간마다 읽어 둔다.
+//   ★ 경보마다 중심·반경(해리), 둘러싼 꼭짓점, 해역 이름이 있다. 날씨 지점이 그 안에 드는지 본다.
+//   ★ 못 받았으면 못 받았다고 말한다. 「경보 없음」 은 받았는데 걸린 것이 없을 때만 말한다.
+let mwCache = null, mwTried = false;
+async function loadMW(){
+  if(mwTried) return mwCache;
+  mwTried = true;
+  try{
+    const r = await fetch(DATA_BASE + 'warn-metarea11.json?v=' + Date.now(), { cache:'no-store' });
+    mwCache = r.ok ? await r.json() : { ok:false };
+    if(mwCache && mwCache.ok) idbSet('mwcache', mwCache).catch(_=>{});
+  }catch(_){ mwCache = null; }
+  if(!mwCache || !mwCache.ok){ try{ const c = await idbGet('mwcache'); if(c) mwCache = { ...c, stale: true }; }catch(_){} }
+  return mwCache;
+}
+function mwInPoly(lat, lon, pts){
+  let inside = false;
+  for(let i = 0, j = pts.length - 1; i < pts.length; j = i++){
+    const yi = pts[i][0], xi = pts[i][1], yj = pts[j][0], xj = pts[j][1];
+    if(((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / ((yj - yi) || 1e-12) + xi)) inside = !inside;
+  }
+  return inside;
+}
+// 이 자리에 걸린 경보
+function mwFor(lat, lon){
+  const W = mwCache;
+  if(!W || !Array.isArray(W.warnings) || !isFinite(lat) || !isFinite(lon)) return [];
+  const box = W.areas || {};
+  return W.warnings.filter(w => {
+    if(Array.isArray(w.circles) && w.circles.some(c => hav(lat, lon, c[0], c[1]) / 1.852 <= c[2])) return true;
+    if(Array.isArray(w.poly) && w.poly.length >= 3 && mwInPoly(lat, lon, w.poly)) return true;
+    if(Array.isArray(w.areas) && w.areas.some(n => { const b = box[n]; return b && lat >= b[0] && lat <= b[2] && lon >= b[1] && lon <= b[3]; })) return true;
+    return false;
+  });
+}
+function mwKindName(w){
+  const k = String(w.kind || ''), x = String(w.text || '');
+  if(/TYPHOON/.test(k)) return t('태풍 경보');
+  if(/STORM/.test(k)) return t('폭풍 경보');
+  if(/GALE/.test(k)) return t('강풍 경보');
+  if(/DENSE FOG/.test(k) || /DENSE FOG/.test(x)) return t('짙은 안개 경보');
+  return t('해상 경보');
+}
+// 러시아 극동 바다이거나 한국·일본 해역 밖이면 이것을 쓴다
+function wxSpotFarSea(){
+  try{
+    if(!wxCur) return false;
+    const la = Number(wxCur.lat), lo = Number(wxCur.lon);
+    const pk = k => SPOT_PACKS.find(p => p.k === k);
+    if(spotPackIn(pk('ru'), la, lo)) return true;
+    return !spotPackIn(pk('kr'), la, lo) && !spotPackIn(pk('jp'), la, lo);
+  }catch(_){ return false; }
+}
+function mwAlertBox(){
+  if(!wxSpotFarSea()) return '';
+  const W = mwCache;
+  const foot = `<a href="https://wwmiws.wmo.int/index.php/metareas/bulletinset/11/html" target="_blank" rel="noopener">${esc(t('원문 보기 (WMO)'))}</a>`;
+  const src = `<div class="wxfoot">${esc(t('출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)'))}</div>`;
+  if(!W || !W.ok){
+    return `<div class="wxbox"><b>${esc(t('먼바다 해상경보'))}</b>
+      <div>${esc(t('먼바다 해상경보를 지금 못 받았습니다 — 아래에서 직접 확인해 주세요'))}</div>
+      <div class="wxfoot">${foot}</div>${src}</div>`;
+  }
+  const mine = mwFor(Number(wxCur.lat), Number(wxCur.lon));
+  let when = '';
+  try{ const d = new Date(W.read), p2 = n => String(n).padStart(2, '0');
+    if(!isNaN(d)) when = p2(d.getMonth()+1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes()); }catch(_){}
+  if(mine.length){
+    return `<div class="wxbox warn"><b>${esc(t('먼바다 해상경보 발효 중'))}</b>${
+      mine.map(w => `<div>${esc(mwKindName(w))}${w.kt ? ' · ' + esc(tsub('바람 {a}~{b}kt', { a: w.kt[0], b: w.kt[1] })) : ''}</div>`
+        + `<div class="wxfoot" style="font-family:ui-monospace,monospace">${esc(String(w.text).slice(0, 240))}</div>`).join('')}
+      <div class="wxfoot">${esc(t('읽음'))} ${esc(when)}${W.stale ? ' · ' + esc(t('저장해 둔 자료')) : ''} · ${foot}</div>${src}</div>`;
+  }
+  return `<div class="wxbox"><b>${esc(t('먼바다 해상경보'))}</b>
+    <div>${esc(t('이 지점에 걸린 먼바다 경보는 없습니다'))}</div>
+    <div class="wxfoot">${esc(t('읽음'))} ${esc(when)}${W.stale ? ' · ' + esc(t('저장해 둔 자료')) : ''} · ${foot}</div>${src}</div>`;
+}
 function wxAlertBox(){
   // ★ 배가 일본 예보구 안에 있으면 気象庁 것을 보여 준다. 한 자리에서 갈린다.
   const jp = jwAlertBox();
   if(jp) return jp;
+  // ★ 5.10 — 러시아 극동·먼 바다는 METAREA XI 경보
+  const mw = mwAlertBox();
+  if(mw) return mw;
   const w = myWarnings();
   const foot = `<a href="https://www.weather.go.kr/w/special-report/overall.do" target="_blank" rel="noopener">${esc(t('기상청 실시간 확인'))}</a>`;
   const when = (krCache && krCache.updated) ? String(krCache.updated).slice(5,16).replace('T',' ') : '';
@@ -45766,7 +46087,7 @@ function wxWhenText(idx){
   // ★ 요일 일곱 자를 한 덩이로 옮긴다 (영어 SMTWTFS · 러시아어 ВПВСЧПС).
   //   글자 수가 일곱이면 그대로 맞아떨어진다.
   const week = t('일월화수목금토');
-  const wd = week[ new Date(Date.UTC(+m[1], +m[2]-1, +m[3])).getUTCDay() ] || '';
+  const wd = weekDay(new Date(Date.UTC(+m[1], +m[2]-1, +m[3])).getUTCDay());
   return t('{m}/{d}({w}) {h}시 기준')
     .split('{m}').join(String(+m[2]))
     .split('{d}').join(String(+m[3]))
@@ -45861,12 +46182,18 @@ async function wxAtPoint(lat, lon){
 //   (실제로 재 보니 서울 한복판에서도 41칸 가운데 10칸에 값이 있었습니다)
 //
 //   ★ 어디서 가져왔는지 화면에 적습니다. 배 자리의 값인 척하지 않습니다.
-const WX_RING_R = [0.05, 0.10, 0.20, 0.35, 0.60, 1.00];   // 도(°) — 대략 5·11·22·39·67·111km
+// ★★★ 5.10 — 111km 까지 뻗던 것을 22km 까지로 줄이고, 방향을 8 → 12 로 촘촘히 했다 (사장님 지적).
+//   Open-Meteo 해상 자료는 기본이 「가까운 바다 칸」 을 스스로 고른다(cell_selection=sea).
+//   2026-09-22 에 여수 원형·소호, 수영만, 진해만, 광양만, 오카야마항을 직접 불러 보니
+//   **모두 그 자리에서 바로 파고가 나왔다.** 파고가 비는 곳은 서울·하바롭스크처럼 뭍이나 강 안쪽이었다.
+//   그런 곳에 70~110km 떨어진 바다 파고를 가져다 붙이면 그 자리 물결이 아니다.
+//   그래서 22km 안에서 **가장 가까운** 값만 쓰고, 그래도 없으면 「바다에서 떨어진 위치」 라고 밝힌다.
+const WX_RING_R = [0.04, 0.08, 0.13, 0.20];   // 도(°) — 대략 4·9·14·22km
 function wxRingPts(lat, lon){
   const out = [];
   const kx = Math.max(0.2, Math.cos(lat*Math.PI/180));
   WX_RING_R.forEach(r=>{
-    for(let a=0;a<360;a+=45){
+    for(let a=0;a<360;a+=30){
       const rad = a*Math.PI/180;
       out.push([ +(lat + r*Math.cos(rad)).toFixed(4), +(lon + r*Math.sin(rad)/kx).toFixed(4) ]);
     }
@@ -45886,13 +46213,16 @@ async function wxMarineNear(lat, lon){
     + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
   const j = await fetchTimeout(u).then(r=>r.ok?r.json():null).catch(()=>null);
   const arr = Array.isArray(j) ? j : (j ? [j] : []);
+  // ★ 5.10 — 첫 번째가 아니라 **가장 가까운** 값을 쓴다. 거리는 Open-Meteo 가 실제로 쓴 칸으로 잰다.
+  let best = null, bd = 1e9;
   for(let i=0;i<arr.length;i++){
     if(!wxHasWave(arr[i])) continue;
     const o = arr[i];
-    o._near = { lat: pts[i][0], lon: pts[i][1], km: Math.round(hav(lat, lon, pts[i][0], pts[i][1])) };
-    return o;
+    const la = isFinite(o.latitude) ? o.latitude : pts[i][0], lo = isFinite(o.longitude) ? o.longitude : pts[i][1];
+    const d = hav(lat, lon, la, lo);
+    if(d < bd){ bd = d; best = o; best._near = { lat: la, lon: lo, km: Math.round(d) }; }
   }
-  return null;
+  return best;
 }
 async function wxFetch(lat, lon){
   const base = 'https://api.open-meteo.com/v1/forecast?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
@@ -45909,6 +46239,8 @@ async function wxFetch(lat, lon){
   if(!wxHasWave(b)){
     try{ const near = await wxMarineNear(lat, lon); if(near) b = near; }catch(_){}
   }
+  // ★ 5.10 — 22km 안에 바다 칸이 없었다 = 뭍·강 안쪽. 화면에서 까닭을 밝힐 때 쓴다.
+  if(!wxHasWave(b)){ b = b || { hourly:{} }; b._noSea = true; }
   return { w:a, m:b };
 }
 
@@ -46487,7 +46819,11 @@ function tideHiLo(pts){
 //     · **다리 통과·수심 환산에는 절대 안 씁니다.** 기준면이 없으니 쓰면 안 됩니다.
 //     · 화면에 참고용이라고 적습니다 — 「앱은 숫자를 지어내지 않는다」 와 같은 규칙입니다.
 // ══════════════════════════════════════════════════════════════════════
-const OM_TIDE_MIN_RANGE = 0.30;   // 이만큼도 안 움직이면 물때라고 말하지 않는다 (동해)
+// ★★★ 5.10 — 30cm → 5cm (사장님 지시: 「해결 방법 찾아서 반드시 해결해」)
+//   동해·블라디보스토크 쪽은 실제 조차가 10~30cm 다. 30cm 문 때문에 그 바다는 물때가 통째로 비었다.
+//   흔들림(수 cm)과 구별만 되면 작은 조차도 보여 주는 것이 맞다 — 5cm 밑이면 아는 척하지 않는다.
+//   그리고 아래 omCalib 로 가까운 관측소·모형 점에 맞춰 시각·높이·기준면을 바로잡는다.
+const OM_TIDE_MIN_RANGE = 0.05;   // 이만큼도 안 움직이면 물때라고 말하지 않는다
 function omTidePts(){
   try{
     const H = wxData && wxData.m && wxData.m.hourly;
@@ -46509,9 +46845,74 @@ function omTidePts(){
     if(ex.length < 3) return null;
     const 낮 = Math.min.apply(null, ex.map(x => x.v));
     const 높 = Math.max.apply(null, ex.map(x => x.v));
+    // ★ 5.10 — 가까운 조화상수 점에 맞춘 보정이 있으면 쓴다 (시각을 옮기고, 조차를 맞추고, 기준면을 그 점의 기준면으로)
+    const C = wxData && wxData.m && wxData.m._cal;
+    if(C && C.ok){
+      const vs = V.filter(v => v != null), 평균 = vs.reduce((a, b) => a + b, 0) / (vs.length || 1);
+      ex.forEach(x => { x.t = x.t + C.lagMs; x.v = C.k * (x.v - 평균) + C.hcMean; });
+      const 낮2 = Math.min.apply(null, ex.map(x => x.v)), 높2 = Math.max.apply(null, ex.map(x => x.v));
+      if(높2 - 낮2 < OM_TIDE_MIN_RANGE) return null;
+      ex.cal = C;
+      return ex;
+    }
     if(높 - 낮 < OM_TIDE_MIN_RANGE) return null;   // 거의 안 움직인다 — 아는 척하지 않는다
     ex.forEach(x => { x.v = x.v - 낮; });          // 이 며칠 중 가장 낮은 물을 0 으로
     return ex;
+  }catch(_){ return null; }
+}
+// ═════════════════════════════════════════════════════════════════
+// ★★★ 5.10 — Open-Meteo 추정값을 **가까운 조화상수 점에 맞춰 바로잡는다** (사장님 지시 2·3·4번)
+//
+//   ★ 5.0 에서 재 보니 Open-Meteo 의 어긋남은 **지점마다 거의 고정**이었다 — 20~35분 빠르고,
+//     조차는 0.9~1.2배, 기준면은 평균해면. 고정된 어긋남은 재서 빼면 된다.
+//   ★ 방법 — 이 자리에서 가장 가까운 조화상수 점(관측소 또는 EOT20 모형 점, 500km 안)의
+//     자리에서 Open-Meteo 해수면을 한 번 더 받는다. 그 점에서는 정답(조화상수 셈)을 안다.
+//       ① 시각: 두 곡선이 가장 잘 겹치는 시간차(−120~+120분, 5분 간격)를 찾는다.
+//       ② 조차: 정답의 흔들림 폭 ÷ Open-Meteo 의 흔들림 폭.
+//       ③ 기준면: 정답의 평균(그 점의 기본수준면 위 높이)으로 옮긴다 — 「며칠 중 가장 낮은 물 = 0」 을 버린다.
+//     그 보정을 이 자리의 Open-Meteo 곡선에 그대로 건다.
+//   ★ 두 곡선이 잘 안 겹치면(상관 0.8 미만) 보정하지 않는다 — 억지로 맞추지 않는다.
+//   ★ 기준면이 이 자리 것이 아니므로 다리·수심에는 여전히 안 쓴다 (est).
+const OM_CAL_KM = 500;
+async function omCalib(lat, lon){
+  try{
+    if(!wxData || !wxData.m || wxData.m._cal !== undefined) return wxData && wxData.m && wxData.m._cal;
+    wxData.m._cal = null;
+    if(!(typeof NEAPS !== 'undefined' && NEAPS && NEAPS.createTidePredictor)) return null;
+    const near = hcNearest(lat, lon);
+    if(!near || near.dist > OM_CAL_KM || near.row.off == null) return null;
+    const r = near.row;
+    const u = 'https://marine-api.open-meteo.com/v1/marine?latitude=' + r.lat.toFixed(4) + '&longitude=' + r.lon.toFixed(4)
+      + '&hourly=sea_level_height_msl&timezone=GMT&forecast_days=5';
+    const j = await fetchTimeout(u).then(x => x.ok ? x.json() : null).catch(() => null);
+    const H = j && j.hourly;
+    if(!H || !Array.isArray(H.time) || !Array.isArray(H.sea_level_height_msl)) return null;
+    const om = [];
+    H.time.forEach((tt, i) => { const v = H.sea_level_height_msl[i]; if(v != null) om.push({ t: Date.parse(tt + 'Z'), v: Number(v) }); });
+    if(om.length < 48) return null;
+    const pr = NEAPS.createTidePredictor(r.cons);
+    const t0 = om[0].t - 3 * 3600e3, t1 = om[om.length - 1].t + 3 * 3600e3;
+    const tl = pr.getTimelinePrediction({ start: new Date(t0), end: new Date(t1), timeFidelity: 300 });
+    // ★ neaps 는 시작 시각을 정시로 내려 잡는다 — 첫 칸의 실제 시각을 기준으로 센다
+    const base = tl.length ? +tl[0].time : t0;
+    const hcAt = ms => { const k = Math.round((ms - base) / 300e3); const p = tl[k]; return (p && Math.abs(+p.time - ms) <= 150e3) ? p.level : null; };
+    const mean = a => a.reduce((x, y) => x + y, 0) / a.length;
+    const omMean = mean(om.map(p => p.v));
+    let best = null;
+    for(let L = -120; L <= 120; L += 5){
+      const a = [], b = [];
+      om.forEach(p => { const h = hcAt(p.t + L * 60e3); if(h != null){ a.push(p.v); b.push(h); } });
+      if(a.length < 40) continue;
+      const ma = mean(a), mb = mean(b);
+      let sab = 0, saa = 0, sbb = 0;
+      for(let i = 0; i < a.length; i++){ const x = a[i] - ma, y = b[i] - mb; sab += x * y; saa += x * x; sbb += y * y; }
+      const cor = sab / Math.sqrt(saa * sbb || 1);
+      if(!best || cor > best.cor) best = { L, cor, k: Math.sqrt(sbb / (saa || 1)), hcMean: mb };
+    }
+    if(!best || !(best.cor >= 0.8) || !(best.k > 0.3 && best.k < 3)) return null;
+    wxData.m._cal = { ok: true, lagMs: best.L * 60e3, lagMin: best.L, k: best.k, cor: best.cor,
+                      omMean, hcMean: best.hcMean + r.off, ref: hcRowName(r), refKm: near.dist, model: r.model === true };
+    return wxData.m._cal;
   }catch(_){ return null; }
 }
 // ★★★ 5.10 — 관(官) 물때표에도 거리 한도를 둔다 (아이폰 시뮬레이터 검사에서 드러남)
@@ -46534,7 +46935,7 @@ function allTidePts(){
 //
 //   대신 되는 것이 있다. 수심계가 보여 주는 값은 '지금 물 높이 기준' 이다.
 //   만조에 4.2m 나왔다고 대 놓으면 저조에 1.1m 가 된다.
-//   우리 조위(국립해양조사원)는 약최저저조위 — 곧 해도 기준면에서 잰 높이다.
+//   우리 조위(국립해양조사원)는 약최저저조위 — 곧 기본수준면에서 잰 높이다.
 //   그러니 잰 값에서 그 시각 조위를 빼면 저조위 기준 수심이 된다.
 //
 //        저조위 기준 = 잰 수심 − 그 시각 조위
@@ -46552,13 +46953,14 @@ function tideAtPlace(lat, lon, ts){
     }
   }
   // ★ 5.2 — 관 물때표가 없는 바다에서는 조화상수로 셈한다.
-  //   높이가 **해도 기준면 위** 값이라 「잰 값 − 조위 = 저조위 기준」 셈이 그대로 맞는다.
+  //   높이가 **기본수준면 위** 값이라 「잰 값 − 조위 = 저조위 기준」 셈이 그대로 맞는다.
   //   ★ 다만 얹히면 배가 부서지는 셈이다. 관측소가 가까울 때(HC_SAFE_KM)만 쓴다.
   //     멀면 예전처럼 빈손으로 돌려준다 — 화면이 「환산할 수 없습니다」 라고 적는다.
   const H = hcTidePts(lat, lon);
   if(H && H.safe){
     const v = tideAt(ts, H.pts);
-    if(v != null) return { v, spot: { name: H.spot.name, dist: H.spot.dist, days: [] }, dist: H.spot.dist, hc: true };
+    // ★ 5.10 — 모형 값이면 조위를 여유(pad)만큼 높게 잡는다 → 환산 수심이 그만큼 얕게 나온다 (안전한 쪽)
+    if(v != null) return { v: v + (H.pad || 0), spot: { name: H.spot.name, dist: H.spot.dist, days: [] }, dist: H.spot.dist, hc: true, pad: H.pad || 0 };
   }
   return null;                          // 자료 기간 밖·관측소 없음 — 지어내지 않는다
 }
@@ -46585,15 +46987,15 @@ function lowTideDepth(raw, tide){
 //     (분조별 진폭과 위상)를 알면 몇 년 뒤 물때도 그 자리에서 셈할 수 있다.
 //     관(官)들이 물때표를 만드는 방법이 바로 이것이다. 그 상수를 앱에 담았다.
 //       · 관측소 — 세계 3991곳 (NOAA 미국 + TICON-4 세계 조위계)
-//       · ★ 5.8 — 러시아 극동 12곳은 조위 관측소 자료가 없어 **위성 조석 모형 EOT20**
+//       · ★ 5.8 — 러시아 극동 12곳은 조위관측소 자료가 없어 **위성 조석 모형 EOT20**
 //         (DGFI-TUM, 0.125° 격자, CC BY 4.0) 에서 항구 곁 격자의 조화상수를 뽑아 넣었다.
 //         꾸러미에서 dok 칸이 2 인 점이다. 기준면은 19년(2026~2044) 셈으로 잡은
-//         최저천문조위(LAT) — 러시아 해도 기준면과 같은 뜻이다. 홋카이도·아오모리 관측소
+//         최저천문조위(LAT) — 러시아 기본수준면과 같은 뜻이다. 홋카이도·아오모리 관측소
 //         35곳에 맞대어 보니 만조·간조 시각 중앙값 4~35분, 높이 3~8cm 였다.
 //         (EOT20 의 SA·SSA 는 계절 수위와 맞지 않아 뺐다 — 빼니 높이가 1~2cm 더 맞았다.)
 //         관측소가 아니므로 다리 통과·수심 환산에는 쓰지 않는다 (safe 가 늘 거짓).
 //       · 인터넷이 없어도 셈한다. 앞날 며칠이든 셈한다.
-//       · 높이는 그 관측소의 **해도 기준면** 위 높이다 (Open-Meteo 어림과 달리 기준면이 있다).
+//       · 높이는 그 관측소의 **기본수준면** 위 높이다 (Open-Meteo 어림과 달리 기준면이 있다).
 //
 //   ★ 얼마나 맞는지 실제로 재 봤다 (2026-09-16)
 //     · 미국 NOAA 공식 물때표와 10곳 · 한 달 — 시각 중앙값 **0.5~4.8분**
@@ -46708,7 +47110,7 @@ function hcUnpack(b64){
     const hat = S16();                 // 약최고고조위 (해도기준면 위 cm). −32768 이면 모름
     const dk  = R8();
     const dok = dk === 1;              // 적힌 기준면이 제 조화상수와 맞는가 (수심·다리에 쓸 수 있는가)
-    const model = dk === 2;            // ★ 5.8 — 조위 관측소가 아니라 위성 조석 모형(EOT20)에서 뽑은 점
+    const model = dk === 2;            // ★ 5.8 — 조위관측소가 아니라 위성 조석 모형(EOT20)에서 뽑은 점
     const name = STR(R8());
     const k = R8(), cons = [];
     for(let j=0;j<k;j++){
@@ -46724,7 +47126,47 @@ function hcAll(){
   if(hcTried) return null;
   hcTried = true;
   try{ hcRows = hcUnpack(HC_PACK); }catch(e){ hcRows = null; }
+  if(hcRows && hcModelRows) hcRows = hcRows.concat(hcModelRows);
   return hcRows;
+}
+// ═════════════════════════════════════════════════════════════════
+// ★★★ 5.10 — 관측소가 없는 바다를 **위성 조석 모형(EOT20) 해안 점**으로 채운다
+//
+//   사장님 지시 (2026-09-22): 「가용한 관측소가 없는 경우에만 추정값을 쓰고, 되도록 관측소를 찾아라」
+//   ★ 5.8 에서 러시아 12곳에만 넣었던 EOT20 조화상수를 **전 세계 해안**으로 넓혔다.
+//     깃허브 작업(eot20.yml)이 EOT20 격자에서 뭍에 닿은 바다 칸을 약 20km 간격으로 뽑고,
+//     관측소가 30km 안에 있는 곳은 뺐다(관측소가 이긴다). 점마다 19년을 셈해 LAT·HAT 를 잡았다.
+//   ★ 그래서 Open-Meteo 해수면 추정값은 **이 점도 150km 안에 없을 때만**(강·호수 안쪽) 쓴다.
+//   ★ 자료가 커서(수 MB) 앱 파일에 넣지 않고 hc-eot20.txt 로 받아 기기에 담아 둔다 — 한 번 받으면 바다에서도 된다.
+const HC_MODEL_SAFE_KM = 15;   // 모형 점이 이만큼 가까우면 다리·수심 셈에도 쓴다 (여유를 더 두고)
+const HC_MODEL_PAD = 0.3;      // m — 모형 값으로 다리·수심을 셀 때 더 두는 여유 (관측소와 견준 높이 차이 3~8cm 의 몇 배)
+let hcModelRows = null, hcModelTried = false;
+async function loadHcModel(){
+  if(hcModelRows || hcModelTried) return hcModelRows;
+  hcModelTried = true;
+  let b64 = null;
+  try{
+    const r = await fetch(DATA_BASE + 'hc-eot20.txt?v=' + Date.now(), { cache:'no-store' });
+    if(r.ok){ b64 = (await r.text()).trim(); if(b64) idbSet('hcmodel', b64).catch(_=>{}); }
+  }catch(_){}
+  if(!b64){ try{ b64 = await idbGet('hcmodel'); }catch(_){} }
+  if(!b64) return null;
+  try{
+    const rows = hcUnpack(b64).map(r => ({ ...r, model: true, dok: false }));
+    if(rows.length){
+      hcModelRows = rows;
+      if(hcRows) hcRows = hcRows.filter(r => !r._m).concat(rows.map(r => ({ ...r, _m: 1 })));
+      hcCache = null;
+    }
+  }catch(_){}
+  return hcModelRows;
+}
+// 모형 점은 이름이 없다 — 좌표로 부른다
+function hcRowName(r){
+  if(r && r.name) return r.name;
+  const la = Number(r && r.lat), lo = Number(r && r.lon);
+  if(!isFinite(la) || !isFinite(lo)) return '';
+  return Math.abs(la).toFixed(2) + '°' + (la >= 0 ? 'N' : 'S') + ' ' + Math.abs(lo).toFixed(2) + '°' + (lo >= 0 ? 'E' : 'W');
 }
 // 그 자리에서 가장 가까운 조화상수 관측소
 function hcNearest(lat, lon){
@@ -46743,7 +47185,7 @@ function hcNearest(lat, lon){
   return best ? { row: best, dist: bd } : null;
 }
 // 그 관측소의 만조·간조를 앞뒤 며칠치 셈한다
-//   높이는 **해도 기준면 위** 높이다 (기준면차를 더해 준다).
+//   높이는 **기본수준면 위** 높이다 (기준면차를 더해 준다).
 let hcCache = null;   // { key, pts, spot }
 function hcTidePts(lat, lon){
   try{
@@ -46761,10 +47203,14 @@ function hcTidePts(lat, lon){
     const pts = ex.map(e => ({ t: +e.time, v: e.level + near.row.off, hi: !!e.high }));
     // ★ safe = 「이 값으로 다리 밑을 지나가도 되는가」 다. 두 가지를 다 물어야 참이다.
     //   ① 관측소가 가까운가 (멀면 그 자리 물때가 아니다)
-    //   ② 그 관측소의 해도 기준면이 제 조화상수와 맞는가 (꾸러미 만들 때 19년치로 따져 두었다)
-    const val = { pts, spot: { name: near.row.name, dist: near.dist, days: [] },
-                  hc: true, hat: near.row.hat, model: near.row.model === true,
-                  safe: near.dist <= HC_SAFE_KM && near.row.dok === true };
+    //   ② 그 관측소의 기본수준면이 제 조화상수와 맞는가 (꾸러미 만들 때 19년치로 따져 두었다)
+    // ★ 5.10 — 모형 점(EOT20)도 가까우면(15km) 다리·수심에 쓴다. 대신 여유를 0.3m 더 둔다 (pad).
+    const isModel = near.row.model === true;
+    const val = { pts, spot: { name: hcRowName(near.row), dist: near.dist, days: [] },
+                  hc: true, hat: near.row.hat, model: isModel,
+                  safe: isModel ? (near.dist <= HC_MODEL_SAFE_KM && near.row.hat != null)
+                                : (near.dist <= HC_SAFE_KM && near.row.dok === true),
+                  pad: isModel ? HC_MODEL_PAD : 0 };
     hcCache = { key, val };
     return val;
   }catch(e){ return null; }
@@ -46778,7 +47224,7 @@ function tideSource(){
     return { pts:T.pts, spot:{ name:'직접 입력', dist:null, days:[] }, manual:true };
   // ★ 5.2 — 관 물때표도 손입력도 없으면 **조화상수로 직접 셈한다.**
   //   이것은 어림이 아니다. 관측소의 분조별 진폭·위상으로 관들이 물때표를
-  //   만드는 것과 같은 셈을 하는 것이고, 높이도 해도 기준면 위 높이다.
+  //   만드는 것과 같은 셈을 하는 것이고, 높이도 기본수준면 위 높이다.
   //   가까운 관측소가 없을 때만 아래 Open-Meteo 어림으로 내려간다.
   if(wxCur){
     const H = hcTidePts(wxCur.lat, wxCur.lon);
@@ -46787,7 +47233,7 @@ function tideSource(){
   // ★ 5.0 — 관측소도 없고 손으로 넣은 것도 없으면 **어림**을 쓴다.
   //   est:true 를 달아 둔다 — 다리·수심 쪽이 이것을 보고 스스로 물러선다.
   const E = omTidePts();
-  if(E) return { pts:E, spot:{ name:t('관측소 없음'), dist:null, days:[] }, est:true };
+  if(E) return { pts:E, spot:{ name:t('관측소 없음'), dist:null, days:[] }, est:true, cal: E.cal || null };
   return null;
 }
 
@@ -46800,7 +47246,10 @@ const WLBL = 62;   // .wlbl 의 width 와 같아야 한다
 
 function fmtHM(ts){ const d=new Date(ts); return tsub('{h}시', {h:String(d.getHours()).padStart(2,'0')}); }
 function fmtMD(ts){ const d=new Date(ts);
-  return (d.getMonth()+1)+'/'+d.getDate()+'('+t('일월화수목금토')[d.getDay()]+')'; }
+  return (d.getMonth()+1)+'/'+d.getDate()+'('+weekDay(d.getDay())+')'; }
+// ★ 5.10 — 요일 한 글자. 러시아어 사전 값은 「Вс Пн Вт …」 처럼 띄어 쓴 두 글자라
+//   글자 차례로 꺼내면 화요일이 빈칸, 수요일이 「П」 로 나왔다. 띄어 쓴 것이면 낱말로 나눈다.
+function weekDay(i){ const w = t('일월화수목금토'); const a = /\s/.test(w) ? w.trim().split(/\s+/) : Array.from(w); return a[i] || ''; }
 
 // 선택 시각 상세바 갱신 (타임라인 재렌더 없이)
 function renderWxSel(){
@@ -46849,6 +47298,9 @@ async function renderWeather(){
   if(!wxCur){ wxInit(); }
   await loadTide();
   await loadKr();
+  await loadCur();           // ★ 5.10 — 조류
+  await loadHcModel();       // ★ 5.10 — 관측소 없는 바다의 조석 모형 점 (EOT20 전 세계 해안)
+  if(wxSpotFarSea()) await loadMW();   // ★ 5.10 — 러시아 극동·먼 바다 해상경보
   // ★★★ 5.10 — 보고 있는 **날씨 지점**이 그 나라 물이면 그 나라 물때도 받는다.
   //   전에는 「기기가 지금 그 나라에 있거나 그 말을 쓸 때」 만 받았다(tidePackSync).
   //   한국에 있는 사람이 도쿄 지점을 골라 두면 일본 물때표가 없어서,
@@ -46862,9 +47314,9 @@ async function renderWeather(){
     }
   }catch(_){}
   // ★ 배가 한국 해역 밖일 때만 일본 자료를 받는다. 한국에 있는 배에는 부를 까닭이 없다.
-  if(typeof boatOutsideKR === 'function' && boatOutsideKR()){
+  if((typeof boatOutsideKR === 'function' && boatOutsideKR()) || wxSpotInJP()){
     await loadSeaJP();
-    if(seaMine()) await loadJW(true);
+    if(seaMine() || (wxCur && seaAt(Number(wxCur.lat), Number(wxCur.lon)))) await loadJW(true);
   }
   if(!wxCur){
     // 지점이 없으면 곧바로 현재 위치로 시작한다. 묻지 않는다.
@@ -46948,6 +47400,8 @@ async function renderWeather(){
     const nowIdx = Math.max(0, Math.min(N-1, Math.floor((nowTs - t0)/3600e3)));
     if(wxSel==null || wxSel < t0 || wxSel > t0+(N-1)*3600e3) wxSel = t0 + nowIdx*3600e3;
 
+    // ★ 5.10 — 추정값을 써야 하는 자리면, 먼저 가까운 조화상수 점에 맞춰 보정을 잡는다 (한 번만 부른다)
+    try{ const T0 = tideSource(); if(T0 && T0.est && wxData.m && wxData.m._cal === undefined) await omCalib(wxCur.lat, wxCur.lon); }catch(_){}
     const TA = tideSource();
     // ★ 5.2 — 조화상수 관측소는 그 자리의 약최고고조위(HAT)를 스스로 알고 있다.
     //   지역 기준값 목록은 한국 위주라, 바깥 바다에서는 엉뚱한 기준을 잡는다.
@@ -46970,7 +47424,10 @@ async function renderWeather(){
       const wv = M && M.hourly ? M.hourly.wave_height[i] : null;
       const night = d.getHours()<6 || d.getHours()>=20;
       rowHour  += `<div class="wc wch${night?' wnight':''}" onclick="wxSelHour(${ts})">${String(d.getHours()).padStart(2,'0')}</div>`;
-      rowArrow += `<div class="wc" onclick="wxSelHour(${ts})"><span class="wxarrow sm" style="transform:rotate(${dir+180}deg);color:${wxWindColor(k)}">&#10148;</span></div>`;
+      // ★ 5.10 — 화살표 글자(➤)는 기본이 **오른쪽(동쪽)** 을 가리킨다. 여태 dir+180 으로 돌려서
+      //   북풍(dir 0)이 서쪽(←)을 가리켰다 — 90° 어긋나 있었다. 바람이 **불어 가는 쪽** 은 dir+180 이고,
+      //   ➤ 가 동쪽(90°)에서 시작하므로 거기서 90° 를 뺀다: dir+180-90 = dir+90.
+      rowArrow += `<div class="wc" onclick="wxSelHour(${ts})"><span class="wxarrow sm" style="transform:rotate(${dir+90}deg);color:${wxWindColor(k)}">&#10148;</span></div>`;
       rowWind  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="background:${wxWindColor(k)}22;color:${wxWindColor(k)}">${k.toFixed(0)}</div>`;
       rowGust  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${g.toFixed(0)}</div>`;
       rowWave  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="color:${wv!=null?wxWaveColor(wv):'#5A5F66'}">${wv!=null?wv.toFixed(1):'·'}</div>`;
@@ -47013,6 +47470,21 @@ async function renderWeather(){
       }
     }
 
+    // ── 조류 (5.10): 10km 안에 조류예보 지점이 있을 때만
+    let curRowA = '', curRowV = '';
+    const CN = curNear();
+    if(CN){
+      let any = false;
+      for(let i=0;i<N;i++){
+        const ts = t0 + i*3600e3;
+        const c = curAt(ts, CN);
+        if(c) any = true;
+        curRowA += `<div class="wc" onclick="wxSelHour(${ts})">${(c && c.dir != null)
+          ? `<span class="wxarrow sm" style="transform:rotate(${c.dir-90}deg);color:#7FC8C2">&#10148;</span>` : '·'}</div>`;
+        curRowV += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="color:#7FC8C2">${c ? c.kt.toFixed(1) : '·'}</div>`;
+      }
+      if(!any){ curRowA = ''; curRowV = ''; }
+    }
     const timeline = `
       <div class="wscroll" id="wxScroll">
         <div class="wgrid" style="width:${N * COLW + WLBL}px">
@@ -47024,6 +47496,8 @@ async function renderWeather(){
           <div class="wrow"><div class="wlbl">${esc(t('파고'))}<i>m</i></div><div class="wcells">${rowWave}</div></div>
           <div class="wrow"><div class="wlbl">${esc(t('기온'))}</div><div class="wcells">${rowTemp}</div></div>
           <div class="wrow"><div class="wlbl">${esc(t('비'))}<i>mm</i></div><div class="wcells">${rowRain}</div></div>
+          ${curRowV?`<div class="wrow"><div class="wlbl">${esc(t('조류'))}</div><div class="wcells">${curRowA}</div></div>
+          <div class="wrow"><div class="wlbl"><i>kt</i></div><div class="wcells">${curRowV}</div></div>`:''}
           ${TA?`<div class="wrow"><div class="wlbl">${esc(t('조위'))}</div><div class="wcells" style="height:44px">${tideRow}</div></div>
           <div class="wrow"><div class="wlbl"><i>cm</i></div><div class="wcells">${tideNumRow}</div></div>`:''}
           <div id="wxHl" style="left:0"></div>
@@ -47040,18 +47514,20 @@ async function renderWeather(){
       bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${t('배 높이(공기흘수)를 먼저 입력해 주세요. 아래 <b>변경</b>에서 안테나 끝까지의 실측값을 넣습니다.')}<br>${esc(t('입력하지 않으면 통과 여부를 계산할 수 없습니다.'))}</div></div>`;
     }
     else if(quickClr>0 && TA && (TA.est || (TA.hc && !TA.safe))){
-      // ★ 5.0 — 참고용 물때에는 해도 기준면이 없다. 여기서 숫자를 내면 그것을 믿고 배가 들어간다.
+      // ★ 5.0 — 참고용 물때에는 기본수준면이 없다. 여기서 숫자를 내면 그것을 믿고 배가 들어간다.
       // ★ 5.2 — 조화상수 물때에는 기준면이 있지만, 관측소가 멀면 그 기준면도 이 자리 것이 아니다.
       bridgeResult = `<div class="qres"><div class="qsub" style="color:#D9AE63">${
         TA.est ? esc(t('이 위치는 참고용 물때라 다리 통과를 계산하지 않습니다.'))
         : TA.model ? esc(t('조석 모형으로 셈한 물때라 다리 통과를 계산하지 않습니다.'))
-               : esc(tsub('가장 가까운 조위 관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.', { km: Math.round(TA.spot.dist) }))}<br>${
-        esc(t(TA.model ? '만조·간조를 직접 입력하시면 계산해 드립니다.' : '참고용 물때에는 해도 기준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.'))}</div></div>`;
+               : esc(tsub('가장 가까운 조위관측소가 {km}km 떨어져 있어 다리 통과를 계산하지 않습니다.', { km: Math.round(TA.spot.dist) }))}<br>${
+        esc(t(TA.model ? '만조·간조를 직접 입력하시면 계산해 드립니다.' : '참고용 물때에는 기본수준면이 없습니다. 만조·간조를 직접 입력하시면 계산해 드립니다.'))}</div></div>`;
     }
     else if(quickClr>0 && TA){
       const tv = tideAt(bridgeT, TA.pts);
       if(tv!=null){
-        const clr = quickClr + (cur.hat - tv);
+        // ★ 5.10 — 조석 모형 값이면 통과 높이를 여유(pad)만큼 낮게 잡는다 (안전한 쪽)
+        const pad = (TA && TA.pad) || 0;
+        const clr = quickClr + (cur.hat - tv) - pad;
         const m = clr - ad;
         const c = m>=mg ? '#5FB894' : m>=0 ? '#D9AE63' : '#E4756A';
         const verdict = m>=mg ? t('통과 가능') : m>=0 ? t('여유 부족 — 위험') : t('통과 불가');
@@ -47060,7 +47536,8 @@ async function renderWeather(){
           <div class="qsub">${esc(tsub('그 시각 조위 {t}cm · 배 높이 {h}m',
               {t:(tv*100).toFixed(0), h:ad.toFixed(2)}))} ·
             ${esc(t('여유'))} <b style="color:${c}">${m.toFixed(2)}m</b> — <b style="color:${c}">${esc(verdict)}</b></div>
-          <div class="qsub2">${quickClr.toFixed(1)} + (${cur.hat.toFixed(2)} − ${tv.toFixed(2)}) = ${clr.toFixed(2)}</div>
+          <div class="qsub2">${quickClr.toFixed(1)} + (${cur.hat.toFixed(2)} − ${tv.toFixed(2)})${pad ? ' − ' + pad.toFixed(1) : ''} = ${clr.toFixed(2)}</div>
+          ${pad ? `<div class="qsub2">${esc(tsub('조석 모형 값이라 {m}m 더 낮게 잡았습니다', { m: pad.toFixed(1) }))}</div>` : ''}
         </div>`;
       } else {
         bridgeResult = `<div class="qres"><div class="qsub">${esc(t('해당 시각의 조위 자료가 없습니다 (물때 제공 범위를 벗어남)'))}</div></div>`;
@@ -47083,7 +47560,7 @@ async function renderWeather(){
           :(TA.est?`<div class="mrm">${esc(t('참고용 물때를 사용하는 중입니다 — 정확한 값을 아시면 직접 입력하시면 그 값을 사용합니다.'))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`
           :(TA.hc?`<div class="mrm">${esc(TA.model
               ? tsub('위성 조석 모형(EOT20)의 {spot} 부근({km}km) 조화상수로 셈한 물때입니다.', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) })
-              : tsub('{spot} 조위 관측소({km}km)의 조화상수로 셈한 물때입니다.', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) }))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`:'')))}
+              : tsub('{spot} 조위관측소({km}km)의 조화상수로 셈한 물때입니다.', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) }))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`:'')))}
       </div>`;
 
     L.innerHTML = head + wxAlertBox()
@@ -47091,17 +47568,21 @@ async function renderWeather(){
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline
       + bridgeCard
-      + `<div class="wxwarn">${TA && TA.est
-          ? t('이 위치는 가까이에 조위 관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 해도 기준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>')
+      + `<div class="wxwarn">${TA && TA.est && TA.cal
+          ? tsub('이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형 값을 <b>{ref}</b>({km}km)의 조화상수에 맞춰 <b>보정한 참고용</b> 물때입니다 (시각 {lag}분 · 조차 {k}배 보정). 높이는 그 지점의 기본수준면으로 옮긴 값이라 이 위치의 기준면과 다를 수 있습니다. <b>다리 통과와 수심 판단에는 사용하지 않습니다.</b>', { ref: esc(nameFor(TA.cal.ref)), km: Math.round(TA.cal.refKm), lag: (TA.cal.lagMin > 0 ? '+' : '') + TA.cal.lagMin, k: TA.cal.k.toFixed(2) })
+          : TA && TA.est
+          ? t('이 위치는 가까이에 조위관측소가 없어, 세계 조석 모형으로 낸 <b>참고용</b> 물때입니다. 만조·간조 시각과 높이는 <b>해도나 그 국가 조석표에서 확인해 주세요.</b> 높이는 <b>이 며칠 중 가장 낮은 물을 0</b> 으로 잡은 값이라 기본수준면이 아닙니다. <b>다리 통과와 수심 판단에는 사용하지 마십시오.</b>')
           : (TA && TA.hc && TA.model
           ? tsub('이 물때는 위성 조석 모형 <b>EOT20</b>에서 뽑은 <b>{spot}</b> 부근({km}km)의 <b>조화상수</b>로 셈한 것입니다. 높이는 <b>최저천문조위(LAT)</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) })
           : (TA && TA.hc
-          ? tsub('이 물때는 <b>{spot}</b> 조위 관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>해도 기준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) })
+          ? tsub('이 물때는 <b>{spot}</b> 조위관측소({km}km)의 <b>조화상수</b>로 셈한 것입니다 — 관들이 물때표를 만드는 것과 같은 셈입니다. 높이는 그 관측소의 <b>기본수준면</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) })
           : t('조위는 국립해양조사원 만조·간조 자료를 보간한 <b>근사값</b>입니다 (오차 ±10~20cm). 실제 교량 통과 전에는 반드시 VTS에 확인하고, 안테나를 포함한 실측 높이로 판단해 주세요.')))}</div>`
       // ★ 4.68 — 나라 물때 자료는 출처를 밝혀야 쓸 수 있다.
       //   일본 기상청 자료는 政府標準利用規約 을 따르고, 그 조건이 「출처 표시」다.
       //   지도 저작권 표기를 지우면 안 되는 것과 같은 까닭이라 화면에서 빼지 않는다.
       + tideFromLine()
+      // ★★★ 5.10 — 조류 출처. **지우지 마십시오 — 공공누리 제1유형(출처표시) 조건입니다.**
+      + (curRowV && CN ? `<div class="wxfoot" style="padding:0 16px">${esc(tsub('조류 — {spot} 조류예보 지점({km}km) · 해양수산부 국립해양조사원 조류예보', { spot: nameFor(CN.s.n), km: (Math.round(CN.dist * 10) / 10).toFixed(1) }))}</div>` : '')
       // ★★★ 5.2 — 조화상수 출처. **지우지 마십시오 — 면허(CC BY 4.0) 조건입니다.**
       //   NOAA(미국·공개 자료)와 TICON-4(CC BY 4.0)를 Neaps 가 모아 둔 것을 씁니다.
       + (TA && TA.hc && !TA.model ? `<div class="wxfoot" style="padding:0 16px">${esc(t('조위 조화상수'))} — `

@@ -40,9 +40,11 @@ jobs:
           cd scripts
           for k in 0 1 2 3; do node eot20_lat.js /tmp/eot20_pts.json /tmp/eot20_$k.json $k 4 > /tmp/lat_$k.log 2>&1 & done
           wait
-          tail -2 /tmp/lat_*.log
+          for f in /tmp/lat_*.log; do tail -n 2 "$f"; done
           node -e "const f=require('fs');let a=[];for(let k=0;k<4;k++)a=a.concat(JSON.parse(f.readFileSync('/tmp/eot20_'+k+'.json')));a.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);f.mkdirSync('../data',{recursive:true});f.writeFileSync('../data/eot20_coast.json',JSON.stringify({source:'EOT20 (Hart-Davis et al. 2021, DGFI-TUM, SEANOE, doi:10.17882/79489, CC BY 4.0)',made:new Date().toISOString(),pts:a}));console.log('pts',a.length)"
           ls -la ../data
+      - uses: actions/upload-artifact@v4
+        with: { name: eot20-coast, path: data/eot20_coast.json, retention-days: 14 }
       - name: 올리기
         run: |
           git config user.name "baetnil-bot"

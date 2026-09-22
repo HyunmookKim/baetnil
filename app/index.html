@@ -5602,6 +5602,7 @@ const I18N = {
     '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Could not get your location, so the track cannot be recorded.\n\nCheck that location is turned on for your phone and allowed for Baetnil.\n\nOpen settings?',
     '기록 중':'Recording',
     '{n}점':'{n} [[point|points]]',
+    'GPS 신호를 찾고 있습니다 — 위치가 정확해지면 첫 점을 기록합니다':'Looking for a GPS signal — the first point is recorded once the position is accurate.',
     '{n}분째 위치가 안 들어옵니다':'no position for {n} [[minute|minutes]]',
     '화면 끈 동안 {n}점':'{n} [[point|points]] while the screen was off',
     '백그라운드 기록이 꺼져 있습니다':'background recording is off',
@@ -9087,6 +9088,7 @@ const I18N = {
     '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'Не удалось получить геопозицию, трек записать нельзя.\n\nПроверьте, включена ли геолокация на телефоне и разрешена ли она для Baetnil.\n\nОткрыть настройки?',
     '기록 중':'Идёт запись',
     '{n}점':'точек: {n}',
+    'GPS 신호를 찾고 있습니다 — 위치가 정확해지면 첫 점을 기록합니다':'Идёт поиск сигнала GPS — первая точка запишется, когда местоположение станет точным.',
     '{n}분째 위치가 안 들어옵니다':'координаты не поступают {n} [[минуту|минуты|минут]]',
     '화면 끈 동안 {n}점':'{n} [[точка|точки|точек]] при выключенном экране',
     '백그라운드 기록이 꺼져 있습니다':'фоновая запись выключена',
@@ -12494,6 +12496,7 @@ const I18N = {
     '위치를 받지 못해 항적을 기록할 수 없습니다.\n\n폰의 위치 기능이 켜져 있는지, 뱃일에 위치를 허용하셨는지 확인해 주세요.\n\n설정을 여시겠습니까?':'位置情報を取得できないため航跡を記録できません。\n\nスマートフォンの位置情報機能がオンになっているか、Baetnil に位置情報を許可されているかご確認ください。\n\n設定を開きますか？',
     '기록 중':'記録中',
     '{n}점':'{n}点',
+    'GPS 신호를 찾고 있습니다 — 위치가 정확해지면 첫 점을 기록합니다':'GPS信号を探しています — 位置が正確になったら最初の点を記録します。',
     '{n}분째 위치가 안 들어옵니다':'{n}分間位置が届いていません',
     '화면 끈 동안 {n}점':'画面を消している間に{n}点',
     '백그라운드 기록이 꺼져 있습니다':'バックグラウンド記録が止まっています',
@@ -16843,6 +16846,23 @@ function trkOldMaxKt(){
   return Math.max(base, isFinite(fast) ? fast : 0);
 }
 const TRK_LOST  = 6;      // 연달아 이만큼 버리면 기준점을 다시 잡는다
+// ★★★ 5.12 — 첫 점은 위성이 제대로 잡힌 뒤에 찍는다 (OpenCPN 이 하는 방식).
+//   켜자마자 들어오는 첫 위치는 아직 위성이 덜 잡혀 수십~수백 미터 어긋나 있다.
+//   그 점이 항적의 시작이 되면 출발선이 엉뚱한 곳에 그어지고, 그다음 점까지
+//   「말도 안 되게 빨리 움직인 것」 으로 보여 줄줄이 버려진다.
+//   ★ 다만 영영 기다리지는 않는다. TRK_FIRST_WAIT 를 넘기면 원래 문(TRK_ACC 60m)으로 받는다 —
+//     흐린 날 항구 안에서 못 기다리다 한 항해를 통째로 잃는 것이 더 나쁘다.
+const TRK_FIRST_ACC  = 20;      // m — 첫 점은 이만큼 또렷해야 한다
+const TRK_FIRST_WAIT = 90000;   // ms — 이만큼까지만 기다린다 (90초)
+// 첫 점을 기다리는 중인가 — 화면에 「위성을 잡는 중」 이라고 밝히는 데도 쓴다
+//   ★ 몰아서 받은 점은 「지금」 이 아니라 **그 점이 찍힌 때**로 잰다 —
+//     화면을 끈 동안 쌓인 점은 한참 뒤에 들어오기 때문이다.
+function trkFirstWait(ac, fromMs, atMs){
+  const from = isFinite(fromMs) ? fromMs : Date.now();
+  const at   = isFinite(atMs) ? atMs : Date.now();
+  if(at - from >= TRK_FIRST_WAIT) return false;
+  return !isFinite(ac) || ac > TRK_FIRST_ACC;
+}
 // ★★★ 4.99 — 「나갔다가 그대로 되돌아온」 점 (사장님 지적: 「아직도 하나 이상하게 찍힌거 있네」)
 //
 //   ★ 속도만으로는 못 잡는다. 점 사이 시간이 넓으면 500m 를 튀어도 16노트라 통과한다.
@@ -17035,6 +17055,11 @@ async function trkBufDrain(){
         const blurry  = !isFinite(ac) || ac > TRK_GPS_ACC;
         if(!hasMove && blurry){ trkNow.net = (Number(trkNow.net) || 0) + 1; continue; }
         if(isFinite(ac) && ac > TRK_ACC){ trkNow.blur = (Number(trkNow.blur) || 0) + 1; continue; }
+        // ★ 5.12 — 첫 점은 여기서도 위성이 잡힌 뒤부터다 (trkPush 와 같은 문)
+        if(!trkNow.pts.length && !cand.length
+           && trkFirstWait(ac, Date.parse(trkNow.from), Number(q.t))){
+          trkNow.wait = (Number(trkNow.wait) || 0) + 1; continue;
+        }
         const p = { la: +Number(q.la).toFixed(5), lo: +Number(q.lo).toFixed(5),
                     t: new Date(Number(q.t)).toISOString() };
         if(isFinite(ac)) p.ac = Math.round(ac);
@@ -17302,6 +17327,11 @@ function trkPush(pos){
     trkNow.blur = (Number(trkNow.blur) || 0) + 1;
     trkSkip(); return false;
   }
+  // ★★★ 5.12 — 아직 한 점도 안 담겼으면, 20m 안으로 또렷해질 때까지 첫 점을 미룬다
+  if(!trkNow.pts.length && trkFirstWait(ac, Date.parse(trkNow.from))){
+    trkNow.wait = (Number(trkNow.wait) || 0) + 1;
+    trkSkip(); return false;
+  }
   trkNow.blur = 0;
   // ★★★ 여기서 떨림을 고른다 (4.79). 고른 자리를 담는다 — 받은 그대로가 아니다.
   // ★ 5.10 — 부품은 time 을 밀리초 숫자로 준다. Date.parse(숫자) 는 NaN 이라 여태 늘 「지금」 을 썼다.
@@ -17430,6 +17460,12 @@ function trkQuietFor(){
 }
 function trkCountText(){
   if(!trkNow) return '';
+  // ★★★ 5.12 — 아직 첫 점을 못 찍었으면 「위성을 잡는 중」 이라고 밝힌다.
+  //   이 말이 없으면 사람은 0점을 보고 「기록이 안 되는구나」 하고 껐다 켠다.
+  if(!(trkNow.pts || []).length && (Number(trkNow.wait) || 0) > 0
+     && trkFirstWait(NaN, Date.parse(trkNow.from))){
+    return t('GPS 신호를 찾고 있습니다 — 위치가 정확해지면 첫 점을 기록합니다');
+  }
   let 글 = tsub('{n}점', { n: String((trkNow.pts || []).length) });
   // ★★★ 5.4 — 화면을 끈 동안 뒤에서 받아 온 점을 따로 적는다.
   //   이게 0 으로 머물러 있으면 백그라운드 기록이 일을 안 하고 있는 것이다.
@@ -25255,7 +25291,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.11';
+const APP_VER = '5.12';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

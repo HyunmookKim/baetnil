@@ -47788,7 +47788,16 @@ window.__boot = 'start';
       async reset(em){ await sendPasswordResetEmail(fauth, em); },
       async out(){ await signOut(fauth); },
     };
+    let lastAuthUid;   // ★ 5.10 — 계정이 바뀌면 받아 둔 글판·장터 목록을 버린다
     onAuthStateChanged(fauth, u=>{
+      // ★ 5.10 — 시뮬레이터 검사 7회째: A 로 로그아웃하고 B 로 들어왔을 때 글판이 0개로 보였다.
+      //   바뀌는 사이에 받은 빈 목록이 「방금 받은 것」 으로 남아 한동안 새로 안 받았다.
+      //   사람이 바뀌면 목록도 새로 받는다.
+      const nowUid = u ? u.uid : null;
+      if(lastAuthUid !== undefined && lastAuthUid !== nowUid){
+        try{ if(typeof window.__listDrop === 'function') window.__listDrop(); }catch(_){}
+      }
+      lastAuthUid = nowUid;
       window.__user = u ? { uid:u.uid, email:u.email||'', name:u.displayName||'' } : null;
       // 명부에 이름을 남긴다. 운영자가 사람을 찾을 수 있어야 조치를 할 수 있다.
       if(u && window.__people) window.__people.mark();

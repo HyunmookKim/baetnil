@@ -16,6 +16,7 @@ SPACE_KM = float(os.environ.get('SPACE_KM', '20'))
 NEAR_KM = float(os.environ.get('NEAR_KM', '30'))
 MAXLAT = 72.0
 SKIP = {'SA', 'SSA'}
+CAP = {'M2':800,'S2':400,'N2':200,'K2':150,'K1':400,'O1':300,'P1':150,'Q1':60,'S1':30,'T2':60,'2N2':60,'J1':40,'M4':200,'MF':30,'MM':30}   # cm — 세계에서 가장 큰 값(펀디만 M2 · 오호츠크해 셸리호프만 K1)보다 넉넉히 위
 
 files = sorted(glob.glob(os.path.join(D, '**', '*_ocean_eot20.nc'), recursive=True))
 if not files: sys.exit('EOT20 파일을 못 찾음: ' + D)
@@ -80,6 +81,13 @@ for n in order:
         if close: break
     if close: continue
     if near_station(la, lo): continue
+    # ★ 격자 가장자리에 말이 안 되는 값이 있다 (실제로 P1 1,101cm · S1 4,575cm 가 찍혔다).
+    #   세계에서 가장 큰 조석(펀디만)도 M2 가 6m 남짓이다. 분조별 상한을 넘는 칸은 통째로 버린다.
+    bad = False
+    for c, (A, P) in C.items():
+        a = float(A[i, j])
+        if not math.isnan(a) and a > CAP.get(c, 100): bad = True; break
+    if bad: continue
     cons = []
     for c, (A, P) in C.items():
         a = float(A[i, j]); p = float(P[i, j])

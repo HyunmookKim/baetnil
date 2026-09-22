@@ -57,6 +57,18 @@ self.addEventListener('install', e=>{
 self.addEventListener('activate', e=>{
   e.waitUntil(caches.keys()
     .then(ks=>Promise.all(ks.filter(k=>k!==CACHE && k!==TILES && k!==PHOTOS && k!==SEEN).map(k=>caches.delete(k))))
+    // ★ 5.10 — 앞 판이 담아 둔 자료 파일(?v=…)·오류 응답을 치운다 (위 fetch 주석 참고)
+    .then(()=>caches.open(CACHE)).then(async c=>{
+      try{
+        const reqs = await c.keys();
+        await Promise.all(reqs.map(async r=>{
+          let uu = null; try{ uu = new URL(r.url); }catch(_){}
+          if(uu && uu.searchParams.has('v')) return c.delete(r);
+          const res = await c.match(r);
+          if(res && !res.ok) return c.delete(r);
+        }));
+      }catch(_){}
+    }).catch(()=>{})
     .then(()=>self.clients.claim()));
 });
 
@@ -168,11 +180,20 @@ self.addEventListener('fetch', e=>{
              || u.pathname.endsWith('/sw.js');
   if(isDoc){ e.respondWith(networkFirst(e.request)); return; }
 
+  // ★★★ 5.10 — ?v= 를 붙여 부르는 자료 파일(tide.json?v=… · current.json?v=… · hc-eot20.txt?v=…)은 건드리지 않는다.
+  //   앱이 스스로 기기(IndexedDB)에 담아 두고, 매번 ?v=지금시각 을 붙여 새로 받는다.
+  //   여기서 담으면 부를 때마다 주소가 달라 **같은 자료가 끝없이 쌓였다**(tide.json 3MB 가 부를 때마다 한 벌씩).
+  //   그리고 없는 파일의 404 까지 담아서, 나중에 파일이 생겨도 영영 404 로 나왔다.
+  if(u.searchParams.has('v')){ return; }
+
   // 아이콘·매니페스트 같은 것은 저장분 우선 (배 위에서 인터넷이 없다)
   e.respondWith(
     caches.match(e.request).then(hit=> hit || fetch(e.request).then(res=>{
-      const copy = res.clone();
-      caches.open(CACHE).then(c=>c.put(e.request, copy)).catch(()=>{});
+      // ★ 5.10 — 성한 응답만 담는다. 404·500 을 담으면 그 파일이 영영 안 보인다.
+      if(res && res.ok){
+        const copy = res.clone();
+        caches.open(CACHE).then(c=>c.put(e.request, copy)).catch(()=>{});
+      }
       return res;
     }).catch(()=>caches.match('./index.html')))
   );

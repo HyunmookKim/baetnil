@@ -46270,6 +46270,7 @@ async function loadTide(){
   }catch(e){}
   if(!tideCache){ try{ tideCache = await idbGet('tidecache'); }catch(e){} }
   tidePackSync();          // 나라별 물때도 같이 챙긴다 (기다리지 않는다)
+  try{ loadHcModel(); }catch(_){}   // ★ 5.10 — 조석 모형 점도 미리 (수심 환산이 날씨 화면을 안 거쳐도 쓰게)
   return tideCache;
 }
 
@@ -47195,12 +47196,21 @@ function hcTidePts(lat, lon){
     if(near.row.off == null) return null;          // 기준면을 모르면 높이를 못 낸다
     const day = Math.floor(Date.now()/864e5);
     const key = near.row.lat + ',' + near.row.lon + ',' + day;
-    if(hcCache && hcCache.key === key) return hcCache.val;
+    // ★ 5.10 — 캐시에는 셈한 만조·간조만 둔다. 거리·safe 는 부른 자리마다 다르다.
+    //   전에는 val 통째로 담아서, 같은 관측소를 가장 가깝게 두는 다른 자리(더 먼 곳)에서도
+    //   앞 자리의 거리와 safe 가 그대로 나왔다 (5km 자리에서 셈한 뒤 55km 자리가 「다리 계산 가능」).
+    if(hcCache && hcCache.key === key) return hcVal(near, hcCache.pts);
     const start = new Date((day-1)*864e5);
     const end   = new Date((day+9)*864e5);
     const ex = NEAPS.createTidePredictor(near.row.cons).getExtremesPrediction({ start, end });
     if(!ex || ex.length < 4) return null;
     const pts = ex.map(e => ({ t: +e.time, v: e.level + near.row.off, hi: !!e.high }));
+    hcCache = { key, pts };
+    return hcVal(near, pts);
+  }catch(e){ return null; }
+}
+function hcVal(near, pts){
+  {
     // ★ safe = 「이 값으로 다리 밑을 지나가도 되는가」 다. 두 가지를 다 물어야 참이다.
     //   ① 관측소가 가까운가 (멀면 그 자리 물때가 아니다)
     //   ② 그 관측소의 기본수준면이 제 조화상수와 맞는가 (꾸러미 만들 때 19년치로 따져 두었다)
@@ -47211,9 +47221,8 @@ function hcTidePts(lat, lon){
                   safe: isModel ? (near.dist <= HC_MODEL_SAFE_KM && near.row.hat != null)
                                 : (near.dist <= HC_SAFE_KM && near.row.dok === true),
                   pad: isModel ? HC_MODEL_PAD : 0 };
-    hcCache = { key, val };
     return val;
-  }catch(e){ return null; }
+  }
 }
 
 function tideSource(){

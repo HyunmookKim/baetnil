@@ -446,7 +446,11 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 .pform .t{font-size:11px;color:#4a8ab5;margin-bottom:6px;font-weight:600}
 input[type=text]{width:100%;background:#0c1e30;border:1px solid #1e4060;border-radius:5px;color:#c8dff0;padding:8px;font-size:13px;outline:none}
 .row{display:flex;gap:6px;margin:6px 0;align-items:center;flex-wrap:wrap}
-.row .q{width:52px}.row .u{width:58px}.row .n{flex:1}
+/* ★ 5.13 — 칸 폭 = 글자 몫(em) + 안쪽 여백(26px). px 로만 박아 두면 폰 글자를 크게 해 둔 사람에게
+   「단위」가 「단!」, 「적어도」가 「적어!」 로 잘려 보였다 (사장님 폰 화면).
+   글자 몫은 네 나라 말 중 가장 긴 것에 맞춘다 — 러시아어 「Кол-во」(3.3em) · 「Мин. кол-во」(5.7em).
+   비고는 자리가 모자라면 다음 줄로 내려간다. */
+.row .q{width:calc(3.6em + 26px)}.row .u{width:calc(2.6em + 26px)}.row .m{width:calc(6em + 26px)}.row .n{flex:1 1 8em;min-width:0}
 .chk{display:flex;align-items:center;gap:6px;font-size:12px;color:#d8b878;margin:6px 0;cursor:pointer;user-select:none}
 .chk input{accent-color:#b58a3a;width:15px;height:15px}
 .bp{flex:1;background:#1a4a7a;border:1px solid #2a6aa0;border-radius:5px;color:#8ac8f0;padding:8px 0;font-size:13px;cursor:pointer;font-weight:600}
@@ -2441,7 +2445,7 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     <div class="row">
       <input type="text" id="fQty" class="q" placeholder="수량" data-tph="수량" value="1" autocomplete="off">
       <input type="text" id="fUnit" class="u" placeholder="단위" data-tph="단위" list="unitList" autocomplete="off">
-      <input type="number" id="fMin" class="q" min="0" step="1" placeholder="적어도" data-tph="적어도" title="이 아래로 떨어지면 오늘 화면에 알립니다" autocomplete="off">
+      <input type="number" id="fMin" class="m" min="0" step="1" placeholder="최소 수량" data-tph="최소 수량" title="이 아래로 떨어지면 오늘 화면에 알립니다" autocomplete="off">
       <datalist id="unitList"><option value="개"><option value="통"><option value="벌"><option value="짝"><option value="켤레"><option value="장"><option value="묶음"><option value="세트"><option value="L"><option value="mL"><option value="m"><option value="롤"><option value="병"><option value="권"></datalist>
       <input type="text" id="fNote" class="n" placeholder="비고" data-tph="비고" autocomplete="off">
     </div>
@@ -2453,7 +2457,7 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
       <input type="file" id="photoFile" accept="image/*" multiple style="display:none" onchange="pickPhoto(event)">
     </div>
     <div class="row" id="fGearRow" style="display:none;align-items:center;gap:8px">
-      <span class="fglbl" data-t="어느 장비 것">어느 장비 것</span>
+      <span class="fglbl" data-t="장비">장비</span>
       <select id="fGear" style="flex:1"></select>
     </div>
     <label class="chk" id="boxChkWrap"><input type="checkbox" id="fBox"> <span data-t="📦 상자/공구함 (안에 물품 추가 가능)">📦 상자/공구함 (안에 물품 추가 가능)</span></label>
@@ -2619,7 +2623,7 @@ const I18N = {
     '잠금 해제':'Unlock',
     '다음으로':'Next',
     '성함':'Name',
-    '어떤 글을 쓰시나요':'What do you write about?',
+    '쓰실 글 소개':'What you plan to write',
     '새것':'New',
     // ── 항해 이름 (4.115)
     '{p} 출발':'From {p}',
@@ -2777,7 +2781,7 @@ const I18N = {
     '리뷰는 공개됩니다. 산 값만 따로 정합니다 — 기본은 나만 보기입니다.':'Reviews are shared. Only the price is set separately — private by default.',
     '다 채우셨습니다.':'All filled in.',
     '날짜':'Date',
-    '무슨 일':'What you did',
+    '정비 내용':'Work done',
     '항목 보기':'View item',
     '수리 보기':'View repair',
     '<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.':'<b>One job, one entry.</b> Record what you did today and how, with photos.',
@@ -2950,10 +2954,9 @@ const I18N = {
     '연재자 신청':'Apply as a columnist',
     '연재 글 올리기':'Publish series articles',
     '글을 이어서 올리고 싶습니다':'I would like to publish a series',
-    '어떤 글을 올리시겠습니까':'What will you publish?',
     '직접 쓴 글':'My own writing',
     '옮긴 글':'Reprint',
-    '어떤 글인가요':'What kind of article is it?',
+    '글 종류':'Type of piece',
     '그동안 쓰신 글 (선택)':'Something you have written (optional)',
     '무엇을 얼마나 쓰실 생각인지 적어 주세요':'Say what you plan to write and how often',
     '어떤 글인지 적어 주세요':'Please describe what you will write',
@@ -3198,7 +3201,7 @@ const I18N = {
     '모집 마감':'Stop looking',
     '{d} 출항 예정입니다.':'Departing on {d}.',
     '자리':'Places',
-    '무슨 항해':'Kind of trip',
+    '항해 종류':'Type of trip',
     '항로':'Route',
     '비용':'Cost',
     '바람 쐬기':'Day sail',
@@ -3237,7 +3240,6 @@ const I18N = {
     '차단한 사람의 글을 다시 봅니다':'Unblock people to see their posts again',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'You can undo this any time — Settings › Blocked people',
     '+ 내 배 리뷰':'+ Review my boat',
-    '어느 장비 것':'Which gear',
     '「{name}」 도면을 지웁니다.':'Delete the plan "{name}".',
     '「{name}」 도면을 지웠습니다.':'Deleted the plan "{name}".',
     '도면 이름':'Plan name',
@@ -3537,9 +3539,10 @@ const I18N = {
     '북':'N', '북북동':'NNE', '북동':'NE', '동북동':'ENE', '동':'E', '동남동':'ESE', '남동':'SE', '남남동':'SSE',
     '남':'S', '남남서':'SSW', '남서':'SW', '서남서':'WSW', '서':'W', '서북서':'WNW', '북서':'NW', '북북서':'NNW',
     '채워야 할 것':'Running low',
-    '적어도':'At least',
-    '적어도 {n}':'at least {n}',
-    '(적어도 {n})':'(at least {n})',
+    '최소 수량':'Min. qty',
+    '최소 수량 {n}':'Min. qty {n}',
+    '최소 {n}':'min {n}',
+    '(최소 {n})':'(min {n})',
     '이 아래로 떨어지면 오늘 화면에 알립니다':'You are told on the Today screen when it drops below this',
     '버림 {n}':'{n} dropped',
     '정확도 {n}m':'accuracy {n} m',
@@ -4185,8 +4188,8 @@ const I18N = {
     '먼저 출항 날짜를 정해 주세요':'Set the departure date first',
     '메탈지그':'Metal jig',
     '명부를 볼 권한이 없습니다':'You do not have permission to view the crew list',
-    '몇 자리':'How many places',
-    '몇 편':'How many parts',
+    '모집 인원':'Spots',
+    '회차':'Part no.',
     '모두 {n}마리':'{n} in total',
     '모두 동의':'Agree to all',
     '모래':'Sand',
@@ -4209,7 +4212,7 @@ const I18N = {
     '무시':'Musi',
     '무엇이 문제인지 알려 주세요':'Tell us what is wrong',
     '무엇이 잘못됐나요?':'What is wrong with it?',
-    '무엇인가요':'What is it about',
+    '문의 유형':'Type of request',
     '문단 하나':'One paragraph',
     '문서 · 연락처':'Documents · contacts',
     '문어':'Octopus',
@@ -4487,7 +4490,7 @@ const I18N = {
     '양망':'Hauling the net',
     '어군탐지':'Fish marks',
     '어떤 권한으로 받을까요?':'What rank should they get?',
-    '어떤 분':'Who you are looking for',
+    '모집 대상':'Looking for',
     '어떤 분을 구하시는지 하나는 골라 주세요':'Pick at least one kind of person you are looking for',
     '어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다':'Tell us which screen you were on and what you were doing — that gets it fixed faster',
     '어제':'Yesterday',
@@ -4497,8 +4500,7 @@ const I18N = {
     '어종을 적어 주세요':'Write the species',
     '어항·물양장·물때 접안':'Fishing harbour, quay, tide-dependent berthing',
     '언제 다녀오셨는지도 함께 적어 주시면 좋습니다':'It helps to say when you were there',
-    '언제까지':'Until when',
-    '언제까지 못 오는지':'How long they will be away',
+    '복귀 예정일':'Back on',
     '얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>':'Set how often it repeats. The unit can be <b>days, weeks or months</b>.<br><br>',
     '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.':'To remove it, clear the home port under My Boat › Basics.',
     '없으면 비워 두세요':'Leave blank if none',
@@ -4689,7 +4691,6 @@ const I18N = {
     '잠금 상태에서는 도면을 바꿀 수 없습니다':'You cannot change the plan while it is locked',
     '잠시 후 다시 확인해 주세요.':'Please check again shortly.',
     '잡담':'Chat',
-    '잡은 것':'Catch',
     '장비':'Gear',
     '잰 값과 잰 시각을 넣으면 그 시각':'Enter the reading and the time, and we',
     '잰 시각':'Time measured',
@@ -6105,7 +6106,7 @@ const I18N = {
     '잠금 해제':'Разблокировать',
     '다음으로':'Далее',
     '성함':'Имя',
-    '어떤 글을 쓰시나요':'О чём вы пишете?',
+    '쓰실 글 소개':'О чём будете писать',
     '새것':'Новые',
     // ── 항해 이름 (4.115)
     '{p} 출발':'Отход: {p}',
@@ -6263,7 +6264,7 @@ const I18N = {
     '리뷰는 공개됩니다. 산 값만 따로 정합니다 — 기본은 나만 보기입니다.':'Отзывы публикуются. Цена настраивается отдельно — по умолчанию скрыта.',
     '다 채우셨습니다.':'Всё заполнено.',
     '날짜':'Дата',
-    '무슨 일':'Что сделано',
+    '정비 내용':'Что сделано',
     '항목 보기':'Открыть пункт',
     '수리 보기':'Открыть ремонт',
     '<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.':'<b>Одна работа — одна запись.</b> Что и как сделали сегодня, с фото.',
@@ -6435,10 +6436,9 @@ const I18N = {
     '연재자 신청':'Заявка автора',
     '연재 글 올리기':'Публикация статей',
     '글을 이어서 올리고 싶습니다':'Хочу вести рубрику',
-    '어떤 글을 올리시겠습니까':'Что вы будете публиковать?',
     '직접 쓴 글':'Собственный текст',
     '옮긴 글':'Перепечатка',
-    '어떤 글인가요':'Какой это материал?',
+    '글 종류':'Тип текста',
     '그동안 쓰신 글 (선택)':'Ваши прежние тексты (необязательно)',
     '무엇을 얼마나 쓰실 생각인지 적어 주세요':'Напишите, о чём и как часто планируете писать',
     '어떤 글인지 적어 주세요':'Опишите, о чём будете писать',
@@ -6683,7 +6683,7 @@ const I18N = {
     '모집 마감':'Прекратить набор',
     '{d} 출항 예정입니다.':'Выход {d}.',
     '자리':'Места',
-    '무슨 항해':'Тип выхода',
+    '항해 종류':'Тип выхода',
     '항로':'Маршрут',
     '비용':'Расходы',
     '바람 쐬기':'Прогулка',
@@ -6722,7 +6722,6 @@ const I18N = {
     '차단한 사람의 글을 다시 봅니다':'Разблокируйте, чтобы снова видеть их записи',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'Вернуть можно в любой момент — Настройки › Заблокированные',
     '+ 내 배 리뷰':'+ Отзыв о своём судне',
-    '어느 장비 것':'Какое оборудование',
     '「{name}」 도면을 지웁니다.':'Удалить план «{name}».',
     '「{name}」 도면을 지웠습니다.':'План «{name}» удалён.',
     '도면 이름':'Название плана',
@@ -7021,9 +7020,10 @@ const I18N = {
     '북':'С', '북북동':'ССВ', '북동':'СВ', '동북동':'ВСВ', '동':'В', '동남동':'ВЮВ', '남동':'ЮВ', '남남동':'ЮЮВ',
     '남':'Ю', '남남서':'ЮЮЗ', '남서':'ЮЗ', '서남서':'ЗЮЗ', '서':'З', '서북서':'ЗСЗ', '북서':'СЗ', '북북서':'ССЗ',
     '채워야 할 것':'Пора пополнить',
-    '적어도':'Минимум',
-    '적어도 {n}':'минимум {n}',
-    '(적어도 {n})':'(минимум {n})',
+    '최소 수량':'Мин. кол-во',
+    '최소 수량 {n}':'Мин. кол-во {n}',
+    '최소 {n}':'мин. {n}',
+    '(최소 {n})':'(мин. {n})',
     '이 아래로 떨어지면 오늘 화면에 알립니다':'Если станет меньше, вы увидите это на экране «Сегодня»',
     '버림 {n}':'отброшено {n}',
     '정확도 {n}m':'точность {n} м',
@@ -7669,8 +7669,8 @@ const I18N = {
     '먼저 출항 날짜를 정해 주세요':'Сначала укажите дату выхода',
     '메탈지그':'Металлический джиг',
     '명부를 볼 권한이 없습니다':'Нет прав смотреть список экипажа',
-    '몇 자리':'Сколько мест',
-    '몇 편':'Сколько частей',
+    '모집 인원':'Мест',
+    '회차':'Часть №',
     '모두 {n}마리':'Всего {n}',
     '모두 동의':'Согласиться со всем',
     '모래':'Песок',
@@ -7694,7 +7694,7 @@ const I18N = {
     '무시':'Муси (день после квадратурного прилива)',
     '무엇이 문제인지 알려 주세요':'Опишите, в чём проблема',
     '무엇이 잘못됐나요?':'Что здесь не так?',
-    '무엇인가요':'О чём речь',
+    '문의 유형':'Тип обращения',
     '문단 하나':'Один абзац',
     '문서 · 연락처':'Документы · контакты',
     '문어':'Осьминог',
@@ -7972,7 +7972,7 @@ const I18N = {
     '양망':'Выборка снасти',
     '어군탐지':'Косяк обнаружен',
     '어떤 권한으로 받을까요?':'Какую роль дать?',
-    '어떤 분':'Кого ищете',
+    '모집 대상':'Кого ищем',
     '어떤 분을 구하시는지 하나는 골라 주세요':'Выберите хотя бы один вариант, кого вы ищете',
     '어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다':'Напишите, на каком экране и что вы делали — так исправим быстрее',
     '어제':'Вчера',
@@ -7982,8 +7982,7 @@ const I18N = {
     '어종을 적어 주세요':'Укажите вид рыбы',
     '어항·물양장·물때 접안':'Рыбный порт, причальная стенка, швартовка по приливу',
     '언제 다녀오셨는지도 함께 적어 주시면 좋습니다':'Полезно указать, когда вы там были',
-    '언제까지':'До какого числа',
-    '언제까지 못 오는지':'Как долго его не будет',
+    '복귀 예정일':'Вернётся',
     '얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>':'Задайте периодичность. Единица — <b>дни, недели или месяцы</b>.<br><br>',
     '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.':'Чтобы убрать, очистите порт приписки в «Моё судно › Основное».',
     '없으면 비워 두세요':'Оставьте пустым, если нет',
@@ -8174,7 +8173,6 @@ const I18N = {
     '잠금 상태에서는 도면을 바꿀 수 없습니다':'Пока заблокировано, план менять нельзя',
     '잠시 후 다시 확인해 주세요.':'Загляните чуть позже.',
     '잡담':'Разговоры',
-    '잡은 것':'Улов',
     '장비':'Снаряжение',
     '잰 값과 잰 시각을 넣으면 그 시각':'Укажите замер и время — мы',
     '잰 시각':'Время замера',
@@ -9602,7 +9600,7 @@ const I18N = {
     '잠금 해제':'ロック解除',
     '다음으로':'次へ',
     '성함':'お名前',
-    '어떤 글을 쓰시나요':'どのような記事を書かれますか',
+    '쓰실 글 소개':'書く予定の記事',
     '새것':'新着',
     // ── 항해 이름 (4.115)
     '{p} 출발':'{p} 発',
@@ -9760,7 +9758,7 @@ const I18N = {
     '리뷰는 공개됩니다. 산 값만 따로 정합니다 — 기본은 나만 보기입니다.':'レビューは公開されます。価格だけ別に決めます — 既定は自分だけです。',
     '다 채우셨습니다.':'すべて埋まりました。',
     '날짜':'日付',
-    '무슨 일':'作業内容',
+    '정비 내용':'整備内容',
     '항목 보기':'項目を見る',
     '수리 보기':'修理を見る',
     '<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.':'<b>一回の作業で一件</b>です。今日何をどうしたかを写真と一緒に残します。',
@@ -9983,10 +9981,9 @@ const I18N = {
     '연재자 신청':'連載者の申請',
     '연재 글 올리기':'連載記事を投稿',
     '글을 이어서 올리고 싶습니다':'続けて記事を投稿したいです',
-    '어떤 글을 올리시겠습니까':'どのような記事を投稿なさいますか',
     '직접 쓴 글':'自分で書いた記事',
     '옮긴 글':'転載記事',
-    '어떤 글인가요':'どんな記事ですか',
+    '글 종류':'記事の種類',
     '그동안 쓰신 글 (선택)':'これまでに書かれた記事（任意）',
     '무엇을 얼마나 쓰실 생각인지 적어 주세요':'何をどれくらい書くつもりか書いてください',
     '어떤 글인지 적어 주세요':'どんな記事か書いてください',
@@ -10224,7 +10221,7 @@ const I18N = {
     '모집 마감':'募集を締め切る',
     '{d} 출항 예정입니다.':'{d} に出港予定です。',
     '자리':'席',
-    '무슨 항해':'航海の種類',
+    '항해 종류':'航海の種類',
     '항로':'航路',
     '비용':'費用',
     '바람 쐬기':'クルージング',
@@ -10262,7 +10259,6 @@ const I18N = {
     '차단한 사람의 글을 다시 봅니다':'ブロックを解除して投稿をまた見ます',
     '언제든 다시 볼 수 있습니다. 설정 › 차단한 사람':'いつでも元に戻せます。設定 › ブロックした人',
     '+ 내 배 리뷰':'+ マイボートのレビュー',
-    '어느 장비 것':'どの装備のもの',
     '「{name}」 도면을 지웁니다.':'「{name}」の図面を削除します。',
     '「{name}」 도면을 지웠습니다.':'「{name}」の図面を削除しました。',
     '도면 이름':'図面の名前',
@@ -10559,9 +10555,10 @@ const I18N = {
     '{c} {d}° · {m}m':'{c} {d}° ・ {m}m',
     '이 위치를 계속 보면서 돌아가세요. 사람을 눈에서 놓치지 마세요.':'この位置を見続けながら戻ってください。落水者から目を離さないでください。',
     '채워야 할 것':'補充が必要なもの',
-    '적어도':'最低',
-    '적어도 {n}':'最低 {n}',
-    '(적어도 {n})':'（最低 {n}）',
+    '최소 수량':'最小数量',
+    '최소 수량 {n}':'最小数量 {n}',
+    '최소 {n}':'最小 {n}',
+    '(최소 {n})':'（最小 {n}）',
     '이 아래로 떨어지면 오늘 화면에 알립니다':'これを下回ると「今日」画面でお知らせします',
     '버림 {n}':'破棄 {n}',
     '정확도 {n}m':'精度 {n}m',
@@ -11196,8 +11193,8 @@ const I18N = {
     '먼저 출항 날짜를 정해 주세요':'先に出港日を決めてください',
     '메탈지그':'メタルジグ',
     '명부를 볼 권한이 없습니다':'名簿を表示する権限がありません',
-    '몇 자리':'席数',
-    '몇 편':'話数',
+    '모집 인원':'募集人数',
+    '회차':'回',
     '모두 {n}마리':'合計 {n}匹',
     '모두 동의':'すべて同意',
     '모래':'砂',
@@ -11221,7 +11218,7 @@ const I18N = {
     '무시':'ムシ',
     '무엇이 문제인지 알려 주세요':'何が問題かお知らせください',
     '무엇이 잘못됐나요?':'何が問題ですか？',
-    '무엇인가요':'ご用件',
+    '문의 유형':'お問い合わせの種類',
     '문단 하나':'1段落',
     '문서 · 연락처':'書類・連絡先',
     '문어':'タコ',
@@ -11494,7 +11491,7 @@ const I18N = {
     '양망':'揚網',
     '어군탐지':'魚群探知（魚探）',
     '어떤 권한으로 받을까요?':'どの権限で受け入れますか？',
-    '어떤 분':'どんな方',
+    '모집 대상':'募集対象',
     '어떤 분을 구하시는지 하나는 골라 주세요':'どんな方を募集するか、一つは選んでください',
     '어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다':'どの画面で何をしたときにそうなったかを書いていただくと、早く直せます',
     '어제':'昨日',
@@ -11504,8 +11501,7 @@ const I18N = {
     '어종을 적어 주세요':'魚種を入力してください',
     '어항·물양장·물때 접안':'漁港・物揚場・潮位次第で接岸',
     '언제 다녀오셨는지도 함께 적어 주시면 좋습니다':'いつ行かれたかも一緒に書いていただけると助かります',
-    '언제까지':'いつまで',
-    '언제까지 못 오는지':'いつまで来られないか',
+    '복귀 예정일':'復帰予定日',
     '얼마마다 반복할지 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 고를 수 있습니다.<br><br>':'どのくらいの間隔で繰り返すかを決めます。単位は<b>日 ・ 週 ・ か月</b>から選べます。<br><br>',
     '없애시려면 내 배 > 기본 정보에서 홈포트 위치를 비워 주세요.':'なくすには、マイボート > 基本情報でホームポートの位置を空にしてください。',
     '없으면 비워 두세요':'なければ空欄のままにしてください',
@@ -11690,7 +11686,6 @@ const I18N = {
     '잠금 상태에서는 도면을 바꿀 수 없습니다':'ロック中は図面を変更できません',
     '잠시 후 다시 확인해 주세요.':'しばらくしてから、もう一度ご確認ください。',
     '잡담':'雑談',
-    '잡은 것':'釣果',
     '장비':'装備',
     '잰 값과 잰 시각을 넣으면 그 시각':'実測値と計測時刻を入力すると、その時刻の',
     '잰 시각':'計測時刻',
@@ -22785,7 +22780,7 @@ function editRoster(uid){
         placeholder:'2026-01-15' },
       { key:'visitNote', label:'오는 주기', value: r.visitNote || '',
         placeholder:'예: 한 달에 한 번, 격주 토요일' },
-      { key:'awayTo', label:'언제까지 못 오는지', value: r.awayTo || '',
+      { key:'awayTo', label:'복귀 예정일', value: r.awayTo || '',
         placeholder:'2026-08-20' },
       { key:'awayNote', label:'부재 사유', value: r.awayNote || '', placeholder:'예: 출장' },
       { key:'memo', type:'multi', rows:3, label:'메모', value: r.memo || '',
@@ -25291,7 +25286,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.12';
+const APP_VER = '5.13';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -27498,7 +27493,7 @@ function itemCardHTML(it){
     ${it.note ? `<div class="cardline">${esc(it.note)}</div>` : ''}
     ${g ? `<div class="cardline">${esc(t('장비'))} · ${esc(gearLabel(g))}</div>` : ''}
     ${it.min != null && it.min !== '' ? `<div class="cardline">${
-        esc(tsub('적어도 {n}', { n: String(it.min) + String(it.unit || '') }))}${
+        esc(tsub('최소 수량 {n}', { n: String(it.min) + String(it.unit || '') }))}${
         lowN ? ' · ' + esc(t('채워야 함')) : ''}</div>` : ''}
     <div class="cardline">${esc(locPath(it))}</div>
     ${(it.photos && it.photos.length)
@@ -27648,7 +27643,7 @@ function rowHTML(it, isChild){
   const lowN = (typeof stockLow === 'function') ? (stockLow([it])[0] || null) : null;
   const lowTag = lowN
     ? ` <span style="color:${lowN.have===0?'#F05B52':'#E8B33C'};font-weight:700">${
-        esc(lowN.have === 0 ? t('없음') : tsub('적어도 {n}', { n: lowN.need + String(it.unit||'') }))}</span>`
+        esc(lowN.have === 0 ? t('없음') : tsub('최소 {n}', { n: lowN.need + String(it.unit||'') }))}</span>`
     : '';
   return `<tr><td class="${cls}">${cam}${nm}</td><td class="tq">×${esc(it.qty)}${esc(it.unit||'')}${lowTag}</td><td class="tm">${esc(it.note)}</td>
     <td class="to"><button class="pm" onclick="listMove(${it.id})">${esc(t('이동'))}</button><button class="pe" onclick="view='map';toggleView(true);startEdit(${it.id})">${esc(t('수정'))}</button>
@@ -29577,7 +29572,7 @@ function renderHome(){
             ? `<b style="color:#F05B52">${esc(t('없음'))}</b>`
             : `<b style="color:#E8B33C">${esc(o.have + String(o.unit||''))}</b>`}
           ${esc(o.name || '')} <span class="hmute">${
-            esc(tsub('(적어도 {n})', { n: o.need + String(o.unit||'') }))}</span></div>`).join(''),
+            esc(tsub('(최소 {n})', { n: o.need + String(o.unit||'') }))}</span></div>`).join(''),
         "setBoatSubTab('stow')", t('적재표'));
     }
   }catch(e){}
@@ -32587,7 +32582,7 @@ function rideLines(it){
   const want = (it.rideWant||[]).map(v=>rideName(RIDE_WANT,v)).join(' · ');
   return [ t('{d} 출항 예정입니다.').split('{d}').join(it.date||''),
            t('자리') + ' — ' + (Number(it.rideN)||1),
-           t('무슨 항해') + ' — ' + rideName(RIDE_TRIP, it.rideTrip),
+           t('항해 종류') + ' — ' + rideName(RIDE_TRIP, it.rideTrip),
            (it.from||it.to) ? (t('항로') + ' — ' + (it.from||'—') + ' → ' + (it.to||'—')) : '',
            t('구하는 분') + ' — ' + (want || t('누구나')),
            t('비용') + ' — ' + rideName(RIDE_COST, it.rideCost),
@@ -32605,15 +32600,15 @@ function rideEdit(){
 
     sub: RIDE_LAW,
     fields: [
-      { key:'n', label:'몇 자리', type:'pick', value:String(Number(it.rideN)||1),
+      { key:'n', label:'모집 인원', type:'pick', value:String(Number(it.rideN)||1),
         options:[{v:'1',name:'1자리'},{v:'2',name:'2자리'},{v:'3',name:'3자리'},
                  {v:'4',name:'4자리'},{v:'5',name:'5자리 이상'}] },
-      { key:'trip', label:'무슨 항해', type:'pick',
+      { key:'trip', label:'항해 종류', type:'pick',
         value: it.rideTrip || (isFishing() ? 'fish' : 'air'), options:RIDE_TRIP },
-      { key:'want', label:'어떤 분', type:'picks',
+      { key:'want', label:'모집 대상', type:'picks',
         value: (it.rideWant && it.rideWant.length) ? it.rideWant : ['new'], options:RIDE_WANT },
       { key:'cost', label:'비용', type:'pick', value: it.rideCost || 'none', options:RIDE_COST },
-      { key:'close', label:'언제까지', type:'pick',
+      { key:'close', label:'모집 마감', type:'pick',
         value: String(it.rideClose == null ? '1' : it.rideClose), options:RIDE_CLOSE },
       { key:'note', type:'multi', rows:4, label:'한마디', value: it.rideNote || '',
         placeholder:'만나는 곳, 챙겨 오실 것, 그 밖에 알려 주실 말씀' }
@@ -36083,7 +36078,7 @@ function openSupport(){
     sub: '불편한 것·이상한 것·있었으면 하는 것을 알려 주세요',
     okText: '보내기',
     fields: [
-      { key:'kind', label:'무엇인가요', type:'pick', value:'bug',
+      { key:'kind', label:'문의 유형', type:'pick', value:'bug',
         options: SUPPORT_ASK.map(k=>({ v:k.v, name:k.name, sub:k.sub })) },
       { key:'text', type:'multi', rows:6, label:'내용',
         placeholder:'어떤 화면에서 무엇을 하셨을 때 그랬는지 적어 주시면 빨리 고칠 수 있습니다' }
@@ -39091,7 +39086,7 @@ function fishRows(g){
       <div class="fchips" style="padding:0 12px 6px">${chips(FISH_BAITS,'bait')}</div>
       <div class="mrrow"><span class="mrlbl">${esc(t('채비'))}</span></div>
       <div class="fchips" style="padding:0 12px 6px">${chips(FISH_RIGS,'rig')}</div>
-      <div class="mrrow"><span class="mrlbl">${esc(t('잡은 것'))}</span>
+      <div class="mrrow"><span class="mrlbl">${esc(t('조과'))}</span>
         <span class="mrm" style="flex:1;color:#7b8794">${esc(t('어종을 누르면 한 마리씩 · 오른쪽 칸은 가장 큰 것 cm'))}</span></div>
       <div class="fchips" style="padding:0 12px 6px">${
         FISH_SPECIES.map(x=>`<button class="tchip" onclick="catchAdd('${g.id}','${jsq(x)}')">${esc(t(x))}${x==='기타'?' '+esc(t('직접')):''}</button>`).join('')}</div>
@@ -43183,7 +43178,7 @@ function mlogBody(it){
     <div class="mrrow"><span class="mrlbl">${esc(t('날짜'))}</span>${unlocked
       ? `<input type="date" value="${esc(it.date||'')}" onchange="mrField('date',this.value)">`
       : `<b class="mrv">${esc(it.date||'—')}</b>`}</div>
-    <div class="mrrow"><span class="mrlbl">${esc(t('무슨 일'))}</span>${unlocked
+    <div class="mrrow"><span class="mrlbl">${esc(t('정비 내용'))}</span>${unlocked
       ? `<input value="${esc(it.title||'')}" style="flex:1" placeholder="${esc(t('해수펌프 임펠러 교체'))}" onchange="mrField('title',this.value)">`
       : `<b class="mrv">${esc(mlogTitle(it))}</b>`}</div>
     ${howPubRow(it)}
@@ -45692,10 +45687,10 @@ function applySeries(){
     okText: '보내기',
     sub: '운영자가 보고 켜 드립니다. 켜지면 뉴스 ▸ 연재에 글 올리는 버튼이 생깁니다.',
     fields: [
-      { key:'mine', label:'어떤 글을 올리시겠습니까', type:'pick', value:'1',
+      { key:'mine', label:'글 종류', type:'pick', value:'1',
         options:[ { v:'1', name:'직접 쓴 글', sub:'항해기 · 정비기 · 기고' },
                   { v:'0', name:'옮긴 글',   sub:'남의 글을 허락받아 옮김' } ] },
-      { key:'about', type:'multi', rows:5, label:'어떤 글을 쓰시나요',
+      { key:'about', type:'multi', rows:5, label:'쓰실 글 소개',
         placeholder:'무엇을 얼마나 쓰실 생각인지 적어 주세요' },
       { key:'link', label:'그동안 쓰신 글 (선택)', placeholder:'https://…' }
     ],
@@ -45799,7 +45794,7 @@ function writeSeries(id){
     okText: x ? '저장' : '올리기',
     sub: '옮긴 글은 저자 · 매체 · 원문 링크가 반드시 있어야 합니다 (허락 조건). 직접 쓴 글은 저자만 있으면 됩니다.',
     fields: [
-      { key:'mine', label:'어떤 글인가요', type:'pick',
+      { key:'mine', label:'글 종류', type:'pick',
         value: (x ? (seriesMine(x) ? '1' : '0') : '1'),
         options:[ { v:'1', name:'직접 쓴 글', sub:'기고 · 연재' },
                   { v:'0', name:'옮긴 글',   sub:'남의 글을 허락받아 옮김' } ] },
@@ -45807,7 +45802,7 @@ function writeSeries(id){
       //   손으로 다시 적으면 한 글자만 달라도 딴 묶음이 되어 흩어진다.
       { key:'sname',     label:'연재 이름', value: x ? (x.sname||'') : '',
         placeholder:'예: 요트인을 위한 인공지능', chips: seriesNames() },
-      { key:'no',        label:'몇 편',    value: x ? String(x.no||'') : '', placeholder:'1' },
+      { key:'no',        label:'회차',    value: x ? String(x.no||'') : '', placeholder:'1' },
       { key:'title',     label:'제목',     value: x ? x.title : '', placeholder:'제목' },
       { key:'author',    label:'저자',     value: x ? x.author : (meName()||''), placeholder:'글쓴이 이름' },
       { key:'origTitle', label:'원제',     value: x ? x.origTitle : '', placeholder:'옮긴 글일 때만' },

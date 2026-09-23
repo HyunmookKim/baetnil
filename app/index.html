@@ -4270,6 +4270,8 @@ const I18N = {
     '배 길이와 선종으로 다시 계산합니다.\n\n':'Recalculate from the boat\'s length and type.\n\n',
     '배 높이':'Air draft',
     '배 목록을 받지 못함 · 눌러서 확인':'Could not fetch the boat list · tap to see why',
+    '서버에 다시 연결하는 중…':'Reconnecting to the server…',
+    '서버 연결이 끊겼습니다 · 앱을 껐다 켜 주세요':'Lost connection to the server · please close and reopen the app',
     '배 소개':'About the boat',
     '배 소개 차례를 바꿉니다.':'Reorder the boat\'s introduction.',
     '배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)':'Appears on the boat\'s page (when board sharing is on)',
@@ -7752,6 +7754,8 @@ const I18N = {
     '배 길이와 선종으로 다시 계산합니다.\n\n':'Пересчитать по длине и типу судна.\n\n',
     '배 높이':'Высота судна',
     '배 목록을 받지 못함 · 눌러서 확인':'Не удалось получить список судов · нажмите, чтобы узнать',
+    '서버에 다시 연결하는 중…':'Повторное подключение к серверу…',
+    '서버 연결이 끊겼습니다 · 앱을 껐다 켜 주세요':'Связь с сервером потеряна · закройте и снова откройте приложение',
     '배 소개':'О судне',
     '배 소개 차례를 바꿉니다.':'Изменить порядок рассказа о судне.',
     '배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)':'Появится на странице судна (если публикация доски включена)',
@@ -11273,6 +11277,8 @@ const I18N = {
     '배 길이와 선종으로 다시 계산합니다.\n\n':'船の長さと船種で再計算します。\n\n',
     '배 높이':'船の高さ',
     '배 목록을 받지 못함 · 눌러서 확인':'船の一覧を取得できません・タップして確認',
+    '서버에 다시 연결하는 중…':'サーバーに再接続しています…',
+    '서버 연결이 끊겼습니다 · 앱을 껐다 켜 주세요':'サーバーとの接続が切れました・アプリを閉じて開き直してください',
     '배 소개':'船の紹介',
     '배 소개 차례를 바꿉니다.':'船の紹介の順番を変更します。',
     '배 소개 페이지에 실립니다 (게시판 공개가 켜져 있을 때)':'船の紹介ページに掲載されます（掲示板の公開がオンのとき）',
@@ -17117,14 +17123,69 @@ async function trkBufStat(){
 }
 // ★ 앱이 죽어도 기록 중이던 것이 남아야 한다. 배 위에서 앱이 한 번 꺼지면
 //   그 항해 항적을 통째로 잃는다.
+//
+// ★★★ 5.14 — 점 하나 담을 때마다 **항적 전체**를 다시 쓰던 것을 고쳤다.
+//   여태 여기서 trkNow(점 전부)를 통째로 글자로 바꿔 저장했다. 항적이 길어질수록 한 번 값이 커져서
+//   넷째 시간에는 첫 시간의 4~5배가 들었다(안드로이드 에뮬레이터 3.5초 → 17.2초, 아이폰 0.2초 → 0.9초).
+//   다른 항적 앱은 이렇게 하지 않는다 — OsmAnd·OpenTracks(안드로이드)·Open GPX Tracker(아이폰) 모두
+//   **점 하나 = 한 줄 덧붙이기** 다. 뱃일 네이티브 쪽(화면 끈 동안의 jsonl 파일)도 이미 그렇게 한다.
+//
+//   그래서 점을 TRK_CHUNK 개씩 묶음으로 나눠 따로 담는다 (bt_trkp0 · bt_trkp1 …).
+//   새 점이 뒤에 붙기만 했으면 **마지막 묶음만** 다시 쓴다. 한 번 값이 항적 길이와 상관없이 같다.
+//   점이 솎아지거나(TRK_MAX) 몰아 받은 점이 가운데 끼면 그때만 전부 다시 쓴다(드물다).
+//   ★ 쓰는 차례: 묶음 먼저, 그다음 머리(bt_trk). 도중에 앱이 죽어도 머리가 가리키는 묶음은 다 있다.
+//   ★ 옛 판이 남긴 한 덩어리(bt_trk 안에 pts)도 그대로 읽는다.
+const TRK_CHUNK = 200;
+const TRK_PKEY  = i => TRK_KEY + 'p' + i;
+let trkKept = { n: 0, head: '', last: '', chunks: 0 };   // 저장소에 이미 적힌 점 — 머리 시각·끝 시각·개수
+function trkKeepMeta(pn){
+  const m = {};
+  for(const k in trkNow){ if(k !== 'pts') m[k] = trkNow[k]; }
+  m.v = 2; m.pn = pn; m.np = (trkNow.pts || []).length;
+  localStorage.setItem(TRK_KEY, JSON.stringify(m));
+}
 function trkKeep(){
   try{
-    if(trkNow) localStorage.setItem(TRK_KEY, JSON.stringify(trkNow));
-    else localStorage.removeItem(TRK_KEY);
+    if(!trkNow){
+      localStorage.removeItem(TRK_KEY);
+      for(let i = 0; i < Math.max(trkKept.chunks, 1) + 2; i++) localStorage.removeItem(TRK_PKEY(i));
+      trkKept = { n: 0, head: '', last: '', chunks: 0 };
+      return;
+    }
+    const pts = trkNow.pts || [];
+    const pn = Math.ceil(pts.length / TRK_CHUNK);
+    // 뒤에 붙기만 했나 — 앞은 그대로이고, 전에 적은 마지막 점도 제자리에 있다
+    const 붙기만 = trkKept.n > 0 && pts.length >= trkKept.n
+      && String((pts[0] || {}).t || '') === trkKept.head
+      && String((pts[trkKept.n - 1] || {}).t || '') === trkKept.last;
+    // ★ 전에 적은 마지막 점이 든 묶음부터 다시 쓴다 — 그 점이 제자리에서 고쳐졌어도 놓치지 않게
+    const from = 붙기만 ? Math.floor((trkKept.n - 1) / TRK_CHUNK) : 0;
+    for(let i = from; i < pn; i++){
+      localStorage.setItem(TRK_PKEY(i), JSON.stringify(pts.slice(i * TRK_CHUNK, (i + 1) * TRK_CHUNK)));
+    }
+    trkKeepMeta(pn);
+    // 줄어들었으면(솎기) 남는 옛 묶음을 치운다
+    for(let i = pn; i < trkKept.chunks; i++) localStorage.removeItem(TRK_PKEY(i));
+    trkKept = { n: pts.length, head: String((pts[0] || {}).t || ''), last: String((pts[pts.length - 1] || {}).t || ''), chunks: pn };
   }catch(e){}
 }
 function trkLoad(){
-  try{ trkNow = JSON.parse(localStorage.getItem(TRK_KEY) || 'null'); }catch(e){ trkNow = null; }
+  try{
+    const m = JSON.parse(localStorage.getItem(TRK_KEY) || 'null');
+    if(m && m.v === 2){
+      let pts = [];
+      for(let i = 0; i < (Number(m.pn) || 0); i++){
+        try{ pts = pts.concat(JSON.parse(localStorage.getItem(TRK_PKEY(i)) || '[]')); }catch(_){}
+      }
+      delete m.v; delete m.pn; delete m.np;
+      m.pts = pts;
+      trkNow = m;
+      trkKept = { n: pts.length, head: String((pts[0] || {}).t || ''), last: String((pts[pts.length - 1] || {}).t || ''), chunks: Math.ceil(pts.length / TRK_CHUNK) };
+    }else{
+      trkNow = m;                          // 옛 판이 남긴 한 덩어리 — 다음 저장 때 묶음으로 바뀐다
+      trkKept = { n: 0, head: '', last: '', chunks: 0 };
+    }
+  }catch(e){ trkNow = null; }
   // ★ 4.117 — 앱을 다시 열었는데 아직 기록 중이면 지켜보기도 다시 켠다.
   //   안 켜면 앱을 껐다 켠 뒤로는 위치가 끊겨도 화면이 조용하다.
   if(trkNow) { try{ trkWatchStart(); }catch(_){} }
@@ -25286,7 +25347,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.13';
+const APP_VER = '5.14';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -47695,7 +47756,42 @@ function errBody(one){
   try{ L.push(supportInfo()); }catch(_){}
   return L.join('\n');
 }
+// ★★★ 5.14 — 파이어베이스 자료방(Firestore)이 「INTERNAL ASSERTION FAILED: Unexpected state」 로 멈추면
+//   그 뒤로는 앱을 껐다 켜기 전까지 배 목록도 기록도 못 받는다.
+//   5.13 자동검사(작은 아이폰)에서 실제로 났다 — 계정을 바꿔 다시 로그인한 직후.
+//   구글 이슈 firebase-js-sdk #8250: Capacitor 앱에서 2024년부터 보고된 것이다.
+//   ① 원인 하나(ca9 — 서버 응답이 겹쳐 오는 경쟁)를 구글이 12.13.0 에서 고쳤다 → 파이어베이스를 12.19.0 으로 올렸다.
+//   ② 그래도 나면, 보고한 앱들이 쓰는 복구 그대로 **앱을 다시 불러 새로 붙는다.**
+//   ★ 사람이 뭔가 적고 있으면 기다린다 — 쓰던 것이 날아가면 안 된다.
+//   ★ 항적은 점마다 저장돼 있고 앱이 켜지면 이어서 기록한다(trkResume).
+//   ★ 2분 안에 또 나면 되풀이하지 않는다 — 끝없이 다시 불러오면 안 된다. 그때는 껐다 켜 달라고만 한다.
+const FS_RELOAD_KEY = 'bt_fsreload';
+let fsRecovering = false;
+function fsDead(msg){ return /INTERNAL ASSERTION FAILED/.test(String(msg || '')); }
+function fsRecover(){
+  if(fsRecovering) return;
+  fsRecovering = true;
+  let last = 0;
+  try{ last = Number(localStorage.getItem(FS_RELOAD_KEY)) || 0; }catch(_){}
+  if(Date.now() - last < 120000){ setSync('서버 연결이 끊겼습니다 · 앱을 껐다 켜 주세요'); return; }
+  setSync('서버에 다시 연결하는 중…');
+  const 한가 = () => {
+    const a = document.activeElement;
+    if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return false;
+    const f = document.getElementById('formOv');
+    if(f && getComputedStyle(f).display !== 'none') return false;
+    return document.visibilityState === 'visible';
+  };
+  const go = () => {
+    if(!한가()){ setTimeout(go, 3000); return; }
+    try{ localStorage.setItem(FS_RELOAD_KEY, String(Date.now())); }catch(_){}
+    try{ if(typeof trkKeep === 'function') trkKeep(); }catch(_){}
+    location.reload();
+  };
+  setTimeout(go, 1500);
+}
 function showErr(msg){
+  try{ if(fsDead(msg)) fsRecover(); }catch(_){}
   // ★ 5.7 — 아이폰 시뮬레이터 검사(ios-release 의 「시뮬레이터에서 켜 보기」)가 이 줄을 읽는다.
   try{ console.error('[baetnil-err] ' + String(msg == null ? '' : msg).slice(0, 600)); }catch(_){}
   try{
@@ -48033,7 +48129,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //   「대부분의 경우 npm 으로 넣기를 강하게 권한다」 고 하고, CDN 은 특별한 경우의 대안이다.
 //   https://firebase.google.com/docs/web/alt-setup
 //   앱 안의 파일이 되면 ① 같은 출처라 오류 내용이 「Script error.」 로 뭉개지지 않고
-//   ② 인터넷이 끊겨도 앱이 켜진다. 판은 10.12.2 그대로(npm firebase@10.12.2 를 묶은 것).
+//   ② 인터넷이 끊겨도 앱이 켜진다.
+//   ★ 5.14 — 10.12.2 → **12.19.0** (npm firebase@12.19.0 을 esbuild 로 묶은 것 — 묶는 법은 tests/fb_bundle.sh).
+//     까닭: 「INTERNAL ASSERTION FAILED: Unexpected state」 의 원인 하나(ca9)를 구글이 12.13.0 에서 고쳤다.
 // ★★★ 5.6 — 어디까지 갔는지 자국을 남긴다 (사장님 동생분 아이폰, 2026-09-21)
 //   「오류: Script error.」 만 뜨고 아무 정보가 없었다. 브라우저는 **바깥에서 받아 온 파일**
 //   (여기서는 파이어베이스)에서 난 오류의 내용을 페이지에 알려 주지 않는다. 그것이 규칙이다.
@@ -48048,7 +48146,10 @@ window.__boot = 'start';
     catch(e){ window.__boot = '못 불러옴: ' + 이름 + ' — ' + ((e && e.message) || e); try{ console.error('[baetnil-boot] ' + window.__boot); }catch(_){} throw e; }
   };
   try{
-    const { initializeApp } = await 받기('firebase-app', './firebase/app.js');
+    const { initializeApp, onLog } = await 받기('firebase-app', './firebase/app.js');
+    // ★ 5.14 — 자료방이 멈춘 것을 파이어베이스 자신의 기록에서도 듣는다.
+    //   이 오류는 던져지지 않고 기록으로만 남는 때가 있다 — 그러면 오류줄(showErr)로는 못 듣는다.
+    try{ onLog(x => { try{ if(fsDead(x && (x.message || (x.args || []).join(' ')))) fsRecover(); }catch(_){} }, { level:'error' }); }catch(_){}
     const { getFirestore, collection, getDocs: _getDocs, getDoc: _getDoc, doc,
             setDoc: _setDoc, updateDoc: _updateDoc, deleteDoc: _deleteDoc,
             query, where, orderBy, limit, startAfter, writeBatch, FieldPath,

@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-5.13';
+const CACHE = 'baetnil-5.14';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -28,7 +28,7 @@ const SEEN = 'baetnil-seen';     // 한 번 본 사진 (글판·장터·정박�
 const SEEN_KEEP = 200;
 // ★ 5.6 — 파이어베이스를 앱 파일로 넣었다. 인터넷이 끊겨도 켜지려면 이것도 담아 둔다.
 const ASSETS = ['./','./index.html','./manifest.webmanifest','./font.woff2','./icon-192.png','./icon-512.png','./icon-180.png',
-  './firebase/app.js','./firebase/auth.js','./firebase/chunk-4EOZNMR2.js','./firebase/firestore.js','./firebase/functions.js','./firebase/storage.js'];
+  './firebase/app.js','./firebase/auth.js','./firebase/chunk-6S4RX4WH.js','./firebase/firestore.js','./firebase/functions.js','./firebase/storage.js'];
 const TILE_HOSTS = ['tile.openstreetmap.org','tiles.openseamap.org'];
 
 // ★ 왜 이렇게 하는가 (2.13 까지 실제로 겪은 사고)
@@ -73,9 +73,17 @@ self.addEventListener('activate', e=>{
 });
 
 // 화면 파일 — 인터넷 우선. 새로 받으면 저장분도 갱신한다.
+//
+// ★★★ 5.14 — 켤 때마다 화면 파일(4.6MB, 압축 1.9MB)을 통째로 받던 것을 고쳤다.
+//   여태 cache:'reload' 였다 — 「묻지 않고 늘 통째로 받는다」(MDN). 바뀐 것이 없어도 매번 받았다.
+//   다른 웹사이트들이 하는 대로 cache:'no-cache' 로 바꾼다 — 「바뀌었나요?」 만 묻고,
+//   서버가 「그대로」(304)라고 하면 브라우저가 가진 것을 쓴다. 바뀌었으면 그때 받는다.
+//   baetnil.com 은 파일 날짜(Last-Modified)를 주고 304 로 답한다 — 2026-09-23 실제로 물어서 확인.
+//   ★ 새 판이 늦게 가는 일은 없다. 매번 서버에 묻는 것은 그대로다.
+//   ★ install 의 cache:'reload' 는 그대로 둔다 — 새 서비스워커가 설치될 때는 반드시 새로 받아야 한다(2.13 사고).
 async function networkFirst(req){
   try{
-    const res = await fetch(new Request(req, { cache:'reload' }));
+    const res = await fetch(new Request(req, { cache:'no-cache' }));
     if(res && res.ok){
       const copy = res.clone();
       caches.open(CACHE).then(c=>c.put(req, copy)).catch(()=>{});

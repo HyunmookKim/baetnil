@@ -25451,7 +25451,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.15';
+const APP_VER = '5.16';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -49251,6 +49251,62 @@ if('serviceWorker' in navigator
    && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){
   window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 }
+</script>
+<script>
+// ★★★ 5.16 — 안드로이드: 키보드가 뜨면 화면은 그대로 두고, 누른 칸만 스크롤로 키보드 위에 올린다.
+//   아이폰 앱·아이폰 사파리·안드로이드 크롬(108 부터)이 모두 이렇게 한다 — 키보드가 화면 아래를 덮고,
+//   아래 탭 줄은 키보드에 가려진다. 화면(웹뷰)을 줄이지 않는다.
+//   (5.15 에서는 웹뷰를 키보드만큼 줄여서 아래 탭 줄이 키보드 위로 따라 올라왔다 — 사장님 지적)
+//   안드로이드 15 이상은 시스템이 알아서 칸을 올려 주지 않아서, 앱 껍데기(MainActivity)가
+//   키보드 높이를 여기 __kbd(기기 픽셀) 로 알려 준다. 아이폰·웹에서는 불리지 않는다.
+(function(){
+  var kb = 0, spacer = null, padEl = null, padOrig = '', padBase = 0;
+  function isField(el){
+    return !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+  }
+  function scroller(el){
+    for(var p = el && el.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement){
+      var oy = getComputedStyle(p).overflowY;
+      if((oy === 'auto' || oy === 'scroll') && p.scrollHeight > p.clientHeight + 1) return p;
+    }
+    return null;   // 문서 전체가 스크롤된다
+  }
+  function clear(){
+    if(spacer){ spacer.style.height = '0px'; }
+    if(padEl){ padEl.style.paddingBottom = padOrig; padEl = null; }
+  }
+  function fit(){
+    var el = document.activeElement;
+    if(!kb || !isField(el)){ clear(); return; }
+    var kbTop = window.innerHeight - kb;          // 키보드 윗줄 (화면 글씨 단위)
+    var sp = scroller(el);
+    if(sp){
+      if(sp !== padEl){ clear(); padEl = sp; padOrig = sp.style.paddingBottom; padBase = parseFloat(getComputedStyle(sp).paddingBottom) || 0; }
+      var extra = Math.max(0, sp.getBoundingClientRect().bottom - kbTop);
+      sp.style.paddingBottom = (padBase + extra) + 'px';
+    }else{
+      if(padEl){ padEl.style.paddingBottom = padOrig; padEl = null; }
+      if(!spacer){ spacer = document.createElement('div'); spacer.id = 'kbdSpacer'; spacer.setAttribute('aria-hidden', 'true'); spacer.style.cssText = 'height:0;pointer-events:none'; }
+      if(spacer.parentNode !== document.body) document.body.appendChild(spacer);
+      spacer.style.height = kb + 'px';
+    }
+    var r = el.getBoundingClientRect();
+    var hd = document.querySelector('header');
+    var topLine = hd ? Math.max(0, hd.getBoundingClientRect().bottom) : 0;
+    var d = 0;
+    if(r.bottom > kbTop - 16) d = r.bottom - (kbTop - 16);          // 칸 아래끝이 키보드 위 16 에 오게
+    else if(r.top < topLine + 8) d = r.top - (topLine + 8);          // 머리줄 밑에 숨었으면 내린다
+    if(d){ if(sp) sp.scrollTop += d; else window.scrollBy(0, d); }
+  }
+  window.__kbd = function(px){
+    kb = px > 0 ? px / (window.devicePixelRatio || 1) : 0;
+    window.__kbdH = kb;
+    fit(); setTimeout(fit, 120);
+  };
+  document.addEventListener('focusin', function(){ if(kb) setTimeout(fit, 30); });
+  // 칸에서 나가면(키보드를 내리지 않았어도) 덧붙인 여백을 걷는다
+  document.addEventListener('focusout', function(){ setTimeout(fit, 50); });
+})();
 </script>
 </body>
 </html>

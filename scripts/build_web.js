@@ -218,8 +218,9 @@ function bakeFront(){
 //   ★ 이제 정본은 앱(app/index.html)의 LEGAL_DOCS 하나뿐이고, 여기서는 굽기만 한다.
 //     앱을 고치면 다음 굽기 때 웹이 따라온다. 손으로 맞출 일이 없어진다.
 const LEGAL_KEYS  = ['terms', 'privacy', 'location'];
-const LEGAL_HEAD  = {           // 「판 …부터 적용 …」 줄. 말마다 적는 법이 다르다.
-  ko: (v, d) => `판 ${v}부터 적용 ${d}`,
+// ★ 5.18 — 「판」 은 사장님이 쓰지 말라 하신 말이다(→ 「버전」).
+const LEGAL_HEAD  = {           // 「버전 … · …부터 적용」 줄. 말마다 적는 법이 다르다.
+  ko: (v, d) => `버전 ${v} · ${d}부터 적용`,
   en: (v, d) => `Version ${v}, in effect from ${d}`,
   ru: (v, d) => `Версия ${v}, действует с ${d}`,
   ja: (v, d) => `版 ${v}・${d} から適用`

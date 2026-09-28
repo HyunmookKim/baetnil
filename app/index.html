@@ -2619,6 +2619,9 @@ const I18N = {
     '앱 자료함':'App files',
     '앱 안':'Inside the app',
     '파일로 저장했습니다.':'Saved to a file.',
+    '파일 앱':'Files app',
+    '나의 iPhone':'On My iPhone',
+    '나의 iPad':'On My iPad',
     // ── 오류 문구를 사람 말로 (4.117)
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.':'\n\nIf this keeps happening, please tell us through Support.',
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\nIf this keeps happening, please tell us through Support.\n',
@@ -6129,6 +6132,9 @@ const I18N = {
     '앱 자료함':'Файлы приложения',
     '앱 안':'Внутри приложения',
     '파일로 저장했습니다.':'Сохранено в файл.',
+    '파일 앱':'Приложение «Файлы»',
+    '나의 iPhone':'На iPhone',
+    '나의 iPad':'На iPad',
     // ── 오류 문구를 사람 말로 (4.117)
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.':'\n\nЕсли это повторяется, напишите нам через раздел поддержки.',
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\nЕсли это повторяется, напишите нам через раздел поддержки.\n',
@@ -9650,6 +9656,9 @@ const I18N = {
     '앱 자료함':'アプリのファイル',
     '앱 안':'アプリ内',
     '파일로 저장했습니다.':'ファイルに保存しました。',
+    '파일 앱':'「ファイル」App',
+    '나의 iPhone':'このiPhone内',
+    '나의 iPad':'このiPad内',
     // ── 오류 문구를 사람 말로 (4.117)
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.':'\n\n何度も起きる場合は、サポートからお知らせください。',
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\n何度も起きる場合は、サポートからお知らせください。\n',
@@ -25688,7 +25697,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.18';
+const APP_VER = '5.19';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26454,6 +26463,27 @@ function navAttachNative(){
     return true;
   }catch(_){ return false; }
 }
+// ★★★ 5.19 — 아이폰: 왼쪽 끝에서 쓸어 뒤로 가기 (사장님 지적: 「항해일지 옆으로 쓸면 뒤로가기 되야하는데 안된다」)
+//   아이폰 앱에는 이것이 아예 없었다. 쓸기는 아이폰 쪽(MainViewController.swift)이 받고,
+//   무엇을 물릴지는 안드로이드 뒤로가기와 **같은 문(navDoBack)** 이 정한다. 두 폰이 똑같이 물린다.
+//   ★ 안드로이드와 다른 점 하나 — 오늘 화면 첫 자리에서는 아무 일도 없다(아이폰 앱은 쓸어서 닫히지 않는다).
+//   ★ 도면에 그리는 중에는 쓸기를 끈다 — 왼쪽 끝에서 선을 긋다가 한 획이 지워지거나 뒤로 가 버리지 않게.
+window.__iosBack = {
+  can(){
+    try{
+      if(typeof lkEdit !== 'undefined' && lkEdit) return { ok:false };
+      if(typeof mrDraw !== 'undefined' && mrDraw) return { ok:false };
+      let bg = '';
+      try{ bg = getComputedStyle(document.body).backgroundColor || ''; }catch(_){}
+      return { ok: !!navBackKind(), bg };
+    }catch(_){ return { ok:false }; }
+  },
+  go(){
+    if(!this.can().ok) return false;
+    try{ const a = document.activeElement; if(a && a !== document.body && a.blur) a.blur(); }catch(_){}
+    try{ return !!navDoBack(); }catch(_){ return false; }
+  }
+};
 // 되돌리기 버튼 표시 갱신
 function paintUndoBtns(){
   ['undoBtn','mrUndoBtn'].forEach(id=>{
@@ -28224,6 +28254,15 @@ async function saveHere(sub, name, mime, text){
     const s = BT_SPOTS[i];
     try{
       await F.writeFile({ path: path, data: b64of(text), directory: s.d, recursive: true });
+      // ★★★ 5.19 — 아이폰은 「문서」 폴더가 사람 눈에 안 보인다. 앱 자리(나의 iPhone › 뱃일)로 알려 준다.
+      //   5.18 까지는 Info.plist 에 파일 앱 공개(UIFileSharingEnabled·LSSupportsOpeningDocumentsInPlace)가
+      //   없어서, 백업을 「문서/Baetnil/backup 에 넣었습니다」 라고 해 놓고 **아무 데서도 못 찾았다.**
+      //   폴더 이름 「뱃일」 은 앱 이름(CFBundleDisplayName) 그대로다 — 어느 나라 말로 써도 같다.
+      if(trkIsIOS() && s.d === 'DOCUMENTS'){
+        const pad = /iPad/i.test(navigator.userAgent || '')
+                 || (/Macintosh/i.test(navigator.userAgent || '') && (navigator.maxTouchPoints || 0) > 1);
+        return { where: [t('파일 앱'), t(pad ? '나의 iPad' : '나의 iPhone'), '뱃일', BT_DIR, sub].join(' › '), why:'' };
+      }
       return { where: t(s.n) + '/' + BT_DIR + '/' + sub, why:'' };
     }catch(e){ 마지막 = String((e && e.message) || e); }
   }
@@ -28232,7 +28271,7 @@ async function saveHere(sub, name, mime, text){
 function saveHereTell(r, name){
   if(!r) return;
   if(r.why){ tell(t('파일로 저장하지 못했습니다.') + '\n\n' + r.why, { kind:'bad' }); return; }
-  if(r.where) tell(tsub('{p}에 넣었습니다.', { p: r.where + '/' + name }), { kind:'good' });
+  if(r.where) tell(tsub('{p}에 넣었습니다.', { p: r.where + (r.where.indexOf(' › ') >= 0 ? ' › ' : '/') + name }), { kind:'good' });
   else tell(t('파일로 저장했습니다.'), { kind:'good' });
 }
 async function backupData(){

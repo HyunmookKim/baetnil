@@ -2282,6 +2282,192 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
 <meta name="apple-mobile-web-app-title" content="뱃일">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-180.png">
+<script id="btLook">
+// ★ id 를 단 까닭 — 검사들이 「id 없는 첫 script 칸」 을 앱 본체로 읽는다. 이것은 본체가 아니라 head 의 테마 엔진이다.
+// ★★★ 5.20 — 화면 테마(노을 · 흰색 · 검정)와 글자 크기 (사장님: 사용자 피드백 「글씨가 작다」 「흰 화면도 있었으면」)
+//   사장님이 초안(claude.ai 아티팩트 「뱃일 화면 색·글씨 초안」)을 보시고 「좋다, 글 크기는 사용자가 정하게 하자」.
+//   조사: claude/뱃일-화면색-글씨-다른앱조사.md
+//
+//   ★ 어떻게 바꾸나 — 초안을 만든 방법 그대로다(그래서 사장님이 보신 그림과 같게 나온다).
+//     · 앱의 색은 CSS 와 그리는 코드 곳곳에 1,000곳 가까이 직접 적혀 있다. 하나씩 이름을 붙이면 반드시 빠뜨린다.
+//     · 그래서 색 하나하나를 OKLab(사람 눈에 고른 색 공간)으로 옮겨 규칙대로 바꾼다.
+//       흰색: 밝기를 뒤집고(바탕은 흰~아주 옅은 회색, 글씨는 먹색), 색상은 살린다.
+//       검정: 바탕은 완전 검정, 반투명 카드·단추 바탕은 한 칸 떠 보이는 짙은 회색(애플 어두운 모드의 두 층), 글씨·강조는 그대로.
+//     · 글자 크기: 작은 글씨일수록 많이, 본문은 조금, 큰 제목·숫자(24px 이상)는 그대로. 바닥은 12px.
+//     · <style> 는 열 때 한 번, 화면을 그릴 때 붙는 style="…"·fill·stroke 는 붙는 순간 바꾼다.
+//     · 노을 + 보통이면 아무것도 안 한다 (5.19 와 똑같다, 드는 품도 없다).
+//   ★ 여기는 <head> 끝이다 — 화면이 그려지기 전에 돈다. 노을 색으로 번쩍 떴다가 바뀌지 않게.
+(function(){
+  'use strict';
+  const srgb2lin = c => c <= 0.04045 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+  const lin2srgb = c => c <= 0.0031308 ? 12.92*c : 1.055*Math.pow(c, 1/2.4) - 0.055;
+  function toOklab(r,g,b){
+    r=srgb2lin(r/255); g=srgb2lin(g/255); b=srgb2lin(b/255);
+    const l=Math.cbrt(0.4122214708*r+0.5363325363*g+0.0514459929*b);
+    const m=Math.cbrt(0.2119034982*r+0.6806995451*g+0.1073969566*b);
+    const s=Math.cbrt(0.0883024619*r+0.2817188376*g+0.6299787005*b);
+    return [0.2104542553*l+0.7936177850*m-0.0040720468*s, 1.9779984951*l-2.4285922050*m+0.4505937099*s, 0.0259040371*l+0.7827717662*m-0.8086757660*s];
+  }
+  function fromOklab(L,a,b){
+    const l=Math.pow(L+0.3963377774*a+0.2158037573*b,3), m=Math.pow(L-0.1055613458*a-0.0638541728*b,3), s=Math.pow(L-0.0894841775*a-1.2914855480*b,3);
+    const r=4.0767416621*l-3.3077115913*m+0.2309699292*s, g=-1.2684380046*l+2.6097574011*m-0.3413193965*s, bb=-0.0041960863*l-0.7034186147*m+1.7076147010*s;
+    const cl = v => Math.max(0, Math.min(255, Math.round(lin2srgb(Math.max(0,Math.min(1,v)))*255)));
+    return [cl(r), cl(g), cl(bb)];
+  }
+  function parse(c){
+    let m = c.match(/^#([0-9a-f]{3,8})$/i);
+    if(m){ let h=m[1]; if(h.length===5||h.length===7) return null;
+      if(h.length===3||h.length===4) h=h.split('').map(x=>x+x).join('');
+      return [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16), h.length===8?parseInt(h.slice(6,8),16)/255:1]; }
+    m = c.match(/^rgba?\(([^)]+)\)$/i);
+    if(m){ const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(Number); if(p.length<3 || p.some(x=>!isFinite(x))) return null; return [p[0],p[1],p[2],p.length>3?p[3]:1]; }
+    return null;
+  }
+  function light(r,g,b,a){
+    const [L,A,B] = toOklab(r,g,b);
+    const C = Math.hypot(A,B), h = Math.atan2(B,A);
+    let L2 = 1.0 - L*0.93, C2 = C;
+    if(L < 0.25){ L2 = 0.985 - L*0.15; C2 = C*0.25; }                              // 바탕·면: 흰~아주 옅은 회색
+    else if(L < 0.40){ L2 = 0.955 - (L-0.25)*0.25; C2 = Math.min(0.05, C*0.9); }  // 눌린 단추·고른 칸: 옅은 푸른 기
+    else if(L2 > 0.9) C2 = C*0.25;
+    else if(L2 < 0.5) C2 = Math.min(0.16, C*1.35);                                // 글씨·강조: 한 단계 짙고 또렷하게
+    const [R,G,Bb] = fromOklab(L2, C2*Math.cos(h), C2*Math.sin(h));
+    return [R,G,Bb,a];
+  }
+  function black(r,g,b,a){
+    const [L,A,B] = toOklab(r,g,b);
+    if(L > 0.42) return [r,g,b,a];
+    const C = Math.hypot(A,B), h = Math.atan2(B,A);
+    if(a < 0.999 && L > 0.05){ const [R,G,Bb] = fromOklab(0.235, C*0.10*Math.cos(h), C*0.10*Math.sin(h)); return [R,G,Bb, Math.max(a, 0.92)]; }
+    const L2 = Math.max(0, (L-0.12)*1.05), C2 = C*0.12;
+    const [R,G,Bb] = fromOklab(L2, C2*Math.cos(h), C2*Math.sin(h));
+    return [R,G,Bb,a];
+  }
+  const fmt = ([r,g,b,a]) => a >= 0.999 ? `rgb(${r},${g},${b})` : `rgba(${r},${g},${b},${+(+a).toFixed(3)})`;
+  const COLOR_RE = /#[0-9a-fA-F]{3,8}\b|rgba?\([^)]*\)/g;
+  const memo = { light: new Map(), black: new Map() };
+  function mapColor(m, th){
+    const M = memo[th]; let v = M.get(m);
+    if(v === undefined){ const p = parse(m); v = p ? fmt((th === 'light' ? light : black)(...p)) : m; M.set(m, v); }
+    return v;
+  }
+  // 글자 크기표 — 보통(5.19 그대로) · 크게(초안) · 아주 크게
+  const FS = [[9,12],[10,12.5],[11,13],[11.5,13.5],[12,14],[12.5,14.5],[13,15],[13.5,15.5],[14,16],[15,16.5],[16,17],[17,18],[18,19],[20,20.5],[24,24]];
+  function fsBig(px){
+    if(px <= FS[0][0]) return FS[0][1];
+    if(px >= 24) return px;
+    for(let i=0;i<FS.length-1;i++){ const [a0,b0]=FS[i],[a1,b1]=FS[i+1];
+      if(px>=a0 && px<=a1) return Math.round((b0+(b1-b0)*(px-a0)/(a1-a0))*2)/2; }
+    return px;
+  }
+  function fsMap(px, fs){
+    if(fs === 'big') return fsBig(px);
+    if(fs === 'bigger') return px >= 24 ? px : Math.round(Math.min(24, fsBig(px) * 1.12) * 2) / 2;
+    return px;
+  }
+  const THEMES = ['sunset', 'light', 'black'], SIZES = ['normal', 'big', 'bigger'];
+  const LS = k => { try{ return localStorage.getItem(k); }catch(_){ return null; } };
+  let theme = THEMES.indexOf(LS('bt_theme')) >= 0 ? LS('bt_theme') : 'sunset';
+  let fs = SIZES.indexOf(LS('bt_fs')) >= 0 ? LS('bt_fs') : 'big';
+  const idle = () => theme === 'sunset' && fs === 'normal';
+  function fix(txt){
+    let s = String(txt);
+    if(theme !== 'sunset') s = s.replace(COLOR_RE, m => mapColor(m, theme));
+    if(fs !== 'normal') s = s.replace(/font-size:\s*([0-9.]+)px/g, (m, v) => 'font-size:' + fsMap(+v, fs) + 'px');
+    return s;
+  }
+  // ── <style> 는 처음 글을 간직해 두고, 바꿀 때마다 처음 글에서 다시 만든다 (두 번 바뀌지 않게)
+  const orig = new WeakMap();
+  function fixStyles(){
+    document.querySelectorAll('style').forEach(st => {
+      if(st.id === 'btThemeCss') return;
+      if(!orig.has(st)) orig.set(st, st.textContent);
+      const n = idle() ? orig.get(st) : fix(orig.get(st));
+      if(st.textContent !== n) st.textContent = n;
+    });
+    let x = document.getElementById('btThemeCss');
+    if(!x){ x = document.createElement('style'); x.id = 'btThemeCss'; (document.head || document.documentElement).appendChild(x); }
+    const bg = theme === 'light' ? '#FFFFFF' : '#000000';
+    const wide = fs === 'bigger' ? 96 : fs === 'big' ? 84 : 0;
+    x.textContent =
+      (theme !== 'sunset'
+        ? `body{background:${bg} !important} body::before,body::after{display:none !important}`
+          + `#mrPanel,#mrPanel.full,#panel,#formOv .formBox,#hatPanelOv #hatPanelBody,#trashView .trashBox,#helpOv .helpbox{background:${bg} !important}`
+          + (theme === 'light' ? `:root{color-scheme:light}` : `:root{color-scheme:dark}`)
+        : '')
+      // 글자를 키우면 좁아지는 자리 — 칸 이름 자리를 넓히고, 머리줄 연결 상태 글은 배 이름에 자리를 양보한다
+      + (wide ? `.mrlbl{width:${wide}px !important} .gtierow .mrlbl{width:${wide - 12}px !important} #syncState{font-size:12px !important}`
+          // 아래 탭 줄은 키우지 않는다 — 애플 지침도 탭 줄 이름표는 글자 크기 설정을 따라 커지지 않는다.
+          // 화면들이 탭 줄 높이에 맞춰 아래를 비워 두어서, 줄이 높아지면 [저장] 같은 단추를 덮는다(tblsavelive).
+          // 대신 9.5px 는 너무 작아 11px 로 올리고, 틈을 줄여 높이는 그대로 둔다.
+          + `#tabbar button{font-size:11px !important;gap:1px !important;padding-bottom:6px !important}` : '');
+    try{
+      const mt = document.querySelector('meta[name="theme-color"]');
+      if(mt){ if(!mt.dataset.orig) mt.dataset.orig = mt.content; mt.content = theme === 'light' ? '#FFFFFF' : theme === 'black' ? '#000000' : mt.dataset.orig; }
+    }catch(_){}
+  }
+  // ── 화면을 그릴 때 붙는 style="…" · fill · stroke — 처음 값을 간직하고 거기서 만든다
+  const ATTRS = ['style', 'fill', 'stroke', 'stop-color'];
+  const first = new WeakMap(), wrote = new WeakMap();
+  function fixEl(e){
+    if(!e || e.nodeType !== 1 || e.hasAttribute('data-bt-raw')) return;   // 제 크기·제 색 그대로 보여야 하는 것(글자 크기 고르는 「가」)
+    let f = first.get(e), w = wrote.get(e);
+    for(const a of ATTRS){
+      if(!e.hasAttribute(a)) continue;
+      const cur = e.getAttribute(a);
+      if(!f) { f = {}; first.set(e, f); }
+      if(!w) { w = {}; wrote.set(e, w); }
+      if(w[a] !== cur) f[a] = cur;                 // 앱이 새로 적은 값 — 이것이 처음 값이다
+      const n = idle() ? f[a] : fix(f[a]);
+      w[a] = n;
+      if(n !== cur) e.setAttribute(a, n);
+    }
+  }
+  function fixTree(root){
+    if(!root || root.nodeType !== 1) return;
+    fixEl(root);
+    root.querySelectorAll('[style],[fill],[stroke],[stop-color]').forEach(fixEl);
+  }
+  let mo = null;
+  function watch(){
+    if(mo || !document.body) return;
+    mo = new MutationObserver(ms => {
+      if(idle()) return;                          // 노을 + 보통이면 할 일이 없다
+      for(const m of ms){
+        if(m.type === 'attributes') fixEl(m.target);
+        else m.addedNodes.forEach(n => { if(n.nodeType === 1){ if(n.tagName === 'STYLE') fixStyles(); else fixTree(n); } });
+      }
+    });
+    mo.observe(document.documentElement, { childList:true, subtree:true, attributes:true, attributeFilter: ATTRS });
+  }
+  // 폰 맨 위 시계 줄 글자 색 — 흰 화면이면 짙은 글자, 아니면 밝은 글자
+  function statusBar(){
+    try{
+      const SB = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+      if(SB && SB.setStyle) SB.setStyle({ style: theme === 'light' ? 'LIGHT' : 'DARK' }).catch(()=>{});
+    }catch(_){}
+  }
+  function applyAll(){
+    fixStyles();
+    if(document.body){ if(!idle()) watch(); if(mo) fixTree(document.body); }
+    try{ document.documentElement.setAttribute('data-bt-theme', theme); document.documentElement.setAttribute('data-bt-fs', fs); }catch(_){}
+    statusBar();
+  }
+  window.btLook = {
+    theme: () => theme, size: () => fs, THEMES, SIZES,
+    set(k, v){
+      if(k === 'theme' && THEMES.indexOf(v) >= 0){ theme = v; try{ localStorage.setItem('bt_theme', v); }catch(_){} }
+      if(k === 'size'  && SIZES.indexOf(v)  >= 0){ fs = v;    try{ localStorage.setItem('bt_fs', v); }catch(_){} }
+      applyAll();
+    },
+    fix, mapColor, fsMap
+  };
+  if(!idle()) fixStyles();
+  document.addEventListener('DOMContentLoaded', () => { applyAll(); });
+  // 캐퍼시터 다리가 늦게 붙어도 시계 줄 색은 맞춘다
+  setTimeout(statusBar, 800); setTimeout(statusBar, 3000);
+})();
+</script>
 </head>
 <body>
 <header>
@@ -2599,6 +2785,29 @@ const I18N = {
     '소개를 저장했습니다.':'Saved your profile.',
     '저장하지 못했습니다. 인터넷을 확인해 주세요.':'Could not save. Please check your connection.',
     '소개를 불러오지 못했습니다. 인터넷을 확인해 주세요.':'Could not load the profile. Please check your connection.',
+    '내 프로필':'My profile',
+    '프로필 수정':'Edit profile',
+    '공개 범위':'Visibility',
+    '화면':'Display',
+    '테마':'Theme',
+    '노을':'Sunset',
+    '흰색':'White',
+    '검정':'Black',
+    '새벽 바다 그림 바탕':'Dawn sea picture background',
+    '흰 바탕에 짙은 글씨':'Dark text on white',
+    '검은 바탕에 밝은 글씨':'Light text on black',
+    '글자 크기':'Text size',
+    '가':'A',
+    '앱 전체에 바로 적용됩니다.':'Applies to the whole app right away.',
+    '관리':'Manage',
+    '계속 수정':'Keep editing',
+    '나가기':'Leave',
+    '프로필을 저장했습니다.':'Profile saved.',
+    '수정한 내용을 저장하지 않고 나갈까요?':'Leave without saving your changes?',
+    '← 뒤로':'← Back',
+    '소개·자주 타는 바다·가고 싶은 곳을 로그인한 회원 누구나 봅니다.':'Any signed-in member can see your intro, usual waters and places you want to go.',
+    '소개·자주 타는 바다·가고 싶은 곳을 선택한 배의 구성원만 봅니다.':'Only members of the boats you choose can see your intro, usual waters and places you want to go.',
+    '소개·자주 타는 바다·가고 싶은 곳을 아무도 못 봅니다.':'Nobody else can see your intro, usual waters or places you want to go.',
     '아직 소개를 적지 않으셨습니다.':'You have not written a profile yet.',
     '이분이 적어 둔 소개가 없거나, 나에게는 공개하지 않았습니다.':'This person has not written a profile, or has not shared it with you.',
     '소개 적기':'Write a profile',
@@ -2627,6 +2836,8 @@ const I18N = {
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\nIf this keeps happening, please tell us through Support.\n',
     '알림을 켜지 못했습니다. 인터넷을 확인하고 다시 해 주세요.':'Could not turn notifications on. Check your connection and try again.',
     '날씨를 받지 못했습니다':'Could not get the weather',
+    '{n}시간 전 예보':'Forecast from {n}h ago',
+    '새 예보를 받는 중…':'Getting the new forecast…',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'Recording stopped in {n} [[place|places]] — those stretches are dotted.',
     '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'The dotted line joins the last position received to the next one received.',
@@ -6112,6 +6323,29 @@ const I18N = {
     '소개를 저장했습니다.':'Профиль сохранён.',
     '저장하지 못했습니다. 인터넷을 확인해 주세요.':'Не удалось сохранить. Проверьте подключение.',
     '소개를 불러오지 못했습니다. 인터넷을 확인해 주세요.':'Не удалось загрузить профиль. Проверьте подключение.',
+    '내 프로필':'Мой профиль',
+    '프로필 수정':'Изменить профиль',
+    '공개 범위':'Кто видит',
+    '화면':'Экран',
+    '테마':'Тема',
+    '노을':'Закат',
+    '흰색':'Белая',
+    '검정':'Чёрная',
+    '새벽 바다 그림 바탕':'Фон — рассветное море',
+    '흰 바탕에 짙은 글씨':'Тёмный текст на белом',
+    '검은 바탕에 밝은 글씨':'Светлый текст на чёрном',
+    '글자 크기':'Размер текста',
+    '가':'А',
+    '앱 전체에 바로 적용됩니다.':'Сразу применяется ко всему приложению.',
+    '관리':'Управление',
+    '계속 수정':'Продолжить',
+    '나가기':'Выйти',
+    '프로필을 저장했습니다.':'Профиль сохранён.',
+    '수정한 내용을 저장하지 않고 나갈까요?':'Выйти, не сохранив изменения?',
+    '← 뒤로':'← Назад',
+    '소개·자주 타는 바다·가고 싶은 곳을 로그인한 회원 누구나 봅니다.':'О себе, обычные воды и куда хотите — видит любой вошедший участник.',
+    '소개·자주 타는 바다·가고 싶은 곳을 선택한 배의 구성원만 봅니다.':'О себе, обычные воды и куда хотите — видят только участники выбранных судов.',
+    '소개·자주 타는 바다·가고 싶은 곳을 아무도 못 봅니다.':'О себе, обычные воды и куда хотите — никто не видит.',
     '아직 소개를 적지 않으셨습니다.':'Вы ещё не заполнили профиль.',
     '이분이 적어 둔 소개가 없거나, 나에게는 공개하지 않았습니다.':'Профиль не заполнен или не открыт для вас.',
     '소개 적기':'Заполнить профиль',
@@ -6140,6 +6374,8 @@ const I18N = {
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\nЕсли это повторяется, напишите нам через раздел поддержки.\n',
     '알림을 켜지 못했습니다. 인터넷을 확인하고 다시 해 주세요.':'Не удалось включить уведомления. Проверьте соединение и попробуйте ещё раз.',
     '날씨를 받지 못했습니다':'Не удалось получить погоду',
+    '{n}시간 전 예보':'Прогноз {n} ч назад',
+    '새 예보를 받는 중…':'Получаем новый прогноз…',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'Запись прерывалась: {n} [[раз|раза|раз]] — эти участки показаны пунктиром.',
     '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'Пунктир соединяет последнюю полученную точку со следующей.',
@@ -9637,6 +9873,29 @@ const I18N = {
     '소개를 저장했습니다.':'自己紹介を保存しました。',
     '저장하지 못했습니다. 인터넷을 확인해 주세요.':'保存できませんでした。通信を確認してください。',
     '소개를 불러오지 못했습니다. 인터넷을 확인해 주세요.':'自己紹介を読み込めませんでした。通信を確認してください。',
+    '내 프로필':'マイプロフィール',
+    '프로필 수정':'プロフィールを編集',
+    '공개 범위':'公開範囲',
+    '화면':'画面',
+    '테마':'テーマ',
+    '노을':'夕焼け',
+    '흰색':'ホワイト',
+    '검정':'ブラック',
+    '새벽 바다 그림 바탕':'夜明けの海の背景',
+    '흰 바탕에 짙은 글씨':'白い背景に濃い文字',
+    '검은 바탕에 밝은 글씨':'黒い背景に明るい文字',
+    '글자 크기':'文字サイズ',
+    '가':'あ',
+    '앱 전체에 바로 적용됩니다.':'アプリ全体にすぐ反映されます。',
+    '관리':'管理',
+    '계속 수정':'編集を続ける',
+    '나가기':'破棄して戻る',
+    '프로필을 저장했습니다.':'プロフィールを保存しました。',
+    '수정한 내용을 저장하지 않고 나갈까요?':'変更を保存せずに戻りますか？',
+    '← 뒤로':'← 戻る',
+    '소개·자주 타는 바다·가고 싶은 곳을 로그인한 회원 누구나 봅니다.':'自己紹介・よく行く海・行きたい所は、ログインした会員なら誰でも見られます。',
+    '소개·자주 타는 바다·가고 싶은 곳을 선택한 배의 구성원만 봅니다.':'自己紹介・よく行く海・行きたい所は、選んだ船のメンバーだけが見られます。',
+    '소개·자주 타는 바다·가고 싶은 곳을 아무도 못 봅니다.':'自己紹介・よく行く海・行きたい所は、誰にも見えません。',
     '아직 소개를 적지 않으셨습니다.':'まだ自己紹介を書いていません。',
     '이분이 적어 둔 소개가 없거나, 나에게는 공개하지 않았습니다.':'この方は自己紹介を書いていないか、あなたには公開していません。',
     '소개 적기':'自己紹介を書く',
@@ -9664,6 +9923,8 @@ const I18N = {
     '\n\n같은 일이 되풀이되면 고객센터로 알려 주세요.\n':'\n\n何度も起きる場合は、サポートからお知らせください。\n',
     '알림을 켜지 못했습니다. 인터넷을 확인하고 다시 해 주세요.':'通知をオンにできませんでした。インターネットを確認してもう一度お試しください。',
     '날씨를 받지 못했습니다':'天気を取得できませんでした',
+    '{n}시간 전 예보':'{n}時間前の予報',
+    '새 예보를 받는 중…':'新しい予報を取得中…',
     // ── 기록이 끊긴 데 (4.116)
     '기록이 {n}곳에서 끊겼습니다 — 그 사이는 점선입니다.':'記録が{n}か所で途切れました — その区間は点線です。',
     '점선은 위치를 마지막으로 받은 곳과 다시 받은 곳을 이은 선입니다.':'点線は、最後に受け取った位置と次に受け取った位置を結んだ線です。',
@@ -16019,6 +16280,7 @@ function myNameSave(v, 알림){
     try{ if(window.__people && window.__people.mark) window.__people.mark({ name: 쓸것 }); }catch(_){}
   }
   try{ applyAccount(); }catch(_){}
+  if(arguments[2]) return;               // ★ 5.20 — 프로필 수정의 「완료」 가 부를 때는 그쪽이 화면을 맡는다
   openAccount();
   // ★ 담겼다고 말해 준다. 말이 없으면 사람은 다시 누른다.
   if(알림){
@@ -16081,50 +16343,102 @@ function wipeLink(){
     + `<div class="mrnone" style="text-align:center;padding-top:0">${
         esc(t('계정을 지우면 클라우드 기록과 올린 글이 함께 사라집니다.'))}</div>`;
 }
-// ── 계정 화면의 소개 자리
-// ★ 화면을 그린 뒤에 클라우드에서 받아 채운다. 안 받아졌으면 빈 칸으로 둔다 —
-//   못 받은 것을 「없다」 로 보여 주고 그대로 담으면 적어 둔 것이 지워진다.
-function profRow(){
+// ── 계정 화면의 「내 프로필」 (5.20)
+// ★★★ 사장님 지적: 「이거 저장하는것도 개좆같이 만들어놔서 저게 뭔저장버튼인지 모르겠다」
+//   「공개」 칸도 무엇을 공개하는지 안 보였다(칸 이름도 공개, 고른 값도 공개).
+//   조사(claude/뱃일-내소개-글쓴이프로필-다른커뮤니티조사.md): Instagram·X·Reddit·네이버 카페·당근 모두
+//   「내 프로필(남에게 보이는 모습)」 과 「프로필 수정」 화면을 따로 둔다. 수정 화면에 들어온 것만으로
+//   무엇을 고치는지 알고, 저장은 위 오른쪽 「완료」(Instagram·네이버 카페). 공개 설정 이름은 페이스북처럼 「공개 범위」,
+//   그 아래에 **누가 무엇을** 보는지 적는다(Strava·Threads).
+// ★ 이 카드는 남이 내 프로필을 눌렀을 때 보는 것과 같은 것을 보여 준다.
+function profLvWho(p){
+  const q = p || profBlank();
+  if(q.lv === 'com')  return t('소개·자주 타는 바다·가고 싶은 곳을 로그인한 회원 누구나 봅니다.');
+  if(q.lv === 'boat') return t('소개·자주 타는 바다·가고 싶은 곳을 선택한 배의 구성원만 봅니다.');
+  return t('소개·자주 타는 바다·가고 싶은 곳을 아무도 못 봅니다.');
+}
+function profCard(){
   const p = profMine || profBlank();
+  const 줄 = (이름표, 값) => `<div class="mrrow"><span class="mrlbl">${esc(t(이름표))}</span>
+      <span class="mrv" style="flex:1;white-space:pre-wrap">${값 ? esc(값) : '<span class="mrm">—</span>'}</span></div>`;
+  return `<div class="ddiv"></div>
+    <div class="mrsecthead" style="display:flex;align-items:center;gap:8px">
+      <span style="flex:1">${esc(t('내 프로필'))}</span>
+      <button class="mrbtn ok" onclick="openProfEdit()">${esc(t('프로필 수정'))}</button></div>
+    ${줄('이름', myName())}
+    ${줄('소개', p.intro)}${줄('자주 타는 바다', p.seas)}${줄('가고 싶은 곳', p.want)}
+    <div class="mrrow"><span class="mrlbl">${esc(t('공개 범위'))}</span>
+      <span class="mrv" style="flex:1">${esc(t(profLvOne(p.lv).name))}</span></div>
+    <div class="mrm" style="padding:0 0 8px 12px">${esc(profLvWho(p))}</div>
+    <div class="ddiv"></div>`;
+}
+// ── 프로필 수정 화면
+let pfEditing = false;      // 수정 화면이 떠 있다
+let pfSnap = '';            // 열 때 모습 — 바뀌었는지 볼 때 쓴다
+let pfDraft = null;         // 수정 중인 것 (다시 그려도 치던 글이 안 날아가게)
+function openProfEdit(){
+  if(!meUid()){ tell(t('로그인이 필요합니다')); return; }
+  const P = document.getElementById('mrPanel'); if(!P) return;
+  if(!pfEditing){
+    pfDraft = Object.assign(profBlank(), profMine || {}, { name: myNameSet() });
+    pfSnap = JSON.stringify(pfDraft);
+  }
+  pfEditing = true;
+  const p = pfDraft;
   const 고른배 = new Set((p.boats || []).map(String));
   const 배칸 = (p.lv !== 'boat') ? '' :
-    `<div class="mrm" style="padding:0 0 4px 74px;color:#7b8794">${esc(t('어느 배의 구성원에게 보일지 선택하세요.'))}</div>`
+    `<div class="mrm" style="padding:0 0 4px 12px">${esc(t('어느 배의 구성원에게 보일지 선택하세요.'))}</div>`
     + (Array.isArray(boats) && boats.length
-        ? boats.map(b => `<div class="mrrow" style="padding-left:74px">
+        ? boats.map(b => `<div class="mrrow">
              <label style="display:flex;align-items:center;gap:8px;flex:1">
                <input type="checkbox" ${고른배.has(String(b.id)) ? 'checked' : ''}
                       onchange="profBoatToggle('${jsq(String(b.id))}', this.checked)">
                <span>${esc(b.name || t('이름 없음'))}</span></label></div>`).join('')
-        : `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(t('아직 배가 없습니다.'))}</div>`);
-  return `<div class="ddiv"></div>
+        : `<div class="mrm" style="padding:0 0 8px 12px">${esc(t('아직 배가 없습니다.'))}</div>`);
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('프로필 수정'))}</b><span style="flex:1"></span>
+        <button class="tab" onclick="profEditBack()">${esc(t('취소'))}</button>
+        <button class="tab on" onclick="profSave()">${esc(t('완료'))}</button></div>
+    <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>
+      <input id="pfName" style="flex:1" maxlength="20" value="${esc(p.name||'')}" placeholder="${esc(myName())}"></div>
+    <div class="mrm" style="padding:0 0 8px 12px">${esc(t('배 명부와 게시판에 이 이름으로 보입니다. 비워 두면 계정에 있는 이름을 사용합니다.'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('소개'))}</span>
-      <textarea id="pfIntro" rows="2" style="flex:1" maxlength="200"
+      <textarea id="pfIntro" rows="3" style="flex:1" maxlength="200"
         placeholder="${esc(t('어떤 배를 얼마나 탔는지, 무엇을 잘하는지'))}">${esc(p.intro||'')}</textarea></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('자주 타는 바다'))}</span>
-      <input id="pfSeas" style="flex:1" maxlength="60"
-        placeholder="${esc(t('여수 · 남해'))}" value="${esc(p.seas||'')}"></div>
+      <input id="pfSeas" style="flex:1" maxlength="60" placeholder="${esc(t('여수 · 남해'))}" value="${esc(p.seas||'')}"></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('가고 싶은 곳'))}</span>
-      <input id="pfWant" style="flex:1" maxlength="60"
-        placeholder="${esc(t('제주 · 대마도'))}" value="${esc(p.want||'')}"></div>
-    <div class="mrrow"><span class="mrlbl">${esc(t('공개'))}</span>
+      <input id="pfWant" style="flex:1" maxlength="60" placeholder="${esc(t('제주 · 대마도'))}" value="${esc(p.want||'')}"></div>
+    <div class="mrrow"><span class="mrlbl">${esc(t('공개 범위'))}</span>
       <select id="pfLv" style="flex:1" onchange="profLvPick(this.value)">${
-        PROF_LEVELS.map(x => `<option value="${x.k}"${p.lv === x.k ? ' selected' : ''}>${
-          esc(t(x.name))}</option>`).join('')}</select></div>
-    <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(t(profLvOne(p.lv).sub))}</div>
+        PROF_LEVELS.map(x => `<option value="${x.k}"${p.lv === x.k ? ' selected' : ''}>${esc(t(x.name))}</option>`).join('')}</select></div>
+    <div class="mrm" style="padding:0 0 8px 12px">${esc(profLvWho(p))}</div>
     ${배칸}
-    <div class="mrrow" style="justify-content:flex-end">
-      <button class="mrbtn ok" onclick="profSave()">${esc(t('저장'))}</button></div>
     <div id="pfMsg" class="mrnone" style="text-align:left;display:none"></div>`;
+  showPanel(P);
+}
+function profDirty(){
+  if(!pfEditing) return false;
+  try{ return JSON.stringify(profRead()) !== pfSnap; }catch(_){ return true; }
+}
+function profEditEnd(){ pfEditing = false; pfDraft = null; pfSnap = ''; }
+// 취소·뒤로 — 바꾼 것이 있으면 버릴지 묻는다 (애플 지침: 닫기 전에 확인해 잃지 않게)
+async function profEditBack(){
+  if(profDirty()){
+    const ok = await ask(t('수정한 내용을 저장하지 않고 나갈까요?'), { ok: t('나가기'), no: t('계속 수정'), warn: true });
+    if(!ok) return;
+  }
+  profEditEnd();
+  openAccount();
 }
 // 화면에 적어 둔 것을 그대로 들고 온다 (다시 그려도 치던 글이 안 날아가게)
 function profRead(){
   const v = id => { const e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; };
-  const p = profMine || profBlank();
-  return Object.assign({}, p, { intro:v('pfIntro'), seas:v('pfSeas'), want:v('pfWant') });
+  const p = pfDraft || profMine || profBlank();
+  return Object.assign({}, p, { name: v('pfName'), intro:v('pfIntro'), seas:v('pfSeas'), want:v('pfWant') });
 }
 function profLvPick(k){
-  profMine = Object.assign(profRead(), { lv: (PROF_LEVELS.some(x=>x.k===k) ? k : 'none') });
-  openAccount();
+  pfDraft = Object.assign(profRead(), { lv: (PROF_LEVELS.some(x=>x.k===k) ? k : 'none') });
+  openProfEdit();
 }
 function profBoatToggle(id, on){
   const p = profRead();
@@ -16132,32 +16446,37 @@ function profBoatToggle(id, on){
   if(on){
     // ★ 규칙이 배 문서를 하나씩 읽어 확인한다. get() 은 한 번에 열 번까지다.
     if(set.size >= PROF_BOAT_MAX && !set.has(String(id))){
-      profMine = p; openAccount();
+      pfDraft = p; openProfEdit();
       profMsg(tsub('배는 {n}척까지 선택할 수 있습니다.', { n: PROF_BOAT_MAX }));
       return;
     }
     set.add(String(id));
   } else set.delete(String(id));
-  profMine = Object.assign(p, { boats: [...set] });
-  openAccount();
+  pfDraft = Object.assign(p, { boats: [...set] });
+  openProfEdit();
 }
 function profMsg(msg){
   const el = document.getElementById('pfMsg'); if(!el) return;
   el.innerHTML = msg ? esc(t(msg)) : '';
   el.style.display = msg ? 'block' : 'none';
 }
+// 「완료」 — 이름과 소개를 함께 저장하고 계정 화면으로 돌아간다
 async function profSave(){
   if(!meUid()){ profMsg('로그인이 필요합니다'); return; }
-  const p = profRead();
+  const q = profRead();
   // ★ 공개로 돌릴 때만 글을 훑는다. 비공개로 되돌리는 것은 언제나 되어야 한다.
-  if(p.lv !== 'none' && typeof badOk === 'function'
-     && !badOk(p.intro, p.seas, p.want)) return;
-  profMine = p;
-  openAccount();
+  if(q.lv !== 'none' && typeof badOk === 'function'
+     && !badOk(q.intro, q.seas, q.want)) return;
+  const 이름 = q.name; const p = Object.assign({}, q); delete p.name;
   profMsg('저장 중…');
   try{
+    if(이름 !== myNameSet()) myNameSave(이름, false, true);
     await window.__profile.save(p);
-    profMsg('소개를 저장했습니다.');
+    profMine = p;
+    try{ delete profCache[String(meUid())]; }catch(_){}
+    profEditEnd();
+    openAccount();
+    tell(t('프로필을 저장했습니다.'), { kind:'good' });
   }catch(e){
     profMsg('저장하지 못했습니다. 인터넷을 확인해 주세요.');
   }
@@ -16176,8 +16495,7 @@ function openAccount(){
         </div>
       <div class="mrrow"><span class="mrlbl">${esc(t('로그인'))}</span><b class="mrv">${esc(me.email||me.name||'—')}</b></div>
       <div class="mrnone" style="text-align:left">${esc(t('이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.'))}</div>
-      ${nameRow()}
-      ${profRow()}
+      ${profCard()}
       <div class="mrrow"><span class="mrlbl">${esc(t('계정 번호'))}</span>
         <span class="mrm" style="flex:1;word-break:break-all">${esc(meUid()||'—')}</span>
         <button class="minib blu" onclick="copyMyUid()">${esc(t('복사'))}</button></div>
@@ -19994,9 +20312,7 @@ async function renderTalk(){
           ${n?`<span class="tnum" title="${esc(t('댓글'))}">${n}</span>`:''}
           ${(Number(po.likeN)||0) > 0 ? `<span class="tnum good" title="${esc(t('도움됐어요'))}">${Number(po.likeN)}</span>` : ''}
           ${po.hidden?`<span class="chip notice">${esc(t('숨김'))}</span>`:''}</div>
-          <div class="fsub">${(isAdmin() && po.by)
-              ? `<span class="whoa" onclick="event.stopPropagation();openPerson('${jsq(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
-              : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}
+          <div class="fsub">${po.by ? whoLink(po.by, po.byName, '') : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}
             ${po.region?' · '+esc(t(po.region)):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
         </div></div>`;
   }
@@ -20767,7 +21083,7 @@ async function openTalk(id){
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'talk:' + id)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="delTalkComment('${jsq(po.id)}','${jsq(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div></div>`;
@@ -20786,9 +21102,7 @@ async function openTalk(id){
       ${할일}<button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
       ${po.region?`<span class="chip">${esc(t(po.region))}</span>`:''}
-      ${(isAdmin() && po.by)
-        ? `<span class="whoa" onclick="openPerson('${jsq(po.by)}')">${esc(po.byName||t('(이름 없음)'))}</span>`
-        : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
+      ${po.by ? whoLink(po.by, po.byName, 'talk:' + po.id) : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
       · ${esc(String(po.ts||'').slice(0,10))}
 </div>
     ${trBar('community', po.id, (po.title||'') + ' ' + (po.body||''),
@@ -22686,7 +23000,7 @@ function openPost(id){
   const cs = (p.comments||[]).map(c=>{
     const mine = String(c.by) === String(me);
     const canDel = mine ? can(b,'board','write') : can(b,'board','full');
-    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'post:' + id)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${canDel?`<button class="ckdel edt" onclick="delCommentUI('${jsq(p.id)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text).replace(/\n/g,'<br>')}</div></div>`;
@@ -23052,20 +23366,48 @@ function openRoster(){
     + rows;
   showPanel(P); boatKeepTabs('roster');
 }
-// ── 한 사람의 소개 보기 (4.137)
+// ── 한 사람의 프로필 보기 (4.137 → 5.20)
 // ★ 안 보이는 까닭을 숨기지 않는다. 「없다」 와 「나한테는 안 보인다」 는 다른 말이다.
-//   숨기면 사람은 앱이 고장 난 줄 안다.
-async function openProfile(uid){
+// ★★★ 5.20 — 게시글·댓글에서 **누구나** 글쓴이를 눌러 이 화면을 본다 (사장님: 「다른 커뮤니티들은 게시글 쓰면
+//   그사람 눌러봐서 그사람에 대해서 이것저것 볼수 있는데」). 조사: claude/뱃일-내소개-글쓴이프로필-다른커뮤니티조사.md
+//   · Reddit·X·Discord·당근 — 글쓴이를 누르면 그 사람의 프로필이 뜬다.
+//   · 5.19 까지는 글쓴이 이름을 **운영자만** 누를 수 있었고, 누르면 관리 화면(계정 번호·운영자 권한)이 떴다.
+//     Reddit·Discord·네이버 카페 모두 관리 정보는 보통 프로필을 대신하지 않는다 — 관리자도 먼저 프로필을 보고,
+//     관리는 그 안의 [관리] 단추(Discord)나 따로 여는 관리 화면(Reddit·네이버)으로 간다. 그대로 한다.
+// back: 'roster' | 'talk:글번호' | 'post:글번호' | 'spot:정박지번호' | '' — 뒤로 가면 돌아갈 자리
+let profBackTo = '';
+function whoLink(uid, name, back){
+  const nm = esc(name || t('(이름 없음)'));
+  if(!uid) return nm;
+  return `<span class="whoa" onclick="event.stopPropagation();openProfile('${jsq(String(uid))}','${jsq(String(name||''))}','${jsq(String(back||''))}')">${nm}</span>`;
+}
+function profBack(){
+  const k = profBackTo; profBackTo = '';
+  const [kind, id] = String(k).split(/:(.*)/s);
+  try{
+    if(kind === 'roster') return openRoster();
+    if(kind === 'talk'   && id) return openTalk(id);
+    if(kind === 'post'   && id) return openPost(id);
+    if(kind === 'spot'   && id) return openSpot(id);
+  }catch(_){}
+  return closeBoat();
+}
+async function openProfile(uid, name, back){
   const P = document.getElementById('mrPanel'); if(!P) return;
+  profBackTo = (back === undefined) ? 'roster' : String(back || '');
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  const 이름 = (b && b.memberNames && b.memberNames[String(uid)]) || t('이름 미등록');
   const 나 = String(uid) === String(meUid());
-  const 머리 = `<div class="mrhead"><b>${esc(이름)}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openRoster()">${esc(t('← 회원 명부'))}</button></div>`;
+  const 이름 = String(name || '').trim()
+    || (나 && typeof myName === 'function' ? myName() : '')
+    || (b && b.memberNames && b.memberNames[String(uid)]) || t('이름 미등록');
+  const 돌아갈말 = profBackTo === 'roster' ? t('← 회원 명부') : t('← 뒤로');
+  const 머리 = `<div class="mrhead" data-profview="${esc(String(uid))}"><b>${esc(이름)}</b><span style="flex:1"></span>
+      <button class="tab" onclick="profBack()">${esc(돌아갈말)}</button></div>`;
   P.innerHTML = 머리 + `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
   showPanel(P);
   let p = null, 못받음 = false;
-  if(profCache[String(uid)] !== undefined) p = profCache[String(uid)];
+  if(나 && profMine) p = profMine;
+  else if(profCache[String(uid)] !== undefined) p = profCache[String(uid)];
   else if(!window.__profile) 못받음 = true;
   else {
     try{ p = await window.__profile.one(uid); profCache[String(uid)] = p; }
@@ -23079,17 +23421,21 @@ async function openProfile(uid){
   } else if(!profHas(p)){
     속 = `<div class="mrnone" style="text-align:left">${
       esc(나 ? t('아직 소개를 적지 않으셨습니다.')
-             : t('이분이 적어 둔 소개가 없거나, 나에게는 공개하지 않았습니다.'))}</div>`
-      + (나 ? `<div class="mrrow" style="justify-content:flex-end">
-           <button class="mrbtn ok" onclick="openAccount()">${esc(t('소개 적기'))}</button></div>` : '');
+             : t('이분이 적어 둔 소개가 없거나, 나에게는 공개하지 않았습니다.'))}</div>`;
   } else {
     속 = 줄('소개', p.intro) + 줄('자주 타는 바다', p.seas) + 줄('가고 싶은 곳', p.want);
   }
-  // 이 배에서 무엇을 하는 사람인지는 명부가 이미 안다 — 소개와 함께 보여 준다
+  // 같은 배 사람이면 이 배에서 무엇을 하는 사람인지 명부가 이미 안다 — 함께 보여 준다
   const r = (typeof memberRows === 'function' && b) ? memberRows(b).find(x => String(x.uid) === String(uid)) : null;
   const 등급 = r ? `<div class="mrrow"><span class="mrlbl">${esc(t('등급'))}</span>
       <b class="mrv" style="flex:1">${esc(r.rankName)}</b></div>` : '';
-  P.innerHTML = 머리 + 등급 + 속;
+  // 내 프로필이면 고치는 길, 운영자면 관리하는 길 — 둘 다 프로필 **안의 단추**로 (보통 프로필을 대신하지 않는다)
+  const 단추 = [];
+  if(나) 단추.push(`<button class="mrbtn ok" onclick="openProfEdit()">${esc(t('프로필 수정'))}</button>`);
+  if(!나 && typeof isAdmin === 'function' && isAdmin())
+    단추.push(`<button class="mrbtn" onclick="profBackTo='';openPerson('${jsq(String(uid))}')">${esc(t('관리'))}</button>`);
+  P.innerHTML = 머리 + 등급 + 속
+    + (단추.length ? `<div class="mrrow" style="justify-content:flex-end;gap:8px">${단추.join('')}</div>` : '');
   showPanel(P);
 }
 
@@ -24326,9 +24672,14 @@ async function loadBoatData(){
   try{ await trkDropIfGone(); }catch(_){}
 }
 
+// ★★★ 5.20 — 저장소가 열릴 때까지 기다리는 문. 열리기 전에 idbGet 을 부르면 db 가 없어서 그냥 실패한다.
+//   켜자마자 부르는 날씨(ensureWx)가 이것 때문에 폰에 담아 둔 날씨를 못 읽고 인터넷을 기다렸다.
+let dbReadyRes = null;
+const dbReady = new Promise(r => { dbReadyRes = r; });
 async function initStorage(){
   try{
     db = await openDB();
+    try{ dbReadyRes(true); }catch(_){}
     // 배 목록을 먼저 읽어야 어느 배의 기록을 불러올지 알 수 있다
     try{ boats = (await idbGet('boats'))||[]; }catch(e){ boats = []; }
     try{ currentBoatId = (await idbGet('curboat'))||null; }catch(e){ currentBoatId = null; }
@@ -24336,6 +24687,7 @@ async function initStorage(){
     await loadBoatData();
     updateTrashTab();
   }catch(e){
+    try{ dbReadyRes(false); }catch(_){}
     db = null;
     try{ items = migrate(JSON.parse(localStorage.getItem('bt_items')||'[]')); }catch(_){ items=[]; }
     try{ trash = migrate(JSON.parse(localStorage.getItem('bt_trash')||'[]')); }catch(_){ trash=[]; }
@@ -25697,7 +26049,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.19';
+const APP_VER = '5.20';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -26463,23 +26815,95 @@ function navAttachNative(){
     return true;
   }catch(_){ return false; }
 }
-// ★★★ 5.19 — 아이폰: 왼쪽 끝에서 쓸어 뒤로 가기 (사장님 지적: 「항해일지 옆으로 쓸면 뒤로가기 되야하는데 안된다」)
-//   아이폰 앱에는 이것이 아예 없었다. 쓸기는 아이폰 쪽(MainViewController.swift)이 받고,
-//   무엇을 물릴지는 안드로이드 뒤로가기와 **같은 문(navDoBack)** 이 정한다. 두 폰이 똑같이 물린다.
-//   ★ 안드로이드와 다른 점 하나 — 오늘 화면 첫 자리에서는 아무 일도 없다(아이폰 앱은 쓸어서 닫히지 않는다).
-//   ★ 도면에 그리는 중에는 쓸기를 끈다 — 왼쪽 끝에서 선을 긋다가 한 획이 지워지거나 뒤로 가 버리지 않게.
+// ★★★ 5.19 → 5.20 — 아이폰: 옆으로 쓸어 뒤로 가기
+//   사장님 지적: 「항해일지 옆으로 쓸면 뒤로가기 되야하는데 안된다」 (5.18 까지 아이폰에는 아예 없었다)
+//   ★ 5.19 는 다른 앱 조사 없이 만들었다(사장님 격노). 5.20 은 조사한 대로 애플 방식에 맞춘다 —
+//     「claude/뱃일-아이폰-뒤로가기-진동-다른앱조사.md」
+//     ① iOS 26 부터 아이폰 앱은 **화면 어디서든** 왼→오른쪽으로 밀면 뒤로 간다
+//        (UINavigationController.interactiveContentPopGestureRecognizer). 왼쪽 끝만이 아니다.
+//     ② 옆으로 스스로 움직이는 칸(지도·도면·달력·가로로 밀리는 줄) 위에서 시작하면 그 칸이 먼저다
+//        (iOS 26 가운데 쓸기가 구글 지도와 부딪힌 개발자 보고 — 애플 포럼 803771).
+//        왼쪽 끝(24pt)에서 시작한 쓸기는 어디서든 뒤로 간다 — 원래 아이폰의 왼쪽 끝 쓸기 그대로.
+//     ③ 밀면 지금 화면이 손가락을 따라가고 **밑에 이전 화면이 드러난다.**
+//        이전 화면 모습은 손가락이 닿을 때마다 아이폰 쪽이 찍어 두고(화면 열쇠 navKey 로),
+//        밀 때 되돌아갈 자리의 열쇠(backKey)로 찾아 밑에 깐다. 놓으면 진짜 화면으로 바뀐다.
+//   ★ 무엇을 물릴지는 안드로이드 뒤로가기와 **같은 문(navDoBack)** 이 정한다. 두 폰이 똑같이 물린다.
+//   ★ 오늘 첫 자리에서는 쓸기가 시작되지 않는다(아이폰 앱은 쓸어서 닫히지 않는다).
+//   ★ 도면에 그리는 중에는 끈다 — 선을 긋다가 뒤로 가 버리지 않게.
+function navKeyParts(){
+  const S = (typeof SCREEN_STACK !== 'undefined') ? SCREEN_STACK : [];
+  const O = (typeof OVERLAY_STACK !== 'undefined') ? OVERLAY_STACK : [];
+  let md = ''; try{ const m = modeNow(); md = m ? m.k : ''; }catch(_){}
+  let pub = '';
+  try{ if(typeof boatPageData !== 'undefined' && boatPageData) pub = (boatPageData.id || '') + '|' + pubSpot(); }catch(_){}
+  let mr = '';
+  try{ if(S.indexOf('mrPanel') >= 0 && typeof mrOpenType !== 'undefined' && mrOpenType) mr = mrOpenType + ':' + mrOpenId; }catch(_){}
+  return { spot: navSpot(), scr: S.join(','), mr, ov: O.join(','), md, pub };
+}
+function navKeyOf(p){ return [p.spot, p.scr, p.mr, p.ov, p.md, p.pub].join('#'); }
+function navKey(){ try{ return navKeyOf(navKeyParts()); }catch(_){ return ''; } }
+// 한 걸음 물리면 어느 화면이 되는가 — 그 화면의 열쇠. 모르면 빈 글자(그때는 밑에 바탕색만 깐다).
+function navBackKey(){
+  try{
+    const k = navBackKind();
+    if(!k || k === 'undo') return '';
+    const p = navKeyParts();
+    if(k === 'overlay'){ p.ov = OVERLAY_STACK.slice(0, -1).join(','); return navKeyOf(p); }
+    if(k === 'mode'){ p.md = ''; return navKeyOf(p); }
+    if(k === 'pubvoy'){ p.pub = (boatPageData.id || '') + '|' + pubTrail[pubTrail.length - 2]; return navKeyOf(p); }
+    if(k === 'screen'){
+      const top = SCREEN_STACK[SCREEN_STACK.length - 1];
+      if(top === 'mrPanel' && mrBack.length){ const b = mrBack[mrBack.length - 1]; p.mr = b.type + ':' + b.id; return navKeyOf(p); }
+      const rest = SCREEN_STACK.slice(0, -1);
+      p.scr = rest.join(','); if(rest.indexOf('mrPanel') < 0) p.mr = ''; p.pub = '';
+      return navKeyOf(p);
+    }
+    if(k === 'spot'){ const tr = navTrails[curTab]; p.spot = tr[tr.length - 2]; return navKeyOf(p); }
+    if(k === 'tab'){ const a = String(p.spot).split('|'); a[0] = 'home'; p.spot = a.join('|'); return navKeyOf(p); }
+  }catch(_){}
+  return '';
+}
+// 이 자리에서 시작한 쓸기를 그 칸이 먼저 받아야 하나 (지도·도면·달력·가로로 밀리는 줄·입력 중인 칸)
+function iosSwipeOwned(x, y){
+  let el = null;
+  try{ el = document.elementFromPoint(x, y); }catch(_){}
+  for(let e = el; e && e !== document.body && e !== document.documentElement; e = e.parentElement){
+    const tag = e.tagName;
+    if(e.id === 'calList' || e.id === 'map' && e.classList.contains('lkedit')) return 'own';
+    if(tag === 'CANVAS') return 'own';
+    if(tag === 'INPUT' && String(e.type).toLowerCase() === 'range') return 'own';
+    if(e === document.activeElement && (/^(INPUT|TEXTAREA)$/.test(tag) || e.isContentEditable)) return 'own';
+    let st = null; try{ st = getComputedStyle(e); }catch(_){}
+    if(!st) continue;
+    const ta = String(st.touchAction || '');
+    if(ta === 'none' || ta === 'pan-y' || ta === 'pinch-zoom') return 'own';
+    const ox = st.overflowX;
+    if((ox === 'auto' || ox === 'scroll') && e.scrollWidth > e.clientWidth + 1 && e.scrollLeft > 0) return 'own';
+  }
+  return '';
+}
 window.__iosBack = {
-  can(){
+  EDGE: 24,
+  // x·y 는 손가락이 닿은 자리(웹 화면 글씨 단위). 없으면 자리는 안 본다.
+  can(x, y){
     try{
-      if(typeof lkEdit !== 'undefined' && lkEdit) return { ok:false };
-      if(typeof mrDraw !== 'undefined' && mrDraw) return { ok:false };
+      if(typeof lkEdit !== 'undefined' && lkEdit) return { ok:false, why:'draw' };
+      if(typeof mrDraw !== 'undefined' && mrDraw) return { ok:false, why:'draw' };
       let bg = '';
       try{ bg = getComputedStyle(document.body).backgroundColor || ''; }catch(_){}
-      return { ok: !!navBackKind(), bg };
+      if(!navBackKind()) return { ok:false, bg, why:'none' };
+      const edge = !(typeof x === 'number') || x <= this.EDGE;
+      if(!edge && iosSwipeOwned(x, y)) return { ok:false, bg, why:'own' };
+      return { ok:true, bg, back: navBackKey() };
     }catch(_){ return { ok:false }; }
   },
+  key(){ return navKey(); },
   go(){
-    if(!this.can().ok) return false;
+    try{
+      if(typeof lkEdit !== 'undefined' && lkEdit) return false;
+      if(typeof mrDraw !== 'undefined' && mrDraw) return false;
+      if(!navBackKind()) return false;
+    }catch(_){ return false; }
     try{ const a = document.activeElement; if(a && a !== document.body && a.blur) a.blur(); }catch(_){}
     try{ return !!navDoBack(); }catch(_){ return false; }
   }
@@ -27893,7 +28317,7 @@ function bindHold(){
     sx = e.clientX; sy = e.clientY; done = false;
     stop();
     timer = setTimeout(() => { done = true;
-      try{ if(navigator.vibrate) navigator.vibrate(12); }catch(_){}
+      holdTick();
       if(id != null && isFinite(id)) itemMenu(id);
       else if(!pickOn && unlocked) pickStart(null);
     }, 500);
@@ -28168,6 +28592,21 @@ function toggleView(force){
 //
 // ★ 문 하나 — 파일을 밖으로 내보내는 일은 전부 여기를 지난다.
 //   자리마다 따로 짜면 한 군데는 앱에서 안 되는 채로 남는다. 실제로 그랬다.
+// ★★★ 5.20 — 길게 눌러 메뉴가 뜰 때 짧은 「톡」 (사장님: 「진동도 넣어야지」)
+//   아이폰: 항목을 길게 누르면(기본 약 0.5초) 메뉴가 뜨면서 짧은 진동이 온다 — 애플 「햅틱 터치」.
+//     아이폰 앱의 웹 화면에는 진동(navigator.vibrate)이 없어서 5.19 까지 아이폰만 조용했다.
+//     캐퍼시터 공식 진동 부품(@capacitor/haptics)으로 애플 햅틱(가벼운 충돌, impact Light)을 낸다.
+//     애플 원칙(HIG Playing haptics): 짧게, 같은 동작엔 늘 같게, 남발하지 않게 — 이 한 자리에만 쓴다.
+//   안드로이드: 길게 누르기에는 원래 짧은 진동이 있다(안드로이드 햅틱 문서). 전과 같이 0.012초.
+//   조사: claude/뱃일-아이폰-뒤로가기-진동-다른앱조사.md
+function holdTick(){
+  try{
+    const H = (typeof trkIsIOS === 'function' && trkIsIOS()) ? capPlug('Haptics') : null;
+    if(H && H.impact){ H.impact({ style:'LIGHT' }).catch(()=>{}); return 'ios'; }
+  }catch(_){}
+  try{ if(navigator.vibrate){ navigator.vibrate(12); return 'vib'; } }catch(_){}
+  return '';
+}
 function capPlug(name){
   try{ return (window.Capacitor && window.Capacitor.Plugins
                && window.Capacitor.Plugins[name]) || null; }catch(_){ return null; }
@@ -29888,8 +30327,14 @@ function renderHome(){
         ${esc(t('배를 등록하지 않아도 날씨와 물때는 볼 수 있습니다.'))}</div>
       <div class="mrrow" style="padding:10px 0 2px">
         <button class="mrbtn" style="width:100%" onclick="homeUseGPS()">${esc(t('지금 있는 곳 날씨 보기'))}</button></div>`;
+  } else if(typeof wxFailed !== 'undefined' && wxFailed && !wxEnsureP){
+    // ★ 5.20 — 못 받았으면 못 받았다고 말한다. 「받는 중」 으로 두면 사람은 영영 기다린다.
+    wxBody = `<div class="hmute">${esc(t('날씨를 받지 못했습니다'))}</div>
+      <div class="mrrow" style="padding:10px 0 2px">
+        <button class="mrbtn" style="width:100%" onclick="wxRetryHome()">${esc(t('다시 시도'))}</button></div>`;
   } else {
     wxBody = `<div class="hmute">${esc(t('날씨를 받는 중입니다…'))}</div>`;
+    try{ wxHomeHeal(); }catch(_){}          // ★ 5.20 — 비어 있으면 스스로 다시 부른다
   }
   try{
     const idx = wxNowIdx();
@@ -29909,7 +30354,7 @@ function renderHome(){
         + `<div class="hrow2">${esc(t('바람'))} <b>${kt(now.wind)}</b>`
         + ` · ${esc(t('돌풍'))} <b>${kt(now.gust)}</b>`
         + ` · ${esc(t('파고'))} <b>${now.wave!=null?Number(now.wave).toFixed(1)+'m':'—'}</b></div>`
-        + `<div class="hmute">${wxWhenText(idx)}</div>`
+        + `<div class="hmute">${wxWhenText(idx)}${wxAgeText() ? ' · ' + esc(wxAgeText()) : ''}</div>`
         + (reefText(rf) ? `<div class="hmute">${esc(reefText(rf))}</div>` : '')
         + (warn.length ? '<div class="hwarn">' + warn.map(w=>esc(w.text)).join('<br>') + '</div>' : '');
     }
@@ -31726,7 +32171,9 @@ function closeTopScreen(){
   if(!id) return false;
   const F = {
     // ★ 기록 창은 안에서 다른 기록으로 건너뛸 수 있다. 자국이 있으면 그리로 돌아간다.
-    mrPanel:   ()=>{ if(mrBack.length){ const p = mrBack.pop();
+    mrPanel:   ()=>{ if(pfEditing && document.getElementById('pfIntro')){ profEditBack(); return; }
+                     if(profBackTo && document.querySelector('#mrPanel [data-profview]')){ profBack(); return; }
+                     if(mrBack.length){ const p = mrBack.pop();
                        mrGoingBack = true; try{ openMR(p.type, p.id); } finally { mrGoingBack = false; }
                        return; }
                      closeBoat(); },
@@ -34085,6 +34532,8 @@ function openSettings(){
   const lbl = x => `<div class="notilbl">${esc(x)}</div>`;
   P.innerHTML = `<div class="mrhead"><b>${t('설정')}</b><span style="flex:1"></span></div>`
     + row(t('알림'), t('댓글 · 정비 기한 · 관심 있는 글'), 'openNoti()')
+    // ★ 5.20 — 테마·글자 크기 (카카오톡 「설정 › 화면」, 토스 「화면 설정」 자리)
+    + row(t('화면'), lookSay(), 'openLook()')
     + (many ? row(t('언어 · Language'), langName, 'openLang()') : '')
     // ★ 4.102 — 나라는 말과 따로 고른다. 긴급 연락처·출항 전 점검표가 이것을 본다.
     + row(t('국가'), (COUNTRIES.find(c=>c.k===boatCc()) ? t(countryName(boatCc())) : t('선택 안 함')),
@@ -34117,6 +34566,45 @@ function openSettings(){
   showPanel(P);
   setHeadTitle('설정');
   try{ paintPhotoRow(); }catch(_){}
+}
+// ★★★ 5.20 — 화면: 테마(노을·흰색·검정) · 글자 크기 (사장님: 「좋다 글 크기 사용자가 정하게 하자」)
+//   조사: claude/뱃일-화면색-글씨-다른앱조사.md — 카카오톡 「설정 › 테마」·「설정 › 화면 › 글자크기」, 토스 「화면 설정」.
+//   바꾸는 일은 <head> 의 btLook 이 한다. 여기는 고르는 자리뿐이다.
+//   ★ 글자 크기는 카카오톡·네이버·아이폰처럼 이름 대신 「가」 를 크기대로 보여 주고 고르게 한다
+//     (그 앱들은 단계 이름 없이 밀대로 고른다 — 이름을 지어내지 않는다).
+const LOOK_THEMES = [
+  { k:'sunset', name:'노을', sub:'새벽 바다 그림 바탕' },
+  { k:'light',  name:'흰색', sub:'흰 바탕에 짙은 글씨' },
+  { k:'black',  name:'검정', sub:'검은 바탕에 밝은 글씨' }
+];
+const LOOK_SIZES = [ { k:'normal', px:15 }, { k:'big', px:19 }, { k:'bigger', px:23 } ];
+function lookSay(){
+  try{ const th = LOOK_THEMES.find(x => x.k === window.btLook.theme()); return th ? t(th.name) : ''; }catch(_){ return ''; }
+}
+function openLook(){
+  const P = document.getElementById('mrPanel'); if(!P || !window.btLook) return;
+  const th = window.btLook.theme(), fs = window.btLook.size();
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('화면'))}</b><span style="flex:1"></span></div>
+    <div class="secl">${esc(t('테마'))}</div>`
+    + LOOK_THEMES.map(x => `<div class="mrrow setrow" onclick="lookPick('theme','${x.k}')">
+        <div style="flex:1;min-width:0"><b class="mrv" style="display:block">${esc(t(x.name))}</b>
+          <span class="mrm" style="display:block">${esc(t(x.sub))}</span></div>
+        <button class="minib ${x.k === th ? 'grn' : 'blu'}">${esc(x.k === th ? t('선택됨') : t('선택'))}</button></div>`).join('')
+    + `<div class="secl">${esc(t('글자 크기'))}</div>
+    <div class="mrrow lookfs" style="gap:10px">`
+    + LOOK_SIZES.map(x => `<button class="tab${x.k === fs ? ' on' : ''}" data-fs="${x.k}" aria-pressed="${x.k === fs}"
+          onclick="lookPick('size','${x.k}')" style="flex:1;min-height:56px"><span data-bt-raw data-lookpx="${x.px}">${esc(t('가'))}</span></button>`).join('')
+    + `</div>
+    <div class="mrrow"><span class="mrv" style="flex:1">${esc(t('바람'))} <b>12kt</b> · ${esc(t('파고'))} <b>0.8m</b> · ${esc(t('간조'))} <b>16:21</b></span></div>
+    <div class="mrnone" style="text-align:left">${esc(t('앱 전체에 바로 적용됩니다.'))}</div>`;
+  // 「가」 는 글자 크기 단계와 상관없이 제 크기로 보여야 고를 수 있다
+  P.querySelectorAll('[data-lookpx]').forEach(e => { e.style.cssText = 'font-size:' + e.getAttribute('data-lookpx') + 'px;line-height:1'; });
+  showPanel(P);
+  setHeadTitle('화면');
+}
+function lookPick(k, v){
+  try{ window.btLook.set(k, v); }catch(_){}
+  openLook();
 }
 // 「이 기기에 저장한 사진」 줄을 채운다.
 //   ★ 숫자를 못 재는 브라우저가 있다. 그때는 장수만 말한다 — 0MB 라고 하면 거짓말이다.
@@ -37689,7 +38177,7 @@ function bpSocial(boatId, recId){
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, '')}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="bpDelComment('${jsq(boatId)}','${jsq(recId)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
@@ -38409,7 +38897,7 @@ function spotCmtHtml(s){
     .slice().sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${esc(c.byName||'')}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'spot:' + s.id)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="delSpotComment('${jsq(s.id)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       ${c.text ? `<div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div>` : ''}
@@ -46560,6 +47048,8 @@ const WX_FRESH_MS  = 60 * 60 * 1000;        // 한 시간 안이면 다시 안 �
 const WX_KEEP_MS   = 12 * 60 * 60 * 1000;   // 못 받으면 반나절까지는 담아 둔 것을 쓴다
 async function wxCacheGet(key){
   try{
+    // ★ 5.20 — 켜자마자 부르면 저장소가 아직 안 열려 있다. 열릴 때까지(길어야 2초) 기다린다.
+    if(!db){ try{ await Promise.race([dbReady, new Promise(r => setTimeout(r, 2000))]); }catch(_){} }
     const c = await idbGet(WX_CACHE_KEY);
     if(c && c.key === key && c.w) return c;
   }catch(_){}
@@ -46570,41 +47060,96 @@ function wxCachePut(key, d){
 }
 // 앱을 열면 날씨를 한 번 받아 둔다.
 // ★ 예전에는 날씨·물때 탭을 눌러야 받아왔다. 그래서 오늘 탭이 비어 있었다.
+//
+// ★★★ 5.20 — 담아 둔 날씨를 **먼저** 보여 주고, 새 예보는 뒤에서 받는다 (사장님: 「오늘창에서 날씨불러오는게 존나 느리던데」)
+//   잰 것(claude/뱃일-날씨-늦게뜸-잰것.md):
+//     ① 로그인이 확인되는 순간(wxReload) 날씨를 비우고, 날씨 화면일 때만 다시 불러서
+//        **오늘 화면은 75초가 지나도 「받는 중」** 이었다. 담아 둔 날씨로는 8ms 면 떴다.
+//     ② 담아 둔 날씨가 한 시간이 지났으면 새로 받을 때까지 아무것도 안 보여 줬다.
+//   안드로이드 공식 지침(오프라인 우선)·웹 표준(stale-while-revalidate)대로:
+//     · 담아 둔 것이 반나절 안이면 곧바로 보여 준다. 한 시간이 지났으면 「n시간 전 예보」 라고 밝힌다(Windy 처럼).
+//     · 한 시간이 지났거나 없으면 새로 받는다 — 보여 줄 것이 있으면 뒤에서, 없으면 기다려서.
+//     · 오늘 화면은 날씨가 비어 있으면 스스로 다시 부른다(wxHomeHeal). 못 받았으면 못 받았다고 말한다.
 let wxEnsuring = false;
-async function ensureWx(){
-  if(wxEnsuring) return null;                       // 한 번에 하나만
-  if(!wxCur) wxInit();
-  if(!wxCur) return null;
-  // ★ 5.0 — 열쇠 모양을 자리별 날씨(wxPtKey)와 **똑같이** 맞춘다.
-  //   달라 두면 같은 자리를 두 번 받아 놓고 서로 못 알아본다.
-  const key = wxPtKey(wxCur.lat, wxCur.lon);
-  if(wxData && wxData.key === key){ wxStamp(); return wxData; }
-  wxEnsuring = true;
-  // ★ 5.10 — 자리를 먼저 잡아 둔다. 담아 둔 것을 읽는 동안 지점이 바뀌면 열쇠와 날씨가 서로 다른 곳이 된다.
-  const wxLat0 = wxCur.lat, wxLon0 = wxCur.lon;
-  const wxSame = () => !!wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key;
-  try{
-    const c = await wxCacheGet(key);
-    // ① 담아 둔 것이 한 시간 안이면 그것을 쓴다 — 부르지 않는다
-    if(c && (Date.now() - (c.at || 0)) < WX_FRESH_MS){
-      if(wxSame()){ wxData = { key: key, w: c.w, m: c.m }; wxStamp(); }
-    }else{
-      try{
-        const d = await wxFetch(wxLat0, wxLon0);
-        wxCachePut(key, d);                           // 그 자리의 날씨는 그 자리 열쇠로 담는다 — 맞는 것이다
-        if(wxSame()){ wxData = { key, ...d }; wxStamp(); }
-      }catch(e){
-        // ② 못 받았으면 담아 둔 것이라도 쓴다 (반나절까지). 빈 화면보다 낫다.
-        if(c && (Date.now() - (c.at || 0)) < WX_KEEP_MS && wxSame()){
-          wxData = { key: key, w: c.w, m: c.m };
-          wxStamp();
-        }
+let wxEnsureP = null;            // 지금 도는 ensureWx — 두 번 부르면 같은 것을 기다린다
+let wxTryAt = 0;                 // 마지막으로 받으려 한 때
+let wxFailed = false;            // 보여 줄 것도 없고 받지도 못했다
+const WX_BG = {};                // 열쇠별 뒤에서 받는 중
+function wxRefresh(key, lat, lon){
+  if(WX_BG[key]) return WX_BG[key];
+  WX_BG[key] = (async ()=>{
+    try{
+      const d = await wxFetch(lat, lon);
+      wxCachePut(key, d);                           // 그 자리의 날씨는 그 자리 열쇠로 담는다
+      if(wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key){
+        wxData = { key, ...d, _at: Date.now() }; wxStamp(); wxFailed = false;
+        try{ if(typeof renderHome === 'function') renderHome(); }catch(_){}
+        try{ if(typeof curScreen === 'function' && curScreen() === 'weather' && typeof renderWeather === 'function') renderWeather(); }catch(_){}
       }
+      return true;
+    }catch(_){ return false; }
+    finally{ delete WX_BG[key]; }
+  })();
+  return WX_BG[key];
+}
+function ensureWx(){
+  if(wxEnsureP) return wxEnsureP;
+  wxEnsureP = (async ()=>{
+    if(!wxCur) wxInit();
+    if(!wxCur) return null;
+    // ★ 5.0 — 열쇠 모양을 자리별 날씨(wxPtKey)와 **똑같이** 맞춘다.
+    const key = wxPtKey(wxCur.lat, wxCur.lon);
+    const wxLat0 = wxCur.lat, wxLon0 = wxCur.lon;
+    const wxSame = () => !!wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key;
+    if(wxData && wxData.key === key){
+      wxStamp();
+      // 들고 있는 것이 한 시간을 넘었으면 뒤에서 새로 받는다
+      if(wxData._at && (Date.now() - wxData._at) >= WX_FRESH_MS) wxRefresh(key, wxLat0, wxLon0);
+      return wxData;
     }
-  }catch(e){ /* 인터넷이 없으면 조용히 넘어간다 */ }
-  wxEnsuring = false;
-  try{ if(typeof renderHome === 'function') renderHome(); }catch(e){}
-  return wxData;
+    wxEnsuring = true;
+    wxTryAt = Date.now();
+    try{
+      let c = null;
+      try{ c = await wxCacheGet(key); }catch(_){}
+      const age = c ? (Date.now() - (c.at || 0)) : Infinity;
+      if(c && age < WX_KEEP_MS && wxSame()){
+        wxData = { key, w: c.w, m: c.m, _at: c.at || 0 }; wxStamp();
+        try{ if(typeof renderHome === 'function') renderHome(); }catch(_){}   // 담아 둔 것을 곧바로
+      }
+      if(age >= WX_FRESH_MS){
+        if(wxData && wxData.key === key) wxRefresh(key, wxLat0, wxLon0);   // 보여 줄 것이 있다 → 뒤에서
+        else await wxRefresh(key, wxLat0, wxLon0);                          // 없다 → 기다린다
+      }
+    }catch(e){ /* 인터넷이 없으면 조용히 넘어간다 */ }
+    wxEnsuring = false;
+    wxFailed = !(wxData && wxSame() && wxData.key === key);
+    try{ if(typeof renderHome === 'function') renderHome(); }catch(e){}
+    return wxData;
+  })().finally(()=>{
+    wxEnsureP = null; wxEnsuring = false;
+    // 못 받았으면 「받는 중」 을 거두고 「받지 못했습니다」 로 다시 그린다 (도는 동안에는 받는 중으로 보였다)
+    if(wxFailed){ try{ if(typeof renderHome === 'function') renderHome(); }catch(_){} }
+  });
+  return wxEnsureP;
+}
+// 오늘 화면이 그려질 때 날씨가 비어 있으면 스스로 다시 부른다
+function wxHomeHeal(){
+  if(!wxCur || wxEnsureP) return;
+  if(wxData && wxData.key === wxPtKey(wxCur.lat, wxCur.lon)) return;
+  // 못 받은 뒤에는 15초에 한 번까지만 다시 부른다 (인터넷이 없을 때 계속 두드리지 않게).
+  // 그냥 비워진 것(로그인 확인·지점 바꿈)이면 곧바로 — 담아 둔 것을 읽는 데는 인터넷이 안 든다.
+  if(wxFailed && Date.now() - wxTryAt < 15000) return;
+  setTimeout(()=>{ try{ ensureWx(); }catch(_){} }, 0);
+}
+function wxRetryHome(){ wxTryAt = 0; wxFailed = false; try{ renderHome(); }catch(_){} }
+// 담아 둔 예보가 한 시간을 넘었으면 언제 것인지 밝힌다 (Windy 「Forecast update time」 처럼)
+function wxAgeText(){
+  const at = wxData && wxData._at;
+  if(!at) return '';
+  const h = Math.floor((Date.now() - at) / 3600e3);
+  if(h < 1) return '';
+  return t('{n}시간 전 예보').split('{n}').join(String(h));
 }
 // 리프 단수는 숫자(0·1·2·3)다. 그대로 찍으면 화면에 '2' 만 덩그러니 나온다.
 // 어느 시각 자료인지. 이것이 없어서 아침 값이 '지금' 인 줄 알았다.
@@ -46797,11 +47342,26 @@ let tideCache = null, tideLoaded = false;
 async function loadTide(){
   if(tideLoaded) return tideCache;
   tideLoaded = true;
-  try{
-    const r = await fetch(DATA_BASE+'tide.json?v='+Date.now(), {cache:'no-store'});
-    if(r.ok){ tideCache = await r.json(); idbSet('tidecache', tideCache).catch(e=>{}); }
-  }catch(e){}
-  if(!tideCache){ try{ tideCache = await idbGet('tidecache'); }catch(e){} }
+  // ★★★ 5.20 — 폰에 담아 둔 물때를 **먼저** 쓰고, 새것은 뒤에서 받는다.
+  //   5.19 까지는 켤 때마다 tide.json(압축 421KB)을 새로 받을 때까지 날씨 화면이 기다렸다
+  //   (claude/뱃일-날씨-늦게뜸-잰것.md). 담아 둔 것이 없을 때만 받을 때까지 기다린다.
+  if(!db){ try{ await Promise.race([dbReady, new Promise(r => setTimeout(r, 2000))]); }catch(_){} }
+  try{ tideCache = await idbGet('tidecache'); }catch(e){}
+  const 새로 = (async ()=>{
+    try{
+      const r = await fetch(DATA_BASE+'tide.json?v='+Date.now(), {cache:'no-store'});
+      if(r.ok){
+        const j = await r.json();
+        const 있었음 = !!tideCache;
+        tideCache = j; idbSet('tidecache', tideCache).catch(e=>{});
+        if(있었음){
+          try{ if(typeof renderHome === 'function' && typeof curScreen === 'function' && curScreen() === 'home') renderHome(); }catch(_){}
+          try{ if(typeof curScreen === 'function' && curScreen() === 'weather') renderWeather(); }catch(_){}
+        }
+      }
+    }catch(e){}
+  })();
+  if(!tideCache) await 새로;
   tidePackSync();          // 나라별 물때도 같이 챙긴다 (기다리지 않는다)
   try{ loadHcModel(); }catch(_){}   // ★ 5.10 — 조석 모형 점도 미리 (수심 환산이 날씨 화면을 안 거쳐도 쓰게)
   return tideCache;
@@ -47835,31 +48395,44 @@ function renderWxSel(){
 }
 
 // ===== 메인 렌더 =====
+// 날씨 화면의 곁 자료 — 물때·한국 소식·조류·조석 모형·먼 바다 경보·그 나라 물때·일본 자료.
+// 지점마다 한 번만 받는다. 받는 동안 날씨는 먼저 그려져 있고, 다 받으면 한 번 더 그린다.
+const WX_AUX = {};
+function wxAuxRun(){
+  const k = wxCur ? wxPtKey(wxCur.lat, wxCur.lon) : '-';
+  if(WX_AUX[k]) return WX_AUX[k];
+  const job = { finished:false, p:null };
+  job.p = (async ()=>{
+    try{ await Promise.all([ loadTide(), loadKr(), loadCur(), loadHcModel() ]); }catch(_){}
+    try{ if(wxSpotFarSea()) await loadMW(); }catch(_){}
+    // ★★★ 5.10 — 보고 있는 **날씨 지점**이 그 나라 물이면 그 나라 물때도 받는다 (그 지점을 골랐다 = 거기 갈 것)
+    try{
+      if(wxCur && typeof spotPacksFor === 'function'){
+        tidePackLoadLocal();
+        for(const pk of spotPacksFor(wxCur.lat, wxCur.lon)){ await tidePackGet(pk); }
+      }
+    }catch(_){}
+    // ★ 배가 한국 해역 밖일 때만 일본 자료를 받는다. 한국에 있는 배에는 부를 까닭이 없다.
+    try{
+      if((typeof boatOutsideKR === 'function' && boatOutsideKR()) || wxSpotInJP()){
+        await loadSeaJP();
+        if(seaMine() || (wxCur && seaAt(Number(wxCur.lat), Number(wxCur.lon)))) await loadJW(true);
+      }
+    }catch(_){}
+  })().finally(()=>{ job.finished = true; });
+  WX_AUX[k] = job;
+  return job;
+}
 async function renderWeather(){
   const L = document.getElementById('weatherList');
   if(!wxCur){ wxInit(); }
-  await loadTide();
-  await loadKr();
-  await loadCur();           // ★ 5.10 — 조류
-  await loadHcModel();       // ★ 5.10 — 관측소 없는 바다의 조석 모형 점 (EOT20 전 세계 해안)
-  if(wxSpotFarSea()) await loadMW();   // ★ 5.10 — 러시아 극동·먼 바다 해상경보
-  // ★★★ 5.10 — 보고 있는 **날씨 지점**이 그 나라 물이면 그 나라 물때도 받는다.
-  //   전에는 「기기가 지금 그 나라에 있거나 그 말을 쓸 때」 만 받았다(tidePackSync).
-  //   한국에 있는 사람이 도쿄 지점을 골라 두면 일본 물때표가 없어서,
-  //   예전에는 1000km 떨어진 한국 관측소 물때가 「도쿄 물때」 로 떴고(5.10 거리 한도 전),
-  //   거리 한도를 둔 뒤로는 아예 관 물때가 안 나왔다. (2026-09-22 시뮬레이터 검사 2회째)
-  //   그 지점을 사람이 골랐다는 것이 「거기 갈 것」 이라는 뜻이라, 그때만 받는다 — 한 번 받으면 기기에 남는다.
-  try{
-    if(wxCur && typeof spotPacksFor === 'function'){
-      tidePackLoadLocal();
-      for(const pk of spotPacksFor(wxCur.lat, wxCur.lon)){ await tidePackGet(pk); }
-    }
-  }catch(_){}
-  // ★ 배가 한국 해역 밖일 때만 일본 자료를 받는다. 한국에 있는 배에는 부를 까닭이 없다.
-  if((typeof boatOutsideKR === 'function' && boatOutsideKR()) || wxSpotInJP()){
-    await loadSeaJP();
-    if(seaMine() || (wxCur && seaAt(Number(wxCur.lat), Number(wxCur.lon)))) await loadJW(true);
-  }
+  // ★★★ 5.20 — 날씨부터 그린다 (사장님: 「날씨창으로 들어가도 존나 느리게 뜸」)
+  //   5.19 까지는 물때(tide.json)·한국 소식·조류·조석 모형·경보를 **차례로 다 받은 뒤에야**
+  //   날씨를 불러 그렸다. 사장님 PC 빠른 인터넷에서도 2.6초, 폰에서는 훨씬 길었다(claude/뱃일-날씨-늦게뜸-잰것.md).
+  //   안드로이드 공식 지침(오프라인 우선)대로, 있는 것부터 보여 주고 곁 자료는 받는 대로 채운다.
+  const aux = wxAuxRun();
+  if(!aux.finished && !aux.hooked){ aux.hooked = true;
+    aux.p.then(()=>{ try{ if(typeof curScreen === 'function' && curScreen() === 'weather') renderWeather(); }catch(_){} }); }
   if(!wxCur){
     // 지점이 없으면 곧바로 현재 위치로 시작한다. 묻지 않는다.
     if(!wxGeoTried){
@@ -47912,20 +48485,17 @@ async function renderWeather(){
       <button class="tab edt" onclick="wxSpotList()">${esc(t('지점 관리'))}</button>
     </div></div>`;
 
-  if(!wxData || wxData.key !== wxCur.lat+','+wxCur.lon){
+  // ★★★ 5.20 — 오늘 화면(ensureWx)과 **같은 열쇠(wxPtKey)·같은 담아 두기**를 쓴다.
+  //   5.19 까지는 여기서만 열쇠를 「lat,lon 그대로」 로 만들어, ensureWx 가 받아 둔 날씨(열쇠는 반올림)를
+  //   못 알아보고 날씨 화면에 들어올 때마다 새로 받았다. 폰에 담아 둔 것도 안 봤다.
+  const wxKey0 = wxPtKey(wxCur.lat, wxCur.lon);
+  if(!wxData || wxData.key !== wxKey0){
     L.innerHTML = head + `<div class="mrnone" id="wxStatus">${esc(t('날씨 불러오는 중…'))}</div>`;
-    // ★★★ 5.10 — 받는 동안 다른 지점을 누르면 **앞 지점의 날씨가 뒤 지점 이름으로** 붙었다.
-    //   전에는 다 받은 뒤에야 그때의 wxCur 로 열쇠를 만들었다.
-    //   그 사이 사람이 여수 → 도쿄로 넘기면 여수 날씨·물때가 「도쿄」 로 저장되고 그대로 그려졌다.
-    //   (2026-09-22 시뮬레이터 검사 2회째 — 도쿄를 골랐는데 여수 물때가 떠 있었다.)
-    //   이제 부르기 전에 열쇠를 잡아 두고, 받고 나서 지점이 바뀌었으면 버리고 지금 지점으로 다시 그린다.
-    const wxKey0 = wxCur.lat+','+wxCur.lon;
-    try{
-      const d = await wxFetch(wxCur.lat, wxCur.lon);
-      if(!wxCur || (wxCur.lat+','+wxCur.lon) !== wxKey0) return renderWeather();
-      wxData = { key: wxKey0, ...d };
-    }catch(e){
-      if(!wxCur || (wxCur.lat+','+wxCur.lon) !== wxKey0) return renderWeather();
+    // ★★★ 5.10 — 받는 동안 다른 지점을 누르면 앞 지점의 날씨가 뒤 지점 이름으로 붙었다.
+    //   열쇠를 먼저 잡아 두고, 받고 나서 지점이 바뀌었으면 버리고 지금 지점으로 다시 그린다.
+    try{ await ensureWx(); }catch(_){}
+    if(!wxCur || wxPtKey(wxCur.lat, wxCur.lon) !== wxKey0) return renderWeather();
+    if(!wxData || wxData.key !== wxKey0){
       L.innerHTML = head + `<div class="mrnone">${esc(t('날씨를 불러오지 못했습니다.'))}<br>${esc(t('인터넷 연결을 확인한 뒤 다시 시도해 주세요.'))}<br><br><button class="tab" onclick="wxData=null;renderWeather()">${esc(t('다시 시도'))}</button></div>`;
       return;
     }
@@ -48105,7 +48675,7 @@ async function renderWeather(){
               : tsub('{spot} 조위관측소({km}km)의 조화상수로 셈한 물때입니다.', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) }))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`:'')))}
       </div>`;
 
-    L.innerHTML = head + wxAlertBox()
+    L.innerHTML = head + (wxAgeText() ? `<div class="mrnone" style="text-align:left;margin:4px 0 0">${esc(wxAgeText())}${(wxData && WX_BG[wxData.key]) ? ' · ' + esc(t('새 예보를 받는 중…')) : ''}</div>` : '') + wxAlertBox()
       + `<div id="boatWx"></div>`
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline

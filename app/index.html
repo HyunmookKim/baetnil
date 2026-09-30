@@ -2459,17 +2459,23 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     try{ document.documentElement.setAttribute('data-bt-theme', theme); document.documentElement.setAttribute('data-bt-fs', fs); }catch(_){}
     statusBar();
   }
-  // ★★★ 5.22 — 안드로이드 14 이하: 폰 맨 위 시계 줄 높이를 앱(MainActivity)이 재서 알려 준다(기기 픽셀).
+  // ★★★ 5.22·5.23 — 안드로이드 14 이하: 폰 맨 위 시계 줄 높이를 앱(MainActivity)이 재서 알려 준다(기기 픽셀).
   //   15 이상과 아이폰은 웹뷰가 env(safe-area-inset-top) 로 알려 주므로 불리지 않는다.
   //   머리줄·창들이 비켜 가는 높이는 한 곳(--sat)에서만 쓴다 — 그 값만 바꾼다.
+  //   받은 값은 기기에 적어 두고 다음에 켤 때 곧바로 쓴다 — 앱이 알려 주기 전 첫 화면부터 비켜 가게.
+  function satSet(v){
+    const cur = document.documentElement.style.getPropertyValue('--sat');
+    if(cur !== v + 'px') document.documentElement.style.setProperty('--sat', v + 'px');
+  }
   window.__sat = function(px){
     try{
       const v = Math.round(Number(px) / (window.devicePixelRatio || 1) * 10) / 10;
       if(!(v > 0 && v < 120)) return;
-      const cur = document.documentElement.style.getPropertyValue('--sat');
-      if(cur !== v + 'px') document.documentElement.style.setProperty('--sat', v + 'px');
+      satSet(v);
+      try{ localStorage.setItem('bt_sat', String(v)); }catch(_){}
     }catch(_){}
   };
+  try{ const v0 = Number(localStorage.getItem('bt_sat')); if(v0 > 0 && v0 < 120) satSet(v0); }catch(_){}
   window.btLook = {
     theme: () => theme, size: () => fs, THEMES, SIZES,
     // ★ 5.21 — 아이폰은 화면이 다시 나타날 때마다 상태 표시줄 부품이 글자 색을 「기본」 으로 되돌린다.
@@ -26069,7 +26075,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.22';
+const APP_VER = '5.23';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

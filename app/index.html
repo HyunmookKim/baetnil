@@ -6329,6 +6329,35 @@ const I18N = {
     '배 보기':'View boat',
     '신고가 없습니다':'No reports',
     '커뮤니티 글':'Community posts',
+  
+
+    // ── 5.24 연료·엔진 시간
+    '항해 {a} · 엔진 {b}을 넣었습니다. 다르면 아래 칸에서 고쳐 주세요.':'Entered {a} under way · {b} engine. If this is wrong, correct it in the fields below.',
+    '도착 날짜가 출발 날짜보다 앞입니다.':'The arrival date is before the departure date.',
+    '연료 게이지':'Fuel gauge',
+    '잔량 확인 방법':'How you check fuel',
+    '앱 추정':'App estimate',
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 이 차이로 소비량을 다시 셈했습니다.':'At the {what} on {d}, the app estimated {p} L left but there was actually {a} L. Consumption has been recalculated from this difference.',
+    '만탱크 주유':'full-tank fill-up',
+    '잔량 확인':'Fuel check',
+    '그 사이에 엔진 시간이 빈 항해가 {n}개 있습니다. 항해일지에서 채워 주세요.':'{n} voyages in that period have no engine hours. Please fill them in the logbook.',
+    '만탱크·잔량 확인 사이에 실제로 쓴 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 최근 구간 {n}개 {v} L/h.':'Fuel actually used between full tanks and fuel checks, divided by the engine hours in between. Last {n} periods: {v} L/h.',
+    '충전과 항해를 따로 셈합니다 — 항해 {a} L/h · 충전 {b} L/h.':'Charging and running are calculated separately — under way {a} L/h · charging {b} L/h.',
+    '더 갈 수 있는 시간은 최근 구간 가운데 가장 많이 쓴 {v} L/h로 셈했습니다.':'Run time left uses the highest recent rate, {v} L/h.',
+    '연료 소비량은 만탱크 주유나 잔량 확인이 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.':'Consumption is calculated once there are at least two full-tank fill-ups or fuel checks with engine running recorded in between. Partial fill-ups alone cannot show how much was used.',
+    '연료 게이지를 보는 배로 정해 두셨습니다. 출항·입항 때 게이지 눈금을 눌러 주세요.':'This boat is set to use the fuel gauge. Tap the gauge reading when you depart and arrive.',
+    '잔량 {L} L':'{L} L left',
+    '확인한 시각입니다. 다르면 고쳐 주세요':'The time you checked. Change it if this is wrong',
+    '남은 양':'Fuel left',
+    '{d} 잔량 확인':'Fuel check {d}',
+    '{d} 잔량 확인 뒤 {h} 돌렸습니다':'{h} run since the fuel check on {d}',
+    '오늘 {t} 넣으신 {L}L까지 합친 지금 양을 적어 주세요.':'Include the {L} L you added today at {t}.',
+    '엔진 시간이 비어 있던 항해 {n}개를 출발·도착 시각으로 채웠습니다.':'Filled in engine hours for {n} voyages from their departure and arrival times.',
+  
+
+    // ── 5.24 연료 ②
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'At the {what} on {d}, the app estimated {p} L left but there was actually {a} L. A fill-up may be missing from the records.',
+    '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'From the {L} L you entered on {d}, plus {a} L added since, less {h} engine hours since.',
   },
   ru: {
     '배는 {n}척까지 선택할 수 있습니다.':'Можно выбрать не более {n} судов.',
@@ -9867,6 +9896,35 @@ const I18N = {
     '배 보기':'Открыть судно',
     '신고가 없습니다':'Жалоб нет',
     '커뮤니티 글':'Записи сообщества',
+  
+
+    // ── 5.24 연료·엔진 시간
+    '항해 {a} · 엔진 {b}을 넣었습니다. 다르면 아래 칸에서 고쳐 주세요.':'Записано: в переходе {a} · двигатель {b}. Если неверно, исправьте в полях ниже.',
+    '도착 날짜가 출발 날짜보다 앞입니다.':'Дата прибытия раньше даты выхода.',
+    '연료 게이지':'Указатель топлива',
+    '잔량 확인 방법':'Как проверяете топливо',
+    '앱 추정':'Расчёт приложения',
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 이 차이로 소비량을 다시 셈했습니다.':'{d}, при событии «{what}», приложение считало, что осталось {p} л, а на самом деле было {a} л. Расход пересчитан по этой разнице.',
+    '만탱크 주유':'заправка до полного бака',
+    '잔량 확인':'Проверка остатка',
+    '그 사이에 엔진 시간이 빈 항해가 {n}개 있습니다. 항해일지에서 채워 주세요.':'За этот период у {n} переходов не указаны моточасы. Заполните их в судовом журнале.',
+    '만탱크·잔량 확인 사이에 실제로 쓴 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 최근 구간 {n}개 {v} L/h.':'Фактически израсходованное топливо между полными баками и проверками остатка, делённое на моточасы за это время. Последние периоды ({n}): {v} л/ч.',
+    '충전과 항해를 따로 셈합니다 — 항해 {a} L/h · 충전 {b} L/h.':'Зарядка и ход считаются отдельно — в переходе {a} л/ч · зарядка {b} л/ч.',
+    '더 갈 수 있는 시간은 최근 구간 가운데 가장 많이 쓴 {v} L/h로 셈했습니다.':'Запас хода по времени рассчитан по наибольшему недавнему расходу — {v} л/ч.',
+    '연료 소비량은 만탱크 주유나 잔량 확인이 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.':'Расход рассчитывается, когда есть хотя бы две заправки до полного бака или проверки остатка и между ними записана работа двигателя. По частичным заправкам нельзя узнать, сколько израсходовано.',
+    '연료 게이지를 보는 배로 정해 두셨습니다. 출항·입항 때 게이지 눈금을 눌러 주세요.':'Для этого судна выбран указатель топлива. При выходе и прибытии отмечайте показание указателя.',
+    '잔량 {L} L':'Остаток {L} л',
+    '확인한 시각입니다. 다르면 고쳐 주세요':'Время проверки. Исправьте, если неверно',
+    '남은 양':'Остаток',
+    '{d} 잔량 확인':'Проверка остатка {d}',
+    '{d} 잔량 확인 뒤 {h} 돌렸습니다':'Наработка {h} после проверки остатка {d}',
+    '오늘 {t} 넣으신 {L}L까지 합친 지금 양을 적어 주세요.':'Укажите остаток с учётом {L} л, залитых сегодня в {t}.',
+    '엔진 시간이 비어 있던 항해 {n}개를 출발·도착 시각으로 채웠습니다.':'Моточасы для {n} переходов заполнены по времени выхода и прибытия.',
+  
+
+    // ── 5.24 연료 ②
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'{d}, при событии «{what}», приложение считало, что осталось {p} л, а на самом деле было {a} л. Возможно, в записях пропущена заправка.',
+    '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'От {L} л, введённых {d}, плюс {a} л, залитых после, минус {h} моточасов после.',
   },
   // ── 일본어 (4.68)
   //
@@ -13324,6 +13382,35 @@ const I18N = {
     '배 보기':'船を見る',
     '신고가 없습니다':'通報はありません',
     '커뮤니티 글':'コミュニティの投稿',
+  
+
+    // ── 5.24 연료·엔진 시간
+    '항해 {a} · 엔진 {b}을 넣었습니다. 다르면 아래 칸에서 고쳐 주세요.':'航海 {a}・エンジン {b} を入力しました。違う場合は下の欄で修正してください。',
+    '도착 날짜가 출발 날짜보다 앞입니다.':'到着日が出発日より前です。',
+    '연료 게이지':'燃料計',
+    '잔량 확인 방법':'残量の確認方法',
+    '앱 추정':'アプリの推定',
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 이 차이로 소비량을 다시 셈했습니다.':'{d} の{what}のとき、アプリは残り {p}L と見ていましたが、実際は {a}L でした。この差で消費量を計算し直しました。',
+    '만탱크 주유':'満タン給油',
+    '잔량 확인':'残量確認',
+    '그 사이에 엔진 시간이 빈 항해가 {n}개 있습니다. 항해일지에서 채워 주세요.':'その間にエンジン時間が空欄の航海が {n} 件あります。航海日誌で入力してください。',
+    '만탱크·잔량 확인 사이에 실제로 쓴 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 최근 구간 {n}개 {v} L/h.':'満タン・残量確認の間に実際に使った燃料を、その間のエンジン稼働時間で割った値です。直近 {n} 区間 {v} L/h。',
+    '충전과 항해를 따로 셈합니다 — 항해 {a} L/h · 충전 {b} L/h.':'充電と航海を分けて計算します — 航海 {a} L/h・充電 {b} L/h。',
+    '더 갈 수 있는 시간은 최근 구간 가운데 가장 많이 쓴 {v} L/h로 셈했습니다.':'航行可能時間は直近の区間で最も多く使った {v} L/h で計算しました。',
+    '연료 소비량은 만탱크 주유나 잔량 확인이 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.':'燃料消費量は、満タン給油か残量確認が2回以上あり、その間にエンジンを回した記録があると計算されます。部分給油だけでは使った量はわかりません。',
+    '연료 게이지를 보는 배로 정해 두셨습니다. 출항·입항 때 게이지 눈금을 눌러 주세요.':'燃料計を見る船に設定されています。出港・入港時に燃料計の目盛りを押してください。',
+    '잔량 {L} L':'残量 {L} L',
+    '확인한 시각입니다. 다르면 고쳐 주세요':'確認した時刻です。違う場合は修正してください',
+    '남은 양':'残量',
+    '{d} 잔량 확인':'{d} 残量確認',
+    '{d} 잔량 확인 뒤 {h} 돌렸습니다':'{d} の残量確認以降 {h} 稼働',
+    '오늘 {t} 넣으신 {L}L까지 합친 지금 양을 적어 주세요.':'今日 {t} に入れた {L}L も含めた今の量を入力してください。',
+    '엔진 시간이 비어 있던 항해 {n}개를 출발·도착 시각으로 채웠습니다.':'エンジン時間が空欄だった航海 {n} 件を出発・到着時刻で入力しました。',
+  
+
+    // ── 5.24 연료 ②
+    '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'{d} の{what}のとき、アプリは残り {p}L と見ていましたが、実際は {a}L でした。その間の給油が記録から漏れている可能性があります。',
+    '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'{d} に入力された {L}L に、その後入れた {a}L を足し、{h} 時間の稼働を引いた値です。',
   }
 };
 
@@ -15929,8 +16016,70 @@ function itemRepair(){
 //   새 고침 문을 만들어 놓고 여기 안 적으면 검사(fixgatetest)가 실패한다.
 const FORMAT_FIXERS = [
   { name:'ckRepair',   run:()=>ckRepair() },
-  { name:'itemRepair', run:()=>itemRepair() }
+  { name:'itemRepair', run:()=>itemRepair() },
+  // ★ 5.24 — 차례가 중요하다: 옛 「지금 잔량」 의 때를 먼저 박고, 그 뒤에 빈 엔진 시간을 채운다.
+  //   거꾸로 하면 총 엔진 시간이 바뀌어 옛 잔량의 때를 엉뚱하게 되살린다.
+  { name:'fuelMarkAt',   run:()=>fuelMarkAt() },
+  { name:'voyHoursFill', run:()=>voyHoursFill() }
 ];
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 5.24 — 엔진 시간이 빈 지난 항해를 채운다 (사장님 결정, 2026-09-30)
+//   「엔진 시간이 빈 지난 항해는 내가 그냥 버튼을 안 눌른 거니까 이번에 업데이트 할 때
+//    예비 다 자동으로 채워 주기 하면 되잖아.」
+//
+//   ★ 까닭 — 「지금 도착」 단추가 도착 시각만 넣고 항해·엔진 시간을 안 셈했다(5.24 에서 고침).
+//     그 단추로 도착한 항해는 항해 시간과 엔진 시간이 **둘 다** 비어 있다.
+//     시각을 손으로 치면 항해 시간이 늘 같이 들어가므로, 둘 다 빈 것이 이 버그의 흔적이다.
+//   ★ 막는 것 (사장님께 여쭌 다섯 가지)
+//     ① 옛 「지금 잔량」 — 적은 때의 총 엔진 시간을 담고 있어 채우면 어긋난다
+//        → fuelMarkAt 이 먼저 그 때를 박아 둔다(FORMAT_FIXERS 차례).
+//     ② 동기화 — 클라우드에서 받은 뒤(runFormatFixers)에만, 편집 중이고 적을 권한이 있을 때만,
+//        빈칸만 채운다. 같은 기록이면 어느 폰이 채워도 값이 같다.
+//     ③ 다른 사람 배 — 일부러 비운 것은 안 건드린다: 출발·도착 시각이 있고
+//        항해 시간·엔진 시간이 **둘 다** 빈 것만.
+//     ④ 며칠짜리 항해 — 도착 날짜가 없는데 항적이 20시간 넘게 이어졌으면 건너뛴다(틀린 값이 된다).
+//     ⑤ 예정 항해·도착 안 찍은 항해 — 건드리지 않는다.
+// ══════════════════════════════════════════════════════════════════
+function voyTrkSpanH(v){
+  const ts = (Array.isArray(v && v.trk) ? v.trk : []).map(p => Date.parse(p && p.t)).filter(isFinite);
+  if(ts.length < 2) return 0;
+  return (Math.max(...ts) - Math.min(...ts)) / 36e5;
+}
+function voyHoursFill(){
+  if(!unlocked) return false;
+  if(typeof permOk === 'function' && !permOk('voyage')) return false;
+  const 빈 = x => String(x == null ? '' : x).trim() === '';
+  let n = 0;
+  (Array.isArray(voyage) ? voyage : []).forEach(v => {
+    if(!v || v.seed || v.plan) return;
+    if(!빈(v.hours) || !빈(v.engineH)) return;
+    if(빈(v.timeOut) || 빈(v.timeIn)) return;
+    if(!voyDay(v.dateIn) && voyTrkSpanH(v) > 20) return;
+    const sh = sailHours(v), eh = engineHoursFromLogs(v);
+    if(sh == null || eh == null) return;
+    v.hours = sh; v.engineH = eh; n++;
+  });
+  if(n){
+    try{ setTimeout(() => { try{ tell(tsub('엔진 시간이 비어 있던 항해 {n}개를 출발·도착 시각으로 채웠습니다.', { n }), { kind:'good' });
+                              renderVoyage(); renderFuel(); }catch(_){} }, 800); }catch(_){}
+  }
+  return n > 0;
+}
+// 옛 「지금 잔량」 에 되살린 때(at)를 박는다 — 한 번만. 배 설정(boat.fuelSet)에 산다.
+function fuelMarkAt(){
+  if(!unlocked) return false;
+  if(typeof permOk === 'function' && !permOk('fuel')) return false;
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  const m = b && b.fuelSet && b.fuelSet.mark;
+  if(!m || (m.at != null && isFinite(Number(m.at)))) return false;
+  const mk = fuelMarkRaw();
+  if(!mk) return false;
+  const at = fuelLegacyAt(mk);
+  if(at == null) return false;
+  b.fuelSet = Object.assign({}, b.fuelSet, { mark: Object.assign({}, m, { at }) });
+  try{ save(); }catch(_){}
+  return true;
+}
 // 하나라도 고쳤으면 저장하고 올린다 — 「고쳤는데 안 올림」 이 구조적으로 불가능해진다.
 // 한 문이 터져도 나머지는 돌린다. 조용히 지나가지 않고 오류를 남긴다.
 function runFormatFixers(){
@@ -19496,7 +19645,7 @@ function posLvRow(it){
 //     그래야 「적었는데 안 나감」 이 구조적으로 안 생긴다.
 const PUB_OUT = {
   voyage: {
-    plain: ['id','date','title','from','to','note','timeOut','timeIn','nm','hours','engineH','kind'],
+    plain: ['id','date','title','from','to','note','timeOut','timeIn','nm','hours','engineH','kind','dateIn'],
     via:   ['lv','trk','logs','posOut','posIn','wxOut','wxIn','fish','photos','phOut','phIn'],
     never: ['crew','plan','pub','pubLv','posLv','trkOn','trkPub','rideOn','rideN','trkPts','weather']
   },
@@ -26075,7 +26224,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.23';
+const APP_VER = '5.24';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -30459,7 +30608,18 @@ function renderHome(){
   //   그래서 여기로 올린다. 탱크 용량을 안 적었거나 만탱크 기록이 없으면 아무것도 안 뜬다
   //   (모르는 것을 아는 척하지 않는다).
   try{
-    const fl = (typeof fuelLeft === 'function') ? fuelLeft() : null;
+    // ★ 5.24 G — 계기판 게이지를 보는 배는 추정 대신 마지막으로 본 눈금을 올린다
+    const 게이지 = (typeof fuelHow === 'function') && fuelHow() === 'gauge';
+    const fl = (!게이지 && typeof fuelLeft === 'function') ? fuelLeft() : null;
+    // 마지막으로 안 양 — 만탱크 주유면 F, 잔량 확인이면 그 눈금(없으면 리터)
+    const mk = (게이지 && typeof fuelModel === 'function') ? fuelModel().last : null;
+    if(mk){
+      const 눈 = mk.kind === 'full' ? 'F' : (mk.gauge ? fuelGaugeShow(mk.gauge) : Math.round(mk.level) + ' L');
+      out += homeCard(esc(t('연료')),
+        `<div class="hrow2"><b style="color:#7FD1AC">${esc(눈)}</b>`
+        + ` <span class="hmute">${esc(t('연료 게이지'))} · ${esc((mk.date || '') + (mk.time ? ' ' + mk.time : ''))}</span></div>`,
+        "goMaint('fuel')", t('연료 기록'));
+    }
     if(fl){
       const tank = boatSpec('fuelTank');
       const pct  = tank > 0 ? Math.round(fl.left / tank * 100) : null;
@@ -30468,7 +30628,8 @@ function renderHome(){
         `<div class="hrow2"><b style="color:${col}">${Math.round(fl.left)} L</b>`
         + (pct == null ? '' : ` <span class="hmute">${esc(tsub('탱크의 {n}%', { n: pct }))}</span>`)
         + `</div>`
-        + `<div class="hrow2 hmute">${esc(tsub('{d} 만탱크 뒤 {h} 돌렸습니다', {
+        // ★ 5.24 — 셈이 만탱크가 아니라 잔량 확인에서 시작하면 그렇게 말한다
+        + `<div class="hrow2 hmute">${esc(tsub(fl.fromKind === 'level' ? '{d} 잔량 확인 뒤 {h} 돌렸습니다' : '{d} 만탱크 뒤 {h} 돌렸습니다', {
               d: fl.from, h: (typeof durText === 'function' ? (durText(fl.since) || '0분') : fl.since) }))}</div>`
         + (pct != null && pct <= 20
             ? `<div class="hrow2" style="color:#F05B52">${esc(t('나가기 전에 채우는 것이 좋겠습니다.'))}</div>` : ''),
@@ -31089,6 +31250,21 @@ function openMR(kind, id){
               RUN_PURPOSES.map(x=>`<option value="${x}"${it.purpose===x?' selected':''}>${esc(t(x))}</option>`).join('')
             }</select>`
           :`<b class="mrv">${esc(keyShow(it.purpose) || '—')}</b>`}</div>`;
+  } else if(kind==='fuel' && it.kind==='level'){
+    // ★ 5.24 — 잔량 확인 (지금 잔량·게이지 눈금·바닥남). 진짜 양을 안 때라
+    //   이것으로 잔량을 다시 맞추고 소비율을 다시 잰다.
+    const TANK = boatSpec('fuelTank');
+    body = tf('날짜','date',it.date,'date','')
+      + hmRow('시각', it.time, "v => mrField('time', v)",
+          unlocked ? `<span class="mrm" style="flex:1;color:#7b8794">${
+            esc(t('확인한 시각입니다. 다르면 고쳐 주세요'))}</span>` : '')
+      + `<div class="mrrow"><span class="mrlbl">${esc(t('남은 양'))}</span>${unlocked
+          ?`<input type="number" step="1" min="0" value="${esc(String(it.level == null ? '' : it.level))}" style="width:90px" onchange="fuelLevelField(this.value)"> L`
+          :`<b class="mrv">${esc(String(it.level == null ? '—' : it.level))} L</b>`}</div>`
+      + ((unlocked && TANK > 0)
+          ? `<div class="mrrow"><span class="mrlbl">${esc(t('연료 게이지'))}</span>${
+              FUEL_GAUGE.map(([g]) => `<button class="minib${it.gauge === g ? ' grn' : ''}" onclick="fuelLevelGauge('${g}')">${esc(fuelGaugeShow(g))}</button>`).join(' ')}</div>`
+          : (it.gauge ? `<div class="mrrow"><span class="mrlbl">${esc(t('연료 게이지'))}</span><b class="mrv">${esc(fuelGaugeShow(it.gauge))}</b></div>` : ''));
   } else if(kind==='fuel'){
     body = tf('날짜','date',it.date,'date','')
       // ★ 시각을 적어 두면 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
@@ -31323,7 +31499,7 @@ async function mrDelete(){
   const row = mrOpenType, arr = DS[row] ? DS[row]() : null; if(!arr) return;
   const i = arr.findIndex(x=>String(x.id)===mrOpenId); if(i<0) return;
   const it = arr[i];
-  const nm = (row==='gear' ? gearLabel(it) : row==='mlog' ? mlogTitle(it) : (row==='review' ? rvTitle(it) : '')) || it.name || it.title || (row==='voyage' ? voyName(it) : row==='fuel' ? tsub('{d} 주유', { d: it.date }) : row==='run' ? tsub('{d} 엔진가동', { d: it.date }) : t('항목'));
+  const nm = (row==='gear' ? gearLabel(it) : row==='mlog' ? mlogTitle(it) : (row==='review' ? rvTitle(it) : '')) || it.name || it.title || (row==='voyage' ? voyName(it) : row==='fuel' ? (it.kind === 'level' ? tsub('{d} 잔량 확인', { d: it.date }) : tsub('{d} 주유', { d: it.date })) : row==='run' ? tsub('{d} 엔진가동', { d: it.date }) : t('항목'));
   if(!await ask(tsub('"{name}" 휴지통으로 옮길까요?\n\n휴지통에서 되돌릴 수 있습니다.', {name:nm}), { ok: t('휴지통으로') })) return;
   // ★★★ 4.139 — 항적을 기록 중인 항해를 지우면 **먼저 멈춘다.**
   //   멈춰야 여태 모은 점이 그 항해에 저장되고, 아래에서 뜨는 휴지통 사본에도
@@ -31341,7 +31517,7 @@ const MR_PERM = { maint:'maint', repair:'maint', mlog:'maint', gear:'maint', rev
                   contact:'contact', vdoc:'contact', check:'check' };
 function mrTrashName(e){
   const d=e.data||{};
-  return (e.kind==='gear' ? gearLabel(d) : e.kind==='mlog' ? mlogTitle(d) : (e.kind==='review' ? rvTitle(d) : '')) || d.name || d.title || d.label || (e.kind==='voyage'? voyName(d) : e.kind==='fuel'?((d.date||'')+' 주유 '+(d.liters||'?')+'L') : e.kind==='run'?((d.date||'')+' 엔진 '+(d.hours||'?')+'h') : '항목');
+  return (e.kind==='gear' ? gearLabel(d) : e.kind==='mlog' ? mlogTitle(d) : (e.kind==='review' ? rvTitle(d) : '')) || d.name || d.title || d.label || (e.kind==='voyage'? voyName(d) : e.kind==='fuel'?(d.kind==='level' ? ((d.date||'')+' '+t('잔량 확인')+' '+(d.level==null?'?':d.level)+'L') : ((d.date||'')+' 주유 '+(d.liters||'?')+'L')) : e.kind==='run'?((d.date||'')+' 엔진 '+(d.hours||'?')+'h') : '항목');
 }
 function mrRestore(tid){
   const i = mrTrash.findIndex(e=>e.id===tid); if(i<0) return;
@@ -33022,6 +33198,16 @@ function migrateVoyage(){
     });
   });
   if(moved) sysSave();   // 잠금 상태에서도 형식 변환은 저장돼야 한다
+  // ★ 5.24 — 혼자 쓰는 배(명부가 없다 = 동기화하지 않는다)는 받아올 것이 없으니 여기서 채운다.
+  //   명부가 있는 배는 클라우드에서 받은 뒤(runFormatFixers)에만 채운다 — 옛 사본에 채우면
+  //   다른 폰에서 새로 고친 것을 덮을 수 있다.
+  try{
+    const b = (typeof curBoat === 'function') ? curBoat() : null;
+    if(b && (!b.members || !Object.keys(b.members).length)){
+      const a = fuelMarkAt(), c = voyHoursFill();
+      if(a || c) sysSave();
+    }
+  }catch(_){}
 }
 
 // ★★★ 4.132 — 같은 날 안에서도 최신이 위로 온다 (사장님 지적, 2026-09-12)
@@ -40223,7 +40409,9 @@ function legRow(label, placeKey, timeKey, wxKey, it){
   return `<div class="legc ${kind}">
       <div class="legh"><span class="ldot"></span>${esc(t(label))}${
         unlocked ? '' : `<span class="lsub">${
-          esc(it[timeKey] ? hm(it[timeKey]) : t('시각 없음'))}</span>`}</div>`
+          // ★ 5.24 — 며칠짜리 항해면 도착 날짜도 적는다
+          esc((kind === 'in' && voyMultiDay(it) ? voyDay(it.dateIn) + ' ' : '')
+              + (it[timeKey] ? hm(it[timeKey]) : t('시각 없음')))}</span>`}</div>`
        // ★★★ 4.99 — 「한 번에」 단추를 그 칸 **안** 맨 위에 둔다 (사장님 지적:
        //   「도착이라고 찍었는데 시간은 또 따로 버튼 눌러서 찍는게 말이나 되냐」).
        //   여태 이 단추가 도착 칸 **밖** 아래에 있어서, 도착 칸을 보던 사람은
@@ -40235,6 +40423,13 @@ function legRow(label, placeKey, timeKey, wxKey, it){
                esc(kind === 'out' ? t('지금 출발 (시각·위치·날씨)') : t('지금 도착 (시각·위치·날씨)'))
              }</button></div>` : '')
        + `<div class="mrrow">${place}${time}</div>`
+       // ★★★ 5.24 — 도착 날짜 (며칠짜리 항해). 「지금 도착」 을 누르면 앱이 오늘로 넣는다.
+       //   도착 시각이 있을 때만 보인다 — 도착 전에는 적을 것이 없다.
+       + ((kind === 'in' && unlocked && String(it.timeIn || '').trim())
+          ? `<div class="mrrow"><span class="mrlbl">${esc(t('날짜'))}</span><input type="date" value="${
+              esc(voyDay(it.dateIn) || voyDay(it.date))}" onchange="voyDateIn(this.value)"></div>` : '')
+       // ★★★ 5.24 G — 계기판 게이지를 보는 배: 출항·입항 때 눈금을 누른다 (한 번 누르면 끝)
+       + voyGaugeRow(it, kind)
        + wxLine(it[wxKey], it[timeKey] ? `wxCapture('${wxKey}')` : '')
        + posLine(it, wxKey)
        + vphBox(it, kind === 'out' ? 'out' : 'in')
@@ -40303,6 +40498,57 @@ function voyTime(timeKey, wxKey, v){
   else { it[wxKey] = null; saveMR(); renderVoyage(); openMR('voyage', mrOpenId); }
 }
 
+// ★ 5.24 G — 출항·입항 칸의 게이지 눈금 줄. 게이지를 보는 배에서만 보인다.
+//   누르면 그 때의 「잔량 확인」 이 연료 기록에 쌓인다(항해와 이어 둔다 — 다시 누르면 고친다).
+function voyGaugeRec(it, leg){
+  return (Array.isArray(fuel) ? fuel : []).find(f => f && f.kind === 'level'
+    && String(f.vid) === String(it && it.id) && f.leg === leg) || null;
+}
+function voyGaugeRow(it, kind){
+  if(typeof fuelHow !== 'function' || fuelHow() !== 'gauge' || !(boatSpec('fuelTank') > 0)) return '';
+  if(isPlan(it)) return '';
+  const r = voyGaugeRec(it, kind);
+  if(!unlocked) return r ? `<div class="mrrow"><span class="mrlbl">${esc(t('연료 게이지'))}</span><b class="mrv">${
+      esc(fuelGaugeShow(r.gauge) || (r.level + ' L'))}</b></div>` : '';
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('연료 게이지'))}</span>${
+    FUEL_GAUGE.map(([g]) => `<button class="minib${r && r.gauge === g ? ' grn' : ''}" onclick="voyGauge('${kind}','${g}')">${
+      esc(fuelGaugeShow(g))}</button>`).join(' ')}</div>`;
+}
+function voyGauge(leg, g){
+  if(!unlocked) return;
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const TANK = boatSpec('fuelTank');
+  const fr = (FUEL_GAUGE.find(x => x[0] === g) || [])[1];
+  if(fr == null || !(TANK > 0)) return;
+  const p = n => String(n).padStart(2, '0'), d = new Date();
+  const 지금 = p(d.getHours()) + ':' + p(d.getMinutes());
+  const 날 = leg === 'in' ? (voyDay(it.dateIn) || voyDay(it.date) || today()) : (voyDay(it.date) || today());
+  const 시 = hm((leg === 'in' ? it.timeIn : it.timeOut) || '') || 지금;
+  let r = voyGaugeRec(it, leg);
+  if(!r){
+    r = { id: newId(), kind: 'level', date: 날, time: 시, level: 0, gauge: '', liters: '', full: false,
+          cost: '', note: '', vid: String(it.id), leg };
+    fuel.push(r);
+  }
+  r.date = 날; r.time = 시; r.gauge = g; r.level = Math.round(TANK * fr);
+  saveMR(); renderVoyage(); openMR('voyage', it.id);
+}
+// ★ 5.24 — 도착 날짜를 고친다. 항해 시간·엔진 시간·도착 날씨가 따라 바뀐다.
+function voyDateIn(v){
+  if(!unlocked) return;
+  const it = getMR('voyage', mrOpenId); if(!it) return;
+  const d = voyDay(v);
+  if(d && voyDay(it.date) && d < voyDay(it.date)){
+    tell(t('도착 날짜가 출발 날짜보다 앞입니다.'), { kind:'bad' });
+    openMR('voyage', mrOpenId); return;
+  }
+  it.dateIn = d; it.seed = false;
+  const sh = sailHours(it); if(sh !== null) it.hours = sh;
+  const eh = engineHoursFromLogs(it); if(eh !== null) it.engineH = eh;
+  saveMR();
+  if(String(it.timeIn || '').trim()) wxCapture('wxIn');
+  else { renderVoyage(); openMR('voyage', mrOpenId); }
+}
 // 입항했을 때 한 번에 — 도착 시각·위치·날씨를 같이 잡는다.
 // 따로 누르려면 세 군데를 건드려야 해서 배 대고 정신없을 때 번거롭다.
 // ★★★ 4.99 — 출발도 한 번에 찍는다. 도착만 있고 출발은 없으면 그것이 이상하다.
@@ -40337,14 +40583,9 @@ function departNow(){
 //     뒤져 지우지 않는다 (사장님이 정하신 것 0번).
 function voyInAt(it){
   // 도착 시각을 실제 시각으로. 도착이 출발보다 이르면 자정을 넘긴 것이다.
+  // ★ 5.24 — 도착 날짜가 있으면 그 날짜로 센다. 예전에는 이틀째 항적을 「도착 뒤」 로 보고 지웠다.
   if(!it || !it.date || !String(it.timeIn || '').trim()) return null;
-  const d = String(it.date).slice(0, 10);
-  const T = v => Date.parse(d + 'T' + hm(v) + ':00');
-  let ms = T(it.timeIn);
-  if(!isFinite(ms)) return null;
-  const out = String(it.timeOut || '').trim() ? T(it.timeOut) : NaN;
-  if(isFinite(out) && ms < out) ms += 864e5;      // 자정을 넘겼다
-  return ms;
+  return voyInMs(it);
 }
 // 도착 뒤에 찍힌 점이 몇 개인가
 function trkAfterIn(it){
@@ -40385,7 +40626,21 @@ function arriveNow(){
   const p = n => String(n).padStart(2,'0');
   const now = new Date();
   it.timeIn = p(now.getHours())+':'+p(now.getMinutes());
+  // ★★★ 5.24 — 도착 날짜도 넣는다 (며칠짜리 항해). 오늘이다.
+  it.dateIn = today();
+  // ★★★ 5.24 — 「지금 도착」 하나로 항해 시간·엔진 시간이 들어간다 (사장님 지적, 2026-09-30)
+  //   「굳이 내가 따로 이렇게 엔진 시간이랑 그리고 항해 시간을 눌러 줘야 되냐 …
+  //    도착 버튼에서 바로 … 자동으로 들어가야 되지 않나?」
+  //   ★ 여태 이 단추는 도착 시각만 넣고 끝났다. 시각을 손으로 칠 때(voyTime)만 셈했다.
+  //     그래서 이 단추로 도착한 항해는 엔진 시간이 비었고, 9/12 뒤 열 번 14.4시간이
+  //     연료 잔량 셈에서 빠졌다 — 기름이 바닥났는데 앱은 140L 남았다고 했다.
+  //   ★ 세일 올림·내림(중간 기록)이 있으면 그만큼 뺀다. 틀리면 아래 칸에서 고치면 된다.
+  const sh = sailHours(it); if(sh !== null) it.hours = sh;
+  const eh = engineHoursFromLogs(it); if(eh !== null) it.engineH = eh;
   it.seed = false; saveMR();
+  if(sh !== null && eh !== null)
+    try{ tell(tsub('항해 {a} · 엔진 {b}을 넣었습니다. 다르면 아래 칸에서 고쳐 주세요.',
+                   { a: durText(sh) || '0분', b: durText(eh) || '0분' }), { kind:'good' }); }catch(_){}
   posHere('wxIn', it.id, true, () => wxCapture('wxIn', it.id));
   // ★ 입항을 찍으면 항적도 끝내고, 도착 뒤 점도 잘라낸다 (문 하나).
   try{ voyArrived(it, true).then(()=>{ try{ openMR('voyage', it.id); }catch(e){} }); }catch(e){}
@@ -40510,7 +40765,69 @@ function hhmmToH(v){
   return h + mi/60;
 }
 const round1 = v => Math.round(v*10)/10;
+// ══════════════════════════════════════════════════════════════════
+// ★★★ 5.24 — 며칠짜리 항해 (사장님 결정, 2026-09-30 「만들어라」)
+//
+//   항해일지에는 출발 날짜 하나와 출발·도착 **시각**만 있었다. 도착 날짜가 없었다.
+//   그래서 모든 셈이 「도착 시각이 출발보다 이르면 다음 날」 로만 봤다 — 하루까지만 맞는다.
+//   이틀 걸린 항해는 항해 시간·엔진 시간이 몇 시간으로 줄고, 더 나쁜 것은
+//   **도착 뒤 점을 잘라내는 곳(voyInAt)이 둘째 날 항적을 통째로 「도착 뒤」 로 보고 지웠다.**
+//   블라디보스토크 같은 긴 항해 전에 반드시 풀어야 했던 구멍이다.
+//
+//   ★ 도착 날짜(dateIn)를 둔다. 「지금 도착」 을 누르면 앱이 오늘로 넣는다.
+//     손으로 고칠 수 있다(도착 칸의 날짜). 없으면 예전처럼 「하루 안」 으로 본다 —
+//     하루짜리 항해는 셈이 한 점도 안 바뀐다.
+// ══════════════════════════════════════════════════════════════════
+const voyDay = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '').trim()) ? String(v).trim() : '';
+function voyOutMs(it){
+  if(!it || !voyDay(it.date) || !String(it.timeOut || '').trim()) return null;
+  return tsOf(voyDay(it.date), hm(it.timeOut));
+}
+function voyInMs(it){
+  if(!it || !voyDay(it.date) || !String(it.timeIn || '').trim()) return null;
+  const o = voyOutMs(it);
+  const dIn = voyDay(it.dateIn);
+  if(dIn){
+    const x = tsOf(dIn, hm(it.timeIn));
+    if(x != null && (o == null || x >= o)) return x;
+  }
+  const x = tsOf(voyDay(it.date), hm(it.timeIn));
+  if(x == null) return null;
+  return (o != null && x < o) ? x + 864e5 : x;      // 자정을 넘긴 항해
+}
+// 도착 날짜가 출발 날짜와 다르게 적혀 있는가 (이때만 날짜로 센다)
+function voyMultiDay(it){
+  const dIn = voyDay(it && it.dateIn);
+  return !!(dIn && dIn !== voyDay(it && it.date));
+}
+// 중간 기록이 실제로 언제였나 (며칠짜리 항해용).
+//   기록에는 시각만 있다. 기록을 만든 때가 id 앞자리에 있으니(newId) 그 날짜에 가장 가까운
+//   날을 고른다. 그것도 없으면 앞 기록 뒤로 이어 붙인다.
+function voyLogMs(it, g, after){
+  const A = voyOutMs(it), B = voyInMs(it);
+  const tm = hm(g && g.time || '');
+  if(A == null || !/^\d{2}:\d{2}$/.test(tm)) return null;
+  const made = Number((String(g && g.id || '').match(/^(\d{12,14})/) || [])[1]);
+  const d0 = new Date(A); d0.setHours(0, 0, 0, 0);
+  const days = Math.ceil(((B != null ? B : A) - d0.getTime()) / 864e5) + 1;
+  let best = null;
+  for(let k = 0; k <= days; k++){
+    const d = new Date(d0.getTime()); d.setDate(d.getDate() + k);
+    const ds = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const x = tsOf(ds, tm);
+    if(x == null || x < A || (B != null && x > B)) continue;
+    if(isFinite(made) && made > 0){
+      if(best == null || Math.abs(x - made) < Math.abs(best - made)) best = x;
+    } else if(after == null || x >= after){ best = x; break; }
+  }
+  return best;
+}
 function sailHours(it){
+  // ★ 5.24 — 도착 날짜가 따로 적혀 있으면 날짜까지 넣어 센다 (며칠짜리 항해)
+  if(it && it.dateIn && voyMultiDay(it)){
+    const A = voyOutMs(it), B = voyInMs(it);
+    if(A != null && B != null && B >= A) return round1((B - A) / 36e5);
+  }
   const a = hhmmToH(it && it.timeOut), b = hhmmToH(it && it.timeIn);
   if(a === null || b === null) return null;
   let d = b - a;
@@ -40520,6 +40837,8 @@ function sailHours(it){
 // 중간 기록의 엔진ON/OFF(세일 올림·내림 포함)로 엔진을 켠 시간을 더한다.
 // 아무 기록도 없으면 항해 내내 켠 것으로 본다 — 모터보트가 그렇다.
 function engineHoursFromLogs(it){
+  // ★ 5.24 — 며칠짜리 항해는 날짜까지 넣어 센다. 하루짜리는 아래 옛 셈 그대로다.
+  if(it && it.dateIn && voyMultiDay(it)) return engineHoursMultiDay(it);
   const a = hhmmToH(it && it.timeOut), b0 = hhmmToH(it && it.timeIn);
   if(a === null || b0 === null) return null;
   const end = (b0 < a) ? b0 + 24 : b0;
@@ -40538,6 +40857,21 @@ function engineHoursFromLogs(it){
   });
   if(on) total += end - last;
   return round1(Math.max(0, Math.min(end - a, total)));
+}
+// 며칠짜리 항해의 엔진 시간 — 셈하는 방법은 위와 같고, 시각 대신 진짜 때(ms)로 센다
+function engineHoursMultiDay(it){
+  const A = voyOutMs(it), B = voyInMs(it);
+  if(A == null || B == null || B < A) return null;
+  let prev = A;
+  const evs = (it.logs || []).map(g => ({ g, e: logEngine(g) }))
+    .filter(x => x.e !== 'keep')
+    .map(x => { const ms = voyLogMs(it, x.g, prev); if(ms != null) prev = ms;
+                return ms == null ? null : { t: ms, on: (x.e === 'on') }; })
+    .filter(Boolean).sort((x, y) => x.t - y.t);
+  let on = true, last = A, total = 0;      // 출발 시점에는 켜 놓고 나간다
+  evs.forEach(e => { if(on) total += e.t - last; on = e.on; last = e.t; });
+  if(on) total += B - last;
+  return round1(Math.max(0, Math.min(B - A, total) / 36e5));
 }
 // 계산 버튼
 function fillSailHours(){
@@ -41652,11 +41986,12 @@ function navDistance(it){
 // 엔진 가동시간 — 출발 시각을 ON으로 보고, 중간기록의 엔진OFF/엔진ON 으로 끊는다.
 // OFF 없이 끝나면 도착 시각까지 켜둔 것으로 본다.
 function navEngine(it){
-  const t0 = tsOf(it.date, it.timeOut), t1 = tsOf(it.date, it.timeIn);
+  // ★ 5.24 — 도착은 도착 날짜까지 넣어 센다 (voyInMs). 자정을 넘긴 도착도 이제 맞다.
+  const t0 = voyOutMs(it), t1 = voyInMs(it);
   if(t0 == null) return null;
   const marks = (it.logs||[])
     .filter(g => g.kind==='엔진ON' || g.kind==='엔진OFF')
-    .map(g => ({ t: tsOf(it.date, g.time), on: g.kind==='엔진ON' }))
+    .map(g => ({ t: voyMultiDay(it) ? voyLogMs(it, g) : tsOf(it.date, g.time), on: g.kind==='엔진ON' }))
     .filter(x => x.t != null && x.t >= t0)
     .sort((a,b)=> a.t - b.t);
   const end = (t1 != null && t1 > t0) ? t1 : null;
@@ -41852,7 +42187,11 @@ async function wxCapture(key, vid){
     ? { lat: pp.lat, lon: pp.lon, name: '', pos: 1 }
     : (wxCur ? { lat: wxCur.lat, lon: wxCur.lon, name: wxCur.name || '', pos: 0 } : null);
   if(!src){ tell(t('날씨 지점이 설정되지 않았습니다. 날씨 탭에서 지점을 먼저 지정해 주세요.')); return; }
-  const ts = tsOf(it.date, hhmm);
+  // ★ 5.24 — 도착은 도착 날짜로, 며칠짜리 항해의 중간 기록은 그 기록의 날로 받는다.
+  //   예전에는 다 출발 날짜로 받아서, 이튿날 도착하면 어제 그 시각 날씨가 박혔다.
+  const ts = (!isVLog && key === 'wxIn') ? voyInMs(it)
+           : (isVLog && voyMultiDay(it)) ? voyLogMs(it, lg)
+           : tsOf(it.date, hhmm);
   if(ts == null){ put({ text:t('시각을 먼저 입력해 주세요'), at:'', spot:'' }); saveMR(); renderVoyage(); openMR('voyage', id); return; }
 
   put({ text:t('받는 중…'), at:'', spot:'' });
@@ -41928,92 +42267,261 @@ function engineHours(){
 const fuelKey = f => String((f && f.date) || '') + '\u0000'
   + ((f && f.time) ? hm(f.time) : '') + '\u0000' + String((f && f.id) || '');
 
-// ★ 이 주유보다 '먼저' 돌린 엔진 시간.
+// ══════════════════════════════════════════════════════════════════════
+// ★★★ 5.24 — 기록이 빠져도 잔량이 맞게 (사장님 결정, 2026-09-30 「만들어라」)
 //
-//   예전에는 날짜만 보고 `v.date <= 주유날짜` 로 셌다. 그래서 8월 17일에 만탱크를 넣고
-//   같은 날 나가서 1.9시간 돌렸는데, 그 1.9시간이 '주유 전에 쓴 것' 으로 들어갔다.
-//   마지막 만탱크 이후 가동시간이 0h 가 되어 잔량이 240L 그대로였다.
+//   사장님 말씀: 「만탱크 채우고 시간당 3리터로 해서 운행했는데 40시간인가 남았다고 나오는데
+//                 실제로는 0리터 남아서 0리터로 고치고 다시 100리터 넣었는데
+//                 왜 계속 3리터로 계산되냐」
+//                「어떤 사람들은 … 매번마다 안 적으니까 또 이게 틀릴 수가 있잖아 …
+//                 다른 데는 어떻게 이걸 해결하는지도 일단 찾아보고 … 제대로 된 해결책」
 //
-//   이제 같은 날이면 시각으로 가른다. 시각을 모르면 '주유가 먼저' 로 본다 —
-//   그래야 그날 돌린 것이 주유 뒤 소비로 잡혀 잔량을 적게 본다.
-//   기름이 실제보다 많다고 믿는 것이 배에서 제일 위험하다.
-function hoursBeforeFill(f){
-  if(!f || !f.date) return 0;
-  const day = String(f.date), ft = f.time ? hm(f.time) : '';
-  const before = (d, t) => {
-    if(!d) return false;
-    if(String(d) < day) return true;
-    if(String(d) > day) return false;
-    if(!ft || !t) return false;          // 어느 한쪽 시각을 모르면 주유가 먼저
-    return hm(t) <= ft;
-  };
-  const a = voyage.filter(v => before(v.date, v.timeIn || v.timeOut))
-                  .reduce((s,v)=> s + (parseFloat(v.engineH)||0), 0);
-  const b = runs.filter(r => before(r.date, r.time))
-                .reduce((s,r)=> s + (parseFloat(r.hours)||0), 0);
-  return a + b;
-}
+//   ★ 무엇이 틀렸나
+//     ① L/시간은 「만탱크 → 만탱크」 로만 쟀다. 사람이 「지금 잔량 0」 을 적어도
+//        그것은 셈의 출발점만 바꿨지 소비량은 안 고쳤다. 그래서 계속 3.0.
+//     ② 엔진 시간이 빠진 항해가 있으면 앱은 그만큼 기름을 덜 썼다고 믿었다.
+//        틀렸다는 것을 앱이 알 길이 없었다.
+//
+//   ★ 다른 곳은 어떻게 푸나 (조사: claude/뱃일-연료-엔진시간-제대로-푸는법-조사.md)
+//     · 배터리 잔량계(Victron) — 더해 가는 셈은 반드시 흘러간다. 진짜 값을 아는 순간
+//       (만충)마다 다시 맞춘다.
+//     · Lowrance·Simrad 연료 셈 — 넣은 양과 셈한 양이 다르면 보정값을 새로 잡는다.
+//       센서가 한쪽으로 틀려도 보정값이 그 틀림을 먹는다.
+//     · 조종사 — 시간×소비율만 믿지 않고 실제 양과 견주며, 소비율은 넉넉하게 잡는다.
+//
+//   ★ 그래서 이렇게 센다
+//     · 「진짜 양을 아는 때」 = 만탱크 주유 · 잔량 확인(지금 잔량·게이지·바닥남).
+//       그때마다 ① 잔량을 그 값으로 다시 맞추고 ② 앞의 그때부터 **실제로 쓴 기름 ÷
+//       앱에 적힌 엔진 시간** 으로 소비율을 다시 잰다.
+//     · 사람이 엔진 시간을 늘 조금씩 빠뜨리면, 빠뜨린 만큼이 소비율에 이미 들어간다
+//       (Lowrance 보정값과 같은 이치). 그래서 계기판이 없어도 잔량이 맞아 간다.
+//     · 소비율 = 최근 구간 셋의 「쓴 기름 합 ÷ 시간 합」. 적은 양으로 잰 짧은 구간이
+//       긴 구간과 같은 무게를 갖지 않는다. (옛 셈은 구간마다의 값을 그냥 평균냈다 —
+//       8월 초 8L·15L 로 잰 짧은 두 구간이 3.0 을 만들었다.)
+//     · 충전(공회전)과 항해는 부하가 달라 기름을 다르게 쓴다. 구간이 충분히 쌓이면
+//       둘을 따로 잰다(최소제곱). 모자라면 하나로 센다.
+//     · 더 갈 수 있는 시간은 최근 구간 가운데 **가장 많이 쓴 값** 으로 셈한다.
+//       기름이 실제보다 많다고 믿는 것이 배에서 제일 위험하다.
+// ══════════════════════════════════════════════════════════════════════
 
-// ★ 시간당 연료 소비량 — 만탱크에서 만탱크까지만 잰다.
-//
-//   부분 주유는 '그동안 얼마나 썼는지' 를 말해 주지 않는다. 탱크가 얼마나 비어 있었는지
-//   모르기 때문이다. 예전에는 부분 주유끼리도 구간을 만들어서, 엔진을 1시간 돌리고
-//   10L 를 부으면 10 L/h 라는 값이 나왔다. 실제 값의 두 배 가까이 부풀었다.
-//   두 만탱크 사이에 넣은 기름을 모두 더하면 그것이 그 구간에 쓴 기름이다.
-function fuelRate(){
-  const arr = fuel.filter(f=> f.date && parseFloat(f.liters)>0)
-                  .sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
-  const fulls = arr.filter(f=> f.full);
-  if(fulls.length < 2) return null;      // 만탱크가 두 번은 있어야 잴 수 있다
-  const segs = [];
-  for(let i=1;i<fulls.length;i++){
-    const a = fulls[i-1], b = fulls[i];
-    const dh = hoursBeforeFill(b) - hoursBeforeFill(a);
-    const ka = fuelKey(a), kb = fuelKey(b);
-    const li = arr.filter(x => fuelKey(x) > ka && fuelKey(x) <= kb)
-                  .reduce((s,x)=> s + (parseFloat(x.liters)||0), 0);
-    if(dh > 0.1 && li > 0) segs.push({ lph: li/dh, date: b.date, dh, li });
+// 날짜·시각을 때(ms)로. 시각이 없으면 dflt 로 본다.
+//   주유·잔량 확인은 00:00 — 「주유가 먼저」(그날 돌린 것을 주유 뒤 소비로 잡아 적게 본다).
+//   항해·가동은 23:59 — 같은 까닭으로 그날 주유보다 뒤로 본다.
+function fuelAt(dateStr, hhmm, dflt){
+  const d = String(dateStr || '').slice(0, 10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  let tm = hm(hhmm || '');
+  if(!/^\d{2}:\d{2}$/.test(tm)) tm = dflt || '00:00';
+  const x = new Date(d + 'T' + tm + ':00').getTime();
+  return isFinite(x) ? x : null;
+}
+// 공회전으로 도는 가동 목적 — 충전은 배가 안 가고 엔진만 돈다
+const FUEL_IDLE = ['충전'];
+// 엔진이 돈 것들 — 언제부터 언제까지 몇 시간인지. 시간은 그 사이에 고르게 퍼져 있다고 본다.
+function fuelUses(nowMs){
+  const now = nowMs || Date.now();
+  const out = [];
+  (Array.isArray(voyage) ? voyage : []).forEach(v => {
+    const h = parseFloat(v && v.engineH) || 0;
+    if(!(h > 0)) return;
+    const 출 = String(v.timeOut || '').trim(), 도 = String(v.timeIn || '').trim();
+    let s = fuelAt(v.date, 출 || 도, '23:59');
+    if(s == null){ out.push({ s: now, e: now, h, idle: false }); return; }   // 날짜 없는 기록 — 지금 것으로
+    let e = s;
+    if(출 && 도){
+      const dIn = String(v.dateIn || '').trim();
+      e = /^\d{4}-\d{2}-\d{2}$/.test(dIn) ? fuelAt(dIn, 도) : fuelAt(v.date, 도);
+      if(e == null) e = s;
+      if(e < s) e = /^\d{4}-\d{2}-\d{2}$/.test(dIn) ? s : e + 864e5;     // 자정을 넘긴 항해
+    }
+    out.push({ s, e, h, idle: false });
+  });
+  (Array.isArray(runs) ? runs : []).forEach(r => {
+    if(!r) return;
+    const s = fuelAt(r.date, r.time, '23:59');
+    const 돎 = (typeof runOn === 'function') ? runOn(r) : !!r.on;
+    const idle = FUEL_IDLE.indexOf(r.purpose) >= 0;
+    if(s == null) return;
+    if(돎){
+      const h = Math.max(0, (now - s) / 36e5);
+      if(h > 0) out.push({ s, e: now, h, idle });
+      return;
+    }
+    const h = parseFloat(r.hours) || 0;
+    if(!(h > 0)) return;
+    let e = String(r.endTime || '').trim() ? fuelAt(r.endDate || r.date, r.endTime) : null;
+    if(e != null && e < s && !r.endDate) e += 864e5;
+    if(e == null || e < s) e = s + h * 36e5;
+    out.push({ s, e, h, idle });
+  });
+  return out;
+}
+// (a, b] 사이에 돈 엔진 시간 — 전부 · 그 가운데 공회전
+function fuelHoursIn(uses, a, b){
+  let all = 0, idle = 0;
+  (uses || []).forEach(u => {
+    let x;
+    if(u.e > u.s){
+      const ov = Math.min(u.e, b) - Math.max(u.s, a);
+      x = ov > 0 ? u.h * ov / (u.e - u.s) : 0;
+    } else x = (u.s > a && u.s <= b) ? u.h : 0;
+    all += x; if(u.idle) idle += x;
+  });
+  return { all, idle };
+}
+// ★ 옛 「지금 잔량」(4.98) — 적은 그때의 **총 엔진 시간** 만 담고 시각이 없다.
+//   그 총 시간에 닿은 때를 찾아 그 날 안에서 시각을 되살린다. 옛 셈은 그날 넣은 기름을
+//   모두 「적은 뒤」 로 더했으므로 그날 첫 주유보다 앞으로 둔다(사장님 9/30 기록: 0L 로 적고
+//   100L 를 넣으셨다).
+//   ★ 이 값은 한 번 잡으면 배 설정에 박아 둔다(fuelMarkAt). 지난 항해에 엔진 시간을
+//     채우면 총 시간이 바뀌어 다시 찾으면 엉뚱한 때가 나온다.
+function fuelLegacyAt(mk, uses){
+  const d = String(mk && mk.date || '').slice(0, 10);
+  const d0 = fuelAt(d, '00:00');
+  if(d0 == null) return null;
+  const d1 = d0 + 864e5 - 60000;
+  const U = uses || fuelUses();
+  const Hc = x => fuelHoursIn(U, -Infinity, x).all;
+  const 목표 = parseFloat(mk.hours) || 0;
+  let at;
+  if(Hc(d0) >= 목표 - 1e-6) at = d0;
+  else if(Hc(d1) < 목표 - 1e-6) at = d1;
+  else {
+    let lo = d0, hi = d1;
+    for(let i = 0; i < 40 && hi - lo > 30000; i++){
+      const mid = (lo + hi) / 2;
+      if(Hc(mid) >= 목표 - 1e-6) hi = mid; else lo = mid;
+    }
+    at = hi;
   }
-  if(!segs.length) return null;
-  const last = segs[segs.length-1];
-  const avg = segs.reduce((s,x)=> s+x.lph, 0) / segs.length;
-  return { last: last.lph, avg, n: segs.length, seg: last };
+  (Array.isArray(fuel) ? fuel : []).forEach(f => {
+    if(!f || f.kind === 'level' || !(parseFloat(f.liters) > 0)) return;
+    if(String(f.date || '').slice(0, 10) !== d) return;
+    const x = fuelAt(f.date, f.time, '00:00');
+    if(x != null && x - 60000 < at) at = x - 60000;
+  });
+  return Math.round(at / 60000) * 60000;
+}
+// 진짜 양을 아는 때와 부분 주유를 때 순서로 줄 세운다
+function fuelEvents(uses){
+  const TANK = boatSpec('fuelTank');
+  const ev = [];
+  (Array.isArray(fuel) ? fuel : []).forEach(f => {
+    if(!f || !f.date) return;
+    const ms = fuelAt(f.date, f.time, '00:00');
+    if(ms == null) return;
+    if(f.kind === 'level'){
+      const L = parseFloat(f.level);
+      if(!isFinite(L) || L < 0) return;
+      ev.push({ ms, k: fuelKey(f), kind: 'level', level: TANK > 0 ? Math.min(TANK, L) : L,
+                gauge: f.gauge || '', rec: f, date: String(f.date).slice(0, 10), time: hm(f.time || '') });
+      return;
+    }
+    const L = parseFloat(f.liters) || 0;
+    if(!(L > 0)) return;
+    ev.push(f.full
+      ? { ms, k: fuelKey(f), kind: 'full', level: TANK > 0 ? TANK : null, liters: L, rec: f,
+          date: String(f.date).slice(0, 10), time: hm(f.time || '') }
+      : { ms, k: fuelKey(f), kind: 'part', liters: L, rec: f });
+  });
+  const mk = fuelMarkRaw();
+  if(mk){
+    const at = (mk.at != null && isFinite(Number(mk.at))) ? Number(mk.at) : fuelLegacyAt(mk, uses);
+    if(at != null) ev.push({ ms: at, k: '', kind: 'level', legacy: true,
+                             level: TANK > 0 ? Math.min(TANK, mk.left) : mk.left,
+                             date: mk.date, time: '', gauge: '' });
+  }
+  return ev.sort((a, b) => (a.ms - b.ms) || String(a.k).localeCompare(String(b.k)));
+}
+// 충전(공회전)과 항해를 따로 잴 수 있으면 잰다 — 쓴 기름 = 항해시간×a + 충전시간×b
+//   구간이 셋 이상, 둘 다 3시간 넘게 쌓였고, 답이 말이 될 때(0 < 충전 < 항해)만.
+function fuelSplit(segs){
+  const S = (segs || []).filter(x => x.lph != null);
+  if(S.length < 3) return null;
+  let suu = 0, sui = 0, sii = 0, syu = 0, syi = 0, HU = 0, HI = 0;
+  S.forEach(x => {
+    const u = x.h - x.hIdle, i = x.hIdle, y = x.used;
+    suu += u * u; sui += u * i; sii += i * i; syu += y * u; syi += y * i; HU += u; HI += i;
+  });
+  if(HU < 3 || HI < 3) return null;
+  const det = suu * sii - sui * sui;
+  if(!(det > 0.05 * suu * sii)) return null;            // 두 시간이 늘 같이 움직이면 가를 수 없다
+  const a = (syu * sii - syi * sui) / det, b = (syi * suu - syu * sui) / det;
+  if(!(a > 0) || !(b > 0) || !(b < a)) return null;
+  return { voy: a, idle: b };
+}
+const FUEL_RECENT = 3;   // 소비율을 잴 때 보는 최근 구간 수
+// ★ 연료 셈은 여기 한 곳에서 한다. 아래 문들(fuelRate·fuelLeft·…)은 이것을 읽기만 한다.
+function fuelModel(nowMs){
+  const now = nowMs || Date.now();
+  const TANK = boatSpec('fuelTank');
+  const uses = fuelUses(now);
+  const H = (a, b) => fuelHoursIn(uses, a, b);
+  const 사람 = fuelLphSet();
+  const segs = [];
+  let cur = null, added = 0;
+  const good = [];
+  fuelEvents(uses).forEach(ev => {
+    if(ev.kind === 'part'){ if(cur) added += ev.liters; return; }
+    if(cur){
+      const before = ev.kind === 'full' ? (TANK > 0 ? Math.max(0, TANK - ev.liters) : null) : ev.level;
+      let used = null;
+      if(cur.kind === 'full' && ev.kind === 'full' && !(TANK > 0)) used = added + ev.liters;
+      else if(cur.level != null && before != null) used = cur.level + added - before;
+      const hh = H(cur.ms, ev.ms);
+      const seg = { from: cur, to: ev, used, h: hh.all, hIdle: hh.idle, added, before };
+      // ★ 그때 앱이 보던 소비율로 셈한 잔량과 실제를 견준다 (어긋나면 알린다)
+      const 앞 = good.slice(-FUEL_RECENT);
+      const 앞율 = 사람 || (앞.length ? 앞.reduce((s, x) => s + x.used, 0) / 앞.reduce((s, x) => s + x.h, 0) : null);
+      if(앞율 != null && cur.level != null && before != null){
+        seg.pred = Math.max(0, cur.level + added - 앞율 * hh.all);
+        seg.diff = before - seg.pred;
+      }
+      if(used != null && used > 0 && hh.all > 0.1){ seg.lph = used / hh.all; good.push(seg); }
+      segs.push(seg);
+    }
+    cur = ev; added = 0;
+  });
+  const recent = good.slice(-FUEL_RECENT);
+  const rate = recent.length ? recent.reduce((s, x) => s + x.used, 0) / recent.reduce((s, x) => s + x.h, 0) : null;
+  const split = fuelSplit(good.slice(-6));
+  const 최대 = recent.length ? Math.max(...recent.map(x => x.lph)) : null;
+  const safe = 사람 || (rate == null ? null : Math.max(split ? split.voy : rate, 최대));
+  const use = 사람 || rate;
+  // ── 지금 남은 양
+  let left = null;
+  const R = cur;
+  if(TANK > 0 && R && R.level != null){
+    const since = H(R.ms, now);
+    const 뒤 = added;                      // 마지막으로 안 때 뒤에 넣은 부분 주유
+    let used = 0, rateUsed = null;
+    if(사람){ used = since.all * 사람; rateUsed = 사람; }
+    else if(split){ used = (since.all - since.idle) * split.voy + since.idle * split.idle; rateUsed = rate; }
+    else if(rate != null){ used = since.all * rate; rateUsed = rate; }
+    if(rateUsed != null || R.kind === 'level'){
+      left = { left: Math.max(0, Math.min(TANK, R.level + 뒤 - used)), used, since: since.all, added: 뒤,
+               from: R.date || '', time: R.time || '', fromKind: R.kind, rate: rateUsed,
+               mine: R.kind === 'level', gauge: R.gauge || '', ref: R };
+    }
+  }
+  return { segs, good, recent, rate, split, safe, use, left, last: R, TANK, uses, H, now };
 }
 
-// 마지막 만탱크 이후 소비량으로 남은 연료를 추정한다 (게이지 고장 대비 보조값)
+// ★ 시간당 연료 소비량 — 앱이 셈한 값 (사람이 적은 값은 따로: fuelLphSet)
+//   avg 는 최근 구간들의 「쓴 기름 합 ÷ 시간 합」 이다 (이름은 옛것 그대로 둔다).
+function fuelRate(){
+  const M = fuelModel();
+  if(M.rate == null) return null;
+  const last = M.good[M.good.length - 1];
+  return { avg: M.rate, last: last.lph, n: M.recent.length, seg: last, safe: M.safe, split: M.split };
+}
+
+// 남은 연료를 추정한다 (게이지 고장 대비 보조값)
 // 연료 탱크 용량은 배마다 다르다 — 배 설정에서 읽는다
 function fuelLeft(){
   const TANK_L = boatSpec('fuelTank');
   if(!(TANK_L > 0)) return null;      // 탱크 용량을 모르면 잔량을 추정하지 않는다
-  // ★ 사람이 「지금 잔량」 을 적었으면 그때부터 센다. 계기판을 본 사람이 앱보다 정확하다.
-  const mk = fuelMark();
-  if(mk){
-    const lph = fuelLphSet() || (fuelRate() ? fuelRate().avg : null);
-    const since = Math.max(0, engineHours().total - mk.hours);
-    if(lph == null)
-      return { left: Math.min(TANK_L, mk.left), used: 0, since, from: mk.date, rate: null, mine: true };
-    const arr2 = fuel.filter(f=> f.date).sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
-    const 더넣음 = arr2.filter(f => String(f.date||'') >= String(mk.date||''))
-                     .reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
-    const left = Math.max(0, Math.min(TANK_L, mk.left - since * lph + 더넣음));
-    return { left, used: since * lph, since, from: mk.date, rate: lph, mine: true };
-  }
-  const arr = fuel.filter(f=> f.date).sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
-  const fulls = arr.filter(f=> f.full);
-  const full = fulls[fulls.length-1];
-  if(!full) return null;
-  const r0 = fuelRate();
-  const lph = fuelLphSet() || (r0 ? r0.avg : null);
-  if(lph == null) return null;
-  const r = { avg: lph };
-  const since = engineHours().total - hoursBeforeFill(full);
-  if(since < 0) return null;
-  const used = since * r.avg;
-  const kf = fuelKey(full);
-  const after = arr.filter(f=> fuelKey(f) > kf && !f.full)
-                   .reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
-  const left = Math.max(0, Math.min(TANK_L, TANK_L - used + after));
-  return { left, used, since, from: full.date, rate: r.avg };
+  return fuelModel().left;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -42043,14 +42551,45 @@ function fuelLphSet(){
   const v = parseFloat(fuelSet().lph);
   return (isFinite(v) && v > 0) ? v : null;
 }
-// 사람이 적은 「지금 잔량」 — 적은 그때의 총 가동시간까지 함께 담는다.
-//   그래야 그 뒤로 얼마나 더 돌렸는지 셈할 수 있다.
-function fuelMark(){
+// 옛(4.98~5.23) 「지금 잔량」 — 배 설정에 하나만 담겼다. 적은 그때의 총 가동시간까지 함께.
+//   ★ 5.24 부터 새로 적는 잔량은 주유 기록 옆에 「잔량 확인」 으로 쌓인다(여러 번 = 여러 기준).
+//     옛것도 버리지 않고 기준 하나로 쓴다. at 은 되살린 때(fuelMarkAt 이 한 번 박는다).
+function fuelMarkRaw(){
   const m = fuelSet().mark;
   if(!m) return null;
   const L = parseFloat(m.left), h = parseFloat(m.hours);
   if(!isFinite(L) || L < 0 || !isFinite(h)) return null;
-  return { left: L, hours: h, date: m.date || '' };
+  return { left: L, hours: h, date: m.date || '', at: (m.at != null && isFinite(Number(m.at))) ? Number(m.at) : null };
+}
+// 지금 잔량 셈이 **사람이 확인한 양** 에서 시작하는가 — 그렇다면 그 확인 (아니면 null).
+//   hours 는 그때까지의 총 가동시간이다(옛 모양 그대로 돌려준다).
+function fuelMark(){
+  const M = fuelModel();
+  const R = M.last;
+  if(!R || R.kind !== 'level') return null;
+  return { left: R.level, hours: M.H(-Infinity, R.ms).all, date: R.date || '', time: R.time || '',
+           gauge: R.gauge || '', legacy: !!R.legacy, rec: R.rec || null };
+}
+// ★ 5.24 G — 잔량을 어떻게 아나: 앱이 추정(기본) / 계기판 게이지
+//   게이지가 되는 배는 게이지가 진짜 값이다. 추정 칸을 감추고 눈금을 누르게 한다.
+//   눈금도 「진짜 양을 아는 때」 라 소비율은 계속 잰다.
+function fuelHow(){ return fuelSet().how === 'gauge' ? 'gauge' : 'est'; }
+function fuelHowSet(v){ fuelSetPut({ how: v === 'gauge' ? 'gauge' : null }); }
+const FUEL_GAUGE = [ ['E', 0], ['1/4', 0.25], ['1/2', 0.5], ['3/4', 0.75], ['F', 1] ];
+const fuelGaugeShow = g => ({ 'E':'E', '1/4':'¼', '1/2':'½', '3/4':'¾', 'F':'F' })[g] || '';
+// 잔량 확인을 하나 쌓는다 (지금 잔량 · 게이지 · 바닥남). 주유 기록 옆에 남는다.
+function fuelLevelAdd(n, extra){
+  const f = Object.assign({
+    id: (typeof newId === 'function') ? newId() : String(Date.now()),
+    kind: 'level', date: today(),
+    time: (typeof nowHM === 'function') ? nowHM()
+          : (d => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'))(new Date()),
+    level: n, gauge: '', liters: '', full: false, cost: '', note: ''
+  }, extra || {});
+  fuel.push(f);
+  if(typeof saveMR === 'function') saveMR(); else save();
+  renderFuel();
+  return f;
 }
 // 눌러서 고치는 창 넷
 function fuelEditLph(){
@@ -42079,27 +42618,76 @@ function fuelEditLeft(){
   needEdit('지금 잔량을 적습니다.', ()=>{
     const TANK = boatSpec('fuelTank');
     const now = fuelLeft();
+    // ★ 5.24 — 오늘 넣은 기름이 있으면 그것까지 합친 양인지 밝힌다.
+    //   9/30 에 사장님이 100L 를 넣고 「0」 을 적으셨는데, 앱은 그 0 이 넣기 전인지 뒤인지
+    //   알 길이 없었다. 적는 그 자리에서 물으면 헷갈릴 일이 없다.
+    const 오늘 = (Array.isArray(fuel) ? fuel : [])
+      .filter(f => f && f.kind !== 'level' && parseFloat(f.liters) > 0 && String(f.date || '') === today())
+      .sort((a, b) => fuelKey(b).localeCompare(fuelKey(a)))[0];
+    const 게이지 = fuelHow() === 'gauge' && TANK > 0;
     openForm({
       title: '지금 잔량',
       sub: t('계기판이나 눈으로 본 지금 남은 양을 적어 주세요. 이 값을 기준으로 앞으로를 셈합니다.')
-         + (TANK > 0 ? ' ' + tsub('탱크 {L}L.', { L: Math.round(TANK) }) : ''),
+         + (TANK > 0 ? ' ' + tsub('탱크 {L}L.', { L: Math.round(TANK) }) : '')
+         + (오늘 ? ' ' + tsub('오늘 {t} 넣으신 {L}L까지 합친 지금 양을 적어 주세요.',
+                             { t: hm(오늘.time || '') || '—', L: fmtNumF(parseFloat(오늘.liters)) }) : ''),
       okText: '저장',
-      fields: [ { key:'left', label:'남은 양 (L)', value: now ? Math.round(now.left) : '', type:'number',
-                  placeholder: TANK > 0 ? String(Math.round(TANK)) : '' } ],
+      fields: (게이지 ? [ { key:'g', label:'연료 게이지', type:'pick', value:'',
+                           options: FUEL_GAUGE.map(([g, fr]) => ({ v: g, name: fuelGaugeShow(g),
+                             sub: Math.round(TANK * fr) + ' L' })) } ] : [])
+        .concat([ { key:'left', label:'남은 양 (L)', value: (now && !게이지) ? Math.round(now.left) : '', type:'number',
+                  placeholder: TANK > 0 ? String(Math.round(TANK)) : '' } ]),
       onOk: v => {
-        const n = parseFloat(v.left);
+        const g = 게이지 ? String(v.g || '') : '';
+        const fr = (FUEL_GAUGE.find(x => x[0] === g) || [])[1];
+        const n = (fr != null && String(v.left || '').trim() === '') ? Math.round(TANK * fr) : parseFloat(v.left);
         if(!isFinite(n) || n < 0) return formErr('left', '0 이상의 수를 적어 주세요.');
         if(TANK > 0 && n > TANK) return formErr('left', tsub('탱크 용량({L}L)보다 많습니다.', { L: Math.round(TANK) }));
-        // ★ 적은 그때의 총 가동시간을 함께 담는다. 그래야 그 뒤로 얼마나 돌렸는지 셈이 된다.
-        fuelSetPut({ mark: { left: n, hours: engineHours().total, date: today() } });
+        // ★ 5.24 — 배 설정 하나에 덮어쓰지 않고 「잔량 확인」 으로 쌓는다.
+        //   쌓여야 확인과 확인 사이에 실제로 쓴 양으로 소비율을 다시 잴 수 있다.
+        fuelLevelAdd(n, { gauge: fr != null ? g : '' });
       }
     });
   });
 }
-function fuelClearMark(){ fuelSetPut({ mark: null }); }
+// 「앱이 셈한 값으로」 — 지금 셈이 기대는 잔량 확인을 치운다 (휴지통으로, 되돌릴 수 있다)
+function fuelClearMark(){
+  const mk = fuelMark();
+  if(!mk) return;
+  if(mk.legacy){ fuelSetPut({ mark: null }); return; }
+  const i = fuel.indexOf(mk.rec);
+  if(i < 0) return;
+  if(typeof mrTrash !== 'undefined' && Array.isArray(mrTrash))
+    mrTrash.push({ id: 'fuel_' + mk.rec.id, kind: 'fuel', data: JSON.parse(JSON.stringify(mk.rec)),
+                   delAt: new Date().toISOString() });
+  fuel.splice(i, 1);
+  if(typeof saveMR === 'function') saveMR(); else save();
+  try{ if(typeof updateTrashTab === 'function') updateTrashTab(); }catch(_){}
+  renderFuel();
+}
+// 잔량 확인 창의 두 칸 — 리터를 적으면 눈금을 지우고, 눈금을 누르면 리터를 채운다
+function fuelLevelField(v){
+  const it = getMR('fuel', mrOpenId); if(!it) return;
+  const TANK = boatSpec('fuelTank');
+  let n = parseFloat(v);
+  if(!isFinite(n) || n < 0){ tell(t('0 이상의 수를 적어 주세요.'), { kind:'bad' }); openMR('fuel', mrOpenId); return; }
+  if(TANK > 0 && n > TANK) n = TANK;
+  it.level = n; it.gauge = '';
+  saveMR(); renderFuel(); openMR('fuel', mrOpenId);
+}
+function fuelLevelGauge(g){
+  const it = getMR('fuel', mrOpenId); if(!it) return;
+  const TANK = boatSpec('fuelTank');
+  const fr = (FUEL_GAUGE.find(x => x[0] === g) || [])[1];
+  if(fr == null || !(TANK > 0)) return;
+  it.gauge = g; it.level = Math.round(TANK * fr);
+  saveMR(); renderFuel(); openMR('fuel', mrOpenId);
+}
+// 숫자를 짧게 (fmtNum 이 없는 자리에서도 쓴다)
+function fmtNumF(n){ return (typeof fmtNum === 'function') ? fmtNum(n) : String(Math.round(n * 10) / 10); }
 function fuelStats(){
   const y = String(new Date().getFullYear());
-  const arr = fuel.filter(f=>(f.date||'').startsWith(y));
+  const arr = fuel.filter(f=>f && f.kind !== 'level' && (f.date||'').startsWith(y));   // 잔량 확인은 주유가 아니다
   const l = arr.reduce((s,f)=>s+(parseFloat(f.liters)||0),0);
   const w = arr.reduce((s,f)=>s+(parseFloat(f.cost)||0),0);
   return {cnt:arr.length, l, w, y};
@@ -42133,29 +42721,30 @@ function fuelStats(){
 // ★ fuelLeft 의 since 와 다르다 — 그쪽은 사람이 「지금 잔량」 을 적었으면 그때부터 센다.
 //   이 칸은 이름 그대로 **만탱크 뒤**라야 한다. 이름과 다른 수를 보여 주면 안 된다.
 function fuelSinceFull(){
-  const arr = (typeof fuel !== 'undefined' && Array.isArray(fuel) ? fuel : [])
-                .filter(f => f && f.date).sort((a,b)=> fuelKey(a).localeCompare(fuelKey(b)));
-  const fulls = arr.filter(f => f.full);
-  const full = fulls[fulls.length - 1];
-  if(!full) return null;
-  const h = engineHours().total - hoursBeforeFill(full);
+  const M = fuelModel();
+  let F = null;
+  fuelEvents(M.uses).forEach(ev => { if(ev.kind === 'full') F = ev; });
+  if(!F) return null;
+  const h = M.H(F.ms, M.now).all;
   if(!(h >= 0)) return null;
   // 만탱크 뒤로 더 넣은 기름도 알려 준다 — 「만탱크 뒤 8시간, 그 사이 20L 더 넣음」
-  const kf = fuelKey(full);
-  const 더 = arr.filter(f => fuelKey(f) > kf).reduce((s,f)=> s + (parseFloat(f.liters)||0), 0);
-  return { h, date: String(full.date || ''), added: 더 };
+  let 더 = 0;
+  fuelEvents(M.uses).forEach(ev => { if(ev.kind === 'part' && ev.ms > F.ms) 더 += ev.liters; });
+  return { h, date: String(F.date || ''), added: 더 };
 }
 // 남은 기름으로 더 돌릴 수 있는 시간 (없으면 null)
 // ★ 사람은 리터가 아니라 **시간**으로 셈한다 — 「두 시간이면 닿는다」
+// ★★ 5.24 F — 최근 구간 가운데 **가장 많이 쓴 값** 으로 셈한다 (조종사가 소비율을 넉넉하게
+//   잡는 것과 같다). 잔량 자체는 가장 그럴듯한 값으로 보여 주고, 「더 갈 수 있나」 만 안전한 쪽으로.
 function fuelHoursLeft(){
-  const left = fuelLeft();
-  const lph = fuelLphSet() || (fuelRate() ? fuelRate().avg : null);
-  if(!left || !(lph > 0)) return null;
-  return left.left / lph;
+  const M = fuelModel();
+  if(!M.left || !(M.safe > 0)) return null;
+  return M.left.left / M.safe;
 }
 function renderFuel(){
   const L = document.getElementById('fuelList');
   const st = fuelStats(), eh = engineHours(), rate = fuelRate(), left = fuelLeft();
+  const M = fuelModel();
 
   // ★ 4.98 — 이름표 셋을 바로잡았다 (사장님 지적)
   //   ① 「63」 위에 「리터」 라고만 적혀 있었다. 옆의 「2026 주유」·「2026 연료비」 와 짝인
@@ -42169,11 +42758,20 @@ function renderFuel(){
   const 손 = on => on ? `<i class="mine">${esc(t('내가 적음'))}</i>` : '';
   // ★ 4.120 — 배를 띄우기 전에 쓰는 수만 남겼다. 까닭은 fuelSinceFull 위의 글에 적었다.
   const 만탱 = fuelSinceFull(), 갈시간 = fuelHoursLeft();
+  // ★ 5.24 G — 계기판 게이지를 보는 배는 추정 칸 대신 마지막으로 본 눈금을 보여 준다.
+  const 게이지 = fuelHow() === 'gauge';
+  const 마지막 = M.last;
+  const 눈금 = !마지막 ? '—'
+    : 마지막.kind === 'full' ? 'F'
+    : (마지막.gauge ? fuelGaugeShow(마지막.gauge) : Math.round(마지막.level) + ' L');
   const head = `<div class="statrow">
-      <div class="stat tapstat" onclick="fuelEditLeft()"><b>${left? Math.round(left.left) : '—'}</b>
-        <span>${esc(t('잔량 추정 L'))}${손(!!내잔)}</span></div>
-      <div class="stat"><b>${갈시간 != null ? durText(갈시간) : '—'}</b>
-        <span>${esc(t('더 갈 수 있는 시간'))}</span></div>
+      ${게이지
+        ? `<div class="stat tapstat" onclick="fuelEditLeft()"><b>${esc(눈금)}</b>
+             <span>${esc(t('연료 게이지'))}</span></div>`
+        : `<div class="stat tapstat" onclick="fuelEditLeft()"><b>${left? Math.round(left.left) : '—'}</b>
+             <span>${esc(t('잔량 추정 L'))}${손(!!내잔)}</span></div>
+           <div class="stat"><b>${갈시간 != null ? durText(갈시간) : '—'}</b>
+             <span>${esc(t('더 갈 수 있는 시간'))}</span></div>`}
       <div class="stat tapstat" onclick="fuelEditLph()"><b>${lphShow? lphShow.toFixed(1) : '—'}</b>
         <span>${esc(t('L/시간'))}${손(!!내lph)}</span></div>
     </div>
@@ -42182,7 +42780,10 @@ function renderFuel(){
       <div class="stat"><b>${esc(durText(eh.total) || '0분')}</b><span>${esc(t('총 가동시간'))}</span></div>
     </div>
     <div class="mrnone edt" style="text-align:left;padding-top:0">${
-      esc(t('L/시간과 잔량은 눌러서 고칠 수 있습니다.'))}</div>`;
+      esc(t('L/시간과 잔량은 눌러서 고칠 수 있습니다.'))}</div>
+    <div class="mrrow edt"><span class="mrlbl">${esc(t('잔량 확인 방법'))}</span>
+      <button class="minib ${게이지 ? '' : 'grn'}" onclick="fuelHowSet('est')">${esc(t('앱 추정'))}</button>
+      <button class="minib ${게이지 ? 'grn' : ''}" onclick="fuelHowSet('gauge')">${esc(t('연료 게이지'))}</button></div>`;
 
   const notes = [];
   if(eh.total > 0)
@@ -42192,9 +42793,34 @@ function renderFuel(){
   if(만탱 && 만탱.added > 0)
     notes.push(esc(tsub('{d} 만탱크 뒤로 {L}L를 더 넣으셨습니다.',
       { d: 만탱.date, L: fmtNum(만탱.added) })));
+  // ★★★ 5.24 E — 진짜 양을 알게 된 때, 앱이 보던 양과 크게 다르면 그렇다고 말한다.
+  //   말하지 않으면 사람은 앱이 늘 맞는 줄 안다. 9/29 에 앱은 140L 라고 했고 실제는 0 이었다.
+  //   ★ 그 사이 엔진 시간이 빈 항해가 있으면 함께 알린다 — 제일 흔한 까닭이다.
+  try{
+    const 끝 = M.segs[M.segs.length - 1];
+    if(끝 && 끝.to === 마지막 && 끝.diff != null && M.TANK > 0){
+      const 한도 = Math.max(20, (끝.to.gauge ? 0.3 : 0.15) * M.TANK);
+      if(Math.abs(끝.diff) >= 한도){
+        // ★ 실제가 더 많으면(넣은 기록 없이 늘었다) 소비율을 잴 수 없다 — 그렇게 말한다.
+        //   「다시 셈했습니다」 라고 하면 거짓말이 된다.
+        notes.push(`<b style="color:#E8B33C">${esc(tsub(끝.lph != null
+            ? '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 이 차이로 소비량을 다시 셈했습니다.'
+            : '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.',
+          { d: 끝.to.date || '—', what: t(끝.to.kind === 'full' ? '만탱크 주유' : '잔량 확인'),
+            p: Math.round(끝.pred), a: Math.round(끝.before) }))}</b>`);
+        const 빈 = (Array.isArray(voyage) ? voyage : []).filter(v => {
+          if(!v || v.plan || String(v.engineH == null ? '' : v.engineH).trim() !== '') return false;
+          if(!String(v.timeOut || '').trim() || !String(v.timeIn || '').trim()) return false;
+          const x = fuelAt(v.date, v.timeOut, '23:59');
+          return x != null && x > 끝.from.ms && x <= 끝.to.ms;
+        }).length;
+        if(빈) notes.push(esc(tsub('그 사이에 엔진 시간이 빈 항해가 {n}개 있습니다. 항해일지에서 채워 주세요.', { n: 빈 })));
+      }
+    }
+  }catch(_){}
   // ★ 「1/3 은 남기고 돌아온다」 — 배 타는 사람들이 널리 쓰는 어림이다.
   //   칸으로 만들면 자리만 먹는다. 갈 수 있는 시간이 나올 때만 한 줄로 적는다.
-  if(갈시간 != null && 갈시간 > 0)
+  if(!게이지 && 갈시간 != null && 갈시간 > 0)
     notes.push(esc(tsub('1/3을 남기려면 {h} 안에 돌아오시는 것이 좋습니다 — 뱃사람들이 사용하는 대략의 기준입니다.',
       { h: durText(갈시간 * 2 / 3) })));
   if(내lph)
@@ -42202,14 +42828,29 @@ function renderFuel(){
       + (rate ? ' ' + esc(tsub('앱이 셈한 값은 {v} 입니다.', { v: rate.avg.toFixed(1) })) : '')
       + ` <button class="minib blu" style="vertical-align:middle" onclick="fuelClearLph()">${
           esc(t('앱이 셈한 값으로'))}</button>`);
-  else if(rate)
-    notes.push(esc(tsub('만탱크와 만탱크 사이에 넣은 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 구간 {n}개 평균 {v} L/h.',
+  else if(rate){
+    notes.push(esc(tsub('만탱크·잔량 확인 사이에 실제로 쓴 기름을 그 사이 엔진 가동시간으로 나눈 값입니다. 최근 구간 {n}개 {v} L/h.',
       { n: rate.n, v: rate.avg.toFixed(1) })));
+    // ★ 5.24 H — 충전(공회전)과 항해를 가를 만큼 쌓였으면 따로 보여 준다
+    if(rate.split)
+      notes.push(esc(tsub('충전과 항해를 따로 셈합니다 — 항해 {a} L/h · 충전 {b} L/h.',
+        { a: rate.split.voy.toFixed(1), b: rate.split.idle.toFixed(1) })));
+    // ★ 5.24 F — 더 갈 수 있는 시간은 넉넉하게(많이 쓴 쪽으로) 셈했음을 밝힌다
+    if(!게이지 && 갈시간 != null && rate.safe > rate.avg + 0.05)
+      notes.push(esc(tsub('더 갈 수 있는 시간은 최근 구간 가운데 가장 많이 쓴 {v} L/h로 셈했습니다.',
+        { v: rate.safe.toFixed(1) })));
+  }
   else
-    notes.push(esc(t('연료 소비량은 [만탱크] 주유가 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.')));
-  if(left && left.mine)
-    notes.push(esc(tsub('잔량은 {d}에 적어 두신 {L}L에서 그 뒤 {h}시간 가동을 뺀 값입니다.',
-        { d: left.from || '—', L: Math.round(내잔 ? 내잔.left : 0), h: left.since.toFixed(1) }))
+    notes.push(esc(t('연료 소비량은 만탱크 주유나 잔량 확인이 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.')));
+  if(게이지)
+    notes.push(esc(t('연료 게이지를 보는 배로 정해 두셨습니다. 출항·입항 때 게이지 눈금을 눌러 주세요.')));
+  else if(left && left.mine)
+    // ★ 5.24 — 그 뒤 넣은 기름이 있으면 그것도 밝힌다. 「0L 에서 0.8시간을 뺐는데 왜 95L?」 가 안 되게.
+    notes.push(esc(tsub(left.added > 0
+          ? '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.'
+          : '잔량은 {d}에 적어 두신 {L}L에서 그 뒤 {h}시간 가동을 뺀 값입니다.',
+        { d: ((left.from || '—') + (left.time ? ' ' + left.time : '')), L: Math.round(내잔 ? 내잔.left : 0),
+          a: fmtNum(left.added || 0), h: left.since.toFixed(1) }))
       + ` <button class="minib blu" style="vertical-align:middle" onclick="fuelClearMark()">${
           esc(t('앱이 셈한 값으로'))}</button>`);
   else if(left)
@@ -42228,7 +42869,15 @@ function renderFuel(){
     ...runs.map(r=>({ k:'run',  date:r.date||'', o:r })),
   ].sort((a,b)=> String(b.date).localeCompare(String(a.date)));
 
-  L.innerHTML = head + sub + (rows.map(x=> x.k==='fuel'
+  L.innerHTML = head + sub + (rows.map(x=> (x.k==='fuel' && x.o.kind==='level')
+    // ★ 5.24 — 잔량 확인 (지금 잔량·게이지 눈금). 주유와 섞여 있어야 「언제 얼마였나」 가 한눈에 보인다.
+    ? `<div class="mr" onclick="openMR('fuel','${x.o.id}')">
+        <div class="ct"><div class="cn">⛽ ${esc(tsub('잔량 {L} L', { L: fmtNum(parseFloat(x.o.level) || 0) }))}${
+          x.o.gauge ? ` <span class="chip">${esc(fuelGaugeShow(x.o.gauge))}</span>` : ''}</div>
+        <span class="chip nchip">${esc(t('잔량 확인'))}</span></div>
+        <div class="mrm">${x.o.date||'—'}${x.o.time?' '+esc(hm(x.o.time)):''}${x.o.note?' · '+esc(x.o.note).slice(0,40):''}</div>
+      </div>`
+    : x.k==='fuel'
     ? `<div class="mr" onclick="openMR('fuel','${x.o.id}')">
         <div class="ct"><div class="cn">⛽ ${x.o.liters?fmtNum(parseFloat(x.o.liters))+' L':'—'}${x.o.full?` <span class="chip">${esc(t('만탱크'))}</span>`:''}</div>
         <span class="chip nchip">${x.o.cost?Number(x.o.cost).toLocaleString()+esc(curOf(x.o)):''}</span></div>

@@ -602,6 +602,8 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 /* ===== 탭바/정기점검/수리목록 ===== */
 body{padding-bottom:62px}
 #tabbar{position:fixed;bottom:0;left:0;right:0;background:#081020;border-top:1px solid #1e3a5a;display:flex;z-index:60}
+/* 5.26 — 폰이 키보드만큼 화면을 줄여 버리는 경우(안드로이드 10 이하 등) 탭 줄이 키보드 위로 따라 올라오지 않게 감춘다 */
+body.kbdrs #tabbar{display:none!important}
 /* ══════════════════════════════════════════════════════════════════════
    ★★★ 4.134 — 「새로 쓰는 것」 은 어느 화면에서나 같은 자리에 (사장님이 정하신 것)
    자리와 크기는 대한민국 정부 디자인 시스템(KRDS)과 머티리얼을 그대로 따른다 —
@@ -787,7 +789,10 @@ header{background:rgba(8,21,33,.92);backdrop-filter:blur(12px);border-bottom:1px
 .sub{font-size:10px;letter-spacing:.18em;color:var(--td);font-weight:600;
   display:flex;gap:8px;align-items:baseline;white-space:nowrap;overflow:hidden}
 #boatSub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-#syncState{flex:0 0 auto}
+/* ★ 5.27 — 글자를 키우거나 「클라우드 연결 안 됨 · 눌러서 확인」 처럼 상태 글이 길면 배 이름이 한 글자만 남았다.
+   배 이름을 먼저 보이게 하고, 상태 글이 줄어든다. */
+#boatSub{flex:0 0 auto;max-width:62%}
+#syncState{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 #syncState{font-size:10.5px;font-weight:600;color:var(--tm);letter-spacing:.02em}
 .tab{background:var(--sf2);border:1px solid var(--bd);border-radius:999px;color:#C4C8CD;font-size:12.5px;font-weight:700;padding:8px 13px}
@@ -1707,8 +1712,11 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #mrPanel.full .mrrow{
   background:rgba(255,255,255,.045);border-radius:14px;
   padding:13px 15px;margin:9px 0;gap:12px;align-items:center}
+/* ★ 5.27 — 칸마다 높이가 들쭉날쭉했다(글만 있는 줄 50 · 입력 칸 줄 70). 입력 칸 줄 높이에 맞춘다. */
+#mrPanel.full .mrrow{min-height:70px}
 #mrPanel.full .mrrow.edt,
 #mrPanel.full .mrrow:empty{background:transparent;padding:2px 0;margin:6px 0}
+#mrPanel.full .mrrow.edt,#mrPanel.full .mrrow:empty{min-height:0}
 #mrPanel.full .mrlbl{
   width:58px;flex-shrink:0;font-size:10.5px;font-weight:600;letter-spacing:.12em;
   color:#93AABD}
@@ -1721,6 +1729,11 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #mrPanel.full select{appearance:none;-webkit-appearance:none;
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236E8497' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat right center}
 #mrPanel.full textarea{resize:vertical;min-height:44px;line-height:1.6}
+/* 5.27 — 눌러서 목록에서 선택하는 칸. 선택 칸(select)과 같은 생김새 */
+.mrpickb{flex:1;min-width:0;min-height:40px;text-align:left;cursor:pointer;
+  background:var(--sf);border:1px solid var(--bd);border-radius:10px;color:var(--tx);padding:7px 30px 7px 10px;font-size:13px;font-family:inherit}
+#mrPanel.full .mrpickb{min-height:44px;background:transparent url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236E8497' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat right center;
+  border:none;border-radius:0;padding:0 22px 0 0;font-size:15px;font-weight:450;color:var(--th)}
 
 /* 무리 이름표 */
 #mrPanel.full .mrtop b,#mrPanel.full .mrsecthead{
@@ -2058,6 +2071,10 @@ body.panelfull #panel .ph{padding-top:0}
 #searchWrap input:focus,.qbox input:focus{
   border-color:rgba(156,198,232,.55);background:rgba(0,0,0,.42)}
 .qbox{margin:12px 0 10px}
+/* ★ 5.27 — 목록 화면(장비·정기점검·수리·정비수첩·항해일지·연료)의 찾기 칸·안내 글·줄이 화면 끝에 붙어 있었다.
+   목록 줄(.mr)·묶음 이름(.ghead)·숫자 칸(.statrow)은 양옆 20px 을 띄우는데 이 셋만 빠져 있었다. 같은 20px 로 맞춘다. */
+:is(#gearList,#maintList,#repairList,#mlogList,#voyageList,#fuelList,#rvList,#contactsList) > .qbox{margin-left:20px;margin-right:20px}
+:is(#gearList,#maintList,#repairList,#mlogList,#voyageList,#fuelList,#rvList,#contactsList) > :is(.mrnone,.mrrow){margin-left:20px;margin-right:20px}
 #mrPanel.full .qbox{margin:6px 0 12px}
 #mrPanel.full .qbox input{background:rgba(0,0,0,.30);border:1px solid rgba(255,255,255,.10);
   border-radius:13px;padding:13px 14px 13px 40px;font-size:14px}
@@ -2352,18 +2369,26 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     if(v === undefined){ const p = parse(m); v = p ? fmt((th === 'light' ? light : black)(...p)) : m; M.set(m, v); }
     return v;
   }
-  // 글자 크기표 — 보통(5.19 그대로) · 크게(초안) · 아주 크게
-  const FS = [[9,12],[10,12.5],[11,13],[11.5,13.5],[12,14],[12.5,14.5],[13,15],[13.5,15.5],[14,16],[15,16.5],[16,17],[17,18],[18,19],[20,20.5],[24,24]];
-  function fsBig(px){
-    if(px <= FS[0][0]) return FS[0][1];
-    if(px >= 24) return px;
-    for(let i=0;i<FS.length-1;i++){ const [a0,b0]=FS[i],[a1,b1]=FS[i+1];
+  // 글자 크기표 — 보통(5.19 그대로) · 크게 · 아주 크게
+  // ★★★ 5.27 — 사장님 지적: 「글자크기가 조정되는것도 있고 조정 안되는것도 있네 … 들죽날죽이다」
+  //   5.20 표는 작은 글씨(12→14, +17%)만 크게 키우고 본문(16→17, +6%)·제목(20→20.5)은 거의 그대로,
+  //   24px 이상은 아예 그대로 두었다. 그래서 「크게」 를 골라도 본문·제목은 안 바뀐 것처럼 보였다.
+  //   → 안드로이드 14 의 글자 크기 표(FontScaleConverter, 글꼴 크기 1.15 · 1.3 단계)를 그대로 쓴다.
+  //     작은 글씨는 더, 큰 글씨는 덜 커지지만 **30px 아래는 모두 커진다.** 30px 이상 큰 숫자만 그대로.
+  //     (안드로이드 14 는 이렇게 해서 큰 글씨가 화면을 넘지 않게 하면서 크기 차례를 지킨다.)
+  const FS_BIG    = [[8,9.2],[10,11.5],[12,13.8],[14,16.4],[18,19.8],[20,21.8],[24,25.2],[30,30]];
+  const FS_BIGGER = [[8,10.4],[10,13],[12,15.6],[14,18.8],[18,21.6],[20,23.6],[24,26.4],[30,30]];
+  function fsTable(px, T){
+    if(px >= 30) return px;
+    if(px <= T[0][0]) return Math.round(px * T[0][1] / T[0][0] * 2) / 2;
+    for(let i=0;i<T.length-1;i++){ const [a0,b0]=T[i],[a1,b1]=T[i+1];
       if(px>=a0 && px<=a1) return Math.round((b0+(b1-b0)*(px-a0)/(a1-a0))*2)/2; }
     return px;
   }
+  function fsBig(px){ return fsTable(px, FS_BIG); }
   function fsMap(px, fs){
-    if(fs === 'big') return fsBig(px);
-    if(fs === 'bigger') return px >= 24 ? px : Math.round(Math.min(24, fsBig(px) * 1.12) * 2) / 2;
+    if(fs === 'big') return fsTable(px, FS_BIG);
+    if(fs === 'bigger') return fsTable(px, FS_BIGGER);
     return px;
   }
   const THEMES = ['sunset', 'light', 'black'], SIZES = ['normal', 'big', 'bigger'];
@@ -2397,6 +2422,10 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
           + (theme === 'light' ? `:root{color-scheme:light}` : `:root{color-scheme:dark}`)
         : '')
       // 글자를 키우면 좁아지는 자리 — 칸 이름 자리를 넓히고, 머리줄 연결 상태 글은 배 이름에 자리를 양보한다
+      // ★ 5.27 — 크기를 따로 안 적은 글씨는 브라우저 기본 16px 을 물려받아 안 커졌다(칸 옆 단위 m·L·kt 등). 바탕 크기도 키운다.
+      + (fs !== 'normal' ? `body{font-size:${fsMap(16, fs)}px}` : '')
+      // 「아주 크게」 에서 장비 화면 위 단추 줄(장비 목록·정기점검·리뷰·도면)이 360px 폰에서 두 줄이 되었다 — 단추 안 여백만 줄인다
+      + (fs === 'bigger' ? `.mrhead .tab{padding-left:10px;padding-right:10px}` : '')
       + (wide ? `.mrlbl{width:${wide}px !important} .gtierow .mrlbl{width:${wide - 12}px !important} #syncState{font-size:12px !important}`
           // 아래 탭 줄은 키우지 않는다 — 애플 지침도 탭 줄 이름표는 글자 크기 설정을 따라 커지지 않는다.
           // 화면들이 탭 줄 높이에 맞춰 아래를 비워 두어서, 줄이 높아지면 [저장] 같은 단추를 덮는다(tblsavelive).
@@ -4127,7 +4156,7 @@ const I18N = {
     '공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.':'You need to sign in to view shared plans.\nPlease sign in on the Account screen.',
     '공개 설정을 바꿀 권한이 없습니다':'You do not have permission to change sharing',
     '공개 자료 삭제':'Delete public page',
-    '공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n':'Shared: the plan itself, the builder and model, and the name you gave it\n',
+    '공개되는 것: 도면 그림, 제조사·모델, 내가 정한 도면 이름\n':'Shared: the plan itself, the builder and model, and the name you gave it\n',
     '공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n':'Not shared: boat name, item list, and all maintenance, voyage and contact records\n\n',
     '공개된 배가 아직 없습니다':'No boats have been shared yet',
     '공개된 배가 없습니다':'No shared boats',
@@ -4559,7 +4588,7 @@ const I18N = {
     '배가 없습니다':'No boat',
     '배는 여러 척 등록할 수 있습니다. 위에서 배를 누르면 그 배로 바뀌고, 기록·날씨·물때가 모두 그 배 기준이 됩니다.':'You can register several boats. Tap a boat above to switch, and the records, weather and tides all follow that boat.',
     '배를 대는 위치에 최대한 가깝게 찍어 주세요.':'Mark it as close as you can to where you actually berth.',
-    '배를 등록하면 정비 기록을 붙일 수 있습니다':'Register a boat and you can attach maintenance records',
+    '배를 등록하면 정비 기록을 추가할 수 있습니다':'Register a boat and you can attach maintenance records',
     '배를 등록해야 사용할 수 있습니다. 등록하면 이 화면이 바로 열립니다.':'You need a registered boat. Register one and this screen opens straight away.',
     '배를 지웁니다.':'Delete the boat.',
     '배를 한 척 더 등록합니다.':'Register another boat.',
@@ -4596,7 +4625,7 @@ const I18N = {
     '분기':'Quarterly',
     '불러오지 못했습니다':'Could not load',
     '불편한 것·이상한 것·있었으면 하는 것을 알려 주세요':'Tell us what is awkward, what looks wrong, and what you wish were there',
-    '붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'There are no maintenance or repair records to attach.\n\nMark a scheduled check done or log a repair and it appears here.',
+    '추가할 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'There are no maintenance or repair records to attach.\n\nMark a scheduled check done or log a repair and it appears here.',
     '빈 곳을 끌면 새 도형 · 도형을 끌면 이동 · 오른쪽 아래 모서리는 크기 · 누르면 삭제':'Drag empty space for a new shape · drag a shape to move it · the bottom-right corner resizes · tap to delete',
     '빈 곳을 끌면 새 수납칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 누르면 이름·삭제':'Drag empty space for a new locker · drag a locker to move it · the blue corner resizes · tap to rename or delete',
     '뻘':'Mud',
@@ -4619,7 +4648,7 @@ const I18N = {
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'A photo plus the spot on the plan helps next time the same thing happens.',
     '사진을 불러오지 못했습니다':'Could not load the photo',
     '이 항해 사진':'Photos from this passage',
-    '출발·도착·중간 기록에 붙이지 않은 사진입니다':'Photos not attached to departure, arrival, or a log entry',
+    '출발·도착·중간 기록에 넣지 않은 사진입니다':'Photos not attached to departure, arrival, or a log entry',
     '사진은 한 자리에 {n}장까지입니다.':'Up to {n} [[photo|photos]] in one place.',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Could not load the photo — check your internet connection',
     '사진을 읽지 못했습니다':'Could not read the photo',
@@ -6308,7 +6337,7 @@ const I18N = {
   
 
     // ── 4.112-정비수첩
-    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목에 붙은 채로 시작합니다.':'Tap + Maintenance log on a scheduled check or a repair and it starts attached to that item.',
+    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목과 연결된 채로 시작합니다.':'Tap + Maintenance log on a scheduled check or a repair and it starts attached to that item.',
   
 
     // ── 5.18
@@ -6358,6 +6387,10 @@ const I18N = {
     // ── 5.24 연료 ②
     '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'At the {what} on {d}, the app estimated {p} L left but there was actually {a} L. A fill-up may be missing from the records.',
     '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'From the {L} L you entered on {d}, plus {a} L added since, less {h} engine hours since.',
+  
+
+    // ── 5.27
+    '이 장비의 고장 {n}건을 완료 처리할까요?':'Mark {n} fault(s) on this gear as done?',
   },
   ru: {
     '배는 {n}척까지 선택할 수 있습니다.':'Можно выбрать не более {n} судов.',
@@ -7692,7 +7725,7 @@ const I18N = {
     '공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.':'Чтобы смотреть общие планы, нужно войти.\nВойдите на экране «Аккаунт».',
     '공개 설정을 바꿀 권한이 없습니다':'Нет прав менять настройки публикации',
     '공개 자료 삭제':'Удалить публичную страницу',
-    '공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n':'Публикуется: сам план, производитель и модель, данное вами название\n',
+    '공개되는 것: 도면 그림, 제조사·모델, 내가 정한 도면 이름\n':'Публикуется: сам план, производитель и модель, данное вами название\n',
     '공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n':'Не публикуется: название судна, список вещей и все записи об обслуживании, походах и контактах\n\n',
     '공개된 배가 아직 없습니다':'Пока нет опубликованных судов',
     '공개된 배가 없습니다':'Опубликованных судов нет',
@@ -8125,7 +8158,7 @@ const I18N = {
     '배가 없습니다':'Судна нет',
     '배는 여러 척 등록할 수 있습니다. 위에서 배를 누르면 그 배로 바뀌고, 기록·날씨·물때가 모두 그 배 기준이 됩니다.':'Можно зарегистрировать несколько судов. Нажмите судно вверху — и записи, погода и приливы переключатся на него.',
     '배를 대는 위치에 최대한 가깝게 찍어 주세요.':'Ставьте отметку как можно ближе к месту фактической стоянки.',
-    '배를 등록하면 정비 기록을 붙일 수 있습니다':'Зарегистрируйте судно — и сможете прикреплять записи об обслуживании',
+    '배를 등록하면 정비 기록을 추가할 수 있습니다':'Зарегистрируйте судно — и сможете прикреплять записи об обслуживании',
     '배를 등록해야 사용할 수 있습니다. 등록하면 이 화면이 바로 열립니다.':'Нужно зарегистрированное судно. После регистрации этот экран откроется сразу.',
     '배를 지웁니다.':'Удалить судно.',
     '배를 한 척 더 등록합니다.':'Зарегистрировать ещё одно судно.',
@@ -8162,7 +8195,7 @@ const I18N = {
     '분기':'Ежеквартально',
     '불러오지 못했습니다':'Не удалось загрузить',
     '불편한 것·이상한 것·있었으면 하는 것을 알려 주세요':'Расскажите, что неудобно, что выглядит неправильно и чего не хватает',
-    '붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'Нет записей об обслуживании или ремонте для прикрепления.\n\nОтметьте регламентную работу выполненной или заведите ремонт — и они появятся здесь.',
+    '추가할 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'Нет записей об обслуживании или ремонте для прикрепления.\n\nОтметьте регламентную работу выполненной или заведите ремонт — и они появятся здесь.',
     '빈 곳을 끌면 새 도형 · 도형을 끌면 이동 · 오른쪽 아래 모서리는 크기 · 누르면 삭제':'Протяните по пустому месту — новая фигура · тяните фигуру, чтобы двигать · правый нижний угол меняет размер · нажатие удаляет',
     '빈 곳을 끌면 새 수납칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 누르면 이름·삭제':'Протяните по пустому месту — новый рундук · тяните рундук, чтобы двигать · синий угол меняет размер · нажатие для имени и удаления',
     '뻘':'Ил',
@@ -8185,7 +8218,7 @@ const I18N = {
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'Фото вместе с местом на плане пригодится, когда то же самое случится снова.',
     '사진을 불러오지 못했습니다':'Не удалось загрузить фото',
     '이 항해 사진':'Фотографии этого перехода',
-    '출발·도착·중간 기록에 붙이지 않은 사진입니다':'Фото, не прикреплённые к отходу, приходу или записи',
+    '출발·도착·중간 기록에 넣지 않은 사진입니다':'Фото, не прикреплённые к отходу, приходу или записи',
     '사진은 한 자리에 {n}장까지입니다.':'В одном месте не более {n} фотографий.',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'Не удалось загрузить фото — проверьте подключение к интернету',
     '사진을 읽지 못했습니다':'Не удалось прочитать фото',
@@ -9875,7 +9908,7 @@ const I18N = {
   
 
     // ── 4.112-정비수첩
-    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목에 붙은 채로 시작합니다.':'Нажмите «+ Журнал работ» в регламенте или ремонте — запись сразу привяжется к этому пункту.',
+    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목과 연결된 채로 시작합니다.':'Нажмите «+ Журнал работ» в регламенте или ремонте — запись сразу привяжется к этому пункту.',
   
 
     // ── 5.18
@@ -9925,6 +9958,10 @@ const I18N = {
     // ── 5.24 연료 ②
     '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'{d}, при событии «{what}», приложение считало, что осталось {p} л, а на самом деле было {a} л. Возможно, в записях пропущена заправка.',
     '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'От {L} л, введённых {d}, плюс {a} л, залитых после, минус {h} моточасов после.',
+  
+
+    // ── 5.27
+    '이 장비의 고장 {n}건을 완료 처리할까요?':'Отметить неисправности этого оборудования ({n}) выполненными?',
   },
   // ── 일본어 (4.68)
   //
@@ -11302,7 +11339,7 @@ const I18N = {
     '공개 도면을 보려면 로그인이 필요합니다.\n계정 화면에서 로그인해 주세요.':'公開図面を見るにはログインが必要です。\nアカウント画面からログインしてください。',
     '공개 설정을 바꿀 권한이 없습니다':'公開設定を変更する権限がありません',
     '공개 자료 삭제':'公開データを削除',
-    '공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n':'公開されるもの：図面の画像、メーカー・モデル、ご自分で付けた図面の名前\n',
+    '공개되는 것: 도면 그림, 제조사·모델, 내가 정한 도면 이름\n':'公開されるもの：図面の画像、メーカー・モデル、ご自分で付けた図面の名前\n',
     '공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n':'公開されないもの：船名、物品一覧、整備・航海・連絡先などすべての記録\n\n',
     '공개된 배가 아직 없습니다':'公開されている船はまだありません',
     '공개된 배가 없습니다':'公開されている船はありません',
@@ -11730,7 +11767,7 @@ const I18N = {
     '배가 없습니다':'船がありません',
     '배는 여러 척 등록할 수 있습니다. 위에서 배를 누르면 그 배로 바뀌고, 기록·날씨·물때가 모두 그 배 기준이 됩니다.':'船は複数登録できます。上で船をタップするとその船に切り替わり、記録・天気・潮汐がすべてその船が基準になります。',
     '배를 대는 위치에 최대한 가깝게 찍어 주세요.':'船をつける場所にできるだけ近い位置を指定してください。',
-    '배를 등록하면 정비 기록을 붙일 수 있습니다':'船を登録すると整備記録を紐づけられます',
+    '배를 등록하면 정비 기록을 추가할 수 있습니다':'船を登録すると整備記録を紐づけられます',
     '배를 등록해야 사용할 수 있습니다. 등록하면 이 화면이 바로 열립니다.':'船を登録するとご利用いただけます。登録するとこの画面がすぐに開きます。',
     '배를 지웁니다.':'船を削除します。',
     '배를 한 척 더 등록합니다.':'船をもう1隻登録します。',
@@ -11768,7 +11805,7 @@ const I18N = {
     '분기':'四半期',
     '불러오지 못했습니다':'読み込めませんでした',
     '불편한 것·이상한 것·있었으면 하는 것을 알려 주세요':'使いにくいところ・おかしいところ・あったらいいものをお知らせください',
-    '붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'紐づけられる整備・修理の記録がありません。\n\n定期点検を完了にするか、修理の項目を残すとここに表示されます。',
+    '추가할 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.':'紐づけられる整備・修理の記録がありません。\n\n定期点検を完了にするか、修理の項目を残すとここに表示されます。',
     '빈 곳을 끌면 새 도형 · 도형을 끌면 이동 · 오른쪽 아래 모서리는 크기 · 누르면 삭제':'空いた場所をドラッグで新しい図形・図形をドラッグで移動・右下の角でサイズ変更・タップで削除',
     '빈 곳을 끌면 새 수납칸 · 칸을 끌면 이동 · 파란 모서리는 크기 · 누르면 이름·삭제':'空いた場所をドラッグで新しい収納スペース・スペースをドラッグで移動・青い角でサイズ変更・タップで名前・削除',
     '뻘':'泥',
@@ -11791,7 +11828,7 @@ const I18N = {
     '사진과 도면 위치를 함께 남겨 두면 나중에 같은 문제가 생겼을 때 참고가 됩니다.':'写真と図面の位置を一緒に残しておくと、あとで同じ問題が起きたときの参考になります。',
     '사진을 불러오지 못했습니다':'写真を読み込めませんでした',
     '이 항해 사진':'この航海の写真',
-    '출발·도착·중간 기록에 붙이지 않은 사진입니다':'出港・入港・中間記録のどれにも付けていない写真です',
+    '출발·도착·중간 기록에 넣지 않은 사진입니다':'出港・入港・中間記録のどれにも付けていない写真です',
     '사진은 한 자리에 {n}장까지입니다.':'写真は一か所に{n}枚までです。',
     '사진을 불러오지 못했습니다 — 인터넷 연결을 확인해 주세요':'写真を読み込めませんでした — インターネット接続を確認してください',
     '사진을 읽지 못했습니다':'写真を読み取れませんでした',
@@ -13361,7 +13398,7 @@ const I18N = {
   
 
     // ── 4.112-정비수첩
-    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목에 붙은 채로 시작합니다.':'定期点検や修理の画面で「+ 整備手帳」を押すと、その項目にひも付いた状態で始まります。',
+    '정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목과 연결된 채로 시작합니다.':'定期点検や修理の画面で「+ 整備手帳」を押すと、その項目にひも付いた状態で始まります。',
   
 
     // ── 5.18
@@ -13411,6 +13448,10 @@ const I18N = {
     // ── 5.24 연료 ②
     '{d} {what} 때 앱은 {p}L 남았다고 봤는데 실제는 {a}L였습니다. 그 사이 넣은 기름이 기록에서 빠졌을 수 있습니다.':'{d} の{what}のとき、アプリは残り {p}L と見ていましたが、実際は {a}L でした。その間の給油が記録から漏れている可能性があります。',
     '잔량은 {d}에 적어 두신 {L}L에 그 뒤 넣은 {a}L를 더하고 {h}시간 가동을 뺀 값입니다.':'{d} に入力された {L}L に、その後入れた {a}L を足し、{h} 時間の稼働を引いた値です。',
+  
+
+    // ── 5.27
+    '이 장비의 고장 {n}건을 완료 처리할까요?':'この装備の故障{n}件を完了にしますか？',
   }
 };
 
@@ -15900,7 +15941,7 @@ function uploadDg(k){
       // 공개(남에게 보이기)는 따로 묻는다 — 기본은 '공개 안 함'이다.
       if(dgCanPublish()){
         const pub = await ask(t('이 도면을 다른 사람도 사용할 수 있게 공개할까요?\n\n')
-          + t('공개되는 것: 도면 그림, 제조사·모델, 내가 붙인 도면 이름\n')
+          + t('공개되는 것: 도면 그림, 제조사·모델, 내가 정한 도면 이름\n')
           + t('공개되지 않는 것: 배 이름, 물품 목록, 정비·항해·연락처 등 모든 기록\n\n')
           + t('"취소"를 눌러도 도면은 내 배에 그대로 사용됩니다.\n')
           + t('나중에 언제든 공개하거나 내릴 수 있습니다.'), { ok: t('공개하기') });
@@ -18731,6 +18772,7 @@ function createBoat(){
     maint = maintDefaults();      // 선종에 맞는 기본 정비 항목
     contacts = contactDefaults();
     checkt = checkDefaults();
+    seedFreshSet('maint', maint); seedFreshSet('contacts', contacts); seedFreshSet('checkt', checkt);
   }
   currentBoatId = boats[boats.length-1].id;
   window.currentBoatId = currentBoatId;
@@ -20540,7 +20582,7 @@ async function renderTalk(){
 let recPickTarget = null;
 function talkPickRecord(rid){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  if(!b){ tell(t('배를 등록하면 정비 기록을 붙일 수 있습니다')); return; }
+  if(!b){ tell(t('배를 등록하면 정비 기록을 추가할 수 있습니다')); return; }
   const rows = [];
   (Array.isArray(maint) ? maint : []).forEach(m=>{
     if(!m.lastDate) return;                      // 한 번도 안 한 것은 쓸 이야기가 없다
@@ -20555,7 +20597,7 @@ function talkPickRecord(rid){
                     + (r.pin ? ' · ' + t('도면 위치') : '')
                     + (r.photos && r.photos.length ? ' · ' + tsub('사진 {n}', { n: r.photos.length }) : '') });
   });
-  if(!rows.length){ tell(t('붙일 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.'), { big:true }); return; }
+  if(!rows.length){ tell(t('추가할 정비·수리 기록이 없습니다.\n\n정기점검을 완료 처리하거나 수리 항목을 남기면 여기에 나옵니다.'), { big:true }); return; }
   recPickTarget = rid;
   const B = document.getElementById('recPickBody');
   B.innerHTML = rows.map(x=>`<div class="fleet" onclick="recPickTake('${jsq(x.v)}')">
@@ -24826,13 +24868,16 @@ async function loadBoatData(){
   items   = migrate(data);
   trash   = migrate(await get('trash', []));
   const m = await get('maint', null);   maint  = (m && m.length) ? m : maintDefaults();
+  seedFreshSet('maint', (m && m.length) ? null : maint);      // 방금 깐 기본 항목인지 적어 둔다 (5.27)
   repair  = await get('repair', []);
   voyage  = await get('voyage', []);
   fuel    = await get('fuel', []);
   runs    = await get('runs', []);
   const c = await get('contacts', null); contacts = (c && c.length) ? c : contactDefaults();
+  seedFreshSet('contacts', (c && c.length) ? null : contacts);
   vdocs   = await get('vdocs', []);
   const k = await get('checkt', null);  checkt = (k && k.length) ? k : checkDefaults();
+  seedFreshSet('checkt', (k && k.length) ? null : checkt);
   mrTrash = await get('mrtrash', []);
   lockers = await get('lockers', []);
   shapes  = await get('shapes', []);
@@ -24844,6 +24889,20 @@ async function loadBoatData(){
   dgResolve();   // 번호만 있는 도면은 기기 복사본이나 창고에서 받아온다
   seedDgIfNeeded();
   await markLoad();   // ★ 무엇이 아직 안 올라간 것인지 알아야 클라우드가 덮지 못한다
+  // ★★★ 5.27 — 기록을 통째로 새로 읽었으면 「무엇을 고쳤나」 의 기준도 새로 잡는다.
+  //   전에는 앞서 보던 배(또는 배 없음) 의 줄을 기준으로 두어서, 새로 읽은 줄이
+  //   전부 「방금 고친 것」 으로 찍혔다. 그러면 기기에 남은 옛것·기본 항목이 클라우드를 이긴다.
+  // ★ 5.27 — 한 번도 클라우드와 주고받은 적 없는 칸에 손 안 댄 기본 항목만 있으면, 그것도 앱이 깐 것이다.
+  //   (배가 없을 때 깐 기본 항목이 옛 공용 칸에 저장됐다가, 기록이 빈 배를 열 때 그대로 넘어온다 — 9/13 과 같은 길)
+  try{
+    ['maint','contacts','checkt'].forEach(k => {
+      const arr = localColl(k);
+      if(seedFreshGet()[k] || !Array.isArray(arr) || !arr.length) return;
+      if(cloudMark[k] && Object.keys(cloudMark[k]).length) return;
+      if(arr.every(x => isPristineSeed(k, x))) seedFreshSet(k, arr);
+    });
+  }catch(_){}
+  try{ editSeen = {}; stampEdits(); }catch(_){}
   // ★ 배를 바꾸면 정비 목록이 통째로 바뀐다. 알람도 그 배 것으로 다시 건다.
   try{ maintAlarmSoon(); }catch(_){}
   // ★★★ 4.139 — 기록 중이던 항해가 이 기기에서 사라졌으면 여기서 멈춘다.
@@ -24872,6 +24931,7 @@ async function initStorage(){
     try{ items = migrate(JSON.parse(localStorage.getItem('bt_items')||'[]')); }catch(_){ items=[]; }
     try{ trash = migrate(JSON.parse(localStorage.getItem('bt_trash')||'[]')); }catch(_){ trash=[]; }
     try{ const m = JSON.parse(localStorage.getItem('bt_maint')||'[]'); maint = m.length? m : maintDefaults(); }catch(_){ maint = deepCopy(MAINT_DEFAULTS); }
+    try{ const m = JSON.parse(localStorage.getItem('bt_maint')||'[]'); seedFreshSet('maint', m.length ? null : maint); }catch(_){ seedFreshSet('maint', maint); }
     try{ repair = JSON.parse(localStorage.getItem('bt_repair')||'[]'); }catch(_){ repair=[]; }
     try{ voyage = JSON.parse(localStorage.getItem('bt_voyage')||'[]'); }catch(_){ voyage=[]; }
     try{ fuel = JSON.parse(localStorage.getItem('bt_fuel')||'[]'); }catch(_){ fuel=[]; }
@@ -24879,8 +24939,10 @@ async function initStorage(){
     try{ boats = JSON.parse(localStorage.getItem('bt_boats')||'[]'); }catch(_){ boats=[]; }
     try{ currentBoatId = localStorage.getItem('bt_curboat')||null; }catch(_){ currentBoatId=null; }
     try{ const c = JSON.parse(localStorage.getItem('bt_contacts')||'[]'); contacts = c.length? c : contactDefaults(); }catch(_){ contacts = contactDefaults(); }
+    try{ const c = JSON.parse(localStorage.getItem('bt_contacts')||'[]'); seedFreshSet('contacts', c.length ? null : contacts); }catch(_){ seedFreshSet('contacts', contacts); }
     try{ vdocs = JSON.parse(localStorage.getItem('bt_vdocs')||'[]'); }catch(_){ vdocs=[]; }
     try{ const k = JSON.parse(localStorage.getItem('bt_checkt')||'[]'); checkt = k.length? k : checkDefaults(); }catch(_){ checkt = checkDefaults(); }
+    try{ const k = JSON.parse(localStorage.getItem('bt_checkt')||'[]'); seedFreshSet('checkt', k.length ? null : checkt); }catch(_){ seedFreshSet('checkt', checkt); }
     try{ mrTrash = JSON.parse(localStorage.getItem('bt_mrtrash')||'[]'); }catch(_){ mrTrash=[]; }
     try{ lockers = JSON.parse(localStorage.getItem('bt_lockers')||'[]'); }catch(_){ lockers=[]; }
     try{ shapes = JSON.parse(localStorage.getItem('bt_shapes')||'[]'); }catch(_){ shapes=[]; }
@@ -25268,6 +25330,79 @@ function deadIds(coll){
   }
   return s;
 }
+// ══════════════════════════════════════════════════════════════
+// ★★★ 5.27 — 앱이 깐 기본 항목이 사장님 정기점검을 덮은 것 (2026-09-30 사장님 지적)
+//
+//   사장님 말씀 — 「어느순간에 업데이트 하면서 내가 정기점검 최신화 해논게 날라간거 같은데 이거 뭐지?」
+//
+//   무슨 일이었나 (사장님 백업 8/31 · 9/13 으로 확인) —
+//   9/13 저녁 8시, 기기 안 기록이 잠깐 「배 없음」 상태가 되었다. 그때 앱이 기본 정기점검
+//   16개(선종 모름 = 공통 것만)를 새로 깔았다. 기본 항목은 번호가 정해져 있다(m01 · m07 …).
+//   사장님이 고쳐 쓰신 「엔진오일(8/18) · 냉각수(8/12, 엔진에 연결)」 도 **같은 번호**다.
+//   ① stampEdits 가 새로 깐 기본 항목을 「이 기기에서 방금 고친 것」 으로 찍었다
+//      (그 전에 보던 줄과 다르니까). ② 합칠 때 더 나중에 고친 쪽이 이기므로 기본 항목이
+//      클라우드의 사장님 기록을 이겼고 ③ 그대로 올라가 덮어썼다. ④ 지우셨던 기본 항목
+//      (연료필터·임펠러 …)도 휴지통 표를 폰 쪽 줄에는 안 대 봐서 되살아났다.
+//   그 뒤 모든 기록이 9/13 20:02 에 「고침」 으로 찍혀 있었다 — 받아온 줄까지 찍은 것이다.
+//
+//   남들은 — CouchDB·PouchDB 는 두 곳이 같은 번호를 따로 만들면 「충돌」 로 두고 한쪽을
+//   조용히 버리지 않는다. 그리고 같은 번호를 기기마다 따로 만들지 말라고 한다.
+//   우리는 번호를 바꿀 수 없다(이미 모든 배의 기록이 m01… 이다). 그래서 이렇게 한다 —
+//
+//   「사람 손이 한 번도 안 닿은 기본 항목」(isPristineSeed) 은
+//     · 고친 것으로 찍지 않는다 (stampEdits)
+//     · 클라우드에 같은 번호가 있으면 언제나 클라우드 것을 따른다
+//     · 클라우드에 기록이 있는데 그 번호가 없으면 넣지 않는다 — 지운 것이거나,
+//       뒤 버전에서 새로 생긴 기본 항목이다. 이미 쓰는 배에 앱이 몰래 더하지 않는다.
+//     · 휴지통에 있는 번호면 넣지 않는다
+//   사람이 한 글자라도 고쳤으면 이 규칙에서 빠진다 — 그때는 예전 그대로 나중 것이 이긴다.
+const SEED_FREE_KEYS = { _m:1, _u:1, seed:1 };
+const seedTplCache = {};
+function seedTemplates(coll){
+  if(seedTplCache[coll]) return seedTplCache[coll];
+  let arr = [];
+  try{
+    if(coll === 'maint'){
+      arr = MAINT_COMMON.slice();
+      Object.keys(MAINT_BY_TYPE).forEach(k => { arr = arr.concat(MAINT_BY_TYPE[k] || []); });
+    } else if(coll === 'checkt'){
+      arr = CHECK_DEFAULTS.slice();
+    } else if(coll === 'contacts'){
+      arr = CONTACT_COMMON.slice();
+      Object.keys(CONTACT_BY_CC).forEach(k => { arr = arr.concat(CONTACT_BY_CC[k] || []); });
+    }
+  }catch(_){ return new Map(); }       // 아직 안 읽혔으면 이번에는 기본 항목을 모르는 것으로 둔다
+  const m = new Map();
+  arr.forEach(x => { if(!x || x.id == null) return; const id = String(x.id);
+    if(!m.has(id)) m.set(id, []); m.get(id).push(x); });
+  return (seedTplCache[coll] = m);
+}
+const seedEmpty = v => v == null || v === '' || v === false || v === 0 ||
+  (Array.isArray(v) && !v.length) || (typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length);
+function isPristineSeed(coll, x){
+  if(!x || x.id == null) return false;
+  if(coll !== 'maint' && coll !== 'checkt' && coll !== 'contacts') return false;
+  const tps = seedTemplates(coll).get(String(x.id));
+  if(!tps || !tps.length) return false;
+  return tps.some(tp => {
+    for(const k in tp){ if(JSON.stringify(tp[k]) !== JSON.stringify(x[k])) return false; }
+    for(const k in x){ if(k in tp || SEED_FREE_KEYS[k]) continue; if(!seedEmpty(x[k])) return false; }
+    return true;
+  });
+}
+// ★ 「방금 앱이 새로 깐 기본 항목」 표 (5.27)
+//   기기에 기록이 없어서 앱이 기본 항목을 깔았을 때만 적는다. 클라우드에서 한 번 받아 합치면 지운다.
+//   빼거나 거르는 것은 **이 표에 있는 줄만** 한다 — 이미 기기에 있던 줄은 기본 항목과 똑같아도 안 건드린다.
+//   (사장님 지시 2026-09-30: 「업데이트 할 때 함부로 과거에 있던 자료 뒤섞이게 만들지 마라」)
+//   껐다 켜도 남아야 해서 기기에 적는다. 배 번호로 나누지 않는다 — 9/13 에는 「배 없음」 때 깔렸다.
+const SEED_FRESH_KEY = 'bt_seedfresh';
+function seedFreshGet(){ try{ return JSON.parse(localStorage.getItem(SEED_FRESH_KEY) || '{}') || {}; }catch(_){ return {}; } }
+function seedFreshSet(coll, rows){
+  try{ const o = seedFreshGet();
+    if(rows && rows.length) o[coll] = rows.map(x => String(x.id)); else delete o[coll];
+    localStorage.setItem(SEED_FRESH_KEY, JSON.stringify(o)); }catch(_){}
+}
+function seedFresh(coll, id){ const a = seedFreshGet()[coll]; return Array.isArray(a) && a.indexOf(String(id)) >= 0; }
 function keepMine(coll, cloudRows){
   const cloud = Array.isArray(cloudRows) ? cloudRows : [];
   const mine  = localColl(coll);
@@ -25286,6 +25421,7 @@ function keepMine(coll, cloudRows){
     if(dead.has(id)) return;                                  // 여기서 지운 것은 안 되살린다
     const l = 내것.get(id);
     if(!l){ out.set(id, x); return; }                         // 여기 없던 것 — 받는다
+    if(isPristineSeed(coll, l)){ out.set(id, x); return; }    // 앱이 깐 그대로면 클라우드 것 (5.27)
     const 남나중 = Number(x._m || 0) > Number(l._m || 0);
     const 내나중 = Number(l._m || 0) > Number(x._m || 0);
     if(내나중) return;                                        // 여기 것이 더 나중이다
@@ -25295,6 +25431,9 @@ function keepMine(coll, cloudRows){
   // ── 여기 줄 중 아직 안 담긴 것
   내것.forEach((x, id) => {
     if(out.has(id)) return;
+    // 앱이 방금 새로 깐 기본 항목(손 안 댄 것) — 지운 것이면 안 되살리고, 클라우드에 기록이 있는데
+    // 그 번호가 없으면 넣지 않는다 (5.27, 위 설명). 원래 기기에 있던 줄은 안 건드린다.
+    if(seedFresh(coll, id) && isPristineSeed(coll, x) && (dead.has(id) || (cloud.length && !클것.has(id)))) return;
     // 클라우드에 없고, 올린 그대로였다면 → 다른 기기에서 지운 것이다
     if(!클것.has(id) && mark && mark[id] === rowMark(x)) return;
     out.set(id, x);
@@ -25305,7 +25444,14 @@ function keepMine(coll, cloudRows){
 // ★ 안 온 칸과 빈 칸으로는 폰 기록을 건드리지 않는다 — 통째로 비운 사고가 있었다.
 function pullInto(coll, rows){
   const mine = localColl(coll);
-  if(!Array.isArray(rows) || !rows.length) return mine;
+  if(!Array.isArray(rows)) return mine;
+  if(!rows.length){
+    // 빈 칸으로는 폰 기록을 안 건드린다. 다만 휴지통에 있는 기본 항목(앱이 깐 그대로)은
+    // 되살리지 않는다 — 기본 항목을 다 지운 배에서 새 기기가 도로 까는 것을 막는다 (5.27)
+    if(!Array.isArray(mine)) return mine;
+    const dead = deadIds(coll);
+    return mine.filter(x => !(x && x.id != null && dead.has(String(x.id)) && seedFresh(coll, x.id) && isPristineSeed(coll, x)));
+  }
   return keepMine(coll, rows);
 }
 // ★★★ 기록마다 「이 기기에서 마지막으로 고친 때」 (4.87 — 사장님 자료가 옛것으로 돌아간 일)
@@ -25330,6 +25476,11 @@ function stampEdits(){
         next[id] = h;
         if(!seen) return;                 // 처음 본 판 — 언제 고쳤는지 알 수 없다
         if(seen[id] === h) return;         // 안 바뀌었다
+        // ★ 5.27 — 사람이 고친 것만 찍는다.
+        //   앱이 깐 그대로인 기본 항목은 고친 것이 아니다 — 찍으면 클라우드의 사람 기록을 이긴다.
+        if(isPristineSeed(coll, x)) return;
+        //   클라우드에 있는 그대로인 줄도 고친 것이 아니다 — 9/13 에 받아온 줄까지 다 찍혔다.
+        if(cloudMark[coll] && cloudMark[coll][id] === rowMark(x)) return;
         x._m = now;                        // 이 기기에서 방금 고쳤다
       });
       editSeen[coll] = next;
@@ -25542,6 +25693,8 @@ async function cloudPull(){
     if(Array.isArray(PULLED[k])) cloudMark[k] = markFromSnap(snapOf(PULLED[k]));
   });
   markSave();
+  // 클라우드와 한 번 합쳤으면 「방금 깐 기본 항목」 표는 할 일을 다 했다 (5.27)
+  ['maint','contacts','checkt'].forEach(k => { if(Array.isArray(PULLED[k])) seedFreshSet(k, null); });
   // 여기까지 왔으면 이 배의 클라우드 자료를 다 받았다. 이제 올려도 된다.
   pullDone = true;
   lastPullAt = Date.now();
@@ -26229,7 +26382,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.25';
+const APP_VER = '5.27';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -31071,7 +31224,7 @@ function openMR(kind, id){
         ?`<input value="${esc(it.name)}" placeholder="${esc(t('점검 항목 이름'))}" style="flex:1" onchange="mrField('name',this.value)">`
         :`<b class="mrv">${esc(it.name || t('(이름 없음)'))}</b>`}${it.seed?` <span class="seedb">${esc(t('초안'))}</span>${helpBtn('seed')}`:''}</div>
       <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
-        ?`<input list="grpList" value="${esc(keyShow(it.grp||'기타'))}" style="width:130px" onchange="mrGrpSet(this.value,'기타')">`
+        ? mrPickBtn(esc(keyShow(it.grp||'기타')), `grpPick('${jsq(String(it.id))}')`)
         :`<b class="mrv">${esc(keyShow(it.grp||'기타'))}</b>`}</div>
       ${mCycleRow(it)}
       ${mLastRow(it, s)}
@@ -31227,7 +31380,7 @@ function openMR(kind, id){
       //   묶음 이름표(secl)는 정비수첩 「정비 절차」 가 이미 쓰는 자리다.
       + `<div class="secl">${esc(t('이 항해 사진'))}</div>`
       + `<div class="mrm" style="padding:2px 14px 6px;color:#7b8794">${
-           esc(t('출발·도착·중간 기록에 붙이지 않은 사진입니다'))}</div>`
+           esc(t('출발·도착·중간 기록에 넣지 않은 사진입니다'))}</div>`
       + vphBox(it, 'all')
         ))
       + (it.weather ? tf('날씨(옛기록)','weather',it.weather) : '');
@@ -43341,28 +43494,77 @@ function renderGear(){
 //   사장님이 「수리에서 어떤 장비인지 고를 수 있어야겠네」 하셨을 때
 //   그 기능은 이미 있었는데 숨어 있었던 것이다. 이제 늘 보여 주고,
 //   장비가 없으면 그 자리에서 만들어 매달 수 있게 한다.
+// ★★★ 5.27 — 계통·장비는 **눌러서 목록에서 선택**한다 (사장님 지적, 2026-09-30)
+//   「정기점검 그 항목에서 보면은 거기에 계통도 있고 그리고 그 안에 이제 어떤 장비인지도 나오는데
+//    그거 그 목록을 이제 내가 눌러 가지고 볼 수 있게 하면 되잖아요」
+//   목록은 담당자 지정과 같은 선택 창(openForm pick)을 쓴다 — 앱 안에서 고르는 창은 하나다.
+//   장비 목록은 그 항목 계통의 장비가 먼저 나온다. 정기점검 계통(엔진·전기…)과
+//   장비 계통(추진·전기…)은 이름이 달라서 아래 표로 잇는다.
+const GRP_GEAR_SYS = { '엔진':['추진','연료'], '전기':['전기'], '선체·수중':['선체·의장','조타','배관·위생'],
+                       '리깅·세일':['돛·삭구','갑판장비'], '안전장비':['안전장비'] };
+function gearSysFor(grp){
+  if(GEAR_SYS.indexOf(grp) >= 0) return [grp];
+  return GRP_GEAR_SYS[grp] || [];
+}
+// 누르면 목록이 뜨는 칸. 생김새는 선택 칸(select)과 같다.
+function mrPickBtn(label, onclick){
+  return `<button class="mrpickb" onclick="${onclick}">${label}</button>`;
+}
 function gearPickRow(it, kind){
-  const rows = gearRows();
   const cur = String(it.gearId || '');
-  if(!rows.length){
-    return `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>
-      <b class="mrv" style="flex:1">—</b>${unlocked
-      ? `<button class="minib blu" onclick="gearMakeFor('${jsq(String(it.id))}','${jsq(kind)}')">${
-          esc(t('장비 추가'))}</button>` : ''}</div>`;
-  }
-  const sorted = rows.slice().sort((a,b) => {
-    const sa = GEAR_SYS.indexOf(gearSysOf(a)), sb = GEAR_SYS.indexOf(gearSysOf(b));
-    if(sa !== sb) return (sa < 0 ? 99 : sa) - (sb < 0 ? 99 : sb);
-    return String(gearLabel(a)).localeCompare(String(gearLabel(b)), 'ko');
-  });
   const now = gearOf(cur);
+  const val = now ? esc(t(gearSysOf(now))) + ' · ' + esc(gearLabel(now)) : esc(t('선택 안 함'));
   return `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>${unlocked
-    ? `<select style="flex:1" onchange="mrField('gearId', this.value)">
-         <option value=""${cur ? '' : ' selected'}>${esc(t('선택 안 함'))}</option>${
-         sorted.map(g => `<option value="${esc(String(g.id))}"${cur === String(g.id) ? ' selected' : ''}>${
-           esc(t(gearSysOf(g))) + ' · ' + esc(gearLabel(g))}</option>`).join('')}</select>`
-    : `<b class="mrv">${esc(now ? gearLabel(now) : '—')}</b>`}${
+    ? mrPickBtn(val, `gearPick('${jsq(String(it.id))}','${jsq(kind)}')`)   // 장비가 없어도 칸은 늘 보인다 — 목록 끝 「장비 추가」
+    : `<b class="mrv" style="flex:1">${esc(now ? gearLabel(now) : '—')}</b>`}${
     now ? ` <button class="minib blu" onclick="openMR('gear','${now.id}')">${esc(t('장비 보기'))}</button>` : ''}</div>`;
+}
+function gearPick(id, kind){
+  if(!unlocked) return;
+  const rec = getMR(kind, id); if(!rec) return;
+  const pri = gearSysFor(rec.grp || '');
+  const 순 = g => { const a = GEAR_SYS.indexOf(gearSysOf(g)); return a < 0 ? 99 : a; };
+  const 정렬 = arr => arr.slice().sort((a, b) => (순(a) - 순(b))
+    || String(gearLabel(a)).localeCompare(String(gearLabel(b)), 'ko'));
+  const rows = gearRows();
+  const 먼저 = 정렬(rows.filter(g => pri.indexOf(gearSysOf(g)) >= 0));
+  const 나머지 = 정렬(rows.filter(g => pri.indexOf(gearSysOf(g)) < 0));
+  const opts = [{ v:'', name:'선택 안 함' }]
+    .concat(먼저.concat(나머지).map(g => ({ v:String(g.id), name:gearLabel(g), sub:gearSysOf(g) || '' })))
+    .concat([{ v:'__add', name:'장비 추가' }]);
+  openForm({
+    title: rec.name || rec.title || t('장비'),
+    okText: '선택',
+    fields: [ { key:'g', label:'장비', type:'pick', value:String(rec.gearId || ''), options:opts } ],
+    onOk: v => {
+      if(v.g === '__add'){ setTimeout(() => gearMakeFor(id, kind), 0); return; }
+      mrOpenType = kind; mrOpenId = id;
+      mrField('gearId', v.g || '');
+    }
+  });
+}
+// 정기점검 계통 — 누르면 목록. 목록에 없는 것은 「직접 입력」.
+function grpPick(id){
+  if(!unlocked) return;
+  const rec = getMR('maint', id); if(!rec) return;
+  const opts = allGrps().map(g => ({ v:g, name:keyShow(g) }))
+    .concat([{ v:'__new', name:'직접 입력' }]);
+  openForm({
+    title: rec.name || t('정기점검'),
+    okText: '선택',
+    fields: [ { key:'g', label:'계통', type:'pick', value:rec.grp || '기타', options:opts } ],
+    onOk: v => {
+      mrOpenType = 'maint'; mrOpenId = id;
+      if(v.g === '__new'){
+        setTimeout(async () => {
+          const s = await askText(t('계통'), '');
+          if(s != null && String(s).trim()){ mrOpenType = 'maint'; mrOpenId = id; mrGrpSet(String(s).trim(), '기타'); }
+        }, 0);
+        return;
+      }
+      mrGrpSet(v.g, '기타');
+    }
+  });
 }
 
 // 지금 보고 있는 기록에 새 장비를 만들어 매단다.
@@ -43375,7 +43577,7 @@ function gearMakeFor(id, kind){
   const g = gearNew();
   const 제목 = String(rec.name || rec.title || '').trim();
   g.name = 제목.replace(/\s*(점검|교체|교환|수리|고장|확인|청소|정비)\s*$/, '').trim() || 제목;
-  if(rec.grp) g.sys = GEAR_SYS.indexOf(rec.grp) >= 0 ? rec.grp : '';
+  if(rec.grp) g.sys = gearSysFor(rec.grp)[0] || '';   // 정기점검 계통(엔진)을 장비 계통(추진)으로 (5.27)
   maint.push(g);
   rec.gearId = String(g.id);
   saveMR();
@@ -44248,10 +44450,14 @@ function gearBody(it){
   //   「이 장비의 정기점검」 줄에 이미 다 나온다. 한 화면에 같은 말을 두 번 쓴 것이다.
   //   상태는 **고장이냐 아니냐** 하나다.
   const 고장수 = gearRepair(it.id).filter(r => r && r.status !== 'done').length;
+  // ★★ 5.27 — 사장님: 「이건또 이상이 없는지 있는지 못바꾸냐」 → 누르면 목록에서 선택 (사장님이 정하신 1번)
+  //   상태는 여전히 연결된 고장 기록으로 정해진다. 따로 적는 칸을 만들면 수리와 어긋난다.
+  //   「고장」 을 고르면 이 장비와 연결된 고장 기록이 생기고, 「이상 없음」 을 고르면 그 고장들을 완료 처리한다.
+  const 상태값 = 고장수
+    ? `<span class="st late">${esc(tsub('고장 {n}', { n: 고장수 }))}</span>`
+    : `<b class="mrv" style="color:var(--grn)">${esc(t('이상 없음'))}</b>`;
   const 상태줄 = `<div class="mrrow"><span class="mrlbl">${esc(t('상태'))}</span>`
-    + (고장수
-        ? `<span class="st late">${esc(tsub('고장 {n}', { n: 고장수 }))}</span>`
-        : `<b class="mrv" style="color:var(--grn)">${esc(t('이상 없음'))}</b>`)
+    + (unlocked ? mrPickBtn(상태값, `gearStatePick('${jsq(String(it.id))}')`) : 상태값)
     + `</div>`;
   return `
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>${unlocked
@@ -44507,6 +44713,33 @@ function addMaintForGear(id){
                name:'', months:12, unit:'m', lastDate:'', gearId:String(g.id),
                note:'', photos:[], pin:null, history:[], seed:false });
   saveMR(); openMR('maint', nid);
+}
+// 장비 상태 고르기 (5.27) — 상태는 연결된 고장 기록에서 나온다. 여기서 고르면 그 기록을 만들거나 완료 처리한다.
+function gearStatePick(id){
+  if(!unlocked) return;
+  const g = gearOf(id); if(!g) return;
+  const 열린것 = gearRepair(id).filter(r => r && r.status !== 'done');
+  openForm({
+    title: gearLabel(g),
+    okText: '선택',
+    fields: [ { key:'s', label:'상태', type:'pick', value: 열린것.length ? 'bad' : 'ok',
+                options: [ { v:'ok', name:'이상 없음' }, { v:'bad', name:'고장' } ] } ],
+    onOk: v => {
+      if(v.s === 'bad'){
+        // 이미 고장이면 그 고장 기록을 연다. 아니면 새로 만든다.
+        if(열린것.length){ const r0 = 열린것[0]; setTimeout(() => openMR('repair', r0.id), 0); return; }
+        setTimeout(() => addRepairForGear(id), 0);
+        return;
+      }
+      if(!열린것.length) return;
+      setTimeout(async () => {
+        if(!await ask(tsub('이 장비의 고장 {n}건을 완료 처리할까요?', { n: 열린것.length }), { ok: t('완료 처리') })) return;
+        열린것.forEach(r => { r.status = 'done'; r.doneDate = today(); });
+        saveMR(); try{ renderMR(); }catch(_){}
+        openMR('gear', id);
+      }, 0);
+    }
+  });
 }
 function addRepairForGear(id){
   if(!unlocked) return;
@@ -44924,7 +45157,7 @@ function renderMLog(){
       <b>${esc(t('정비수첩'))}</b>
       <div>${t('<b>한 번 작업하면 한 건</b>입니다. 오늘 무엇을 어떻게 했는지 사진과 함께 남깁니다.')}<br>
         ${esc(t('다음에 같은 일을 할 때 그대로 보고 따라 하면 됩니다.'))}</div>
-      <div class="emptysub">${esc(t('정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목에 붙은 채로 시작합니다.'))}</div>
+      <div class="emptysub">${esc(t('정기점검·수리 화면의 「+ 정비수첩」을 누르면 그 항목과 연결된 채로 시작합니다.'))}</div>
       <button class="mrbtn" onclick="needEdit('정비수첩을 씁니다.', ()=>addMlog())">${esc(t('+ 정비수첩'))}</button>
     </div>`;
     return;
@@ -50456,6 +50689,14 @@ window.__boot = 'start';
     //   쪽을 나누는 셈은 여기 한 곳에만 둔다. 컬렉션마다 따로 짜면 한 군데는 틀린다.
     const PAGE_N = { community: 30, market: 30, spots: 100 };
     const cursors = {};
+    // ★★★ 5.27 — 자동검사 계정이 올린 글·물건·정박지는 다른 사람 목록에 안 나온다
+    //   (사장님: 「자동검사글은 언제 지울래」 → 「그래 1 2 다해라」). 검사 중 몇 분씩 실제 게시판에 보였다.
+    //   올릴 때 검사 계정이면 e2e 표를 달고, 목록·찾기에서 검사 계정이 아니면 그 표가 있는 것을 뺀다.
+    //   검사 계정끼리는 서로 보인다(신고·차단 검사가 남의 글을 봐야 한다).
+    const E2E_RE = /^e2e-[a-z0-9]+-[ab]@baetnil\.com$/i;
+    const amE2E = () => { try{ const u = fauth.currentUser; return !!(u && E2E_RE.test(String(u.email || ''))); }catch(_){ return false; } };
+    const e2eMark = body => { try{ if(body && amE2E()) body.e2e = true; }catch(_){} return body; };
+    const e2eHide = rows => amE2E() ? rows : (rows || []).filter(x => !(x && x.e2e === true));
     async function pageList(name, ord, more){
       const N = PAGE_N[name] || 30;
       const parts = [collection(fdb, name), orderBy(ord, 'desc')];
@@ -50465,7 +50706,7 @@ window.__boot = 'start';
       parts.push(limit(N));
       const snap = await getDocs(query.apply(null, parts));
       if(snap.docs.length) cursors[name] = snap.docs[snap.docs.length - 1];
-      return { rows: snap.docs.map(d => d.data()), done: snap.docs.length < N };
+      return { rows: e2eHide(snap.docs.map(d => d.data())), done: snap.docs.length < N };
     }
     // 글을 쓰거나 지우면 앱이 들고 있는 목록이 낡는다. 쓰는 그 자리에서 버리게 한다.
     const bust = k => { try{ if(window.__listDrop) window.__listDrop(k); }catch(_){} };
@@ -50481,9 +50722,10 @@ window.__boot = 'start';
         if(!grams || !grams.length) return [];
         const snap = await getDocs(query(collection(fdb, 'community'),
           where('kw', 'array-contains-any', grams.slice(0, 10)), limit(n || 60)));
-        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+        return e2eHide(snap.docs.map(d => Object.assign({ id:d.id }, d.data())));
       },
       async add(body){
+        e2eMark(body);
         await setDoc(doc(fdb, 'community', String(body.id)), body);
         bust('talk');
         return body.id;
@@ -50725,9 +50967,10 @@ window.__boot = 'start';
         if(!grams || !grams.length) return [];
         const snap = await getDocs(query(collection(fdb, 'spots'),
           where('kw', 'array-contains-any', grams.slice(0, 10)), limit(n || 60)));
-        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+        return e2eHide(snap.docs.map(d => Object.assign({ id:d.id }, d.data())));
       },
       async put(body){
+        e2eMark(body);
         await setDoc(doc(fdb,'spots',String(body.id)), body);
         bust('spots');
         return body.id;
@@ -50749,9 +50992,9 @@ window.__boot = 'start';
         if(!grams || !grams.length) return [];
         const snap = await getDocs(query(collection(fdb, 'market'),
           where('kw', 'array-contains-any', grams.slice(0, 10)), limit(n || 60)));
-        return snap.docs.map(d => Object.assign({ id:d.id }, d.data()));
+        return e2eHide(snap.docs.map(d => Object.assign({ id:d.id }, d.data())));
       },
-      async put(body){ await setDoc(doc(fdb,'market',String(body.id)), body); bust('market'); return body.id; },
+      async put(body){ e2eMark(body); await setDoc(doc(fdb,'market',String(body.id)), body); bust('market'); return body.id; },
       async edit(id, patch){ await setDoc(doc(fdb,'market',String(id)), patch, { merge:true }); bust('market'); },
       async del(id){ await deleteDoc(doc(fdb,'market',String(id))); bust('market'); }
     };
@@ -50907,6 +51150,20 @@ if('serviceWorker' in navigator
 //   키보드 높이를 여기 __kbd(기기 픽셀) 로 알려 준다. 아이폰·웹에서는 불리지 않는다.
 (function(){
   var kb = 0, spacer = null, padEl = null, padOrig = '', padBase = 0;
+  // ★★★ 5.26 — 폰이 키보드만큼 화면(웹뷰)을 줄여 버리는 경우를 따로 본다 (사장님: 「고칠수 있음 고쳐라」).
+  //   안드로이드 11~14 는 앱 껍데기가 화면을 안 줄이게 해 두었다(MainActivity). 그래도 10 이하처럼
+  //   화면이 줄어드는 폰이 있다. 그때는 ① 이미 줄어든 만큼은 여백을 또 붙이지 않고(두 번 올라가 칸이 튐)
+  //   ② 아래 탭 줄을 감춘다 — 키보드 위로 따라 올라오지 않게.
+  var baseH = window.innerHeight, rs = false;
+  function shrunk(){ return Math.max(0, baseH - window.innerHeight); }
+  function rsSet(on){ if(on === rs) return; rs = on; try{ document.body.classList.toggle('kbdrs', on); }catch(_){} }
+  window.addEventListener('resize', function(){
+    var el = document.activeElement, f = isField(el);
+    if(!f && !kb){ baseH = window.innerHeight; rsSet(false); return; }   // 키보드가 없을 때의 높이
+    if(window.innerHeight > baseH) baseH = window.innerHeight;
+    rsSet(f && shrunk() > 100);
+    setTimeout(fit, 30);
+  });
   function isField(el){
     return !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
   }
@@ -50923,8 +51180,11 @@ if('serviceWorker' in navigator
   }
   function fit(){
     var el = document.activeElement;
-    if(!kb || !isField(el)){ clear(); return; }
-    var kbTop = window.innerHeight - kb;          // 키보드 윗줄 (화면 글씨 단위)
+    // ★ 5.26 — 화면이 이미 줄었으면 그만큼은 키보드가 덮지 않는다
+    var k = Math.max(0, kb - shrunk());
+    if(!isField(el)) rsSet(false);
+    if(!k || !isField(el)){ clear(); return; }
+    var kbTop = window.innerHeight - k;           // 키보드 윗줄 (화면 글씨 단위)
     var sp = scroller(el);
     if(sp){
       if(sp !== padEl){ clear(); padEl = sp; padOrig = sp.style.paddingBottom; padBase = parseFloat(getComputedStyle(sp).paddingBottom) || 0; }
@@ -50934,7 +51194,7 @@ if('serviceWorker' in navigator
       if(padEl){ padEl.style.paddingBottom = padOrig; padEl = null; }
       if(!spacer){ spacer = document.createElement('div'); spacer.id = 'kbdSpacer'; spacer.setAttribute('aria-hidden', 'true'); spacer.style.cssText = 'height:0;pointer-events:none'; }
       if(spacer.parentNode !== document.body) document.body.appendChild(spacer);
-      spacer.style.height = kb + 'px';
+      spacer.style.height = k + 'px';
     }
     var r = el.getBoundingClientRect();
     var hd = document.querySelector('header');

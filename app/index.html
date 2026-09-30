@@ -437,6 +437,7 @@ h1{font-size:17px;font-weight:700;color:#c8dff0}
 #hint .w{color:#d8b878}#hint .d{color:#8a6ac0}
 #panel{position:fixed;right:0;top:0;bottom:0;width:300px;background:#081828;border-left:1px solid #1e3a5a;display:none;flex-direction:column;z-index:30;box-shadow:-6px 0 24px #0009}
 #panel.open{display:flex}
+#panel.who>:not(.whobox){display:none!important}
 .ph{padding:12px 14px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .pz{font-size:10px;color:#4a8ab5;letter-spacing:1px}
 .pl{font-size:14px;font-weight:700;color:#c8dff0}
@@ -2445,6 +2446,11 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     try{
       const SB = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
       if(SB && SB.setStyle) SB.setStyle({ style: theme === 'light' ? 'LIGHT' : 'DARK' }).catch(()=>{});
+      // ★ 5.21 — 안드로이드 14 이하는 시계 줄이 제 바탕색을 따로 갖는다(15 부터는 앱 화면이 그 밑까지 그려져 이 값은 쓰이지 않는다).
+      //   머리줄 맨 윗색과 같게 칠한다 — 흰 화면에서 짙은 글자로 바꿨는데 바탕이 짙으면 시계가 안 보인다.
+      const cap = window.Capacitor;
+      if(SB && SB.setBackgroundColor && cap && cap.getPlatform && cap.getPlatform() === 'android')
+        SB.setBackgroundColor({ color: theme === 'light' ? '#FFFFFF' : theme === 'black' ? '#000000' : '#122A44' }).catch(()=>{});
     }catch(_){}
   }
   function applyAll(){
@@ -2455,6 +2461,9 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
   }
   window.btLook = {
     theme: () => theme, size: () => fs, THEMES, SIZES,
+    // ★ 5.21 — 아이폰은 화면이 다시 나타날 때마다 상태 표시줄 부품이 글자 색을 「기본」 으로 되돌린다.
+    //   앱 쪽(MainViewController.viewDidAppear)에서 이것을 불러 테마 색으로 다시 맞춘다.
+    statusBar,
     set(k, v){
       if(k === 'theme' && THEMES.indexOf(v) >= 0){ theme = v; try{ localStorage.setItem('bt_theme', v); }catch(_){} }
       if(k === 'size'  && SIZES.indexOf(v)  >= 0){ fs = v;    try{ localStorage.setItem('bt_fs', v); }catch(_){} }
@@ -26049,7 +26058,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.20';
+const APP_VER = '5.21';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -27241,6 +27250,7 @@ function openLocker(id){
   //   화면이 없으면 열 것도 없다 — 고른 칸만 기억해 두고 돌아간다.
   const panel = document.getElementById('panel');
   if(!panel) return;
+  stowPanelOwn();      // ★ 5.21 — 사람 선택이 남아 있으면 치우고 적재표를 연다
   updateHeader(); resetForm(); renderPanelItems();
   panel.classList.add('open');
   refreshBoxes();
@@ -27248,6 +27258,7 @@ function openLocker(id){
 function openBox(boxId){
   const b = getItem(boxId); if(!b) return;
   selected = b.lockerId; inBox = boxId; editId = null; moveId = null; mergeId = null;
+  stowPanelOwn();
   updateHeader(); resetForm(); renderPanelItems();
   document.getElementById('panel').classList.add('open');
   refreshBoxes();
@@ -27411,7 +27422,7 @@ function stowZoomBind(){
   }, {passive:false});
   window.addEventListener('resize', ()=>{ if(mapTouched){ mapClamp(); mapApply(false); } });
 }
-function closePanel(){ if(typeof paintFab === 'function') setTimeout(paintFab, 0); selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
+function closePanel(){ stowPanelOwn(); if(typeof paintFab === 'function') setTimeout(paintFab, 0); selected=null; inBox=null; editId=null; moveId=null; mergeId=null; document.getElementById('panel').classList.remove('open'); refreshBoxes(); }
 
 // ── 물품을 어느 장비 것인지 잇는 칸
 // ★ 장비가 하나도 없으면 줄을 통째로 감춘다. 고를 것이 없는 고르기 칸은
@@ -32153,7 +32164,9 @@ function screenPush(id){
   // 머리줄 이름을 그 화면 이름으로 바꾸고 아래 탭 불을 끈다.
   // 안 그러면 머리줄에 '적재표' 가 남아 다른 탭 위에 얹힌 것처럼 보인다.
   try{
-    const t = el.querySelector('.pl, .trashHead > span, .formHead > span, .mrhead > b, .mrtop > b');
+    // ★ 5.21 — 가려 둔 칸의 이름은 건너뛴다(사람 선택이 적재표 틀을 빌려 뜰 때 적재표 칸 이름 「.pl」 은 가려져 있다)
+    const ts = Array.from(el.querySelectorAll('.pl, .trashHead > span, .formHead > span, .mrhead > b, .mrtop > b'));
+    const t = ts.find(x => !x.closest('[style*="display: none"], [style*="display:none"]') && !(el.classList.contains('who') && !x.closest('.whobox'))) || ts[0];
     const nm = t && String(t.textContent || '').trim();
     if(nm) setHeadTitle(nm);
     ['tabHome','tabBoat','tabVoyage','tabCommunity'].forEach(x=>{
@@ -33351,6 +33364,7 @@ async function planWhoDone(){
   const 고른것 = planPick ? planPick.who.slice() : [];
   planPick = null;
   closeTopScreen();
+  stowPanelOwn();
   if(!it) return;
   // ★ 4.128 — 「탄 사람」 은 기록에 바로 넣는다. 알림 예약과는 상관이 없다.
   if(무엇 === 'crew'){
@@ -33380,9 +33394,32 @@ function openVoyCrew(vid){
   planPick = { vid: String(it.id), what:'crew', who: voyCrewIds(it).slice() };
   planWhoPaint();
 }
+// ★★★ 5.21 — 사람 선택이 적재표 화면을 통째로 지우던 것 (사장님이 보내 주신 오류 신고, 2026-09-29)
+//   「Cannot set properties of null (setting 'innerHTML') at renderPanelItems ← openLocker」
+//   사람 선택은 적재표와 같은 틀(#panel)을 빌려 뜬다. 그런데 틀의 속을 innerHTML 로 덮어써서
+//   물품 목록(#pitems)·물품 칸(.pform)·칸 이름이 앱을 다시 켤 때까지 사라졌다(4.128 부터).
+//   그 뒤 적재 화면에서 칸을 누르면 목록 자리가 없어 앱이 죽었다.
+//   ★ 이제 사람 선택은 틀 안의 제 칸(.whobox)에만 그리고, 그동안 적재표 칸들은 가려 둔다.
+//     닫히거나 적재표가 열리면 제 칸을 치운다 — 적재표 칸들은 한 번도 지워지지 않는다.
+function whoBoxOf(P){
+  let W = P.querySelector('.whobox');
+  if(!W){ W = document.createElement('div'); W.className = 'whobox'; P.appendChild(W); }
+  P.classList.add('who');
+  return W;
+}
+function stowPanelOwn(){
+  try{
+    const P = document.getElementById('panel');
+    if(!P) return;
+    const W = P.querySelector('.whobox');
+    if(W) W.remove();
+    P.classList.remove('who');
+  }catch(_){}
+}
 function planWhoPaint(){
-  const P = document.getElementById('panel');
-  if(!P || !planPick) return;
+  const P0 = document.getElementById('panel');
+  if(!P0 || !planPick) return;
+  const P = whoBoxOf(P0);
   const b  = (typeof curBoat === 'function') ? curBoat() : null;
   const me = (typeof meUid === 'function') ? String(meUid() || '') : '';
   const it = getMR('voyage', planPick.vid);
@@ -33431,7 +33468,7 @@ function planWhoPaint(){
     + `<div class="mrrow" style="gap:8px;justify-content:flex-end;padding-top:10px">
          <button class="mrbtn" onclick="planWhoClear()">${esc(t('선택 해제'))}</button>
          <button class="mrbtn" onclick="planWhoSaveSet()">${esc(t('이대로 그룹으로 저장'))}</button></div>`;
-  showPanel(P);
+  showPanel(P0);
   setHeadTitle(크루 ? '함께 탄 사람 선택' : '알릴 사람 선택');
 }
 

@@ -81,6 +81,8 @@
 .catchrow .minib{flex:0 0 auto;min-width:38px;padding:5px 8px}
 .catchrow input{flex:0 0 58px;width:58px;min-width:0}
 .whoa{color:#8ab4d8;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+/* 5.29 — 탈퇴한 회원: 누를 수 없는 흐린 이름 (다음 카페처럼) */
+.whogone{color:var(--tm)}
 .chip.late{background:#7A3A30;color:#FF9A8A}
 .chip.notice{background:#7a5a2a;color:#FFE0B0}
 .chip.good{background:#17453a;color:#7aefaa;border-color:#2a6a58}
@@ -1329,6 +1331,12 @@ body.pnsc #mrPanel .mrhead::before, body.pnsc #mrPanel > .mrtop::before{opacity:
 .dbadge.on{display:inline-block}
 .ditem{display:flex;align-items:center}
 .cklink{padding:5px 10px;font-size:11px;text-decoration:none;flex-shrink:0}
+/* ★ 5.28 — 「바로가기」·「수정」 단추가 있는 줄은 글자를 키우면 항목 이름이 서너 줄로 접혔다(「원거리 / 수상레저 / 신고 (해당 / 시)」).
+   이름에 최소 폭을 주고, 단추가 안 들어가면 단추 묶음이 다음 줄 오른쪽으로 내려간다. */
+.ckrow{flex-wrap:wrap}
+.cklbl{flex:1 1 9em;min-width:9em}
+.ckacts{display:flex;gap:8px;align-items:center;margin-left:auto;flex-shrink:0}
+.ckacts:empty{display:none}
 .newsup{font-size:11px;color:var(--td);margin:12px 18px 0}
 .newsr .cn{font-size:15px;line-height:1.45}
 .newss{font-size:12.5px;color:#9BA1A9;line-height:1.65;margin:7px 0 10px;white-space:pre-line}
@@ -1712,11 +1720,15 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 #mrPanel.full .mrrow{
   background:rgba(255,255,255,.045);border-radius:14px;
   padding:13px 15px;margin:9px 0;gap:12px;align-items:center}
-/* ★ 5.27 — 칸마다 높이가 들쭉날쭉했다(글만 있는 줄 50 · 입력 칸 줄 70). 입력 칸 줄 높이에 맞춘다. */
-#mrPanel.full .mrrow{min-height:70px}
+/* ★ 5.27 — 칸마다 높이가 들쭉날쭉했다(글만 있는 줄 50 · 입력 칸 줄 70). 입력 칸 줄 높이에 맞춘다.
+   ★★★ 5.29 — 기록 창(openMR, .rec)에만 건다. 5.27 은 모든 화면에 걸었는데, 로그인 화면에서 키보드가 뜨면
+   안드로이드 15 에뮬레이터가 통째로 꺼졌다(5.27·5.28 네 번 모두). 검사용 가지로 나눠 보니 이 한 줄만 되돌리면
+   끝까지 갔다(e2e-check-528-mrh 55/0, 528-css 55/0, 528-rest 55/0 · 되돌리지 않은 528-js·528-hdr·main 은 꺼짐).
+   로그인·계정 화면은 5.26 처럼 둔다. */
+#mrPanel.full.rec .mrrow{min-height:70px}
 #mrPanel.full .mrrow.edt,
 #mrPanel.full .mrrow:empty{background:transparent;padding:2px 0;margin:6px 0}
-#mrPanel.full .mrrow.edt,#mrPanel.full .mrrow:empty{min-height:0}
+#mrPanel.full.rec .mrrow.edt,#mrPanel.full.rec .mrrow:empty{min-height:0}
 #mrPanel.full .mrlbl{
   width:58px;flex-shrink:0;font-size:10.5px;font-weight:600;letter-spacing:.12em;
   color:#93AABD}
@@ -1726,6 +1738,8 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
   background:transparent;border:none;border-radius:0;padding:0;
   font-size:15px;font-weight:450;color:var(--th);flex:1;min-width:0}
 #mrPanel.full input::placeholder,#mrPanel.full textarea::placeholder{color:#7C93A8}
+/* ★ 5.28 — 좁은 칸에서 자리글이 「선택하거나 직접 입력하세」 처럼 글자 중간에서 잘렸다. 잘리면 … 로 줄인다. */
+#mrPanel.full input{text-overflow:ellipsis}
 #mrPanel.full select{appearance:none;-webkit-appearance:none;
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%236E8497' stroke-width='1.6' stroke-linecap='round'/></svg>") no-repeat right center}
 #mrPanel.full textarea{resize:vertical;min-height:44px;line-height:1.6}
@@ -4348,7 +4362,7 @@ const I18N = {
     '내 등급보다 높은 자리는 줄 수 없습니다':'You cannot grant a rank above your own',
     '내 배를 고친 이야기 · 고장·수리':'Fixing my boat · faults and repairs',
     '내가 누를 때까지 그대로 둔다':'Leave it until I tap it',
-    '내가 올린 글·정박지·중고 장터':'My posts, berths and market listings',
+    '내가 올린 정박지·중고 장터':'My berths and market listings',
     '내리지 못했습니다.\n\n':'Could not take it down.\n\n',
     '내용 보기':'Read it',
     '내용을 넣어 주세요':'Please enter something',
@@ -5363,7 +5377,13 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Tap the directions this berth is <b>open to</b>. Wind from those bearings makes the boat roll, or worse.',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Only <b>approved contributors</b> may post a series. This is because it is a place for reprinting other people\'s writing.',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Tap <b>[Add]</b> at the top right',
-    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'<b>Other people\'s comments</b> on your posts go with the post.',
+    // ── 5.29 탈퇴한 회원
+    '남는 것':'What stays',
+    '커뮤니티 글·댓글':'Community posts and comments',
+    '글쓴이는 「탈퇴한 회원」 으로 보입니다':'Shown as "Deleted account"',
+    '탈퇴해도 커뮤니티에 쓴 글과 댓글은 지워지지 않습니다. 지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주세요.':'Leaving does not delete your community posts and comments. If you want any of them gone, delete them yourself before you leave.',
+    '글 {a}개 · 댓글 {b}개':'Posts {a} · Comments {b}',
+    '탈퇴한 회원':'Deleted account',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'Our tides run large. A sounder reading is relative to <b>the moment you measured</b>, so writing it down as it is will ground you at low water.',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 위치의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'The weather, tides and depths in this app are <b>for reference</b>. Whether to sail and where to lie is your judgement and your responsibility. (Terms, article 6)',
     '이 위치·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'There is no tide data for this place and time, so it <b>cannot be converted</b>.',
@@ -6155,7 +6175,7 @@ const I18N = {
     // ── 4.100 — 숫자를 끼우는 문장
     '인터넷이 연결되어 있으면 사진은 클라우드로 올라가 저장 공간을 거의 차지하지 않습니다.':'When you are online, photos go to the cloud and take almost no space.',
     '지금은 클라우드에 올리지 못해 글 안에 담았습니다.':'Right now they could not be uploaded, so they are kept inside the post.',
-    '클라우드에 올려 두었던 배 기록과 커뮤니티 글은 이미 지웠습니다.':'The boat records and community posts stored in the cloud have already been deleted.',
+    '클라우드에 올려 두었던 배 기록은 이미 지웠고, 커뮤니티 글·댓글은 「탈퇴한 회원」 으로 바꿨습니다.':'The boat records stored in the cloud have already been deleted, and your community posts and comments now show "Deleted account".',
     '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.':'Please sign out, sign in again, and press once more.',
     '계정을 지웠습니다.':'Your account has been deleted.',
     '그동안 이용해 주셔서 감사합니다.':'Thank you for using it.',
@@ -7917,7 +7937,7 @@ const I18N = {
     '내 등급보다 높은 자리는 줄 수 없습니다':'Нельзя назначить роль выше вашей',
     '내 배를 고친 이야기 · 고장·수리':'Как я чинил судно · поломки и ремонт',
     '내가 누를 때까지 그대로 둔다':'Оставить, пока не нажму сам',
-    '내가 올린 글·정박지·중고 장터':'Мои записи, стоянки и объявления',
+    '내가 올린 정박지·중고 장터':'Мои стоянки и объявления',
     '내리지 못했습니다.\n\n':'Не удалось снять.\n\n',
     '내용 보기':'Читать',
     '내용을 넣어 주세요':'Введите содержимое',
@@ -8934,7 +8954,13 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'Отметьте направления, которым эта стоянка <b>открыта</b>. Ветер оттуда раскачивает судно или создаёт опасность.',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'Серии могут публиковать <b>только одобренные авторы</b>. Это место для перепечатки чужих текстов, поэтому так.',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'Нажмите <b>[Добавить]</b> вверху справа',
-    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'<b>Чужие комментарии</b> к вашим записям исчезнут вместе с записью.',
+    // ── 5.29 탈퇴한 회원
+    '남는 것':'Что останется',
+    '커뮤니티 글·댓글':'Посты и комментарии в сообществе',
+    '글쓴이는 「탈퇴한 회원」 으로 보입니다':'Автор будет показан как «Удалённый аккаунт»',
+    '탈퇴해도 커뮤니티에 쓴 글과 댓글은 지워지지 않습니다. 지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주세요.':'Выход из сервиса не удаляет ваши посты и комментарии в сообществе. Если хотите их убрать, удалите их сами до выхода.',
+    '글 {a}개 · 댓글 {b}개':'Постов: {a} · комментариев: {b}',
+    '탈퇴한 회원':'Удалённый аккаунт',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'У нас большие приливы. Показание эхолота отсчитывается от <b>момента замера</b>, поэтому, записав его как есть, в малую воду сядете на грунт.',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 위치의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'Погода, приливы и глубины в этом приложении — <b>справочные сведения</b>. Решение о выходе и о месте стоянки, как и ответственность за него, остаются за пользователем. (Условия, ст. 6)',
     '이 위치·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'Для этого места и времени нет данных об уровне, поэтому <b>пересчитать нельзя</b>.',
@@ -9726,7 +9752,7 @@ const I18N = {
     // ── 4.100 — 숫자를 끼우는 문장
     '인터넷이 연결되어 있으면 사진은 클라우드로 올라가 저장 공간을 거의 차지하지 않습니다.':'При наличии интернета фото уходят в облако и почти не занимают места.',
     '지금은 클라우드에 올리지 못해 글 안에 담았습니다.':'Сейчас загрузить не удалось, поэтому они вложены в саму запись.',
-    '클라우드에 올려 두었던 배 기록과 커뮤니티 글은 이미 지웠습니다.':'Записи судна и посты сообщества, хранившиеся в облаке, уже удалены.',
+    '클라우드에 올려 두었던 배 기록은 이미 지웠고, 커뮤니티 글·댓글은 「탈퇴한 회원」 으로 바꿨습니다.':'Записи судна в облаке уже удалены, а ваши посты и комментарии в сообществе теперь подписаны «Удалённый аккаунт».',
     '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.':'Выйдите, войдите снова и нажмите ещё раз.',
     '계정을 지웠습니다.':'Учётная запись удалена.',
     '그동안 이용해 주셔서 감사합니다.':'Спасибо, что пользовались приложением.',
@@ -11532,7 +11558,7 @@ const I18N = {
     '내 등급보다 높은 자리는 줄 수 없습니다':'自分より高い役割は与えられません',
     '내 배를 고친 이야기 · 고장·수리':'マイボートを直した話・故障・修理',
     '내가 누를 때까지 그대로 둔다':'自分が押すまでそのままにする',
-    '내가 올린 글·정박지·중고 장터':'自分が上げた投稿・係留地・中古売買',
+    '내가 올린 정박지·중고 장터':'自分が上げた係留地・中古売買',
     '내리지 못했습니다.\n\n':'取り下げできませんでした。\n\n',
     '내용 보기':'内容を表示',
     '내용을 넣어 주세요':'内容を入れてください',
@@ -12516,7 +12542,13 @@ const I18N = {
     '여기서 <b>트여 있는</b> 방향을 눌러 주세요. 그 방향에서 바람이 불면 배가 흔들리거나 위험합니다.':'ここで <b>開けている</b> 方向を押してください。その方向から風が吹くと船が揺れたり危険になったりします。',
     '연재는 <b>허락받은 분만</b> 올릴 수 있습니다. 남의 글을 옮겨 싣는 자리라서 그렇습니다.':'連載は <b>許可を受けた方だけ</b> が投稿できます。他の方の文章を転載する場所だからです。',
     '오른쪽 위 <b>[추가]</b> 를 누릅니다':'右上の <b>[追加]</b> を押します',
-    '올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.':'投稿された記事についた <b>他の方のコメント</b> も記事と一緒に消えます。',
+    // ── 5.29 탈퇴한 회원
+    '남는 것':'残るもの',
+    '커뮤니티 글·댓글':'コミュニティの投稿・コメント',
+    '글쓴이는 「탈퇴한 회원」 으로 보입니다':'投稿者は「退会したユーザー」と表示されます',
+    '탈퇴해도 커뮤니티에 쓴 글과 댓글은 지워지지 않습니다. 지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주세요.':'退会しても、コミュニティに書いた投稿とコメントは削除されません。消したい投稿・コメントは、退会する前にご自身で削除してください。',
+    '글 {a}개 · 댓글 {b}개':'投稿 {a}件・コメント {b}件',
+    '탈퇴한 회원':'退会したユーザー',
     '우리 바다는 물때 차가 큽니다. 수심계 값은 <b>잰 그때</b> 기준이라 그대로 적으면 저조 때 얹힙니다.':'韓国の海は潮汐の差が大きいです。水深計の値は <b>測ったその時</b> が基準なので、そのまま記入すると干潮時に座礁します。',
     '이 앱의 날씨·물때·수심은 <b>참고 자료</b>입니다. 출항 여부와 정박 위치의 판단과 책임은 이용자에게 있습니다. (이용약관 제6조)':'このアプリの天気・潮汐・水深は <b>参考資料</b> です。出港の可否と係留場所の判断および責任は利用者にあります。（利用規約第6条）',
     '이 위치·이 시각은 조위 자료가 없어 <b>환산할 수 없습니다</b>.':'この場所・この時刻は潮位データがないため <b>換算できません</b>。',
@@ -13216,7 +13248,7 @@ const I18N = {
     // ── 4.100 — 숫자를 끼우는 문장
     '인터넷이 연결되어 있으면 사진은 클라우드로 올라가 저장 공간을 거의 차지하지 않습니다.':'インターネットにつながっていれば写真はクラウドに上がり、容量をほとんど使いません。',
     '지금은 클라우드에 올리지 못해 글 안에 담았습니다.':'今はクラウドに上げられなかったため、投稿の中に収めました。',
-    '클라우드에 올려 두었던 배 기록과 커뮤니티 글은 이미 지웠습니다.':'クラウドに保存していた船の記録とコミュニティ投稿はすでに削除しました。',
+    '클라우드에 올려 두었던 배 기록은 이미 지웠고, 커뮤니티 글·댓글은 「탈퇴한 회원」 으로 바꿨습니다.':'クラウドに保存していた船の記録はすでに削除し、コミュニティの投稿・コメントは「退会したユーザー」に変えました。',
     '로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.':'ログアウトしてから再度ログインし、もう一度押してください。',
     '계정을 지웠습니다.':'アカウントを削除しました。',
     '그동안 이용해 주셔서 감사합니다.':'ご利用ありがとうございました。',
@@ -16794,7 +16826,7 @@ async function openWipe(){
     <div class="mrrow"><span class="mrlbl">${esc(t('배 기록'))}</span>
       <span class="mrm" style="flex:1">${esc(t('물품·정비·수리·항해일지·서류·도면·게시판'))}</span></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('커뮤니티'))}</span>
-      <span class="mrm" style="flex:1">${esc(t('내가 올린 글·정박지·중고 장터'))}</span>
+      <span class="mrm" style="flex:1">${esc(t('내가 올린 정박지·중고 장터'))}</span>
       <b class="mrv" id="wipeN">${esc(t('세는 중…'))}</b></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('계정'))}</span>
       <span class="mrm" style="flex:1">${esc((window.__user && window.__user.email) || t('로그인 계정'))}</span></div>
@@ -16803,19 +16835,25 @@ async function openWipe(){
     + (guest.length ? `<div class="mrnone" style="text-align:left">
         ${tsub('<b>남의 배 {n}척</b>에 참여 중입니다 —', { n: guest.length })}
         ${esc(guest.map(b=>b.name).join(', '))}<br>${esc(t('그 배의 기록은 지워지지 않습니다. 다만 명부에 제 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 하시는 편이 깔끔합니다.'))}</div>` : '')
-    + `<div class="mrnone" style="text-align:left">${t('올려 두신 글의 <b>남의 댓글</b>도 글과 함께 사라집니다.')}<br>${esc(t('문의·신고 기록 등은 정한 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
+    + `<div class="mrsecthead">${esc(t('남는 것'))}</div>
+      <div class="mrrow"><span class="mrlbl">${esc(t('커뮤니티 글·댓글'))}</span>
+        <span class="mrm" style="flex:1">${esc(t('글쓴이는 「탈퇴한 회원」 으로 보입니다'))}</span>
+        <b class="mrv" id="wipeKeep">${esc(t('세는 중…'))}</b></div>
+      <div class="mrnone" style="text-align:left">${esc(t('탈퇴해도 커뮤니티에 쓴 글과 댓글은 지워지지 않습니다. 지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주세요.'))}</div>
+      <div class="mrnone" style="text-align:left">${esc(t('문의·신고 기록 등은 정한 기간 동안 따로 보관합니다 (개인정보처리방침 참고).'))}</div>
       <div class="mrrow" style="justify-content:center;padding:16px 12px">
         <button class="mrbtn big warn" onclick="askWipe()">${esc(t('계정 삭제'))}</button></div>`;
   showPanel(P);
   setHeadTitle('계정 삭제');
   // 몇 개인지는 세어 봐야 안다 — 화면은 먼저 띄우고 숫자만 나중에 채운다
   try{
-    const n = window.__account ? await window.__account.minePosts(false) : 0;
+    const r = window.__account ? await window.__account.minePosts(false) : { del:0, keep:0, cmt:0 };
     const el = document.getElementById('wipeN');
-    if(el) el.textContent = tsub('{n}개', { n: n });
+    if(el) el.textContent = tsub('{n}개', { n: r.del });
+    const ek = document.getElementById('wipeKeep');
+    if(ek) ek.textContent = tsub('글 {a}개 · 댓글 {b}개', { a: r.keep, b: r.cmt });
   }catch(_){
-    const el = document.getElementById('wipeN');
-    if(el) el.textContent = t('셀 수 없음');
+    ['wipeN','wipeKeep'].forEach(k => { const el = document.getElementById(k); if(el) el.textContent = t('셀 수 없음'); });
   }
 }
 // ★ 정해진 글자를 그대로 적게 한다. 확인 창 한 번으로는 잘못 눌린다.
@@ -16858,7 +16896,7 @@ async function doWipe(){
     // ★ 파이어베이스는 오래된 로그인으로는 계정을 못 지우게 한다.
     //   여기서 기기 자료까지 지워 버리면 사람만 붕 뜬다. 그래서 멈추고 알린다.
     wipeSay(`${t('보안을 위해 <b>다시 로그인한 뒤</b>에 지울 수 있습니다.')}<br><br>`
-      + t('클라우드에 올려 두었던 배 기록과 커뮤니티 글은 이미 지웠습니다.') + '<br>'
+      + t('클라우드에 올려 두었던 배 기록은 이미 지웠고, 커뮤니티 글·댓글은 「탈퇴한 회원」 으로 바꿨습니다.') + '<br>'
       + t('로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.')
       + '<div class="mrrow" style="justify-content:center;padding:16px 0">'
       + `<button class="mrbtn big" onclick="doSignOut()">${esc(t('로그아웃'))}</button></div>`);
@@ -20534,7 +20572,7 @@ async function renderTalk(){
           ${n?`<span class="tnum" title="${esc(t('댓글'))}">${n}</span>`:''}
           ${(Number(po.likeN)||0) > 0 ? `<span class="tnum good" title="${esc(t('도움됐어요'))}">${Number(po.likeN)}</span>` : ''}
           ${po.hidden?`<span class="chip notice">${esc(t('숨김'))}</span>`:''}</div>
-          <div class="fsub">${po.by ? whoLink(po.by, po.byName, '') : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}
+          <div class="fsub">${po.by ? whoLink(po.by, po.byName, '', po.gone) : esc(whoName(po))}${po.boatName?' · '+esc(po.boatName):''}
             ${po.region?' · '+esc(t(po.region)):''} · ${esc(String(po.ts||'').slice(0,10))}</div>
         </div></div>`;
   }
@@ -20687,7 +20725,8 @@ function talkRecordText(kind, it){
     L.push(t('[정비 기록]') + ' ' + (it.name || ''));
     const bl = boatLine(); if(bl) L.push(bl);
     if(it.grp) L.push(t('계통') + ': ' + t(it.grp));
-    L.push(t('주기') + ': ' + (it.months || '') + t(UNIT_LABEL[it.unit || 'm'] || ''));
+    L.push(t('주기') + ': ' + [mHasMonths(it) ? it.months + t(UNIT_LABEL[it.unit || 'm'] || '') : '',
+      parseFloat(it.hrs) > 0 ? tsub('엔진 {n}시간', { n: parseFloat(it.hrs) }) : ''].filter(Boolean).join(' · '));
     L.push(t('마지막') + ': ' + (it.lastDate || '—'));
     const hist = (it.history || []).map(h=>h.date).slice(-5);
     if(hist.length) L.push(t('이력') + ': ' + hist.join(', ')
@@ -21305,7 +21344,7 @@ async function openTalk(id){
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'talk:' + id)}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'talk:' + id, c.gone)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="delTalkComment('${jsq(po.id)}','${jsq(c.id)}',${c.old?'true':'false'})">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div></div>`;
@@ -21317,14 +21356,14 @@ async function openTalk(id){
     canDelTalk(po) ? { name:'삭제', edit:true, warn:true, run:() => delTalk(po.id) } : null,
     { name:'댓글 쓰기', edit:true, run: () => writeTalkComment(po.id) },
     { name:'신고', run: () => reportTalk(po.id) },
-    (po.by && String(po.by) !== String(meUid() || ''))
+    (po.by && !po.gone && String(po.by) !== String(meUid() || ''))
       ? { name:'이 사람 차단', run: () => mutePersonUI(po.by, po.byName || '') } : null
   ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',po.title))}</b><span style="flex:1"></span>
       ${할일}<button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
       ${po.region?`<span class="chip">${esc(t(po.region))}</span>`:''}
-      ${po.by ? whoLink(po.by, po.byName, 'talk:' + po.id) : esc(po.byName||'')}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
+      ${po.by ? whoLink(po.by, po.byName, 'talk:' + po.id, po.gone) : esc(whoName(po))}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
       · ${esc(String(po.ts||'').slice(0,10))}
 </div>
     ${trBar('community', po.id, (po.title||'') + ' ' + (po.body||''),
@@ -21648,7 +21687,7 @@ async function adminReports(){
     const why = Object.keys(cnt).map(k => cnt[k] > 1 ? t(k) + ' ' + tsub('{n}건', { n: cnt[k] }) : t(k));
     return `<div class="fleet"><div class="fmain">
       <div class="fname">${p.hidden?`<span class="chip notice">${esc(t('숨김'))}</span> `:''}${esc(p.title||t('(제목 없음)'))}</div>
-      <div class="fsub">${esc(p.byName||'')}${p.boatName?' · '+esc(p.boatName):''}
+      <div class="fsub">${esc(whoName(p))}${p.boatName?' · '+esc(p.boatName):''}
         · ${esc(tsub('신고 {n}건', { n: p.reportN||0 }))}${why.length?' · '+esc(why.join(', ')):''}</div>
       <div class="fchips" style="margin-top:6px">
         <button class="tchip" onclick="openTalk('${jsq(p.id)}')">${esc(t('글 보기'))}</button>
@@ -23222,7 +23261,7 @@ function openPost(id){
   const cs = (p.comments||[]).map(c=>{
     const mine = String(c.by) === String(me);
     const canDel = mine ? can(b,'board','write') : can(b,'board','full');
-    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'post:' + id)}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'post:' + id, c.gone)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${canDel?`<button class="ckdel edt" onclick="delCommentUI('${jsq(p.id)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text).replace(/\n/g,'<br>')}</div></div>`;
@@ -23598,7 +23637,17 @@ function openRoster(){
 //     관리는 그 안의 [관리] 단추(Discord)나 따로 여는 관리 화면(Reddit·네이버)으로 간다. 그대로 한다.
 // back: 'roster' | 'talk:글번호' | 'post:글번호' | 'spot:정박지번호' | '' — 뒤로 가면 돌아갈 자리
 let profBackTo = '';
-function whoLink(uid, name, back){
+// ★★★ 5.29 — 탈퇴한 사람의 글·댓글 (사장님 2026-10-01: 「다른 커뮤니티들은 어떻게 하는지 봐라 …
+//   그대로 놔두고 그사람 누군지 보면 탈퇴한 계정이라고 나오는거 같던데」 → 조사 → 「2는 2로」)
+//   다음 카페(「탈퇴한 회원」)·네이버 카페(탈퇴해도 글·댓글이 지워지지 않음)·레딧([deleted]) 처럼
+//   글과 댓글은 남기고 글쓴이 이름을 지운다. 탈퇴할 때 앱이 그 글·댓글에 gone:true 를 적고 이름을 비운다.
+//   이름을 눌러도 프로필이 열리지 않는다(이미 지워졌다).
+function whoName(x){
+  if(x && x.gone) return t('탈퇴한 회원');
+  return String((x && x.byName) || '');
+}
+function whoLink(uid, name, back, gone){
+  if(gone) return `<span class="whogone">${esc(t('탈퇴한 회원'))}</span>`;
   const nm = esc(name || t('(이름 없음)'));
   if(!uid) return nm;
   return `<span class="whoa" onclick="event.stopPropagation();openProfile('${jsq(String(uid))}','${jsq(String(name||''))}','${jsq(String(back||''))}')">${nm}</span>`;
@@ -24797,7 +24846,11 @@ const WX_AUTO_KEYS = ['maxWind','maxGust','maxWave','maxPeriod','minVis','maxCur
 const BOAT_FIELDS = ['name','type','port','maker','model','year','lat','lon','code',
                      'phone','trkHide',
                      'spec','members','memberNames','ranks','roster','openJoin',
-                     'pub','intro','createdAt','tideStyle'];
+                     'pub','intro','createdAt','tideStyle',
+                     // ★★★ 5.28 — 연료 설정(L/시간·옛 「지금 잔량」·잔량 확인 방법)도 올린다.
+                     //   여태 이 목록에서 빠져 고친 기기에만 남았다. 사장님이 폰에서 7.2·잔량 0 을 고쳤는데
+                     //   컴퓨터에는 210L·3.0 으로 나왔다 (2026-10-01 지적). 받을 때는 나중에 고친 쪽(_at)을 따른다.
+                     'fuelSet'];
 if(typeof window !== 'undefined') window.__boatFields = BOAT_FIELDS;
 
 function curBoat(){
@@ -25775,14 +25828,33 @@ async function mergeCloudBoats(){
       const dirty = boatDirty.has(String(cb.id));
       // 이미 있는 배는 두 번 넣지 않는다. 칸은 목록대로 전부 받는다.
       // 골라 받으면 빠뜨린 칸이 영영 안 내려온다 (2.6 의 제원 동기화 사고).
+      let 연료올림 = false;
       BOAT_FIELDS.forEach(k => {
         if(k === 'members' || k === 'memberNames') return;   // 위에서 합쳤다
+        // ★ 5.28 — 연료 설정은 나중에 고친 쪽(_at)을 따른다. 클라우드에 없거나 이 기기 것이
+        //   더 나중이면 이 기기 것을 지키고 올린다(5.27 까지 이 기기에만 있던 값이 여기서 처음 올라간다).
+        if(k === 'fuelSet'){
+          const L = old.fuelSet, C = cb.fuelSet;
+          const lt = Number((L && L._at) || 0), ct = Number((C && C._at) || 0);
+          if(fuelSetHas(C) && fuelSetHas(L) && !lt){
+            // 이 기기 값은 한 번도 안 올라간 옛것이다 — 버리지 않고 합친다(겹치는 칸은 클라우드 것)
+            old.fuelSet = Object.assign({}, L, C, { _at: Date.now() });
+            연료올림 = true;
+          }
+          else if(fuelSetHas(C) && (!fuelSetHas(L) || ct >= lt)) old.fuelSet = C;
+          else if(fuelSetHas(L) && (!fuelSetHas(C) || lt > ct)){
+            if(!lt) old.fuelSet = Object.assign({}, L, { _at: Date.now() });
+            연료올림 = true;
+          }
+          return;
+        }
         if(cb[k] !== undefined && cb[k] !== null) old[k] = cb[k];
       });
       old.members = mergedMembers;
       old.memberNames = mergedNames;
       migrateRanks(old);
       if(dirty) saveBoatCloud(old, true);   // 합친 것을 다시 올린다
+      else if(연료올림) fuelSetUpload(old);
       return;
     }
     migrateRanks(cb);
@@ -26382,7 +26454,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.27';
+const APP_VER = '5.29';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29468,29 +29540,52 @@ const nowHM = () => { const d = new Date();
 //     그 숫자를 쓴다. 머큐리조차 계기판 읽는 장비를 따로 판다.
 //   ★ 시간 주기를 안 적으면 여태와 똑같이 달력만 본다. 있던 기록은 그대로다.
 const engNow = () => { try{ return engineHours().total || 0; }catch(_){ return 0; } };
-// 시간 주기로 볼 때 얼마나 남았나 (시간 주기가 없으면 null)
+// ★★★ 5.29 — 정기점검의 엔진 시간은 「마지막으로 한 뒤 엔진을 몇 시간 가동했나」 로 센다
+//   (사장님 2026-10-01: 「엔진 시간 저건 가동 시간이고 사람이 직접 쓰는 엔진시간은 엔진 가동 얼마나 하고
+//    나서 점검을 받는지 세는 기준인데 … 그걸 같이 동기화하면 어떻게 하냐」 → 고칠 길 「그래」)
+//   여태는 「마지막 · 엔진 [ ] 시간」 칸에 앱의 총 가동시간(지금 59.8)을 넣게 하고 그 숫자에 주기를 더했다.
+//   두 숫자는 다른 것이다 — 앱의 가동시간은 기록에서 센 것이고, 사람이 적는 것은 「몇 시간마다」 다.
+//   이제 사람은 「몇 시간마다」 만 적는다. 앱은 마지막으로 한 날 뒤의 항해일지 엔진 시간과
+//   엔진 가동 기록을 더해 「그 뒤 가동시간」 을 세고, 주기에서 뺀다. 차량 정비 앱의 「km 기준 교체 주기」 와 같다.
+//   ★ 옛 기록의 lastH 는 지우지 않는다(지난 이력·내보내기에 남은 값). 다만 셈에는 안 쓴다.
+//   ★ 완료 처리를 누른 날은 누른 때(lastAt) 뒤부터 센다 — 그날 아침 항해까지 세면 안 된다.
+function engHoursSince(dayISO, atMs){
+  const day = String(dayISO || '').slice(0, 10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null;
+  const 그날 = new Date(day + 'T00:00:00').getTime();
+  if(!isFinite(그날)) return null;
+  let 부터 = 그날;
+  const at = Number(atMs);
+  if(isFinite(at) && at >= 그날 && at < 그날 + 864e5) 부터 = at;
+  let h = 0;
+  (Array.isArray(voyage) ? voyage : []).forEach(v => {
+    const d = voyDay(v && v.date); if(!d) return;
+    const 출발 = (typeof voyOutMs === 'function' && voyOutMs(v)) || new Date(d + 'T00:00:00').getTime();
+    if(출발 >= 부터) h += parseFloat(v.engineH) || 0;
+  });
+  (Array.isArray(runs) ? runs : []).forEach(r => {
+    const a = runAt(r && r.date, r && r.time); if(!a || a.getTime() < 부터) return;
+    if(runOn(r)){ const m = runMins(r); h += (m != null ? m / 60 : 0); }
+    else h += parseFloat(r.hours) || 0;
+  });
+  return Math.round(h * 10) / 10;
+}
+// 이 항목을 마지막으로 한 뒤 가동시간 (마지막 날짜가 없으면 null — 셀 기준이 없다)
+function mHoursUsed(it){ return it && it.lastDate ? engHoursSince(it.lastDate, it.lastAt) : null; }
+// 시간 주기로 볼 때 얼마나 남았나 (시간 주기가 없거나 마지막 날짜가 없으면 null)
 function mHourLeft(it){
   const per = parseFloat(it && it.hrs);
   if(!isFinite(per) || per <= 0) return null;
-  const base = parseFloat(it.lastH);
-  // ★★★ 4.102 — 기준이 없으면 시간으로 세지 않는다.
-  //   여태는 기준이 없으면 **0시간부터** 센 셈으로 봤다. 엔진을 이미 400시간 돌린 배에서는
-  //   「250시간 지남」 이 바로 떠 버린다 — 앱이 모르는 것을 아는 척한 것이다.
-  //   기준이 없으면 달력만 본다. 화면에서는 「마지막 · 엔진 [ ] 시간」 칸에 적어 넣는다.
-  if(!isFinite(base)) return null;
-  return (base + per) - engNow();
+  const used = mHoursUsed(it);
+  if(used === null) return null;
+  return per - used;
 }
-// 이 항목의 시간 기준이 잡혀 있나
-function mHasBase(it){ return isFinite(parseFloat(it && it.lastH)); }
-// 「지금 21.6」 단추 — 마지막에 한 때의 엔진 시간을 **지금 값**으로 채운다.
-//   ★ 4.102 — 단추 이름에 들어갈 숫자를 그대로 보여 준다. 눌러 보지 않아도 무엇이 들어갈지 안다.
-function mHourBaseNow(){
-  const it = getMR('maint', mrOpenId); if(!it) return;
-  it.lastH = engNow(); it.seed = false;
-  saveMR();
-  if(typeof schedulePush === 'function') schedulePush();
-  rerender('maint'); openMR('maint', mrOpenId);
-}
+// ★★★ 5.29 — 달력 주기를 비울 수 있다 (사장님 2026-10-01: 「내가 엔진 시간으로만 하고 싶은데 왜 꼭 날짜가 들어가냐?」)
+//   UpKeep·MaintainX 는 「계기(엔진 시간)만」·「달력만」·「둘 중 먼저」 셋을 다 둔다. 엔진 시간 칸이
+//   「비워 두면 달력만」 이듯, 달력 칸도 비우면 엔진 시간만 본다. 마지막 날짜는 그 뒤 가동시간을 세는 출발점이 된다.
+//   옛 기록(months 가 숫자)은 그대로다.
+function mHasMonths(it){ const n = parseInt(it && it.months, 10); return isFinite(n) && n > 0; }
+// ★ 5.29 — 「지금 59.8시간」 단추(앱 가동시간을 마지막 칸에 넣던 것)를 없앴다. 위 engHoursSince 참고.
 
 // ★★★ 4.102 — 엔진 시간 줄. 「몇 시간마다」 만으로는 사람이 아무것도 못 한다.
 //   지금 몇 시간인지, 이 항목 기준이 언제인지, 다음까지 얼마나 남았는지를 같이 보여 준다.
@@ -29527,12 +29622,12 @@ function mCycleRow(it){
   const 시간있음 = isFinite(per) && per > 0;
   if(!unlocked){
     return `<div class="mrrow"><span class="mrlbl">${esc(t('주기'))}</span>
-      <b class="mrv">${it.months}${UNIT_LABEL[it.unit||'m']}${
-        시간있음 ? ' · ' + esc(tsub('엔진 {n}시간', { n: per })) : ''}</b></div>`;
+      <b class="mrv">${[mHasMonths(it) ? it.months + UNIT_LABEL[it.unit||'m'] : '',
+        시간있음 ? esc(tsub('엔진 {n}시간', { n: per })) : ''].filter(Boolean).join(' · ') || '—'}</b></div>`;
   }
   return `<div class="mrrow"><span class="mrlbl">${esc(t('주기'))}${helpBtn('cycle')}</span>
-      <input type="number" min="1" value="${it.months}" style="width:56px"
-             onchange="mrField('months',parseInt(this.value,10)||12)">
+      <input type="number" min="1" value="${mHasMonths(it) ? it.months : ''}" style="width:56px"
+             onchange="mrField('months', this.value === '' ? '' : (parseInt(this.value,10)||''))">
       <select onchange="mrField('unit',this.value)">
         <option value="d"${(it.unit||'m')==='d'?' selected':''}>${esc(t('일'))}</option>
         <option value="w"${(it.unit||'m')==='w'?' selected':''}>${esc(t('주'))}</option>
@@ -29541,49 +29636,42 @@ function mCycleRow(it){
       <span class="mrv2" style="margin-left:10px">${esc(t('엔진'))}</span>
       <input type="number" min="0" step="1" value="${esc(it.hrs == null ? '' : it.hrs)}" style="width:64px"
              onchange="mrField('hrs', this.value === '' ? '' : (parseFloat(this.value)||''))">
-      <span class="mrv2">${esc(t('시간'))}</span></div>
-    <div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(
-      시간있음 ? t('달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.')
-               : t('엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.'))}</div>`;
+      <span class="mrv2">${esc(t('시간'))}</span></div>${(() => {
+      // ★ 5.29 — 달력 칸을 비우고 엔진 시간만 적었을 때는 안내 줄을 두지 않는다(새 문장을 짓지 않는다)
+      const 안내 = 시간있음 && !mHasMonths(it) ? ''
+        : 시간있음 ? t('달력과 엔진 시간 가운데 먼저 오는 쪽을 알려 드립니다.')
+                 : t('엔진 시간마다 하는 일이면 오른쪽 칸에 적으세요. 비워 두면 달력만 봅니다.');
+      return 안내 ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(안내)}</div>` : '';
+    })()}`;
 }
 function mLastRow(it, s){
   const per = parseFloat(it.hrs);
   const 시간있음 = isFinite(per) && per > 0;
-  const 지금 = Math.round(engNow() * 10) / 10;
-  const 기준 = mHasBase(it) ? (Math.round(parseFloat(it.lastH) * 10) / 10) : null;
+  // ★ 5.29 — 마지막 줄에는 사람이 적는 칸이 날짜 하나뿐이다. 그 뒤 가동시간은 앱이 기록에서 세어 보여만 준다.
+  const 가동 = 시간있음 ? mHoursUsed(it) : null;
   const 남음 = mHourLeft(it);
   // ── 「다음」 줄 — 사람이 정말 알고 싶은 것. 계산해서 보여만 준다.
   const 다음들 = [];
   if(s.next) 다음들.push(fmtDate(s.next));
-  if(시간있음 && 기준 !== null)
-    다음들.push(tsub('엔진 {n}시간', { n: Math.round((기준 + per) * 10) / 10 })
-      + ' (' + (남음 < 0 ? tsub('{n}시간 지남', { n: Math.round(-남음) })
-                        : tsub('{n}시간 남음', { n: Math.round(남음) })) + ')');
+  if(시간있음 && 남음 !== null)
+    다음들.push(남음 < 0 ? tsub('{n}시간 지남', { n: Math.round(-남음 * 10) / 10 })
+                        : tsub('{n}시간 남음', { n: Math.round(남음 * 10) / 10 }));
   return `<div class="mrrow"><span class="mrlbl">${esc(t('마지막'))}</span>${unlocked
       ? `<input type="date" value="${it.lastDate||''}" onchange="mrField('lastDate',this.value)">`
       : `<b class="mrv">${it.lastDate||'—'}</b>`}
-      ${시간있음 ? (unlocked
-        ? `<span class="mrv2" style="margin-left:10px">${esc(t('엔진'))}</span>
-           <input type="number" min="0" step="0.1" value="${기준 === null ? '' : 기준}" style="width:64px"
-                  onchange="mrField('lastH', this.value === '' ? '' : (parseFloat(this.value)||0))">
-           <span class="mrv2">${esc(t('시간'))}</span>
-           <button class="minib ${기준 === null ? 'grn' : ''}" onclick="mHourBaseNow()"
-             >${esc(tsub('지금 {n}시간', { n: 지금 }))}</button>`
-        : `<b class="mrv">${기준 === null ? '—' : esc(tsub('엔진 {n}시간', { n: 기준 }))}</b>`) : ''}
+      ${가동 !== null
+        ? `<span class="mrv2" style="margin-left:10px;white-space:nowrap">${esc(t('가동시간'))} ${esc(String(가동))}${esc(t('시간'))}</span>` : ''}
       <span class="st ${s.k}">${esc(s.t)}</span></div>
     ${다음들.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('다음'))}</span>
-      <b class="mrv" style="flex:1;font-weight:450">${esc(다음들.join(' · '))}</b></div>` : ''}
-    ${시간있음 && 기준 === null && unlocked
-      ? `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${esc(
-          t('마지막으로 했을 때 엔진이 몇 시간이었는지 적으세요. 그래야 남은 시간을 셀 수 있습니다.'))}</div>` : ''}`;
+      <b class="mrv" style="flex:1;font-weight:450">${esc(다음들.join(' · '))}</b></div>` : ''}`;
 }
 function mStatus(it){
   const hl = mHourLeft(it);                       // 시간으로 본 남은 양
-  if(!it.lastDate && hl === null)
+  if((!it.lastDate || !mHasMonths(it)) && hl === null)
     return {c:'#5A5F66', t:t('미기록'), k:'none', next:null, days:null};
-  // ── 달력으로 본 것
+  // ── 달력으로 본 것 (달력 주기를 비웠으면 안 본다 — 5.29)
   let days = null, nd = null;
-  if(it.lastDate){
+  if(it.lastDate && mHasMonths(it)){
     nd = addPeriod(it.lastDate, it.months, it.unit||'m');
     days = Math.floor((nd - new Date())/864e5);
   }
@@ -31046,7 +31134,7 @@ function renderMaintList(){
               :(nSnz?`<span class="chip mute">${esc(t('미룸'))}</span>`:'')}
           <span class="st ${s.k}">${s.t}</span></div>
         <div class="mrm">${(()=>{ const g = it.gearId ? gearOf(it.gearId) : null;
-            return g ? `<span style="color:#9CC6E8">${esc(gearLabel(g))}</span> · ` : ''; })()}${esc(tsub('주기 {n}{u}', {n:it.months, u:UNIT_LABEL[it.unit||'m']}))} · ${esc(tsub('마지막 {d}', {d:it.lastDate||'—'}))}${s.next?' · '+esc(tsub('다음 {d}', {d:fmtDate(s.next)})):''}${it.pin?' · '+esc(t('핀')):''}${it.photos&&it.photos.length?' · '+esc(tsub('사진 {n}', { n: it.photos.length })):''}</div>
+            return g ? `<span style="color:#9CC6E8">${esc(gearLabel(g))}</span> · ` : ''; })()}${esc(mHasMonths(it) ? tsub('주기 {n}{u}', {n:it.months, u:UNIT_LABEL[it.unit||'m']}) : (parseFloat(it.hrs) > 0 ? t('주기') + ' ' + tsub('엔진 {n}시간', { n: parseFloat(it.hrs) }) : t('주기') + ' —'))} · ${esc(tsub('마지막 {d}', {d:it.lastDate||'—'}))}${s.next?' · '+esc(tsub('다음 {d}', {d:fmtDate(s.next)})):''}${it.pin?' · '+esc(t('핀')):''}${it.photos&&it.photos.length?' · '+esc(tsub('사진 {n}', { n: it.photos.length })):''}</div>
       </div>`;
     }).join('');
   }).join('');
@@ -31263,7 +31351,7 @@ function openMR(kind, id){
         :`<span class="st ${RP_K[it.status]||'none'}">${RP_LABEL[it.status]}</span>`}
         <span class="mrv2">${esc(t('발견'))} ${it.created||'—'}${it.doneDate?' · '+esc(t('완료'))+' '+it.doneDate:''}</span></div>
       <div class="mrrow"><span class="mrlbl">${esc(t('계통'))}</span>${unlocked
-        ?`<input list="grpList" value="${esc(keyShow(it.grp))}" style="width:130px" placeholder="${esc(t('엔진/전기…'))}" onchange="mrGrpSet(this.value,'')">`
+        ? mrPickBtn(esc(it.grp ? keyShow(it.grp) : t('선택 안 함')), `grpPick('${jsq(String(it.id))}','repair')`)
         :`<b class="mrv">${esc(keyShow(it.grp) || '—')}</b>`}</div>`
       + gearPickRow(it, 'repair')
       // ★ 고친 뒤에 어떻게 고쳤는지 남기는 자리. 여기서 바로 간다.
@@ -31497,6 +31585,7 @@ function openMR(kind, id){
       <button class="mrbtn" onclick="document.getElementById('mrFile').click()">${esc(t('앨범'))}</button></div>`:''}
     ${pinBtns}`;
   showPanel(P);
+  P.classList.add('rec');
   // 항해일지는 화면이 그려진 뒤에 지도를 켠다 (크기를 알아야 축척이 정해진다)
   // ★ 점이 하나도 없어도 켠다. 지도가 보는 곳이자 적는 곳이라 늘 있어야 한다.
   if(kind === 'voyage'){
@@ -31634,8 +31723,10 @@ async function mrComplete(){
     h: (it.lastH != null && it.lastH !== '') ? Number(it.lastH) : undefined });
   if(it.history.length>20) it.history.length=20;
   it.lastDate = today(); it.seed=false;
-  // ★ 그때의 엔진 시간을 찍어 둔다 — 다음 주기를 여기서부터 센다 (4.93)
+  // ★ 그때의 엔진 시간을 찍어 둔다 — 지난 이력에 「그때 엔진시간」 으로 남는다 (4.93·4.121)
   try{ it.lastH = engNow(); }catch(_){}
+  // ★ 5.29 — 다음 주기는 누른 때부터 가동한 시간으로 센다 (engHoursSince)
+  it.lastAt = Date.now();
   // ★★★ 4.112 — 여기서 정비수첩을 **만들지 않는다** (사장님 지적)
   //
   //   「전기 점검이나 뭐 이런 거 내가 몇 개 완료했다고. 버튼 누르면 이게 자동으로
@@ -32947,6 +33038,7 @@ function showPanel(P){
   if(typeof paintFab === 'function') setTimeout(paintFab, 0);   // 화면이 뜨면 단추는 숨는다
   // (발자국은 screenPush 한 군데에서 남긴다. 여기서 또 남기면 두 칸이 쌓인다.)
   P.classList.add('open', 'full');
+  P.classList.remove('rec');      // 기록 창이면 openMR 이 다시 넣는다 (5.29 — 칸 높이 맞춤은 기록 창에만)
   const t = P.querySelector('.mrhead > b, .mrtop > b');
   if(t) setHeadTitle(String(t.textContent || '').trim());
   // ★★★ 4.120 — 머리줄 높이를 **한 번 더** 잰다.
@@ -35565,11 +35657,13 @@ function trRepaint(coll, id){
 // ★ 5.18 — 1.9 → 2.0 (2026-09-27). 개인정보처리방침 3번(이용 목적)과 10번(운영자가 보는 것)을 더했다
 //   (사장님 2026-09-27 — 배가 범죄에 쓰일 수 있으니 운영자가 어느 정도는 봐야 한다).
 //   같은 김에 「판」 을 「버전」 으로, 약관의 「글판」 을 「게시판」 으로 바꿨다.
-const LEGAL_VER  = '2.0';
+// ★ 5.29 — 2.0 → 2.1 (2026-10-01). 탈퇴해도 커뮤니티 글·댓글은 남고 글쓴이는 「탈퇴한 회원」
+//   (사장님 「2는 2로」). 약관 제11조②, 개인정보처리방침 4번·16번 — 네 나라 말 모두.
+const LEGAL_VER  = '2.1';
 // ★ 날짜도 말마다 적는 법이 다르다. 사전에 넣지 않고 여기 한 곳에 둔다 —
 //   법 문서의 시행일이라 자동 번역에 맡길 값이 아니다.
-const LEGAL_DATES = { ko:'2026년 9월 27일', en:'27 September 2026', ru:'27 сентября 2026 г.',
-                      ja:'2026年9月27日' };
+const LEGAL_DATES = { ko:'2026년 10월 1일', en:'1 October 2026', ru:'1 октября 2026 г.',
+                      ja:'2026年10月1日' };
 const LEGAL_DATE = LEGAL_DATES.ko;   // 예전 코드·검사 호환
 // ★ 이름은 말마다 따로 적는다. 사전에 넣으면 자동 번역이 사람 이름을 건드린다.
 //   본인이 쓰는 표기가 있으므로 여기서만 고친다.
@@ -35698,9 +35792,11 @@ terms: { title: '이용약관', body: `
 
 제11조 (계정 정지와 해지)
 ① 이용자는 언제든 탈퇴할 수 있습니다.
-② 제7조를 어긴 경우 운영자는 게시물 삭제, 일시 정지, 이용 제한을 할 수 있습니다.
-③ 심하거나 반복되면 계정을 영구히 제한할 수 있습니다.
-④ 조치에 이의가 있으면 고객센터로 알려 주십시오.
+② 탈퇴해도 커뮤니티에 쓴 글과 댓글은 지워지지 않습니다. 글쓴이 이름을 지우고
+   「탈퇴한 회원」 으로 보이게 합니다. 지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주십시오.
+③ 제7조를 어긴 경우 운영자는 게시물 삭제, 일시 정지, 이용 제한을 할 수 있습니다.
+④ 심하거나 반복되면 계정을 영구히 제한할 수 있습니다.
+⑤ 조치에 이의가 있으면 고객센터로 알려 주십시오.
 
 제12조 (유료 서비스)
 ① 유료 기능이 생기면 가격, 결제 방법, 환불 기준을 결제 화면에 미리 알립니다.
@@ -35778,7 +35874,8 @@ privacy: { title: '개인정보처리방침', body: `
 
 4. 얼마나 갖고 있나
  · 계정 정보: 탈퇴할 때까지
- · 배 기록·게시물: 이용자가 지울 때까지, 또는 탈퇴할 때까지
+ · 배 기록·정박지·중고 장터 글: 이용자가 지울 때까지, 또는 탈퇴할 때까지
+ · 커뮤니티 글·댓글: 이용자가 지울 때까지. 탈퇴해도 지워지지 않고, 글쓴이 이름을 지워 「탈퇴한 회원」 으로 보입니다
  · 고객센터 문의: 답변을 마친 뒤 3년 (분쟁 대비)
  · 신고·제재 기록: 3년 (같은 일이 되풀이되는지 보기 위해)
  탈퇴하면 지체 없이 파기합니다. 다만 위 기간을 정한 기록과 위치정보 이용·제공사실 확인자료(6개월, 위치정보법 제16조 제2항)는 그 기간 동안 따로 보관합니다.
@@ -35855,8 +35952,9 @@ privacy: { title: '개인정보처리방침', body: `
  · 앱을 지우신 뒤에도: **baetnil.com/delete.html** 에서 지워 달라고 하실 수 있습니다.
    {EMAIL} 로 알려 주셔도 됩니다.
  · 탈퇴하시면 계정 정보와 이용자가 만든 기록을 지체 없이 지웁니다.
- · 남의 글에 단 댓글처럼 남의 글과 얽힌 것은, 이름을 지우고 내용만 남깁니다.
-   그것까지 지우면 남의 글이 앞뒤가 안 맞게 되기 때문입니다.
+ · 커뮤니티에 쓴 글과 댓글은 지우지 않고, 이름(과 글에 적힌 배 이름)을 지워 「탈퇴한 회원」 으로 남깁니다.
+   지우면 남이 단 댓글과 대화가 앞뒤가 안 맞게 되기 때문입니다.
+   지우고 싶은 글·댓글은 탈퇴하기 전에 직접 지워 주십시오.
 
 17. 대한민국 밖에서 이용하시는 분께
  · 이 앱의 데이터베이스는 **대한민국**에 있습니다 (Google Cloud Firestore 서울 리전). 로그인 처리는 미국에서 이루어집니다.
@@ -36088,10 +36186,13 @@ Article 10 (Interruption of Service)
 
 Article 11 (Suspension and Termination)
 1. You may leave at any time.
-2. If you breach Article 7 the operator may delete content, suspend you temporarily,
+2. Leaving does not delete the posts and comments you wrote in the community. Your name is
+   removed and they are shown as "Deleted account". If you want any of them gone, please delete
+   them yourself before you leave.
+3. If you breach Article 7 the operator may delete content, suspend you temporarily,
    or restrict your use.
-3. If the breach is serious or repeated, the account may be restricted permanently.
-4. If you object to any such measure, please tell us through Support.
+4. If the breach is serious or repeated, the account may be restricted permanently.
+5. If you object to any such measure, please tell us through Support.
 
 Article 12 (Paid Services)
 1. If paid features are introduced, the price, payment method and refund terms are shown
@@ -36181,7 +36282,9 @@ if the two differ, the Korean text prevails.
 
 4. How long it is kept
  · Account details: until you leave
- · Boat records and posts: until you delete them, or until you leave
+ · Boat records, berths and market listings: until you delete them, or until you leave
+ · Community posts and comments: until you delete them. They are not deleted when you leave;
+   your name is removed and they are shown as "Deleted account"
  · Support enquiries: 3 years after the reply (in case of dispute)
  · Reports and sanctions: 3 years (to see whether the same thing recurs)
  When you leave, data is destroyed without delay. Records the law requires us to keep are
@@ -36264,8 +36367,10 @@ if the two differ, the Korean text prevails.
  · Inside the App: Drawer > Account > Leave
  · After you have removed the App: ask at **baetnil.com/delete.html**, or write to {EMAIL}.
  · When you leave, your account details and the records you made are deleted without delay.
- · Where something is bound up with another person's post - a comment you left on it - the
-   name is removed and only the text stays, so that their post still makes sense.
+ · The posts and comments you wrote in the community are not deleted. Your name (and the boat
+   name on a post) is removed and they stay as "Deleted account", because deleting them would
+   leave other people's comments and conversations without context.
+   If you want any of them gone, please delete them yourself before you leave.
 
 17. If you are outside the Republic of Korea
  · The App's database is in **the Republic of Korea** (Google Cloud Firestore, Seoul region). Sign-in is processed in the United States.
@@ -36513,9 +36618,11 @@ terms: { title: '利用規約', body: `
 
 第11条（アカウントの停止と解約）
 ① 利用者はいつでも退会できます。
-② 第7条に反した場合、運営者は投稿物の削除、一時停止、利用制限を行うことができます。
-③ 程度が重い場合や繰り返される場合は、アカウントを永久に制限することがあります。
-④ 措置に異議があるときは、サポート窓口にお知らせください。
+② 退会しても、コミュニティに書いた投稿とコメントは削除されません。投稿者の名前を消し、
+   「退会したユーザー」と表示します。消したい投稿・コメントは、退会する前にご自身で削除してください。
+③ 第7条に反した場合、運営者は投稿物の削除、一時停止、利用制限を行うことができます。
+④ 程度が重い場合や繰り返される場合は、アカウントを永久に制限することがあります。
+⑤ 措置に異議があるときは、サポート窓口にお知らせください。
 
 第12条（有料サービス）
 ① 有料機能ができたときは、価格・支払方法・返金の基準を決済画面で事前にお知らせします。
@@ -36600,7 +36707,9 @@ privacy: { title: 'プライバシーポリシー', body: `
 
 4. どれくらい保管するか
  ・アカウント情報: 退会まで
- ・船の記録・投稿物: 利用者が削除するまで、または退会まで
+ ・船の記録・係留地・中古売買の投稿: 利用者が削除するまで、または退会まで
+ ・コミュニティの投稿・コメント: 利用者が削除するまで。退会しても削除されず、投稿者の名前を消して
+   「退会したユーザー」と表示します
  ・サポート窓口へのお問い合わせ: 回答を終えたのち3年（紛争に備えて）
  ・通報・制裁の記録: 3年（同じことが繰り返されていないか見るため）
  退会されたときは遅滞なく破棄します。ただし法令が保管を定めているものは、
@@ -36684,8 +36793,9 @@ privacy: { title: 'プライバシーポリシー', body: `
  ・アプリを削除された後でも: **baetnil.com/delete.html** から削除をご請求いただけます。
    {EMAIL} にご連絡いただいても結構です。
  ・退会されたときは、アカウント情報とご自身で作られた記録を遅滞なく削除します。
- ・他の方の投稿に付けたコメントのように他人の投稿と結びついているものは、
-   お名前を消し、本文だけを残します。それまで消すと、その方の投稿が意味をなさなくなるためです。
+ ・コミュニティに書いた投稿とコメントは削除せず、お名前（と投稿に書かれた船の名前）を消して
+   「退会したユーザー」として残します。消してしまうと、他の方のコメントや会話が意味をなさなくなるためです。
+   消したい投稿・コメントは、退会する前にご自身で削除してください。
 
 17. 個人情報取扱事業者の表示と、外国での取扱いについて（個人情報保護法第32条）
  ・事業者の氏名（代表者）: {OWNER}{BIZ}
@@ -36939,10 +37049,13 @@ terms: { title: 'Пользовательское соглашение', body: `
 
 Статья 11 (Приостановление и прекращение)
 1. Вы можете уйти в любой момент.
-2. При нарушении статьи 7 оператор вправе удалить материалы, временно приостановить
+2. Выход из сервиса не удаляет ваши посты и комментарии в сообществе. Имя автора удаляется,
+   и они показываются как «Удалённый аккаунт». Если хотите что-то из них убрать, удалите это
+   сами до выхода.
+3. При нарушении статьи 7 оператор вправе удалить материалы, временно приостановить
    или ограничить пользование.
-3. При грубом или повторном нарушении учётная запись может быть ограничена бессрочно.
-4. Возражения по принятым мерам направляйте в поддержку.
+4. При грубом или повторном нарушении учётная запись может быть ограничена бессрочно.
+5. Возражения по принятым мерам направляйте в поддержку.
 
 Статья 12 (Платные услуги)
 1. При появлении платных функций цена, способ оплаты и условия возврата заранее показываются
@@ -37037,7 +37150,9 @@ privacy: { title: 'Политика конфиденциальности', body:
 
 4. Сколько они хранятся
  · Данные учётной записи: до выхода из сервиса
- · Записи судна и публикации: до удаления вами либо до выхода из сервиса
+ · Записи судна, стоянки и объявления барахолки: до удаления вами либо до выхода из сервиса
+ · Посты и комментарии в сообществе: до удаления вами. При выходе из сервиса они не удаляются;
+   имя автора удаляется, и они показываются как «Удалённый аккаунт»
  · Обращения в поддержку: 3 года после ответа (на случай спора)
  · Жалобы и меры: 3 года (чтобы видеть повторяющиеся случаи)
  При выходе данные уничтожаются без промедления. Сведения, которые закон обязывает хранить,
@@ -37121,8 +37236,9 @@ privacy: { title: 'Политика конфиденциальности', body:
  · Даже после удаления Приложения: запрос можно оставить на **baetnil.com/delete.html**
    либо написать на {EMAIL}.
  · При выходе из сервиса учётные данные и созданные вами записи удаляются без промедления.
- · То, что связано с чужими материалами (например, ваш комментарий к чужой записи),
-   лишается имени, а текст остаётся, иначе чужая запись потеряет смысл.
+ · Посты и комментарии в сообществе не удаляются: имя (и название судна в посте) удаляется,
+   и они остаются как «Удалённый аккаунт», иначе чужие комментарии и разговоры потеряют смысл.
+   Если хотите что-то из них убрать, удалите это сами до выхода.
  · **Требование о прекращении распространения** ваших персональных данных, размещённых
    на доске объявлений или барахолке, исполняется **в течение трёх рабочих дней**
    (ст. 10.1 закона № 152-ФЗ).
@@ -38575,7 +38691,7 @@ function bpSocial(boatId, recId){
     .sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, '')}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, '', c.gone)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="bpDelComment('${jsq(boatId)}','${jsq(recId)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       <div class="cmtbody">${esc(c.text||'').replace(/\n/g,'<br>')}</div></div>`;
@@ -39295,7 +39411,7 @@ function spotCmtHtml(s){
     .slice().sort((a,b)=>String(a.ts||'').localeCompare(String(b.ts||'')));
   const cs = all.map(c=>{
     const mine = String(c.by) === String(meUid());
-    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'spot:' + s.id)}
+    return `<div class="cmt"><div class="cmthead">${whoLink(c.by, c.byName, 'spot:' + s.id, c.gone)}
         <span>${esc(String(c.ts||'').slice(0,10))}</span>
         ${(mine || isAdmin('postDel'))?`<button class="ckdel edt" onclick="delSpotComment('${jsq(s.id)}','${jsq(c.id)}')">&#10005;</button>`:''}</div>
       ${c.text ? `<div class="cmtbody">${esc(trCmt(tv, c.id, c.text)).replace(/\n/g,'<br>')}</div>` : ''}
@@ -39942,7 +40058,9 @@ const CAL_KINDS = {
   mlog:       { c:'#5FB894', n:'정비수첩' },
   repair:     { c:'#E4756A', n:'고장' },
   repairDone: { c:'#5FB894', n:'고친 날' },
-  vdoc:       { c:'#C4574B', n:'문서' }
+  vdoc:       { c:'#C4574B', n:'문서' },
+  // ★ 5.27 — 사장님: 「달력에 기름 넣은건 안나오네」 → 「주유만 넣어라」. 잔량 확인·엔진 가동은 안 올린다.
+  fuel:       { c:'#A98BD6', n:'주유' }
 };
 
 // 그 기간에 걸린 것을 다 모은다. from·to 는 'YYYY-MM-DD' (양 끝 포함).
@@ -39988,6 +40106,13 @@ function calItems(from, to){
     const nm = String(r.title || '').trim() || t('수리');
     if(r.created)  add(r.created,  'repair',     r.id, nm);
     if(r.doneDate) add(r.doneDate, 'repairDone', r.id, nm);
+  });
+  // ── 주유 (잔량 확인 기록은 빼고 넣은 것만)
+  ((typeof fuel !== 'undefined' && Array.isArray(fuel)) ? fuel : []).forEach(f => {
+    if(!f || f.kind === 'level') return;
+    const L = parseFloat(f.liters);
+    const nm = (isFinite(L) && L > 0 ? fmtNum(L) + ' L' : t('주유')) + (f.full ? ' · ' + t('만탱크') : '');
+    add(f.date, 'fuel', f.id, nm, f.time);
   });
   // ── 문서 만료일
   (Array.isArray(vdocs) ? vdocs : []).forEach(d => {
@@ -40114,7 +40239,7 @@ function calSwipeBind(){
 // 줄을 누르면 그 기록 창으로. ★ 달력은 기록을 품지 않는다 — 원래 자리로 보낸다.
 function calGo(kind, id){
   const K = { plan:'voyage', voyage:'voyage', maint:'maint', maintDone:'maint', mlog:'mlog',
-              repair:'repair', repairDone:'repair', vdoc:'vdoc' }[kind];
+              repair:'repair', repairDone:'repair', vdoc:'vdoc', fuel:'fuel' }[kind];
   if(!K) return;
   openMR(K, id);
 }
@@ -42701,8 +42826,22 @@ function fuelSet(){
 function fuelSetPut(o){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   if(!b) return;
-  b.fuelSet = Object.assign({}, b.fuelSet || {}, o);
+  // ★ 5.28 — 고친 때(_at)를 함께 적고 클라우드에도 올린다. 다른 기기는 나중 것을 따른다.
+  b.fuelSet = Object.assign({}, b.fuelSet || {}, o, { _at: Date.now() });
   save(); renderFuel();
+  if(typeof fuelSetUpload === 'function') fuelSetUpload(b);
+}
+// 배 설정을 올릴 권한(배 정보 쓰기)이 있을 때만 올린다 — 없으면 이 기기에만 남는다(규칙이 막는다).
+function fuelSetUpload(b){
+  try{
+    if(!b || typeof saveBoatCloud !== 'function') return;
+    if(typeof can === 'function' && !can(b, 'boat', 'write')) return;
+    saveBoatCloud(b, true);
+  }catch(_){}
+}
+// 연료 설정에 사람이 적은 것이 있나 (_at 만 있는 빈 껍데기는 아니다)
+function fuelSetHas(fs){
+  return !!(fs && typeof fs === 'object' && Object.keys(fs).some(k => k !== '_at' && fs[k] != null));
 }
 // 사람이 적은 L/시간 (없으면 null)
 function fuelLphSet(){
@@ -43513,10 +43652,14 @@ function mrPickBtn(label, onclick){
 function gearPickRow(it, kind){
   const cur = String(it.gearId || '');
   const now = gearOf(cur);
-  const val = now ? esc(t(gearSysOf(now))) + ' · ' + esc(gearLabel(now)) : esc(t('선택 안 함'));
+  // ★ 5.27 — 등록 안 한 장비는 이름만 쳐 둘 수 있다 (gearName). 장비 목록에는 안 들어간다.
+  //   사장님: 「수리랑 정기점검은 꼭 등록된 장비가 아닐수도 있으니가 자기가 칠수도 있게」
+  const typed = !now && String(it.gearName || '').trim();
+  const val = now ? esc(t(gearSysOf(now))) + ' · ' + esc(gearLabel(now))
+            : typed ? esc(typed) : esc(t('선택 안 함'));
   return `<div class="mrrow"><span class="mrlbl">${esc(t('장비'))}</span>${unlocked
     ? mrPickBtn(val, `gearPick('${jsq(String(it.id))}','${jsq(kind)}')`)   // 장비가 없어도 칸은 늘 보인다 — 목록 끝 「장비 추가」
-    : `<b class="mrv" style="flex:1">${esc(now ? gearLabel(now) : '—')}</b>`}${
+    : `<b class="mrv" style="flex:1">${esc(now ? gearLabel(now) : (typed || '—'))}</b>`}${
     now ? ` <button class="minib blu" onclick="openMR('gear','${now.id}')">${esc(t('장비 보기'))}</button>` : ''}</div>`;
 }
 function gearPick(id, kind){
@@ -43531,38 +43674,58 @@ function gearPick(id, kind){
   const 나머지 = 정렬(rows.filter(g => pri.indexOf(gearSysOf(g)) < 0));
   const opts = [{ v:'', name:'선택 안 함' }]
     .concat(먼저.concat(나머지).map(g => ({ v:String(g.id), name:gearLabel(g), sub:gearSysOf(g) || '' })))
-    .concat([{ v:'__add', name:'장비 추가' }]);
+    .concat([{ v:'__type', name:'직접 입력' }, { v:'__add', name:'장비 추가' }]);
+  const typedNow = !gearOf(String(rec.gearId || '')) && String(rec.gearName || '').trim();
   openForm({
     title: rec.name || rec.title || t('장비'),
     okText: '선택',
-    fields: [ { key:'g', label:'장비', type:'pick', value:String(rec.gearId || ''), options:opts } ],
+    fields: [ { key:'g', label:'장비', type:'pick', value: typedNow ? '__type' : String(rec.gearId || ''), options:opts } ],
     onOk: v => {
       if(v.g === '__add'){ setTimeout(() => gearMakeFor(id, kind), 0); return; }
+      if(v.g === '__type'){
+        setTimeout(async () => {
+          const s = await askText(t('장비'), String(rec.gearName || ''));
+          if(s == null) return;
+          const r2 = getMR(kind, id); if(!r2) return;
+          r2.gearId = ''; mrOpenType = kind; mrOpenId = id;
+          mrField('gearName', String(s).trim());
+        }, 0);
+        return;
+      }
       mrOpenType = kind; mrOpenId = id;
+      const r2 = getMR(kind, id); if(r2 && v.g) r2.gearName = '';   // 등록된 장비를 고르면 쳐 둔 이름은 지운다
       mrField('gearId', v.g || '');
     }
   });
 }
-// 정기점검 계통 — 누르면 목록. 목록에 없는 것은 「직접 입력」.
-function grpPick(id){
+// 계통 — 누르면 목록. 목록에 없는 것은 「직접 입력」.
+// ★ 5.27 — 정기점검(사장님 지적)과 수리(「내가 그렇게 바꾸라 했잖아」)가 같은 문을 쓴다.
+//   정기점검은 비우지 않는다(기본 「기타」). 수리는 비워 둘 수 있다(「선택 안 함」).
+function grpPick(id, kind){
   if(!unlocked) return;
-  const rec = getMR('maint', id); if(!rec) return;
-  const opts = allGrps().map(g => ({ v:g, name:keyShow(g) }))
+  const K = kind === 'repair' ? 'repair' : 'maint';
+  const rec = getMR(K, id); if(!rec) return;
+  const dflt = K === 'repair' ? '' : '기타';
+  const gs = allGrps().slice();
+  if(rec.grp && gs.indexOf(rec.grp) < 0) gs.push(rec.grp);
+  const opts = (K === 'repair' ? [{ v:'', name:'선택 안 함' }] : [])
+    .concat(gs.map(g => ({ v:g, name:keyShow(g) })))
     .concat([{ v:'__new', name:'직접 입력' }]);
   openForm({
-    title: rec.name || t('정기점검'),
+    title: rec.name || rec.title || t(K === 'repair' ? '수리' : '정기점검'),
     okText: '선택',
-    fields: [ { key:'g', label:'계통', type:'pick', value:rec.grp || '기타', options:opts } ],
+    fields: [ { key:'g', label:'계통', type:'pick', value:rec.grp || dflt, options:opts } ],
     onOk: v => {
-      mrOpenType = 'maint'; mrOpenId = id;
+      mrOpenType = K; mrOpenId = id;
       if(v.g === '__new'){
         setTimeout(async () => {
           const s = await askText(t('계통'), '');
-          if(s != null && String(s).trim()){ mrOpenType = 'maint'; mrOpenId = id; mrGrpSet(String(s).trim(), '기타'); }
+          if(s != null && String(s).trim()){ mrOpenType = K; mrOpenId = id; mrGrpSet(String(s).trim(), dflt); }
         }, 0);
         return;
       }
-      mrGrpSet(v.g, '기타');
+      if(K === 'repair' && !v.g){ mrField('grp', ''); return; }
+      mrGrpSet(v.g, dflt);
     }
   });
 }
@@ -43576,7 +43739,9 @@ function gearMakeFor(id, kind){
   if(!rec) return;
   const g = gearNew();
   const 제목 = String(rec.name || rec.title || '').trim();
-  g.name = 제목.replace(/\s*(점검|교체|교환|수리|고장|확인|청소|정비)\s*$/, '').trim() || 제목;
+  const 쳐둔것 = String(rec.gearName || '').trim();   // 직접 입력해 둔 장비 이름이 있으면 그것으로 (5.27)
+  g.name = 쳐둔것 || 제목.replace(/\s*(점검|교체|교환|수리|고장|확인|청소|정비)\s*$/, '').trim() || 제목;
+  rec.gearName = '';
   if(rec.grp) g.sys = gearSysFor(rec.grp)[0] || '';   // 정기점검 계통(엔진)을 장비 계통(추진)으로 (5.27)
   maint.push(g);
   rec.gearId = String(g.id);
@@ -43974,7 +44139,7 @@ function cvData(){
                   || String(a.name || '').localeCompare(String(b2.name || ''), 'ko'))
     .map(m => ({
       name: m.name || '', grp: keyShow(m.grp || '기타'),
-      cycle: String(m.months || '') + (UNIT_LABEL[m.unit || 'm'] || '')
+      cycle: mHasMonths(m) ? String(m.months) + (UNIT_LABEL[m.unit || 'm'] || '') : ''
              + ((parseFloat(m.hrs) > 0) ? ' · ' + tsub('엔진 {n}시간', { n: parseFloat(m.hrs) }) : ''),
       last: m.lastDate || '', lastH: (m.lastH != null && m.lastH !== '') ? Number(m.lastH) : null,
       // ★ 지난 이력 — 날짜와 **그때의 엔진시간**
@@ -46168,8 +46333,8 @@ function renderCheck(){
       <span class="ckbox">${on?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>':''}</span>
       <span class="cklbl">${esc(c.label)}</span>
       ${c.who?`<span class="chip whochip">${esc(taskOwnerName(curBoat(), c.who))}</span>`:''}
-      ${c.url?`<a class="mrbtn cklink" href="${esc(c.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(t('바로가기'))}</a>`:''}
-      <button class="minib edt" onclick="event.stopPropagation();ckRowMenu('${c.id}')">${esc(t('수정'))}</button>
+      <span class="ckacts">${c.url?`<a class="mrbtn cklink" href="${esc(c.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${esc(t('바로가기'))}</a>`:''}
+      <button class="minib edt" onclick="event.stopPropagation();ckRowMenu('${c.id}')">${esc(t('수정'))}</button></span>
     </div>`;
   }).join('') : `<div class="mrnone">${esc(isOrph?t('미분류 항목이 없습니다.'):t('항목이 없습니다. 아래에서 추가해 주세요.'))}</div>`;
 
@@ -50104,7 +50269,7 @@ window.__boot = 'start';
     try{ onLog(x => { try{ if(fsDead(x && (x.message || (x.args || []).join(' ')))) fsRecover(); }catch(_){} }, { level:'error' }); }catch(_){}
     const { getFirestore, collection, getDocs: _getDocs, getDoc: _getDoc, doc,
             setDoc: _setDoc, updateDoc: _updateDoc, deleteDoc: _deleteDoc,
-            query, where, orderBy, limit, startAfter, writeBatch, FieldPath,
+            query, where, orderBy, limit, startAfter, writeBatch, FieldPath, collectionGroup,
             getCountFromServer, increment, deleteField, arrayUnion, arrayRemove } =
       await 받기('firebase-firestore', './firebase/firestore.js');
     // ★ 저장과 읽기는 전부 이 문 하나를 지난다 (netWait 설명 참고).
@@ -50241,21 +50406,52 @@ window.__boot = 'start';
     // ── 계정 지우기 (탈퇴)
     //   스토어 두 곳 다 '앱 안에서 계정을 지울 수 있을 것' 을 요구한다.
     window.__account = {
-      // 내가 커뮤니티에 올린 것을 세거나(del=false) 지운다(del=true)
+      // 내가 커뮤니티에 올린 것을 세거나(del=false) 탈퇴 처리한다(del=true)
+      // ★★★ 5.29 — 사장님 「2는 2로」 (2026-10-01): 탈퇴해도 커뮤니티 글·댓글은 남기고 글쓴이를 「탈퇴한 회원」 으로.
+      //   다음 카페·네이버 카페·레딧이 그렇게 한다. 지우면 남이 단 댓글과 대화가 통째로 사라진다.
+      //   · 커뮤니티 글   → 남긴다. 이름·배 이름을 비우고 gone:true. 찾기 낱말(kw)에서도 이름을 뺀다.
+      //   · 댓글(어느 글이든) → 남긴다. 이름을 비우고 gone:true.
+      //   · 정박지·중고 장터 → 예전처럼 지운다 (사고팔 사람이 없는 물건, 내가 처음 올린 정박지).
+      //   이름을 못 비우면(규칙·막힘) 그 글·댓글은 지운다 — 이름이 남는 것보다 낫다 (처리방침 16번).
+      //   돌려주는 값: { del: 지울 것 수, keep: 남길 글 수, cmt: 남길 댓글 수 }
       async minePosts(del){
         const uid = fauth.currentUser && fauth.currentUser.uid;
-        if(!uid) return 0;
-        let n = 0;
-        for(const name of ['community','spots','market']){
+        const r = { del: 0, keep: 0, cmt: 0 };
+        if(!uid) return r;
+        const 사진 = new Set();
+        for(const name of ['spots','market']){
           let snap;
           try{ snap = await getDocs(query(collection(fdb, name), where('by','==',uid))); }
           catch(_){ continue; }
           for(const d of snap.docs){
-            if(del){ try{ await deleteDoc(d.ref); }catch(_){} }
-            n++;
+            if(del){
+              try{ await deleteDoc(d.ref); try{ photoUrlsOf(d.data()).forEach(u => 사진.add(u)); }catch(_){} }catch(_){}
+            }
+            r.del++;
           }
         }
-        return n;
+        if(del && window.__dropMinePhotos) await window.__dropMinePhotos(사진);
+        try{
+          const snap = await getDocs(query(collection(fdb, 'community'), where('by','==',uid)));
+          for(const d of snap.docs){
+            r.keep++;
+            if(!del) continue;
+            const x = d.data() || {};
+            const kw = (typeof kwOf === 'function') ? kwOf(String(x.title || '')) : [];
+            try{ await updateDoc(d.ref, { byName: '', boatName: '', gone: true, kw: kw }); }
+            catch(_){ try{ await deleteDoc(d.ref); }catch(__){} }
+          }
+        }catch(_){}
+        try{
+          const snap = await getDocs(query(collectionGroup(fdb, 'comments'), where('by','==',uid)));
+          for(const d of snap.docs){
+            r.cmt++;
+            if(!del) continue;
+            try{ await updateDoc(d.ref, { byName: '', gone: true }); }
+            catch(_){ try{ await deleteDoc(d.ref); }catch(__){} }
+          }
+        }catch(_){}
+        return r;
       },
       async wipeUserDoc(){
         const uid = fauth.currentUser && fauth.currentUser.uid;
@@ -50533,9 +50729,35 @@ window.__boot = 'start';
     };
     // 배 지우기 — 딸린 기록까지 지운다.
     // 규칙상 선주만 지울 수 있고, 실패해도 기기에서는 이미 지워진 상태다.
+    // ★★★ 5.29 — 배·정박지·장터를 통째로 지울 때 그 안의 내 사진도 창고에서 치운다
+    //   (사장님 「다 그렇게 해라」 — 홈페이지 계정 삭제 안내에 「올린 사진」 이 지워진다고 적어 놓고
+    //    실제로는 하나하나 지울 때만 치우고, 배 하나·계정 하나를 통째로 지울 때는 그대로 남았다).
+    //   ★ 내 커뮤니티 글에 들어간 사진은 남긴다 — 정비 기록을 글에 넣으면 같은 사진 주소를 쓴다.
+    //     탈퇴해도 글은 남으므로(5.29) 그 사진도 남아야 글이 안 깨진다.
+    //   ★ 창고 규칙이 「내가 올린 사진」 만 지우게 하므로 남(다른 구성원)의 사진은 건드려지지 않는다.
+    async function keepPhotoSet(){
+      const keep = new Set();
+      try{
+        const uid = fauth.currentUser && fauth.currentUser.uid; if(!uid) return keep;
+        const snap = await getDocs(query(collection(fdb, 'community'), where('by','==',uid)));
+        snap.docs.forEach(d => { try{ photoUrlsOf(d.data()).forEach(u => keep.add(u)); }catch(_){} });
+      }catch(_){}
+      return keep;
+    }
+    async function dropMinePhotos(urls){
+      try{
+        if(!urls || !urls.size || typeof dropPhotos !== 'function') return 0;
+        const keep = await keepPhotoSet();
+        return await dropPhotos([...urls].filter(u => !keep.has(u)));
+      }catch(_){ return 0; }
+    }
+    window.__dropMinePhotos = dropMinePhotos;
     window.__delBoat = async (boatId) => {
       if(!fauth.currentUser || !boatId) return false;
       const id = String(boatId);
+      const 사진 = new Set();
+      const 사진담기 = x => { try{ photoUrlsOf(x).forEach(u => 사진.add(u)); photoUrlsOf({ blocks: (x && x.intro) || [] }).forEach(u => 사진.add(u)); }catch(_){} };
+      try{ const bd = await getDoc(doc(fdb, 'boats', id)); if(bd.exists()) 사진담기(bd.data()); }catch(_){}
       const colls = ['all','items','trash','maint','repair','voyage','fuel','runs',
                      'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs',
                      'reviews','meta'];
@@ -50544,6 +50766,7 @@ window.__boot = 'start';
       await Promise.all(colls.map(async name => {
         try{
           const snap = await getDocs(collection(fdb, 'boats', id, name));
+          snap.docs.forEach(d => 사진담기(d.data()));
           for(let off=0; off<snap.docs.length; off+=200){
             const b = writeBatch(fdb);
             snap.docs.slice(off, off+200).forEach(d=>b.delete(d.ref));
@@ -50554,6 +50777,7 @@ window.__boot = 'start';
       try{ await window.__boatIndex.del(id); }catch(_){}   // 배를 지우기 전에 — 지운 뒤에는 선주인지 가릴 수 없다
       try{ await deleteDoc(doc(fdb, 'boats', id)); }
       catch(e){ return (e && e.code === 'permission-denied') ? 'denied' : false; }
+      await dropMinePhotos(사진);   // 배가 지워진 뒤에 — 못 지운 배의 사진을 먼저 치우면 기록이 깨진다
       return true;
     };
     // ── 신고

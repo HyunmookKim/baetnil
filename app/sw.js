@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-5.30';
+const CACHE = 'baetnil-5.32';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -128,6 +128,7 @@ async function trimSeen(){
 //     4.82 에서 새로 팠다. 이것이 없으면 화면을 돌아올 때마다 다시 받는다
 //     (창고가 「저장하지 마라」 를 붙여 보내기 때문이다 — 위 주석 참고).
 //     ★ 오래된 것부터 버린다. ①의 400장은 건드리지 않는다.
+let photoCors = null;   // 5.32 — 사진 창고가 cors 를 허용하나 (모름 · 된다 · 막힘)
 async function photoFetch(req){
   try{
     const c = await caches.open(PHOTOS);
@@ -140,7 +141,17 @@ async function photoFetch(req){
     if(hit2) return hit2;
   }catch(_){}
   try{
-    const res = await fetch(req);
+    // ★★★ 5.32 — 사진(<img>)이 부르는 요청은 no-cors 라 받은 것이 「불투명(opaque, status 0)」 이다.
+    //   그래서 아래 「200 만 담는다」 에 한 번도 안 걸렸고, 본 사진이 SEEN 에 하나도 안 남았다 —
+    //   화면을 돌아올 때마다 다시 받았다(사진 창고 요금). 사진 창고 주소는 cors 로 다시 불러 담을 수 있는 응답을 받는다.
+    //   cors 가 안 되면(허용 설정이 없을 때) 예전처럼 원래 요청으로 받는다 — 사진은 그대로 보인다.
+    //   ★ cors 가 한 번 막히면 이 서비스워커가 도는 동안은 다시 안 해 본다 — 막힐 때마다 두 번씩 받게 되므로.
+    let res = null;
+    if(photoCors !== false){
+      try{ res = await fetch(new Request(req.url, { mode:'cors', credentials:'omit' })); photoCors = true; }
+      catch(_){ res = null; photoCors = false; }
+    }
+    if(!res || res.status !== 200) res = await fetch(req);
     // ★ 200 만 담는다. 오류 화면을 담아 두면 그 사진이 영영 안 보인다.
     if(res && res.status === 200){
       const copy = res.clone();

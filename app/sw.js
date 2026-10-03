@@ -1,4 +1,4 @@
-const CACHE = 'baetnil-5.34';
+const CACHE = 'baetnil-5.35';
 const TILES = 'baetnil-tiles';   // 지도 타일 전용 (앱 버전을 올려도 지우지 않는다)
 const PHOTOS = 'baetnil-photos'; // 창고 사진 전용 (앱 버전을 올려도 지우지 않는다)
 
@@ -204,6 +204,10 @@ self.addEventListener('fetch', e=>{
   //   여기서 담으면 부를 때마다 주소가 달라 **같은 자료가 끝없이 쌓였다**(tide.json 3MB 가 부를 때마다 한 벌씩).
   //   그리고 없는 파일의 404 까지 담아서, 나중에 파일이 생겨도 영영 404 로 나왔다.
   if(u.searchParams.has('v')){ return; }
+  // ★★★ 5.35 — 물때·조류·조석 모형은 앱이 「바뀌었을 때만 받기」(cache:'no-cache') 로 부른다(?v= 없이).
+  //   여기서 저장분 우선으로 주면 새 물때가 영영 안 온다 — 브라우저 HTTP 캐시(ETag·304)에 맡기고 건드리지 않는다.
+  if(e.request.cache === 'no-cache' || e.request.cache === 'no-store' || e.request.cache === 'reload'){ return; }
+  if(/\/(tide|current|tide-[a-z]+)\.json$|\/hc-eot20\.txt$/.test(u.pathname)){ return; }
 
   // 아이콘·매니페스트 같은 것은 저장분 우선 (배 위에서 인터넷이 없다)
   e.respondWith(

@@ -2527,6 +2527,13 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
   // 폰 맨 위 시계 줄 글자 색 — 흰 화면이면 짙은 글자, 아니면 밝은 글자
   function statusBar(){
     try{
+      // ★ 5.33 — 안드로이드는 @capacitor/status-bar 를 빼고(플레이 「지원 중단된 API」 권장 조치) 앱 부품 BaetnilBars 로 한다.
+      //   글자 색은 SystemBars(캐퍼시터 8)와 같은 길(setAppearanceLightStatusBars), 14 이하 바탕색은 그쪽에서만 칠한다.
+      const BB = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.BaetnilBars;
+      if(BB && BB.setStyle){
+        BB.setStyle({ light: theme === 'light', color: theme === 'light' ? '#FFFFFF' : theme === 'black' ? '#000000' : '#122A44' }).catch(()=>{});
+        return;
+      }
       const SB = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
       if(SB && SB.setStyle) SB.setStyle({ style: theme === 'light' ? 'LIGHT' : 'DARK' }).catch(()=>{});
       // ★ 5.21 — 안드로이드 14 이하는 시계 줄이 제 바탕색을 따로 갖는다(15 부터는 앱 화면이 그 밑까지 그려져 이 값은 쓰이지 않는다).
@@ -26738,7 +26745,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.32';
+const APP_VER = '5.33';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -31897,6 +31904,16 @@ function openMR(kind, id){
       { mode:'view', line: (typeof trkLine === 'function') ? trkLine(it) : null,
         vid: it.id, track:true }));
   }
+}
+// ★★★ 5.33 — 「이 기록 창이 지금 화면에 떠 있는가」 는 여기 한 곳에서 본다 (문 하나).
+//   mrOpenType·mrOpenId 만 보면 안 된다 — 승선 이력 종이·배 이력서처럼 같은 창(#mrPanel)에 다른 것을 띄워도
+//   두 값은 남아 있어서, 날씨·항적이 늦게 끝난 뒤 그 화면을 항해일지로 덮어 버렸다
+//   (에뮬레이터 검사 「승선 이력 종이 — 종이도 안내도 안 뜸」). 기록 창이 떠 있으면 openMR 이 'rec' 를 넣고,
+//   다른 것을 띄우면 showPanel 이 뺀다.
+function mrShown(kind, id){
+  const P = document.getElementById('mrPanel');
+  return !!P && P.classList.contains('open') && P.classList.contains('rec')
+    && mrOpenType === kind && mrOpenId != null && String(mrOpenId) === String(id);
 }
 function closeMR(){
   const P = document.getElementById('mrPanel');
@@ -41235,7 +41252,12 @@ function arriveNow(){
                    { a: durText(sh) || '0분', b: durText(eh) || '0분' }), { kind:'good' }); }catch(_){}
   posHere('wxIn', it.id, true, () => wxCapture('wxIn', it.id));
   // ★ 입항을 찍으면 항적도 끝내고, 도착 뒤 점도 잘라낸다 (문 하나).
-  try{ voyArrived(it, true).then(()=>{ try{ openMR('voyage', it.id); }catch(e){} }); }catch(e){}
+  // ★ 5.33 — 항적 멈추기(voyArrived)는 몇 초 걸린다. 그사이 다른 화면(승선 이력 종이·메뉴 등)으로 옮겼으면
+  //   그 화면을 이 항해일지로 덮어 버렸다(에뮬레이터 검사 「승선 이력 종이 — 종이도 안내도 안 뜸」: 종이가 열린 뒤
+  //   항해일지가 다시 그려짐). 아직 이 항해일지 창이 떠 있을 때만 다시 그린다.
+  try{ voyArrived(it, true).then(()=>{ try{
+    if(mrShown('voyage', it.id)) openMR('voyage', it.id);
+  }catch(e){} }); }catch(e){}
   renderVoyage(); openMR('voyage', it.id);
 }
 
@@ -42676,7 +42698,7 @@ function posHere(key, vid, quiet, done){
     if(!quiet) tell(t('이 기기에서는 위치 기능을 사용할 수 없습니다.'));
     fin(); return;
   }
-  const draw = ()=>{ if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id); };
+  const draw = ()=>{ if(mrShown('voyage', id)) openMR('voyage', id); };
   posPut(it, key, { lat:null, lon:null, acc:null, pending:true });
   draw();
   geoGet(String(key).startsWith('log:') ? '항해일지 중간 기록 위치'
@@ -42787,7 +42809,7 @@ async function wxCapture(key, vid){
   if(ts == null){ put({ text:t('시각을 먼저 입력해 주세요'), at:'', spot:'' }); saveMR(); renderVoyage(); openMR('voyage', id); return; }
 
   put({ text:t('받는 중…'), at:'', spot:'' });
-  if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id);
+  if(mrShown('voyage', id)) openMR('voyage', id);
   try{
     const d = await wxAtPoint(src.lat, src.lon);
     const H = d.w && d.w.hourly;
@@ -42834,7 +42856,7 @@ async function wxCapture(key, vid){
     put({ text: tsub('받지 못함: {why}', {why: e.message || t('인터넷 확인')}), at:'', spot:'' });
   }
   saveMR(); renderVoyage();
-  if(mrOpenType==='voyage' && String(mrOpenId)===String(id)) openMR('voyage', id);
+  if(mrShown('voyage', id)) openMR('voyage', id);
 }
 
 // ----- 연료 -----

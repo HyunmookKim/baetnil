@@ -538,7 +538,7 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .fopt span{color:#8a97a8;font-size:12px}
 .fopt.on{border-color:#4ad9ff;background:#12314a}
 .fopt.on b{color:#cfefff}
-.formFoot{padding:12px 16px calc(12px + env(safe-area-inset-bottom));border-top:1px solid #1e3a5a;
+.formFoot{padding:12px 16px calc(12px + var(--sab));border-top:1px solid #1e3a5a;
   display:flex;gap:9px;align-items:center}
 .fbtn{flex:1;border-radius:9px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;
   background:#14304a;border:1px solid #2a5a8a;color:#9ed0f5}
@@ -697,7 +697,7 @@ body.hasfab{padding-bottom:calc(var(--tabh,62px) + 88px)}
 /* 아래 탭줄은 덮지 않는다. 덮으면 다른 데로 갈 방법이 없어진다 (2.4 의 교훈).
    머리줄의 삼선과 아래 탭줄, 두 갈래로 항상 나갈 수 있다. */
 #mrPanel.full{top:var(--hdrH,56px);bottom:62px;max-height:none;border-radius:0;border-top:none;
-  padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  padding-bottom:calc(24px + var(--sab))}
 #mrPanel input,#mrPanel textarea,#mrPanel select{background:#0c1e30;border:1px solid #1e4060;border-radius:7px;color:#c8dff0;padding:7px 10px;font-size:13px;outline:none}
 .mrrow{display:flex;gap:8px;margin:7px 0;align-items:center;flex-wrap:wrap}
 /* ★ 4.118 — 장비에 매달 것을 고르는 줄. 줄 아무 데나 눌러도 골라진다(label).
@@ -971,7 +971,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .itcard.edcard{padding-top:2px}
 @media (prefers-reduced-motion:reduce){ .btflash{animation:none;outline:2px solid rgba(156,198,232,.55)} }
 #snack{position:fixed;left:50%;transform:translateX(-50%) translateY(140%);
-  bottom:calc(70px + env(safe-area-inset-bottom));
+  bottom:calc(70px + var(--sab));
   z-index:9400;max-width:min(520px,calc(100vw - 28px));width:max-content;
   display:flex;align-items:center;gap:10px;
   padding:12px 16px;border-radius:14px;
@@ -1000,7 +1000,7 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .actov{align-items:flex-end;padding:0}
 .actbox{width:100%;max-width:520px;margin:0 auto;
   background:var(--sf,#15171B);border-top:1px solid var(--bd,#1B2E3E);
-  border-radius:18px 18px 0 0;padding:10px 14px calc(14px + env(safe-area-inset-bottom));
+  border-radius:18px 18px 0 0;padding:10px 14px calc(14px + var(--sab));
   box-shadow:0 -10px 34px rgba(0,0,0,.5);max-height:80vh;display:flex;flex-direction:column}
 /* 잡는 손잡이 — 아래에서 올라온 칸이라는 것을 알려 준다 (글자를 안 쓴다) */
 .acttit{width:38px;height:4px;border-radius:999px;background:var(--bd,#1B2E3E);
@@ -1146,7 +1146,7 @@ body.pnsc #mrPanel .mrhead::before, body.pnsc #mrPanel > .mrtop::before{opacity:
 .mob122{background:var(--red);color:#2A0E0C}
 .mobx{background:rgba(255,255,255,.16);color:#fff}
 /* 항해 중에만 화면에 떠 있는 단추 (4.66). 어느 탭에 있든 한 번에 닿아야 한다. */
-.mobfab{position:fixed;right:12px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:8000;
+.mobfab{position:fixed;right:12px;bottom:calc(74px + var(--sab));z-index:8000;
   display:none;align-items:center;gap:8px;min-height:54px;padding:0 20px;border:0;border-radius:999px;
   cursor:pointer;background:rgba(228,117,106,.92);backdrop-filter:blur(14px);
   color:#2A0E0C;font-size:16px;font-weight:900;letter-spacing:.02em;
@@ -1188,7 +1188,7 @@ body.pnsc #mrPanel .mrhead::before, body.pnsc #mrPanel > .mrtop::before{opacity:
 #tabbar button.on{color:var(--ac);background:#17191D}
 #tabbar svg{width:22px;height:22px}
 #drawerOv{position:fixed;inset:0;background:#000a;z-index:80;display:none}
-.dver{padding:12px 16px calc(14px + env(safe-area-inset-bottom));color:#93AABD;font-size:11.5px;line-height:1.5}
+.dver{padding:12px 16px calc(14px + var(--sab));color:#93AABD;font-size:11.5px;line-height:1.5}
 .dver.warn{color:#f0c98a}
 #drawerOv.open{display:block}
 #drawer{position:absolute;top:0;right:0;bottom:0;width:min(290px,82vw);background:#15171B;border-left:1px solid #24272C;padding:14px 0;display:flex;flex-direction:column;overflow:auto}
@@ -1723,12 +1723,12 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 /* 화면 하나가 쓰는 여백 — 아래 탭줄에 안 가리게 아래를 넉넉히 둔다 */
 #mrPanel,#panel,#formOv .formBox,#hatPanelOv #hatPanelBody,
 #trashView .trashBox,#helpOv .helpbox{
-  padding:14px 20px calc(86px + env(safe-area-inset-bottom));
+  padding:14px 20px calc(86px + var(--sab));
 }
 #panel{display:none;flex-direction:column}
 #panel.open{display:block}
 #mrPanel.open{display:block}
-#mrPanel.full{top:auto;bottom:auto;padding:14px 20px calc(86px + env(safe-area-inset-bottom))}
+#mrPanel.full{top:auto;bottom:auto;padding:14px 20px calc(86px + var(--sab))}
 
 /* 화면이 떠 있을 때 머리줄에는 한 줄만 남긴다 (이름줄은 남긴다) */
 body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
@@ -1737,8 +1737,8 @@ body.panelfull header > *:not(.hrow):not(#hNav){display:none!important}
 /* ★ 오늘·출항 전 점검과 같은 결로 맞춘다.
    지금은 이름표와 값이 각각 상자에 갇혀 있어서 서식 작성 화면처럼 보인다.
    한 줄이 하나의 유리 카드가 되고, 그 안에서 이름표는 왼쪽·값은 오른쪽에 앉는다. */
-#mrPanel.full{padding:14px 20px calc(24px + env(safe-area-inset-bottom))}
-#panel{padding:14px 20px calc(24px + env(safe-area-inset-bottom))}
+#mrPanel.full{padding:14px 20px calc(24px + var(--sab))}
+#panel{padding:14px 20px calc(24px + var(--sab))}
 
 #mrPanel.full .mrrow{
   background:rgba(255,255,255,.045);border-radius:14px;
@@ -2313,6 +2313,19 @@ header{padding-top:var(--sat)}
 #formOv,#dgPick,#trashView,#helpOv,#hatPanelOv{padding-top:var(--sat)}
 #drawer{padding-top:calc(14px + var(--sat))}
 #panel{padding-top:calc(14px + var(--sat))}
+/* ── 아래 내비게이션 줄(세 단추·제스처 막대) 비켜 가기 (5.34) ─────────────
+   ★ 아래 여백도 한 곳(--sab)에만 둔다. 아이폰·웹은 예전처럼 env(safe-area-inset-bottom).
+   ★ 안드로이드는 앱(MainActivity)이 내비게이션 줄 높이를 재서 __sab 로 준다 — 웹뷰가 env 값을 주는지는 웹뷰 판마다 다르다.
+     그때 html 에 sabn 표시를 달고, 아래 탭 줄을 그만큼 늘리고 탭 줄 위에 붙는 것들을 그만큼 올린다.
+     (안드로이드 14 이하도 5.34 부터 화면 끝까지 그린다 — 플레이 권장 EdgeToEdge.enable) */
+:root{--sab:env(safe-area-inset-bottom,0px)}
+html.sabn #tabbar{border-bottom:var(--sabn,0px) solid transparent}
+html.sabn body:not(.hasfab){padding-bottom:calc(66px + var(--sabn,0px))}
+html.sabn #panel{bottom:calc(62px + var(--sabn,0px))}
+html.sabn #mrPanel{bottom:calc(62px + var(--sabn,0px))}
+html.sabn #mrPanel.full{bottom:calc(62px + var(--sabn,0px))}
+html.sabn #errbar{bottom:calc(74px + var(--sabn,0px))}
+html.sabn .pickbar{bottom:calc(64px + var(--sabn,0px))}
 
 /* ══ 밑으로 펼쳐지는 고르기 (4.88) ═══════════════════════════════════════
    ★ 새 모양을 만들지 않는다. 판은 .hcard 가 쓰는 유리, 줄은 .tab / .tab.on
@@ -2566,6 +2579,32 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     }catch(_){}
   };
   try{ const v0 = Number(localStorage.getItem('bt_sat')); if(v0 > 0 && v0 < 120) satSet(v0); }catch(_){}
+  // ★★★ 5.34 — 안드로이드: 아래 내비게이션 줄 높이(기기 픽셀)를 앱(MainActivity)이 알려 준다. 0 이면 내비게이션 줄이 없거나 숨김.
+  //   받은 값은 적어 두고 다음에 켤 때 곧바로 쓴다(앱이 알려 주기 전 첫 화면부터 탭 줄이 비켜 가게) — 안드로이드 앱에서만.
+  function sabSet(v){
+    const R = document.documentElement;
+    if(R.style.getPropertyValue('--sabn') !== v + 'px'){
+      R.style.setProperty('--sab', v + 'px');
+      R.style.setProperty('--sabn', v + 'px');
+    }
+    R.classList.toggle('sabn', v > 0);
+    try{ if(typeof paintFab === 'function') paintFab(); }catch(_){}   // 탭 줄 높이(--tabh)를 다시 잰다
+  }
+  window.__sab = function(px){
+    try{
+      const v = Math.round(Number(px) / (window.devicePixelRatio || 1) * 10) / 10;
+      if(!(v >= 0 && v < 200)) return;
+      sabSet(v);
+      try{ localStorage.setItem('bt_sab', String(v)); }catch(_){}
+    }catch(_){}
+  };
+  try{
+    const C = window.Capacitor;
+    if(C && C.isNativePlatform && C.isNativePlatform() && C.getPlatform && C.getPlatform() === 'android'){
+      const s0 = localStorage.getItem('bt_sab');
+      if(s0 != null && s0 !== ''){ const v1 = Number(s0); if(v1 >= 0 && v1 < 200) sabSet(v1); }
+    }
+  }catch(_){}
   window.btLook = {
     theme: () => theme, size: () => fs, THEMES, SIZES,
     // ★ 5.21 — 아이폰은 화면이 다시 나타날 때마다 상태 표시줄 부품이 글자 색을 「기본」 으로 되돌린다.
@@ -17976,6 +18015,7 @@ async function trkBufStop(){
 //   ★ 자바가 준 수와 담은 수를 항해에 남긴다. 이게 없어서 9/17 에도 에둘러 증명해야 했다.
 // ══════════════════════════════════════════════════════════════════
 let trkDraining = false;
+const TRK_BEFORE_MS = 60000;   // 항해 시작보다 이만큼 넘게 앞선 점은 지난 기록의 찌꺼기로 본다 (5.34)
 async function trkBufDrain(){
   const P = trkP();
   if(!P || !trkNow || trkDraining) return 0;
@@ -17992,6 +18032,11 @@ async function trkBufDrain(){
         const q = arr[i];
         if(!q || !isFinite(q.la) || !isFinite(q.lo) || !isFinite(q.t)) continue;
         if(q.mk === 1){ trkNow.mock = (Number(trkNow.mock) || 0) + 1; continue; }
+        // ★★★ 5.34 — 이 항해를 시작하기 전에 찍힌 점은 받지 않는다.
+        //   기록 장치가 앱이 꺼졌다 켜져도 스스로 다시 켜지므로(안드로이드·아이폰), 지난 항해가 끝난 뒤
+        //   파일에 남은 점이 다음 항해 앞에 섞일 수 있다. 시계 차이를 생각해 1분은 봐준다.
+        { const f0 = Date.parse(trkNow.from);
+          if(isFinite(f0) && Number(q.t) < f0 - TRK_BEFORE_MS){ trkNow.old = (Number(trkNow.old) || 0) + 1; continue; } }
         // ★ 5.10 — 기지국·와이파이로 잡은 위치는 받지 않는다 (서비스도 이제 GPS 만 받는다. 예전 버전이 남긴 줄 대비)
         const ac      = (q.ac == null ? NaN : Number(q.ac));
         // ★ 5.32 — 위성 점인지는 공급원으로 가른다 (trkSatPt). 안드로이드 gps · 아이폰은 속도를 준 점
@@ -18064,8 +18109,15 @@ async function trkBufStat(){
     const r = await P.status();
     trkNow.bufRun   = !!(r && r.running);
     trkNow.bufBytes = Number(r && r.bytes) || 0;
+    // ★ 5.34 — 아이폰: 앱이 꺼졌다 켜지며 기록 장치가 스스로 이어 붙였으면 항해에 남긴다 (백업으로 확인)
+    if(r && r.relaunch) trkNow.relaunch = true;
     return r;
   }catch(_){ return null; }
+}
+// 기록 중인 항해가 없을 때도 장치 상태를 본다 (trkResume)
+async function trkBufStatRaw(){
+  const P = trkP(); if(!P || typeof P.status !== 'function') return null;
+  try{ return await P.status(); }catch(_){ return null; }
 }
 // ★ 앱이 죽어도 기록 중이던 것이 남아야 한다. 배 위에서 앱이 한 번 꺼지면
 //   그 항해 항적을 통째로 잃는다.
@@ -18904,6 +18956,9 @@ async function trkStop(){
       it.trkStat = { got: Number(cur.got) || 0, kept: (cur.pts || []).length,
                      drop: Number(cur.drop) || 0, mock: Number(cur.mock) || 0,
                      saved: pts.length };
+      // ★ 5.34 — 지난 기록 찌꺼기로 버린 점 · 앱이 꺼졌다 켜지며 기록 장치가 스스로 이어 붙였는지
+      if(Number(cur.old) > 0) it.trkStat.old = Number(cur.old);
+      if(cur.relaunch) it.trkStat.relaunch = true;
       try{ saveMR(); }catch(e){}
       try{ schedulePush(); }catch(e){}
       try{ renderVoyage(); }catch(e){}
@@ -18961,7 +19016,15 @@ async function trkResume(){
   if(!isNative()) return;
   trkLoad();
   mobFabSync();
-  if(!trkNow) return;
+  if(!trkNow){
+    // ★★★ 5.34 — 기록 장치는 앱이 꺼졌다 켜져도 스스로 다시 켜진다(안드로이드 START_STICKY · 아이폰 BaetnilTrackRec).
+    //   앱 쪽에 기록 중인 항해가 없는데 장치만 돌고 있으면 끈다 — 배터리가 새지 않게, 다음 항해에 옛 점이 섞이지 않게.
+    try{
+      const st = await trkBufStatRaw();
+      if(st && st.running){ await trkBufStop(); const P = trkP(); if(P) await P.drain(); }
+    }catch(_){}
+    return;
+  }
   // 앱이 꺼져 있는 사이에 그 항해가 없어졌을 수 있다 — 그러면 되살리지 않는다
   if(await trkDropIfGone()) return;
   trkNow.id = null;
@@ -26745,7 +26808,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.33';
+const APP_VER = '5.34';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [

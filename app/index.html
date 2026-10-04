@@ -1061,8 +1061,27 @@ body.pnsc #mrPanel .mrhead::before, body.pnsc #mrPanel > .mrtop::before{opacity:
    머티리얼 「Scrolling techniques」: 탭 줄은 위에 붙어 남는다(the tab bar stays anchored at the top).
    애플 HIG 「Tab bars」: 갈래를 옮겨 다니는 동안 탭 줄을 계속 보이게 둔다. 찾기 칸은 목록 위에 두고 붙이지 않는다 — 붙이는 줄은 화면마다 하나만. */
 .pinbar{position:sticky;top:var(--stickyTop,var(--hdrH,56px));z-index:6}
-body.scrolled .pinbar{background:rgba(6,18,31,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  box-shadow:0 8px 14px -10px rgba(0,0,0,.7)}
+/* ★★★ 5.37 — 5.35 는 붙여 둔 줄 뒤를 거의 검정(.94)으로 통째로 칠하고 그림자 선까지 넣었다.
+   9/10(4.123) 에 사장님이 「꼭 검정 선을 넣어서 글 읽는 칸을 잘라먹어야 하나」 로 이미 없앤 바로 그 검은 띠를 다시 만든 것이다.
+   (사장님 10/4: 「그냥 검은띠 만들어놓은거잖아 … 엣날에도 분명 지적했는데」)
+   → 4.123 과 같은 문: 색을 칠하지 않고 뒤만 흐린다(애플 뉴스·사파리) · 아래 끝은 선 없이 서서히 · 맨 위에서는 안 보인다.
+   ★ 흐림 판은 ::before 라 줄 자신이 옆으로 밀리는 칸(overflow)이면 잘린다 — 그래서 밀리는 칸은 안에 두고 .pinbar 는 바깥 껍데기로만 쓴다. */
+.pinbar::before{
+  content:'';position:absolute;left:calc(-1 * var(--pbl,0px));right:calc(-1 * var(--pbr,0px));top:-14px;bottom:-14px;z-index:-1;
+  pointer-events:none;opacity:0;transition:opacity .2s linear;
+  background:rgba(6,18,31,.42);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);backdrop-filter:blur(16px) saturate(1.2);
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 22px),transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 22px),transparent 100%)}
+/* ★ 좌우는 화면 끝까지 — 숫자(-24px)로 박으면 화면 밖으로 넘쳐 옆으로 밀린다(390 폭에서 414).
+     줄마다 화면 끝까지의 거리를 재서 넣는다 (pinbarEdges) */
+body.scrolled .pinbar::before, body.pnsc .pinbar::before{opacity:1}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .pinbar::before{background:rgba(6,18,31,.86)}
+}
+@media (prefers-reduced-motion:reduce){ .pinbar::before{transition:none} }
+/* 4.123 의 #mrPanel .mrhead::before 와 겹치면 두 겹으로 짙어진다 — 하나만 */
+#mrPanel .mrhead.pinbar::before{display:none}
 /* 5.36 — 붙여 두는 줄 안의 둘째 줄 */
 .gflt:empty{display:none}
 .gflt{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
@@ -1695,8 +1714,10 @@ header{background:linear-gradient(to bottom,rgba(10,24,40,.55),rgba(16,40,64,.18
   backdrop-filter:blur(10px);border-bottom:none}
 /* ★ 5.30 — 목록을 올리면 글이 맨 윗줄(탭 이름) 밑으로 비쳐 탭 이름과 겹쳤다.
    아이폰·안드로이드 앱처럼 밑으로 무언가 지나갈 때만 윗줄에 바탕을 깐다 (iOS scrollEdgeAppearance) */
-body.scrolled header{background:linear-gradient(to bottom,rgba(10,24,40,.96),rgba(14,34,54,.93));
-  border-bottom:1px solid rgba(255,255,255,.06)}
+/* ★★★ 5.37 — 5.30 은 내릴 때 맨 윗줄을 거의 검정(.96)으로 칠하고 아래 선을 그었다 — 4.123 에서 없앤 검은 띠와 같은 꼴.
+   같은 문으로: 칠하지 않고 뒤를 흐린다(글이 밑으로 지나가도 흐려져서 탭 이름과 안 겹친다), 선은 없다. */
+body.scrolled header{background:linear-gradient(to bottom,rgba(10,24,40,.62),rgba(14,34,54,.42));
+  -webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2);border-bottom:none}
 
 /* 빈 목록 안내 — 4.66. #0E1620 짜리 검은 상자라 바다 위에 판때기가 얹혀 있었다. */
 .emptybox{background:rgba(255,255,255,.05);backdrop-filter:blur(14px);
@@ -2974,6 +2995,7 @@ let langAuto = null;
 const I18N = {
   ko: {},
   en: {
+    '받는 중…':'Fetching…',   // ★ 5.37 — 화면 말은 「불러오는 중…」 으로 바꿨다. 옛 기록에 남은 글자를 옮기려고 열쇠만 둔다
     '배를 둘러보기에 공개합니다 · 공개 설정에서 언제든 끌 수 있습니다':'Your boat will be shown in Boats · You can turn this off any time in Boat sharing',
     '배는 {n}척까지 선택할 수 있습니다.':'You can pick up to {n} [[boat|boats]].',
     '← 회원 명부':'← Crew list',
@@ -3035,7 +3057,7 @@ const I18N = {
     '문서':'Documents',
     '휴대폰 저장공간':'Phone storage',
     '앱 파일':'App files',
-    '앱 안':'Inside the app',
+    '앱 내':'Inside the app',
     '파일로 저장했습니다.':'Saved to a file.',
     '파일 앱':'Files app',
     '나의 iPhone':'On My iPhone',
@@ -3071,7 +3093,7 @@ const I18N = {
     '표 삭제':'Delete table',
     '+ 줄':'+ Row',
     '+ 칸':'+ Column',
-    '줄 삭제':'Delete row',
+    '행 삭제':'Delete row',
     '칸 삭제':'Delete column',
     '이 표를 지울까요?':'Delete this table?',
     '줄은 {n}개까지 넣을 수 있습니다.':'You can add up to {n} [[row|rows]].',
@@ -3237,7 +3259,7 @@ const I18N = {
     '{d} 만탱크 후 {h} 가동':'{h} run since the full tank on {d}',
     '{d} 설치':'Fitted {d}',
     '고장 {n}':'{n} [[fault|faults]]',
-    '지남 {n}':'{n} overdue',
+    '기한 지남 {n}':'{n} overdue',
     '임박 {n}':'{n} due soon',
     '정기점검 {n}':'{n} [[scheduled check|scheduled checks]]',
     '정비수첩 {n}':'{n} [[maintenance log|maintenance logs]]',
@@ -3250,10 +3272,10 @@ const I18N = {
     '연료 기록':'Fuel log', '연락처':'Contacts', '문서':'Documents',
 
     '오늘':'Today', '배':'Boat', '항해일지':'Logbook', '커뮤니티':'Community',
-    '내 배':'My boat', '기본정보':'Basics', '제원':'Specs', '배소개':'About',
+    '내 배':'My boat', '기본정보':'Basics', '제원':'Specs', '배 소개':'About',
     '계통별 요약':'By system',
     '마지막 정비':'Last service',
-    '회원명부':'Crew', '등급설정':'Ranks', '게시판':'Board', '할일':'Tasks',
+    '회원명부':'Crew', '등급 설정':'Ranks', '게시판':'Board', '할일':'Tasks',
     '참여신청':'Requests', '공개설정':'Sharing',
     '정박지':'Berths', '중고 장터':'Market', '배 둘러보기':'Boats', '뉴스':'News',
     '로그인':'Sign in', '로그아웃':'Sign out', '계정':'Account',
@@ -3267,14 +3289,13 @@ const I18N = {
     '{n}개 목록 중':'across {n} [[list|lists]]',
     '[초안] 주기·내용 확인 필요':'[draft] Check the interval and the work',
     '[초안] 확인 필요':'[draft] Needs checking',
-    '이 사람 안 보기':'Hide this person',
+    '이 사용자의 글 보지 않기':'Hide this person',
     '안 보기로 한 사람의 글을 다시 봅니다':'Bring back posts from people you hid',
     '{name} 님의 글과 댓글을 이 기기에서 숨길까요?':'Hide {name}\'s posts and comments on this device?',
     '이제 이 사람의 글이 표시되지 않습니다.':'You will no longer see posts from this person.',
     '내 글은 숨길 수 없습니다':'You cannot hide your own posts',
     '누가 올렸는지 알 수 없습니다':'We cannot tell who posted this',
     '이 사람':'this person',
-    '(이름 모름)':'(name unknown)',
     '「{w}」 같은 말은 올릴 수 없습니다.':'Words like "{w}" cannot be posted.',
     '해당 부분을 수정해 주세요.':'Please change that part.',
     'Google로 계속하기':'Continue with Google',
@@ -3298,7 +3319,6 @@ const I18N = {
     '거절하기':'Decline',
     '다시 계산':'Recalculate',
     '복원하기':'Restore',
-    '버리고 닫기':'Discard',
     '휴지통으로':'To Trash',
     '편집 모드로':'Switch to editing',
     '출항 기록':'Log departure',
@@ -3405,7 +3425,6 @@ const I18N = {
     '편집 모드로 바꾸고 계속할까요?':'Switch to edit mode and continue?',
     // ── 3.79 에서 새로 넣은 것
     '번역 보기':'Translate',
-    '원어로 보기':'See original',
     '자동 번역된 글입니다':'Machine translated',
     '번역하는 중…':'Translating…',
     '지금은 번역할 수 없습니다':'Translation is unavailable right now',
@@ -3414,7 +3433,7 @@ const I18N = {
     '앱 화면에 표시되는 언어가 바뀝니다.':'This changes the app\'s display language.',
     '다른 사람이 올린 글은 작성한 언어 그대로 표시됩니다. 글을 열면 번역 버튼이 나옵니다.':'Posts are shown in the language they were written in. Open a post to see the Translate button.',
     // ── 3.80 에서 새로 넣은 것
-    '사진을 넣는 중…':'Adding photos…',
+    '사진 업로드 중…':'Adding photos…',
     '삭제할 사진을 먼저 한 번 눌러 주세요.':'Tap the photo you want to remove first.',
     '사진은 글자처럼 백스페이스로 삭제할 수 있습니다.':'Photos can be deleted with backspace, just like text.',
     // ── 3.82 에서 새로 넣은 것
@@ -3464,7 +3483,6 @@ const I18N = {
     '자세히':'Details',
     '점검하기':'Run the check',
     '곧 해야 할 정비':'Maintenance due soon',
-    '지남':'Overdue',
     '임박':'Due',
     '정비 탭':'Maintenance',
     '내 할 일':'My tasks',
@@ -3476,8 +3494,6 @@ const I18N = {
     '배 목록':'Boats',
     '찾기':'Search',
     '{n}시간마다':'every {n} h',
-    '남음 {n}시간':'{n} h left',
-    '지남 {n}시간':'{n} h over',
     '엔진 가동 몇 시간마다 해야 하는 작업인지 입력합니다. 예: 엔진오일 250시간, 임펠러 500시간.<br><br>':'Enter how many engine hours between jobs — engine oil every 250 h, impeller every 500 h.<br><br>',
     '개월 주기와 <b>둘 다</b> 입력하면 <b>먼저 도래하는 쪽</b>을 알려 줍니다. 예: 「6개월 또는 250시간 중 먼저 도래하는 시점」.<br><br>':'If you fill in <b>both</b> this and the calendar cycle, whichever comes <b>first</b> is shown — \'6 months or 250 hours, whichever comes first\'.<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합산해 계산합니다. 계기판 시간을 따로 확인하지 않아도 됩니다.<br><br>':'Hours are counted from the app\'s <b>engine running records</b> plus running time in the logbook. No gauge reading needed.<br><br>',
@@ -3649,7 +3665,7 @@ const I18N = {
     '배 옮기기':'Delivery',
     '처음이어도 괜찮습니다':'Beginners welcome',
     '승선 경험 있는 분':'Some experience',
-    '면허 있는 분':'Licensed',
+    '면허 소지자':'Licensed',
     '야간 당직 가능한 분':'Able to stand night watch',
     '낚시 장비 있으신 분':'With fishing gear',
     '없습니다':'None',
@@ -3708,9 +3724,7 @@ const I18N = {
     '주기마다 알려 드리고, 한 일은 그대로 이력이 됩니다':'Reminds you when each is due, and what you did becomes the history',
     '제조사·모델·일련번호·설치일. 교체하면 지난 것도 이력에 남습니다':'Maker, model, serial number, fitting date — and the old one stays in the history when you replace it',
     '장비·정비·수리·항해를 한 장으로. 배를 넘길 때 그대로 드리면 됩니다':'Gear, maintenance, repairs and voyages on one page — hand it over as it is',
-    '첫걸음':'First steps',
     '끝났습니다':'done',
-    '정비 한 건 남기기':'Record one job',
     '오늘 한 일이든 지난 일이든 좋습니다':'Something you did today, or something from before',
     '배 이력서 만들어 보기':'Make a boat record',
     '기록한 내용이 한 장의 문서로 정리됩니다':'What you wrote becomes one page',
@@ -3925,7 +3939,7 @@ const I18N = {
     '정비 절차':'How it was done',
     '한 단계 = 사진 한 장 + 설명 한 줄. 다음에 같은 작업을 할 때나 같은 배를 타는 다른 사람이 참고할 수 있습니다.':'One step = one photo and one line. Useful next time you do the same job, and to anyone else who sails the same boat.',
     '난이도':'Difficulty',
-    '걸린 시간':'Time taken',
+    '소요 시간':'Time taken',
     '든 돈':'Cost',
     '원':' KRW',
     '부품·공구':'Parts and tools',
@@ -4040,7 +4054,6 @@ const I18N = {
     '총 가동시간':'Total running hours',
     'L/시간':'L/h',
     '주유량 L':'Litres filled',
-    '내가 적음':'set manually',
     'L/시간과 잔량은 눌러서 수정할 수 있습니다.':'Tap L/h or the estimate to correct it.',
     'L/시간을 {v}로 입력하셨습니다.':'You set L/h to {v}.',
     '앱 계산값은 {v}입니다.':'Calculated value: {v}.',
@@ -4083,7 +4096,7 @@ const I18N = {
     '+ 항목 추가':'+ Add item',
     // ── 3.89 · 커뮤니티 · 정박지 · 장터 · 뉴스 · 계정
     '이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.':'Sign in with this account on another device to see the same records.',
-    '계정 번호':'Account number',
+    '회원번호':'Account number',
     '운영자 지정을 요청할 때 이 번호를 알려 주세요.':'Give this number when asking to be made an admin.',
     '이전 사진':'Old photos',
     '문서에 남아 있는 사진은 앱을 실행할 때마다 조금씩 클라우드로 옮겨집니다':'Photos still stored inside documents move to the cloud a few at a time on each launch',
@@ -4116,7 +4129,7 @@ const I18N = {
     '로그인하러 가기':'Go to sign in',
     '전체':'All',
     '전 지역':'All regions',
-    '새 글 순':'Newest',
+    '최신순':'Newest',
     '도움이 된 순':'Most helpful',
     '+ 내 배 정비 기록 추가':'+ Attach a maintenance record',
     '댓글':'Comments',
@@ -4125,7 +4138,7 @@ const I18N = {
     '사람':'Person',
     '← 운영자':'← Admin',
     '불러오는 중…':'Loading…',
-    '최고 운영자입니다.':'This is the head admin.',
+    '최고 관리자입니다.':'This is the head admin.',
     '앱 소유자이므로 앱에서 권한을 변경하거나 지정을 해제할 수 없습니다.':'As the app owner, their rights cannot be changed or removed here.',
     '운영자 권한':'Admin rights',
     '글쓰기 차단':'Block from posting',
@@ -4133,13 +4146,13 @@ const I18N = {
     '영업':'Commercial',
     '중간 기록':'Log entries',
     '이 배에 참여 신청':'Ask to join this boat',
-    '안 보기':'Hide',
+    '보지 않기':'Hide',
     '+ 글쓰기':'+ New post',
     '내보내기':'Remove',
     '회원 명부':'Crew list',
     '← 내 배':'← My boat', '← 계류장':'← Moorings', '계류장':'Moorings',
     '남의 배':'Other boats', '항해기록':'Voyages', '정비수첩':'Maintenance log', '제품리뷰':'Product reviews',
-    '배리뷰':'Boat reviews',
+    '배 리뷰':'Boat reviews',
     '등급 설정':'Rank settings',
     '위에 있을수록 높은 등급입니다. 자신보다 낮은 등급만 수정할 수 있습니다.':'Higher on the list means a higher rank. You can only edit ranks below your own.',
     '+ 등급 추가':'+ New rank',
@@ -4193,7 +4206,7 @@ const I18N = {
     '(삭제된 배)':'(boat deleted)',
     '(자동)':'(auto)',
     '(저조위 기준)':'(chart datum)',
-    '+ 계정 번호로 지정':'+ Add by account number',
+    '+ 회원번호로 지정':'+ Add by account number',
     '+ 글':'+ Text',
     '+ 사진':'+ Photo',
     '+ 사진 추가':'+ Add photos',
@@ -4268,7 +4281,6 @@ const I18N = {
     '갈치':'Hairtail',
     '감성돔':'Black sea bream',
     '숨기면 둘러보기에 표시되지 않습니다. 배 주인의 물품·정비 기록은 그대로 유지됩니다.':'Hiding takes it off Browse boats. The owner\'s items and maintenance records are untouched.',
-    '감춤':'Hidden',
     '갑오징어':'Cuttlefish',
     '강원':'Gangwon',
     '같은 내용을 반복해서 올림':'Posting the same thing over and over',
@@ -4334,7 +4346,7 @@ const I18N = {
     '권한이 없습니다':'You do not have permission',
     '그 기록을 찾지 못했습니다':'That record could not be found',
     '그 밖':'Other',
-    '그 밖의 이야기':'Anything else',
+    '자유게시판':'Anything else',
     '기타 사유':'Some other reason',
     '그 배의 기록은 삭제되지 않습니다. 다만 명부에 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 요청하시는 것이 좋습니다.':'That boat\'s records are not deleted. Your name may stay on the crew list, so it is best to ask the owner to remove you first.',
     '상대방은 더 이상 이 배의 기록을 볼 수 없습니다.':'They will no longer be able to see this boat\'s records.',
@@ -4349,7 +4361,6 @@ const I18N = {
     '글 신고':'Report post',
     '글 삭제':'Delete post',
     '글·댓글 쓰기 차단':'Block from posting and commenting',
-    '글쓴이 이름':'Author name',
     '글을 관리할 권한이 없습니다':'You do not have permission to manage posts',
     '글과 사진을 함께 복사해 본문 칸에 붙여넣으면 사진도 함께 들어갑니다.':'Copy the text together with its photos and paste it into the body; the photos are added too.',
     '글을 쓸 권한이 없습니다':'You do not have permission to post',
@@ -4370,7 +4381,6 @@ const I18N = {
     '기상청 실시간 확인':'Check live at the Korea Meteorological Administration',
     '대한민국 해역 밖이라 기상청 해상 특보가 제공되지 않습니다':'Outside Korean waters, so KMA marine warnings do not cover this area',
     '해당 국가의 기상 기관에서 확인해 주세요':'Please check with the weather service of that country',
-    '기억해 둘 것':'Worth remembering',
     '기온':'Air temp',
     '설정':'Settings',
     '알림':'Notifications',
@@ -4402,10 +4412,10 @@ const I18N = {
     '공개 항해일지에 지나온 경로를 표시합니다':'Shows the route you sailed in your public logbook',
     '출발·도착 지점 반경 {n}해리를 가리고 {k}개 지점을 표시합니다':'Hiding {n} nm around start and finish; showing {k} points',
     '배의 계류 위치는 공개되지 않습니다. 가리는 범위는 배 › 공개 설정에서 변경할 수 있습니다.':'Your mooring location is never shared. Change the hidden radius in Boat › Sharing.',
-    '항적 가리기':'TRACK MASK',
+    '항적 숨기기':'TRACK MASK',
     '가림 반경':'Hidden radius',
     '{n}해리':'{n} NM',
-    '가리지 않음':'Don\'t hide',
+    '무관':'Don\'t hide',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'For voyages with the track on, this distance around the start and finish is cut off before the track is shown. This keeps your berth hidden.',
     '계류 위치 주변은 가려져 있습니다.':'The area around the berth is hidden.',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'Entries and photos · crew names are not shared · the track can be turned on per voyage',
@@ -4471,8 +4481,8 @@ const I18N = {
     '나중에 차단 이유를 확인할 수 있도록':'So you remember later why you blocked them',
     '나중에 정비 문제로 도움을 구할 때, 상대방이 배를 알아야 정확한 답을 받을 수 있습니다. ':'When you later ask for help with maintenance, people answer more accurately if they know the boat. ',
     '낚시장비':'Fishing gear',
-    '날마다':'Daily',
-    '날마다 초기화':'Reset daily',
+    '매일':'Daily',
+    '매일 초기화':'Reset daily',
     '날씨 —':'Weather —',
     '날씨 기록은 삭제되지 않습니다.':'Your weather records are not deleted.',
     '날씨 데이터를 받지 못했습니다':'Could not fetch weather data',
@@ -4495,12 +4505,12 @@ const I18N = {
     '원작자 허락을 받아 옮긴 글':'Reposted with the author\'s permission',
     '다른 사람이 올린 연재는 수정할 수 없습니다.\n\n작성자만 수정할 수 있습니다.':'You cannot edit someone else\'s series.\n\nOnly the person who posted it can.',
     '남해식':'South-coast naming',
-    '내 계정 번호\n\n':'My account number\n\n',
+    '내 회원번호\n\n':'My account number\n\n',
     '내 계정 번호를 복사했습니다.\n\n':'Your account number has been copied.\n\n',
     '내 등급보다 낮은 등급만 지정할 수 있습니다':'You can only grant ranks below your own',
     '내 등급보다 높은 등급은 지정할 수 없습니다':'You cannot grant a rank above your own',
     '내 배를 고친 이야기 · 고장·수리':'Fixing my boat · faults and repairs',
-    '내가 누를 때까지 그대로 두기':'Leave it until I tap it',
+    '[초기화]를 누를 때까지 체크가 유지됩니다':'Checks stay until you tap Reset',
     '내가 올린 정박지·중고 장터':'My berths and market listings',
     '내리지 못했습니다.\n\n':'Could not take it down.\n\n',
     '내용 보기':'Read it',
@@ -4538,7 +4548,7 @@ const I18N = {
     '추가 내용':'Anything to add',
     '도면 도형이 잠겨 있습니다.\n\n지금 잠금을 해제할까요?\n해제한 뒤 다시 시도해 주세요.\n(도구 막대의 자물쇠 버튼으로도 잠그거나 해제할 수 있습니다)':'The plan shapes are locked.\n\nUnlock them now?\nAfter unlocking, try again.\n(You can also use the padlock on the toolbar.)',
     '도면 사진':'Plan image',
-    '도면 사진 바꾸기':'Replace the plan image',
+    '도면 사진 변경':'Replace the plan image',
     '도면 핀':'Plan pins',
     '도면 🔓':'Plan 🔓',
     '도면·수납칸 편집':'Edit plans and lockers',
@@ -4551,7 +4561,6 @@ const I18N = {
     '도형':'Shape',
     '돈이 오가는 기능입니다. 문제가 생기면 이 기능부터 잠그세요.':'Money changes hands here. If there is trouble, lock this first.',
     '동':'E',
-    '동그라미':'Circle',
     '동기화 실패 · 눌러서 확인':'Sync failed · tap to see why',
     '동남동':'ESE',
     '동북동':'ENE',
@@ -4644,8 +4653,7 @@ const I18N = {
     '목록에 없는 항목을 직접 입력해 주세요':'Write something not on the list',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'There is only one list. Add another list first.',
     '목포':'Mokpo',
-    '몰라서 묻는 것':'Questions',
-    '받지 못함: {why}':'Not received: {why}',
+    '불러오지 못함: {why}':'Not received: {why}',
     '묘박':'At anchor',
     '묘박 가능한 수심을 추정합니다. 앵커줄은 보통 수심의 5~7배가 필요합니다.':'Gauges the depth you can anchor in. You normally need 5–7 times the depth in rode.',
     '무료 나눔':'Free',
@@ -4680,8 +4688,8 @@ const I18N = {
     '이 물때는 위성 조석 모형 <b>EOT20</b>에서 추출한 <b>{spot}</b> 부근({km}km)의 <b>조화상수</b>로 계산한 것입니다. 높이는 <b>최저천문조위(LAT)</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'This tide is computed from the <b>harmonic constants</b> of the satellite tide model <b>EOT20</b> near <b>{spot}</b> ({km} km away). Heights are above <b>Lowest Astronomical Tide (LAT)</b>. Before passing under a bridge, <b>check the chart and VTS.</b>',
     '조석 모형':'Tide model',
     '참고용 물때를 사용하고 있습니다. 정확한 값을 아시면 직접 입력해 주세요. 입력한 값을 사용합니다.':'Using an estimated tide. If you know the real figures, enter them and they will be used.',
-    '물때 자료를 받는 중…':'Fetching tide data…',
-    '물어보기':'Ask a question',
+    '물때 정보를 불러오는 중…':'Fetching tide data…',
+    '질문하기':'Ask a question',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Items, maintenance, repairs, logbook, documents, plans, board',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'This is a locker for items. Draw walls and partitions with Line, Rectangle or Triangle.',
     '미꾸라지':'Loach',
@@ -4692,14 +4700,12 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ④
-    '바꾸지 못했습니다.\n\n':'Could not change it.\n\n',
-    '바꾸지 못했습니다: ':'Could not change it: ',
+    '변경하지 못했습니다.\n\n':'Could not change it.\n\n',
+    '변경하지 못했습니다: ':'Could not change it: ',
     '바다에서는 인터넷이 안 될 때가 있습니다. 그럴 때는 로그인 없이 이 기기에서만 사용하다가 나중에 로그인하셔도 됩니다.':'At sea you may not have internet. If so, you can use the app on this device without signing in, and sign in later.',
     '바람막이':'Wind shelter',
     '바위':'Rock',
     '외부 공개':'Visible to others',
-    '받는 중…':'Fetching…',
-    '받아오는 중…':'Downloading…',
     '발효 중인 해상 특보 없음':'No marine warnings in force',
     '방어':'Yellowtail',
     '방파제 안쪽 접안':'Alongside inside the breakwater',
@@ -4815,7 +4821,7 @@ const I18N = {
     '새 등급을 만듭니다.':'Create a new rank.',
     '새 소식':'News',
     '새 수납칸':'New locker',
-    '새 점검 목록':'New checklist',
+    '새 체크리스트':'New checklist',
     '신규':'new',
     '신규 {n}':'{n} new',
     '새우':'Shrimp',
@@ -5004,20 +5010,19 @@ const I18N = {
     '작성자와 운영자만 수정할 수 있습니다':'Only the poster and an administrator can edit this',
     '작성자와 운영자만 삭제할 수 있습니다':'Only the poster and an administrator can delete this',
     '작성자만 변경할 수 있습니다':'Only the poster can change this',
-    '옮기기':'Move',
     '옮긴 글은 저자 · 매체 · 원문 링크가 반드시 있어야 합니다 (허락 조건). 직접 쓴 글은 저자만 있으면 됩니다.':'A reprint must carry the author, the publication and a link to the original (that is the permission condition). Your own writing needs only the author.',
     '옮긴 글은 저자·매체·원문 링크가 모두 있어야 등록됩니다.\n':'A reprint can only be posted with the author, publication and original link all present.\n',
     '옮긴 글일 때만':'Reprints only',
     '옮긴 글일 때만 · https://…':'Reprints only · https://…',
     '옮긴 글일 때만 · 예: Yacht Russia':'Reprints only · e.g. Yacht Russia',
-    '옮길 목록':'Move to list',
+    '이동할 목록':'Move to list',
     '완도':'Wando',
     '완료된 수리':'Completed repairs',
     '완전삭제':'Delete for good',
     '신고 사유를 선택해 주세요':'Choose a reason for reporting',
     '외줄':'Handline',
     '요금':'Fee',
-    '요트·보트·낚시배':'Yachts, boats, fishing boats',
+    '요트·보트·낚싯배':'Yachts, boats, fishing boats',
     '욕설·비방':'Abuse',
     '우럭':'Rockfish',
     '운영자 지정':'Appoint administrators',
@@ -5034,7 +5039,6 @@ const I18N = {
     '원제':'Original title',
     '원투':'Surfcasting',
     '웜':'Soft plastic',
-    '위에 없는 이야기':'Anything not listed above',
     '위치 —':'Position —',
     '위치 지정':'Set the position',
     '위치를 가져오지 못했습니다.':'Could not get your position.',
@@ -5125,7 +5129,6 @@ const I18N = {
     '자갈':'Gravel',
     '자동':'Auto',
     '자료 없음':'No data',
-    '위치 찍기':'Set location',
     '위치를 먼저 지정해 주세요':'Set the location first',
     '자주 보는 위치를 지도에서 지정해 두면 눌러서 바로 볼 수 있습니다.':'Mark the places you check often on the map and one tap brings them up.',
     '작게':'Smaller',
@@ -5153,7 +5156,7 @@ const I18N = {
     '전북':'North Jeolla',
     '전자장비':'Electronics',
     '전체 보기':'Fit to screen',
-    '점검 목록 수정':'Edit checklist',
+    '체크리스트 수정':'Edit checklist',
     '점검 주기':'Service interval',
     '점검 항목':'Check item',
     '점검 항목 수정':'Edit check item',
@@ -5162,7 +5165,7 @@ const I18N = {
     '정기점검과 수리목록':'Scheduled checks and repairs',
     '정기점검에 「{list}」 항목이 남아 있습니다.':'「{list}」 is still in scheduled checks.',
     '정말 삭제할까요':'Really delete it',
-    '정박 중 점검처럼 주 단위로 하는 것':'Weekly jobs, like checks while lying alongside',
+    '매주 월요일 0시에 체크가 초기화됩니다':'Checks reset every Monday at midnight',
     '정박지 수정':'Edit berth',
     '정박지 신고':'Report berth',
     '정박지 올리기':'Add a berth',
@@ -5194,11 +5197,10 @@ const I18N = {
     '좁은 수로를 지날 때 감당할 수 있는 조류 세기입니다.':'The tidal stream you can handle in a narrow channel.',
     '주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.':'If it comes round on a cycle it is a scheduled check; if it came up suddenly it is a repair.',
     '주꾸미':'Webfoot octopus',
-    '주마다':'Weekly',
-    '주마다 초기화':'Reset weekly',
+    '매주':'Weekly',
+    '매주 초기화':'Reset weekly',
     '주소는 https:// 로 시작해야 합니다':'The link must start with https://',
     '주소를 입력하면 눌러서 열 수 있습니다':'Add a link and it opens with a tap',
-    '주인':'Owner',
     '주차':'Parking',
     '부여할 수 있는 등급이 없습니다':'There is no rank you can grant',
     '중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n':'The log entries have no engine on or off records.\n\n',
@@ -5208,7 +5210,7 @@ const I18N = {
     '지금 납부한 것으로 기록할까요?':'Record it as paid now?',
     '지금 업데이트':'Update now',
     '지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.':'Have you just departed?\n\nThis turns the plan into a logbook entry and records the time, position and weather now.',
-    '지금 크기':'Current size',
+    '원본':'Current size',
     '현재 시각':'Set to now',
     '지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'You are in read-only mode (editing locked).\n\nTap [View only] in the top bar\nand switch it to [Editing].',
     '지금은 보기 전용입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'You are in read-only mode.\n\nTap [View only] in the top bar\nand switch it to [Editing].',
@@ -5234,7 +5236,7 @@ const I18N = {
     '직접':'manual',
     '직접 입력':'Manual entry',
     '직접 입력한 만조·간조 사용 중':'Using the high and low water you entered',
-    '수동 초기화':'Manual reset',
+    '반복 안 함':'Never',
     '진행 중인 항목이 없습니다':'Nothing in progress',
     '질문':'Question',
     '찜':'Saved',
@@ -5254,9 +5256,9 @@ const I18N = {
     '첫 항목 추가하기':'Add the first item',
     '체크리스트':'Checklists',
     '체크항목':'Check item',
-    '초기화 주기':'Reset cycle',
+    '반복':'Repeat',
     '초안 표시':'The [draft] badge',
-    '최고 운영자':'Head admin',
+    '최고 관리자':'Head admin',
     '최대':'max',
     '출발':'Departure',
     '출발 날씨':'Weather on departure',
@@ -5267,7 +5269,7 @@ const I18N = {
     '출발과 도착 사이에 있었던 일':'What happened between departure and arrival',
     '출항 3일 전까지':'Until 3 days before departure',
     '출항 당일까지':'Until the day of departure',
-    '출항 전 점검처럼 출항할 때마다 하는 것':'Things you do every time you go out, like pre-departure checks',
+    '매일 0시에 체크가 초기화됩니다':'Checks reset every day at midnight',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'Grouping them by situation, such as before departure or after arrival, makes them easy to find',
     '출항 전날까지':'Until the day before departure',
     '충남':'South Chungcheong',
@@ -5333,7 +5335,6 @@ const I18N = {
     '할 수 있는 일을 켜거나 끕니다. 모두 끄면 운영자 지정이 해제됩니다.':'Switch their duties on and off. Turning them all off removes them as an administrator.',
     '할 수 있는 일이 없습니다':'No permissions',
     '할 수 있는 일이 하나도 남지 않습니다.\n\n이 사람의 운영자 지정을 해제할까요?':'They would be left with no duties at all.\n\nRemove them as an administrator?',
-    '할 일 배정':'Assigning tasks',
     '할 일을 배정할 권한이 없습니다':'You do not have permission to assign tasks',
     '할 일을 볼 권한이 없습니다':'You do not have permission to view tasks',
     '합치기 (수량 합산·사진 통합)':'Merge (add quantities, combine photos)',
@@ -5367,7 +5368,7 @@ const I18N = {
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n삭제해도 배를 열면 다시 생깁니다.\n':'This spot was created automatically from the home port.\n\nDelete it and it comes back next time you open the boat.\n',
     '화면이 보이지 않음':'Screen not visible',
     '화장실':'Toilet',
-    '확인 글자':'Confirmation text',
+    '확인 문구':'Confirmation text',
     '확인함':'Checked',
     '환산':'Convert',
     '환산값이 0보다 작습니다.\n\n측정값이나 측정 시각을 다시 확인해 주세요.':'The converted value is below zero.\n\nCheck the reading and the time you measured it.',
@@ -5742,10 +5743,10 @@ const I18N = {
     '글은 계속 읽으실 수 있습니다.':'You can still read.',
     '운영자를 지정하거나 해제할 권한이 없습니다':'You do not have permission to appoint or remove admins',
     '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.':'Could not verify your sign-in.\n\nPlease restart the app and try again.',
-    '최고 운영자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'The head admin cannot be changed from the app.\n\nThey own this app, so their permissions cannot be changed and they cannot be removed.',
+    '최고 관리자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'The head admin cannot be changed from the app.\n\nThey own this app, so their permissions cannot be changed and they cannot be removed.',
     '본인의 운영자 지정은 직접 해제할 수 없습니다.\n\n운영자를 지정할 수 있는 사람이 아무도 없게 되는 것을 막기 위해서입니다.\n다른 분에게 지정 권한을 준 뒤 그분이 해제해 주셔야 합니다.':'You cannot remove yourself.\n\nThis prevents a state where nobody can appoint an admin.\nGive appointment rights to someone else and have them remove you.',
     '본인의 지정 권한은 직접 끌 수 없습니다.\n\n끄면 운영자를 지정할 수 있는 사람이 없어 되돌릴 수 없습니다.\n다른 분에게 지정 권한을 준 뒤 그분이 꺼 주셔야 합니다.':'You cannot switch off your own appointment rights.\n\nOnce off, nobody could appoint an admin and it could not be undone.\nGive appointment rights to someone else and have them switch yours off.',
-    '최고 운영자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'The head admin cannot be blocked.\n\nThey own this app.',
+    '최고 관리자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'The head admin cannot be blocked.\n\nThey own this app.',
     '본인은 차단할 수 없습니다.':'You cannot block yourself.',
     '배를 숨기거나 삭제할 권한이 없습니다':'You do not have permission to hide or delete boats',
     '오늘의 클라우드 사용량을 모두 사용했습니다.\n\n· 기기에 저장된 기록은 그대로 있으며, 앱의 모든 기능을 계속 사용할 수 있습니다.\n· 다른 기기와의 동기화만 잠시 중지됩니다.\n· 매일 한 번(한국 시간 오후 4시쯤) 자동으로 초기화됩니다.\n\n이 문제가 반복되면 운영자에게 알려 주세요. 고객센터에서 보낼 수 있습니다.':'Today\'s cloud allowance is used up.\n\n· Everything on this device is intact and the app works as normal.\n· Only syncing with your other devices pauses.\n· It resets automatically each day (around 16:00 Korean time).\n\nIf this keeps happening, please tell the admin. You can send a message from Support.',
@@ -5758,7 +5759,7 @@ const I18N = {
     '계산 불가':'Cannot calculate',
     '불러오지 못했습니다: {why}':'Could not load: {why}',
     '차단된 자료: {what} — {why}':'Blocked records: {what} — {why}',
-    '형식이 다른 파일':'File format does not match',
+    '지원되지 않는 파일 형식':'File format does not match',
     '물품 수정 (아래에서 사진 추가 가능)':'Edit item (you can add photos below)',
     '수정 완료':'Done',
     '전체 {a}개 물품 · {b}개 수납칸':'Items: {a} · Lockers: {b}',
@@ -5776,8 +5777,6 @@ const I18N = {
 
     // ── 4.01d
     '미기록':'No record',
-    '지남 {n}일':'{n} [[day|days]] overdue',
-    '남음 {n}일':'{n} [[day|days]] left',
     '기한 초과':'Overdue',
     '곧':'Soon',
     '주기 {n}{u}':'Every {n}{u}',
@@ -5820,7 +5819,7 @@ const I18N = {
   
 
     // ── 4.07
-    '되돌리고 닫기':'Discard and close',
+    '저장하지 않고 닫기':'Discard and close',
     '수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.':'Discard your changes and close?\n\nEverything you changed since opening this screen goes back to how it was.',
   
 
@@ -5863,11 +5862,10 @@ const I18N = {
     '위치정보 이용에 동의하셔야 현재 위치를 확인할 수 있습니다.\n\n동의하시겠습니까?\n(메뉴 › 약관·방침 › 위치정보에서 언제든 켜고 끌 수 있습니다.)':'You need to agree to the use of location information before the app can get your current position.\n\nDo you agree?\n(You can turn it off or on at any time under Menu › Terms and policies › Location.)',
     '위치정보 수집 동의 철회':'Withdraw location consent',
     '위치정보 수집 동의를 철회할까요?\n\n철회하면 「지금 여기」, 현재 위치 날씨 등의 기능을 사용할 수 없습니다.\n이미 저장된 좌표는 그대로 남습니다. 항해 기록에서 따로 삭제하실 수 있습니다.':'Withdraw your consent to location collection?\n\nFeatures such as "Here now" and weather for your current position will stop working.\nCoordinates already saved stay as they are. You can delete them individually in the logbook.',
-    '내려받기':'Download',
+    '다운로드':'Download',
     '지금은 동의하신 상태입니다.':'Location consent is currently on.',
     '현재 동의하지 않으신 상태이므로 위치정보를 수집하지 않습니다.':'You have not agreed, so no location is being received.',
     '접근':'Accessed',
-    '위치정보 수집 동의를 거둠':'Withdrew location consent',
     '클라우드에서 항해 좌표를 받음':'Received voyage coordinates from the cloud',
     '위치정보 수집에 동의':'Agreed to location collection', '위치정보 수집에 동의하기':'Agree to location collection', '동의·철회':'Consent',
   
@@ -5912,7 +5910,7 @@ const I18N = {
     '이 배의 정비수첩':'Maintenance log of this boat',
     '이 배의 정비 기록':'Maintenance records of this boat',
     '아직 선택하지 않았습니다':'No one picked yet',
-    '함께 탄 사람 선택':'Select who was aboard',
+    '동승자 선택':'Select who was aboard',
     '선택한 분들의 앱 「내 승선 이력」에 이 항해가 기록됩니다.':'This voyage is added to the sea time record of everyone you pick.',
     '{name} 님이 탔습니다':'{name} was aboard',
     '밤 12시':'12 AM (midnight)',
@@ -5926,7 +5924,6 @@ const I18N = {
     '배에 참여하시면 승선한 항해가 「내 승선 이력」에 기록됩니다.':'Once you join a boat, the passages you sail build up as your sea time record.',
     '언제, 어느 배로, 몇 해리를 항해했는지 한 장으로 출력할 수 있습니다. 직접 입력하는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'One sheet showing when you sailed, on which boat, and how many miles. You do not write it yourself: it comes straight from the boat logs.',
     '선장':'Skipper',
-    '함께 탄 사람':'Who was aboard',
     '여기서 선택한 사람의 앱 「내 승선 이력」에 이 항해가 기록됩니다. 명부에 없는 손님은 아래 「동승」에 이름을 입력해 주세요.':'Anyone picked here counts it in their own app under My sea time. For guests who are not on the crew list, write their names under Crew aboard below.',
     '내 승선 이력':'My sea time',
     '항해 일수':'Days at sea',
@@ -5977,7 +5974,6 @@ const I18N = {
     '이제 장비·정비·수리·항해 기록을 한 장의 문서로 출력할 수 있습니다. 배를 넘길 때 그대로 전해 주시면 됩니다.':'Your gear, maintenance, repairs and voyages now come out as a single sheet. Hand it over as is when you sell the boat.',
     '계류 위치 지정':'Set where the boat is moored',
     '출항 전 점검 한 번 해 보기':'Run a pre-departure check once',
-    '자리 잡기':'Set the spot',
     '이 휴대폰의 배터리 절전 목록에 뱃일이 들어 있습니다.':'Baetnil is on the battery saver list on this phone.',
     '절전 목록에서 제외하면 화면을 꺼도 항적이 더 안정적으로 기록됩니다. 한 번만 설정하시면 됩니다.':'Remove it from that list so the track records more reliably with the screen off. You only need to do this once.',
     '화면이 꺼져 있던 {m}분 동안 위치 정보가 한 번도 수신되지 않았습니다.':'No location was received during the {m} minutes the screen was off.',
@@ -6287,7 +6283,7 @@ const I18N = {
     '설치한 지 얼마 안 됨':'Just fitted',
     '1년 미만':'Under a year',
     '1~3년':'1–3 years',
-    '3년 넘게':'Over 3 years',
+    '3년 이상':'Over 3 years',
     '엔':'JPY',
     '달러':'USD',
     '유로':'EUR',
@@ -6349,7 +6345,7 @@ const I18N = {
     '{name} 운용':'{name} — operations',
     '물품 {n}개와 정비·수리·항해일지·도면':'{n} [[item|items]], maintenance, repairs, logbook and plans',
     '정기점검 · 마지막 {date}':'Scheduled check · last {date}',
-    '(모두 {n}회)':'({n} [[time|times]] in all)',
+    '(총 {n}회)':'({n} [[time|times]] in all)',
     '사진 {n}장':'{n} [[photo|photos]]',
     '{n}건':'{n}',
     '모두 {n}명.':'{n} people in all.',
@@ -6604,6 +6600,7 @@ const I18N = {
     '연료 기록에 추가했습니다':'Added to Fuel log.',
   },
   ru: {
+    '받는 중…':'Получение…',
     '배를 둘러보기에 공개합니다 · 공개 설정에서 언제든 끌 수 있습니다':'Судно будет показано в разделе «Суда» · Это можно отключить в любое время в «Публикация судна»',
     '배는 {n}척까지 선택할 수 있습니다.':'Можно выбрать не более {n} судов.',
     '← 회원 명부':'← Список экипажа',
@@ -6664,7 +6661,7 @@ const I18N = {
     '문서':'Документы',
     '휴대폰 저장공간':'Память телефона',
     '앱 파일':'Файлы приложения',
-    '앱 안':'Внутри приложения',
+    '앱 내':'Внутри приложения',
     '파일로 저장했습니다.':'Сохранено в файл.',
     '파일 앱':'Приложение «Файлы»',
     '나의 iPhone':'На iPhone',
@@ -6700,7 +6697,7 @@ const I18N = {
     '표 삭제':'Удалить таблицу',
     '+ 줄':'+ Строка',
     '+ 칸':'+ Столбец',
-    '줄 삭제':'Удалить строку',
+    '행 삭제':'Удалить строку',
     '칸 삭제':'Удалить столбец',
     '이 표를 지울까요?':'Удалить эту таблицу?',
     '줄은 {n}개까지 넣을 수 있습니다.':'Можно добавить не более {n} [[строки|строк|строк]].',
@@ -6866,7 +6863,7 @@ const I18N = {
     '{d} 만탱크 후 {h} 가동':'Наработка {h} после полной заправки {d}',
     '{d} 설치':'Установлено {d}',
     '고장 {n}':'Неисправностей: {n}',
-    '지남 {n}':'Просрочено: {n}',
+    '기한 지남 {n}':'Просрочено: {n}',
     '임박 {n}':'Скоро: {n}',
     '정기점검 {n}':'Регламент: {n}',
     '정비수첩 {n}':'Журнал работ: {n}',
@@ -6879,10 +6876,10 @@ const I18N = {
     '연료 기록':'Журнал топлива', '연락처':'Контакты', '문서':'Документы',
 
     '오늘':'Сегодня', '배':'Судно', '항해일지':'Судовой журнал', '커뮤니티':'Сообщество',
-    '내 배':'Моё судно', '기본정보':'Основное', '제원':'Характеристики', '배소개':'О судне',
+    '내 배':'Моё судно', '기본정보':'Основное', '제원':'Характеристики', '배 소개':'О судне',
     '계통별 요약':'По системам',
     '마지막 정비':'Последнее обслуживание',
-    '회원명부':'Экипаж', '등급설정':'Роли', '게시판':'Доска', '할일':'Задачи',
+    '회원명부':'Экипаж', '등급 설정':'Роли', '게시판':'Доска', '할일':'Задачи',
     '참여신청':'Заявки', '공개설정':'Публикация',
     '정박지':'Стоянки', '중고 장터':'Объявления', '배 둘러보기':'Суда', '뉴스':'Новости',
     '로그인':'Войти', '로그아웃':'Выйти', '계정':'Аккаунт',
@@ -6896,14 +6893,13 @@ const I18N = {
     '{n}개 목록 중':'по {n} [[списку|спискам|спискам]]',
     '[초안] 주기·내용 확인 필요':'[черновик] Уточните периодичность и объём работ',
     '[초안] 확인 필요':'[черновик] Требует проверки',
-    '이 사람 안 보기':'Скрыть этого человека',
+    '이 사용자의 글 보지 않기':'Скрыть этого человека',
     '안 보기로 한 사람의 글을 다시 봅니다':'Вернуть записи скрытых людей',
     '{name} 님의 글과 댓글을 이 기기에서 숨길까요?':'Скрыть записи и комментарии {name} на этом устройстве?',
     '이제 이 사람의 글이 표시되지 않습니다.':'Записи этого человека больше не показываются.',
     '내 글은 숨길 수 없습니다':'Свои записи скрыть нельзя',
     '누가 올렸는지 알 수 없습니다':'Не удалось определить автора',
     '이 사람':'этот человек',
-    '(이름 모름)':'(имя неизвестно)',
     '「{w}」 같은 말은 올릴 수 없습니다.':'Слова вроде «{w}» публиковать нельзя.',
     '해당 부분을 수정해 주세요.':'Измените эту часть.',
     'Google로 계속하기':'Продолжить с Google',
@@ -6927,7 +6923,6 @@ const I18N = {
     '거절하기':'Отклонить',
     '다시 계산':'Пересчитать',
     '복원하기':'Восстановить',
-    '버리고 닫기':'Отменить правки',
     '휴지통으로':'В корзину',
     '편집 모드로':'Перейти к правке',
     '출항 기록':'Записать выход',
@@ -7033,7 +7028,6 @@ const I18N = {
     '편집 모드로 바꾸고 계속할까요?':'Перейти в режим правки и продолжить?',
     // ── 3.79 에서 새로 넣은 것
     '번역 보기':'Перевести',
-    '원어로 보기':'Показать оригинал',
     '자동 번역된 글입니다':'Машинный перевод',
     '번역하는 중…':'Перевод…',
     '지금은 번역할 수 없습니다':'Перевод сейчас недоступен',
@@ -7042,7 +7036,7 @@ const I18N = {
     '앱 화면에 표시되는 언어가 바뀝니다.':'Меняется язык интерфейса.',
     '다른 사람이 올린 글은 작성한 언어 그대로 표시됩니다. 글을 열면 번역 버튼이 나옵니다.':'Записи остаются на языке автора — откройте запись, и появится кнопка перевода.',
     // ── 3.80 에서 새로 넣은 것
-    '사진을 넣는 중…':'Добавляем фото…',
+    '사진 업로드 중…':'Добавляем фото…',
     '삭제할 사진을 먼저 한 번 눌러 주세요.':'Сначала нажмите на фото, которое хотите удалить.',
     '사진은 글자처럼 백스페이스로 삭제할 수 있습니다.':'Фото удаляются клавишей Backspace, как обычный текст.',
     // ── 3.82 에서 새로 넣은 것
@@ -7092,7 +7086,6 @@ const I18N = {
     '자세히':'Подробно',
     '점검하기':'Проверить',
     '곧 해야 할 정비':'Скоро обслуживание',
-    '지남':'Просрочено',
     '임박':'Скоро',
     '정비 탭':'Обслуживание',
     '내 할 일':'Мои задачи',
@@ -7104,8 +7097,6 @@ const I18N = {
     '배 목록':'Суда',
     '찾기':'Поиск',
     '{n}시간마다':'каждые {n} ч',
-    '남음 {n}시간':'осталось {n} ч',
-    '지남 {n}시간':'просрочено на {n} ч',
     '엔진 가동 몇 시간마다 해야 하는 작업인지 입력합니다. 예: 엔진오일 250시간, 임펠러 500시간.<br><br>':'Укажите, через сколько моточасов повторять — масло каждые 250 ч, крыльчатка каждые 500 ч.<br><br>',
     '개월 주기와 <b>둘 다</b> 입력하면 <b>먼저 도래하는 쪽</b>을 알려 줍니다. 예: 「6개월 또는 250시간 중 먼저 도래하는 시점」.<br><br>':'Если заполнить <b>оба</b> — календарь и моточасы — покажем то, что наступит <b>раньше</b>: «6 месяцев или 250 часов, что раньше».<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합산해 계산합니다. 계기판 시간을 따로 확인하지 않아도 됩니다.<br><br>':'Часы считаются по <b>записям работы двигателя</b> в приложении и по наработке из судового журнала. Показания счётчика снимать не нужно.<br><br>',
@@ -7277,7 +7268,7 @@ const I18N = {
     '배 옮기기':'Перегон',
     '처음이어도 괜찮습니다':'Новички приветствуются',
     '승선 경험 있는 분':'С опытом',
-    '면허 있는 분':'С правами',
+    '면허 소지자':'С правами',
     '야간 당직 가능한 분':'Готов стоять ночную вахту',
     '낚시 장비 있으신 분':'Со своими снастями',
     '없습니다':'Нет',
@@ -7336,9 +7327,7 @@ const I18N = {
     '주기마다 알려 드리고, 한 일은 그대로 이력이 됩니다':'Напомним, когда придёт срок, а сделанное станет историей',
     '제조사·모델·일련번호·설치일. 교체하면 지난 것도 이력에 남습니다':'Производитель, модель, серийный номер, дата установки — при замене прежнее остаётся в истории',
     '장비·정비·수리·항해를 한 장으로. 배를 넘길 때 그대로 드리면 됩니다':'Снаряжение, обслуживание, ремонты и походы на одной странице — можно передать как есть',
-    '첫걸음':'Первые шаги',
     '끝났습니다':'готово',
-    '정비 한 건 남기기':'Записать одну работу',
     '오늘 한 일이든 지난 일이든 좋습니다':'Сегодняшнюю или прошлую — любую',
     '배 이력서 만들어 보기':'Составить судовую историю',
     '기록한 내용이 한 장의 문서로 정리됩니다':'Записанное станет одной страницей',
@@ -7552,7 +7541,7 @@ const I18N = {
     '정비 절차':'Как это делалось',
     '한 단계 = 사진 한 장 + 설명 한 줄. 다음에 같은 작업을 할 때나 같은 배를 타는 다른 사람이 참고할 수 있습니다.':'Один шаг — одно фото и одна строка. Пригодится в следующий раз и любому, кто ходит на этом же судне.',
     '난이도':'Сложность',
-    '걸린 시간':'Затраченное время',
+    '소요 시간':'Затраченное время',
     '든 돈':'Затраты',
     '원':' вон',
     '부품·공구':'Детали и инструмент',
@@ -7667,7 +7656,6 @@ const I18N = {
     '총 가동시간':'Общая наработка',
     'L/시간':'л/ч',
     '주유량 L':'Залито, л',
-    '내가 적음':'задано вручную',
     'L/시간과 잔량은 눌러서 수정할 수 있습니다.':'Нажмите на «л/ч» или остаток, чтобы исправить.',
     'L/시간을 {v}로 입력하셨습니다.':'Вы задали {v} л/ч.',
     '앱 계산값은 {v}입니다.':'Расчётное значение: {v}.',
@@ -7710,7 +7698,7 @@ const I18N = {
     '+ 항목 추가':'+ Добавить пункт',
     // ── 3.89 · 커뮤니티 · 정박지 · 장터 · 뉴스 · 계정
     '이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.':'Войдите на другом устройстве — увидите те же записи.',
-    '계정 번호':'Номер аккаунта',
+    '회원번호':'Номер аккаунта',
     '운영자 지정을 요청할 때 이 번호를 알려 주세요.':'Сообщите этот номер, когда просите права администратора.',
     '이전 사진':'Старые фото',
     '문서에 남아 있는 사진은 앱을 실행할 때마다 조금씩 클라우드로 옮겨집니다':'Фото внутри документов постепенно переносятся в облако при каждом запуске',
@@ -7743,7 +7731,7 @@ const I18N = {
     '로그인하러 가기':'Перейти ко входу',
     '전체':'Все',
     '전 지역':'Все регионы',
-    '새 글 순':'Новые',
+    '최신순':'Новые',
     '도움이 된 순':'Полезные',
     '+ 내 배 정비 기록 추가':'+ Добавить запись обслуживания',
     '댓글':'Комментарии',
@@ -7752,7 +7740,7 @@ const I18N = {
     '사람':'Человек',
     '← 운영자':'← Администратор',
     '불러오는 중…':'Загрузка…',
-    '최고 운영자입니다.':'Это главный администратор.',
+    '최고 관리자입니다.':'Это главный администратор.',
     '앱 소유자이므로 앱에서 권한을 변경하거나 지정을 해제할 수 없습니다.':'Это владелец приложения — его права нельзя изменить или снять здесь.',
     '운영자 권한':'Права администратора',
     '글쓰기 차단':'Запретить писать',
@@ -7760,13 +7748,13 @@ const I18N = {
     '영업':'Коммерческие',
     '중간 기록':'Записи в пути',
     '이 배에 참여 신청':'Подать заявку на вступление',
-    '안 보기':'Скрыть',
+    '보지 않기':'Скрыть',
     '+ 글쓰기':'+ Написать',
     '내보내기':'Исключить',
     '회원 명부':'Список экипажа',
     '← 내 배':'← Моё судно', '← 계류장':'← Причал', '계류장':'Причал',
     '남의 배':'Другие суда', '항해기록':'Переходы', '정비수첩':'Журнал работ', '제품리뷰':'Отзывы',
-    '배리뷰':'Отзывы о судах',
+    '배 리뷰':'Отзывы о судах',
     '등급 설정':'Настройка ролей',
     '위에 있을수록 높은 등급입니다. 자신보다 낮은 등급만 수정할 수 있습니다.':'Чем выше в списке, тем выше роль. Менять можно только роли ниже своей.',
     '+ 등급 추가':'+ Новая роль',
@@ -7820,7 +7808,7 @@ const I18N = {
     '(삭제된 배)':'(судно удалено)',
     '(자동)':'(авто)',
     '(저조위 기준)':'(от нуля глубин)',
-    '+ 계정 번호로 지정':'+ Добавить по номеру аккаунта',
+    '+ 회원번호로 지정':'+ Добавить по номеру аккаунта',
     '+ 글':'+ Текст',
     '+ 사진':'+ Фото',
     '+ 사진 추가':'+ Добавить фото',
@@ -7895,7 +7883,6 @@ const I18N = {
     '갈치':'Рыба-сабля',
     '감성돔':'Чёрный морской карась',
     '숨기면 둘러보기에 표시되지 않습니다. 배 주인의 물품·정비 기록은 그대로 유지됩니다.':'Судно исчезнет из обзора. Вещи и записи об обслуживании владельца останутся нетронутыми.',
-    '감춤':'Скрыто',
     '갑오징어':'Каракатица',
     '강원':'Канвондо',
     '같은 내용을 반복해서 올림':'Повторная публикация одного и того же',
@@ -7961,7 +7948,7 @@ const I18N = {
     '권한이 없습니다':'Нет прав',
     '그 기록을 찾지 못했습니다':'Такая запись не найдена',
     '그 밖':'Прочее',
-    '그 밖의 이야기':'Всё остальное',
+    '자유게시판':'Всё остальное',
     '기타 사유':'Другая причина',
     '그 배의 기록은 삭제되지 않습니다. 다만 명부에 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 요청하시는 것이 좋습니다.':'Записи этого судна не удаляются. Но ваше имя может остаться в списке экипажа, поэтому лучше сначала попросить владельца исключить вас.',
     '상대방은 더 이상 이 배의 기록을 볼 수 없습니다.':'Он больше не увидит записи этого судна.',
@@ -7976,7 +7963,6 @@ const I18N = {
     '글 신고':'Пожаловаться на запись',
     '글 삭제':'Удалить запись',
     '글·댓글 쓰기 차단':'Запретить писать записи и комментарии',
-    '글쓴이 이름':'Имя автора',
     '글을 관리할 권한이 없습니다':'Нет прав управлять записями',
     '글과 사진을 함께 복사해 본문 칸에 붙여넣으면 사진도 함께 들어갑니다.':'Скопируйте текст вместе с фото и вставьте в поле — фотографии вставятся тоже.',
     '글을 쓸 권한이 없습니다':'Нет прав писать записи',
@@ -7997,7 +7983,6 @@ const I18N = {
     '기상청 실시간 확인':'Проверить у метеослужбы',
     '대한민국 해역 밖이라 기상청 해상 특보가 제공되지 않습니다':'За пределами вод Кореи, поэтому корейские морские предупреждения здесь не действуют',
     '해당 국가의 기상 기관에서 확인해 주세요':'Проверьте у метеослужбы этой страны',
-    '기억해 둘 것':'Стоит запомнить',
     '기온':'Температура',
     '설정':'Настройки',
     '알림':'Уведомления',
@@ -8029,10 +8014,10 @@ const I18N = {
     '공개 항해일지에 지나온 경로를 표시합니다':'Показывает пройденный маршрут в открытом судовом журнале',
     '출발·도착 지점 반경 {n}해리를 가리고 {k}개 지점을 표시합니다':'Скрыто {n} м. миль вокруг начала и конца; показано точек: {k}',
     '배의 계류 위치는 공개되지 않습니다. 가리는 범위는 배 › 공개 설정에서 변경할 수 있습니다.':'Место стоянки не публикуется. Радиус скрытия меняется в «Судно › Публикация».',
-    '항적 가리기':'СКРЫТИЕ ТРЕКА',
+    '항적 숨기기':'СКРЫТИЕ ТРЕКА',
     '가림 반경':'Радиус скрытия',
     '{n}해리':'{n} м. миль',
-    '가리지 않음':'Не скрывать',
+    '무관':'Не скрывать',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'На переходах с включённым треком столько вокруг начала и конца вырезается перед показом. Это скрывает место стоянки.',
     '계류 위치 주변은 가려져 있습니다.':'Область вокруг места стоянки скрыта.',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'Записи и фото; имена экипажа не публикуются; трек включается для каждого перехода отдельно',
@@ -8098,8 +8083,8 @@ const I18N = {
     '나중에 차단 이유를 확인할 수 있도록':'Чтобы потом помнить причину блокировки',
     '나중에 정비 문제로 도움을 구할 때, 상대방이 배를 알아야 정확한 답을 받을 수 있습니다. ':'Когда вы позже спросите совета по ремонту, ответ будет точнее, если собеседник знает судно. ',
     '낚시장비':'Рыболовные снасти',
-    '날마다':'Ежедневно',
-    '날마다 초기화':'Сброс каждый день',
+    '매일':'Ежедневно',
+    '매일 초기화':'Сброс каждый день',
     '날씨 —':'Погода —',
     '날씨 기록은 삭제되지 않습니다.':'Записи о погоде при этом не удаляются.',
     '날씨 데이터를 받지 못했습니다':'Не удалось получить данные о погоде',
@@ -8122,12 +8107,12 @@ const I18N = {
     '원작자 허락을 받아 옮긴 글':'Перепечатка с разрешения автора',
     '다른 사람이 올린 연재는 수정할 수 없습니다.\n\n작성자만 수정할 수 있습니다.':'Чужую серию изменить нельзя.\n\nЭто может сделать только автор публикации.',
     '남해식':'Южное побережье',
-    '내 계정 번호\n\n':'Мой номер аккаунта\n\n',
+    '내 회원번호\n\n':'Мой номер аккаунта\n\n',
     '내 계정 번호를 복사했습니다.\n\n':'Номер аккаунта скопирован.\n\n',
     '내 등급보다 낮은 등급만 지정할 수 있습니다':'Можно назначать только роли ниже вашей',
     '내 등급보다 높은 등급은 지정할 수 없습니다':'Нельзя назначить роль выше вашей',
     '내 배를 고친 이야기 · 고장·수리':'Как я чинил судно · поломки и ремонт',
-    '내가 누를 때까지 그대로 두기':'Оставить, пока не нажму сам',
+    '[초기화]를 누를 때까지 체크가 유지됩니다':'Отметки остаются, пока вы не нажмёте «Сбросить»',
     '내가 올린 정박지·중고 장터':'Мои стоянки и объявления',
     '내리지 못했습니다.\n\n':'Не удалось снять.\n\n',
     '내용 보기':'Читать',
@@ -8165,7 +8150,7 @@ const I18N = {
     '추가 내용':'Что добавить',
     '도면 도형이 잠겨 있습니다.\n\n지금 잠금을 해제할까요?\n해제한 뒤 다시 시도해 주세요.\n(도구 막대의 자물쇠 버튼으로도 잠그거나 해제할 수 있습니다)':'Фигуры на плане заблокированы.\n\nРазблокировать сейчас?\nПосле разблокировки повторите действие.\n(Замок на панели инструментов делает то же самое.)',
     '도면 사진':'Изображение плана',
-    '도면 사진 바꾸기':'Заменить изображение плана',
+    '도면 사진 변경':'Заменить изображение плана',
     '도면 핀':'Метки на плане',
     '도면 🔓':'План 🔓',
     '도면·수납칸 편집':'Правка планов и рундуков',
@@ -8178,7 +8163,6 @@ const I18N = {
     '도형':'Фигура',
     '돈이 오가는 기능입니다. 문제가 생기면 이 기능부터 잠그세요.':'Здесь проходят деньги. При проблемах блокируйте это в первую очередь.',
     '동':'В',
-    '동그라미':'Круг',
     '동기화 실패 · 눌러서 확인':'Синхронизация не удалась · нажмите, чтобы узнать',
     '동남동':'ВЮВ',
     '동북동':'ВСВ',
@@ -8272,8 +8256,7 @@ const I18N = {
     '목록에 없는 항목을 직접 입력해 주세요':'Впишите то, чего нет в списке',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'Список только один. Сначала добавьте ещё один.',
     '목포':'Мокпхо',
-    '몰라서 묻는 것':'Вопросы',
-    '받지 못함: {why}':'Не получено: {why}',
+    '불러오지 못함: {why}':'Не получено: {why}',
     '묘박':'На якоре',
     '묘박 가능한 수심을 추정합니다. 앵커줄은 보통 수심의 5~7배가 필요합니다.':'Оценивает глубину для якорной стоянки. Обычно длина якорного каната — 5–7 глубин.',
     '무료 나눔':'Даром',
@@ -8308,8 +8291,8 @@ const I18N = {
     '이 물때는 위성 조석 모형 <b>EOT20</b>에서 추출한 <b>{spot}</b> 부근({km}km)의 <b>조화상수</b>로 계산한 것입니다. 높이는 <b>최저천문조위(LAT)</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'Этот прилив рассчитан по <b>гармоническим постоянным</b> спутниковой приливной модели <b>EOT20</b> у пункта <b>{spot}</b> ({km} км). Высоты отсчитаны от <b>наинизшего теоретического уровня (LAT)</b>. Перед проходом под мостом <b>сверьтесь с картой и VTS.</b>',
     '조석 모형':'Приливная модель',
     '참고용 물때를 사용하고 있습니다. 정확한 값을 아시면 직접 입력해 주세요. 입력한 값을 사용합니다.':'Используется приблизительный прилив. Если знаете точные значения, введите их, и они будут использоваться.',
-    '물때 자료를 받는 중…':'Получение данных о приливе…',
-    '물어보기':'Задать вопрос',
+    '물때 정보를 불러오는 중…':'Получение данных о приливе…',
+    '질문하기':'Задать вопрос',
     '물품·정비·수리·항해일지·서류·도면·게시판':'Вещи, обслуживание, ремонт, судовой журнал, документы, планы, доска',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'Это рундук для вещей. Стены и переборки рисуйте линией, прямоугольником или треугольником.',
     '미꾸라지':'Вьюн',
@@ -8320,14 +8303,12 @@ const I18N = {
   
 
     // ── 3.90 · 외국어 ④
-    '바꾸지 못했습니다.\n\n':'Не удалось изменить.\n\n',
-    '바꾸지 못했습니다: ':'Не удалось изменить: ',
+    '변경하지 못했습니다.\n\n':'Не удалось изменить.\n\n',
+    '변경하지 못했습니다: ':'Не удалось изменить: ',
     '바다에서는 인터넷이 안 될 때가 있습니다. 그럴 때는 로그인 없이 이 기기에서만 사용하다가 나중에 로그인하셔도 됩니다.':'В море интернета часто нет. Тогда пользуйтесь приложением на этом устройстве без входа, а войдёте позже.',
     '바람막이':'Защита от ветра',
     '바위':'Камень',
     '외부 공개':'Видно всем',
-    '받는 중…':'Получение…',
-    '받아오는 중…':'Загрузка…',
     '발효 중인 해상 특보 없음':'Действующих морских предупреждений нет',
     '방어':'Лакедра',
     '방파제 안쪽 접안':'К стенке внутри волнолома',
@@ -8443,7 +8424,7 @@ const I18N = {
     '새 등급을 만듭니다.':'Создать новую роль.',
     '새 소식':'Новости',
     '새 수납칸':'Новый рундук',
-    '새 점검 목록':'Новый чек-лист',
+    '새 체크리스트':'Новый чек-лист',
     '신규':'новое',
     '신규 {n}':'новых: {n}',
     '새우':'Креветка',
@@ -8632,20 +8613,19 @@ const I18N = {
     '작성자와 운영자만 수정할 수 있습니다':'Изменить может только автор или администратор',
     '작성자와 운영자만 삭제할 수 있습니다':'Удалить может только автор или администратор',
     '작성자만 변경할 수 있습니다':'Изменить может только автор',
-    '옮기기':'Перенести',
     '옮긴 글은 저자 · 매체 · 원문 링크가 반드시 있어야 합니다 (허락 조건). 직접 쓴 글은 저자만 있으면 됩니다.':'Для перепечатки обязательны автор, издание и ссылка на оригинал (это условие разрешения). Для своего текста достаточно автора.',
     '옮긴 글은 저자·매체·원문 링크가 모두 있어야 등록됩니다.\n':'Перепечатка публикуется только при наличии автора, издания и ссылки на оригинал.\n',
     '옮긴 글일 때만':'Только для перепечаток',
     '옮긴 글일 때만 · https://…':'Только для перепечаток · https://…',
     '옮긴 글일 때만 · 예: Yacht Russia':'Только для перепечаток · напр. Yacht Russia',
-    '옮길 목록':'В какой список',
+    '이동할 목록':'В какой список',
     '완도':'Вандо',
     '완료된 수리':'Завершённый ремонт',
     '완전삭제':'Удалить навсегда',
     '신고 사유를 선택해 주세요':'Выберите причину жалобы',
     '외줄':'Ручная снасть',
     '요금':'Плата',
-    '요트·보트·낚시배':'Яхты, катера, рыболовные суда',
+    '요트·보트·낚싯배':'Яхты, катера, рыболовные суда',
     '욕설·비방':'Оскорбления',
     '우럭':'Морской окунь',
     '운영자 지정':'Назначить администратора',
@@ -8662,7 +8642,6 @@ const I18N = {
     '원제':'Оригинальное название',
     '원투':'Дальний заброс',
     '웜':'Силиконовая приманка',
-    '위에 없는 이야기':'Всё, чего нет выше',
     '위치 —':'Позиция —',
     '위치 지정':'Задать позицию',
     '위치를 가져오지 못했습니다.':'Не удалось определить местоположение.',
@@ -8753,7 +8732,6 @@ const I18N = {
     '자갈':'Галька',
     '자동':'Авто',
     '자료 없음':'Нет данных',
-    '위치 찍기':'Отметить место',
     '위치를 먼저 지정해 주세요':'Сначала отметьте место',
     '자주 보는 위치를 지도에서 지정해 두면 눌러서 바로 볼 수 있습니다.':'Отметьте на карте места, которые часто смотрите, и они будут открываться одним нажатием.',
     '작게':'Меньше',
@@ -8781,7 +8759,7 @@ const I18N = {
     '전북':'Северная Чолладо',
     '전자장비':'Электроника',
     '전체 보기':'Вписать в экран',
-    '점검 목록 수정':'Изменить чек-лист',
+    '체크리스트 수정':'Изменить чек-лист',
     '점검 주기':'Периодичность',
     '점검 항목':'Пункт проверки',
     '점검 항목 수정':'Изменить пункт проверки',
@@ -8790,7 +8768,7 @@ const I18N = {
     '정기점검과 수리목록':'Регламент и ремонт',
     '정기점검에 「{list}」 항목이 남아 있습니다.':'В регламенте остались пункты: «{list}».',
     '정말 삭제할까요':'Точно удалить',
-    '정박 중 점검처럼 주 단위로 하는 것':'Еженедельные дела — например, проверки у стенки',
+    '매주 월요일 0시에 체크가 초기화됩니다':'Отметки сбрасываются каждый понедельник в 0:00',
     '정박지 수정':'Изменить стоянку',
     '정박지 신고':'Пожаловаться на стоянку',
     '정박지 올리기':'Добавить стоянку',
@@ -8822,11 +8800,10 @@ const I18N = {
     '좁은 수로를 지날 때 감당할 수 있는 조류 세기입니다.':'Сила течения, с которой вы справитесь в узкости.',
     '주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.':'Повторяется по циклу — это регламент; возникло внезапно — это ремонт.',
     '주꾸미':'Мелкий осьминог (чуккуми)',
-    '주마다':'Еженедельно',
-    '주마다 초기화':'Сброс каждую неделю',
+    '매주':'Еженедельно',
+    '매주 초기화':'Сброс каждую неделю',
     '주소는 https:// 로 시작해야 합니다':'Адрес должен начинаться с https://',
     '주소를 입력하면 눌러서 열 수 있습니다':'Если указать адрес, он будет открываться по нажатию',
-    '주인':'Владелец',
     '주차':'Парковка',
     '부여할 수 있는 등급이 없습니다':'Нет роли, которую вы можете дать',
     '중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n':'В записях нет отметок о включении и выключении двигателя.\n\n',
@@ -8836,7 +8813,7 @@ const I18N = {
     '지금 납부한 것으로 기록할까요?':'Записать как оплаченное сейчас?',
     '지금 업데이트':'Обновить сейчас',
     '지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.':'Вы только что вышли?\n\nПлан превратится в запись судового журнала, и будут записаны время, позиция и погода.',
-    '지금 크기':'Текущий размер',
+    '원본':'Текущий размер',
     '현재 시각':'Текущее время',
     '지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'Сейчас режим только для чтения (правка заблокирована).\n\nНажмите [Только чтение] в верхней строке\nи переключите на [Правка].',
     '지금은 보기 전용입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'Сейчас режим только для чтения.\n\nНажмите [Только чтение] в верхней строке\nи переключите на [Правка].',
@@ -8862,7 +8839,7 @@ const I18N = {
     '직접':'вручную',
     '직접 입력':'Ручной ввод',
     '직접 입력한 만조·간조 사용 중':'Используются введённые вами полная и малая вода',
-    '수동 초기화':'Сброс вручную',
+    '반복 안 함':'Никогда',
     '진행 중인 항목이 없습니다':'В работе ничего нет',
     '질문':'Вопрос',
     '찜':'В избранном',
@@ -8882,9 +8859,9 @@ const I18N = {
     '첫 항목 추가하기':'Добавить первый пункт',
     '체크리스트':'Чек-листы',
     '체크항목':'Пункт проверки',
-    '초기화 주기':'Периодичность сброса',
+    '반복':'Повтор',
     '초안 표시':'Пометка «черновик»',
-    '최고 운영자':'Главный администратор',
+    '최고 관리자':'Главный администратор',
     '최대':'макс.',
     '출발':'Отход',
     '출발 날씨':'Погода на отходе',
@@ -8895,7 +8872,7 @@ const I18N = {
     '출발과 도착 사이에 있었던 일':'Что произошло между отходом и приходом',
     '출항 3일 전까지':'За 3 дня до выхода',
     '출항 당일까지':'До дня выхода включительно',
-    '출항 전 점검처럼 출항할 때마다 하는 것':'То, что делается каждый раз перед выходом',
+    '매일 0시에 체크가 초기화됩니다':'Отметки сбрасываются каждый день в 0:00',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'Если разделить их по ситуациям (перед выходом, после прихода), искать будет проще',
     '출항 전날까지':'За день до выхода',
     '충남':'Южная Чхунчхондо',
@@ -8961,7 +8938,6 @@ const I18N = {
     '할 수 있는 일을 켜거나 끕니다. 모두 끄면 운영자 지정이 해제됩니다.':'Включайте и выключайте полномочия. Если выключить все, он перестанет быть администратором.',
     '할 수 있는 일이 없습니다':'Полномочий нет',
     '할 수 있는 일이 하나도 남지 않습니다.\n\n이 사람의 운영자 지정을 해제할까요?':'У него не останется ни одного полномочия.\n\nСнять с него права администратора?',
-    '할 일 배정':'Назначение задач',
     '할 일을 배정할 권한이 없습니다':'Нет прав назначать задачи',
     '할 일을 볼 권한이 없습니다':'Нет прав смотреть задачи',
     '합치기 (수량 합산·사진 통합)':'Объединить (сложить количество, свести фото)',
@@ -8995,7 +8971,7 @@ const I18N = {
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n삭제해도 배를 열면 다시 생깁니다.\n':'Эта точка создана автоматически по порту приписки.\n\nЕсли её удалить, она снова появится при открытии судна.\n',
     '화면이 보이지 않음':'Экран недоступен',
     '화장실':'Туалет',
-    '확인 글자':'Текст подтверждения',
+    '확인 문구':'Текст подтверждения',
     '확인함':'Просмотрено',
     '환산':'Пересчитать',
     '환산값이 0보다 작습니다.\n\n측정값이나 측정 시각을 다시 확인해 주세요.':'Пересчитанное значение меньше нуля.\n\nПроверьте замер и время замера.',
@@ -9371,10 +9347,10 @@ const I18N = {
     '글은 계속 읽으실 수 있습니다.':'Читать по-прежнему можно.',
     '운영자를 지정하거나 해제할 권한이 없습니다':'Нет прав назначать или снимать администраторов',
     '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.':'Не удалось проверить вход.\n\nПерезапустите приложение и повторите.',
-    '최고 운영자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'Главного администратора нельзя изменить из приложения.\n\nОн владелец приложения: его права нельзя менять, и снять его нельзя.',
+    '최고 관리자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'Главного администратора нельзя изменить из приложения.\n\nОн владелец приложения: его права нельзя менять, и снять его нельзя.',
     '본인의 운영자 지정은 직접 해제할 수 없습니다.\n\n운영자를 지정할 수 있는 사람이 아무도 없게 되는 것을 막기 위해서입니다.\n다른 분에게 지정 권한을 준 뒤 그분이 해제해 주셔야 합니다.':'Нельзя снять самого себя.\n\nИначе может не остаться никого, кто мог бы назначать администраторов.\nПередайте право назначения другому пользователю, чтобы он снял вас.',
     '본인의 지정 권한은 직접 끌 수 없습니다.\n\n끄면 운영자를 지정할 수 있는 사람이 없어 되돌릴 수 없습니다.\n다른 분에게 지정 권한을 준 뒤 그분이 꺼 주셔야 합니다.':'Нельзя отключить собственное право назначения.\n\nПосле отключения никто не сможет назначать администраторов, и это не восстановить.\nПередайте право назначения другому пользователю, чтобы он отключил ваше.',
-    '최고 운영자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'Главного администратора нельзя заблокировать.\n\nОн владелец приложения.',
+    '최고 관리자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'Главного администратора нельзя заблокировать.\n\nОн владелец приложения.',
     '본인은 차단할 수 없습니다.':'Нельзя заблокировать самого себя.',
     '배를 숨기거나 삭제할 권한이 없습니다':'Нет прав скрывать или удалять суда',
     '오늘의 클라우드 사용량을 모두 사용했습니다.\n\n· 기기에 저장된 기록은 그대로 있으며, 앱의 모든 기능을 계속 사용할 수 있습니다.\n· 다른 기기와의 동기화만 잠시 중지됩니다.\n· 매일 한 번(한국 시간 오후 4시쯤) 자동으로 초기화됩니다.\n\n이 문제가 반복되면 운영자에게 알려 주세요. 고객센터에서 보낼 수 있습니다.':'Дневной лимит облака исчерпан.\n\n· Все записи на устройстве целы, приложение работает как обычно.\n· Приостановлена только синхронизация с другими устройствами.\n· Лимит сбрасывается каждый день (около 16:00 по корейскому времени).\n\nЕсли это повторяется, сообщите администратору. Это можно сделать в разделе поддержки.',
@@ -9387,7 +9363,7 @@ const I18N = {
     '계산 불가':'Невозможно рассчитать',
     '불러오지 못했습니다: {why}':'Не удалось загрузить: {why}',
     '차단된 자료: {what} — {why}':'Заблокированные записи: {what} — {why}',
-    '형식이 다른 파일':'Формат файла не подходит',
+    '지원되지 않는 파일 형식':'Формат файла не подходит',
     '물품 수정 (아래에서 사진 추가 가능)':'Изменить вещь (фото можно добавить ниже)',
     '수정 완료':'Готово',
     '전체 {a}개 물품 · {b}개 수납칸':'Вещей: {a} · Рундуков: {b}',
@@ -9405,8 +9381,6 @@ const I18N = {
 
     // ── 4.01d
     '미기록':'Нет записи',
-    '지남 {n}일':'Просрочено на {n} дн.',
-    '남음 {n}일':'Осталось {n} дн.',
     '기한 초과':'Просрочено',
     '곧':'Скоро',
     '주기 {n}{u}':'Каждые {n}{u}',
@@ -9449,7 +9423,7 @@ const I18N = {
   
 
     // ── 4.07
-    '되돌리고 닫기':'Отменить и закрыть',
+    '저장하지 않고 닫기':'Отменить и закрыть',
     '수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.':'Отменить изменения и закрыть?\n\nВсё, что вы изменили после открытия этого экрана, вернётся как было.',
   
 
@@ -9493,11 +9467,10 @@ const I18N = {
     '위치정보 수집에 동의':'Согласие на сбор дано', '위치정보 수집에 동의하기':'Согласиться на сбор местоположения', '동의·철회':'Согласие',
     '위치정보 수집 동의 철회':'Отозвать согласие',
     '위치정보 수집 동의를 철회할까요?\n\n철회하면 「지금 여기」, 현재 위치 날씨 등의 기능을 사용할 수 없습니다.\n이미 저장된 좌표는 그대로 남습니다. 항해 기록에서 따로 삭제하실 수 있습니다.':'Отозвать согласие на сбор местоположения?\n\nПерестанут работать «Я здесь» и погода по текущему месту.\nУже сохранённые координаты останутся. Их можно удалить по отдельности в судовом журнале.',
-    '내려받기':'Скачать',
+    '다운로드':'Скачать',
     '지금은 동의하신 상태입니다.':'Сейчас согласие дано.',
     '현재 동의하지 않으신 상태이므로 위치정보를 수집하지 않습니다.':'Согласие не дано, местоположение не принимается.',
     '접근':'Доступ',
-    '위치정보 수집 동의를 거둠':'Согласие на сбор отозвано',
     '클라우드에서 항해 좌표를 받음':'Получены координаты походов из облака',
   
 
@@ -9541,7 +9514,7 @@ const I18N = {
     '이 배의 정비수첩':'Журнал работ этого судна',
     '이 배의 정비 기록':'Записи об обслуживании этого судна',
     '아직 선택하지 않았습니다':'Пока никто не отмечен',
-    '함께 탄 사람 선택':'Выбрать, кто был на борту',
+    '동승자 선택':'Выбрать, кто был на борту',
     '선택한 분들의 앱 「내 승선 이력」에 이 항해가 기록됩니다.':'У отмеченных это засчитается в их приложении в разделе Мой морской стаж.',
     '{name} 님이 탔습니다':'{name} был на борту',
     '밤 12시':'00:00',
@@ -9555,7 +9528,6 @@ const I18N = {
     '배에 참여하시면 승선한 항해가 「내 승선 이력」에 기록됩니다.':'Как только вы вступите на судно, пройденные переходы начнут накапливаться как ваш морской стаж.',
     '언제, 어느 배로, 몇 해리를 항해했는지 한 장으로 출력할 수 있습니다. 직접 입력하는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'Один лист: когда, на каком судне и сколько миль вы прошли. Вы не вписываете это сами. Данные берутся прямо из судовых журналов.',
     '선장':'Капитан',
-    '함께 탄 사람':'Кто был на борту',
     '여기서 선택한 사람의 앱 「내 승선 이력」에 이 항해가 기록됩니다. 명부에 없는 손님은 아래 「동승」에 이름을 입력해 주세요.':'У отмеченных здесь это засчитается в их приложении в разделе Мой морской стаж. Гостей, которых нет в списке экипажа, впишите ниже в поле Экипаж на борту.',
     '내 승선 이력':'Мой морской стаж',
     '항해 일수':'Дней в море',
@@ -9606,7 +9578,6 @@ const I18N = {
     '이제 장비·정비·수리·항해 기록을 한 장의 문서로 출력할 수 있습니다. 배를 넘길 때 그대로 전해 주시면 됩니다.':'Теперь оборудование, обслуживание, ремонты и походы выходят одним листом. При продаже судна передайте его как есть.',
     '계류 위치 지정':'Отметить стоянку судна',
     '출항 전 점검 한 번 해 보기':'Пройти проверку перед выходом',
-    '자리 잡기':'Отметить место',
     '이 휴대폰의 배터리 절전 목록에 뱃일이 들어 있습니다.':'Baetnil в списке энергосбережения этого телефона.',
     '절전 목록에서 제외하면 화면을 꺼도 항적이 더 안정적으로 기록됩니다. 한 번만 설정하시면 됩니다.':'Уберите его из этого списка, и трек будет надёжнее записываться при выключенном экране. Достаточно сделать один раз.',
     '화면이 꺼져 있던 {m}분 동안 위치 정보가 한 번도 수신되지 않았습니다.':'За {m} мин. с выключенным экраном не пришло ни одной точки.',
@@ -9916,7 +9887,7 @@ const I18N = {
     '설치한 지 얼마 안 됨':'Только установлено',
     '1년 미만':'Менее года',
     '1~3년':'1–3 года',
-    '3년 넘게':'Более 3 лет',
+    '3년 이상':'Более 3 лет',
     '엔':'JPY',
     '달러':'USD',
     '유로':'EUR',
@@ -9978,7 +9949,7 @@ const I18N = {
     '{name} 운용':'{name} — эксплуатация',
     '물품 {n}개와 정비·수리·항해일지·도면':'{n} [[вещь|вещи|вещей]], обслуживание, ремонты, судовой журнал и планы',
     '정기점검 · 마지막 {date}':'Регламент · последний раз {date}',
-    '(모두 {n}회)':'(всего {n} [[раз|раза|раз]])',
+    '(총 {n}회)':'(всего {n} [[раз|раза|раз]])',
     '사진 {n}장':'{n} фото',
     '{n}건':'{n}',
     '모두 {n}명.':'Всего людей: {n}.',
@@ -10244,6 +10215,7 @@ const I18N = {
   //
   // ★ 「뱃일」 은 앱 이름이라 그대로 둔다. 「원」 은 円 이 아니라 ウォン 이다.
   ja: {
+    '받는 중…':'受信中…',
     '배를 둘러보기에 공개합니다 · 공개 설정에서 언제든 끌 수 있습니다':'船を「船を見る」に公開します ・ 「船の公開設定」でいつでもオフにできます',
     '배는 {n}척까지 선택할 수 있습니다.':'船は {n} 隻まで選べます。',
     '← 회원 명부':'← メンバー名簿',
@@ -10304,7 +10276,7 @@ const I18N = {
     '휴대폰의 Baetnil 폴더에 기록을 파일 하나로 저장합니다':'この端末の Baetnil フォルダに記録を一つのファイルで保存します',
     '휴대폰 저장공간':'本体ストレージ',
     '앱 파일':'アプリのファイル',
-    '앱 안':'アプリ内',
+    '앱 내':'アプリ内',
     '파일로 저장했습니다.':'ファイルに保存しました。',
     '파일 앱':'「ファイル」App',
     '나의 iPhone':'このiPhone内',
@@ -10340,7 +10312,7 @@ const I18N = {
     '표 삭제':'表を削除',
     '+ 줄':'+ 行',
     '+ 칸':'+ 列',
-    '줄 삭제':'行を削除',
+    '행 삭제':'行を削除',
     '칸 삭제':'列を削除',
     '이 표를 지울까요?':'この表を削除しますか？',
     '줄은 {n}개까지 넣을 수 있습니다.':'行は{n}個まで入れられます。',
@@ -10506,7 +10478,7 @@ const I18N = {
     '{d} 만탱크 후 {h} 가동':'{d} の満タン以降 {h} 稼働',
     '{d} 설치':'{d} 取付',
     '고장 {n}':'故障 {n}',
-    '지남 {n}':'超過 {n}',
+    '기한 지남 {n}':'超過 {n}',
     '임박 {n}':'まもなく {n}',
     '정기점검 {n}':'定期点検 {n}',
     '정비수첩 {n}':'整備手帳 {n}',
@@ -10528,9 +10500,7 @@ const I18N = {
     '제원':'仕様',
     '계통별 요약':'系統別のまとめ',
     '마지막 정비':'前回の整備',
-    '배소개':'船の紹介',
     '회원명부':'メンバー名簿',
-    '등급설정':'役割の設定',
     '게시판':'掲示板',
     '할일':'やること',
     '참여신청':'参加申請',
@@ -10597,14 +10567,13 @@ const I18N = {
     '{n}개 목록 중':'{n}件のリストから',
     '[초안] 주기·내용 확인 필요':'[下書き] 周期・内容の確認が必要',
     '[초안] 확인 필요':'[下書き] 確認が必要',
-    '이 사람 안 보기':'この人を非表示',
+    '이 사용자의 글 보지 않기':'この人を非表示',
     '안 보기로 한 사람의 글을 다시 봅니다':'非表示にした人の投稿を再び表示します',
     '{name} 님의 글과 댓글을 이 기기에서 숨길까요?':'{name} さんの投稿とコメントをこの端末で非表示にしますか？',
     '이제 이 사람의 글이 표시되지 않습니다.':'この人の投稿は表示されなくなりました。',
     '내 글은 숨길 수 없습니다':'自分の投稿は非表示にできません',
     '누가 올렸는지 알 수 없습니다':'投稿した人が分かりません',
     '이 사람':'この人',
-    '(이름 모름)':'（名前不明）',
     '「{w}」 같은 말은 올릴 수 없습니다.':'「{w}」のような言葉は投稿できません。',
     '해당 부분을 수정해 주세요.':'その部分を修正してください。',
     'Google로 계속하기':'Googleで続ける',
@@ -10628,7 +10597,6 @@ const I18N = {
     '거절하기':'拒否する',
     '다시 계산':'再計算',
     '복원하기':'復元する',
-    '버리고 닫기':'破棄して閉じる',
     '휴지통으로':'ゴミ箱へ',
     '편집 모드로':'編集モードにする',
     '출항 기록':'出港記録',
@@ -10723,7 +10691,6 @@ const I18N = {
     '실수로 수정되지 않도록 잠가 두었습니다.':'誤って編集されないようロックしています。',
     '편집 모드로 바꾸고 계속할까요?':'編集モードに切り替えて続けますか？',
     '번역 보기':'翻訳を表示',
-    '원어로 보기':'原文を表示',
     '자동 번역된 글입니다':'自動翻訳された文章です',
     '번역하는 중…':'翻訳中…',
     '지금은 번역할 수 없습니다':'今は翻訳できません',
@@ -10731,7 +10698,7 @@ const I18N = {
     '번역하지 못했습니다':'翻訳できませんでした',
     '앱 화면에 표시되는 언어가 바뀝니다.':'アプリの表示言語が変わります。',
     '다른 사람이 올린 글은 작성한 언어 그대로 표시됩니다. 글을 열면 번역 버튼이 나옵니다.':'ほかの人の投稿は書かれた言語のまま表示されます。投稿を開くと翻訳ボタンが表示されます。',
-    '사진을 넣는 중…':'写真を挿入中…',
+    '사진 업로드 중…':'写真を挿入中…',
     '삭제할 사진을 먼저 한 번 눌러 주세요.':'削除する写真を先に一度タップしてください。',
     '사진은 글자처럼 백스페이스로 삭제할 수 있습니다.':'写真は文字と同じように、バックスペースで削除できます。',
     '회비':'会費',
@@ -10778,7 +10745,6 @@ const I18N = {
     '자세히':'詳細',
     '점검하기':'点検する',
     '곧 해야 할 정비':'まもなく必要な整備',
-    '지남':'期限超過',
     '임박':'間近',
     '정비 탭':'整備タブ',
     '내 할 일':'自分のタスク',
@@ -10789,8 +10755,6 @@ const I18N = {
     '배 목록':'船の一覧',
     '찾기':'検索',
     '{n}시간마다':'{n}時間ごと',
-    '남음 {n}시간':'あと{n}時間',
-    '지남 {n}시간':'{n}時間超過',
     '엔진 가동 몇 시간마다 해야 하는 작업인지 입력합니다. 예: 엔진오일 250시간, 임펠러 500시간.<br><br>':'エンジン稼働何時間ごとの作業かを入力します。例：エンジンオイル 250時間、インペラー 500時間。<br><br>',
     '개월 주기와 <b>둘 다</b> 입력하면 <b>먼저 도래하는 쪽</b>을 알려 줍니다. 예: 「6개월 또는 250시간 중 먼저 도래하는 시점」.<br><br>':'月単位の周期と<b>両方</b>入力すると、<b>先に来るほう</b>をお知らせします。例：「6か月または250時間のいずれか早いほう」。<br><br>',
     '시간은 앱의 <b>엔진 가동 기록</b>과 항해일지의 가동시간을 합산해 계산합니다. 계기판 시간을 따로 확인하지 않아도 됩니다.<br><br>':'時間はアプリの<b>エンジン稼働記録</b>と航海日誌の稼働時間を合わせて数えます。計器を読む必要はありません。<br><br>',
@@ -10961,7 +10925,7 @@ const I18N = {
     '배 옮기기':'回航',
     '처음이어도 괜찮습니다':'初めてでも大丈夫です',
     '승선 경험 있는 분':'乗船経験のある方',
-    '면허 있는 분':'免許をお持ちの方',
+    '면허 소지자':'免許をお持ちの方',
     '야간 당직 가능한 분':'夜間当直ができる方',
     '낚시 장비 있으신 분':'釣り道具をお持ちの方',
     '없습니다':'ありません',
@@ -11019,9 +10983,7 @@ const I18N = {
     '주기마다 알려 드리고, 한 일은 그대로 이력이 됩니다':'周期ごとにお知らせし、行ったことはそのまま履歴になります',
     '제조사·모델·일련번호·설치일. 교체하면 지난 것도 이력에 남습니다':'メーカー・モデル・シリアル番号・取付日。交換すると以前のものも履歴に残ります',
     '장비·정비·수리·항해를 한 장으로. 배를 넘길 때 그대로 드리면 됩니다':'装備・整備・修理・航海を1枚に。船を引き継ぐときにそのままお渡しできます',
-    '첫걸음':'はじめの一歩',
     '끝났습니다':'完了',
-    '정비 한 건 남기기':'整備を1件記録する',
     '오늘 한 일이든 지난 일이든 좋습니다':'今日のことでも、以前のことでもかまいません',
     '배 이력서 만들어 보기':'船歴書を作ってみる',
     '기록한 내용이 한 장의 문서로 정리됩니다':'書いたものが1枚の書面になります',
@@ -11235,7 +11197,7 @@ const I18N = {
     '정비 절차':'整備手順',
     '한 단계 = 사진 한 장 + 설명 한 줄. 다음에 같은 작업을 할 때나 같은 배를 타는 다른 사람이 참고할 수 있습니다.':'1ステップ＝写真1枚＋説明1行。次に同じ作業をするときや、同じ船に乗るほかの人の参考になります。',
     '난이도':'難易度',
-    '걸린 시간':'所要時間',
+    '소요 시간':'所要時間',
     '든 돈':'かかった費用',
     '원':'ウォン',
     '부품·공구':'部品・工具',
@@ -11348,7 +11310,6 @@ const I18N = {
     '총 가동시간':'総稼働時間',
     'L/시간':'L/時',
     '주유량 L':'給油量 L',
-    '내가 적음':'手動入力',
     'L/시간과 잔량은 눌러서 수정할 수 있습니다.':'L/時と残量はタップして修正できます。',
     'L/시간을 {v}로 입력하셨습니다.':'L/時は {v} と入力されています。',
     '앱 계산값은 {v}입니다.':'アプリの計算値は {v} です。',
@@ -11390,7 +11351,7 @@ const I18N = {
     '초기화':'リセット',
     '+ 항목 추가':'+ 項目を追加',
     '이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.':'このアカウントでログインした他の端末でも、同じ記録を見ることができます。',
-    '계정 번호':'アカウント番号',
+    '회원번호':'アカウント番号',
     '운영자 지정을 요청할 때 이 번호를 알려 주세요.':'管理者に設定してもらうときは、この番号をお伝えください。',
     '이전 사진':'古い写真',
     '문서에 남아 있는 사진은 앱을 실행할 때마다 조금씩 클라우드로 옮겨집니다':'書類の中に残っている写真は、アプリを起動するたびに少しずつクラウドへ移します',
@@ -11423,7 +11384,7 @@ const I18N = {
     '로그인하러 가기':'ログインする',
     '전체':'すべて',
     '전 지역':'全地域',
-    '새 글 순':'新着順',
+    '최신순':'新着順',
     '도움이 된 순':'役に立った順',
     '+ 내 배 정비 기록 추가':'+ マイボートの整備記録を追加',
     '댓글':'コメント',
@@ -11432,7 +11393,7 @@ const I18N = {
     '사람':'ユーザー',
     '← 운영자':'← 管理者',
     '불러오는 중…':'読み込み中…',
-    '최고 운영자입니다.':'最高管理者です。',
+    '최고 관리자입니다.':'最高管理者です。',
     '앱 소유자이므로 앱에서 권한을 변경하거나 지정을 해제할 수 없습니다.':'このアプリの所有者のため、アプリ上で権限の変更や解任はできません。',
     '운영자 권한':'管理者権限',
     '글쓰기 차단':'投稿を禁止',
@@ -11440,11 +11401,11 @@ const I18N = {
     '영업':'商用',
     '중간 기록':'中間記録',
     '이 배에 참여 신청':'この船に参加申請',
-    '안 보기':'非表示',
+    '보지 않기':'非表示',
     '+ 글쓰기':'+ 投稿',
     '내보내기':'外す',
     '회원 명부':'メンバー名簿',
-    '배리뷰':'船のレビュー',
+    '배 리뷰':'船のレビュー',
     '등급 설정':'役割の設定',
     '위에 있을수록 높은 등급입니다. 자신보다 낮은 등급만 수정할 수 있습니다.':'上にあるほど高い役割です。自分より低い役割のみ編集できます。',
     '+ 등급 추가':'+ 役割を追加',
@@ -11495,7 +11456,7 @@ const I18N = {
     '(삭제된 배)':'（削除された船）',
     '(자동)':'（自動）',
     '(저조위 기준)':'（最低水面基準）',
-    '+ 계정 번호로 지정':'+ アカウント番号で指定',
+    '+ 회원번호로 지정':'+ アカウント番号で指定',
     '+ 글':'+ テキスト',
     '+ 사진':'+ 写真',
     '+ 사진 추가':'+ 写真を追加',
@@ -11570,7 +11531,6 @@ const I18N = {
     '갈치':'タチウオ',
     '감성돔':'クロダイ',
     '숨기면 둘러보기에 표시되지 않습니다. 배 주인의 물품·정비 기록은 그대로 유지됩니다.':'非表示にすると「船を見る」から外れます。オーナーの物品・整備記録はそのまま残ります。',
-    '감춤':'非表示',
     '갑오징어':'コウイカ',
     '강원':'江原',
     '같은 내용을 반복해서 올림':'同じ内容の繰り返し投稿',
@@ -11633,7 +11593,7 @@ const I18N = {
     '권한이 없습니다':'権限がありません',
     '그 기록을 찾지 못했습니다':'その記録が見つかりませんでした',
     '그 밖':'その他',
-    '그 밖의 이야기':'その他の話',
+    '자유게시판':'その他の話',
     '기타 사유':'その他の理由',
     '그 배의 기록은 삭제되지 않습니다. 다만 명부에 이름이 남을 수 있으니, 먼저 그 배의 선주에게 내보내 달라고 요청하시는 것이 좋습니다.':'その船の記録は削除されません。ただし名簿に名前が残ることがあるので、先にその船のオーナーに外してもらうようお願いすることをおすすめします。',
     '상대방은 더 이상 이 배의 기록을 볼 수 없습니다.':'その方はもうこの船の記録を見ることができません。',
@@ -11648,7 +11608,6 @@ const I18N = {
     '글 신고':'投稿を通報',
     '글 삭제':'投稿を削除',
     '글·댓글 쓰기 차단':'投稿・コメント禁止',
-    '글쓴이 이름':'投稿者名',
     '글을 관리할 권한이 없습니다':'投稿を管理する権限がありません',
     '글과 사진을 함께 복사해 본문 칸에 붙여넣으면 사진도 함께 들어갑니다.':'文章を写真ごとコピーして本文欄に貼り付けると、写真も一緒に入ります。',
     '글을 쓸 권한이 없습니다':'投稿を書く権限がありません',
@@ -11669,7 +11628,6 @@ const I18N = {
     '기상청 실시간 확인':'韓国気象庁（KMA）でリアルタイム確認',
     '대한민국 해역 밖이라 기상청 해상 특보가 제공되지 않습니다':'韓国の海域外のため、韓国気象庁の海上警報は発表されません',
     '해당 국가의 기상 기관에서 확인해 주세요':'その国の気象機関でご確認ください',
-    '기억해 둘 것':'覚えておくこと',
     '기온':'気温',
     '설정':'設定',
     '알림':'通知',
@@ -11701,10 +11659,10 @@ const I18N = {
     '공개 항해일지에 지나온 경로를 표시합니다':'公開した航海日誌で通った航路を表示します',
     '출발·도착 지점 반경 {n}해리를 가리고 {k}개 지점을 표시합니다':'出港・入港の周囲 {n}海里を隠して {k}点を表示します',
     '배의 계류 위치는 공개되지 않습니다. 가리는 범위는 배 › 공개 설정에서 변경할 수 있습니다.':'船の係留位置は公開されません。隠す範囲は 船 › 公開設定 で変更できます。',
-    '항적 가리기':'航跡の非表示範囲',
+    '항적 숨기기':'航跡の非表示範囲',
     '가림 반경':'非表示の半径',
     '{n}해리':'{n}海里',
-    '가리지 않음':'隠さない',
+    '무관':'隠さない',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'航跡をオンにした航海で、出港・入港の周囲をこの分だけ切り取って表示します。船の係留位置を隠すためのものです。',
     '계류 위치 주변은 가려져 있습니다.':'船の係留位置の周囲は隠されています。',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'記録の内容と写真・同乗者は非公開・航跡は航海ごとに個別にオン',
@@ -11770,8 +11728,8 @@ const I18N = {
     '나중에 차단 이유를 확인할 수 있도록':'あとでブロックの理由を確認できるように',
     '나중에 정비 문제로 도움을 구할 때, 상대방이 배를 알아야 정확한 답을 받을 수 있습니다. ':'あとで整備のことで助けを求めるとき、相手が船を知っていると答えが正確になります。 ',
     '낚시장비':'釣具',
-    '날마다':'毎日',
-    '날마다 초기화':'毎日リセット',
+    '매일':'毎日',
+    '매일 초기화':'毎日リセット',
     '날씨 —':'天気 —',
     '날씨 기록은 삭제되지 않습니다.':'天気の記録が消えるわけではありません。',
     '날씨 데이터를 받지 못했습니다':'天気データを取得できませんでした',
@@ -11795,12 +11753,12 @@ const I18N = {
     '원작자 허락을 받아 옮긴 글':'他人の記事を許可を得て転載',
     '다른 사람이 올린 연재는 수정할 수 없습니다.\n\n작성자만 수정할 수 있습니다.':'ほかの人が投稿した連載は編集できません。\n\n投稿者本人のみ編集できます。',
     '남해식':'韓国南岸式',
-    '내 계정 번호\n\n':'自分のアカウント番号\n\n',
+    '내 회원번호\n\n':'自分のアカウント番号\n\n',
     '내 계정 번호를 복사했습니다.\n\n':'自分のアカウント番号をコピーしました。\n\n',
     '내 등급보다 낮은 등급만 지정할 수 있습니다':'自分より低い役割のみ付与できます',
     '내 등급보다 높은 등급은 지정할 수 없습니다':'自分より高い役割は付与できません',
     '내 배를 고친 이야기 · 고장·수리':'マイボートを直した話・故障・修理',
-    '내가 누를 때까지 그대로 두기':'自分が押すまでそのままにする',
+    '[초기화]를 누를 때까지 체크가 유지됩니다':'[リセット]を押すまでチェックはそのままです',
     '내가 올린 정박지·중고 장터':'自分が投稿した係留地・中古売買',
     '내리지 못했습니다.\n\n':'取り下げできませんでした。\n\n',
     '내용 보기':'内容を表示',
@@ -11835,7 +11793,7 @@ const I18N = {
     '추가 내용':'補足',
     '도면 도형이 잠겨 있습니다.\n\n지금 잠금을 해제할까요?\n해제한 뒤 다시 시도해 주세요.\n(도구 막대의 자물쇠 버튼으로도 잠그거나 해제할 수 있습니다)':'図面の図形がロックされています。\n\n今すぐ解除しますか？\n解除してからもう一度お試しください。\n（ツールバーの鍵でも解除・ロックができます）',
     '도면 사진':'図面の写真',
-    '도면 사진 바꾸기':'図面の写真を変更',
+    '도면 사진 변경':'図面の写真を変更',
     '도면 핀':'図面ピン',
     '도면 🔓':'図面 🔓',
     '도면·수납칸 편집':'図面・収納スペースの編集',
@@ -11848,7 +11806,6 @@ const I18N = {
     '도형':'図形',
     '돈이 오가는 기능입니다. 문제가 생기면 이 기능부터 잠그세요.':'お金がやり取りされる機能です。問題が起きたら、まずここをロックしてください。',
     '동':'東',
-    '동그라미':'円',
     '동기화 실패 · 눌러서 확인':'同期失敗・タップして確認',
     '동남동':'東南東',
     '동북동':'東北東',
@@ -11942,8 +11899,7 @@ const I18N = {
     '목록에 없는 항목을 직접 입력해 주세요':'リストにない項目を入力してください',
     '목록이 하나뿐입니다. 목록을 먼저 추가해 주세요.':'リストが1つだけです。先にリストを追加してください。',
     '목포':'木浦',
-    '몰라서 묻는 것':'質問',
-    '받지 못함: {why}':'取得できません：{why}',
+    '불러오지 못함: {why}':'取得できません：{why}',
     '묘박':'錨泊',
     '묘박 가능한 수심을 추정합니다. 앵커줄은 보통 수심의 5~7배가 필요합니다.':'錨泊できる水深の目安です。アンカーロープは通常、水深の5〜7倍が必要です。',
     '무료 나눔':'無料でお譲り',
@@ -11978,8 +11934,8 @@ const I18N = {
     '이 물때는 위성 조석 모형 <b>EOT20</b>에서 추출한 <b>{spot}</b> 부근({km}km)의 <b>조화상수</b>로 계산한 것입니다. 높이는 <b>최저천문조위(LAT)</b> 위 높이입니다. 다리 밑을 지나기 전에는 <b>해도와 VTS로 확인해 주세요.</b>':'この潮汐は衛星潮汐モデル<b>EOT20</b>の<b>{spot}</b>付近（{km}km）の<b>調和定数</b>から計算したものです。高さは<b>最低天文潮位（LAT）</b>からの高さです。橋の下を通る前には<b>海図とVTSでご確認ください。</b>',
     '조석 모형':'潮汐モデル',
     '참고용 물때를 사용하고 있습니다. 정확한 값을 아시면 직접 입력해 주세요. 입력한 값을 사용합니다.':'目安の潮汐を使用中です。正確な値がわかる場合は手入力すると、その値を使います。',
-    '물때 자료를 받는 중…':'潮汐データを取得中…',
-    '물어보기':'質問する',
+    '물때 정보를 불러오는 중…':'潮汐データを取得中…',
+    '질문하기':'質問する',
     '물품·정비·수리·항해일지·서류·도면·게시판':'物品・整備・修理・航海日誌・書類・図面・掲示板',
     '물품이 들어가는 칸입니다. 벽이나 구획선은 "선·네모·세모"로 그리세요.':'物品を入れるスペースです。壁や仕切り線は「線・四角・三角」で描いてください。',
     '미꾸라지':'ドジョウ',
@@ -11987,14 +11943,12 @@ const I18N = {
     '미입력':'未入力',
     '미터 단위 숫자로 입력해 주세요':'メートル単位の数字で入力してください',
     '바꾸기':'変更',
-    '바꾸지 못했습니다.\n\n':'変更できませんでした。\n\n',
-    '바꾸지 못했습니다: ':'変更できませんでした: ',
+    '변경하지 못했습니다.\n\n':'変更できませんでした。\n\n',
+    '변경하지 못했습니다: ':'変更できませんでした: ',
     '바다에서는 인터넷이 안 될 때가 있습니다. 그럴 때는 로그인 없이 이 기기에서만 사용하다가 나중에 로그인하셔도 됩니다.':'海ではインターネットがつながらないことがあります。そのときはログインせずにこの端末だけで使い、あとからログインしてもかまいません。',
     '바람막이':'風よけ',
     '바위':'岩',
     '외부 공개':'外部に公開',
-    '받는 중…':'受信中…',
-    '받아오는 중…':'取得中…',
     '발효 중인 해상 특보 없음':'発表中の海上警報・注意報はありません',
     '방어':'ブリ',
     '방파제 안쪽 접안':'防波堤の内側に着岸',
@@ -12111,7 +12065,7 @@ const I18N = {
     '새 등급을 만듭니다.':'新しい役割を作成します。',
     '새 소식':'お知らせ',
     '새 수납칸':'新しい収納スペース',
-    '새 점검 목록':'新しい点検リスト',
+    '새 체크리스트':'新しいチェックリスト',
     '신규':'新着',
     '신규 {n}':'新着 {n}',
     '새우':'エビ',
@@ -12294,20 +12248,19 @@ const I18N = {
     '작성자와 운영자만 수정할 수 있습니다':'投稿者と管理者のみ編集できます',
     '작성자와 운영자만 삭제할 수 있습니다':'投稿者と管理者のみ削除できます',
     '작성자만 변경할 수 있습니다':'投稿者のみ変更できます',
-    '옮기기':'移動',
     '옮긴 글은 저자 · 매체 · 원문 링크가 반드시 있어야 합니다 (허락 조건). 직접 쓴 글은 저자만 있으면 됩니다.':'転載記事には著者 ・ 媒体 ・ 原文リンクが必須です（許諾の条件）。自分で書いた記事は著者のみで構いません。',
     '옮긴 글은 저자·매체·원문 링크가 모두 있어야 등록됩니다.\n':'転載記事は著者・媒体・原文リンクがすべてそろって初めて投稿できます。\n',
     '옮긴 글일 때만':'転載記事のときのみ',
     '옮긴 글일 때만 · https://…':'転載記事のときのみ ・ https://…',
     '옮긴 글일 때만 · 예: Yacht Russia':'転載記事のときのみ ・ 例：Yacht Russia',
-    '옮길 목록':'移動先のリスト',
+    '이동할 목록':'移動先のリスト',
     '완도':'莞島',
     '완료된 수리':'完了した修理',
     '완전삭제':'完全削除',
     '신고 사유를 선택해 주세요':'通報する理由を選択してください',
     '외줄':'一本釣り',
     '요금':'料金',
-    '요트·보트·낚시배':'ヨット・ボート・釣り船',
+    '요트·보트·낚싯배':'ヨット・ボート・釣り船',
     '욕설·비방':'暴言・誹謗',
     '우럭':'クロソイ',
     '운영자 지정':'管理者に任命',
@@ -12324,7 +12277,6 @@ const I18N = {
     '원제':'原題',
     '원투':'投げ釣り',
     '웜':'ワーム',
-    '위에 없는 이야기':'上記以外',
     '위치 —':'位置 —',
     '위치 지정':'位置を指定',
     '위치를 가져오지 못했습니다.':'位置を取得できませんでした。',
@@ -12412,7 +12364,6 @@ const I18N = {
     '자갈':'砂利',
     '자동':'自動',
     '자료 없음':'データなし',
-    '위치 찍기':'地点を指定',
     '위치를 먼저 지정해 주세요':'先に地点を指定してください',
     '자주 보는 위치를 지도에서 지정해 두면 눌러서 바로 볼 수 있습니다.':'よく見る地点を地図で指定しておくと、タップしてすぐ見られます。',
     '작게':'小さく',
@@ -12440,7 +12391,7 @@ const I18N = {
     '전북':'全羅北道',
     '전자장비':'電子機器',
     '전체 보기':'全体表示',
-    '점검 목록 수정':'点検リストの編集',
+    '체크리스트 수정':'チェックリストの編集',
     '점검 주기':'点検周期',
     '점검 항목':'点検項目',
     '점검 항목 수정':'点検項目の編集',
@@ -12449,7 +12400,7 @@ const I18N = {
     '정기점검과 수리목록':'定期点検と修理リスト',
     '정기점검에 「{list}」 항목이 남아 있습니다.':'定期点検に「{list}」の項目が残っています。',
     '정말 삭제할까요':'本当に削除しますか',
-    '정박 중 점검처럼 주 단위로 하는 것':'係留中の点検のように週単位で行うもの',
+    '매주 월요일 0시에 체크가 초기화됩니다':'毎週月曜日0時にチェックがリセットされます',
     '정박지 수정':'係留地の編集',
     '정박지 신고':'係留地の通報',
     '정박지 올리기':'係留地の投稿',
@@ -12481,11 +12432,10 @@ const I18N = {
     '좁은 수로를 지날 때 감당할 수 있는 조류 세기입니다.':'狭い水路を通るときに対応できる潮流の強さです。',
     '주기적으로 하는 일이면 정기점검, 갑자기 생긴 문제면 수리목록이라고 생각하시면 됩니다.':'定期的に行うことは定期点検、突然発生した問題は修理リストとお考えください。',
     '주꾸미':'イイダコ',
-    '주마다':'毎週',
-    '주마다 초기화':'毎週リセット',
+    '매주':'毎週',
+    '매주 초기화':'毎週リセット',
     '주소는 https:// 로 시작해야 합니다':'アドレスは https:// で始まる必要があります',
     '주소를 입력하면 눌러서 열 수 있습니다':'アドレスを入力するとタップして開けます',
-    '주인':'オーナー',
     '주차':'駐車場',
     '부여할 수 있는 등급이 없습니다':'付与できる役割がありません',
     '중간 기록에 엔진을 끄고 켠 기록이 없습니다.\n\n':'途中の記録にエンジンを停止・始動した記録がありません。\n\n',
@@ -12495,7 +12445,7 @@ const I18N = {
     '지금 납부한 것으로 기록할까요?':'今、支払い済みとして記録しますか？',
     '지금 업데이트':'今すぐ更新',
     '지금 출항하셨습니까?\n\n이 예정을 항해일지로 바꾸고, 지금 시각·위치·날씨를 기록합니다.':'今、出港されましたか？\n\nこの予定を航海日誌に変え、現在の時刻・位置・天気を記録します。',
-    '지금 크기':'現在のサイズ',
+    '원본':'現在のサイズ',
     '현재 시각':'現在時刻',
     '지금은 보기 전용(편집 잠금)입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'現在は閲覧のみ（編集ロック）です。\n\n右上のヘッダーにある [閲覧のみ] を押して\n[編集中] に切り替えてください。',
     '지금은 보기 전용입니다.\n\n오른쪽 위 [보기 전용]을 눌러\n[편집 중]으로 바꾸시면 됩니다.':'現在は閲覧のみです。\n\n右上のヘッダーにある [閲覧のみ] を押して\n[編集中] に切り替えてください。',
@@ -12521,7 +12471,7 @@ const I18N = {
     '직접':'手動',
     '직접 입력':'手入力',
     '직접 입력한 만조·간조 사용 중':'手入力した満潮・干潮を使用中',
-    '수동 초기화':'手動リセット',
+    '반복 안 함':'しない',
     '진행 중인 항목이 없습니다':'進行中の項目はありません',
     '질문':'質問',
     '찜':'お気に入り',
@@ -12541,9 +12491,9 @@ const I18N = {
     '첫 항목 추가하기':'最初の項目を追加',
     '체크리스트':'チェックリスト',
     '체크항목':'チェック項目',
-    '초기화 주기':'リセット周期',
+    '반복':'繰り返し',
     '초안 표시':'下書き表示',
-    '최고 운영자':'最高管理者',
+    '최고 관리자':'最高管理者',
     '최대':'最大',
     '출발':'出港',
     '출발 날씨':'出港時の天気',
@@ -12551,7 +12501,7 @@ const I18N = {
     '출발과 도착 사이에 있었던 일':'出港から入港までの出来事',
     '출항 3일 전까지':'出港3日前まで',
     '출항 당일까지':'出港当日まで',
-    '출항 전 점검처럼 출항할 때마다 하는 것':'発航前検査のように、出港するたびに行うもの',
+    '매일 0시에 체크가 초기화됩니다':'毎日0時にチェックがリセットされます',
     '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다':'出港前・入港後のように場面ごとに分けておくと探しやすくなります',
     '출항 전날까지':'出港前日まで',
     '충남':'忠清南道',
@@ -12617,7 +12567,6 @@ const I18N = {
     '할 수 있는 일을 켜거나 끕니다. 모두 끄면 운영자 지정이 해제됩니다.':'できることをオン・オフします。すべてオフにすると管理者から外れます。',
     '할 수 있는 일이 없습니다':'できることがありません',
     '할 수 있는 일이 하나도 남지 않습니다.\n\n이 사람의 운영자 지정을 해제할까요?':'できることが一つも残りません。\n\nこの人を管理者から外しますか？',
-    '할 일 배정':'作業の割り当て',
     '할 일을 배정할 권한이 없습니다':'作業を割り当てる権限がありません',
     '할 일을 볼 권한이 없습니다':'作業を見る権限がありません',
     '합치기 (수량 합산·사진 통합)':'まとめる（数量を合算・写真を統合）',
@@ -12651,7 +12600,7 @@ const I18N = {
     '홈포트에서 자동으로 만들어진 지점입니다.\n\n삭제해도 배를 열면 다시 생깁니다.\n':'ホームポートから自動で作成された地点です。\n\n削除しても船を開くと再び作成されます。\n',
     '화면이 보이지 않음':'画面が表示されない',
     '화장실':'トイレ',
-    '확인 글자':'確認文字',
+    '확인 문구':'確認文字',
     '확인함':'確認済み',
     '환산':'換算',
     '환산값이 0보다 작습니다.\n\n측정값이나 측정 시각을 다시 확인해 주세요.':'換算値が0より小さいです。\n\n実測値または計測時刻をもう一度ご確認ください。',
@@ -12993,10 +12942,10 @@ const I18N = {
     '글은 계속 읽으실 수 있습니다.':'閲覧は引き続きご利用いただけます。',
     '운영자를 지정하거나 해제할 권한이 없습니다':'管理者を任命・解任する権限がありません',
     '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.':'ログイン情報を確認できませんでした。\n\nアプリを再起動してお試しください。',
-    '최고 운영자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'最高管理者はアプリから変更できません。\n\nこのアプリの所有者のため、権限の変更や解任はできません。',
+    '최고 관리자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.':'最高管理者はアプリから変更できません。\n\nこのアプリの所有者のため、権限の変更や解任はできません。',
     '본인의 운영자 지정은 직접 해제할 수 없습니다.\n\n운영자를 지정할 수 있는 사람이 아무도 없게 되는 것을 막기 위해서입니다.\n다른 분에게 지정 권한을 준 뒤 그분이 해제해 주셔야 합니다.':'自分自身を解任することはできません。\n\n誰も管理者を任命できない状態になるのを防ぐためです。\n他の方に任命権限を与えた上で、その方に解任していただく必要があります。',
     '본인의 지정 권한은 직접 끌 수 없습니다.\n\n끄면 운영자를 지정할 수 있는 사람이 없어 되돌릴 수 없습니다.\n다른 분에게 지정 권한을 준 뒤 그분이 꺼 주셔야 합니다.':'自分の任命権限を自分でオフにすることはできません。\n\nオフにすると誰も管理者を任命できなくなり、元に戻せません。\n他の方に任命権限を与えた上で、その方にオフにしていただく必要があります。',
-    '최고 운영자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'最高管理者をブロックすることはできません。\n\nこのアプリの所有者です。',
+    '최고 관리자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.':'最高管理者をブロックすることはできません。\n\nこのアプリの所有者です。',
     '본인은 차단할 수 없습니다.':'自分自身をブロックすることはできません。',
     '배를 숨기거나 삭제할 권한이 없습니다':'船を非表示にしたり削除したりする権限がありません',
     '오늘의 클라우드 사용량을 모두 사용했습니다.\n\n· 기기에 저장된 기록은 그대로 있으며, 앱의 모든 기능을 계속 사용할 수 있습니다.\n· 다른 기기와의 동기화만 잠시 중지됩니다.\n· 매일 한 번(한국 시간 오후 4시쯤) 자동으로 초기화됩니다.\n\n이 문제가 반복되면 운영자에게 알려 주세요. 고객센터에서 보낼 수 있습니다.':'本日利用できるクラウドの使用量を使い切りました。\n\n・端末にある記録はそのまま残り、アプリはこのまますべてお使いいただけます。\n・他の端末との同期だけが一時的に止まります。\n・毎日1回（韓国時間の午後4時頃）に自動で解除されます。\n\n何度も起きる場合は管理者にお知らせください。サポートから送信できます。',
@@ -13006,7 +12955,7 @@ const I18N = {
     '계산 불가':'算出不可',
     '불러오지 못했습니다: {why}':'読み込めませんでした：{why}',
     '차단된 자료: {what} — {why}':'ブロックされたデータ：{what} — {why}',
-    '형식이 다른 파일':'形式が異なるファイル',
+    '지원되지 않는 파일 형식':'形式が異なるファイル',
     '물품 수정 (아래에서 사진 추가 가능)':'物品の編集（下から写真を追加できます）',
     '수정 완료':'編集完了',
     '전체 {a}개 물품 · {b}개 수납칸':'全 {a}件の物品・{b}件の収納スペース',
@@ -13021,8 +12970,6 @@ const I18N = {
     '{n}척':'{n}隻',
     '— 현재 위치에서 가장 가까운 지역 (지금: {n} {v})':'— 現在地から最も近い地域（現在：{n} {v}）',
     '미기록':'未記録',
-    '지남 {n}일':'超過 {n}日',
-    '남음 {n}일':'残り {n}日',
     '기한 초과':'期限超過',
     '곧':'まもなく',
     '주기 {n}{u}':'周期 {n}{u}',
@@ -13050,7 +12997,7 @@ const I18N = {
     '클라우드에 연결하지 못했습니다.\n\n인터넷 연결이 끊겼거나 클라우드 서비스가 잠시 중단되었을 수 있습니다.\n\n기기에 저장된 기록으로 앱을 계속 사용하실 수 있고, 다시 연결되면 자동으로 동기화됩니다.':'クラウドに接続できませんでした。\n\nインターネットが切れているか、クラウド側が一時的に停止している可能性があります。\n\nアプリは端末内の記録でそのままお使いいただけます。再接続されると自動で同期されます。',
     '먼저 도면을 추가해 주세요.\n\n도면 화면에서 기본 도면을 선택하거나 사진을 올릴 수 있습니다.':'先に図面を追加してください。\n\n図面画面で基本の図面を選ぶか、写真をアップロードできます。',
     '오늘 번역할 수 있는 양을 모두 사용했습니다. 내일 다시 시도해 주세요.':'本日翻訳できる量を使い切りました。明日もう一度お試しください。',
-    '되돌리고 닫기':'元に戻して閉じる',
+    '저장하지 않고 닫기':'元に戻して閉じる',
     '수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.':'編集内容を破棄して閉じますか？\n\nこの画面を開いた後に変更した内容がすべて元に戻ります。',
     '입력하지 않으면 그날 항해 전에 주유한 것으로 간주합니다':'記入しない場合、その日の航海より前に給油したものとみなします',
     '연료 소비량은 [만탱크] 주유가 두 번 이상 있고 그 사이에 엔진을 돌린 기록이 있어야 계산됩니다. 부분 주유만으로는 얼마나 사용했는지 알 수 없습니다.':'燃料消費量は[満タン]給油が2回以上あり、その間にエンジンを動かした記録がある場合に計算されます。部分給油だけではどれだけ使ったか分かりません。',
@@ -13078,11 +13025,10 @@ const I18N = {
     '위치정보 이용에 동의하셔야 현재 위치를 확인할 수 있습니다.\n\n동의하시겠습니까?\n(메뉴 › 약관·방침 › 위치정보에서 언제든 켜고 끌 수 있습니다.)':'位置情報の利用に同意していただくと現在地を取得できます。\n\n同意されますか？\n（メニュー › 規約・ポリシー › 位置情報 からいつでもオン・オフできます。）',
     '위치정보 수집 동의 철회':'位置情報の収集同意を撤回',
     '위치정보 수집 동의를 철회할까요?\n\n철회하면 「지금 여기」, 현재 위치 날씨 등의 기능을 사용할 수 없습니다.\n이미 저장된 좌표는 그대로 남습니다. 항해 기록에서 따로 삭제하실 수 있습니다.':'位置情報の収集同意を撤回しますか？\n\n撤回すると「現在地」・現在地の天気などの機能が止まります。\nすでに保存された座標はそのまま残ります。航海記録から個別に削除できます。',
-    '내려받기':'ダウンロード',
+    '다운로드':'ダウンロード',
     '지금은 동의하신 상태입니다.':'現在は同意されている状態です。',
     '현재 동의하지 않으신 상태이므로 위치정보를 수집하지 않습니다.':'現在は同意されていない状態のため、位置情報を取得しません。',
     '접근':'アクセス',
-    '위치정보 수집 동의를 거둠':'位置情報の収集同意を撤回',
     '클라우드에서 항해 좌표를 받음':'クラウドから航海の座標を取得',
     '현재 위치는 로그인하신 분만 사용할 수 있습니다.\n\n로그인하시겠습니까?\n(로그인하지 않아도 지도에서 위치를 직접 지정할 수 있습니다.)':'現在地はログインした方のみご利用いただけます。\n\nログインされますか？\n（ログインしなくても地図から直接指定できます。）',
     '현재 위치는 로그인하신 분만 사용할 수 있습니다.':'現在地はログインした方のみご利用いただけます。',
@@ -13110,7 +13056,7 @@ const I18N = {
     '이 배의 정비수첩':'この船の整備手帳',
     '이 배의 정비 기록':'この船の整備記録',
     '아직 선택하지 않았습니다':'まだ選んでいません',
-    '함께 탄 사람 선택':'乗っていた人を選択',
+    '동승자 선택':'乗っていた人を選択',
     '선택한 분들의 앱 「내 승선 이력」에 이 항해가 기록됩니다.':'選択した方のアプリの「乗船履歴」にこの航海が記録されます。',
     '{name} 님이 탔습니다':'{name} が乗っていました',
     '밤 12시':'深夜0時',
@@ -13124,7 +13070,6 @@ const I18N = {
     '배에 참여하시면 승선한 항해가 「내 승선 이력」에 기록됩니다.':'船に参加すると、乗船した航海が「乗船履歴」に記録されます。',
     '언제, 어느 배로, 몇 해리를 항해했는지 한 장으로 출력할 수 있습니다. 직접 입력하는 것이 아니라 배의 항해일지에서 그대로 가져옵니다.':'いつ・どの船で・何海里航海したかを一枚にまとめて出力できます。自分で書くのではなく、船の航海日誌からそのまま取り込まれます。',
     '선장':'船長',
-    '함께 탄 사람':'乗っていた人',
     '여기서 선택한 사람의 앱 「내 승선 이력」에 이 항해가 기록됩니다. 명부에 없는 손님은 아래 「동승」에 이름을 입력해 주세요.':'ここで選択した人のアプリの「乗船履歴」にこの航海が記録されます。名簿にないお客様は、下の「同乗」に名前を入力してください。',
     '내 승선 이력':'乗船履歴',
     '항해 일수':'海に出た日数',
@@ -13175,7 +13120,6 @@ const I18N = {
     '이제 장비·정비·수리·항해 기록을 한 장의 문서로 출력할 수 있습니다. 배를 넘길 때 그대로 전해 주시면 됩니다.':'これで装備・整備・修理・航海の記録を一枚の書類にまとめられます。船を譲るときにそのまま渡せます。',
     '계류 위치 지정':'係留場所を設定',
     '출항 전 점검 한 번 해 보기':'発航前検査を一度やってみる',
-    '자리 잡기':'場所を設定',
     '이 휴대폰의 배터리 절전 목록에 뱃일이 들어 있습니다.':'このスマホの省電力リストにBaetnilが入っています。',
     '절전 목록에서 제외하면 화면을 꺼도 항적이 더 안정적으로 기록됩니다. 한 번만 설정하시면 됩니다.':'そのリストから外しておくと、画面を消しても航跡がより確実に残ります。一度だけで済みます。',
     '화면이 꺼져 있던 {m}분 동안 위치 정보가 한 번도 수신되지 않았습니다.':'画面を消していた{m}分の間、位置が一度も届きませんでした。',
@@ -13464,7 +13408,7 @@ const I18N = {
     '설치한 지 얼마 안 됨':'取り付けたばかり',
     '1년 미만':'1年未満',
     '1~3년':'1〜3年',
-    '3년 넘게':'3年以上',
+    '3년 이상':'3年以上',
     '엔':'円',
     '달러':'ドル',
     '유로':'ユーロ',
@@ -13526,7 +13470,7 @@ const I18N = {
     '{name} 운용':'{name} 運用',
     '물품 {n}개와 정비·수리·항해일지·도면':'物品 {n} 点と整備・修理・航海日誌・図面',
     '정기점검 · 마지막 {date}':'定期点検・最終 {date}',
-    '(모두 {n}회)':'（全 {n} 回）',
+    '(총 {n}회)':'（全 {n} 回）',
     '사진 {n}장':'写真 {n} 枚',
     '{n}건':'{n} 件',
     '모두 {n}명.':'全 {n} 名。',
@@ -14241,7 +14185,7 @@ async function dgSetPublic(k, on){
              : t('비공개로 전환했습니다.\n이미 가져간 사용자의 도면은 그대로 남습니다.'), { kind:'good' });
     if(typeof mrMapKind!=='undefined' && document.getElementById('mrMap')
        && document.getElementById('mrMap').innerHTML){ setMapKind(mrMapKind, false); }
-  }catch(e){ tell(t('바꾸지 못했습니다: ') + ((e && e.message) || e), { kind:'bad' }); }
+  }catch(e){ tell(t('변경하지 못했습니다: ') + ((e && e.message) || e), { kind:'bad' }); }
 }
 // 창고 번호만 있고 그림이 없는 도면을 받아온다. 기기 복사본이 있으면 그것부터 쓴다.
 async function dgResolve(){
@@ -14926,7 +14870,7 @@ function qlTableInit(){
 // ══ 표를 그 자리에서 고친다 (4.118) ══
 // 칸에 친 글자는 곧바로 data-tbl 에 적힌다. Quill 은 저장할 때 이것을 읽는다 — 문 하나.
 let TBL_WIRED = false;
-const TBL_BTNS = [['row+','+ 줄'], ['col+','+ 칸'], ['row-','줄 삭제'],
+const TBL_BTNS = [['row+','+ 줄'], ['col+','+ 칸'], ['row-','행 삭제'],
                   ['col-','칸 삭제'], ['head','머리글 행'], ['kill','표 삭제']];
 function tblBarHtml(){
   return `<div class="qltblbar" contenteditable="false">`
@@ -15215,7 +15159,7 @@ function richPickPhoto(fid){
     const fs2 = [].slice.call(inp.files || []);
     if(!fs2.length) return;
     const mark = richMark(fid);
-    richStatus(fid, t('사진을 넣는 중…'));
+    richStatus(fid, t('사진 업로드 중…'));
     resizePhotos(fs2, out => {
       richInsert(fid, out.map(u => ({ t:'photo', v:u })), mark);
       richStatus(fid, '');
@@ -15241,7 +15185,7 @@ function onRichPaste(e, fid){
   const mark = richMark(fid);
   // 표만 딸려 온 것이면 사진 줄이기를 거치지 않는다
   if(!photos.length){ richInsert(fid, parts, mark); return; }
-  richStatus(fid, t('사진을 넣는 중…'));
+  richStatus(fid, t('사진 업로드 중…'));
   resizePhotos(photos, out => {
     let k = 0;
     const seq = parts.map(x => x.t === 'photo' ? { t:'photo', v: out[k++] } : x)
@@ -16076,7 +16020,7 @@ function onFormPaste(e, i){
     el.selectionStart = el.selectionEnd = a + pad.length + text.length;
   }
   const box = document.getElementById('formPhotos');
-  if(box) box.innerHTML = `<div class="fhint">${esc(t('사진을 넣는 중…'))}</div>`;
+  if(box) box.innerHTML = `<div class="fhint">${esc(t('사진 업로드 중…'))}</div>`;
   resizePhotos(photos.concat(files), out=>formPhotoAdd(out));
 }
 function formPicksToggle(key, i, v){
@@ -17127,7 +17071,7 @@ function openAccount(){
       <div class="mrrow"><span class="mrlbl">${esc(t('로그인'))}</span><b class="mrv">${esc(me.email||me.name||'—')}</b></div>
       <div class="mrnone" style="text-align:left">${esc(t('이 계정으로 로그인한 다른 기기에서도 같은 기록을 볼 수 있습니다.'))}</div>
       ${profCard()}
-      <div class="mrrow"><span class="mrlbl">${esc(t('계정 번호'))}</span>
+      <div class="mrrow"><span class="mrlbl">${esc(t('회원번호'))}</span>
         <span class="mrm" style="flex:1;word-break:break-all">${esc(meUid()||'—')}</span>
         <button class="minib blu" onclick="copyMyUid()">${esc(t('복사'))}</button></div>
       <div class="mrnone" style="text-align:left">${esc(t('운영자 지정을 요청할 때 이 번호를 알려 주세요.'))}</div>
@@ -17245,7 +17189,7 @@ function askWipe(){
     title: '정말 삭제할까요',
     sub: tsub('되돌릴 수 없습니다. 계속하려면 아래에 «{word}»를 그대로 입력해 주세요.', { word: WIPE_WORD }),
     okText: '삭제',
-    fields: [ { key:'word', label:'확인 글자', value:'', placeholder: WIPE_WORD } ],
+    fields: [ { key:'word', label:'확인 문구', value:'', placeholder: WIPE_WORD } ],
     onOk: v => {
       if(String(v.word || '').trim() !== WIPE_WORD) return formErr('word', '입력한 문구가 일치하지 않아 삭제하지 않았습니다.');
       doWipe();
@@ -17954,6 +17898,33 @@ const TRK_ASK  = 5;       // m — 폰에게는 이만큼마다 달라고 한다
 const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가운데 점을 버린다
 const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
 const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라우드는 멈출 때 한 번)
+// ★★★★ 5.37 — 항적을 남기는 규칙은 **OsmAnd 가 하는 그대로** 따른다.
+//   사장님 (2026-10-04): 「무조건 다른 어플 따라서 만들으라고 … 절대로 아주 티끌만한거라도 정하지 마라」
+//   10/4 항해 — 기록 장치가 준 위치 81개 중 21개만 담고, 입항 때 「일직선 가운데 점 지우기(25m)」 로 5개까지 줄인 뒤
+//   남은 5점 사이가 5분·200m 넘는다고 「3곳에서 끊겼습니다」 를 띄웠다. 거리 10m·25m·5분·200m·정확도 3배·
+//   첫 점 20m/90초·흔들림 고르기 — 모두 다른 앱 확인 없이 정해 둔 것이었다. 그래서 다 걷어내고 OsmAnd 원본 코드로 바꾼다.
+//   OsmAnd (SavingTrackHelper.shouldRecordLocation · OsmandSettings 기본값, 보트 화면도 같은 값):
+//     · SAVE_TRACK_INTERVAL 5000ms — 앞에 남긴 점에서 5초가 지나야 다음 점을 남긴다
+//     · SAVE_TRACK_PRECISION 50m  — 정확도를 안 주거나 50m 보다 흐린 위치는 안 남긴다
+//     · SAVE_TRACK_MIN_DISTANCE 0 · SAVE_TRACK_MIN_SPEED 0 — 거리·속도로는 거르지 않는다
+//     · 받은 좌표 그대로 남긴다 (흔들림 고르기 없음) · 저장할 때 점을 줄이지 않는다
+//     · 선 끊기(collectDBTracks) — 앞 점과 6분 이상 벌어졌고 **그 앞 간격의 10배 이상**일 때만 새 구간
+//     · 위치 공급원은 GPS (OsmAnd 안내: 항적이 흔들리면 공급원을 Android API(GPS)로)
+const TRK_OSM_MS     = 5000;
+const TRK_OSM_ACC    = 50;
+const TRK_OSM_SEG_MS = 360000;   // 6분
+const TRK_OSM_SEG_X  = 10;
+// 이 위치를 남기나 — '' 면 남긴다. 'blur' 정확도, 'often' 5초 안
+function trkOsmWhy(p, last){
+  const ac = (p && p.ac != null) ? Number(p.ac) : NaN;
+  if(!isFinite(ac) || ac < 0 || ac > TRK_OSM_ACC) return 'blur';
+  if(last){
+    const dt = Date.parse(p.t) - Date.parse(last.t);
+    if(!(dt > TRK_OSM_MS)) return 'often';
+  }
+  return '';
+}
+function trkCnt(k){ if(trkNow) trkNow[k] = (Number(trkNow[k]) || 0) + 1; }
 // ★ 엉뚱한 점 거르기 (4.51 — 여수 항적이 시내와 산으로 뻗쳤다)
 // ★ 위성 자리라고 볼 수 있는 또렷함. 이보다 흐리면서 speed·bearing 도 없으면
 //   기지국·와이파이로 지어낸 자리로 본다 (4.78).
@@ -17997,7 +17968,7 @@ function trkSatPt(q, ac){
   const pv = String((q && q.pv) || '');
   if(pv === 'gps') return true;
   if(pv === 'network' || pv === 'fused' || pv === 'passive') return false;
-  if(pv === 'ios') return (q.sp != null) || (isFinite(ac) && ac <= TRK_FIRST_ACC);
+  if(pv === 'ios') return true;   // ★ 5.37 — 아이폰은 공급원을 안 준다. OsmAnd 처럼 정확도(50m)로만 거른다
   const hasMove = (q && (q.sp != null || q.br != null));
   return !!hasMove || (isFinite(ac) && ac <= TRK_GPS_ACC);
 }
@@ -18089,8 +18060,7 @@ const TRK_BACK_M = 100;   // m — 이만큼은 벗어나야 본다
 //   ★ 그래서 지우지 않는다 — 끊긴 데를 **끊긴 대로** 그린다.
 //     해도 플로터도 신호가 끊기면 선을 잇지 않는다. 없는 길을 그려 주는 것이
 //     안 그려 주는 것보다 나쁘다 — 사람이 그 선을 지나온 길로 믿기 때문이다.
-const TRK_GAP_S = 300;    // 초 — 이만큼 넘게 안 들어왔고
-const TRK_GAP_M = 200;    // m  — 그 사이 이만큼 넘게 떨어졌으면 선을 끊는다
+// ★ 5.37 — 예전 TRK_GAP_S(5분)·TRK_GAP_M(200m) 는 없앴다. 끊김은 OsmAnd 문(TRK_OSM_SEG_MS·TRK_OSM_SEG_X)으로 본다
 const TRK_KEY  = 'bt_trk';
 // ★★★ 떨림 고르개 (4.79)
 //   점을 받은 그대로 찍으면, 배가 곧게 가고 있어도 선이 지그재그로 떨린다.
@@ -18252,19 +18222,11 @@ async function trkBufDrain(){
         // ★ 5.32 — 위성 점인지는 공급원으로 가른다 (trkSatPt). 안드로이드 gps · 아이폰은 속도를 준 점
         if(!trkSatPt(q, ac)){ trkNow.net = (Number(trkNow.net) || 0) + 1; continue; }
         trkNow.sat = (Number(trkNow.sat) || 0) + 1;
-        if(isFinite(ac) && ac > TRK_ACC){ trkNow.blur = (Number(trkNow.blur) || 0) + 1; continue; }
-        // ★ 5.32 — 이 기기가 방금까지 내던 정확도보다 갑자기 몇 배 흐려진 점은 버린다 (trkAccJump)
-        const 튐 = trkAccJump(ac, trkNow.acr);
-        trkAccSeen(ac);
-        if(튐){ trkNow.blur = (Number(trkNow.blur) || 0) + 1; continue; }
-        // ★ 5.12 — 첫 점은 여기서도 위성이 잡힌 뒤부터다 (trkPush 와 같은 문)
-        if(!trkNow.pts.length && !cand.length
-           && trkFirstWait(ac, Date.parse(trkNow.from), Number(q.t))){
-          trkNow.wait = (Number(trkNow.wait) || 0) + 1; continue;
-        }
+        // ★ 5.37 — OsmAnd: 정확도를 안 주거나 50m 보다 흐리면 안 남긴다 (그 밖의 거르기는 없다)
+        if(!(isFinite(ac) && ac >= 0 && ac <= TRK_OSM_ACC)){ trkCnt('blur'); continue; }
         const p = { la: +Number(q.la).toFixed(5), lo: +Number(q.lo).toFixed(5),
                     t: new Date(Number(q.t)).toISOString() };
-        if(isFinite(ac)) p.ac = Math.round(ac);
+        p.ac = Math.round(ac);
         const qs = trkSpd(q);
         if(isFinite(qs)) p.sp = Math.round(qs * 10) / 10;
         cand.push(p);
@@ -18275,21 +18237,22 @@ async function trkBufDrain(){
         const all = (trkNow.pts || []).concat(cand)
           .filter(p => p && isFinite(p.la) && isFinite(p.lo) && p.t)
           .sort((x, y) => (Date.parse(x.t) || 0) - (Date.parse(y.t) || 0));
-        // ③ 같은 시각은 하나만 남기고, 50m 문과 속도 문을 처음부터 다시 건다
+        // ③ 같은 시각은 하나만 남기고, 5초 간격(OsmAnd)을 처음부터 다시 건다
         const out = [];
         let prevT = -1;
         for(let i = 0; i < all.length; i++){
           const p  = all[i];
           const tt = Date.parse(p.t) || 0;
           if(tt === prevT) continue;
-          const L = out[out.length - 1];
-          if(L && hav(L.la, L.lo, p.la, p.lo) * 1000 < TRK_DIST * 0.6) continue;
-          if(L && trkTooFast(L, p)) continue;
+          // ★ 5.37 — OsmAnd: 앞에 남긴 점에서 5초가 지나야 남긴다 (거리·속도로는 안 거른다)
+          { const L = out[out.length - 1];
+            if(L && !(tt - (Date.parse(L.t) || 0) > TRK_OSM_MS)) continue; }
           out.push(p); prevT = tt;
         }
         trkNow.pts = (out.length > TRK_MAX) ? trkSimplify(out, TRK_TOL) : out;
         n = Math.max(0, trkNow.pts.length - before);
         trkNow.bufAdd = (Number(trkNow.bufAdd) || 0) + n;
+        trkNow.often = (Number(trkNow.often) || 0) + Math.max(0, cand.length - n);   // 5초 안에 온 것
         trkBufMark();
         trkKeep();
         try{ trkFlush(); }catch(_){}
@@ -18466,7 +18429,7 @@ function trkFlush(){
   const it = (typeof voyage !== 'undefined' ? voyage : [])
                .find(v => String(v.id) === String(trkNow.vid));
   if(!it) return false;
-  const pts = trkSimplify(trkNow.pts || [], TRK_TOL);
+  const pts = (trkNow.pts || []).slice();   // ★ 5.37 — OsmAnd 처럼 줄이지 않는다
   if(pts.length < 2) return false;
   it.trk = pts;
   trkNow.saved = (trkNow.pts || []).length;
@@ -18585,72 +18548,13 @@ function trkPush(pos){
     trkSkip(); return false;
   }
 
-  // ★★★ ①-나 기지국·와이파이로 지어낸 자리는 버린다 (4.78)
-  //
-  //   ★ 여태 accuracy 하나만 보고 있었다. 그런데 accuracy 는 68% 신뢰구간이라
-  //     기지국 자리인데도 작게 나오는 일이 있고, 아예 안 주는 기기도 있다.
-  //     그래서 「흐리면 버린다」 만으로는 시내로 뻗친 선을 못 막았다 (사장님 사진).
-  //
-  //   ★ 다른 신호가 있다 — **위성으로 잡은 자리는 speed 나 bearing 을 함께 준다.**
-  //     기지국·와이파이로 지어낸 자리는 둘 다 null 이다. 플러그인이 그대로 넘겨준다.
-  //     그래서 「둘 다 없고 흐리기까지 하면」 위성 자리가 아니라고 본다.
-  //
-  //   ★ 둘 다 없다고 무조건 버리지는 않는다 — 배가 멈춰 있으면 speed 0, bearing null
-  //     인 기기가 있다. 그때는 accuracy 가 또렷하므로(보통 5~20m) 통과한다.
-  const hasMove = (pos.speed != null) || (pos.bearing != null);
-  const blurry  = !isFinite(ac) || ac > TRK_GPS_ACC;
-  if(!hasMove && blurry){
-    trkNow.net = (Number(trkNow.net) || 0) + 1;
-    trkSkip(); return false;
-  }
-
-  if(isFinite(ac) && ac > TRK_ACC){
-    trkNow.blur = (Number(trkNow.blur) || 0) + 1;
-    trkSkip(); return false;
-  }
-  // ★ 5.32 — 이 기기가 방금까지 내던 정확도보다 갑자기 몇 배 흐려진 점은 버린다 (trkAccJump)
-  const 튐 = trkAccJump(ac, trkNow.acr);
-  trkAccSeen(ac);
-  if(튐){
-    trkNow.blur = (Number(trkNow.blur) || 0) + 1;
-    trkSkip(); return false;
-  }
-  // ★★★ 5.12 — 아직 한 점도 안 담겼으면, 20m 안으로 또렷해질 때까지 첫 점을 미룬다
-  if(!trkNow.pts.length && trkFirstWait(ac, Date.parse(trkNow.from))){
-    trkNow.wait = (Number(trkNow.wait) || 0) + 1;
-    trkSkip(); return false;
-  }
-  trkNow.blur = 0;
-  // ★★★ 여기서 떨림을 고른다 (4.79). 고른 자리를 담는다 — 받은 그대로가 아니다.
-  // ★ 5.10 — 부품은 time 을 밀리초 숫자로 준다. Date.parse(숫자) 는 NaN 이라 여태 늘 「지금」 을 썼다.
-  //   화면을 켠 채 곧바로 받을 때는 괜찮지만, 몰아서 들어오면 흔들림 고르기가 시간을 0초로 보고 선이 뒤처졌다.
-  const tms = (typeof pos.time === 'number' && isFinite(pos.time)) ? pos.time
-            : (Date.parse(pos.time || 0) || Date.now());
-  const spd = trkSpd({ sp: pos.speed });
-  const sm  = trkSmooth(la, lo, ac, tms, spd);
-  const p = { la:+sm.la.toFixed(5), lo:+sm.lo.toFixed(5),
-              t: new Date(pos.time || Date.now()).toISOString() };
-  // ★ 5.10 — GPS 칩이 잰 속도(m/s)를 남긴다. 이상한 위치인지 판단할 때 이것을 쓴다.
-  if(isFinite(spd)) p.sp = Math.round(spd * 10) / 10;
-  // ★ 정확도를 점마다 남긴다. 이게 없으면 나중에 「왜 이렇게 됐나」를 물어도
-  //   자료가 없어서 또 추측만 하게 된다 — 4.51 에서 실제로 그랬다.
+  // ★ 5.37 — OsmAnd 그대로: 정확도 50m · 5초 간격. 받은 좌표 그대로 남긴다 (흔들림 고르기·거리·속도 거르기 없음)
+  const p = { la:+la.toFixed(5), lo:+lo.toFixed(5), t: new Date(pos.time || Date.now()).toISOString() };
   if(isFinite(ac)) p.ac = Math.round(ac);
-  const last = trkNow.pts[trkNow.pts.length - 1];
-  // ★ 폰이 걸러 주기로 했지만 믿지 않는다. 기기마다 다르고, 서 있을 때
-  //   GPS 가 몇 미터씩 흔들리는 것을 다 담으면 정박 중에도 선이 자란다.
-  if(last && hav(last.la, last.lo, p.la, p.lo) * 1000 < TRK_DIST * 0.6) return false;
-  // ★ 5.10 — 멈춰 있는데(칩 속도가 거의 0) 정확도 범위 안에서 흔들린 것은 담지 않는다.
-  //   OsmAnd 도 멈춰 있는 동안의 흔들림이 항적을 지그재그로 만든다고 안내한다.
-  if(last && isFinite(spd) && spd < TRK_STILL_MS
-     && hav(last.la, last.lo, p.la, p.lo) * 1000 < Math.max(TRK_DIST * 3, isFinite(ac) ? ac : 0)) return false;
-  // ★ ② 또렷해도 이 배가 낼 수 없는 속도로 뛴 점은 버린다.
-  //   오래 끊겼다 이어진 것은 시간도 그만큼 벌어져 있어 저절로 통과한다.
-  //   다만 기준점 자체가 망가지면 영영 못 받으므로, 연달아 TRK_LOST 번 버리면
-  //   그 점을 받아 기준을 다시 잡는다.
-  if(last && trkTooFast(last, p) && (Number(trkNow.skip) || 0) + 1 < TRK_LOST){
-    trkSkip(); return false;
-  }
-  trkNow.skip = 0;
+  const spd = trkSpd({ sp: pos.speed });
+  if(isFinite(spd)) p.sp = Math.round(spd * 10) / 10;
+  const why = trkOsmWhy(p, trkNow.pts[trkNow.pts.length - 1]);
+  if(why){ trkCnt(why); return false; }
   trkNow.pts.push(p);
   if(trkNow.pts.length > TRK_MAX) trkNow.pts = trkSimplify(trkNow.pts, TRK_TOL);
   trkKeep();
@@ -19155,7 +19059,8 @@ async function trkStop(){
   //   여태는 사람이 「튄 점 다듬기」 를 눌러야 했다. 누를 줄 알아야 깨끗해지는
   //   기록은 안 깨끗한 기록이다. 배에서 내리면 이미 다듬어져 있어야 한다.
   //   (되돌리기가 있는 손 다듬기와 달리 여기서는 아직 저장 전이라 잃을 것이 없다)
-  const pts = trkSimplify(trkClean(cur.pts || []).pts, TRK_TOL);
+  // ★ 5.37 — OsmAnd 처럼 남긴 점을 그대로 저장한다 (튄 점 걷기·가운데 점 지우기 없음)
+  const pts = (cur.pts || []).filter(p => p && isFinite(p.la) && isFinite(p.lo));
   // ★ 클라우드로는 여기서 한 번만 올린다 (점마다 올리면 배터리를 더 먹는다)
   if(pts.length >= 2){
     const it = (typeof voyage !== 'undefined' ? voyage : []).find(v => String(v.id) === String(cur.vid));
@@ -19166,6 +19071,9 @@ async function trkStop(){
       it.trkStat = { got: Number(cur.got) || 0, kept: (cur.pts || []).length,
                      drop: Number(cur.drop) || 0, mock: Number(cur.mock) || 0,
                      saved: pts.length };
+      // ★ 5.37 — 버린 까닭별 개수 (백업 하나로 어디서 몇 개 빠졌는지 바로 보이게)
+      ['blur', 'often', 'net'].forEach(k => { if(Number(cur[k]) > 0) it.trkStat[k] = Number(cur[k]); });
+      it.trkRule = 'osmand';
       // ★ 5.34 — 지난 기록 찌꺼기로 버린 점 · 앱이 꺼졌다 켜지며 기록 장치가 스스로 이어 붙였는지
       if(Number(cur.old) > 0) it.trkStat.old = Number(cur.old);
       if(cur.relaunch) it.trkStat.relaunch = true;
@@ -19562,7 +19470,7 @@ const PERMS = [
   { k:'fuel',    name:t('연료·엔진 기록') },
   { k:'contact', name:t('연락처·문서') },
   { k:'check',   name:t('체크리스트') },
-  { k:'task',    name:t('할 일 배정') },
+  { k:'task',    name:t('담당자 지정') },
   { k:'board',   name:t('게시판') },
   { k:'roster',  name:t('회원 명부 보기') },
   { k:'dues',    name:t('회비·개인 메모') },
@@ -20268,7 +20176,7 @@ function crewPickRow(it){
             String(voySkipper(it, b)) === String(m.uid) ? ' selected' : ''}>${
             esc(m.name)}</option>`).join('')}</select>`
       : `<b class="mrv">${esc(선장 || '—')}</b>`}</div>`
-    + `<div class="mrrow"><span class="mrlbl">${esc(t('함께 탄 사람'))}</span>
+    + `<div class="mrrow"><span class="mrlbl">${esc(t('동승자'))}</span>
         <span style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:5px">${칩}</span>`
     // ★ 감추는 일은 잠금 CSS(.edt) 한 곳에만 맡긴다. 여기서 또 unlocked 를 따지면
     //   문이 둘이 되고, 언젠가 한쪽만 고쳐져서 「단추가 사라졌다」 는 말을 듣는다.
@@ -20606,7 +20514,7 @@ function openMuted(){
   P.innerHTML = `<div class="mrhead"><b>${esc(t('차단한 사람'))}</b><span style="flex:1"></span></div>`
     + (ids.length
         ? ids.map(id => `<div class="fleet"><div class="fmain">
-            <div class="fname">${esc(mutedName(id) || t('(이름 모름)'))}</div>
+            <div class="fname">${esc(mutedName(id) || t('(이름 없음)'))}</div>
             <div class="fsub">${esc(String(id).slice(-6))}</div></div>
             <div class="fbtns"><button class="minib blu"
               onclick="unmutePersonUI('${jsq(id)}')">${esc(t('다시 보기'))}</button></div></div>`).join('')
@@ -20801,7 +20709,7 @@ const TALK_KINDS = [
   { v:'maint', name:t('정비'),   sub:t('내 배를 고친 이야기 · 고장·수리') },
   { v:'trip',  name:t('항해기'), sub:t('다녀온 곳') },
   { v:'gear',  name:t('장비'),   sub:t('사서 사용해 본 물건 · 제품 후기') },
-  { v:'free',  name:t('잡담'),   sub:t('그 밖의 이야기') },
+  { v:'free',  name:t('잡담'),   sub:t('자유게시판') },
   // ★ '크루' 라고 하지 않는다.
   //   낚시배 타는 분들은 '출조·동출', 모터보트는 '같이 나가실 분' 이라고 한다.
   //   크루는 요트 말이다. 배 세 종류를 한 자리에 담아야 하므로 요트 말을 쓰면 안 된다.
@@ -20823,7 +20731,7 @@ const RIDE_TRIP = [
 const RIDE_WANT = [
   { v:'new',   name:'처음이어도 괜찮습니다', sub:'' },
   { v:'exp',   name:'승선 경험 있는 분',        sub:'' },
-  { v:'lic',   name:'면허 있는 분',         sub:'' },
+  { v:'lic',   name:'면허 소지자',         sub:'' },
   { v:'watch', name:'야간 당직 가능한 분',      sub:'' },
   { v:'gear',  name:'낚시 장비 있으신 분',   sub:'' }
 ];
@@ -20924,7 +20832,7 @@ const ADMIN_PERMS = [
   { k:'admin',   name:t('운영자 지정'),      sub:t('다른 사람을 운영자로 지정') },
   { k:'series',  name:t('연재 글 올리기'),   sub:t('뉴스 ▸ 연재에 옮긴 글 올리기') }
 ];
-// ★ 최고 운영자 — 이 앱의 주인이다.
+// ★ 최고 관리자 — 이 앱의 주인이다.
 //   앱으로는 누구도 권한을 바꾸거나 해임할 수 없다. 규칙에서도 막는다.
 //   계정을 코드에 박지 않는다 — admins 문서의 owner 표시로 정한다.
 //   그래야 나중에 앱이 넘어갈 때 파이어베이스 콘솔에서 표시만 옮기면 된다.
@@ -20980,7 +20888,7 @@ async function claimOwner(){
 function isAdmin(perm){
   if(!adminMe) return false;
   if(!perm) return true;
-  // ★ 최고 운영자는 언제나 전부 된다.
+  // ★ 최고 관리자는 언제나 전부 된다.
   //   권한을 새로 만들 때마다 주인 문서를 고쳐 줄 수는 없다.
   if(adminMe.owner === true) return true;
   const perms = adminMe.perms || {};
@@ -20997,7 +20905,7 @@ function permOnlySeries(perms){
 function amSeriesOnly(){ return !!adminMe && permOnlySeries(adminMe.perms); }
 function roleChip(a){
   if(!a) return '';
-  if(a.owner) return `<span class="chip">${esc(t('최고 운영자'))}</span>`;
+  if(a.owner) return `<span class="chip">${esc(t('최고 관리자'))}</span>`;
   return permOnlySeries(a.perms)
     ? `<span class="chip whochip">${esc(t('연재자'))}</span>`
     : `<span class="chip whochip">${esc(t('운영자'))}</span>`;
@@ -21130,10 +21038,10 @@ async function renderTalk(){
   }
   talkList = listRowsSeen('talk');
 
-  const kinds = `<div class="tfilt pinbar">`
+  const kinds = `<div class="pinbar"><div class="tfilt">`
     + `<button class="tchip${talkKind?'':' on'}" onclick="setTalkKind('')">${esc(t('전체'))}</button>`
     + TALK_KINDS.map(k=>`<button class="tchip${talkKind===k.v?' on':''}" onclick="setTalkKind('${k.v}')">${k.name}</button>`).join('')
-    + `</div>`;
+    + `</div></div>`;
   const regs = `<div class="tfilt">`
     + `<button class="tchip${talkRegion?'':' on'}" onclick="setTalkRegion('')">${esc(t('전 지역'))}</button>`
     + REGIONS.map(r=>`<button class="tchip${talkRegion===r?' on':''}" onclick="setTalkRegion('${jsq(r)}')">${esc(t(r))}</button>`).join('')
@@ -21169,7 +21077,7 @@ async function renderTalk(){
   const rows = 보일것.map(talkRow).join('');
 
   const sorts = `<div class="tfilt">`
-    + `<button class="tchip${talkSort==='ts'?' on':''}" onclick="setTalkSort('ts')">${esc(t('새 글 순'))}</button>`
+    + `<button class="tchip${talkSort==='ts'?' on':''}" onclick="setTalkSort('ts')">${esc(t('최신순'))}</button>`
     + `<button class="tchip${talkSort==='likeN'?' on':''}" onclick="setTalkSort('likeN')">${esc(t('도움이 된 순'))}</button>`
     + `</div>`;
   const qbox = `<div class="qbox"><input id="talkQ" value="${esc(talkQ)}"
@@ -21314,7 +21222,7 @@ function talkRecordText(kind, it){
     L.push(t('마지막') + ': ' + (it.lastDate || '—'));
     const hist = (it.history || []).map(h=>h.date).slice(-5);
     if(hist.length) L.push(t('이력') + ': ' + hist.join(', ')
-      + ' ' + tsub('(모두 {n}회)', { n: it.history.length }));
+      + ' ' + tsub('(총 {n}회)', { n: it.history.length }));
   } else {
     L.push(t('[수리 기록]') + ' ' + (it.title || ''));
     const bl = boatLine(); if(bl) L.push(bl);
@@ -22104,7 +22012,7 @@ function copyMyUid(){
   const u = meUid();
   if(!u){ tell(t('로그인한 뒤에 이용할 수 있습니다')); return; }
   try{ navigator.clipboard.writeText(u); tell(t('내 계정 번호를 복사했습니다.\n\n') + u, { kind:'good' }); }
-  catch(e){ tell(t('내 계정 번호\n\n') + u); }
+  catch(e){ tell(t('내 회원번호\n\n') + u); }
 }
 
 let adminTab  = 'reports';
@@ -22129,7 +22037,7 @@ function adminIsMe(uid){
 // ★ 운영자 문서를 손대기 전 검사 — 반드시 여기 한 곳만 고친다.
 //   흩어 놓으면 한 군데만 고치고 나머지를 빠뜨린다. 실제로 여러 번 그랬다.
 //   막을 것은 세 가지다.
-//    1) 최고 운영자 — 이 앱의 주인. 앱으로는 누구도 못 건드린다.
+//    1) 최고 관리자 — 이 앱의 주인. 앱으로는 누구도 못 건드린다.
 //    2) 잠김 — 마지막 임명 권한자가 자기 권한을 끄거나 자기를 해임하면 영영 복구가 안 된다.
 //    3) 누구인지 모르는 상태 — 그러면 위의 두 검사가 그냥 통과해 버린다.
 //   what: 'perm'(권한 켜고 끄기) · 'remove'(해임) · 'add'(새로 세우기)
@@ -22138,7 +22046,7 @@ function adminGuard(uid, what, key, on){
   if(!isAdmin('admin')) return '운영자를 지정하거나 해제할 권한이 없습니다';
   if(!adminMyUid()) return '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.';
   if(isOwnerAdmin(uid))
-    return '최고 운영자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.';
+    return '최고 관리자는 앱에서 변경할 수 없습니다.\n\n이 앱의 소유자이므로 권한을 변경하거나 지정을 해제할 수 없습니다.';
   if(what === 'remove' && adminIsMe(uid))
     return '본인의 운영자 지정은 직접 해제할 수 없습니다.\n\n운영자를 지정할 수 있는 사람이 아무도 없게 되는 것을 막기 위해서입니다.\n다른 분에게 지정 권한을 준 뒤 그분이 해제해 주셔야 합니다.';
   if(what === 'perm' && key === 'admin' && !on && adminIsMe(uid))
@@ -22149,7 +22057,7 @@ function adminGuard(uid, what, key, on){
 function banGuard(uid){
   if(!isAdmin('userBan')) return '사용자를 차단할 권한이 없습니다';
   if(!adminMyUid()) return '로그인 정보를 확인하지 못했습니다.\n\n앱을 다시 켜고 시도해 주세요.';
-  if(isOwnerAdmin(uid)) return '최고 운영자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.';
+  if(isOwnerAdmin(uid)) return '최고 관리자는 차단할 수 없습니다.\n\n이 앱의 소유자입니다.';
   if(adminIsMe(uid)) return '본인은 차단할 수 없습니다.';
   return '';
 }
@@ -22246,7 +22154,7 @@ function adminReportDone(id, on){
   panelMark();
   window.__report.done(id, on === true || on === 'true')
     .then(()=>openAdmin())
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 async function adminReports(){
   const box = await adminReportBox();
@@ -22288,7 +22196,7 @@ async function adminUnhide(id){
   panelMark();
   window.__talk.edit(id, { hidden:false, reports:{}, reportN:0 })
     .then(()=>openAdmin())
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 async function adminDel(id){
   if(!isAdmin('postDel')){ tell(t('글을 지울 권한이 없습니다')); return; }
@@ -22323,7 +22231,7 @@ async function adminBoats(){
           tsub('{n}명', { n: String(x.memberN || 0) }),
           String(x.createdAt || x.updatedAt || '').slice(0, 10)].filter(Boolean).join(' · '))}</div>
         ${x.owner ? `<div class="fchips" style="margin-top:6px">
-          <button class="tchip" onclick="openPerson('${jsq(x.owner)}')">${esc(t('주인'))}</button></div>` : ''}
+          <button class="tchip" onclick="openPerson('${jsq(x.owner)}')">${esc(t('선주'))}</button></div>` : ''}
         </div></div>`).join(''));
   if(!pubRows.length) return `<div class="notilbl">${esc(t('공개된 배'))}</div><div class="mrnone">${esc(t('공개된 배가 없습니다'))}</div>` + privHtml;
   return `<div class="notilbl">${esc(t('공개된 배'))}</div><div class="mrnone" style="text-align:left">${esc(t('숨기면 둘러보기에 표시되지 않습니다. 배 주인의 물품·정비 기록은 그대로 유지됩니다.'))}</div>`
@@ -22334,7 +22242,7 @@ async function adminBoats(){
         <div class="fchips" style="margin-top:6px">
           <button class="tchip" onclick="openBoatPage('${jsq(x.id)}')">${esc(t('보기'))}</button>
           <button class="tchip${x.adminHidden?' on':''}" onclick="adminBoatHide('${jsq(x.id)}',${x.adminHidden?'false':'true'})">${x.adminHidden?t('다시 올리기'):t('숨기기')}</button>
-          ${x.owner?`<button class="tchip" onclick="openPerson('${jsq(x.owner)}')">${esc(t('주인'))}</button>`:''}
+          ${x.owner?`<button class="tchip" onclick="openPerson('${jsq(x.owner)}')">${esc(t('선주'))}</button>`:''}
           <button class="tchip" onclick="adminBoatDel('${jsq(x.id)}')">${esc(t('공개 자료 삭제'))}</button>
         </div></div></div>`).join('') + privHtml;
 }
@@ -22347,7 +22255,7 @@ async function adminBoatHide(id, on){
   panelMark();
   window.__pub.patch(id, { adminHidden: val })
     .then(()=>openAdmin())
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 async function adminBoatDel(id){
   if(!isAdmin('boatMod')){ tell(t(boatModGuard())); return; }
@@ -22459,7 +22367,7 @@ async function openPerson(uid){
 
   const permBox = owner
     ? `<div class="mrnone" style="text-align:left">
-        <b>${esc(t('최고 운영자입니다.'))}</b> ${esc(t('앱 소유자이므로 앱에서 권한을 변경하거나 지정을 해제할 수 없습니다.'))}</div>`
+        <b>${esc(t('최고 관리자입니다.'))}</b> ${esc(t('앱 소유자이므로 앱에서 권한을 변경하거나 지정을 해제할 수 없습니다.'))}</div>`
     : canAppoint
       ? `<div class="mrnone" style="text-align:left">${a
           ? t('할 수 있는 일을 켜거나 끕니다. 모두 끄면 운영자 지정이 해제됩니다.')
@@ -22488,7 +22396,7 @@ async function openPerson(uid){
     ${''/* ★ 이메일은 보여 주지 않는다. 앱 명부에 담지도 않는다 —
            목적에 필요한 최소한만 다룬다는 방침(10항)에 맞춘 것이다.
            정말 필요하면 파이어베이스 콘솔의 Authentication 에서 본다. */}
-    <div class="mrrow"><span class="mrlbl">${esc(t('계정 번호'))}</span>
+    <div class="mrrow"><span class="mrlbl">${esc(t('회원번호'))}</span>
       <span class="mrm" style="flex:1;word-break:break-all">${esc(String(uid))}</span></div>
     <div class="ghead"><b>${esc(t('운영자 권한'))}</b></div>
     ${permBox}
@@ -22517,7 +22425,7 @@ async function personPerm(uid, key, on){
   window.__admin.set(uid, { perms })
     .then(()=>{ if(adminIsMe(uid)) return loadAdmin().then(()=>{ paintAdminMenu(); openPerson(uid); });
                 openPerson(uid); })
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 // 새로 운영자로 세운다
 async function personAppoint(uid, key){
@@ -22588,7 +22496,7 @@ async function adminAdmins(){
         </div></div>`;
       }).join('')
     + `<div class="mrrow" style="justify-content:center;padding:14px">
-        <button class="mrbtn ok" onclick="adminAdd()">${esc(t('+ 계정 번호로 지정'))}</button></div>`;
+        <button class="mrbtn ok" onclick="adminAdd()">${esc(t('+ 회원번호로 지정'))}</button></div>`;
 }
 // 명부에 아직 없는 사람은 계정 번호를 받아 세운다
 function adminAdd(){
@@ -22599,7 +22507,7 @@ function adminAdd(){
     sub:'상대방의 계정 번호를 붙여넣으세요',
     okText:'지정',
     fields:[
-      { key:'uid',  label:'계정 번호', value:'', placeholder:'상대가 복사해 준 번호' },
+      { key:'uid',  label:'회원번호', value:'', placeholder:'상대가 복사해 준 번호' },
       { key:'name', label:'이름',     value:'', placeholder:'다른 사람이 알아볼 수 있는 이름' }
     ],
     onOk: v => {
@@ -22666,9 +22574,9 @@ async function openExplore(biz){
                review: t('제품 · 제조사 · 종류로 찾기'),
                boat:   t('배 이름 · 항구 · 제조사 · 모델로 찾기') };
   const kind = expKind();
-  W.innerHTML = (kind === 'boat' ? `<div class="tfilt pinbar">
+  W.innerHTML = (kind === 'boat' ? `<div class="pinbar"><div class="tfilt">
         <button class="tchip${exploreBiz?'':' on'}" onclick="setExploreBiz(false)">${esc(t('전체'))}</button>
-        <button class="tchip${exploreBiz?' on':''}" onclick="setExploreBiz(true)">${esc(t('영업'))}</button></div>` : '')
+        <button class="tchip${exploreBiz?' on':''}" onclick="setExploreBiz(true)">${esc(t('영업'))}</button></div></div>` : '')
     + `<div class="qbox"><input id="expQ" value="${esc(kind === 'boat' ? exploreQ : expQ)}"
         placeholder="${esc(ph[kind] || '')}"
         oninput="exploreFilterUI(this.value)" autocomplete="off"></div>`
@@ -22877,7 +22785,7 @@ function pubHowBody(m, backName){
     ${row('부품 종류', (m.kind && m.kind !== gname) ? t(m.kind) : '')}
     ${row('계통',     m.sys && t(m.sys))}
     ${row('난이도',   m.hard ? howHardText(m.hard) : '')}
-    ${row('걸린 시간', m.work ? (durText(m.work) || String(m.work)) : '')}
+    ${row('소요 시간', m.work ? (durText(m.work) || String(m.work)) : '')}
     ${row('비용',    m.cost ? (Number(String(m.cost).replace(/[^0-9.]/g,'')||0).toLocaleString() + curOf(m)) : '')}
     ${row('부품·공구', m.used)}
     <div class="secl" style="margin-top:16px">${esc(t('정비 절차'))}</div>
@@ -23376,10 +23284,10 @@ function openPublish(){
 // 가리개 넓이 — 항이 넓은 곳도 있고 좁은 곳도 있다. 배 주인이 고른다.
 function trkHideRows(b){
   const cur = trkHideNm(b);
-  return `<div class="notilbl">${esc(t('항적 가리기'))}</div>`
+  return `<div class="notilbl">${esc(t('항적 숨기기'))}</div>`
     + `<div class="mrrow optrow lkro"><span class="lbl">${esc(t('가림 반경'))}</span>`
     + TRK_HIDE.map(v=>`<button class="optb${cur===v?' on':''}" onclick="setTrkHide(${v})">${
-        esc(v > 0 ? tsub('{n}해리', {n:String(v)}) : t('가리지 않음'))}</button>`).join('')
+        esc(v > 0 ? tsub('{n}해리', {n:String(v)}) : t('무관'))}</button>`).join('')
     + `</div>`
     + `<div class="mrnone" style="text-align:left">${esc(
         t('항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.'))}</div>`;
@@ -23622,7 +23530,7 @@ async function delIntro(i){
 const POST_KINDS = [
   { v:'notice', name:t('공지'),     sub:t('맨 위에 고정됩니다') },
   { v:'hand',   name:t('인수인계'), sub:t('교대 시 인계 사항') },
-  { v:'free',   name:t('일반'),     sub:t('그 밖의 이야기') }
+  { v:'free',   name:t('일반'),     sub:t('자유게시판') }
 ];
 function meUid(){
   return (typeof window!=='undefined' && window.__user) ? window.__user.uid : null;
@@ -24362,7 +24270,7 @@ function editRoster(uid){
         placeholder:'2026-08-20' },
       { key:'awayNote', label:'부재 사유', value: r.awayNote || '', placeholder:'예: 출장' },
       { key:'memo', type:'multi', rows:3, label:'메모', value: r.memo || '',
-        placeholder:'기억해 둘 것' }
+        placeholder:'메모' }
     ],
     onOk: v => {
       const bad = k => v[k] && !/^\d{4}-\d{2}-\d{2}$/.test(v[k]);
@@ -24757,7 +24665,7 @@ let boatTab = 'info';
 //   아홉 개가 세 줄이 되어 화면 위쪽을 통째로 먹었다. 붙여 쓴다.
 const BOAT_TABS2 = [
   ['roster',  t('회원명부'),  'openRoster',    'roster'],
-  ['ranks',   t('등급설정'),  'openRanks',     'ranks'],
+  ['ranks',   t('등급 설정'),  'openRanks',     'ranks'],
   ['board',   t('게시판'),    'openBoard',     'board'],
   ['tasks',   t('할일'),      'openMyTasks',   null],
   ['joins',   t('참여신청'),  'openJoinReqs',  'members'],
@@ -24860,7 +24768,7 @@ function boatHead(cur){
       <button class="tab fleetc" onclick="openFleet()">${esc(t('배 목록'))} ▾</button>
       <button class="tab${cur==='info'?' on':''}" onclick="openBoat('info')">${esc(t('기본정보'))}</button>
       <button class="tab${cur==='spec'?' on':''}" onclick="openBoat('spec')">${esc(t('제원'))}</button>
-      <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">${esc(t('배소개'))}</button>`
+      <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">${esc(t('배 소개'))}</button>`
     + boatTabsFor(curBoat()).map(([k,name,fn])=>
         `<button class="tab${cur===k?' on':''}" onclick="${fn}()">${esc(t(name))}</button>`).join('')
     + `</div></div>`;
@@ -26738,7 +26646,7 @@ async function syncDown(){
   //   평소에는 바뀐 것만 받지만, 여기서는 지난 셈을 버리고 통째로 받는다.
   //   무언가 어긋났을 때 사람이 스스로 바로잡을 수 있는 유일한 길이다.
   clearSyncBase();
-  setSync('받아오는 중…');
+  setSync('불러오는 중…');
   cloudPull().then(()=>{
     tell(t('클라우드에서 가져왔습니다.'), { kind:'good' });
   }).catch(e=>{
@@ -26817,7 +26725,7 @@ let permSkipShown = false;   // 권한 때문에 못 올린 것을 한 번은 �
 function schedulePush(){
   if(!cloud || !(unlocked || pushFree)) return;
   // 받아오기가 끝나기 전이면 미뤄 둔다. 끝나면 이어서 올린다.
-  if(!pullDone){ pushWanted = true; setSync('받아오는 중…'); return; }
+  if(!pullDone){ pushWanted = true; setSync('불러오는 중…'); return; }
   setSync('저장 중…');
   pushPending = true;
   clearTimeout(pushTimer);
@@ -27244,7 +27152,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.36';
+const APP_VER = '5.37';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -27713,7 +27621,7 @@ function lkMenu(id){
                   { v:'wall', name:'벽면·선반', sub:'점선으로 표시' } ] },
       { key:'size', label:'크기', type:'pick', value:'1',
         options:[ { v:'0.8', name:'작게',   sub:'20% 축소' },
-                  { v:'1',   name:'그대로', sub:'지금 크기' },
+                  { v:'1',   name:'그대로', sub:'원본' },
                   { v:'1.2', name:'크게',   sub:'20% 확대' } ] }
     ],
     del: { text:'수납칸 삭제', run: ()=>lkDelete(id) },
@@ -29874,7 +29782,7 @@ const BT_SPOTS = [
   { d:'DOCUMENTS',        n:'문서' },
   { d:'EXTERNAL_STORAGE', n:'휴대폰 저장공간' },
   { d:'EXTERNAL',         n:'앱 파일' },
-  { d:'DATA',             n:'앱 안' }
+  { d:'DATA',             n:'앱 내' }
 ];
 // 넣고 나서 { where:'문서/Baetnil/backup', why:'' } 를 돌려준다.
 // where 가 비면 브라우저가 받은 것(웹)이고, why 가 차면 못 넣은 것이다.
@@ -29938,7 +29846,7 @@ function restoreData(ev){
     try{
       const data = JSON.parse(r.result);
       const arr = Array.isArray(data) ? data : data.items;
-      if(!Array.isArray(arr)) throw new Error(t('형식이 다른 파일'));
+      if(!Array.isArray(arr)) throw new Error(t('지원되지 않는 파일 형식'));
       // 칸을 먼저 되살린다. 칸 없이 물품만 넣으면 전부 갈 곳을 잃는다.
       const bkLockers = Array.isArray(data.lockers) ? data.lockers : null;
       const restored  = bkLockers && bkLockers.length ? bkLockers
@@ -30468,21 +30376,21 @@ function mStatus(it){
   }
   // ── 시간으로만 볼 때
   if(days === null){
-    if(hl < 0)   return {c:'#E4756A', t:tsub('지남 {n}시간', {n:Math.round(-hl)}), k:'late', next:null, days:null, hrsLeft:hl};
-    if(hl <= 20) return {c:'#D9AE63', t:tsub('남음 {n}시간', {n:Math.round(hl)}),  k:'soon', next:null, days:null, hrsLeft:hl};
-    return {c:'#5FB894', t:tsub('남음 {n}시간', {n:Math.round(hl)}), k:'ok', next:null, days:null, hrsLeft:hl};
+    if(hl < 0)   return {c:'#E4756A', t:tsub('{n}시간 지남', {n:Math.round(-hl)}), k:'late', next:null, days:null, hrsLeft:hl};
+    if(hl <= 20) return {c:'#D9AE63', t:tsub('{n}시간 남음', {n:Math.round(hl)}),  k:'soon', next:null, days:null, hrsLeft:hl};
+    return {c:'#5FB894', t:tsub('{n}시간 남음', {n:Math.round(hl)}), k:'ok', next:null, days:null, hrsLeft:hl};
   }
   // ── 달력만 볼 때
-  const 달력 = (days<0)   ? {c:'#E4756A', t:tsub('지남 {n}일', {n:-days}), k:'late', next:nd, days}
-             : (days<=30) ? {c:'#D9AE63', t:tsub('남음 {n}일', {n:days}),  k:'soon', next:nd, days}
-                          : {c:'#5FB894', t:tsub('남음 {n}일', {n:days}), k:'ok', next:nd, days};
+  const 달력 = (days<0)   ? {c:'#E4756A', t:tsub('{n}일 지남', {n:-days}), k:'late', next:nd, days}
+             : (days<=30) ? {c:'#D9AE63', t:tsub('{n}일 남음', {n:days}),  k:'soon', next:nd, days}
+                          : {c:'#5FB894', t:tsub('{n}일 남음', {n:days}), k:'ok', next:nd, days};
   if(hl === null) return 달력;
   // ── 둘 다 있으면 **먼저 오는 쪽**을 보여 준다
   //   ★ 하루를 대략 한 시간 가동으로 보고 견준다 — 배는 매일 안 나간다.
   //     자로 잰 값이 아니라 「어느 쪽이 더 급한가」를 가리는 데만 쓴다.
-  const 시간 = (hl<0)   ? {c:'#E4756A', t:tsub('지남 {n}시간', {n:Math.round(-hl)}), k:'late', next:nd, days, hrsLeft:hl}
-             : (hl<=20) ? {c:'#D9AE63', t:tsub('남음 {n}시간', {n:Math.round(hl)}),  k:'soon', next:nd, days, hrsLeft:hl}
-                        : {c:'#5FB894', t:tsub('남음 {n}시간', {n:Math.round(hl)}), k:'ok', next:nd, days, hrsLeft:hl};
+  const 시간 = (hl<0)   ? {c:'#E4756A', t:tsub('{n}시간 지남', {n:Math.round(-hl)}), k:'late', next:nd, days, hrsLeft:hl}
+             : (hl<=20) ? {c:'#D9AE63', t:tsub('{n}시간 남음', {n:Math.round(hl)}),  k:'soon', next:nd, days, hrsLeft:hl}
+                        : {c:'#5FB894', t:tsub('{n}시간 남음', {n:Math.round(hl)}), k:'ok', next:nd, days, hrsLeft:hl};
   const 급함 = { late:0, soon:1, ok:2, none:3 };
   if(급함[시간.k] !== 급함[달력.k]) return 급함[시간.k] < 급함[달력.k] ? 시간 : 달력;
   return (hl <= days) ? 시간 : 달력;              // 같은 급이면 더 가까운 쪽
@@ -30726,7 +30634,7 @@ const COMSUB_TITLES = {talk:t('게시판'), spots:t('정박지'), market:t('중�
 //   · 배리뷰    민카라 「クルマレビュー」. 민카라는 부품 리뷰와 차 리뷰를 따로 둔다 —
 //                「이 부품 좋다」 와 「이 배 어떻더라」 는 읽는 사람이 다르기 때문이다.
 //                배를 사려는 사람에게는 이쪽이 전부다.
-const OTHERSUB_TITLES = {voyage:t('항해일지'), maint:t('정비수첩'), review:t('제품리뷰'), boatrv:t('배리뷰')};
+const OTHERSUB_TITLES = {voyage:t('항해일지'), maint:t('정비수첩'), review:t('제품리뷰'), boatrv:t('배 리뷰')};
 let expSub = (function(){ try{ return localStorage.getItem('bt_expsub') || 'voyage'; }catch(_){ return 'voyage'; } })();
 // ★ 지금 무슨 갈래를 그리나. 「배 둘러보기」(커뮤니티)와 「남의 배」 가 같은 화면을 쓰므로
 //   여기 한 곳에서 가른다. 두 곳에서 가르면 탭과 내용이 어긋난다.
@@ -30772,7 +30680,7 @@ async function setFeat(k, on){
     featOff = next;
     paintHNav();
     if(typeof openAdmin === 'function') openAdmin();
-  }catch(e){ tell(t('바꾸지 못했습니다.\n\n') + ((e && e.message) || e), { kind:'bad' }); }
+  }catch(e){ tell(t('변경하지 못했습니다.\n\n') + ((e && e.message) || e), { kind:'bad' }); }
 }
 // 꺼 둔 것은 하위 탭에서 뺀다. 운영자에게는 표시해서 보여 준다.
 function comSubList(){
@@ -30918,10 +30826,28 @@ function fabRun(i){
 }
 // ★ 5.30 — 밑으로 글이 지나갈 때만 맨 윗줄에 바탕 (위 CSS body.scrolled header)
 (function(){
-  const on = () => { try{ document.body.classList.toggle('scrolled', (window.scrollY || document.documentElement.scrollTop || 0) > 2); }catch(_){} };
+  const on = () => { try{ document.body.classList.toggle('scrolled', (window.scrollY || document.documentElement.scrollTop || 0) > 2); }catch(_){} pinbarEdges(); };
   try{ window.addEventListener('scroll', on, { passive:true }); }catch(_){}
+  try{ window.addEventListener('resize', on, { passive:true }); }catch(_){}
   try{ document.addEventListener('DOMContentLoaded', on); }catch(_){}
 })();
+// ★ 5.37 — 붙여 둔 줄의 흐림 판을 화면 양끝까지 맞춘다 (넘치지도 모자라지도 않게)
+let pinEdgeRaf = 0;
+function pinbarEdges(){
+  if(pinEdgeRaf) return;
+  pinEdgeRaf = requestAnimationFrame(() => {
+    pinEdgeRaf = 0;
+    try{
+      const W = document.documentElement.clientWidth || window.innerWidth;
+      document.querySelectorAll('.pinbar').forEach(b => {
+        if(!b.offsetParent) return;
+        const r = b.getBoundingClientRect();
+        b.style.setProperty('--pbl', Math.max(0, Math.round(r.left)) + 'px');
+        b.style.setProperty('--pbr', Math.max(0, Math.round(W - r.right)) + 'px');
+      });
+    }catch(_){}
+  });
+}
 function paintFab(){
   const host = document.getElementById('fabHost');
   if(!host) return;
@@ -31316,7 +31242,7 @@ function crewCard(){
   const 단추 = (fn, 말) => `<button class="minib blu" onclick="${fn}">${esc(t(말))}</button>`;
   const 다음 = !S.날씨 ? 'wx' : !S.타기 ? 'ride' : 'join';
   return `<div class="hcard intro">
-      <div class="hct"><b>${esc(t('첫걸음'))}</b><span class="gcnt">${S.n}/3</span></div>`
+      <div class="hct"><b>${esc(t('시작하기'))}</b><span class="gcnt">${S.n}/3</span></div>`
     + 줄(S.날씨, '현재 위치 날씨 보기',
         S.날씨 ? t('바람·돌풍·파고·물때가 이 위치를 기준으로 표시됩니다')
                : t('배가 없어도 그대로 사용하실 수 있습니다'),
@@ -31374,7 +31300,7 @@ function startCard(){
   // ★ 다음에 할 것 **하나에만** 단추를 둔다. 넷 다 달아 두면 할 일 목록이 되어 버린다.
   const 다음 = !S.자리 ? 'port' : !S.점검 ? 'ck' : 'mlog';
   return `<div class="hcard intro">
-      <div class="hct"><b>${esc(t('첫걸음'))}</b><span class="gcnt">${S.n}/4</span></div>`
+      <div class="hct"><b>${esc(t('시작하기'))}</b><span class="gcnt">${S.n}/4</span></div>`
     // ① 이미 끝나 있다. 그리고 **앱이 해 둔 일**을 여기서 알려 준다.
     + 줄(true, '배 등록',
         tsub('정기점검 {n}건과 출항 전 점검 {m}건이 함께 들어와 있습니다', { n:S.정기N, m:S.점검N }), '')
@@ -31387,7 +31313,7 @@ function startCard(){
         S.점검 ? tsub('{d}/{n} · 출항할 때마다 이 목록을 사용하시면 됩니다', { d:S.점검한N, n:S.점검N })
                : t('입력할 것은 없습니다. 항목을 눌러 넘기기만 하시면 됩니다'),
         다음 === 'ck' ? 단추('startGoCheck()', '점검하기') : '')
-    + 줄(S.정비, '정비 한 건 남기기',
+    + 줄(S.정비, '정비 기록 추가',
         S.정비 ? tsub('{n}건 · 다음에도 그대로 따라 하실 수 있습니다', { n:S.정비N })
                : t('사진 한 장과 한 줄이면 됩니다. 예전에 한 작업이어도 괜찮습니다'),
         다음 === 'mlog' ? 단추('startGoMlog()', '기록하기') : '')
@@ -31709,7 +31635,7 @@ function renderHome(){
     if(soon.length){
       out += homeCard(esc(t('곧 해야 할 정비')),
         soon.map(o=>`<div class="hrow2">${o.s.k==='late'
-            ? `<b style="color:#F05B52">${esc(t('지남'))}</b>`
+            ? `<b style="color:#F05B52">${esc(t('기한 지남'))}</b>`
             : `<b style="color:#E8B33C">${esc(t('임박'))}</b>`}
           ${esc(o.x.name || '')}</div>`).join(''),
         // ★ 단추 이름도 가는 곳과 같아야 한다. 「정비 탭」 을 눌렀는데 정기점검이 열리면 그것도 거짓말이다.
@@ -32034,7 +31960,7 @@ async function mrRevertClose(){ return mrCancel(); }
 async function mrRevertCloseOld(){
   const it = getMR(mrOpenType, mrOpenId);
   if(!it || !mrDirty()){ closeMR(); return; }
-  if(!await ask(t('수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.'), { ok: t('버리고 닫기'), warn: true })) return;
+  if(!await ask(t('수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.'), { ok: t('저장하지 않고 닫기'), warn: true })) return;
   const back = mrClone(mrSnap), kind = mrOpenType;
   Object.keys(it).forEach(k => { delete it[k]; });
   Object.assign(it, back);
@@ -32776,7 +32702,7 @@ function setMapKind(k, keepView){
     + `<div class="mrzoom mctl"><button onclick="dgZoom(1.5)">+</button>`
     + `<button onclick="dgZoom(1/1.5)">−</button>`
     + `<button onclick="dgReset()" title="${esc(t('전체 보기'))}">⤢</button>`
-    + `<button onclick="uploadDg('${k}')" title="${esc(t('도면 사진 바꾸기'))}">🖼</button>`
+    + `<button onclick="uploadDg('${k}')" title="${esc(t('도면 사진 변경'))}">🖼</button>`
     + `<button class="edt" onclick="dgPickBuiltin('${k}')" title="${esc(t('기본 도면에서 선택'))}">⛵</button>`
     + `<button onclick="dgPickLib('${k}')" title="${esc(t('공개 도면에서 선택'))}">📚</button>`
     + (dgPub[k]
@@ -34800,7 +34726,7 @@ function planWhoPaint(){
       aria-label="${esc(말(u))}"
       title="${esc(말(u))}"><span></span></button>`;
   // ★ 4.128 — 제목만 갈린다. 고르는 일은 한 벌이다.
-  const 제목 = 크루 ? t('함께 탄 사람 선택') : t('알릴 사람 선택');
+  const 제목 = 크루 ? t('동승자 선택') : t('알릴 사람 선택');
   P.innerHTML = `<div class="mrhead"><b>${제목}</b><span style="flex:1"></span>
       <button class="mrbtn ok" onclick="planWhoDone()">${esc(t('완료'))}</button></div>`
     + `<div class="mrnone" style="text-align:left">${
@@ -34831,7 +34757,7 @@ function planWhoPaint(){
          <button class="mrbtn" onclick="planWhoClear()">${esc(t('선택 해제'))}</button>
          <button class="mrbtn" onclick="planWhoSaveSet()">${esc(t('이대로 그룹으로 저장'))}</button></div>`;
   showPanel(P0);
-  setHeadTitle(크루 ? '함께 탄 사람 선택' : '알릴 사람 선택');
+  setHeadTitle(크루 ? '동승자 선택' : '알릴 사람 선택');
 }
 
 function rideBox(it){
@@ -38458,7 +38384,7 @@ const SUPPORT_MAIL = 'help@baetnil.com';
 const SUPPORT_KINDS = [
   { v:'bug',  name:t('오류 신고'),   sub:t('앱이 이상하게 동작합니다') },
   { v:'idea', name:t('건의'),       sub:t('이런 것이 있으면 좋겠습니다') },
-  { v:'ask',  name:t('물어보기'),    sub:t('사용법을 모르겠습니다') },
+  { v:'ask',  name:t('질문하기'),    sub:t('사용법을 모르겠습니다') },
   { v:'etc',  name:t('그 밖'),      sub:t('기타') },
   // ★ 고객센터 화면에서는 안 고르게 한다 (SUPPORT_ASK).
   //   연재는 물어볼 것이 따로 있어서 전용 화면(applySeries)으로 받는다.
@@ -38621,7 +38547,7 @@ function supportDone(id, on){
   panelMark();                       // ★ 처리한 뒤에도 보던 자리에 머문다
   window.__support.edit(id, { done: val })
     .then(()=>{ try{ supBadgeCheck(); }catch(_){} return openAdmin(); })
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 
 // ===== 중고 장터 =====
@@ -38636,7 +38562,7 @@ function supportDone(id, on){
 //    2) 안전거래 안내 — 선입금이 사기의 거의 전부다. 눈에 띄는 자리에 둔다.
 //    3) 신고와 자동 숨김 — 고지만 하고 방치하면 그것이 책임이 된다.
 const MARKET_CATS = [
-  { v:'boat',   name:t('배'),        sub:t('요트·보트·낚시배') },
+  { v:'boat',   name:t('배'),        sub:t('요트·보트·낚싯배') },
   { v:'engine', name:t('엔진·추진'), sub:t('선외기·선내기·프로펠러') },
   { v:'sail',   name:t('세일·로프'), sub:t('돛·시트·러닝리깅') },
   { v:'elec',   name:t('전자장비'),  sub:t('플로터·레이더·오토파일럿·무전기') },
@@ -38723,10 +38649,10 @@ async function renderMarket(){
   }
   marketList = listRowsSeen('market');
 
-  W.innerHTML = `<div class="tfilt pinbar">`
+  W.innerHTML = `<div class="pinbar"><div class="tfilt">`
       + `<button class="tchip${marketCat?'':' on'}" onclick="setMarketCat('')">${esc(t('전체'))}</button>`
       + MARKET_CATS.map(c=>`<button class="tchip${marketCat===c.v?' on':''}" onclick="setMarketCat('${c.v}')">${c.name}</button>`).join('')
-      + `</div>
+      + `</div></div>
     <div class="qbox"><input id="mkQ" value="${esc(marketQ)}"
         placeholder="${esc(t('물건 이름 · 내용으로 찾기'))}"
         oninput="marketFilter(this.value)" autocomplete="off"></div>
@@ -38990,7 +38916,7 @@ function setItemState(id, st){
   if(!canEditItem(m)){ tell(t('작성자만 변경할 수 있습니다')); return; }
   window.__market.edit(id, { state: st })
     .then(()=>{ m.state = st; openItem(id); })
-    .catch(e=>tell(t('바꾸지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
+    .catch(e=>tell(t('변경하지 못했습니다.\n\n') + ((e&&e.message)||e), { kind:'bad' }));
 }
 async function delItem(id){
   if(guardEdit('장터 글을 삭제합니다.', ()=>delItem(id))) return;
@@ -39830,12 +39756,12 @@ async function renderSpots(){
     // ★ 4.74 — 나라 띠 (사장님이 정하신 것). 자료가 두 나라 이상일 때만 뜬다.
     + spotCcBar()
     + borderLine(spotCc)
-    + `<div class="tfilt pinbar">`
+    + `<div class="pinbar"><div class="tfilt">`
       + `<button class="tchip${spotKindNow()?'':' on'}" onclick="setSpotKind('')">${esc(t('전체'))}</button>`
       + SPOT_KINDS.map(k=>`<button class="tchip${spotKindNow()===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
       // ★ 5.36 — 목록·지도도 붙어 있는 줄 끝에 둔다 (따로 두면 내릴 때 위로 사라졌다)
       + `<span style="flex:1"></span>` + spotViewBtns()
-      + `</div>
+      + `</div></div>
     <div class="qbox"><input id="spQ" value="${esc(spotQ)}"
         placeholder="${esc(t('정박지 이름 · 지역으로 찾기'))}"
         oninput="spotFilter(this.value)" autocomplete="off"></div>`
@@ -40551,7 +40477,7 @@ async function spotDepthCalc(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
   if(!tideCache){
-    P.innerHTML = `<div class="mrhead"><b>${esc(t('수심 환산'))}</b></div><div class="mrnone">${esc(t('물때 자료를 받는 중…'))}</div>`;
+    P.innerHTML = `<div class="mrhead"><b>${esc(t('수심 환산'))}</b></div><div class="mrnone">${esc(t('물때 정보를 불러오는 중…'))}</div>`;
     showPanel(P);
     try{ await loadTide(); }catch(e){}
   }
@@ -42335,10 +42261,15 @@ function trkPoints(it){
     if(p && typeof p.lat === 'number' && typeof p.lon === 'number')
       out.push({ lat:p.lat, lon:p.lon, label, time: time||'', key });
   };
-  push(it.posOut, t('출발'), it.timeOut, 'wxOut');
+  // ★ 5.37 — 항적이 있으면 출발·도착 표시는 항적의 첫 점·끝 점에 둔다 (OsmAnd 가 항적 처음·끝에 표시를 두는 방식).
+  //   10/4 — 출발을 누른 순간의 위치가 정확도 129m 짜리라 「출발」 이 소호 쪽에 찍혔다.
+  const 줄 = trkRaw(it).filter(p => p && isFinite(p.la) && isFinite(p.lo));
+  const 끝점 = p => p ? { lat: p.la, lon: p.lo } : null;
+  push(줄.length > 1 ? 끝점(줄[0]) : it.posOut, t('출발'), it.timeOut, 'wxOut');
   (it.logs||[]).slice().sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')))
     .forEach(g=> push(g.pos, g.kind ? t(g.kind) : t('기록'), g.time, 'log:'+g.id));
-  push(it.posIn, t('도착'), it.timeIn, 'wxIn');
+  const 기록중 = trkOn() && trkNow && String(trkNow.vid) === String(it.id);
+  push((줄.length > 1 && !기록중) ? 끝점(줄[줄.length - 1]) : it.posIn, t('도착'), it.timeIn, 'wxIn');
   return out;
 }
 // ── 항적 선 위의 한 점 찾기
@@ -42461,11 +42392,17 @@ function logShowOnMap(lid){
 // ★ 두 점 사이가 「기록이 끊긴 데」인가 (4.116)
 //   오래 안 들어왔고, 그 사이 멀리 떨어졌으면 — 그 사이를 배가 어떻게 갔는지 앱은 모른다.
 //   ★ 순수한 셈이라 폰 없이 검사된다.
-function trkGap(a, b){
+// ★★★ 5.37 — OsmAnd 그대로 (SavingTrackHelper.collectDBTracks):
+//   앞 점과 **6분 이상** 벌어졌고, 그 간격이 **바로 앞 간격의 10배 이상**일 때만 선을 끊는다.
+//   (pre = a 의 앞 점. 없으면 OsmAnd 처럼 끊지 않는다)
+function trkGap(a, b, pre){
   if(!a || !b) return false;
-  const dt = (Date.parse(b.t) - Date.parse(a.t)) / 1000;
-  if(!isFinite(dt) || dt <= TRK_GAP_S) return false;
-  return hav(a.la, a.lo, b.la, b.lo) * 1000 > TRK_GAP_M;
+  const dt = Date.parse(b.t) - Date.parse(a.t);
+  if(!isFinite(dt) || dt < TRK_OSM_SEG_MS) return false;
+  if(!pre) return false;
+  const dp = Date.parse(a.t) - Date.parse(pre.t);
+  if(!isFinite(dp)) return false;
+  return dt >= TRK_OSM_SEG_X * dp;
 }
 // 이 항적이 몇 곳에서 끊겼나 — 사람에게 그대로 알려 준다 (4.116)
 //   ★ 끊긴 것을 숨기면 사람은 그 선을 지나온 길로 믿는다. 그것이 제일 나쁘다.
@@ -42478,7 +42415,7 @@ function trkGapList(it){
   const out = [];
   if(!Array.isArray(a) || a.length < 2) return out;
   for(let i = 1; i < a.length; i++){
-    if(!trkGap(a[i-1], a[i])) continue;
+    if(!trkGap(a[i-1], a[i], a[i-2])) continue;
     const t1 = Date.parse(a[i-1].t), t2 = Date.parse(a[i].t);
     out.push({ from: a[i-1].t, to: a[i].t,
                sec: (isFinite(t1) && isFinite(t2)) ? Math.round((t2 - t1) / 1000) : 0 });
@@ -42501,17 +42438,19 @@ function trkGapText(g){
 }
 function trkLine(it){
   const a = trkRaw(it);
-  // 튄 점·되돌아온 점을 빼고 그린다. 자료는 그대로 두고 보이는 것만 고른다.
-  const 깨끗 = (Array.isArray(a) && a.length > 2) ? trkClean(a).pts : a;
+  // ★★★ 5.37 — 남긴 점을 **그대로** 그린다 (OsmAnd). 그릴 때 거르지 않는다.
+  //   사장님 (10/4): 「자꾸 개좆같은 꼼수로 그리기에서 고치는 병신같은 방법 쓰지 말고」
+  //   예전에는 그릴 때 튄 점·되돌아온 점을 빼고(trkClean) 그렸다 — 기록이 틀린 것을 그림에서 덮는 꼴이다.
+  const 깨끗 = a;
   const out = [];
-  let 앞 = null;
+  let 앞 = null, 앞앞 = null;
   (깨끗 || []).forEach(p => {
     if(!(p && isFinite(p.la) && isFinite(p.lo))) return;
     // ★★★ 4.116 — 기록이 끊긴 데는 **선을 잇지 않는다** (사장님 지적).
     //   여기에 곧은 선을 그으면 「배가 그리로 곧장 갔다」 는 거짓말이 된다.
     //   9/9 항적이 그랬다 — 40분 동안 한 점도 안 들어왔는데 639m 짜리 곧은 선이 그려졌다.
-    out.push({ lat:p.la, lon:p.lo, brk: 앞 ? trkGap(앞, p) : false });
-    앞 = p;
+    out.push({ lat:p.la, lon:p.lo, brk: 앞 ? trkGap(앞, p, 앞앞) : false });
+    앞앞 = 앞; 앞 = p;
   });
   return out.length > 1 ? out : null;
 }
@@ -43399,7 +43338,7 @@ async function wxCapture(key, vid){
            : tsOf(it.date, hhmm);
   if(ts == null){ put({ text:t('시각을 먼저 입력해 주세요'), at:'', spot:'' }); saveMR(); renderVoyage(); openMR('voyage', id); return; }
 
-  put({ text:t('받는 중…'), at:'', spot:'' });
+  put({ text:t('불러오는 중…'), at:'', spot:'' });
   if(mrShown('voyage', id)) openMR('voyage', id);
   try{
     const d = await wxAtPoint(src.lat, src.lon);
@@ -43444,7 +43383,7 @@ async function wxCapture(key, vid){
           pos: src.pos, lat: src.lat, lon: src.lon,
           dir, kt, gust, wave, tide, temp, tideSpot: tspot });
   }catch(e){
-    put({ text: tsub('받지 못함: {why}', {why: e.message || t('인터넷 확인')}), at:'', spot:'' });
+    put({ text: tsub('불러오지 못함: {why}', {why: e.message || t('인터넷 확인')}), at:'', spot:'' });
   }
   saveMR(); renderVoyage();
   if(mrShown('voyage', id)) openMR('voyage', id);
@@ -44449,7 +44388,7 @@ function gearState(id){
     if(d !== null && d < 0) late++; else if(d !== null && d <= 30) soon++; });
   const open = gearRepair(id).filter(r => r && r.status !== 'done').length;
   if(open) return { k:'late', label: tsub('고장 {n}', { n: open }) };
-  if(late) return { k:'late', label: tsub('지남 {n}', { n: late }) };
+  if(late) return { k:'late', label: tsub('기한 지남 {n}', { n: late }) };
   if(soon) return { k:'soon', label: tsub('임박 {n}', { n: soon }) };
   return { k:'none', label:'' };
 }
@@ -45265,7 +45204,7 @@ ${계통몸 ? `<h2>${E(t('계통별 요약'))}</h2><table class="g"><thead><tr>$
 
 ${칸('장비', ['계통','이름','제조사','모델','일련번호','설치일'], 장비몸)}
 ${칸('정기점검', ['계통','항목','주기','마지막 실시일','당시 엔진 시간','이전 이력'], 점검몸)}
-${칸('정비수첩', ['날짜','작업 내용','장비','걸린 시간','비용','사용 부품'], 수첩몸)}
+${칸('정비수첩', ['날짜','작업 내용','장비','소요 시간','비용','사용 부품'], 수첩몸)}
 ${칸('수리', ['발생일','고장','장비 · 계통','수리일'], 수리몸)}
 ${칸('문서', ['종류','이름','만료일'], 문서몸)}
 
@@ -45699,7 +45638,7 @@ const RV_USED = [
   { k:'new',  n:'설치한 지 얼마 안 됨' },
   { k:'y1',   n:'1년 미만' },
   { k:'y3',   n:'1~3년' },
-  { k:'y3up', n:'3년 넘게' }
+  { k:'y3up', n:'3년 이상' }
 ];
 const RV_CURS = ['원','엔','달러','유로'];
 
@@ -46610,7 +46549,7 @@ function howBlock(it){
            [1,2,3,4,5].map(n=>`<option value="${n}"${Number(it.hard)===n?' selected':''}>${howHardText(n)}</option>`).join('')
          }</select>`
       : `<b class="mrv">${it.hard ? howHardText(it.hard) : '—'}</b>`}</div>`;
-  h += durRow('걸린 시간', 'work', it.work);
+  h += durRow('소요 시간', 'work', it.work);
   h += `<div class="mrrow"><span class="mrlbl">${esc(t('비용'))}</span>${unlocked
       ? `<input type="text" inputmode="numeric" value="${esc(String(it.cost||''))}" style="width:120px" onchange="mrField('cost',this.value)"> ${esc(curNow())}`
       : `<b class="mrv">${it.cost ? esc(String(it.cost)) + esc(curOf(it)) : '—'}</b>`}</div>`;
@@ -47049,12 +46988,12 @@ function setDocSub(k){
 // ★ 갈래 이름을 띠에 한 번 쓰고, 아래에 또 제목으로 쓰지 않는다.
 //   「문서」 바로 밑에 또 「문서」 가 나오면 줄만 잡아먹는다.
 function docBar(){
-  return `<div class="tfilt pinbar" style="align-items:center">` + DOC_SUBS.map(x =>
+  return `<div class="pinbar"><div class="tfilt" style="align-items:center">` + DOC_SUBS.map(x =>
       `<button class="tchip${x.k === docSub ? ' on' : ''}" onclick="setDocSub('${x.k}')">${
         esc(t(x.n))}${x.k === 'docs' ? docDueTag() : ''}</button>`).join('')
     // ★ 5.30 — 위에 「+ 추가」 와 아래 + 단추가 같은 일을 하는 단추로 둘 있었다.
     //   새로 쓰는 것은 어느 화면에서나 오른쪽 아래 + 한 자리에서 (4.134 사장님이 정하신 것) — 위 단추를 뺀다
-    + `</div>`;
+    + `</div></div>`;
 }
 // 기한이 지났거나 다가온 문서가 있으면 갈래 이름 옆에 수를 붙인다.
 // ★ 안 그러면 연락처를 보고 있는 동안 만료된 선박검사증이 안 보인다.
@@ -47139,7 +47078,7 @@ function addVdoc(){
 // 배열을 따로 만들면 그 경로를 열두 곳 넘게 고쳐야 하고, 한 곳만 빠뜨려도
 // 기록이 조용히 사라진다.
 
-const CK_CYCLES = { d:t('날마다 초기화'), w:t('주마다 초기화'), n:t('수동 초기화') };
+const CK_CYCLES = { d:t('매일 초기화'), w:t('매주 초기화'), n:t('반복 안 함') };
 
 function ckLists(){
   // ★ 받아오기가 줄 차례를 뒤섞는다. 기기마다 같은 차례로 보이게 한다.
@@ -47330,15 +47269,15 @@ function ckAskCycle(cur){
 function addCheckList(){
   if(!unlocked) return;
   openForm({
-    title: '새 점검 목록',
+    title: '새 체크리스트',
     sub: '출항 전, 입항 후처럼 상황별로 나눠 두면 찾기 쉽습니다',
     okText: '만들기',
     fields: [
       { key:'name',  label:'목록 이름', value:'', placeholder:'예: 출항 전 점검' },
-      { key:'cycle', label:'초기화 주기', type:'pick', value:'d',
-        options: [{v:'d', name:'날마다', sub:'출항 전 점검처럼 출항할 때마다 하는 것'},
-       {v:'w', name:'주마다', sub:'정박 중 점검처럼 주 단위로 하는 것'},
-       {v:'n', name:'수동 초기화', sub:'내가 누를 때까지 그대로 두기'}] }
+      { key:'cycle', label:'반복', type:'pick', value:'d',
+        options: [{v:'d', name:'매일', sub:'매일 0시에 체크가 초기화됩니다'},
+       {v:'w', name:'매주', sub:'매주 월요일 0시에 체크가 초기화됩니다'},
+       {v:'n', name:'반복 안 함', sub:'[초기화]를 누를 때까지 체크가 유지됩니다'}] }
     ],
     onOk: v => {
       if(!v.name) return formErr('name', '목록 이름을 넣어 주세요');
@@ -47352,14 +47291,14 @@ function renameCheckList(id){
   if(!unlocked) return;
   const l = ckLists().find(x=>String(x.id)===String(id)); if(!l) return;
   openForm({
-    title: '점검 목록 수정',
+    title: '체크리스트 수정',
     okText: '저장',
     fields: [
       { key:'name',  label:'목록 이름', value:l.name, placeholder:'예: 출항 전 점검' },
-      { key:'cycle', label:'초기화 주기', type:'pick', value:l.cycle || 'd',
-        options: [{v:'d', name:'날마다', sub:'출항 전 점검처럼 출항할 때마다 하는 것'},
-       {v:'w', name:'주마다', sub:'정박 중 점검처럼 주 단위로 하는 것'},
-       {v:'n', name:'수동 초기화', sub:'내가 누를 때까지 그대로 두기'}] }
+      { key:'cycle', label:'반복', type:'pick', value:l.cycle || 'd',
+        options: [{v:'d', name:'매일', sub:'매일 0시에 체크가 초기화됩니다'},
+       {v:'w', name:'매주', sub:'매주 월요일 0시에 체크가 초기화됩니다'},
+       {v:'n', name:'반복 안 함', sub:'[초기화]를 누를 때까지 체크가 유지됩니다'}] }
     ],
     del: { text:'목록 삭제', run: ()=>delCheckList(id) },
     onOk: v => {
@@ -47425,7 +47364,7 @@ function editCheckItem(id){
     options: [{ v:'', name:'없음', sub:'담당자 없음' }].concat(memberRows(b).map(m=>({ v:m.uid, name:m.name, sub:m.rankName }))) });
   if(ls.length > 1) fields.push({ key:'list', label:'목록', type:'pick', value:String(it.list || ''),
     options: ls.map(l=>({ v:String(l.id), name:l.name,
-      sub: l.cycle==='w' ? '주마다 초기화' : l.cycle==='n' ? '수동 초기화' : '날마다 초기화' })) });
+      sub: l.cycle==='w' ? '매주 초기화' : l.cycle==='n' ? '반복 안 함' : '매일 초기화' })) });
   openForm({
     title: '점검 항목 수정',
     okText: '저장',
@@ -47447,7 +47386,7 @@ function editCheckItem(id){
 //   4.100 은 줄마다 그림 단추 넷(👤 ✎ ✕ …)을 하나로 모은 것이었는데, 모으면서 고르고 실행하는 단계를 하나 더 만들었다.
 //   다른 앱처럼 단추 하나 → 항목 화면 하나에서 이름·링크·담당자·목록·삭제를 다 한다.
 function ckRowMenu(id){ editCheckItem(id); }
-// 「목록 수정」 도 곧바로 목록 화면(이름·초기화 주기·목록 삭제)을 연다 — 아이폰 미리 알림 「목록 정보」 와 같은 꼴
+// 「목록 수정」 도 곧바로 목록 화면(이름·반복·목록 삭제)을 연다 — 아이폰 미리 알림 「목록 정보」 와 같은 꼴
 function ckListMenu(id){ renameCheckList(id); }
 function moveCheckItem(id){
   if(!unlocked) return;
@@ -47457,11 +47396,11 @@ function moveCheckItem(id){
   openForm({
     title: '다른 목록으로 옮기기',
     sub: it.label,
-    okText: '옮기기',
+    okText: '이동',
     fields: [
-      { key:'list', label:'옮길 목록', type:'pick', value:String(it.list),
+      { key:'list', label:'이동할 목록', type:'pick', value:String(it.list),
         options: ls.map(l=>({ v:String(l.id), name:l.name,
-          sub: l.cycle==='w' ? '주마다 초기화' : l.cycle==='n' ? '수동 초기화' : '날마다 초기화' })) }
+          sub: l.cycle==='w' ? '매주 초기화' : l.cycle==='n' ? '반복 안 함' : '매일 초기화' })) }
     ],
     onOk: v => {
       if(!v.list) return false;
@@ -48822,7 +48761,7 @@ function writeSeries(id){
         placeholder:'예: 요트인을 위한 인공지능', chips: seriesNames() },
       { key:'no',        label:'회차',    value: x ? String(x.no||'') : '', placeholder:'1' },
       { key:'title',     label:'제목',     value: x ? x.title : '', placeholder:'제목' },
-      { key:'author',    label:'저자',     value: x ? x.author : (meName()||''), placeholder:'글쓴이 이름' },
+      { key:'author',    label:'저자',     value: x ? x.author : (meName()||''), placeholder:'작성자' },
       { key:'origTitle', label:'원제',     value: x ? x.origTitle : '', placeholder:'옮긴 글일 때만' },
       { key:'source',    label:'매체',     value: x ? x.source : '', placeholder:'옮긴 글일 때만 · 예: Yacht Russia' },
       { key:'link',      label:'원문 링크', value: x ? x.link : '', placeholder:'옮긴 글일 때만 · https://…' },
@@ -48913,10 +48852,10 @@ async function renderNews(force){
   const 내소식 = (내말 === 'ko') ? gov : 온것.filter(x => (x.lang || 'en') === 내말);
   const 세계   = (내말 === 'ko') ? 온것 : 온것.filter(x => (x.lang || 'en') !== 내말);
   const nNew = (rows, f) => rows.filter(f || newsIsNew).length;
-  const tabs = `<div class="subrow pinbar">`
+  const tabs = `<div class="pinbar"><div class="subrow">`
     + [['kr', newsHomeName(), nNew(내소식)], ['ww', t('세계 소식'), nNew(세계)], ['sr', t('연재'), 0]]
         .map(([k,n,c])=>`<button class="tab${newsSub===k?' on':''}" onclick="setNewsSub('${k}')">${esc(n)}${c?` <span class="tnum">${c}</span>`:''}</button>`).join('')
-    + `</div>`;
+    + `</div></div>`;
   // ★ 걸러 보는 단추가 아니다. 「알림을 어디서 켜나」를 여기 두는 것이다.
   //   목록을 거르는 것으로 읽히지 않게 말을 「고르기」로 두고 소식 위가 아니라 오른쪽에 둔다.
   const nCat = notiGet().krCats.length + notiGet().wwCats.length;

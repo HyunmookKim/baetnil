@@ -1063,13 +1063,23 @@ body.pnsc #mrPanel .mrhead::before, body.pnsc #mrPanel > .mrtop::before{opacity:
 .pinbar{position:sticky;top:var(--stickyTop,var(--hdrH,56px));z-index:6}
 body.scrolled .pinbar{background:rgba(6,18,31,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   box-shadow:0 8px 14px -10px rgba(0,0,0,.7)}
+/* 5.36 — 붙여 두는 줄 안의 둘째 줄 */
+.gflt:empty{display:none}
+.gflt{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.gflt .subrow{padding:0;margin:0}
+.ckpin .ckchips{margin-bottom:0}
 /* 남의 배 화면 — 탭 줄을 머리줄 둘째 줄로 (머리줄째 붙어 있다) */
 #mrPanel .mrhead.mrhead2{flex-wrap:wrap}
 #mrPanel .mrhead.mrhead2 .bsubs{flex-basis:100%;margin-top:8px}
 .cilist{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px}
 .cirow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:rgba(255,255,255,.045);border-radius:12px;padding:10px 13px}
-.cirow .cikind{font-size:12px;color:var(--tm,#8a97a8);min-width:64px}
-.cirow .cival{flex:1;min-width:0;overflow-wrap:anywhere}
+.cirow{flex-direction:column;align-items:stretch;gap:3px}
+.cirow .cihead{display:flex;align-items:center;gap:6px}
+.cirow .cikind{font-size:12px;color:var(--tm,#8a97a8)}
+.cirow .cival{min-width:0;overflow-wrap:anywhere;font-size:15px}
+.cicus{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:0;position:relative}
+.cicus .cicl{flex:1 1 auto;width:100%;padding-right:34px}
+.cicus .cicx{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:30px;height:34px;border:0;background:transparent;color:#9ed0f5;font-size:15px;cursor:pointer}
 .ciedit{background:rgba(255,255,255,.045);border-radius:14px;padding:12px;margin:9px 0;display:flex;flex-direction:column;gap:8px}
 .ciline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .cisel{flex:1 1 0;min-width:0;width:auto;min-height:44px;font-size:15px;border-radius:10px;padding:0 8px;background:#0c1e30;color:#dfe8f2;border:1px solid #24486c}
@@ -1078,6 +1088,21 @@ body.scrolled .pinbar{background:rgba(6,18,31,.94);-webkit-backdrop-filter:blur(
 .pubmaster .permname{font-size:16px;font-weight:800}
 #mrPanel > .mrtop{flex-wrap:wrap;gap:6px;justify-content:flex-start}
 #mrPanel > .mrtop > b{margin-right:auto}
+/* ★★★ 5.36 — 머리 단추 줄 한 가지 꼴: 왼쪽 「취소」(또는 단계 「← 위치」), 오른쪽 할 일 · 「저장」(하나만 진하게).
+   애플 HIG 「Sheets」: Cancel 은 앞쪽(왼쪽), Done/Save 는 뒤쪽(오른쪽). 머티리얼 전체 화면 창: 닫기 왼쪽, 저장 오른쪽. */
+.nvbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nvbar > .nvL{margin-right:auto}
+.nvbar > .nvL + b{margin-right:auto}
+#mrPanel.full .nvbar > .nvL + b{display:none}
+.nvbar .nvsave{font-weight:800}
+.nvbar > .nvR{margin-left:auto;display:flex;gap:6px;align-items:center}
+/* 머리줄 「←」 */
+#hNav .hback{flex:0 0 auto;width:40px;height:40px;margin:-6px 4px -6px -10px;border:0;background:transparent;color:var(--th,#E8EEF4);
+  font-size:22px;line-height:1;cursor:pointer;border-radius:999px}
+#hNav .hback:active{background:rgba(255,255,255,.08)}
+body.nvedit #hNav .hback{display:none}
+#hNav .htrow{display:flex;align-items:center;min-width:0}
+#hNav .htrow .htit{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #mrPanel .mrhead .acthead{margin-left:auto}
 /* 붙여 둔 줄이 화면을 너무 먹으면 안 된다 — 단추는 작게 */
 #mrPanel > .mrtop .mrbtn{padding:6px 10px;font-size:12px}
@@ -1326,6 +1351,7 @@ body.scrolled .pinbar{background:rgba(6,18,31,.94);-webkit-backdrop-filter:blur(
 .wc{width:34px;flex-shrink:0;height:26px;display:flex;align-items:center;justify-content:center;font-size:11px}
 .wch{font-size:10px;color:#84898F;font-weight:700}
 .wnight{background:#0B0D11}
+.wdate .wsun{font-weight:500;color:#9AA7B4;margin-left:8px;white-space:nowrap}
 .wcv{font-weight:750;font-variant-numeric:tabular-nums}
 .wcv.dim{color:#84898F;font-weight:600}
 .wbr{height:16px}
@@ -2745,6 +2771,8 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
     <span class="hend">
       <button class="tab" id="gearViewBtn" onclick="mrToggleView(gearScreenKind())" data-t="도면">도면</button>
     </span>
+    <!-- ★ 5.36 — 정기점검 거르개(전체·기한 초과·임박)도 붙여 둔다. 따로 두면 내릴 때 위로 사라졌다. -->
+    <div id="gearFlt" class="gflt"></div>
   </div>
   <div id="gearList"></div>
   <div id="maintList" style="display:none"></div>
@@ -6561,6 +6589,19 @@ const I18N = {
     '+ 연락처 추가':'+ Add contact',
     '저장했습니다':'Saved',
     '전화·이메일·SNS':'Phone · email · social',
+  
+
+    // ── 5.36 — 장비 고장·머리줄 ←·일출 일몰
+    '일출':'Sunrise',
+    '일몰':'Sunset',
+    '수리목록에 추가됩니다':'Added to Repairs',
+    '{gear} · 수리목록에 추가됩니다':'{gear} · Added to Repairs',
+    '수리목록에 추가했습니다':'Added to Repairs.',
+    '뒤로':'Back',
+  
+
+    // ── 5.36 — 항해 연료 게이지 알림
+    '연료 기록에 추가했습니다':'Added to Fuel log.',
   },
   ru: {
     '배를 둘러보기에 공개합니다 · 공개 설정에서 언제든 끌 수 있습니다':'Судно будет показано в разделе «Суда» · Это можно отключить в любое время в «Публикация судна»',
@@ -10177,6 +10218,19 @@ const I18N = {
     '+ 연락처 추가':'+ Добавить контакт',
     '저장했습니다':'Сохранено',
     '전화·이메일·SNS':'Телефон · почта · соцсети',
+  
+
+    // ── 5.36 — 장비 고장·머리줄 ←·일출 일몰
+    '일출':'Восход',
+    '일몰':'Закат',
+    '수리목록에 추가됩니다':'Будет добавлено в «Ремонт»',
+    '{gear} · 수리목록에 추가됩니다':'{gear} · будет добавлено в «Ремонт»',
+    '수리목록에 추가했습니다':'Добавлено в «Ремонт».',
+    '뒤로':'Назад',
+  
+
+    // ── 5.36 — 항해 연료 게이지 알림
+    '연료 기록에 추가했습니다':'Добавлено в журнал топлива.',
   },
   // ── 일본어 (4.68)
   //
@@ -13712,6 +13766,19 @@ const I18N = {
     '+ 연락처 추가':'+ 連絡先を追加',
     '저장했습니다':'保存しました',
     '전화·이메일·SNS':'電話・メール・SNS',
+  
+
+    // ── 5.36 — 장비 고장·머리줄 ←·일출 일몰
+    '일출':'日の出',
+    '일몰':'日の入り',
+    '수리목록에 추가됩니다':'修理リストに追加されます',
+    '{gear} · 수리목록에 추가됩니다':'{gear}・修理リストに追加されます',
+    '수리목록에 추가했습니다':'修理リストに追加しました。',
+    '뒤로':'戻る',
+  
+
+    // ── 5.36 — 항해 연료 게이지 알림
+    '연료 기록에 추가했습니다':'燃料記録に追加しました。',
   }
 };
 // ★★★ 5.35 — 사전 꺼내기 (사장님: 「더 빠르게 … 응 한다음에 조금이라도 문제 생기면 되돌려라」, 2026-10-03)
@@ -16960,9 +17027,8 @@ function openProfEdit(){
                       onchange="profBoatToggle('${jsq(String(b.id))}', this.checked)">
                <span>${esc(b.name || t('이름 없음'))}</span></label></div>`).join('')
         : `<div class="mrm" style="padding:0 0 8px 12px">${esc(t('아직 배가 없습니다.'))}</div>`);
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('프로필 수정'))}</b><span style="flex:1"></span>
-        <button class="tab" onclick="profEditBack()">${esc(t('취소'))}</button>
-        <button class="tab on" onclick="profSave()">${esc(t('완료'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="profEditBack()">${esc(t('취소'))}</button><b>${esc(t('프로필 수정'))}</b>
+        <button class="tab on nvsave" onclick="profSave()">${esc(t('저장'))}</button></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>
       <input id="pfName" style="flex:1" maxlength="20" value="${esc(p.name||'')}" placeholder="${esc(myName())}"></div>
     <div class="mrm" style="padding:0 0 8px 12px">${esc(t('배 명부와 게시판에 이 이름으로 표시됩니다. 비워 두면 계정 이름을 사용합니다.'))}</div>
@@ -17334,8 +17400,7 @@ function openSignup(){
 function drawSignup(){
   const P = document.getElementById('mrPanel');
   if(!P) return;
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('회원가입'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openAccount()">${esc(t('취소'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="openAccount()">${esc(t('취소'))}</button><b>${esc(t('회원가입'))}</b></div>
     <div class="suf"><label for="suEm">${esc(t('이메일'))}</label>
       <input id="suEm" type="email" autocomplete="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="name@example.com"></div>
     <div class="suf"><label for="suPw">${esc(t('비밀번호'))}</label>
@@ -17674,8 +17739,7 @@ function needBoatCard(what){
 function openBoatSetup(){
   const P = document.getElementById('mrPanel');
   // ★ 닫는 길이 반드시 있어야 한다. 없으면 막다른 골목이 된다. 실제로 그랬다.
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('배 등록'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoatSetup()">${esc(t('← 오늘'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="closeBoatSetup()"><b>${esc(t('배 등록'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('이 앱은 배 한 척을 기준으로 기록을 관리합니다.'))}<br>${esc(t('먼저 배를 등록해 주세요. 입력한 내용은 언제든 수정할 수 있습니다.'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>
       <input id="nbName" style="flex:1" placeholder="${esc(t('예: 여수 Sunshine'))}" autocomplete="off"></div>
@@ -19335,9 +19399,8 @@ function openPortPick(){
   portPickCtx = { id: b.id };
   const cur = (b.lat != null && b.lon != null) ? { lat:b.lat, lon:b.lon } : null;
   const box = document.getElementById('mrPanel');
-  box.innerHTML = `<div class="mrhead"><b>${esc(t('홈포트 위치'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="portPickCancel()">${esc(t('취소'))}</button>
-      <button class="tab on" id="portSave" onclick="portPickSave()" ${cur?'':'disabled'}>${esc(t('저장'))}</button></div>
+  box.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="portPickCancel()">${esc(t('취소'))}</button><b>${esc(t('홈포트 위치'))}</b>
+      <button class="tab on nvsave" id="portSave" onclick="portPickSave()" ${cur?'':'disabled'}>${esc(t('저장'))}</button></div>
     ${mapBox('portMap','52vh')}
     <div class="mrnone" style="text-align:left">${esc(t('지도를 누르면 위치가 지정됩니다 · 끌어서 이동 · 두 손가락으로 확대'))}<br>${esc(t('정박지나 계류장 위치를 지정해 주세요.'))}</div>
     <div class="mrrow" style="justify-content:center">
@@ -20694,8 +20757,7 @@ async function hideBoatUI(id){
 async function openHidden(){
   const ids = hiddenBoats();
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('숨긴 배'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="backToExplore()">${esc(t('목록'))}</button></div>`
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('숨긴 배'))}</b><span style="flex:1"></span></div>`
     + (ids.length ? `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`
                   : `<div class="mrnone">${esc(t('숨긴 배가 없습니다'))}</div>`);
   showPanel(P);
@@ -21882,7 +21944,7 @@ async function openTalk(id){
       ? { name:'이 사람 차단', run: () => mutePersonUI(po.by, po.byName || '') } : null
   ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',po.title))}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="backToTalk()">${esc(t('목록'))}</button></div>
+      ${할일}</div>
     <div class="postmeta"><span class="chip">${esc(kn)}</span>
       ${po.region?`<span class="chip">${esc(t(po.region))}</span>`:''}
       ${po.by ? whoLink(po.by, po.byName, 'talk:' + po.id, po.gone) : esc(whoName(po))}${po.boatName?' · '+esc(po.boatName):''}${po.boatType?' · '+esc(po.boatType):''}
@@ -22383,8 +22445,7 @@ function paintPeopleRows(){
 async function openPerson(uid){
   if(!isAdmin() || amSeriesOnly()){ tell(t('운영자만 볼 수 있습니다')); return; }
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('사람'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openAdmin()">${esc(t('← 운영자'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openAdmin()"><b>${esc(t('사람'))}</b><span style="flex:1"></span></div>
     <div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
   showPanel(P);
   let u = null, a = null, ban = null;
@@ -22422,8 +22483,7 @@ async function openPerson(uid){
         + (ban && ban.why ? `<div class="mrnone" style="text-align:left">${esc(t('사유'))}: ${esc(ban.why)}</div>` : ''))
     : '';
 
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('사람'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openAdmin()">${esc(t('← 운영자'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openAdmin()"><b>${esc(t('사람'))}</b><span style="flex:1"></span></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('성함'))}</span><b class="mrv">${esc(personCur.name || t('(이름 없음)'))}</b></div>
     ${''/* ★ 이메일은 보여 주지 않는다. 앱 명부에 담지도 않는다 —
            목적에 필요한 최소한만 다룬다는 방침(10항)에 맞춘 것이다.
@@ -23222,7 +23282,7 @@ function paintBoatPage(){
   const 탭줄 = secs.length ? `<div class="bsubs">` + secs.map(([k,n])=>
         `<button class="tab${k===boatPageTab?' on':''}" onclick="setBoatPageTab('${k}')">${esc(n)}</button>`).join('') + `</div>` : '';
   P.innerHTML = `<div class="mrhead mrhead2"><b>${esc(boatShowName(x) || '')}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="backToExplore()">${esc(t('목록'))}</button>${탭줄}</div>
+      ${할일}${탭줄}</div>
     <div class="postmeta"><span class="chip">${esc(t(x.typeName||''))}</span>
       ${x.biz?`<span class="chip notice">${esc(t('영업'))}</span>`:''}${esc(boatShowPort(x) || '')}</div>
     ${(boatPageTab === 'intro' && (x.intro||[]).length)
@@ -23302,8 +23362,7 @@ function openPublish(){
         ? `<span class="mrm" style="padding:0 6px">${esc(표시 ? t('켜짐') : t('꺼짐'))}</span>`
         : `<button class="permb${표시?'':' on'}" onclick="setListedUI(false)">${esc(t('끄기'))}</button>
            <button class="permb${표시?' on':''}" onclick="setListedUI(true)">${esc(t('켜기'))}</button>`}</div></div>`;
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('배 공개 설정'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoat('info')">${esc(t('← 계류장'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openBoat('info')"><b>${esc(t('배 공개 설정'))}</b><span style="flex:1"></span></div>
     ${맨위}
     <div class="mrnone" style="text-align:left">
       ${isPublic(b) ? `<b>${esc(t('지금 공개 중입니다.'))}</b> ${esc(t('배 이름과 선종은 항상 함께 보입니다.'))}`
@@ -23438,8 +23497,7 @@ function openIntro(){
       </div>` : ''}</div>`;
   }).join('');
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('소개 페이지'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openPublish()">${esc(t('← 공개 설정'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openPublish()"><b>${esc(t('소개 페이지'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('글과 사진을 섞어서 쓰시면 됩니다.'))}
       ${pubOn(b,'intro') ? '' : `<br><b>${esc(t('소개 페이지가 꺼져 있어 다른 사람에게 보이지 않습니다.'))}</b>`}</div>`
     + (rows || `<div class="mrnone">${esc(t('아직 아무것도 없습니다'))}</div>`)
@@ -23811,8 +23869,8 @@ function openPost(id){
     // 남이 쓴 글만 신고한다. 신고는 안전장치라 보기 전용이어도 된다.
     (p.by && String(p.by) !== String(meUid())) ? { name:'신고', run:() => reportBoatPost(p.id) } : null
   ].filter(Boolean));
-  P.innerHTML = `<div class="mrhead"><b>${esc(p.title)}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="openBoard()">${esc(t('목록'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openBoard()"><b>${esc(p.title)}</b><span style="flex:1"></span>
+      ${할일}</div>
     <div class="postmeta"><span class="chip${p.kind==='notice'?' notice':''}">${esc(kn)}</span>
       ${p.pub?`<span class="chip">${esc(t('공개'))}</span>`:''}
       ${esc(p.byName||'')} · ${esc(String(p.ts||'').slice(0,10))}
@@ -24155,8 +24213,7 @@ function openRoster(){
       </div>
     </div>`;
   }).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('회원 명부'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoat('info')">${esc(t('← 계류장'))}</button></div>`
+  P.innerHTML = `<div class="mrhead" data-up="openBoat('info')"><b>${esc(t('회원 명부'))}</b><span style="flex:1"></span></div>`
     + (al.length ? `<div class="rosteral">${al.map(a=>
         a.kind==='dues' ? `${esc(a.name)} · ${esc(t('회비 납부일이 지났습니다'))}`
                         : `${esc(a.name)} · ${esc(tsub('{until}까지 부재', { until: a.until }))}${a.note?' ('+esc(a.note)+')':''}`
@@ -24208,9 +24265,7 @@ async function openProfile(uid, name, back){
   const 이름 = String(name || '').trim()
     || (나 && typeof myName === 'function' ? myName() : '')
     || (b && b.memberNames && b.memberNames[String(uid)]) || t('이름 미등록');
-  const 돌아갈말 = profBackTo === 'roster' ? t('← 회원 명부') : t('← 뒤로');
-  const 머리 = `<div class="mrhead" data-profview="${esc(String(uid))}"><b>${esc(이름)}</b><span style="flex:1"></span>
-      <button class="tab" onclick="profBack()">${esc(돌아갈말)}</button></div>`;
+  const 머리 = `<div class="mrhead" data-profview="${esc(String(uid))}"><b>${esc(이름)}</b><span style="flex:1"></span></div>`;
   P.innerHTML = 머리 + `<div class="mrnone">${esc(t('불러오는 중…'))}</div>`;
   showPanel(P);
   let p = null, 못받음 = false;
@@ -24369,8 +24424,7 @@ function openRanks(){
           ? `<button class="minib blu edt" onclick="editRankUI('${jsq(r.id)}')">${esc(t('수정'))}</button>` : ''}
       </div></div>`;
   }).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('등급 설정'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoat('info')">${esc(t('← 계류장'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openBoat('info')"><b>${esc(t('등급 설정'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('위에 있을수록 높은 등급입니다. 자신보다 낮은 등급만 수정할 수 있습니다.'))}</div>`
     + list
     + `<div class="mrrow edt" style="justify-content:center;padding:14px 12px">
@@ -24404,8 +24458,7 @@ function editRankUI(id){
         `<button class="permb${l.v===cur?' on':''}"${r.owner?' disabled':''}
            onclick="setPermUI('${jsq(id)}','${p.k}','${l.v}')">${l.name}</button>`).join('')}</div></div>`;
   }).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(r.name)}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openRanks()">${esc(t('← 등급 설정'))}</button></div>
+  P.innerHTML = `<div class="mrhead" data-up="openRanks()"><b>${esc(r.name)}</b><span style="flex:1"></span></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('등급 이름'))}</span>
       ${unlocked ? `<input value="${esc(r.name)}" style="flex:1" onchange="renameRankUI('${jsq(id)}',this.value)">` : `<b class="mrv">${esc(r.name)}</b>`}</div>`
     + (r.owner
@@ -24571,8 +24624,7 @@ function joinByCode(){
 //   제대로 보여 주는데 여기만 달랏다. 이제 언제나 화면을 열고 「왜 비었는지」 를 적는다.
 function joinReqsPanel(속){
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('참여 신청'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoat('info')">${esc(t('← 계류장'))}</button></div>` + 속;
+  P.innerHTML = `<div class="mrhead" data-up="openBoat('info')"><b>${esc(t('참여 신청'))}</b><span style="flex:1"></span></div>` + 속;
   showPanel(P); boatKeepTabs('joins');
 }
 async function openJoinReqs(){
@@ -24585,8 +24637,7 @@ async function openJoinReqs(){
   catch(e){ joinReqsPanel(빈(t('신청을 불러오지 못했습니다: ') + ((e && e.message) || e))); return; }
   if(!list || !list.length){ joinReqsPanel(빈(t('받은 참여 신청이 없습니다'))); return; }
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('참여 신청'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="openBoat('info')">${esc(t('← 계류장'))}</button></div>`
+  P.innerHTML = `<div class="mrhead" data-up="openBoat('info')"><b>${esc(t('참여 신청'))}</b><span style="flex:1"></span></div>`
     + list.map(v=>`<div class="fleet">
         <div class="fmain"><div class="fname">${esc(v.name||t('이름 미등록'))}
             <span class="chip">${esc(uidTail(v.uid))}</span></div>
@@ -24787,11 +24838,24 @@ async function retryDirtyBoats(){
 // ★ 옮기는 일은 여기 한 곳에서 한다 — 부르는 자리가 서른 곳이 넘는다.
 function setHeadTitle(title){
   const N = document.getElementById('hNav');
-  if(N) N.innerHTML = `<h1 class="htit">${esc(title ? t(title) : '뱃일')}</h1>`;
+  // ★★★ 5.36 — 들어온 화면에는 왼쪽 위에 「←」 하나 (사장님: 「저장 후 닫기 그냥 닫기 뒤로 가기 … 다른 어플들이랑 완전히 다르거든」).
+  //   애플 HIG 「Toolbars」·머티리얼 「Top app bar」: 뒤로는 왼쪽 위 화살표 하나. 화면마다 오른쪽 「목록」·「← 뒤로」 를 따로 두지 않는다.
+  //   고치는 화면(왼쪽에 「취소」 가 있는 화면)에서는 숨긴다 — 애플: 취소·완료·뒤로를 같이 두지 않는다.
+  const 뒤로 = (typeof SCREEN_STACK !== 'undefined' && SCREEN_STACK.length)
+    ? `<button class="hback" onclick="navBackBtn()" aria-label="${esc(t('뒤로'))}">←</button>` : '';
+  if(N) N.innerHTML = 뒤로 ? `<div class="htrow">${뒤로}<h1 class="htit">${esc(title ? t(title) : '뱃일')}</h1></div>`
+                       : `<h1 class="htit">${esc(title ? t(title) : '뱃일')}</h1>`;
+}
+// 머리줄 「←」 — 휴대폰 뒤로 가기와 똑같이 한 걸음 물린다(문 하나: navDoBack)
+function navBackBtn(){
+  try{ if(navDepth > 0){ history.back(); return; } }catch(_){}
+  navDoBack();
 }
 function boatHead(cur){
   // ★ 두 줄로 나눠 두었더니 아홉 개가 세 줄이 됐다. 한 덩어리로 흘려보내면 두 줄에 담긴다.
-  return `<div class="mrhead"><b>${esc(t('계류장'))}</b><span style="flex:1"></span></div>
+  // ★★★ 5.36 — 탭 줄(배 목록·기본정보·제원·배소개·회원명부…)을 머리줄 **안** 둘째 줄로 옮겼다.
+  //   5.35 에서 남의 배 화면만 옮기고 내 배 계류장은 빠뜨려, 내리면 탭 줄이 위로 사라졌다(사장님: 「또 하나만 고쳐놔가지고」).
+  return `<div class="mrhead mrhead2"><b>${esc(t('계류장'))}</b><span style="flex:1"></span>
     <div class="bsubs">
       <button class="tab fleetc" onclick="openFleet()">${esc(t('배 목록'))} ▾</button>
       <button class="tab${cur==='info'?' on':''}" onclick="openBoat('info')">${esc(t('기본정보'))}</button>
@@ -24799,7 +24863,7 @@ function boatHead(cur){
       <button class="tab${cur==='intro'?' on':''}" onclick="openBoat('intro')">${esc(t('배소개'))}</button>`
     + boatTabsFor(curBoat()).map(([k,name,fn])=>
         `<button class="tab${cur===k?' on':''}" onclick="${fn}()">${esc(t(name))}</button>`).join('')
-    + `</div>`;
+    + `</div></div>`;
 }
 // 그 화면이 스스로 그린 머리줄을 '내 배' 버튼 줄로 바꿔 끼운다.
 // 화면마다 머리줄을 다시 짜게 하면 또 하나씩 빠뜨린다.
@@ -25095,9 +25159,11 @@ function ciRowsHtml(list){
   return list.map((c, i) => {
     const lab = ciLabName(c);
     const ext = (c.t !== 'tel' && c.t !== 'email');
-    return `<div class="cirow"><span class="cikind">${esc(t(ciKind(c.t).name))}</span>
-      <a class="mrv cival" href="${esc(ciHref(c))}"${ext ? ' target="_blank" rel="noopener"' : ''}>${esc(ciShow(c))}</a>
-      ${lab ? `<span class="chip">${esc(lab)}</span>` : ''}${i === 0 && list.length > 1 ? `<span class="chip good">${esc(t('대표'))}</span>` : ''}</div>`;
+    // ★★★ 5.36 — 용도(영업용·사무용·직접 입력한 이름)는 그 연락처 **바로 위 이름 자리**에 둔다 (사장님: 「그 이름이 위에가 있어야지」).
+    //   아이폰 연락처: 작은 이름표가 번호 위 · 안드로이드 연락처: 이름표가 번호 바로 곁. 직접 입력한 이름도 정해진 이름과 같은 자리.
+    return `<div class="cirow"><div class="cihead"><span class="cikind">${esc(t(ciKind(c.t).name))}${lab ? ' · ' + esc(lab) : ''}</span>${
+        i === 0 && list.length > 1 ? `<span class="chip good">${esc(t('대표'))}</span>` : ''}</div>
+      <a class="mrv cival" href="${esc(ciHref(c))}"${ext ? ' target="_blank" rel="noopener"' : ''}>${esc(ciShow(c))}</a></div>`;
   }).join('');
 }
 // ── 고치는 화면 (구글 주소록처럼 줄마다 종류·내용·용도, 아래 「+ 연락처 추가」)
@@ -25118,12 +25184,18 @@ function paintCiEdit(errs){
     return `<div class="ciedit" data-i="${i}">
       <div class="ciline">
         <select class="cisel" aria-label="${esc(t('종류'))}" onchange="ciSet(${i},'t',this.value)">${opt(CI_KINDS, c.t, x => x.name)}</select>
-        <select class="cisel" aria-label="${esc(t('용도'))}" onchange="ciSet(${i},'lab',this.value)">${opt(CI_LABS, c.lab, x => x.name)}</select>
+        ${c.lab === 'custom'
+          // ★★★ 5.36 — 「직접 입력」 을 고르면 **용도 칸 그 자리**가 글 칸으로 바뀐다 (사장님: 「그 이름이 위에가 있어야지 … 연락처
+          //   밑으로 들어가 있으면 어디에다 쓰는지 어떻게 하냐」). 구글 연락처는 「맞춤 라벨」 창에서 받아 라벨 자리에,
+          //   아이폰은 「사용자 설정 레이블」 을 받아 레이블 자리에 보여 준다. 연락처 아래에 따로 칸을 두는 앱은 없다.
+          //   ▾ 를 누르면 다시 목록에서 고른다.
+          ? `<span class="cicus"><input class="cisel cicl" data-i="${i}" value="${esc(c.cl)}" maxlength="20" placeholder="${esc(t('직접 입력'))}"
+               aria-label="${esc(t('용도'))}" oninput="ciSet(${i},'cl',this.value,true)"><button class="cicx" type="button"
+               onclick="ciSet(${i},'lab','')" aria-label="${esc(t('용도'))}">▾</button></span>`
+          : `<select class="cisel" aria-label="${esc(t('용도'))}" onchange="ciSet(${i},'lab',this.value)">${opt(CI_LABS, c.lab, x => x.name)}</select>`}
       </div>
       <input class="ciinput" type="${K.type}" value="${esc(c.v)}" placeholder="${esc(t(K.ph))}" autocomplete="off"
         oninput="ciSet(${i},'v',this.value,true)">
-      ${c.lab === 'custom' ? `<input class="ciinput" value="${esc(c.cl)}" placeholder="${esc(t('직접 입력'))}"
-        oninput="ciSet(${i},'cl',this.value,true)">` : ''}
       ${errs[i] ? `<div class="ferr" style="display:block">${esc(errs[i])}</div>` : ''}
       <div class="ciline" style="justify-content:flex-end">
         ${i > 0 ? `<button class="minib" onclick="ciMove(${i})">${esc(t('위로 이동'))}</button>` : `<span class="chip good">${esc(t('대표'))}</span>`}
@@ -25131,9 +25203,8 @@ function paintCiEdit(errs){
       </div>
     </div>`;
   }).join('');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('연락처 수정'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="ciCancel()">${esc(t('취소'))}</button>
-      <button class="tab on" onclick="ciSave()">${esc(t('저장'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="ciCancel()">${esc(t('취소'))}</button><b>${esc(t('연락처 수정'))}</b>
+      <button class="tab on nvsave" onclick="ciSave()">${esc(t('저장'))}</button></div>
     <div class="mrnone" style="text-align:left">${esc(t('맨 위 연락처가 대표 연락처입니다.'))} ${esc(t('공개 설정에서 연락처를 켜야 다른 사람에게 표시됩니다.'))}</div>
     ${rows}
     ${ciDraft.length < CI_MAX ? `<div class="mrrow" style="padding:10px 0"><button class="tab" onclick="ciAdd()">${esc(t('+ 연락처 추가'))}</button></div>` : ''}`;
@@ -25143,6 +25214,10 @@ function ciSet(i, k, v, quiet){
   if(!ciDraft || !ciDraft[i]) return;
   ciDraft[i][k] = v;
   if(!quiet) paintCiEdit();
+  // 「직접 입력」 을 고르면 그 자리 글 칸에 바로 커서를 둔다
+  if(k === 'lab' && v === 'custom'){
+    try{ const e = document.querySelector('#mrPanel .cicl[data-i="' + i + '"]'); if(e) e.focus(); }catch(_){}
+  }
 }
 function ciAdd(){ if(ciDraft && ciDraft.length < CI_MAX){ ciDraft.push({ t:'tel', v:'', lab:'', cl:'' }); paintCiEdit(); } }
 function ciDel(i){ if(ciDraft){ ciDraft.splice(i, 1); paintCiEdit(); } }
@@ -27169,7 +27244,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.35';
+const APP_VER = '5.36';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -31830,7 +31905,8 @@ function renderMaintList(){
     </div>`;
   const 걸린것 = mrFindRows('maint', view);
   const order = allGrps().filter(g=>걸린것.some(it=>it.grp===g));
-  L.innerHTML = mrFindBox('maint') + bar
+  { const F = document.getElementById('gearFlt'); if(F) F.innerHTML = bar; }
+  L.innerHTML = mrFindBox('maint')
     + (order.length ? ''
        : (mrFindQ.maint ? mrFindNone()
           : `<div class="mrnone">${esc(t('해당하는 항목이 없습니다'))}</div>`))
@@ -31919,7 +31995,7 @@ function mrAdd(kind, on){
     repair.push({id, grp:'', title:'', status:'open', note:'',
                  photos:[], pin:null, created:day, doneDate:''});
   }
-  saveMR(); renderMR(); openMR(kind, id);
+  saveMR(); renderMR(); mrOpenNew(kind, id);
 }
 
 // ===== 상세 패널 =====
@@ -31954,7 +32030,8 @@ function mrDirty(){
   const it = getMR(mrOpenType, mrOpenId);
   return !!it && !mrSame(it, mrSnap);
 }
-async function mrRevertClose(){
+async function mrRevertClose(){ return mrCancel(); }
+async function mrRevertCloseOld(){
   const it = getMR(mrOpenType, mrOpenId);
   if(!it || !mrDirty()){ closeMR(); return; }
   if(!await ask(t('수정한 내용을 버리고 닫을까요?\n\n이 창을 연 뒤 변경한 내용이 모두 원래대로 돌아갑니다.'), { ok: t('버리고 닫기'), warn: true })) return;
@@ -32300,14 +32377,13 @@ function openMR(kind, id){
   //   긴 기록(사진 여러 장 붙은 정비수첩 같은 것)에서 맨 아래까지 내려가지 않아도 닿는다.
   const 할일 = actSet(mrActs(kind, it));
   P.innerHTML = `
-    <div class="mrtop"><b>${TITLES[kind]||''}</b>
+    <div class="mrtop nvbar">${unlocked
+        ? `<button class="tab nvL" onpointerdown="mrHoldClose()" onclick="mrCancel()">${esc(t('취소'))}</button>`
+        : `<button class="tab nvL nvback" onclick="closeMR()" aria-label="${esc(t('뒤로'))}">←</button>`}
+      <b>${TITLES[kind]||''}</b>
       ${할일}
       ${unlocked
-        ? `<button class="mrbtn ok" onpointerdown="mrHoldClose()" onclick="mrSaveClose()">${esc(t('저장 후 닫기'))}</button>
-           <button class="mrbtn warn" id="mrRevertBtn" style="${mrDirty()?'':'display:none'}"
-                   onpointerdown="mrHoldClose()" onclick="mrRevertClose()">${esc(t('되돌리고 닫기'))}</button>
-           <button class="mrbtn" onpointerdown="mrHoldClose()" onclick="closeMR()">${esc(t('목록'))}</button>`
-        : `<button class="mrbtn" onclick="closeMR()">${esc(t('목록'))}</button>`}</div>
+        ? `<button class="tab on nvsave" onpointerdown="mrHoldClose()" onclick="mrSaveClose()">${esc(t('저장'))}</button>` : ''}</div>
     ${body}
     <div class="mrrow"><span class="mrlbl">${esc(t('메모'))}</span>${unlocked
       ?`<textarea rows="2" style="flex:1" onchange="mrField('note',this.value)">${esc(it.note||'')}</textarea>`
@@ -32334,12 +32410,18 @@ function openMR(kind, id){
 //   두 값은 남아 있어서, 날씨·항적이 늦게 끝난 뒤 그 화면을 항해일지로 덮어 버렸다
 //   (에뮬레이터 검사 「승선 이력 종이 — 종이도 안내도 안 뜸」). 기록 창이 떠 있으면 openMR 이 'rec' 를 넣고,
 //   다른 것을 띄우면 showPanel 이 뺀다.
+function mrRecShown(){
+  const P = document.getElementById('mrPanel');
+  return !!P && P.classList.contains('open') && P.classList.contains('rec') && !!mrOpenType && mrOpenId != null;
+}
 function mrShown(kind, id){
   const P = document.getElementById('mrPanel');
   return !!P && P.classList.contains('open') && P.classList.contains('rec')
     && mrOpenType === kind && mrOpenId != null && String(mrOpenId) === String(id);
 }
 function closeMR(){
+  // ★ 5.36 — 막 만든 기록을 아무것도 안 적고 닫으면(목록으로 바로 가는 길 등) 빈 기록을 남기지 않는다
+  try{ if(mrOpenType && mrOpenId != null && mrNewKeys.has(mrOpenType + ':' + mrOpenId) && !mrDirty()) mrDropNew(mrOpenType, mrOpenId); }catch(_){}
   const P = document.getElementById('mrPanel');
   // 'full' 도 같이 걷어낸다. 남겨 두면 다음에 다른 화면이 엉뚱한 크기로 뜬다.
   if(P) P.classList.remove('open', 'full');
@@ -32413,10 +32495,74 @@ function mrSaveClose(){
   }catch(_){}
   setTimeout(()=>{
     mrClosing = false;
+    // ★★★ 5.36 — 이름(내용) 없는 기록은 저장하지 않는다 (사장님: 「수리 목록이 지금 제목이 없이 들어가네」).
+    //   다른 앱(MaintainX 「What needs to be done?」·Fleetio Summary)도 이 칸 하나는 꼭 받는다. 칸 바로 아래에 알린다.
+    const 빈칸 = mrNeedTitle(mrOpenType, getMR(mrOpenType, mrOpenId));
+    if(빈칸){ mrTitleErr(빈칸); return; }
+    mrNewKeys.delete(mrOpenType + ':' + mrOpenId);
     if(typeof saveMR === 'function') saveMR();
     if(typeof schedulePush === 'function') schedulePush();
     closeMR();
   }, 0);
+}
+// ── 꼭 적어야 하는 칸 (5.36) — 수리는 「내용」, 정기점검은 「이름」. 다른 기록은 이름이 없어도 날짜·종류로 알아본다.
+function mrNeedTitle(kind, it){
+  if(!it) return null;
+  if(kind === 'repair' && !String(it.title || '').trim()) return { key:'title', msg:'내용을 입력해 주세요' };
+  if(kind === 'maint' && !String(it.name || '').trim()) return { key:'name', msg:'점검 항목을 입력해 주세요' };
+  return null;
+}
+function mrTitleErr(f){
+  const P = document.getElementById('mrPanel'); if(!P) return;
+  const inp = P.querySelector(`input[onchange*="mrField('${f.key}'"]`);
+  if(!inp) return;
+  const row = inp.closest('.mrrow') || inp.parentElement;
+  let e = row.nextElementSibling;
+  if(!(e && e.classList.contains('mrerr'))){
+    e = document.createElement('div'); e.className = 'ferr mrerr'; e.style.display = 'block';
+    row.parentElement.insertBefore(e, row.nextSibling);
+  }
+  e.textContent = t(f.msg);
+  try{ inp.focus(); inp.scrollIntoView({ block:'center' }); }catch(_){}
+}
+// ── 새로 만든 기록 (5.36) — 「+ 추가」 로 막 만든 기록은 「취소」 하면 남기지 않는다(애플·머티리얼 공통).
+//   여태는 빈 기록을 먼저 만들어 열었기 때문에, 그냥 닫으면 이름 없는 기록이 목록에 남았다.
+const mrNewKeys = new Set();
+function mrOpenNew(kind, id){
+  mrNewKeys.add(kind + ':' + String(id));
+  openMR(kind, id);
+}
+function mrDropNew(kind, id){
+  const arr = DS[kind] ? DS[kind]() : null; if(!arr) return;
+  const i = arr.findIndex(x => String(x.id) === String(id));
+  if(i >= 0) arr.splice(i, 1);
+  mrNewKeys.delete(kind + ':' + String(id));
+  saveMR(); try{ schedulePush(); }catch(_){}
+  try{ rerender(kind); }catch(_){}
+}
+// ── 취소 (5.36) — 왼쪽 위. 애플 HIG 「Cancel 은 앞쪽(왼쪽)」, 머티리얼 「닫기는 왼쪽」.
+//   바뀐 것이 있으면 묻는다(앱에 이미 있는 말: 「수정한 내용을 저장하지 않고 나갈까요?」 · 계속 수정 / 나가기).
+//   새로 만든 기록이면 남기지 않고, 고치던 기록이면 연 때 모습으로 되돌린다.
+async function mrLeaveOk(){
+  const kind = mrOpenType, id = mrOpenId;
+  const it = getMR(kind, id); if(!it) return true;
+  const 새것 = mrNewKeys.has(kind + ':' + id);
+  if(mrDirty()){
+    if(!await ask(t('수정한 내용을 저장하지 않고 나갈까요?'), { ok: t('나가기'), no: t('계속 수정'), warn: true })) return false;
+  }
+  if(새것){ mrDropNew(kind, id); return true; }
+  if(mrDirty()){
+    const back = mrClone(mrSnap);
+    Object.keys(it).forEach(k => { delete it[k]; });
+    Object.assign(it, back);
+    saveMR(); try{ schedulePush(); }catch(_){}
+    try{ rerender(kind); }catch(_){}
+  }
+  return true;
+}
+async function mrCancel(){
+  if(!await mrLeaveOk()) return;
+  closeMR();
 }
 
 // 기록 칸 중에 '숫자여야 하는 것' 과 그 성한 범위.
@@ -33160,14 +33306,15 @@ function mrMapClick(e){
   if(x<0||x>100||y<0||y>100) return;
   // 새로 넣기로 시작했으면 이 자리에서 기록을 만든다 — 자리가 먼저다
   const ty = pinTarget.type;
-  const id = pinTarget.새로 ? pinNewRec(ty) : pinTarget.id;
+  const pinNew = !!pinTarget.새로;
+  const id = pinNew ? pinNewRec(ty) : pinTarget.id;
   const it = getMR(ty, id); if(!it){ pinCancel(); return; }
   it.pin = {map:mrMapKind, x, y};
   const 돌아갈자리 = pinTarget.온자리;        // pinCancel 이 pinTarget 을 비우기 전에 챙긴다
   pinCancel(); saveMR();
   // 도면에서 시작했으면 도면에 남고, 목록에서 왔으면 목록으로 돌아간다
   if(돌아갈자리 === 'map') setMapKind(mrMapKind, true);
-  openMR(ty, id);
+  if(pinNew) mrOpenNew(ty, id); else openMR(ty, id);
 }
 
 // ============================================================
@@ -33371,6 +33518,23 @@ function closeTopScreen(){
     // ★ 기록 창은 안에서 다른 기록으로 건너뛸 수 있다. 자국이 있으면 그리로 돌아간다.
     mrPanel:   ()=>{ if(pfEditing && document.getElementById('pfIntro')){ profEditBack(); return; }
                      if(profBackTo && document.querySelector('#mrPanel [data-profview]')){ profBack(); return; }
+                     // ★★★ 5.36 — 위 화면이 정해진 화면(회원 명부 → 계류장 등)은 그리로 간다. 예전 오른쪽 「← 계류장」 단추가 하던 일.
+                     { const up = document.querySelector('#mrPanel.open > .mrhead[data-up]');
+                       if(up && up.dataset.up){
+                         try{ (new Function(up.dataset.up))(); }catch(_){}
+                         // 위 화면도 같은 창이면(회원 명부 → 계류장) 뒤로 칸을 되살린다. 창이 닫혔으면 안 쌓는다.
+                         try{ const P2 = document.getElementById('mrPanel');
+                              if(P2 && P2.classList.contains('open')) navPush('screen:mrPanel'); }catch(_){}
+                         return; } }
+                     // ★★★ 5.36 — 고치던 기록에서 뒤로 가면(안드로이드 뒤로·아이폰 쓸어 넘기기) 「취소」 와 같이 묻는다.
+                     //   안드로이드 공식 안내: 저장 안 한 것이 있을 때만 「나갈까요?」 를 묻는다.
+                     if(mrRecShown() && (mrDirty() || mrNewKeys.has(mrOpenType + ':' + mrOpenId))){
+                       try{ navPush('screen:mrPanel'); }catch(_){}      // 「계속 수정」 이면 뒤로 칸을 되살린다
+                       mrLeaveOk().then(ok => { if(!ok) return;
+                         if(mrBack.length){ const p = mrBack.pop();
+                           mrGoingBack = true; try{ openMR(p.type, p.id); } finally { mrGoingBack = false; } }
+                         else closeBoat(); });
+                       return; }
                      if(mrBack.length){ const p = mrBack.pop();
                        mrGoingBack = true; try{ openMR(p.type, p.id); } finally { mrGoingBack = false; }
                        return; }
@@ -33782,6 +33946,8 @@ function showPanel(P){
   // (발자국은 screenPush 한 군데에서 남긴다. 여기서 또 남기면 두 칸이 쌓인다.)
   P.classList.add('open', 'full');
   P.classList.remove('rec');      // 기록 창이면 openMR 이 다시 넣는다 (5.29 — 칸 높이 맞춤은 기록 창에만)
+  // ★ 5.36 — 왼쪽에 「취소」 가 있는 화면이면 머리줄 「←」 를 숨긴다 (취소와 뒤로를 같이 두지 않는다)
+  try{ document.body.classList.toggle('nvedit', !!P.querySelector('.nvbar > .nvL:not(.nvback)')); }catch(_){}
   const t = P.querySelector('.mrhead > b, .mrtop > b');
   if(t) setHeadTitle(String(t.textContent || '').trim());
   // ★★★ 4.120 — 머리줄 높이를 **한 번 더** 잰다.
@@ -34818,7 +34984,7 @@ function addPlan(on){
              timeOut:'', timeIn:'',
              logs:[], weather:'', note:'', photos:[], wxOut:null, wxIn:null,
              posOut:null, posIn:null};
-  voyage.push(v); saveMR(); renderVoyage(); openMR('voyage', v.id);
+  voyage.push(v); saveMR(); renderVoyage(); mrOpenNew('voyage', v.id);
 }
 // 예정 → 진짜 항해. 이때 비로소 시각·위치·날씨를 잡는다.
 async function planStart(){
@@ -38247,8 +38413,7 @@ function drawAgree(){
       <span class="agtxt"><b class="agmust" style="color:${must?'#F0803C':'#7b8794'}">(${must?t('필수'):t('선택 사항')})</b> ${esc(name)}${
         doc?`<br><button class="minib blu" onclick="openLegal('${doc}')">${esc(t('내용 보기'))}</button>`:''}</span></div>`;
   const ok = agreeChk.terms && agreeChk.privacy && agreeChk.age;
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('시작하기 전에'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="agreeCancel()">${esc(t('취소'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="agreeCancel()">${esc(t('취소'))}</button><b>${esc(t('시작하기 전에'))}</b></div>
     <div class="lgnote">${esc(t('뱃일을 이용하시려면 아래에 동의해 주세요. 내용은 언제든 서랍 › 약관·방침 에서 다시 보실 수 있습니다.'))}</div>
     <div class="mrrow"><button class="mrbtn${agreeChk.terms&&agreeChk.privacy&&agreeChk.age&&agreeChk.loc?' ok':''}" style="flex:1" onclick="agreeAll()">${esc(t('모두 동의'))}</button></div>
     ${row('terms',t('이용약관'), true, 'terms')}
@@ -38667,7 +38832,7 @@ async function openItem(id){
     canDelItem(m) ? { name:'삭제', edit:true, warn:true, run: () => delItem(m.id) } : null
   ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',m.title))}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="backToMarket()">${esc(t('목록'))}</button></div>
+      ${할일}</div>
     <div class="postmeta">
       ${m.state && m.state!=='sale'?`<span class="chip ${m.state==='done'?'late':'notice'}">${esc(stateName(m.state))}</span>`:''}
       <span class="chip">${esc(catName(m.cat))}</span>
@@ -38713,9 +38878,8 @@ function writeItem(id){
 function itemForm(){
   const d = marketDraft || {};
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${marketDraft && marketDraft.id ? t('물건 수정') : t('판매 글 올리기')}</b><span style="flex:1"></span>
-      <button class="tab" onclick="backToMarket()">${esc(t('취소'))}</button>
-      <button class="tab on" onclick="itemSave()">${esc(t('올리기'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="backToMarket()">${esc(t('취소'))}</button><b>${marketDraft && marketDraft.id ? t('물건 수정') : t('판매 글 올리기')}</b>
+      <button class="tab on nvsave" onclick="itemSave()">${esc(t('올리기'))}</button></div>
     <div class="fhint" style="padding:8px 12px 0">${esc(t('올린 글은 누구나 볼 수 있습니다. 이름·연락처를 입력하시면 함께 공개됩니다. 올린 뒤에도 직접 삭제할 수 있습니다.'))}</div>
     <div class="mrrow"><span class="mrlbl">${esc(t('제목'))}</span>
       <input id="mkTitle" style="flex:1" placeholder="${esc(t('예: 야마하 9.9마력 선외기'))}" value="${esc(d.title||'')}"></div>
@@ -39669,6 +39833,8 @@ async function renderSpots(){
     + `<div class="tfilt pinbar">`
       + `<button class="tchip${spotKindNow()?'':' on'}" onclick="setSpotKind('')">${esc(t('전체'))}</button>`
       + SPOT_KINDS.map(k=>`<button class="tchip${spotKindNow()===k.v?' on':''}" onclick="setSpotKind('${k.v}')">${k.name}</button>`).join('')
+      // ★ 5.36 — 목록·지도도 붙어 있는 줄 끝에 둔다 (따로 두면 내릴 때 위로 사라졌다)
+      + `<span style="flex:1"></span>` + spotViewBtns()
       + `</div>
     <div class="qbox"><input id="spQ" value="${esc(spotQ)}"
         placeholder="${esc(t('정박지 이름 · 지역으로 찾기'))}"
@@ -39676,7 +39842,6 @@ async function renderSpots(){
     // 오프라인에서는 올릴 수가 없다. 눌러 놓고 안 된다고 하느니 감춘다.
     // ★ 4.134 — 「+ 정박지 올리기」 는 오른쪽 아래 플로팅으로 갔다.
     //   ★ 오프라인에서는 올릴 수가 없다 — 그때는 플로팅도 안 뜬다 (fabActs 가 본다).
-    + spotViewBar()
     + (spotView === 'map'
         ? mapBox('spotsMap','58vh') + spotMapFoot()
         : `<div id="spotRows">` + spotRowsHtml() + `</div>`);
@@ -39690,12 +39855,11 @@ function setSpotView(v){
   try{ localStorage.setItem('bt_spotview', spotView); }catch(_){}
   renderSpots();
 }
-function spotViewBar(){
-  return `<div class="tfilt" style="justify-content:flex-end">
-      <button class="tchip${spotView==='list'?' on':''}" onclick="setSpotView('list')">${esc(t('목록'))}</button>
-      <button class="tchip${spotView==='map'?' on':''}" onclick="setSpotView('map')">${esc(t('지도'))}</button>
-    </div>`;
+function spotViewBtns(){
+  return `<button class="tchip${spotView==='list'?' on':''}" onclick="setSpotView('list')">${esc(t('목록'))}</button>`
+    + `<button class="tchip${spotView==='map'?' on':''}" onclick="setSpotView('map')">${esc(t('지도'))}</button>`;
 }
+function spotViewBar(){ return `<div class="tfilt" style="justify-content:flex-end">${spotViewBtns()}</div>`; }
 // ★ 지도에 찍는 수를 묶어 둔다. 천 곳을 한 번에 찍으면 배 위 폰에서 멎는다.
 const SPOT_MAP_MAX = 300;
 // ★★★ 4.102 — 지도에 **한 군데만** 찍히던 것 (사장님이 여러 번 지적하신 것)
@@ -40092,7 +40256,7 @@ async function openSpot(id){
                       edit:true, warn:true, run: () => delSpot(s.id) } : null
   ].filter(Boolean));
   P.innerHTML = `<div class="mrhead"><b>${esc(spotShowName(s))}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="backToSpots()">${esc(t('목록'))}</button></div>
+      ${할일}</div>
     <div class="postmeta"><span class="chip">${esc(spotKindName(s.kind))}</span>
       ${s.region?`<span class="chip">${esc(spotRegionName(s.region))}</span>`:''}
       ${esc(s.byName||'')} · ${esc(String(s.ts||'').slice(0,10))}
@@ -40283,9 +40447,8 @@ function spotPickPlace(){
   const d = (spotPickCtx && spotPickCtx.draft) || null;
   const has = !!(d && d.lat != null);
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('위치 지정'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="backToSpots()">${esc(t('취소'))}</button>
-      <button class="tab on" onclick="spotPlaceNext()">${esc(t('다음으로'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="backToSpots()">${esc(t('취소'))}</button><b>${esc(t('위치 지정'))}</b>
+      <button class="tab on nvsave" onclick="spotPlaceNext()">${esc(t('다음으로'))}</button></div>
     ${mapBox('spotPickMap','48vh')}
     <div class="mrnone" style="text-align:left">${esc(t('지도를 누르면 그 위치가 지정됩니다 · 끌어서 이동 · 두 손가락으로 확대'))}<br>${esc(t('배를 대는 위치에 최대한 가깝게 표시해 주세요.'))}</div>
     <div class="mrrow" style="justify-content:center">
@@ -40327,10 +40490,10 @@ function spotForm(){
   d.fac = d.fac || {};
   const P = document.getElementById('mrPanel');
   const 옮김 = canMoveSpot(spotPickCtx.id ? spotOf(spotPickCtx.id) : null);
-  P.innerHTML = `<div class="mrhead"><b>${spotPickCtx.id?t('정박지 수정'):t('정박지 올리기')}</b><span style="flex:1"></span>
-      ${옮김 ? `<button class="tab" onclick="spotPickPlace()">${esc(t('← 위치'))}</button>` : ''}
-      <button class="tab" onclick="backToSpots()">${esc(t('취소'))}</button>
-      <button class="tab on" onclick="spotSave()">${esc(t('올리기'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar">${옮김
+        ? `<button class="tab nvL" onclick="spotPickPlace()">${esc(t('← 위치'))}</button>`
+        : `<button class="tab nvL" onclick="backToSpots()">${esc(t('취소'))}</button>`}<b>${spotPickCtx.id?t('정박지 수정'):t('정박지 올리기')}</b>
+      <button class="tab on nvsave" onclick="spotSave()">${esc(t('올리기'))}</button></div>
     <div class="fhint" style="padding:8px 12px 0">${esc(t('올린 글은 누구나 볼 수 있습니다. 이름·연락처를 입력하시면 함께 공개됩니다. 올린 뒤에도 직접 삭제할 수 있습니다.'))}</div>
     ${옮김 ? '' : `<div class="mrnone" style="text-align:left">${
         esc(t('위치(핀)는 운영자만 옮길 수 있습니다. 위치가 틀렸다면 다녀온 이야기로 알려 주세요.'))}</div>`}
@@ -40401,9 +40564,8 @@ async function spotDepthCalc(){
   // 좁은 폰(360px)에서도 한 줄에 들어가야 한다 — 줄이 넘어가면 누르다 헷갈린다
   const B = (t, f) => `<button class="mrbtn" style="min-width:44px;padding:8px 6px" onclick="${f}">${t}</button>`;
   const col = low == null ? '#7b8794' : low < 1 ? '#F05B52' : low < 2 ? '#E8B33C' : '#46B87C';
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('수심 환산'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="spotDepthCancel()">${esc(t('취소'))}</button>
-      <button class="tab${low == null ? '' : ' on'}" onclick="spotDepthApply()">${esc(t('적용'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="spotDepthCancel()">${esc(t('취소'))}</button><b>${esc(t('수심 환산'))}</b>
+      <button class="tab nvsave${low == null ? '' : ' on'}" onclick="spotDepthApply()">${esc(t('적용'))}</button></div>
     <div class="mrnone" style="text-align:left">${t('수심계 값은 <b>측정한 시점의 수위 기준</b>입니다. 만조 때 측정한 값을 그대로 입력하면 저조 때 좌초할 수 있습니다.')}<br>${esc(t('측정값과 측정 시각을 입력하면 그 시각'))}<b>${esc(t('조위를 빼서'))}</b> ${esc(t('저조위 기준으로 환산합니다.'))}</div>
 
     <div class="ghead"><b>${esc(t('수심계 표시값'))}</b></div>
@@ -41159,7 +41321,7 @@ function renderCal(){
   // 머리 — 달 넘기기 · 오늘 · 내보내기
   const ago = new Date(Y, M - 2, 1), nxt = new Date(Y, M, 1);
   const lbl = d => calTitle(d.getFullYear(), d.getMonth() + 1);
-  let h = `<div class="calhead">
+  let h = `<div class="calhead pinbar">
       <button class="calnav" onclick="calMove(-1)" aria-label="${esc(lbl(ago))}">‹</button>
       <b class="calym">${esc(calTitle(Y, M))}</b>
       <button class="calnav" onclick="calMove(1)" aria-label="${esc(lbl(nxt))}">›</button>
@@ -41559,6 +41721,7 @@ function voyGauge(leg, g){
   const 날 = leg === 'in' ? (voyDay(it.dateIn) || voyDay(it.date) || today()) : (voyDay(it.date) || today());
   const 시 = hm((leg === 'in' ? it.timeIn : it.timeOut) || '') || 지금;
   let r = voyGaugeRec(it, leg);
+  const 새것 = !r;
   if(!r){
     r = { id: newId(), kind: 'level', date: 날, time: 시, level: 0, gauge: '', liters: '', full: false,
           cost: '', note: '', vid: String(it.id), leg };
@@ -41566,6 +41729,9 @@ function voyGauge(leg, g){
   }
   r.date = 날; r.time = 시; r.gauge = g; r.level = Math.round(TANK * fr);
   saveMR(); renderVoyage(); openMR('voyage', it.id);
+  // ★ 5.36 — 다른 기록(연료 기록)에 들어가는 것은 말 없이 넣지 않는다 (장비 「고장」 과 같은 까닭 — 사장님 지적).
+  if(새것){ const rid = r.id;
+    try{ snack(t('연료 기록에 추가했습니다'), { kind:'good', act:{ name:'보기', fn:() => openMR('fuel', rid) } }); }catch(_){} }
 }
 // ★ 5.24 — 도착 날짜를 고친다. 항해 시간·엔진 시간·도착 날씨가 따라 바뀐다.
 function voyDateIn(v){
@@ -43958,7 +44124,7 @@ function addFuel(){
   // ★ 시각은 앱이 지금으로 찍어 둔다. 다르면 창에서 고치면 된다.
   //   이것이 있어야 '넣고 나갔는지 / 나갔다 와서 넣었는지' 를 앱이 안다.
   const f = {id:newId(), date:today(), time:nowHM(), liters:'', cost:'', full:false, note:''};
-  fuel.push(f); saveMR(); renderFuel(); openMR('fuel', f.id);
+  fuel.push(f); saveMR(); renderFuel(); mrOpenNew('fuel', f.id);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -44015,7 +44181,7 @@ function addRun(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const r = {id:newId(), date:today(), time:nowHM(), endDate:'', endTime:'',
              on:true, hours:'', purpose:'충전', note:''};
-  runs.push(r); saveMR(); renderFuel(); openMR('run', r.id);
+  runs.push(r); saveMR(); renderFuel(); mrOpenNew('run', r.id);
 }
 // 엔진을 끈다 — 끈 시각을 찍고 가동시간을 셈해 넣는다
 function runStop(id){
@@ -44333,7 +44499,7 @@ function addGear(){
   if(!unlocked) return;    // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const g = gearNew();
   maint.push(g);
-  saveMR(); renderGearWrap(); openMR('gear', g.id);
+  saveMR(); renderGearWrap(); mrOpenNew('gear', g.id);
 }
 function renderGear(){
   const L = document.getElementById('gearList'); if(!L) return;
@@ -45317,8 +45483,7 @@ function paperOpen(name, html, saveJs){
   const P = document.getElementById('mrPanel');
   if(!P) return;
   P.innerHTML = `<div class="mrhead"><b>${esc(name)}</b><span style="flex:1"></span>
-      <button class="tab" onclick="paperSave()">${esc(t('파일로 저장'))}</button>
-      <button class="tab" onclick="setBoatSubTab('docs')">${esc(t('닫기'))}</button></div>
+      <button class="tab" onclick="paperSave()">${esc(t('파일로 저장'))}</button></div>
     <iframe class="paperfr" sandbox="allow-same-origin" title="${esc(name)}"
       srcdoc="${esc(paperInApp(html))}"></iframe>
     <div class="mrnone" style="text-align:left">${
@@ -45618,7 +45783,7 @@ function addReview(seed){
   if(!unlocked) return;    // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const r = rvNew(seed);
   reviews.push(r);
-  saveMR(); renderGearWrap(); openMR('review', r.id);
+  saveMR(); renderGearWrap(); mrOpenNew('review', r.id);
 }
 // 장비 카드에서 바로 쓰기 — 제조사·모델·종류·계통을 그대로 물려받는다.
 // ★ 다시 치게 하면 안 쓴다. 그리고 다시 치면 열쇠가 어긋나 딴 칸이 된다.
@@ -45638,9 +45803,15 @@ function addMaintForGear(id){
   maint.push({ id:nid, grp: gearSysOf(g) === '기타' ? '기타' : gearSysOf(g),
                name:'', months:12, unit:'m', lastDate:'', gearId:String(g.id),
                note:'', photos:[], pin:null, history:[], seed:false });
-  saveMR(); openMR('maint', nid);
+  saveMR(); mrOpenNew('maint', nid);
 }
 // 장비 상태 고르기 (5.27) — 상태는 연결된 고장 기록에서 나온다. 여기서 고르면 그 기록을 만들거나 완료 처리한다.
+// ★★★ 5.36 — 「고장」 을 고르면 **말 없이** 제목 없는 수리 기록을 만들어 열던 것을 고쳤다 (사장님:
+//   「장비에서 고장 났다고 표시를 하면 바로 말도 없이 이게 수리 목록으로 들어가 버리잖아 … 사람들이 기본적으로
+//   이게 장비를 저장했다고 생각을 하지 … 수리 목록이 지금 제목이 없이 들어가네」).
+//   다른 앱(MaintainX·UpKeep·Fiix·Fleetio): 상태를 바꾼다고 작업 기록이 저절로 생기지 않는다. 기록은
+//   「고장 추가(Add Issue)」 처럼 이름이 붙은 동작으로 만들고, **내용(Summary)은 꼭 적어야** 저장된다.
+//   그래서 「고장」 을 고르면 **수리목록에 추가된다고 밝힌 작은 창**에서 내용을 받고, 추가한 뒤 알린다.
 function gearStatePick(id){
   if(!unlocked) return;
   const g = gearOf(id); if(!g) return;
@@ -45649,12 +45820,12 @@ function gearStatePick(id){
     title: gearLabel(g),
     okText: '선택',
     fields: [ { key:'s', label:'상태', type:'pick', value: 열린것.length ? 'bad' : 'ok',
-                options: [ { v:'ok', name:'이상 없음' }, { v:'bad', name:'고장' } ] } ],
+                options: [ { v:'ok', name:'이상 없음' }, { v:'bad', name:'고장', sub:'수리목록에 추가됩니다' } ] } ],
     onOk: v => {
       if(v.s === 'bad'){
-        // 이미 고장이면 그 고장 기록을 연다. 아니면 새로 만든다.
+        // 이미 고장이면 그 고장 기록을 연다. 아니면 내용을 받아 추가한다.
         if(열린것.length){ const r0 = 열린것[0]; setTimeout(() => openMR('repair', r0.id), 0); return; }
-        setTimeout(() => addRepairForGear(id), 0);
+        setTimeout(() => gearRepairAsk(id), 0);
         return;
       }
       if(!열린것.length) return;
@@ -45667,15 +45838,34 @@ function gearStatePick(id){
     }
   });
 }
-function addRepairForGear(id){
+// 장비에서 고장을 추가한다 — 내용을 먼저 받는다(빈 제목으로는 안 만든다).
+// 만든 뒤에는 장비 화면에 그대로 있고, 아래 알림에서 「보기」 로 그 수리 기록을 연다.
+function gearRepairAsk(id){
   if(!unlocked) return;
   const g = gearOf(id); if(!g) return;
-  const nid = newId();
-  repair.push({ id:nid, grp: gearSysOf(g) === '기타' ? '' : gearSysOf(g),
-                title:'', status:'open', gearId:String(g.id),
-                note:'', photos:[], pin:null, created:today(), doneDate:'' });
-  saveMR(); openMR('repair', nid);
+  openForm({
+    title: '+ 고장',
+    sub: tsub('{gear} · 수리목록에 추가됩니다', { gear: gearLabel(g) }),
+    okText: '추가',
+    fields: [ { key:'title', label:'내용', value:'', placeholder:'고장·수리 내용' } ],
+    onOk: v => {
+      const 내용 = String(v.title || '').trim();
+      if(!내용) return formErr('title', '내용을 입력해 주세요');
+      const nid = newId();
+      repair.push({ id:nid, grp: gearSysOf(g) === '기타' ? '' : gearSysOf(g),
+                    title:내용, status:'open', gearId:String(g.id),
+                    note:'', photos:[], pin:null, created:today(), doneDate:'' });
+      saveMR(); try{ schedulePush(); }catch(_){}
+      try{ renderMR(); }catch(_){}
+      setTimeout(() => {
+        openMR('gear', id);
+        try{ snack(t('수리목록에 추가했습니다'), { kind:'good', act:{ name:'보기', fn:() => openMR('repair', nid) } }); }catch(_){}
+      }, 0);
+    }
+  });
 }
+// 장비 화면의 「+ 고장」 도 같은 창을 쓴다 (빈 수리 기록을 먼저 만들지 않는다)
+function addRepairForGear(id){ gearRepairAsk(id); }
 function addReviewForGear(id){
   const g = gearOf(id); if(!g) return;
   addReview({ gearId:String(g.id), maker:g.maker || '', model:g.model || '',
@@ -46059,7 +46249,7 @@ function addMlog(seed){
   if(!unlocked) return;    // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const lg = mlogNew(seed);
   maint.push(lg);
-  saveMR(); renderMLog(); openMR('mlog', lg.id);
+  saveMR(); renderMLog(); mrOpenNew('mlog', lg.id);
 }
 function addMlogForGear(id){
   const g = gearOf(id); if(!g) return;
@@ -46151,6 +46341,7 @@ function renderGearWrap(){
   // 배 리뷰는 사용기 갈래에서만 뜬다. 배 하나에 하나면 충분하므로 이미 썼으면 감춘다.
   const ab2 = document.getElementById('gearAddBtn2');
   if(ab2) ab2.style.display = (isR && unlocked && !brRows().length) ? '' : 'none';
+  { const F = document.getElementById('gearFlt'); if(F) F.innerHTML = ''; }   // 정기점검 목록일 때만 채운다
   if(isMap) setMapKind(mrMapKind);
   else if(isR) renderReviews();
   else if(k === 'maint') renderMaintList();
@@ -46926,7 +47117,7 @@ function renderContacts(){
 function addContact(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const c = {id:newId(), name:'', phone:'', email:'', site:'', note:''};
-  contacts.push(c); docSub = 'contact'; saveMR(); renderContacts(); openMR('contact', c.id);
+  contacts.push(c); docSub = 'contact'; saveMR(); renderContacts(); mrOpenNew('contact', c.id);
 }
 // ★ 4.67 — 문서는 「찍어서 올리는 것」이다 (사장님 지적).
 //   보험증서·선박검사증·면허는 종이를 사진으로 남기는 것이지 글로 적는 것이 아니다.
@@ -46936,7 +47127,7 @@ function addContact(){
 function addVdoc(){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   const d = {id:newId(), title:'', note:'', photos:[]};
-  vdocs.push(d); docSub = 'docs'; saveMR(); renderContacts(); openMR('vdoc', d.id);
+  vdocs.push(d); docSub = 'docs'; saveMR(); renderContacts(); mrOpenNew('vdoc', d.id);
   try{ const cam = document.getElementById('mrCam'); if(cam) cam.click(); }catch(_){}
 }
 
@@ -47100,12 +47291,12 @@ function renderCheck(){
   }).join('') : `<div class="mrnone">${esc(isOrph?t('미분류 항목이 없습니다.'):t('항목이 없습니다. 아래에서 추가해 주세요.'))}</div>`;
 
   L.innerHTML =
-    `<div class="ckchips pinbar">${chips}</div>
+    `<div class="pinbar ckpin"><div class="ckchips">${chips}</div>
      <div class="statrow">
        <div class="stat"><b>${n} / ${items.length}</b><span>${esc(CK_CYCLES[list.cycle]||CK_CYCLES.d)}</span></div>
        <div class="ckman">${manage}
          <button class="mrbtn" onclick="resetCheck()">${esc(t('초기화'))}</button></div>
-     </div>` +
+     </div></div>` +
     rows +
     (isOrph ? '' : `<div style="padding:12px 18px"><button class="tab edt" onclick="addCheckItem()">${esc(t('+ 항목 추가'))}</button></div>`);
 }
@@ -48595,7 +48786,7 @@ async function openSeries(id){
     { name:'삭제', edit:true, warn:true, run:() => delSeries(x.id) }
   ].filter(a => a.name === '수정' ? canEditSeries(x) : canDelSeries(x)));
   P.innerHTML = `<div class="mrhead"><b>${esc(trPick(tv,'title',x.title))}</b><span style="flex:1"></span>
-      ${할일}<button class="tab" onclick="closeBoat()">${esc(t('목록'))}</button></div>
+      ${할일}</div>
     <div class="postmeta">${x.no?`<span class="chip">${esc(tsub('{n}편', { n: x.no }))}</span>`:''}
       ${[esc(x.author||''), esc(x.source||''),
          x.date ? esc(String(x.date).slice(0,10)) : ''].filter(Boolean).join(' · ')}</div>
@@ -49402,8 +49593,7 @@ function wxSpotRows(){
 }
 function wxSpotList(){
   const P = document.getElementById('mrPanel');
-  P.innerHTML = `<div class="mrhead"><b>${esc(t('날씨 지점'))}</b><span style="flex:1"></span>
-      <button class="tab" onclick="closeBoat();switchTab('home')">${esc(t('← 오늘'))}</button></div>
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('날씨 지점'))}</b><span style="flex:1"></span></div>
     <div class="mrnone" style="text-align:left">${esc(t('자주 보는 위치를 지도에서 지정해 두면 눌러서 바로 볼 수 있습니다.'))}</div>
     ${wxSpotRows() || `<div class="mrnone">${esc(t('아직 지점이 없습니다'))}</div>`}
     <div class="mrrow" style="justify-content:center;padding:14px">
@@ -49429,9 +49619,8 @@ function wxEditSpot(id){
 function wxSpotPick(cur){
   const P = document.getElementById('mrPanel');
   const has = !!(cur && cur.lat != null);
-  P.innerHTML = `<div class="mrhead"><b>${cur?t('지점 수정'):t('날씨 지점 추가')}</b><span style="flex:1"></span>
-      <button class="tab" onclick="wxSpotList()">${esc(t('취소'))}</button>
-      <button class="tab on" id="wxSpotSaveBtn" onclick="wxSpotSave()">${esc(t('저장'))}</button></div>
+  P.innerHTML = `<div class="mrhead nvbar"><button class="tab nvL" onclick="wxSpotList()">${esc(t('취소'))}</button><b>${cur?t('지점 수정'):t('날씨 지점 추가')}</b>
+      <button class="tab on nvsave" id="wxSpotSaveBtn" onclick="wxSpotSave()">${esc(t('저장'))}</button></div>
     <div class="mrrow"><span class="mrlbl">${esc(t('이름'))}</span>
       <input id="wxSpotName" style="flex:1" placeholder="${esc(t('예: 안도항'))}" autocomplete="off"
         value="${cur?esc(cur.name):''}"></div>
@@ -50185,6 +50374,28 @@ const COLW = 34;   // 시간당 열 폭(px)
 const WLBL = 62;   // .wlbl 의 width 와 같아야 한다
 
 function fmtHM(ts){ const d=new Date(ts); return tsub('{h}시', {h:String(d.getHours()).padStart(2,'0')}); }
+// ===== 해 뜨고 지는 시각 (5.36) =====
+// ★ 사장님: 「날씨에 보면은 언제 해가 뜨고 지는지 이런 것도 지금 안 나와 있네」.
+//   날씨를 받을 때 이미 Open-Meteo 에서 날마다의 일출·일몰(daily=sunrise,sunset)을 함께 받고 있었는데 화면에 안 썼다.
+//   다른 앱: 다음 날씨(「일출시간 06:29 일몰시간 18:13」)·바다 날씨 페이지(「일출 06:22 · 18:04」)는 한 줄로,
+//   Windy.app 은 날짜 머리에 넣고, PredictWind 는 밤 시간 칸을 어둡게 칠한다. 여기서는 날짜 머리 + 밤 칸 칠하기 + 고른 시각 줄.
+function wxSunDays(d){
+  const D = d && d.w && d.w.daily;
+  if(!D || !Array.isArray(D.sunrise) || !Array.isArray(D.sunset)) return [];
+  return D.sunrise.map((r, i) => ({ rise: wxTs(r, d), set: wxTs(D.sunset[i], d) }))
+                  .filter(x => x.rise != null && x.set != null);
+}
+// 그 시각이 든 날의 일출·일몰
+function wxSunOf(ts, d){
+  const S = wxSunDays(d);
+  const k = new Date(ts); const key = k.getFullYear() + '-' + k.getMonth() + '-' + k.getDate();
+  return S.find(x => { const r = new Date(x.rise); return r.getFullYear() + '-' + r.getMonth() + '-' + r.getDate() === key; }) || null;
+}
+function wxSunLine(sun){
+  if(!sun) return '';
+  const hm = ts => { const d = new Date(ts); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+  return esc(t('일출')) + ' ' + hm(sun.rise) + ' · ' + esc(t('일몰')) + ' ' + hm(sun.set);
+}
 function fmtMD(ts){ const d=new Date(ts);
   return (d.getMonth()+1)+'/'+d.getDate()+'('+weekDay(d.getDay())+')'; }
 // ★ 5.10 — 요일 한 글자. 러시아어 사전 값은 「Вс Пн Вт …」 처럼 띄어 쓴 두 글자라
@@ -50220,6 +50431,7 @@ function renderWxSel(){
     <div class="selmid">
       <b>${fmtMD(wxSel)} ${fmtHM(wxSel)}</b>
       ${tide!=null?` · ${esc(t('조위'))} <b>${(tide*100).toFixed(0)}cm</b>`:''}
+      ${(()=>{ const 해 = wxSunOf(wxSel, wxData); return 해 ? `<div class="selw wsunsel">${wxSunLine(해)}</div>` : ''; })()}
       ${wline?`<div class="selw">${wline}</div>`:''}
       ${bline?`<div class="selw">${bline}</div>`:''}
     </div>
@@ -50317,7 +50529,7 @@ async function renderWeather(){
     return;
   }
 
-  const head = `<div class="wxbar"><div class="wxspots">
+  const head = `<div class="wxbar pinbar"><div class="wxspots">
       <button class="tab${wxCur.id==='gps'?' on':''}" onclick="wxUseGPS()">${esc(t('현재 위치'))}</button>
       ${wxSpots.map(s=>`<button class="tab${wxCur.id===s.id?' on':''}" onclick="wxPick('${s.id}')">${esc(nameFor(s.name))}</button>`).join('')}
       <button class="tab edt" onclick="wxSpotList()">${esc(t('지점 관리'))}</button>
@@ -50372,7 +50584,9 @@ async function renderWeather(){
       } else dateSpans[dateSpans.length-1].n++;
       const k = H.wind_speed_10m[i], g = H.wind_gusts_10m[i], dir = H.wind_direction_10m[i];
       const wv = M && M.hourly ? M.hourly.wave_height[i] : null;
-      const night = d.getHours()<6 || d.getHours()>=20;
+      // ★ 5.36 — 밤 칸은 그 날 실제 일출·일몰로 칠한다(예전: 6시 전·20시 뒤로 어림). 일출·일몰을 못 받았으면 예전대로.
+      const 해 = wxSunOf(ts, wxData);
+      const night = 해 ? (ts + 1800e3 < 해.rise || ts + 1800e3 >= 해.set) : (d.getHours()<6 || d.getHours()>=20);
       rowHour  += `<div class="wc wch${night?' wnight':''}" onclick="wxSelHour(${ts})">${String(d.getHours()).padStart(2,'0')}</div>`;
       // ★ 5.10 — 화살표 글자(➤)는 기본이 **오른쪽(동쪽)** 을 가리킨다. 여태 dir+180 으로 돌려서
       //   북풍(dir 0)이 서쪽(←)을 가리켰다 — 90° 어긋나 있었다. 바람이 **불어 가는 쪽** 은 dir+180 이고,
@@ -50385,7 +50599,11 @@ async function renderWeather(){
       const rn = (H.precipitation && H.precipitation[i] != null) ? H.precipitation[i] : null;
       rowRain  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="${wxRainStyle(rn)}">${(rn!=null && rn>0) ? rn.toFixed(1) : '·'}</div>`;
     }
-    rowDate = dateSpans.map(s=>`<div class="wdate" style="width:${s.n*COLW}px">${s.label}</div>`).join('');
+    rowDate = dateSpans.map(s=>{
+      const 해 = wxSunOf(t0 + s.from*3600e3, wxData);
+      const 줄 = (해 && s.n >= 8) ? `<span class="wsun">${wxSunLine(해)}</span>` : '';
+      return `<div class="wdate" style="width:${s.n*COLW}px">${s.label}${줄}</div>`;
+    }).join('');
 
     // ── 조위: 곡선(0시부터, 전날 극값으로 보간) + 시간별 수치 행
     let tideRow = '', tideNumRow = '';

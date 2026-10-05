@@ -3907,6 +3907,7 @@ const I18N = {
     '중간 기록으로 계산':'from the log entries',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Engine hours are part of the time under way.',
     '항적':'Track',
+    '기록 간격':'Logging interval',
     '끌어서 이동 · 두 손가락으로 확대':'Drag to pan · pinch to zoom',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'This map is for reviewing records. Use official charts for navigation.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Map © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
@@ -7510,6 +7511,7 @@ const I18N = {
     '중간 기록으로 계산':'по записям в журнале',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'Моточасы входят во время в пути.',
     '항적':'Трек',
+    '기록 간격':'Интервал записи трека',
     '끌어서 이동 · 두 손가락으로 확대':'Перетаскивайте карту · масштаб двумя пальцами',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'Карта для просмотра записей. Для навигации используйте официальные карты.',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'Карта © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)',
@@ -11165,6 +11167,7 @@ const I18N = {
     '중간 기록으로 계산':'中間記録から計算',
     '엔진 시간은 항해 시간 안에 들어 있습니다.':'エンジン時間は航海時間に含まれます。',
     '항적':'航跡',
+    '기록 간격':'記録間隔',
     '끌어서 이동 · 두 손가락으로 확대':'ドラッグで移動・2本指で拡大',
     '기록 확인용 지도입니다. 실제 항해에는 공식 해도를 사용해 주세요.':'記録確認用の地図です。実際の航海には公式の海図をご使用ください。',
     '지도 © OpenSeaMap (CC BY-SA) · © OpenStreetMap contributors (ODbL)':'地図 © OpenSeaMap （CC BY-SA） ・ © OpenStreetMap contributors （ODbL）',
@@ -17218,6 +17221,11 @@ function wipeSay(msg){
     <div class="mrnone" style="text-align:left">${t(msg)}</div>`;
 }
 async function doWipe(){
+  // ★ 5.40 — 인터넷이 없으면 시작하지 않는다. 클라우드만 반쯤 지워지고 계정은 남는다.
+  if(typeof navigator !== 'undefined' && navigator.onLine === false){
+    tell(t('인터넷에 연결되어 있지 않습니다') + '\n\n' + t('인터넷 연결을 확인한 뒤 다시 시도해 주세요.'));
+    return;
+  }
   wipeSay('삭제 중입니다. 앱을 닫지 말아 주세요…');
   // 0) 전에 지우다 만 배부터 — 계정이 없어지면 다시는 못 지운다
   try{ await retryBoatDels(); }catch(_){}
@@ -17243,6 +17251,15 @@ async function doWipe(){
       + t('로그아웃했다가 다시 로그인하신 뒤 한 번 더 눌러 주세요.')
       + '<div class="mrrow" style="justify-content:center;padding:16px 0">'
       + `<button class="mrbtn big" onclick="doSignOut()">${esc(t('로그아웃'))}</button></div>`);
+    return;
+  }
+  // ★★★ 5.40 — 계정을 못 지웠으면(인터넷 끊김 등) 지웠다고 하지 않는다 (사장님 「3은 당연히 고쳐야지」, 2026-10-05).
+  //   예전에는 'fail'·'none' 이어도 아래로 내려가 기기 기록을 지우고 「계정을 지웠습니다」 라고 했다 — 계정은 남아 있는데.
+  //   기기 기록은 그대로 두고, 못 지웠다고 알리고, 다시 시도하게 한다(앞 단계는 여러 번 해도 같다).
+  if(r !== 'ok'){
+    wipeSay(t('삭제하지 못했습니다.\n\n').replace(/\n/g, '<br>') + t('인터넷 연결을 확인한 뒤 다시 시도해 주세요.')
+      + '<div class="mrrow" style="justify-content:center;padding:16px 0">'
+      + `<button class="mrbtn big warn" onclick="doWipe()">${esc(t('다시 시도'))}</button></div>`);
     return;
   }
   // 5) 이 기기에 남은 것 — 여기까지 왔으면 계정은 없어졌다
@@ -17912,7 +17929,10 @@ const TRK_DIST = 10;      // m — 이만큼은 움직여야 한 점으로 담�
 const TRK_STILL_MS = 0.3; // m/s (약 0.6노트) — 칩이 이보다 느리다고 하면 멈춰 있는 것으로 본다
 const TRK_ASK  = 5;       // m — 폰에게는 이만큼마다 달라고 한다 (폰 문). 촘촘히 받아 우리가 고른다 (5.10: 10→5, 저장 간격 10m 보다 촘촘히)
 const TRK_TOL  = 25;      // m — 직선에서 이만큼 안 벗어나면 가운데 점을 버린다
-const TRK_MAX  = 4000;    // 한 항해에 담을 점 수 상한
+// ★★★ 5.40 — 「점이 4,000개를 넘으면 직선 가운데 점 지우기(25m)」(TRK_MAX)를 없앴다.
+//   사장님 (2026-10-05): 「2는 씨발 왜 4000개면 줄이냐? 다른데 확인 후 우리어플에 가장 최적화된 방법으로 고쳐라」
+//   4,000 은 제가 예전에 정한 숫자였다. OsmAnd·GPSLogger 는 기록을 줄이지 않는다(파일로 남긴다).
+//   기기(IndexedDB)에는 그대로 다 남긴다. 클라우드 문서 한 개 1MiB 한계는 올릴 때만 따로 맞춘다(voyCloudBody).
 const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라우드는 멈출 때 한 번)
 // ★★★★ 5.37 — 항적을 남기는 규칙은 **OsmAnd 가 하는 그대로** 따른다.
 //   사장님 (2026-10-04): 「무조건 다른 어플 따라서 만들으라고 … 절대로 아주 티끌만한거라도 정하지 마라」
@@ -17926,7 +17946,20 @@ const TRK_FLUSH = 20;     // 점 이만큼마다 기기에 넣어 둔다 (클라
 //     · 받은 좌표 그대로 남긴다 (흔들림 고르기 없음) · 저장할 때 점을 줄이지 않는다
 //     · 선 끊기(collectDBTracks) — 앞 점과 6분 이상 벌어졌고 **그 앞 간격의 10배 이상**일 때만 새 구간
 //     · 위치 공급원은 GPS (OsmAnd 안내: 항적이 흔들리면 공급원을 Android API(GPS)로)
-const TRK_OSM_MS     = 5000;
+const TRK_OSM_MS     = 5000;     // 기본 기록 간격 (OsmAnd 기본 5초)
+// ★★★ 5.40 — 기록 간격을 사람이 정한다 (사장님 「1은 사용자가 정할수 있게」, 2026-10-05).
+//   OsmAnd 「기록 간격」(save_track_interval_globally) 고르는 값 그대로: 초 1·2·3·5·10·15·20·30·60·90 · 분 2·3·5
+//   (OsmAnd 코드 OsmandMonitoringPlugin.SECONDS / MINUTES. SECONDS 의 0 은 뺐다 — 0 은 간격이 아니다)
+//   이 기기에 담는다 (OsmAnd 도 앱 설정). 기본 5초.
+const TRK_INT_KEY  = 'bt_trkint';
+const TRK_INT_OPTS = [1, 2, 3, 5, 10, 15, 20, 30, 60, 90, 120, 180, 300];   // 초
+function trkIntSec(){
+  try{ const v = Number(localStorage.getItem(TRK_INT_KEY)); if(TRK_INT_OPTS.indexOf(v) >= 0) return v; }catch(_){}
+  return TRK_OSM_MS / 1000;
+}
+function trkIntMs(){ return trkIntSec() * 1000; }
+// 「5초」 · 「90초」 · 「2분」 — OsmAnd 처럼 SECONDS(1~90) 는 초로, MINUTES(2·3·5) 는 분으로. 단위 낱말은 앱이 이미 쓰는 초·분
+function trkIntLabel(sec){ return sec <= 90 ? sec + t('초') : (sec / 60) + t('분'); }
 const TRK_OSM_ACC    = 50;
 const TRK_OSM_SEG_MS = 360000;   // 6분
 const TRK_OSM_SEG_X  = 10;
@@ -17936,7 +17969,7 @@ function trkOsmWhy(p, last){
   if(!isFinite(ac) || ac < 0 || ac > TRK_OSM_ACC) return 'blur';
   if(last){
     const dt = Date.parse(p.t) - Date.parse(last.t);
-    if(!(dt > TRK_OSM_MS)) return 'often';
+    if(!(dt >= trkIntMs())) return 'often';   // ★ 5.40 — 사람이 정한 기록 간격
   }
   return '';
 }
@@ -18175,7 +18208,8 @@ async function trkBufStart(){
   const P = trkP(); if(!P) return null;
   try{
     const r = await P.start({ title: t('뱃일 — 항해 기록 중'),
-                              text:  t('항적을 기록하고 있습니다. 입항을 기록하면 중지됩니다.') });
+                              text:  t('항적을 기록하고 있습니다. 입항을 기록하면 중지됩니다.'),
+                              ms: trkIntMs() });   // ★ 5.40 — 안드로이드 기록 장치가 이 간격마다 위성 위치를 받는다
     return r || null;
   }catch(_){ return null; }
 }
@@ -18253,19 +18287,25 @@ async function trkBufDrain(){
         const all = (trkNow.pts || []).concat(cand)
           .filter(p => p && isFinite(p.la) && isFinite(p.lo) && p.t)
           .sort((x, y) => (Date.parse(x.t) || 0) - (Date.parse(y.t) || 0));
-        // ③ 같은 시각은 하나만 남기고, 5초 간격(OsmAnd)을 처음부터 다시 건다
+        // ③ 같은 시각은 하나만 남기고, 기록 간격(OsmAnd)을 건다
+        //   ★ 5.40 — 이미 남긴 점은 다시 거르지 않는다. 항해 도중에 간격을 늘려도 앞에 남긴 점이 지워지지 않게.
+        //   ★ 5.40 — 「간격 이상」 이면 남긴다(>=). 안드로이드 기록 장치는 그 간격마다 위치를 주므로 딱 그 간격으로 온다 —
+        //     「간격보다 커야」(>) 로 두면 하나 건너 하나씩 버려져 간격이 두 배가 된다.
+        const 남긴 = new Set((trkNow.pts || []).map(p => String(p && p.t)));
+        const 간격 = trkIntMs();
         const out = [];
         let prevT = -1;
         for(let i = 0; i < all.length; i++){
           const p  = all[i];
           const tt = Date.parse(p.t) || 0;
           if(tt === prevT) continue;
-          // ★ 5.37 — OsmAnd: 앞에 남긴 점에서 5초가 지나야 남긴다 (거리·속도로는 안 거른다)
-          { const L = out[out.length - 1];
-            if(L && !(tt - (Date.parse(L.t) || 0) > TRK_OSM_MS)) continue; }
+          if(!남긴.has(String(p.t))){
+            const L = out[out.length - 1];
+            if(L && !(tt - (Date.parse(L.t) || 0) >= 간격)) continue;
+          }
           out.push(p); prevT = tt;
         }
-        trkNow.pts = (out.length > TRK_MAX) ? trkSimplify(out, TRK_TOL) : out;
+        trkNow.pts = out;   // ★ 5.40 — 줄이지 않는다 (TRK_MAX 없앰)
         n = Math.max(0, trkNow.pts.length - before);
         trkNow.bufAdd = (Number(trkNow.bufAdd) || 0) + n;
         trkNow.often = (Number(trkNow.often) || 0) + Math.max(0, cand.length - n);   // 5초 안에 온 것
@@ -18351,7 +18391,10 @@ function trkKeep(){
     // ★ 전에 적은 마지막 점이 든 묶음부터 다시 쓴다 — 그 점이 제자리에서 고쳐졌어도 놓치지 않게
     const from = 붙기만 ? Math.floor((trkKept.n - 1) / TRK_CHUNK) : 0;
     for(let i = from; i < pn; i++){
-      localStorage.setItem(TRK_PKEY(i), JSON.stringify(pts.slice(i * TRK_CHUNK, (i + 1) * TRK_CHUNK)));
+      // ★ 5.40 — 점을 줄이지 않으니 긴 항해는 묶음이 많아진다. 기기 저장소(localStorage)는 몇 MB 뿐이라
+      //   구글 Encoded Polyline 꼴로 짧게 적는다(같은 값으로 되돌아오는지 확인한 뒤에만 — 아니면 예전대로 JSON).
+      const part = pts.slice(i * TRK_CHUNK, (i + 1) * TRK_CHUNK);
+      localStorage.setItem(TRK_PKEY(i), trkEnc(part) || JSON.stringify(part));
     }
     trkKeepMeta(pn);
     // 줄어들었으면(솎기) 남는 옛 묶음을 치운다
@@ -18365,7 +18408,7 @@ function trkLoad(){
     if(m && m.v === 2){
       let pts = [];
       for(let i = 0; i < (Number(m.pn) || 0); i++){
-        try{ pts = pts.concat(JSON.parse(localStorage.getItem(TRK_PKEY(i)) || '[]')); }catch(_){}
+        try{ pts = pts.concat(trkChunkRead(localStorage.getItem(TRK_PKEY(i)))); }catch(_){}
       }
       delete m.v; delete m.pn; delete m.np;
       m.pts = pts;
@@ -18393,6 +18436,135 @@ function mobFabSync(){
   }catch(_){}
 }
 
+// ★★★ 5.40 — 항적을 짧은 글자로 적기 (구글 「Encoded Polyline Algorithm Format」 — 구글 지도·Strava 가 항적을 이 꼴로 준다)
+//   위경도: 1e5 를 곱해 반올림 → 앞 점과의 차 → 부호 → 5비트씩 → +63. 우리 점은 이미 소수 다섯째 자리라 그대로 되돌아온다.
+//   시각(ms)·정확도·속도도 같은 방식으로 적는다. 시각은 자리가 커서 비트 연산(32비트) 대신 나눗셈으로 한다.
+//   ★ 되돌렸을 때 원래와 한 글자라도 다르면 null — 그때는 예전대로 둔다(자료가 바뀌지 않게).
+function trkVarEnc(v){
+  let s2 = v < 0 ? (-v * 2 - 1) : v * 2, o = '';
+  while(s2 >= 32){ o += String.fromCharCode((32 + (s2 % 32)) + 63); s2 = Math.floor(s2 / 32); }
+  return o + String.fromCharCode(s2 + 63);
+}
+function trkVarDec(str){
+  const out = []; let i = 0;
+  while(i < str.length){
+    let r = 0, m = 1, b;
+    do{ b = str.charCodeAt(i++) - 63; if(!(b >= 0)) return null; r += (b % 32) * m; m *= 32; }while(b >= 32 && i <= str.length);
+    out.push(r % 2 === 1 ? -(r + 1) / 2 : r / 2);
+  }
+  return out;
+}
+const TRK_ENC_KEYS = { la:1, lo:1, t:1, ac:1, sp:1 };
+function trkEnc(pts){
+  try{
+    if(!Array.isArray(pts) || !pts.length) return null;
+    let la0 = 0, lo0 = 0, t0 = 0, A = '', T = '', AC = '', SP = '';
+    for(const p of pts){
+      if(!p || typeof p !== 'object') return null;
+      for(const k in p) if(!TRK_ENC_KEYS[k]) return null;
+      const la = Math.round(p.la * 1e5), lo = Math.round(p.lo * 1e5), tm = Date.parse(p.t);
+      if(!isFinite(la) || !isFinite(lo) || !isFinite(tm)) return null;
+      if(la / 1e5 !== p.la || lo / 1e5 !== p.lo || new Date(tm).toISOString() !== p.t) return null;
+      let ac = 0, sp = 0;
+      if(p.ac != null){ if(!(Number.isInteger(p.ac) && p.ac >= 0)) return null; ac = p.ac + 1; }
+      if(p.sp != null){ const v = Math.round(p.sp * 10); if(!(v / 10 === p.sp && v >= 0)) return null; sp = v + 1; }
+      A += trkVarEnc(la - la0) + trkVarEnc(lo - lo0); T += trkVarEnc(tm - t0);
+      AC += trkVarEnc(ac); SP += trkVarEnc(sp);
+      la0 = la; lo0 = lo; t0 = tm;
+    }
+    const z = 'z1,' + pts.length + ',' + A + ',' + T + ',' + AC + ',' + SP;
+    const back = trkDec(z);
+    return (back && JSON.stringify(back) === JSON.stringify(pts.map(p => trkEncOrder(p)))) ? z : null;
+  }catch(_){ return null; }
+}
+function trkEncOrder(p){   // 되돌린 점과 견줄 때 칸 차례를 맞춘다
+  const o = { la: p.la, lo: p.lo, t: p.t };
+  if(p.ac != null) o.ac = p.ac;
+  if(p.sp != null) o.sp = p.sp;
+  return o;
+}
+function trkDec(z){
+  try{
+    const f = String(z || '').split(',');
+    if(f.length !== 6 || f[0] !== 'z1') return null;
+    const n = Number(f[1]);
+    const A = trkVarDec(f[2]), T = trkVarDec(f[3]), AC = trkVarDec(f[4]), SP = trkVarDec(f[5]);
+    if(!A || !T || !AC || !SP || A.length !== n * 2 || T.length !== n || AC.length !== n || SP.length !== n) return null;
+    const out = []; let la = 0, lo = 0, tm = 0;
+    for(let i = 0; i < n; i++){
+      la += A[i * 2]; lo += A[i * 2 + 1]; tm += T[i];
+      const p = { la: la / 1e5, lo: lo / 1e5, t: new Date(tm).toISOString() };
+      if(AC[i] > 0) p.ac = AC[i] - 1;
+      if(SP[i] > 0) p.sp = (SP[i] - 1) / 10;
+      out.push(p);
+    }
+    return out;
+  }catch(_){ return null; }
+}
+function trkChunkRead(v){
+  const x = String(v || '');
+  if(x.indexOf('z1,') === 0) return trkDec(x) || [];
+  return JSON.parse(x || '[]');
+}
+// ★ 파이어스토어 문서 크기 (공식 「Storage size calculations」 그대로)
+//   문자열 = UTF-8 바이트 + 1 · 숫자 8 · 참/거짓 1 · null 1 · 배열 = 값의 합 · 지도 = (칸 이름 + 값)의 합
+//   문서 = 이름(컬렉션·문서 id 각 +1, 합 +16) + 칸들 + 32. 한 문서 1MiB(1,048,576) 까지.
+const FS_DOC_MAX = 1048576;
+function fsStrSize(x){ try{ return new TextEncoder().encode(String(x)).length + 1; }catch(_){ return String(x).length * 3 + 1; } }
+function fsSize(v){
+  if(v === null || v === undefined) return 1;
+  if(typeof v === 'string') return fsStrSize(v);
+  if(typeof v === 'number') return 8;
+  if(typeof v === 'boolean') return 1;
+  if(Array.isArray(v)){ let n = 0; for(const x of v) n += fsSize(x); return n; }
+  if(typeof v === 'object'){ let n = 0; for(const k in v){ if(v[k] === undefined) continue; n += fsStrSize(k) + fsSize(v[k]); } return n; }
+  return 8;
+}
+function fsDocSize(pathParts, body){
+  let name = 16; (pathParts || []).forEach(x => { name += fsStrSize(x); });
+  return name + fsSize(body) + 32;
+}
+// ★★★ 5.40 — 클라우드로 올릴 항해 한 건 (기기 기록은 그대로 둔다)
+//   ① 그대로 1MiB 안이면 그대로 (예전 앱도 그대로 읽는다)
+//   ② 넘으면 항적을 짧은 글자(trkz)로 — 같은 점이 그대로 되돌아온다(받을 때 trkDec)
+//   ③ 그래도 넘으면 클라우드 사본만 직선 간소화로 줄인다 — 들어갈 만큼만(1m 부터 두 배씩).
+//      SeaPeople 도 긴 항적은 줄이고, Strava 도 지도용 줄인 선(summary_polyline)을 따로 둔다.
+//      줄였다는 표시(trkCut = 원래 점 수)를 남기고, 원래 기록은 이 기기에 그대로 있다(받을 때 기기 쪽을 지킨다).
+function voyCloudBody(v, pathParts){
+  try{
+    if(!v || !Array.isArray(v.trk) || v.trk.length < 2) return v;
+    const fits = b => fsDocSize(pathParts, Object.assign({ _u: new Date().toISOString() }, b)) <= FS_DOC_MAX;
+    const base = Object.assign({}, v); delete base.trkCut; delete base.trkz;
+    if(fits(base)) return base;
+    const z = trkEnc(v.trk);
+    const pack = pts => {
+      const b = Object.assign({}, base); delete b.trk;
+      const zz = trkEnc(pts);
+      if(zz) b.trkz = zz; else b.trk = pts;
+      return b;
+    };
+    if(z){ const b = Object.assign({}, base); delete b.trk; b.trkz = z; if(fits(b)) return b; }
+    for(let tol = 1; tol <= 65536; tol *= 2){
+      const b = pack(trkSimplify(v.trk, tol));
+      b.trkCut = v.trk.length;
+      if(fits(b)) return b;
+    }
+    return base;
+  }catch(_){ return v; }
+}
+window.voyCloudBody = voyCloudBody;
+window.trkDec = trkDec;
+// 받을 때 — 클라우드 사본이 줄인 것(trkCut)이면 이 기기에 더 긴 원래 기록이 있을 때 그것을 지킨다
+function voyKeepLocalTrk(rows){
+  if(!Array.isArray(rows)) return rows;
+  return rows.map(r => {
+    if(!r || !(r.trkCut > 0)) return r;
+    const mine = (typeof voyage !== 'undefined' ? voyage : []).find(x => x && String(x.id) === String(r.id));
+    const o = Object.assign({}, r); delete o.trkCut;
+    if(mine && Array.isArray(mine.trk) && mine.trk.length > (Array.isArray(o.trk) ? o.trk.length : 0)) o.trk = mine.trk;
+    return o;
+  });
+}
 // ★ 직선으로 간 구간은 가운데 점을 버려도 선 모양이 같다.
 //   좌표를 그대로 재면 안 된다 — 경도 1도의 길이는 위도에 따라 좁아진다.
 //   미터로 바꿔서 잰다.
@@ -18574,8 +18746,7 @@ function trkPush(pos){
   if(isFinite(spd)) p.sp = Math.round(spd * 10) / 10;
   const why = trkOsmWhy(p, trkNow.pts[trkNow.pts.length - 1]);
   if(why){ trkCnt(why); return false; }
-  trkNow.pts.push(p);
-  if(trkNow.pts.length > TRK_MAX) trkNow.pts = trkSimplify(trkNow.pts, TRK_TOL);
+  trkNow.pts.push(p);   // ★ 5.40 — 줄이지 않는다 (TRK_MAX 없앰)
   trkKeep();
   if((trkNow.pts.length - (Number(trkNow.saved) || 0)) >= TRK_FLUSH) trkFlush();
   trkLive();
@@ -18848,7 +19019,7 @@ function trkLiveDrainOn(){
   trkLiveDrainTimer = setInterval(() => {
     if(!trkNow){ trkLiveDrainOff(); return; }
     try{ if(document.visibilityState === 'visible') trkBufDrain(); }catch(_){}
-  }, TRK_OSM_MS);
+  }, Math.max(TRK_OSM_MS, trkIntMs()));   // ★ 5.40 — 기록 간격보다 자주 가져올 까닭이 없다 (짧으면 5초마다)
 }
 function trkLiveDrainOff(){ if(trkLiveDrainTimer){ clearInterval(trkLiveDrainTimer); trkLiveDrainTimer = null; } }
 // 기록 장치가 「위성 위치를 받을 수 없다」 고 하면 그 까닭을 사람 말로 바꾼다. '' 는 문제없음.
@@ -23376,10 +23547,31 @@ async function setBizUI(on){
   if(on){ const b2 = curBoat(); if(b2 && b2.pub && b2.pub.listed === false) b2.pub.listed = true; }
   setPubUI('biz', !!on, 'info');
 }
+// ★★★ 5.40 — 밖에 내보내는 배 사본(boatPublic)은 문서 하나다. 항적을 더는 4,000점에서 줄이지 않으니
+//   공개한 항해의 항적이 길면 1MiB 를 넘어 사본이 통째로 안 올라간다(조용히 실패).
+//   그래서 넘을 때만 공개 사본의 항적을 들어갈 만큼만 직선 간소화로 줄인다(1m 부터 두 배씩) —
+//   Strava 가 지도에 보여 주는 줄인 선(summary_polyline)과 같은 생각. 내 기록은 그대로다.
+function pubFit(data, b){
+  try{
+    if(!data || !Array.isArray(data.voyage)) return data;
+    const parts = ['boatPublic', String((b && b.id) || '')];
+    const fits = d => fsDocSize(parts, Object.assign({ owner: 'x'.repeat(28) }, d)) <= FS_DOC_MAX;
+    if(fits(data)) return data;
+    const orig = data.voyage.map(v => Array.isArray(v && v.trk) ? v.trk : null);
+    for(let tol = 1; tol <= 65536; tol *= 2){
+      data.voyage.forEach((v, i) => {
+        const a = orig[i]; if(!a || a.length < 3) return;
+        v.trk = trkSimplify(a.map(q => ({ la: q.lat, lo: q.lon })), tol).map(q => ({ lat: q.la, lon: q.lo }));
+      });
+      if(fits(data)) return data;
+    }
+    return data;
+  }catch(_){ return data; }
+}
 // 공개 자료를 밖에 내보낸다 (비공개면 지운다)
 function pushPublic(b){
   if(!window.__pub) return;
-  const data = buildPublic(b);
+  const data = pubFit(buildPublic(b), b);
   if(data) window.__pub.put(b.id, data).catch(()=>{});
   else window.__pub.remove(b.id).catch(()=>{});
 }
@@ -26451,6 +26643,8 @@ async function cloudPull(){
   //   여기서 갈아치우는 바람에 아직 못 올린 기록이 통째로 사라졌었다.
   maint    = pullInto('maint',    r.maint);
   repair   = pullInto('repair',   r.repair);
+  // ★ 5.40 — 클라우드 사본이 줄인 항적이면 이 기기의 원래 기록을 지킨다
+  try{ r.voyage = voyKeepLocalTrk(r.voyage); }catch(_){}
   voyage   = pullInto('voyage',   r.voyage);
   fuel     = pullInto('fuel',     r.fuel);
   runs     = pullInto('runs',     r.runs);
@@ -27201,7 +27395,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.39';
+const APP_VER = '5.40';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -35913,6 +36107,9 @@ function openSettings(){
     // ★ 4.102 — 나라는 말과 따로 고른다. 긴급 연락처·출항 전 점검표가 이것을 본다.
     + row(t('국가'), (COUNTRIES.find(c=>c.k===boatCc()) ? t(countryName(boatCc())) : t('선택 안 함')),
           'openCc()')
+    // ★ 5.40 — 항적 기록 간격 (OsmAnd 「여행 레코딩 › 기록 간격」)
+    + lbl(t('항적'))
+    + row(t('기록 간격'), trkIntLabel(trkIntSec()), 'openTrkInt()')
     // ★ 클라우드와 파일은 하는 일이 다르다. 묶음을 갈라 놓지 않으면 사람이 헷갈린다.
     //   상용 앱들이 「동기화」와 「백업」을 절대 같은 층에 안 두는 까닭이다.
     + lbl(t('클라우드'))
@@ -35976,6 +36173,28 @@ function openLook(){
   P.querySelectorAll('[data-lookpx]').forEach(e => { e.style.cssText = 'font-size:' + e.getAttribute('data-lookpx') + 'px;line-height:1'; });
   showPanel(P);
   setHeadTitle('화면');
+}
+// ★★★ 5.40 — 기록 간격 고르기 (사장님 「1은 사용자가 정할수 있게」). 고르는 값은 OsmAnd 그대로.
+//   글은 이름(기록 간격)과 값(5초 · 2분)뿐이다 — 설명 문장을 지어 넣지 않는다.
+function openTrkInt(){
+  const P = document.getElementById('mrPanel'); if(!P) return;
+  const cur = trkIntSec();
+  P.innerHTML = `<div class="mrhead"><b>${esc(t('기록 간격'))}</b><span style="flex:1"></span></div>`
+    + TRK_INT_OPTS.map(sec => `<div class="mrrow setrow" onclick="trkIntPick(${sec})">
+        <div style="flex:1;min-width:0"><b class="mrv" style="display:block">${esc(trkIntLabel(sec))}</b></div>
+        <button class="minib ${sec === cur ? 'grn' : 'blu'}">${esc(sec === cur ? t('선택됨') : t('선택'))}</button></div>`).join('');
+  showPanel(P);
+  setHeadTitle('기록 간격');
+}
+async function trkIntPick(sec){
+  if(TRK_INT_OPTS.indexOf(sec) < 0) return;
+  try{ localStorage.setItem(TRK_INT_KEY, String(sec)); }catch(_){}
+  // 기록 중이면 바로 적용한다 — 안드로이드 기록 장치는 다시 켜면 새 간격으로 받는다(이미 남긴 점은 그대로)
+  try{
+    if(trkNow && trkNow.nat && !trkIsIOS()){ await trkBufStart(); }
+    if(trkLiveDrainTimer){ trkLiveDrainOff(); trkLiveDrainOn(); }
+  }catch(_){}
+  openTrkInt();
 }
 function lookPick(k, v){
   try{ window.btLook.set(k, v); }catch(_){}
@@ -51560,6 +51779,11 @@ window.__boot = 'start';
         const o = d.data() || {};
         if(o._u && o._u > u) u = o._u;
         delete o._u;
+        // ★ 5.40 — 짧은 글자로 올린 항적은 받을 때 점으로 되돌린다 (voyCloudBody ②)
+        if(typeof o.trkz === 'string' && typeof window.trkDec === 'function'){
+          const back = window.trkDec(o.trkz);
+          if(back){ o.trk = back; delete o.trkz; }
+        }
         return o;
       });
       return { rows, u };
@@ -51608,7 +51832,9 @@ window.__boot = 'start';
         p.delM.forEach(k=>ops.push(['del','maint',k]));
         p.setR.forEach(i=>ops.push(['set','repair',String(i.id),i]));
         p.delR.forEach(k=>ops.push(['del','repair',k]));
-        (p.setV||[]).forEach(i=>ops.push(['set','voyage',String(i.id),i]));
+        // ★ 5.40 — 항해 문서는 1MiB 안에 맞춘다 (voyCloudBody). 넘으면 같이 실린 항해까지 통째로 못 올라간다.
+        (p.setV||[]).forEach(i=>ops.push(['set','voyage',String(i.id),
+          (typeof window.voyCloudBody === 'function') ? window.voyCloudBody(i, ['boats', String(window.currentBoatId || ''), 'voyage', String(i.id)]) : i]));
         (p.delV||[]).forEach(k=>ops.push(['del','voyage',k]));
         (p.setF||[]).forEach(i=>ops.push(['set','fuel',String(i.id),i]));
         (p.delF||[]).forEach(k=>ops.push(['del','fuel',k]));

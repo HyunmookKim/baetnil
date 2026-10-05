@@ -143,8 +143,9 @@
   display:none;align-items:center;justify-content:center;padding:20px}
 .helpbox{width:100%;max-width:420px;max-height:76vh;overflow:auto;
   background:#131C26;border:1px solid #24313F;border-radius:14px}
-.helphd{display:flex;align-items:center;gap:8px;padding:14px 14px 10px;
-  border-bottom:1px solid #24313F;position:sticky;top:0;background:#131C26}
+.helphd{display:flex;align-items:center;gap:8px;padding:14px 14px 10px}
+/* ★ 5.39 — 도움말 머리(제목·닫기)는 갈래 줄과 같은 붙여 두는 줄(.pinbar)이다.
+   예전에는 짙은 남색(#131C26)을 통째로 깔고 아래 선을 그어 노을 위에 띠가 얹혔다(검정 화면은 선, 흰 화면은 회색 띠). */
 .helphd b{flex:1;font-size:15px}
 .helpbd{padding:14px;font-size:13px;line-height:1.85;color:#C6D3DF}
 .helpbd b{color:#DFE6EE}
@@ -573,8 +574,8 @@ td{padding:3px 6px;border-top:1px solid #0f2030}
 .trashHead{padding:13px 16px;border-bottom:1px solid #1e3a5a;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;color:#c8dff0}
 #trashBody{padding:10px 14px;overflow:auto;min-width:0}
 /* ★ 4.132 — 휴지통 안 갈래 칩. 줄을 내려도 위에 붙어 있어야 지금 어느 갈래인지 안다. */
-#trashBody .trchips{position:sticky;top:-10px;z-index:2;background:#0a1828;
-  padding:8px 0 6px;margin:-10px 0 2px;min-width:0}
+#trashBody .trchips{padding:8px 0 6px;margin:-10px 0 2px;min-width:0}
+/* ★ 5.39 — 붙여 두는 일은 바깥 껍데기(.pinbar)가 한다. 예전에는 짙은 남색(#0a1828)을 통째로 깔아 노을 위에 띠가 됐다. */
 /* ★★★ 4.134 — 휴지통이 화면보다 넓어져 가로로 잘리던 것 (사장님 지적, 2026-09-12)
      390짜리 화면에 상자가 515로 그려졌다. 줄 이름이 왼쪽으로 잘려 보였다.
    ★ 왜 — 갈래 칩 줄(.tfilt)은 줄바꿈을 안 한다(nowrap). 그래서 그 줄의 **최소 너비**가
@@ -2559,6 +2560,21 @@ img.imgbroken::after{content:attr(data-brokentxt);position:absolute;inset:0;
         ? `body{background:${bg} !important} body::before,body::after{display:none !important}`
           + `#mrPanel,#mrPanel.full,#panel,#formOv .formBox,#hatPanelOv #hatPanelBody,#trashView .trashBox,#helpOv .helpbox{background:${bg} !important}`
           + (theme === 'light' ? `:root{color-scheme:light}` : `:root{color-scheme:dark}`)
+          // ★★★ 5.39 — 붙어 있는 줄(맨 윗줄·갈래 줄·기록 창 머리줄·아래 탭 줄)의 바탕은 화면 바탕색으로 비치게 한다.
+          //   사장님 (10/5): 「검은색이랑 흰색 바탕에서는 안 고친 건 아니지」 · 「그띠가 왜 만든건지부터 고민해야하는거 아니냐」
+          //   이 줄들의 바탕은 밑으로 지나가는 글을 흐려 단추 글씨를 읽히게 하려고 있다(4.123 · 5.30 · 5.37).
+          //   노을은 바탕이 그림이라 짙은 남색을 옅게(.42) 깔고 뒤를 흐린다. 그런데 위의 색 바꾸기가 반투명한 짙은 색을
+          //   「떠 보이는 면」 진회색(.92)으로 바꿔서, 검정 화면에서는 검정 위에 진회색 띠가 얹혔다(흰 화면은 푸른 기 도는 회색).
+          //   애플 HIG 「Toolbars」: 막대에 따로 바탕색을 깔지 말고 밑의 내용(content layer)이 막대의 색을 정하게 하라 ·
+          //   「Scroll views」: 스크롤 가장자리 효과는 흐림·서서히 사라짐이고 가리거나 어둡게 하지 않는다.
+          //   → 노을과 같은 문(흐림 · 같은 옅기 · 아래 끝 서서히 · 맨 위에서는 안 보임)에 색만 이 화면의 바탕색.
+          + (() => { const c = theme === 'light' ? '255,255,255' : '0,0,0';
+              return `header{background:linear-gradient(to bottom,rgba(${c},.55),rgba(${c},.18)) !important}`
+                + `body.scrolled header{background:linear-gradient(to bottom,rgba(${c},.62),rgba(${c},.42)) !important}`
+                + `.pinbar::before,#mrPanel .mrhead::before,#mrPanel > .mrtop::before{background:rgba(${c},.42) !important}`
+                + `#tabbar{background:linear-gradient(to bottom,rgba(${c},.35),rgba(${c},.86)) !important}`
+                + `@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){`
+                +   `.pinbar::before,#mrPanel .mrhead::before,#mrPanel > .mrtop::before{background:rgba(${c},.86) !important}}`; })()
         : '')
       // 글자를 키우면 좁아지는 자리 — 칸 이름 자리를 넓히고, 머리줄 연결 상태 글은 배 이름에 자리를 양보한다
       // ★ 5.27 — 크기를 따로 안 적은 글씨는 브라우저 기본 16px 을 물려받아 안 커졌다(칸 옆 단위 m·L·kt 등). 바탕 크기도 키운다.
@@ -16595,7 +16611,7 @@ function openHelp(key){
     document.body.appendChild(el);
   }
   el.innerHTML = `<div class="helpbox">
-      <div class="helphd"><b>${esc(t(h[0]))}</b>
+      <div class="helphd pinbar"><b>${esc(t(h[0]))}</b>
         <button class="tab" onclick="closeHelp()">${esc(t('닫기'))}</button></div>
       <div class="helpbd">${t(h[1])}</div></div>`;
   el.style.display = 'flex';
@@ -27185,7 +27201,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.38';
+const APP_VER = '5.39';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -28955,12 +28971,12 @@ function openTrash(){
   const 볼것 = trashSub === 'all' ? 다 : 다.filter(r => r.g === trashSub);
   let html = '';
   if(있는갈래.length > 1){
-    html += `<div class="tfilt trchips">`
+    html += `<div class="pinbar"><div class="tfilt trchips">`
       + `<button class="tchip${trashSub === 'all' ? ' on' : ''}" onclick="setTrashSub('all')">${
           esc(t('전체'))} ${다.length}</button>`
       + 있는갈래.map(x => `<button class="tchip${trashSub === x.k ? ' on' : ''}" onclick="setTrashSub('${x.k}')">${
           esc(t(x.n))} ${다.filter(r => r.g === x.k).length}</button>`).join('')
-      + `</div>`;
+      + `</div></div>`;
   }
   let 앞갈래 = '';
   html += 볼것.map(r => {

@@ -792,7 +792,15 @@ body.locked .stat.tapstat{pointer-events:none;cursor:default}
 .perrow::-webkit-scrollbar{display:none}
 /* 옆에 더 있다는 것을 오른쪽 끝을 흐리게 해서 알린다 — 끝까지 밀면 흐림을 뗀다 */
 .perrow:not(.end){-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
-.perrow .tab{flex:0 0 auto;padding:6px 12px;font-size:12px;white-space:nowrap}
+/* ★ 5.43 — 칩 다섯이 한 줄을 고르게 채운다(Apple 건강 「1일·1주·1개월…」 가 한 줄을 채우듯). 남으면 늘고, 모자라면(큰 글자) 옆으로 민다 */
+.perrow .tab{flex:1 0 auto;padding:6px 10px;font-size:12px;white-space:nowrap}
+/* ★ 5.43 — 1일·1개월·1년 넘기는 줄. 앱 달력 머리 줄(.calhead ‹ 2026년 10월 ›)을 그대로 쓴다 — 새 모양을 만들지 않는다 */
+.pernav{padding:8px 10px 0}
+.pernav .calym{font-size:17px}
+.calnav:disabled{opacity:.25;cursor:default}
+.pertitle{border:0;background:none;padding:2px 6px;font-family:inherit;cursor:pointer;min-height:36px}   /* ‹ › 줄과 같은 높이 — 기간을 바꿔도 아래 숫자가 위아래로 안 뛴다 */
+/* 총 가동시간 칸 아래 「2025-03-14부터」 — 이름표(.stat span)와 같은 색·크기 계열, 한 단계 옅게 (Fuelly 「Added Apr 2024」 자리) */
+.stat .statsub{display:block;font-style:normal;font-size:10px;font-weight:600;color:var(--td);opacity:.8;margin-top:3px;letter-spacing:.04em;white-space:nowrap}
 
 /* ============ D테마 : 새벽 바다 ============ */
 /* ★ 앞의 C테마는 이름 그대로 '연장' 이었다. 주황은 공사장의 색이고,
@@ -841,7 +849,10 @@ h1{font-size:20px;font-weight:800;color:var(--th);letter-spacing:-.02em}
 .calym{font-size:19px;font-weight:800;color:var(--th);text-align:center;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .calnav{border:0;background:none;color:var(--tx);font-size:26px;line-height:1;
-  padding:0 8px;cursor:pointer;font-family:inherit}
+  padding:0 8px;cursor:pointer;font-family:inherit;
+  /* ★ 5.43 — 누르는 자리를 손가락 크기(44×44, 애플·구글 권장)로. 글자 ‹ › 만큼(25×27)이라 잘 안 눌렸다 — 항해 기간·달력 둘 다 */
+  min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;
+  margin:-4px -8px;padding:0}   /* 커진 누름 자리만큼 바깥 여백을 당겨 글자 자리(‹ 2026년 10월 ›)는 예전 그대로 */
 .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;
   background:var(--bd2);border-top:1px solid var(--bd2);border-bottom:1px solid var(--bd2)}
 .caldow{border-bottom:0}
@@ -3231,7 +3242,7 @@ const I18N = {
     '+ 정기점검':'+ Scheduled check',
     '+ 고장':'+ Fault',
     '+ 일정':'+ Event', '일정':'Event', '제목을 입력해 주세요':'Enter a title',
-    '이번 달':'This month', '1년':'1 year', '3년':'3 years', '5년':'5 years', '시작일':'Start date', '종료일':'End date',
+    '1일':'1 day', '1개월':'1 month', '1년':'1 year', '{d}부터':'Since {d}', '시작일':'Start date', '종료일':'End date',
     '시작일을 입력해 주세요':'Enter a start date', '종료일을 입력해 주세요':'Enter an end date',
     '시작 시점':'Count from', '만탱크 후':'After full tank', '주유 후':'After refuel', '주유 후 가동':'Since last refuel', '{d} 이후 가동':'Since {d}',
     '+ 제품 리뷰':'+ Product review',
@@ -6839,7 +6850,7 @@ const I18N = {
     '+ 정기점검':'+ Пункт регламента',
     '+ 고장':'+ Неисправность',
     '+ 일정':'+ Мероприятие', '일정':'Мероприятие', '제목을 입력해 주세요':'Введите название',
-    '이번 달':'Этот месяц', '1년':'1 год', '3년':'3 года', '5년':'5 лет', '시작일':'Дата начала', '종료일':'Дата окончания',
+    '1일':'1 день', '1개월':'1 месяц', '1년':'1 год', '{d}부터':'с {d}', '시작일':'Дата начала', '종료일':'Дата окончания',
     '시작일을 입력해 주세요':'Введите дату начала', '종료일을 입력해 주세요':'Введите дату окончания',
     '시작 시점':'Отсчёт с', '만탱크 후':'После полного бака', '주유 후':'После заправки', '주유 후 가동':'С последней заправки', '{d} 이후 가동':'С {d}',
     '+ 제품 리뷰':'+ Отзыв',
@@ -10459,7 +10470,7 @@ const I18N = {
     '+ 고장':'+ 故障',
     // ★ 5.41 — 予定 은 「예정」(+ 예정) 이 이미 쓴다. 겹치지 않게 Apple カレンダー 「新規イベント」 의 イベント
     '+ 일정':'+ イベント', '일정':'イベント', '제목을 입력해 주세요':'タイトルを入力してください',
-    '이번 달':'今月', '1년':'1年', '3년':'3年', '5년':'5年', '시작일':'開始日', '종료일':'終了日',
+    '1일':'1日', '1개월':'1か月', '1년':'1年', '{d}부터':'{d}から', '시작일':'開始日', '종료일':'終了日',
     '시작일을 입력해 주세요':'開始日を入力してください', '종료일을 입력해 주세요':'終了日を入力してください',
     '시작 시점':'起点', '만탱크 후':'満タン後', '주유 후':'給油後', '주유 후 가동':'給油後の稼働', '{d} 이후 가동':'{d} 以降の稼働',
     '+ 제품 리뷰':'+ パーツレビュー',
@@ -19710,6 +19721,9 @@ const PERMS = [
   { k:'fuel',    name:t('연료·엔진 기록') },
   { k:'contact', name:t('연락처·문서') },
   { k:'check',   name:t('체크리스트') },
+  // ★ 5.43 — 「선주가 권한주는식」 (사장님 2026-10-06). 네이버 밴드 「멤버 권한 설정 › 일정 등록」 처럼 일정을 따로 뗀다.
+  //   이 줄이 생기기 전 등급에는 값이 없다 → 배 정보·제원 권한을 따른다(PERM_FALLBACK, 클라우드 규칙도 같게).
+  { k:'sched',   name:t('일정') },
   { k:'task',    name:t('담당자 지정') },
   { k:'board',   name:t('게시판') },
   { k:'roster',  name:t('회원 명부 보기') },
@@ -19775,10 +19789,14 @@ function myRank(b){
   return rankOf(b, mem[me]);
 }
 // 어떤 등급이 이 항목에 대해 가진 권한
+// ★ 5.43 — 새로 생긴 항목이 옛 등급에 없을 때 따를 항목. 클라우드 규칙의 allowedSched 와 반드시 같아야 한다.
+//   (어긋나면 앱은 된다 하고 클라우드는 거부한다 — 4.132 「크루가 넣은 예정이 안 보임」 과 같은 일)
+const PERM_FALLBACK = { sched:'boat' };
 function permOf(rank, key){
   if(!rank) return 'none';
   if(rank.owner) return 'full';           // 선주는 언제나 전체
-  const v = (rank.perms || {})[key];
+  const P = rank.perms || {};
+  const v = (key in P || !PERM_FALLBACK[key]) ? P[key] : P[PERM_FALLBACK[key]];
   return (v in PERM_ORDER) ? v : 'none';
 }
 // 내가 이 일을 할 수 있는가. need 는 view / write / full
@@ -26946,7 +26964,7 @@ const COLL_PERM = {
   items:'stow', trash:'stow',
   lockers:'diagram', shapes:'diagram', dgimgs:'diagram',
   maint:'maint', repair:'maint', mrtrash:'maint', reviews:'maint',
-  scheds:'boat',   // ★ 5.41 — 클라우드 규칙의 「위에 없는 컬렉션」 문(배 정보 쓰기)과 같게. 어긋나면 올리다 거부당한다.
+  scheds:'sched',  // ★ 5.43 — 등급 설정의 「일정」 (5.41 은 배 정보 쓰기). 클라우드 규칙 scheds 문과 같게.
   voyage:'voyage',
   fuel:'fuel', runs:'fuel',
   contacts:'contact', vdocs:'contact',
@@ -26970,7 +26988,7 @@ const COLL_PERM = {
 //     감추지는 않는다 — 감추면 기능이 아예 없는 줄 안다.
 //   ★ 등급이 없는 배(혼자 쓰는 배)는 막지 않는다.
 const PERM_NAME = { stow:'적재표 (물품)', diagram:'도면·수납칸 편집', maint:'정비·수리', voyage:'항해일지',
-  fuel:'연료·엔진 기록', contact:'연락처·문서', check:'체크리스트', board:'게시판' };
+  fuel:'연료·엔진 기록', contact:'연락처·문서', check:'체크리스트', board:'게시판', sched:'일정' };
 function permOk(key){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
   if(!b) return true;
@@ -27428,7 +27446,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.42';
+const APP_VER = '5.44';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -30544,7 +30562,10 @@ function engHoursSince(dayISO, atMs){
     if(출발 >= 부터) h += parseFloat(v.engineH) || 0;
   });
   (Array.isArray(runs) ? runs : []).forEach(r => {
-    const a = runAt(r && r.date, r && r.time); if(!a || a.getTime() < 부터) return;
+    // ★ 5.43 — 시각 없이 날짜만 적은 엔진 가동 기록도 센다(그날 0시로 본다). 여태는 runAt 이 null 이라 조용히 빠졌다 —
+    //   총 가동시간(engineHours)에는 들어가는데 「그 뒤 가동시간」 에는 안 들어가 두 수가 어긋났다.
+    const 날 = /^\d{4}-\d{2}-\d{2}$/.test(String(r && r.date || '')) ? new Date(String(r.date) + 'T00:00:00') : null;
+    const a = runAt(r && r.date, r && r.time) || 날; if(!a || a.getTime() < 부터) return;
     if(runOn(r)){ const m = runMins(r); h += (m != null ? m / 60 : 0); }
     else h += parseFloat(r.hours) || 0;
   });
@@ -32871,7 +32892,7 @@ async function mrDelete(){
 // 기록 갈래마다 어느 권한을 봐야 하나 — 여기 한 곳에서만 정한다
 const MR_PERM = { maint:'maint', repair:'maint', mlog:'maint', gear:'maint', review:'maint',
                   voyage:'voyage', fuel:'fuel', run:'fuel',
-                  contact:'contact', vdoc:'contact', check:'check', sched:'boat' };
+                  contact:'contact', vdoc:'contact', check:'check', sched:'sched' };
 function mrTrashName(e){
   const d=e.data||{};
   return (e.kind==='gear' ? gearLabel(d) : e.kind==='mlog' ? mlogTitle(d) : (e.kind==='review' ? rvTitle(d) : '')) || d.name || d.title || d.label || (e.kind==='voyage'? voyName(d) : e.kind==='fuel'?(d.kind==='level' ? ((d.date||'')+' '+t('잔량 확인')+' '+(d.level==null?'?':d.level)+'L') : ((d.date||'')+' 주유 '+(d.liters||'?')+'L')) : e.kind==='run'?((d.date||'')+' 엔진 '+(d.hours||'?')+'h') : '항목');
@@ -34526,40 +34547,67 @@ function kwHit(o, q){
 function fmtNum(n){ return (Math.round(n*10)/10).toLocaleString('ko-KR'); }
 // ★★ 5.42 — 항해·거리·엔진 시간을 보는 기간을 사람이 고른다 (사장님 2026-10-06:
 //   「2026년도 것만 보는게 아니라 사용자가 월별 일별 1년 3년 5년 뭐 이런식으로 자율적으로 기간 선택해서 볼수있게」)
-//   다른 앱: Saillogger 통계 「All time」 + 해마다 칩 · Pocket Sailing Logbook 「all time and by year」 ·
-//   Apple 건강 「1일·1주·1개월·6개월·1년」 · 은행 조회 「1주·1개월·3개월·6개월·1년」 + 시작일·종료일 직접입력.
-//   → 이번 달 · 올해(2026년) · 1년 · 3년 · 5년 · 전체 · 직접 입력(시작일~종료일). 기본은 예전처럼 올해. 기기에 기억한다.
+// ★★★ 5.43 — 5.42 는 말씀과 달랐다: 「월별 일별」 을 「이번 달」 하나로 줄이고 하루는 직접 입력에 묻었으며,
+//   「2026년도 것만 보는게 아니라」 하셨는데 「2026년」 칩을 남겼다. 지난달·지난 어느 날을 볼 길이 없었다.
+//   사장님: 「다른 어플들 확인해 가지고 정해 가지고 만들어라」 → 다른 앱 그대로 다시 만든다.
+//   · Apple 건강(아이폰) 「1일·1주·1개월·6개월·1년」 (support.apple.com/ko-kr/108790) → 「1일 · 1개월 · 1년」
+//   · 지난 날·달·해로 넘기기: 삼성 헬스(안드로이드) 「그래프를 좌우로 이동」 · 넘기는 줄은 앱 달력 머리 줄(‹ 2026년 10월 ›) 모양 그대로
+//   · 「전체」: Saillogger 통계 「All time」 · 「직접 입력」(시작일~종료일): 은행 거래내역 조회 — 3년·5년 같은 긴 기간은 여기서
+//   · 3년·5년 단추를 둔 앱은 찾지 못해 넣지 않는다. 다섯 칩이라 폰 한 줄에 들어간다 (5.42 의 일곱 칩은 「직접 입력」 이 잘렸다).
+//   · 처음은 5.41 까지처럼 올해(1년). 고른 칩은 기기에 기억하고, 넘긴 자리는 다시 켜면 오늘로 돌아온다(Apple 건강과 같음).
 const VOY_PER_KEY = 'bt_voyper';
+let voyAt = '';   // 1일·1개월·1년에서 넘겨 본 자리 (그 기간 안의 아무 날, 'YYYY-MM-DD'). 비면 오늘.
 function voyPer(){
+  const okD = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
   try{ const o = JSON.parse(localStorage.getItem(VOY_PER_KEY) || 'null');
-       if(o && /^(m|y|y1|y3|y5|all|c)$/.test(o.k)) return o; }catch(_){}
+       if(o && /^(d|m|y|all)$/.test(o.k)) return { k: o.k };
+       if(o && o.k === 'c' && okD(o.a) && okD(o.b)) return o;
+       // 5.42 에 기억된 것 — 이번 달은 1개월, 올해·1년·3년·5년은 1년(올해)으로
+       if(o && o.k === 'y1' || o && o.k === 'y3' || o && o.k === 'y5') return { k:'y' };
+  }catch(_){}
   return { k:'y' };
 }
+function voyAnchor(){ return /^\d{4}-\d{2}-\d{2}$/.test(voyAt) ? voyAt : today(); }
+function voyMonthEnd(y, m){ return new Date(y, m, 0).getDate(); }   // m 은 1~12
 // 고른 기간의 처음·끝 ('YYYY-MM-DD', 양 끝 포함). 전체면 null.
 function voyPerRange(p){
   p = p || voyPer();
-  const td = today(), y = td.slice(0, 4);
-  const back = n => { const d = new Date(); d.setFullYear(d.getFullYear() - n); d.setDate(d.getDate() + 1); return fmtDate(d); };
-  if(p.k === 'm')  return { a: td.slice(0, 8) + '01', b: td };
-  if(p.k === 'y')  return { a: y + '-01-01', b: y + '-12-31' };
-  if(p.k === 'y1') return { a: back(1), b: td };
-  if(p.k === 'y3') return { a: back(3), b: td };
-  if(p.k === 'y5') return { a: back(5), b: td };
-  if(p.k === 'c' && /^\d{4}-\d{2}-\d{2}$/.test(String(p.a || '')) && /^\d{4}-\d{2}-\d{2}$/.test(String(p.b || '')))
-    return p.a <= p.b ? { a: p.a, b: p.b } : { a: p.b, b: p.a };
+  const at = voyAnchor(), Y = +at.slice(0, 4), M = +at.slice(5, 7);
+  const p2 = n => String(n).padStart(2, '0');
+  if(p.k === 'd') return { a: at, b: at };
+  if(p.k === 'm') return { a: Y + '-' + p2(M) + '-01', b: Y + '-' + p2(M) + '-' + p2(voyMonthEnd(Y, M)) };
+  if(p.k === 'y') return { a: Y + '-01-01', b: Y + '-12-31' };
+  if(p.k === 'c') return p.a <= p.b ? { a: p.a, b: p.b } : { a: p.b, b: p.a };
   return null;
 }
 function voyPerSet(k){
   if(k === 'c') return voyPerPick();
+  voyAt = '';   // 칩을 누르면 오늘이 든 기간부터 (Apple 건강과 같음)
   try{ localStorage.setItem(VOY_PER_KEY, JSON.stringify({ k })); }catch(_){}
   renderVoyage();
+}
+// ‹ › — 하루·한 달·한 해씩. 오늘이 든 기간보다 뒤로는 안 간다(앞날의 항해는 아직 없다).
+function voyPerMove(n){
+  const p = voyPer(); if(!/^(d|m|y)$/.test(p.k)) return;
+  const at = voyAnchor(), Y = +at.slice(0, 4), M = +at.slice(5, 7), D = +at.slice(8, 10);
+  let d;
+  if(p.k === 'd') d = new Date(Y, M - 1, D + n);
+  else if(p.k === 'm') d = new Date(Y, M - 1 + n, 1);
+  else d = new Date(Y + n, 0, 1);
+  const next = fmtDate(d);
+  if(n > 0 && !voyPerNext()) return;
+  voyAt = next > today() ? today() : next;
+  renderVoyage();
+}
+function voyPerNext(){
+  const r = voyPerRange(); return !!r && r.b < today();
 }
 function voyPerPick(){
   const p = voyPer(), r = voyPerRange(p) || { a: '', b: today() };
   openForm({
     title: '직접 입력',
-    fields: [ { key:'a', label:'시작일', type:'date', value: p.k === 'c' ? p.a : r.a },
-              { key:'b', label:'종료일', type:'date', value: p.k === 'c' ? p.b : r.b } ],
+    fields: [ { key:'a', label:'시작일', type:'date', value: r.a },
+              { key:'b', label:'종료일', type:'date', value: r.b } ],
     okText: '적용',
     onOk: v => {
       if(!/^\d{4}-\d{2}-\d{2}$/.test(v.a || '')){ formErr('a', '시작일을 입력해 주세요'); return false; }
@@ -34569,16 +34617,36 @@ function voyPerPick(){
     }
   });
 }
-function voyPerRow(){
-  const p = voyPer(), y = today().slice(0, 4);
-  const r = voyPerRange(p);
+// 넘기는 줄의 제목 — 달은 달력 머리 줄(calTitle)과 같은 글, 날은 각 언어의 날짜 글
+function voyPerTitle(p, r){
+  const v = (typeof calLang === 'function') ? calLang() : 'ko';
+  const Y = +r.a.slice(0, 4), M = +r.a.slice(5, 7), D = +r.a.slice(8, 10);
+  if(p.k === 'm') return calTitle(Y, M);
+  if(p.k === 'y') return tsub('{y}년', { y: Y });
+  if(p.k === 'd'){
+    const loc = { ko:'ko-KR', ja:'ja-JP', en:'en-US', ru:'ru-RU' }[v] || 'ko-KR';
+    try{ return new Date(Y, M - 1, D).toLocaleDateString(loc, { year:'numeric', month:'long', day:'numeric' }); }
+    catch(_){ return r.a; }
+  }
   const dot = d => String(d || '').replace(/-/g, '.');
+  return r.a === r.b ? dot(r.a) : dot(r.a) + ' – ' + dot(r.b);
+}
+function voyPerRow(){
+  const p = voyPer(), r = voyPerRange(p);
   const chip = (k, name) => `<button class="tab${p.k === k ? ' on' : ''}" onclick="voyPerSet('${k}')">${esc(name)}</button>`;
-  return `<div class="perrow" onscroll="this.classList.toggle('end', this.scrollLeft + this.clientWidth >= this.scrollWidth - 4)">`
-    + chip('m', t('이번 달')) + chip('y', tsub('{y}년', { y })) + chip('y1', t('1년')) + chip('y3', t('3년')) + chip('y5', t('5년'))
-    + chip('all', t('전체'))
-    + chip('c', (p.k === 'c' && r) ? dot(r.a) + ' – ' + dot(r.b) : t('직접 입력'))
+  let h = `<div class="perrow" onscroll="this.classList.toggle('end', this.scrollLeft + this.clientWidth >= this.scrollWidth - 4)">`
+    + chip('d', t('1일')) + chip('m', t('1개월')) + chip('y', t('1년')) + chip('all', t('전체')) + chip('c', t('직접 입력'))
     + `</div>`;
+  if(!r) return h;
+  const title = voyPerTitle(p, r);
+  if(p.k === 'c')   // 직접 입력은 넘기지 않는다 — 고른 기간만 보여 주고, 누르면 다시 고친다
+    return h + `<div class="calhead pernav"><button class="calym pertitle" onclick="voyPerPick()">${esc(title)}</button></div>`;
+  const 다음 = voyPerNext();
+  return h + `<div class="calhead pernav">
+      <button class="calnav" onclick="voyPerMove(-1)" aria-label="‹">‹</button>
+      <b class="calym">${esc(title)}</b>
+      <button class="calnav" onclick="voyPerMove(1)" aria-label="›"${다음 ? '' : ' disabled'}>›</button>
+      <span style="flex:1"></span></div>`;
 }
 function voyStats(){
   const y = String(new Date().getFullYear());
@@ -41337,6 +41405,11 @@ function schedDates(s, from, to){
   }
   return out;
 }
+function schedSee(){
+  const b = (typeof curBoat === 'function') ? curBoat() : null;
+  if(!b || !b.ranks || !Object.keys(b.ranks).length) return true;   // 등급을 안 쓰는 배
+  return can(b, 'sched', 'view');
+}
 function addSched(day){
   if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
   if(needPerm(MR_PERM.sched)) return;
@@ -41397,7 +41470,9 @@ function calItems(from, to){
     add(f.date, 'fuel', f.id, nm, f.time);
   });
   // ── 일정 (5.41) — 반복이면 그 기간에 걸리는 날마다 올린다
-  (Array.isArray(scheds) ? scheds : []).forEach(e => {
+  // ★ 5.43 — 등급 설정의 「일정」 이 「없음」 이면 보이지 않는다(「없음 — 화면이 보이지 않음」).
+  //   클라우드는 구성원이면 일정을 내려준다 — 한 칸이 거부되면 받아오기 전체가 멎기 때문이다(cloud.pull 은 칸을 한꺼번에 받는다).
+  (Array.isArray(scheds) && schedSee() ? scheds : []).forEach(e => {
     if(!e) return;
     const nm = String(e.title || '').trim() || t('일정');
     schedDates(e, from, to).forEach(d => add(d, 'sched', e.id, nm, e.time));
@@ -44388,6 +44463,64 @@ function ehFromPick(){
     }
   });
 }
+// ★★ 5.43 — 「총 가동시간」 이 어느 때부터의 합인지 보이게, 시작 시점도 고르게 (사장님 2026-10-06:
+//   「총가동시간도 어느 기점으로 총가동시간인데?」 → 「다른 어플들 확인해 가지고 정해 가지고 만들어라」)
+//   여태 이 칸은 「앱에 처음 기록한 때부터」 의 합(항해일지 엔진 시간 + 엔진만 가동)이었는데 화면 어디에도 그 말이 없었다.
+//   다른 것: 기아·현대 트립 컴퓨터 「누적 정보 — 초기화 시점부터 현재까지」(사람이 초기화한다) ·
+//            Fuelly — 총계 옆에 등록한 때(「Added Apr 2024」)를 적는다(조사한 앱 가운데 유일하게 시작 날짜를 보여 줌).
+//   → 칸을 누르면 「시작 시점」: 전체 · 직접 입력(시작일). 만탱크 칸(5.42)과 같은 모양.
+//     전체면 이름 「총 가동시간」 밑에 첫 기록 날 「2025-03-14부터」, 직접 입력이면 이름이 「2025-03-14 이후 가동」.
+//   ★ 보는 기준만 바꾼다 — 기록은 그대로, 정비 주기(5.29 부터 「마지막으로 한 뒤」 를 따로 센다)도 그대로.
+function ehTotKey(){ return 'bt_ehtot@' + String(currentBoatId || ''); }
+function ehTot(){
+  try{ const o = JSON.parse(localStorage.getItem(ehTotKey()) || 'null');
+       if(o && o.k === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(String(o.d || ''))) return o; }catch(_){}
+  return { k:'all' };
+}
+// 엔진 시간이 처음 적힌 날 — engineHours() 가 더하는 것과 같은 기록에서 찾는다
+function ehFirstDay(){
+  let f = '';
+  const see = d => { d = String(d || '').slice(0, 10); if(/^\d{4}-\d{2}-\d{2}$/.test(d) && (!f || d < f)) f = d; };
+  voyage.forEach(v => { if((parseFloat(v.engineH) || 0) > 0) see(v.date); });
+  runs.forEach(r => { if((parseFloat(r.hours) || 0) > 0 || (typeof runOn === 'function' && runOn(r))) see(r.date); });
+  return f;
+}
+function ehTotal(){
+  const o = ehTot();
+  if(o.k === 'date'){
+    // 정기점검의 「그 뒤 가동시간」(5.29)과 같은 셈 — 그날 0시부터의 항해일지 엔진 시간 + 엔진만 가동.
+    //   그래서 첫 기록 날을 고르면 「전체」 와 같은 값이 나온다.
+    const h = engHoursSince(o.d) || 0;
+    return { h: h > 0 ? h : 0, name: tsub('{d} 이후 가동', { d: o.d }), sub: '' };
+  }
+  const f = ehFirstDay();
+  return { h: engineHours().total, name: t('총 가동시간'), sub: f ? tsub('{d}부터', { d: f }) : '' };
+}
+function ehTotPick(){
+  const o = ehTot();
+  openForm({
+    title: '시작 시점',
+    fields: [ { key:'k', label:'', type:'pick', value: o.k,
+                options: [ { v:'all', name:'전체' }, { v:'date', name:'직접 입력' } ] } ],
+    okText: '적용',
+    onOk: v => {
+      if(v.k === 'date'){
+        setTimeout(() => openForm({
+          title: '직접 입력',
+          fields: [ { key:'d', label:'시작일', type:'date', value: o.k === 'date' ? o.d : (ehFirstDay() || today()) } ],
+          okText: '적용',
+          onOk: w => {
+            if(!/^\d{4}-\d{2}-\d{2}$/.test(w.d || '')){ formErr('d', '시작일을 입력해 주세요'); return false; }
+            try{ localStorage.setItem(ehTotKey(), JSON.stringify({ k:'date', d: w.d })); }catch(_){}
+            renderFuel();
+          } }), 0);
+        return;
+      }
+      try{ localStorage.removeItem(ehTotKey()); }catch(_){}
+      renderFuel();
+    }
+  });
+}
 function fuelSinceFull(){
   const M = fuelModel();
   let F = null;
@@ -44432,6 +44565,7 @@ function renderFuel(){
   // ★ 4.120 — 배를 띄우기 전에 쓰는 수만 남겼다. 까닭은 fuelSinceFull 위의 글에 적었다.
   const 만탱 = fuelSinceFull(), 갈시간 = fuelHoursLeft();
   const 가동 = ehSince();   // ★ 5.42 — 고른 시작 시점부터 (기본은 만탱크 후 = 만탱)
+  const 총 = ehTotal();      // ★ 5.43 — 총 가동시간: 전체(첫 기록 날 표시) 또는 고른 시작일부터
   // ★ 5.24 G — 계기판 게이지를 보는 배는 추정 칸 대신 마지막으로 본 눈금을 보여 준다.
   const 게이지 = fuelHow() === 'gauge';
   const 마지막 = M.last;
@@ -44451,7 +44585,7 @@ function renderFuel(){
     </div>
     <div class="statrow">
       <div class="stat pickstat" onclick="ehFromPick()"><b>${가동 ? statDur(durText(가동.h)) : '—'}</b><span>${esc(ehFromName())}<em>▾</em></span></div>
-      <div class="stat"><b>${statDur(durText(eh.total) || '0분')}</b><span>${esc(t('총 가동시간'))}</span></div>
+      <div class="stat pickstat" onclick="ehTotPick()"><b>${statDur(durText(총.h) || '0분')}</b><span>${esc(총.name)}<em>▾</em></span>${총.sub ? `<i class="statsub">${esc(총.sub)}</i>` : ''}</div>
     </div>
     <div class="mrnone edt" style="text-align:left;padding-top:0">${
       esc(t('L/시간과 잔량은 눌러서 수정할 수 있습니다.'))}</div>
@@ -52056,9 +52190,18 @@ window.__boot = 'start';
       async pull(base){
         const meta = await getDoc(doc(fdb, boatPath(), 'meta', 'info'));
         const colls = {};
+        // ★★ 5.44 — 권한이 없는 칸만 건너뛴다 (사장님 2026-10-06: 「권한이 없으면 없는것만 건너뛰어야지」)
+        //   여태는 열일곱 칸을 한꺼번에 받다가, 등급에서 「없음」 인 칸(기본 손님은 항해일지·연료 등) 하나를
+        //   규칙이 거부하면 받아오기 전체가 멎었다 — 볼 수 있는 적재표·게시판도 못 받았다.
+        //   거부된 칸은 rows 없이 돌려준다 → 그 칸은 기기 것을 그대로 두고(pullInto), 나머지는 정상으로 합친다.
+        //   권한 말고 다른 오류(인터넷 끊김 등)는 예전처럼 전체를 멈춘다 — 반쯤 받은 것으로 합치면 안 된다.
         await Promise.all(CO.map(async name => {
           const b = base && base[name];
-          colls[name] = b ? await diffColl(name, b) : await fullColl(name);
+          try{ colls[name] = b ? await diffColl(name, b) : await fullColl(name); }
+          catch(e){
+            if(e && e.code === 'permission-denied'){ colls[name] = { mode:'skip', rows:null }; return; }
+            throw e;
+          }
         }));
         return { seeded: meta.exists(), colls };
       },

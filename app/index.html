@@ -783,6 +783,16 @@ body.locked .lkro .permb:not(.on), body.locked .lkro .optb:not(.on){display:none
 body.locked .lkro .permb.on, body.locked .lkro .optb.on{pointer-events:none;background:none!important;border-color:transparent!important;box-shadow:none!important;color:inherit!important}
 body.locked .lkro .notisw, body.locked .notisw[data-lkro]{pointer-events:none;opacity:.45}
 body.locked .stat.tapstat{pointer-events:none;cursor:default}
+/* ★ 5.42 — 보는 기준을 고르는 칸(편집이 아니라 보기) — 보기 전용에서도 눌린다. 고르는 줄임을 ▾ 로 알린다(배 이름 「SUNSHINE ▾」 와 같은 표시). */
+.stat.pickstat{cursor:pointer}
+.stat.pickstat span{white-space:nowrap}
+.stat.pickstat span em{font-style:normal;opacity:.7;margin-left:3px}
+/* ★ 5.42 — 항해 통계 기간 (Saillogger 「All time · 해마다」 칩 + 은행 앱 「1개월·1년 … 직접입력」) — 한 줄, 옆으로 민다 */
+.perrow{display:flex;gap:6px;margin:12px 16px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.perrow::-webkit-scrollbar{display:none}
+/* 옆에 더 있다는 것을 오른쪽 끝을 흐리게 해서 알린다 — 끝까지 밀면 흐림을 뗀다 */
+.perrow:not(.end){-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
+.perrow .tab{flex:0 0 auto;padding:6px 12px;font-size:12px;white-space:nowrap}
 
 /* ============ D테마 : 새벽 바다 ============ */
 /* ★ 앞의 C테마는 이름 그대로 '연장' 이었다. 주황은 공사장의 색이고,
@@ -3221,6 +3231,9 @@ const I18N = {
     '+ 정기점검':'+ Scheduled check',
     '+ 고장':'+ Fault',
     '+ 일정':'+ Event', '일정':'Event', '제목을 입력해 주세요':'Enter a title',
+    '이번 달':'This month', '1년':'1 year', '3년':'3 years', '5년':'5 years', '시작일':'Start date', '종료일':'End date',
+    '시작일을 입력해 주세요':'Enter a start date', '종료일을 입력해 주세요':'Enter an end date',
+    '시작 시점':'Count from', '만탱크 후':'After full tank', '주유 후':'After refuel', '주유 후 가동':'Since last refuel', '{d} 이후 가동':'Since {d}',
     '+ 제품 리뷰':'+ Product review',
     '입력 필요':'To fill in',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'Select this item in a maintenance or repair record and it appears here.',
@@ -4433,7 +4446,6 @@ const I18N = {
     '항적 숨기기':'TRACK MASK',
     '가림 반경':'Hidden radius',
     '{n}해리':'{n} NM',
-    '무관':'Don\'t hide',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'For voyages with the track on, this distance around the start and finish is cut off before the track is shown. This keeps your berth hidden.',
     '계류 위치 주변은 가려져 있습니다.':'The area around the berth is hidden.',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'Entries and photos · crew names are not shared · the track can be turned on per voyage',
@@ -6827,6 +6839,9 @@ const I18N = {
     '+ 정기점검':'+ Пункт регламента',
     '+ 고장':'+ Неисправность',
     '+ 일정':'+ Мероприятие', '일정':'Мероприятие', '제목을 입력해 주세요':'Введите название',
+    '이번 달':'Этот месяц', '1년':'1 год', '3년':'3 года', '5년':'5 лет', '시작일':'Дата начала', '종료일':'Дата окончания',
+    '시작일을 입력해 주세요':'Введите дату начала', '종료일을 입력해 주세요':'Введите дату окончания',
+    '시작 시점':'Отсчёт с', '만탱크 후':'После полного бака', '주유 후':'После заправки', '주유 후 가동':'С последней заправки', '{d} 이후 가동':'С {d}',
     '+ 제품 리뷰':'+ Отзыв',
     '입력 필요':'Нужно заполнить',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'Выберите это оборудование в записи об обслуживании или ремонте — и запись появится здесь.',
@@ -8037,7 +8052,6 @@ const I18N = {
     '항적 숨기기':'СКРЫТИЕ ТРЕКА',
     '가림 반경':'Радиус скрытия',
     '{n}해리':'{n} м. миль',
-    '무관':'Не скрывать',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'На переходах с включённым треком столько вокруг начала и конца вырезается перед показом. Это скрывает место стоянки.',
     '계류 위치 주변은 가려져 있습니다.':'Область вокруг места стоянки скрыта.',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'Записи и фото; имена экипажа не публикуются; трек включается для каждого перехода отдельно',
@@ -10445,6 +10459,9 @@ const I18N = {
     '+ 고장':'+ 故障',
     // ★ 5.41 — 予定 은 「예정」(+ 예정) 이 이미 쓴다. 겹치지 않게 Apple カレンダー 「新規イベント」 의 イベント
     '+ 일정':'+ イベント', '일정':'イベント', '제목을 입력해 주세요':'タイトルを入力してください',
+    '이번 달':'今月', '1년':'1年', '3년':'3年', '5년':'5年', '시작일':'開始日', '종료일':'終了日',
+    '시작일을 입력해 주세요':'開始日を入力してください', '종료일을 입력해 주세요':'終了日を入力してください',
+    '시작 시점':'起点', '만탱크 후':'満タン後', '주유 후':'給油後', '주유 후 가동':'給油後の稼働', '{d} 이후 가동':'{d} 以降の稼働',
     '+ 제품 리뷰':'+ パーツレビュー',
     '입력 필요':'要記入',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'整備・修理の記録でこの装備を選択すると、ここに表示されます。',
@@ -11685,7 +11702,6 @@ const I18N = {
     '항적 숨기기':'航跡の非表示範囲',
     '가림 반경':'非表示の半径',
     '{n}해리':'{n}海里',
-    '무관':'隠さない',
     '항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.':'航跡をオンにした航海で、出港・入港の周囲をこの分だけ切り取って表示します。船の係留位置を隠すためのものです。',
     '계류 위치 주변은 가려져 있습니다.':'船の係留位置の周囲は隠されています。',
     '기록 내용과 사진 · 동승자는 공개되지 않음 · 항적은 항해마다 따로 켤 수 있음':'記録の内容と写真・同乗者は非公開・航跡は航海ごとに個別にオン',
@@ -15946,7 +15962,7 @@ function openForm(o){
         + `${esc(f.value||'')}</textarea></div>`;
     }
     return `<div class="frow"><label for="ff${i}">${esc(t(f.label||''))}</label>`
-      + `<input id="ff${i}" value="${esc(f.value||'')}" placeholder="${esc(t(f.placeholder||''))}"`
+      + `<input id="ff${i}"${f.type === 'date' ? ' type="date"' : ''} value="${esc(f.value||'')}" placeholder="${esc(t(f.placeholder||''))}"`
       + ` inputmode="${esc(f.mode||'text')}" autocomplete="off" enterkeyhint="done">`
       + ((f.chips && f.chips.length)
           ? `<div class="fchips">${f.chips.map(c=>
@@ -23511,7 +23527,7 @@ function trkHideRows(b){
   return `<div class="notilbl">${esc(t('항적 숨기기'))}</div>`
     + `<div class="mrrow optrow lkro"><span class="lbl">${esc(t('가림 반경'))}</span>`
     + TRK_HIDE.map(v=>`<button class="optb${cur===v?' on':''}" onclick="setTrkHide(${v})">${
-        esc(v > 0 ? tsub('{n}해리', {n:String(v)}) : t('무관'))}</button>`).join('')
+        esc(v > 0 ? tsub('{n}해리', {n:String(v)}) : t('없음'))}</button>`).join('')   // ★ 5.42 — 「무관」 은 제가 지은 말(사장님 지적). 고르는 줄의 빈 값은 Apple 캘린더 알림처럼 「없음」
     + `</div>`
     + `<div class="mrnone" style="text-align:left">${esc(
         t('항적을 켠 항해는 출발·도착 지점에서 이 반경 안의 항적을 잘라내고 표시합니다. 배의 계류 위치를 가리기 위한 것입니다.'))}</div>`;
@@ -27412,7 +27428,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.41';
+const APP_VER = '5.42';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -30429,12 +30445,14 @@ function maintSnoozed(it, now){
   return (now || new Date()) <= d;
 }
 function maintNotiToggle(){
+  if(!unlocked) return;   // ★ 5.42 — 보기 전용이면 안 된다
   const it = getMR('maint', mrOpenId); if(!it) return;
   it.noti = !maintNotiOn(it);
   if(it.noti) it.snooze = '';      // 다시 켜면 미뤄 둔 것도 푼다
   it.seed = false; saveMR(); rerender('maint'); openMR('maint', mrOpenId);
 }
 function maintSnooze(days){
+  if(!unlocked) return;   // ★ 5.42 — 보기 전용이면 안 된다
   const it = getMR('maint', mrOpenId); if(!it) return;
   const n = Number(days) || 0;
   if(n <= 0){ it.snooze = ''; }
@@ -30458,8 +30476,8 @@ function maintNotiRow(it){
           : sn ? esc(tsub('{d}까지 미뤄 둠', { d: it.snooze }))
           : esc(t('기한이 다가오면 알려 드립니다'))}</span>
       </div>
-      <button class="notisw${on?' on':''}" onclick="maintNotiToggle()" aria-pressed="${on?'true':'false'}"
-        aria-label="${esc(t('정비 · 점검 기한 알림'))}" title="${esc(t('정비 · 점검 기한 알림'))}"><span></span></button></div>`;
+      <button class="notisw edt${on?' on':''}" onclick="maintNotiToggle()" aria-pressed="${on?'true':'false'}"
+        aria-label="${esc(t('정비 · 점검 기한 알림'))}" title="${esc(t('정비 · 점검 기한 알림'))}"><span></span></button></div>`;   // ★ 5.42 — 보기 전용이면 감춘다(edt) — 배 기록 it.noti 를 바꾼다. 위 줄에 상태 글은 그대로
   if(!unlocked || !on) return head;
   return head + `<div class="mrrow" style="gap:6px;flex-wrap:wrap;padding-top:0">
       <span class="mrm" style="color:#7b8794">${esc(t('미루기'))}</span>
@@ -34506,10 +34524,67 @@ function kwHit(o, q){
   return t.split(/\s+/).every(w => hay.indexOf(w) >= 0);
 }
 function fmtNum(n){ return (Math.round(n*10)/10).toLocaleString('ko-KR'); }
+// ★★ 5.42 — 항해·거리·엔진 시간을 보는 기간을 사람이 고른다 (사장님 2026-10-06:
+//   「2026년도 것만 보는게 아니라 사용자가 월별 일별 1년 3년 5년 뭐 이런식으로 자율적으로 기간 선택해서 볼수있게」)
+//   다른 앱: Saillogger 통계 「All time」 + 해마다 칩 · Pocket Sailing Logbook 「all time and by year」 ·
+//   Apple 건강 「1일·1주·1개월·6개월·1년」 · 은행 조회 「1주·1개월·3개월·6개월·1년」 + 시작일·종료일 직접입력.
+//   → 이번 달 · 올해(2026년) · 1년 · 3년 · 5년 · 전체 · 직접 입력(시작일~종료일). 기본은 예전처럼 올해. 기기에 기억한다.
+const VOY_PER_KEY = 'bt_voyper';
+function voyPer(){
+  try{ const o = JSON.parse(localStorage.getItem(VOY_PER_KEY) || 'null');
+       if(o && /^(m|y|y1|y3|y5|all|c)$/.test(o.k)) return o; }catch(_){}
+  return { k:'y' };
+}
+// 고른 기간의 처음·끝 ('YYYY-MM-DD', 양 끝 포함). 전체면 null.
+function voyPerRange(p){
+  p = p || voyPer();
+  const td = today(), y = td.slice(0, 4);
+  const back = n => { const d = new Date(); d.setFullYear(d.getFullYear() - n); d.setDate(d.getDate() + 1); return fmtDate(d); };
+  if(p.k === 'm')  return { a: td.slice(0, 8) + '01', b: td };
+  if(p.k === 'y')  return { a: y + '-01-01', b: y + '-12-31' };
+  if(p.k === 'y1') return { a: back(1), b: td };
+  if(p.k === 'y3') return { a: back(3), b: td };
+  if(p.k === 'y5') return { a: back(5), b: td };
+  if(p.k === 'c' && /^\d{4}-\d{2}-\d{2}$/.test(String(p.a || '')) && /^\d{4}-\d{2}-\d{2}$/.test(String(p.b || '')))
+    return p.a <= p.b ? { a: p.a, b: p.b } : { a: p.b, b: p.a };
+  return null;
+}
+function voyPerSet(k){
+  if(k === 'c') return voyPerPick();
+  try{ localStorage.setItem(VOY_PER_KEY, JSON.stringify({ k })); }catch(_){}
+  renderVoyage();
+}
+function voyPerPick(){
+  const p = voyPer(), r = voyPerRange(p) || { a: '', b: today() };
+  openForm({
+    title: '직접 입력',
+    fields: [ { key:'a', label:'시작일', type:'date', value: p.k === 'c' ? p.a : r.a },
+              { key:'b', label:'종료일', type:'date', value: p.k === 'c' ? p.b : r.b } ],
+    okText: '적용',
+    onOk: v => {
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(v.a || '')){ formErr('a', '시작일을 입력해 주세요'); return false; }
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(v.b || '')){ formErr('b', '종료일을 입력해 주세요'); return false; }
+      try{ localStorage.setItem(VOY_PER_KEY, JSON.stringify({ k:'c', a: v.a, b: v.b })); }catch(_){}
+      renderVoyage();
+    }
+  });
+}
+function voyPerRow(){
+  const p = voyPer(), y = today().slice(0, 4);
+  const r = voyPerRange(p);
+  const dot = d => String(d || '').replace(/-/g, '.');
+  const chip = (k, name) => `<button class="tab${p.k === k ? ' on' : ''}" onclick="voyPerSet('${k}')">${esc(name)}</button>`;
+  return `<div class="perrow" onscroll="this.classList.toggle('end', this.scrollLeft + this.clientWidth >= this.scrollWidth - 4)">`
+    + chip('m', t('이번 달')) + chip('y', tsub('{y}년', { y })) + chip('y1', t('1년')) + chip('y3', t('3년')) + chip('y5', t('5년'))
+    + chip('all', t('전체'))
+    + chip('c', (p.k === 'c' && r) ? dot(r.a) + ' – ' + dot(r.b) : t('직접 입력'))
+    + `</div>`;
+}
 function voyStats(){
   const y = String(new Date().getFullYear());
-  // ★ 예정 항해는 아직 안 나간 것이다. 올해 항해 수에 넣으면 거짓말이 된다.
-  const arr = voyage.filter(v=>!isPlan(v) && (v.date||'').startsWith(y));
+  const r = voyPerRange();
+  // ★ 예정 항해는 아직 안 나간 것이다. 항해 수에 넣으면 거짓말이 된다.
+  const arr = voyage.filter(v=>!isPlan(v) && (!r || (String(v.date||'').slice(0,10) >= r.a && String(v.date||'').slice(0,10) <= r.b)));
   // ★ 4.130 — 안 적은 항해도 항적에서 잰 거리로 센다
   const nm = arr.reduce((s,v)=>s+voyNmNum(v),0);
   const eh = arr.reduce((s,v)=>s+(parseFloat(v.engineH)||0),0);
@@ -34594,7 +34669,7 @@ function renderVoyage(){
   migrateVoyage();
   const L = document.getElementById('voyageList');
   const st = voyStats();
-  const head = `<div class="statrow"><div class="stat"><b>${st.cnt}</b><span>${st.y} ${esc(t('항해'))}</span></div><div class="stat"><b>${fmtNum(st.nm)}</b><span>${esc(t('거리 NM'))}</span></div><div class="stat"><b>${fmtNum(st.eh)}</b><span>${esc(t('엔진 h'))}</span></div></div>`;
+  const head = voyPerRow() + `<div class="statrow"><div class="stat"><b>${st.cnt}</b><span>${esc(t('항해'))}</span></div><div class="stat"><b>${fmtNum(st.nm)}</b><span>${esc(t('거리 NM'))}</span></div><div class="stat"><b>${fmtNum(st.eh)}</b><span>${esc(t('엔진 h'))}</span></div></div>`;
   const arr = [...voyage]
     .filter(v => voyHit(v, voyQ))
     .sort(voyNewFirst);
@@ -34632,6 +34707,11 @@ function renderVoyage(){
   L.innerHTML = head + qbox + planBox + (past.map(row).join('') || (voyQ.trim()
         ? `<div class="mrnone">${esc(t('찾은 항해가 없습니다.'))}</div>`
         : `<div class="mrnone">${esc(t('기록된 항해가 없습니다. 오른쪽 아래 [+]를 눌러 시작해 보세요.'))}</div>`));
+  // ★ 5.42 — 고른 기간 칩이 화면 밖(오른쪽)에 있으면 보이게 민다
+  try{ const R = L.querySelector('.perrow'), on = R && R.querySelector('.tab.on');
+       if(R && on){ const 오른끝 = on.offsetLeft - R.offsetLeft + on.offsetWidth;
+                    R.scrollLeft = 오른끝 > R.clientWidth - 24 ? 오른끝 - R.clientWidth + 24 : 0;   // 안 보일 때만 민다
+                    R.classList.toggle('end', R.scrollLeft + R.clientWidth >= R.scrollWidth - 4); } }catch(_){}
 }
 // ── 항적 기록 칸 (앱에서, 이 항해를 기록하고 있을 때만 보인다)
 // ★ 켜졌는지 꺼졌는지 화면에 표시가 없으면, 배에서 몇 시간 뒤에야 안 그려진 걸 안다.
@@ -44141,7 +44221,8 @@ function fuelEditLph(){
     });
   });
 }
-function fuelClearLph(){ fuelSetPut({ lph: null }); }
+// ★ 5.42 — 보기 전용이면 안 된다 (사장님 「이 두버튼은 왜 보기전용인데 안사라지냐?」). 단추는 edt 로 감추고, 함수도 막는다.
+function fuelClearLph(){ if(!unlocked) return; fuelSetPut({ lph: null }); }
 function fuelEditLeft(){
   if(!needEdit || typeof needEdit !== 'function') return;
   needEdit('현재 잔량을 입력합니다.', ()=>{
@@ -44181,6 +44262,7 @@ function fuelEditLeft(){
 }
 // 「앱이 셈한 값으로」 — 지금 셈이 기대는 잔량 확인을 치운다 (휴지통으로, 되돌릴 수 있다)
 function fuelClearMark(){
+  if(!unlocked) return;   // ★ 5.42 — 보기 전용이면 안 된다
   const mk = fuelMark();
   if(!mk) return;
   if(mk.legacy){ fuelSetPut({ mark: null }); return; }
@@ -44249,6 +44331,63 @@ function fuelStats(){
 // 마지막 만탱크 뒤로 엔진을 몇 시간 돌렸나 (없으면 null)
 // ★ fuelLeft 의 since 와 다르다 — 그쪽은 사람이 「지금 잔량」 을 적었으면 그때부터 센다.
 //   이 칸은 이름 그대로 **만탱크 뒤**라야 한다. 이름과 다른 수를 보여 주면 안 된다.
+// ★★ 5.42 — 이 칸을 어느 때부터 셀지 사람이 고른다 (사장님 2026-10-06:
+//   「만탱크후 가동도 자기가 어느시점부터 가동했는지 보고 싶은 사람들도 있어서 알아서 볼수 있게 해라」)
+//   다른 것: 기아 트립 컴퓨터 「주유 후 정보(주유 시점부터)」·「누적 정보(초기화 시점부터)」, 평균 연비 기준 고르기
+//   (재시동 후·주유 후·누적) · 테슬라 「마지막 충전 이후」·트립 미터 초기화.
+//   → 만탱크 후(기본) · 주유 후(마지막 주유부터) · 직접 입력(시작일). 보는 기준이라 기기에 기억하고, 보기 전용에서도 고른다.
+function ehFromKey(){ return 'bt_ehfrom@' + String(currentBoatId || ''); }
+function ehFrom(){
+  try{ const o = JSON.parse(localStorage.getItem(ehFromKey()) || 'null');
+       if(o && (o.k === 'fuel' || (o.k === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(String(o.d || ''))))) return o; }catch(_){}
+  return { k:'full' };
+}
+function ehFromName(o){
+  o = o || ehFrom();
+  if(o.k === 'fuel') return t('주유 후 가동');
+  if(o.k === 'date') return tsub('{d} 이후 가동', { d: o.d });
+  return t('만탱크 후 가동');
+}
+// 고른 때부터 엔진을 몇 시간 돌렸나 — 만탱크 후는 예전 그대로(fuelSinceFull)
+function ehSince(){
+  const o = ehFrom();
+  if(o.k === 'full') return fuelSinceFull();
+  const M = fuelModel();
+  let ms = null, date = '';
+  if(o.k === 'fuel'){
+    fuelEvents(M.uses).forEach(ev => { if(ev.kind === 'full' || ev.kind === 'part'){ ms = ev.ms; date = String((ev.rec && ev.rec.date) || ev.date || ''); } });
+  } else {
+    const d = new Date(o.d + 'T00:00:00'); if(!isNaN(d)){ ms = d.getTime(); date = o.d; }
+  }
+  if(ms == null) return null;
+  const h = M.H(ms, M.now).all;
+  return (h >= 0) ? { h, date, added: 0 } : null;
+}
+function ehFromPick(){
+  const o = ehFrom();
+  openForm({
+    title: '시작 시점',
+    fields: [ { key:'k', label:'', type:'pick', value: o.k,
+                options: [ { v:'full', name:'만탱크 후' }, { v:'fuel', name:'주유 후' }, { v:'date', name:'직접 입력' } ] } ],
+    okText: '적용',
+    onOk: v => {
+      if(v.k === 'date'){
+        setTimeout(() => openForm({
+          title: '직접 입력',
+          fields: [ { key:'d', label:'시작일', type:'date', value: o.k === 'date' ? o.d : today() } ],
+          okText: '적용',
+          onOk: w => {
+            if(!/^\d{4}-\d{2}-\d{2}$/.test(w.d || '')){ formErr('d', '시작일을 입력해 주세요'); return false; }
+            try{ localStorage.setItem(ehFromKey(), JSON.stringify({ k:'date', d: w.d })); }catch(_){}
+            renderFuel();
+          } }), 0);
+        return;
+      }
+      try{ localStorage.setItem(ehFromKey(), JSON.stringify({ k: v.k === 'fuel' ? 'fuel' : 'full' })); }catch(_){}
+      renderFuel();
+    }
+  });
+}
 function fuelSinceFull(){
   const M = fuelModel();
   let F = null;
@@ -44292,6 +44431,7 @@ function renderFuel(){
   const 손 = on => on ? `<i class="mine">${esc(t('직접 입력'))}</i>` : '';
   // ★ 4.120 — 배를 띄우기 전에 쓰는 수만 남겼다. 까닭은 fuelSinceFull 위의 글에 적었다.
   const 만탱 = fuelSinceFull(), 갈시간 = fuelHoursLeft();
+  const 가동 = ehSince();   // ★ 5.42 — 고른 시작 시점부터 (기본은 만탱크 후 = 만탱)
   // ★ 5.24 G — 계기판 게이지를 보는 배는 추정 칸 대신 마지막으로 본 눈금을 보여 준다.
   const 게이지 = fuelHow() === 'gauge';
   const 마지막 = M.last;
@@ -44310,7 +44450,7 @@ function renderFuel(){
         <span>${esc(t('L/시간'))}${손(!!내lph)}</span></div>
     </div>
     <div class="statrow">
-      <div class="stat"><b>${만탱 ? statDur(durText(만탱.h)) : '—'}</b><span>${esc(t('만탱크 후 가동'))}</span></div>
+      <div class="stat pickstat" onclick="ehFromPick()"><b>${가동 ? statDur(durText(가동.h)) : '—'}</b><span>${esc(ehFromName())}<em>▾</em></span></div>
       <div class="stat"><b>${statDur(durText(eh.total) || '0분')}</b><span>${esc(t('총 가동시간'))}</span></div>
     </div>
     <div class="mrnone edt" style="text-align:left;padding-top:0">${
@@ -44360,7 +44500,7 @@ function renderFuel(){
   if(내lph)
     notes.push(esc(tsub('L/시간을 {v}로 입력하셨습니다.', { v: 내lph.toFixed(1) }))
       + (rate ? ' ' + esc(tsub('앱 계산값은 {v}입니다.', { v: rate.avg.toFixed(1) })) : '')
-      + ` <button class="minib blu" style="vertical-align:middle" onclick="fuelClearLph()">${
+      + ` <button class="minib blu edt" style="vertical-align:middle" onclick="fuelClearLph()">${
           esc(t('계산값으로 되돌리기'))}</button>`);
   else if(rate){
     notes.push(esc(tsub('만탱크 주유·잔량 확인 사이에 실제로 사용한 연료를 그 기간의 엔진 가동 시간으로 나눈 값입니다. 최근 {n}개 구간: {v} L/h.',
@@ -44385,7 +44525,7 @@ function renderFuel(){
           : '잔량은 {d}에 입력하신 {L}L에서 이후 {h}시간 가동한 사용량을 뺀 값입니다.',
         { d: ((left.from || '—') + (left.time ? ' ' + left.time : '')), L: Math.round(내잔 ? 내잔.left : 0),
           a: fmtNum(left.added || 0), h: left.since.toFixed(1) }))
-      + ` <button class="minib blu" style="vertical-align:middle" onclick="fuelClearMark()">${
+      + ` <button class="minib blu edt" style="vertical-align:middle" onclick="fuelClearMark()">${
           esc(t('계산값으로 되돌리기'))}</button>`);
   else if(left)
     notes.push(esc(tsub('잔량은 {d} 만탱크 이후 {h}시간 가동을 기준으로 추정한 값입니다. 실제 잔량은 연료 게이지로 확인해 주세요.',

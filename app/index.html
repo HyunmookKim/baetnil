@@ -3220,6 +3220,7 @@ const I18N = {
     '+ 정비수첩':'+ Maintenance log',
     '+ 정기점검':'+ Scheduled check',
     '+ 고장':'+ Fault',
+    '+ 일정':'+ Event', '일정':'Event', '제목을 입력해 주세요':'Enter a title',
     '+ 제품 리뷰':'+ Product review',
     '입력 필요':'To fill in',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'Select this item in a maintenance or repair record and it appears here.',
@@ -6825,6 +6826,7 @@ const I18N = {
     '+ 정비수첩':'+ Журнал работ',
     '+ 정기점검':'+ Пункт регламента',
     '+ 고장':'+ Неисправность',
+    '+ 일정':'+ Мероприятие', '일정':'Мероприятие', '제목을 입력해 주세요':'Введите название',
     '+ 제품 리뷰':'+ Отзыв',
     '입력 필요':'Нужно заполнить',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'Выберите это оборудование в записи об обслуживании или ремонте — и запись появится здесь.',
@@ -10441,6 +10443,8 @@ const I18N = {
     '+ 정비수첩':'+ 整備手帳',
     '+ 정기점검':'+ 定期点検',
     '+ 고장':'+ 故障',
+    // ★ 5.41 — 予定 은 「예정」(+ 예정) 이 이미 쓴다. 겹치지 않게 Apple カレンダー 「新規イベント」 의 イベント
+    '+ 일정':'+ イベント', '일정':'イベント', '제목을 입력해 주세요':'タイトルを入力してください',
     '+ 제품 리뷰':'+ パーツレビュー',
     '입력 필요':'要記入',
     '정비·수리 기록에서 이 장비를 선택하면 여기에 표시됩니다.':'整備・修理の記録でこの装備を選択すると、ここに表示されます。',
@@ -19480,7 +19484,7 @@ function createBoat(){
   if(!first){
     // 두 번째 이후의 배는 빈 기록으로 시작한다
     currentBoatId = nb.id; window.currentBoatId = currentBoatId;
-    items=[]; trash=[]; repair=[]; voyage=[]; fuel=[]; runs=[]; vdocs=[]; mrTrash=[];
+    items=[]; trash=[]; repair=[]; voyage=[]; fuel=[]; runs=[]; vdocs=[]; mrTrash=[]; scheds=[];
     maint = maintDefaults();      // 선종에 맞는 기본 정비 항목
     contacts = contactDefaults();
     checkt = checkDefaults();
@@ -24839,7 +24843,7 @@ async function rejectJoin(inviteId){
 // 한 척의 기록이 어느 저장 칸에 흩어져 있는지 한곳에 적어 둔다.
 // 여기서 빠지면 지운 배의 기록이 기기에 남는다.
 const BOAT_DATA = ['all','trash','maint','repair','voyage','fuel','runs',
-                   'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews'];
+                   'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews','scheds'];
 function boatKeys(id){
   return BOAT_DATA.map(n => n + '@' + id);
 }
@@ -25875,6 +25879,7 @@ async function loadBoatData(){
   shapes  = await get('shapes', []);
   posts   = await get('posts', []);
   reviews = await get('reviews', []);
+  scheds  = await get('scheds', []);
   seedLockersIfNeeded();
   { const _dg = await get('dgimgs', []); dgImgs = dgFromArr(_dg); dgSmall = dgSmallFromArr(_dg);
     dgRef = dgRefFromArr(_dg); dgPub = dgPubFromArr(_dg); }
@@ -25940,6 +25945,7 @@ async function initStorage(){
     try{ shapes = JSON.parse(localStorage.getItem('bt_shapes')||'[]'); }catch(_){ shapes=[]; }
     try{ posts = JSON.parse(localStorage.getItem('bt_posts')||'[]'); }catch(_){ posts=[]; }
     try{ reviews = JSON.parse(localStorage.getItem('bt_reviews')||'[]'); }catch(_){ reviews=[]; }
+    try{ scheds = JSON.parse(localStorage.getItem('bt_scheds')||'[]'); }catch(_){ scheds=[]; }
     seedLockersIfNeeded();
     try{ const _dg = JSON.parse(localStorage.getItem('bt_dgimgs')||'[]');
       dgImgs = dgFromArr(_dg); dgSmall = dgSmallFromArr(_dg);
@@ -25987,6 +25993,7 @@ function saveLocal(){
     idbSet(bkey('shapes'), shapes).catch(e=>{});
     idbSet(bkey('posts'), posts).catch(e=>{});
     idbSet(bkey('reviews'), reviews).catch(e=>{});
+    idbSet(bkey('scheds'), scheds).catch(e=>{});
     idbSet(bkey('dgimgs'), dgArr()).catch(e=>{});
     idbSet('boats', boats).catch(e=>{});
     idbSet('curboat', currentBoatId).catch(e=>{});
@@ -26007,6 +26014,7 @@ function saveLocal(){
       localStorage.setItem('bt_checkt', JSON.stringify(checkt));
       localStorage.setItem('bt_mrtrash', JSON.stringify(mrTrash));
       localStorage.setItem('bt_reviews', JSON.stringify(reviews));
+      localStorage.setItem('bt_scheds', JSON.stringify(scheds));
       localStorage.setItem(lk('lockers'), JSON.stringify(lockers));
       localStorage.setItem('bt_dgimgs', JSON.stringify(dgArr()));
     }
@@ -26135,6 +26143,7 @@ let lastCloudDG = {};
 let lastCloudSH = {};
 let lastCloudPO = {};
 let lastCloudRV = {};
+let lastCloudSC = {};   // 5.41 일정
 let lastPushErr = null;
 let pushErrShown = false;
 let cloudSeeded = false;   // 클라우드에 이 배의 자료가 있는가 (meta/info 존재)
@@ -26308,7 +26317,7 @@ function gonePrune(){
 }
 function deadIds(coll){
   const s = new Set();
-  const KIND = { maint:['maint','gear','mlog'], repair:['repair'], reviews:['review'],
+  const KIND = { maint:['maint','gear','mlog'], repair:['repair'], reviews:['review'], scheds:['sched'],
                  voyage:['voyage'], fuel:['fuel'], runs:['run'], contacts:['contact'],
                  vdocs:['vdoc'], checkt:['check'] };
   const ks = KIND[coll];
@@ -26533,7 +26542,7 @@ const SYNC_BASE_KEY = 'bt_sbase_';
 //   자동으로 도는 주기는 길게 잡는다.
 const SYNC_FULL_MS = 6048e5;   // 7일
 const SYNC_COLLS = ['items','trash','maint','repair','voyage','fuel','runs','contacts',
-                    'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews'];
+                    'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews','scheds'];
 function localColl(k){
   switch(k){
     case 'items':    return items;
@@ -26551,6 +26560,7 @@ function localColl(k){
     case 'shapes':   return shapes;
     case 'posts':    return posts;
     case 'reviews':  return reviews;
+    case 'scheds':   return scheds;
     case 'dgimgs':   return (typeof dgArr === 'function') ? dgArr() : [];
   }
   return [];
@@ -26632,6 +26642,7 @@ async function cloudPull(){
   r.checkt = g('checkt'); r.mrtrash = g('mrtrash'); r.lockers = g('lockers');
   r.shapes = g('shapes'); r.posts = g('posts'); r.dgimgs = g('dgimgs');
   r.reviews = g('reviews');
+  r.scheds  = g('scheds');
   // ★★★ 휴지통을 **먼저** 합친다 (4.87).
   //   지운 것은 휴지통에 남고, 그 휴지통이 「되살리지 마라」 는 표가 된다(deadIds).
   //   그런데 휴지통을 나중에 합치면, 다른 기기에서 지운 것이 이번 받아오기에 실려 와도
@@ -26655,6 +26666,7 @@ async function cloudPull(){
   shapes   = pullInto('shapes',   r.shapes);
   posts    = pullInto('posts',    r.posts);
   reviews  = pullInto('reviews',  r.reviews);
+  scheds   = pullInto('scheds',   r.scheds);
   // 정비 휴지통은 빈 것도 뜻이 있다 — 다 비웠다는 뜻이다
   if(Array.isArray(r.dgimgs) && r.dgimgs.length){
     const dg = keepMine('dgimgs', r.dgimgs);
@@ -26676,13 +26688,14 @@ async function cloudPull(){
   lastCloudSH = snapOf(Array.isArray(r.shapes)? r.shapes : []);
   lastCloudPO = snapOf(Array.isArray(r.posts)? r.posts : []);
   lastCloudRV = snapOf(Array.isArray(r.reviews)? r.reviews : []);
+  lastCloudSC = snapOf(Array.isArray(r.scheds)? r.scheds : []);
   lastCloudDG = snapOf(Array.isArray(r.dgimgs)? r.dgimgs : []);
   // ★ 자국 갱신 — 「이 줄들은 클라우드와 같다」.
   //   안 온 칸은 지난 자국을 그대로 둔다. 자국을 비워 버리면 다른 기기에서 지운 것이
   //   영영 안 지워지고 되살아난다.  (적재표·휴지통은 아래 seeded 갈래에서 따로 찍는다)
   const PULLED = { maint:r.maint, repair:r.repair, voyage:r.voyage, fuel:r.fuel, runs:r.runs,
     contacts:r.contacts, vdocs:r.vdocs, checkt:r.checkt, mrtrash:r.mrtrash, lockers:r.lockers,
-    shapes:r.shapes, posts:r.posts, reviews:r.reviews, dgimgs:r.dgimgs };
+    shapes:r.shapes, posts:r.posts, reviews:r.reviews, scheds:r.scheds, dgimgs:r.dgimgs };
   SYNC_COLLS.forEach(k => {
     if(Array.isArray(PULLED[k])) cloudMark[k] = markFromSnap(snapOf(PULLED[k]));
   });
@@ -26846,7 +26859,7 @@ async function cloudSeedCheck(){
   // 물품만 보면 안 된다. 정비·항해일지·체크리스트만 있는 배도 올려야 한다.
   const n = items.length + trashShown().length + maint.length + repair.length + voyage.length
           + fuel.length + runs.length + contacts.length + vdocs.length + checkt.length
-          + lockers.length + shapes.length + posts.length + reviews.length;
+          + lockers.length + shapes.length + posts.length + reviews.length + scheds.length;
   if(!n) return;
   if(!await ask(t('클라우드에 이 배의 자료가 없습니다.') + '\n\n'
     + tsub('이 기기의 기록 {n}건을 올릴까요?', {n:n}) + '\n'
@@ -26911,12 +26924,13 @@ const COLL_NAME = {
   items:t('물품'), trash:t('휴지통'), lockers:t('수납칸'), shapes:t('도형'), dgimgs:t('도면 사진'),
   maint:t('정기점검'), repair:t('수리목록'), mrtrash:t('정비 휴지통'), voyage:t('항해일지'),
   fuel:t('연료 기록'), runs:t('엔진 가동'), contacts:t('연락처'), vdocs:t('문서'),
-  checkt:t('출항 전 점검'), posts:t('게시판'), reviews:t('제품 리뷰'), meta:t('배 정보')
+  checkt:t('출항 전 점검'), posts:t('게시판'), reviews:t('제품 리뷰'), scheds:t('일정'), meta:t('배 정보')
 };
 const COLL_PERM = {
   items:'stow', trash:'stow',
   lockers:'diagram', shapes:'diagram', dgimgs:'diagram',
   maint:'maint', repair:'maint', mrtrash:'maint', reviews:'maint',
+  scheds:'boat',   // ★ 5.41 — 클라우드 규칙의 「위에 없는 컬렉션」 문(배 정보 쓰기)과 같게. 어긋나면 올리다 거부당한다.
   voyage:'voyage',
   fuel:'fuel', runs:'fuel',
   contacts:'contact', vdocs:'contact',
@@ -27008,6 +27022,8 @@ async function pushNow(){
     const [setPO,delPO] = diff(curPO, lastCloudPO);
     const curRV = snapOf(reviews);
     const [setRV,delRV] = diff(curRV, lastCloudRV);
+    const curSC = snapOf(scheds);
+    const [setSC,delSC] = diff(curSC, lastCloudSC);
     const curDG = snapOf(dgArr());
     const [setDG,delDG] = diff(curDG, lastCloudDG);
     // 보낼 것을 한곳에 모은다.
@@ -27017,7 +27033,7 @@ async function pushNow(){
     const payload = {setI, delI, setT, delT, setM, delM, setR, delR,
                      setV, delV, setF, delF, setC, delC, setD, delD, setK, delK, setMT, delMT,
                      setRN, delRN, setL, delL, setDG, delDG, setSH, delSH, setPO, delPO,
-                     setRV, delRV};
+                     setRV, delRV, setSC, delSC};
     // ★ 내 등급으로 못 쓰는 컬렉션은 아예 빼고 보낸다.
     //   보내 봐야 거부당할 뿐 아니라, 같은 배치에 실린 것까지 함께 막힌다.
     const KEYOF = { setI:'items', delI:'items', setT:'trash', delT:'trash',
@@ -27027,7 +27043,7 @@ async function pushNow(){
       setK:'checkt', delK:'checkt', setMT:'mrtrash', delMT:'mrtrash',
       setL:'lockers', delL:'lockers', setSH:'shapes', delSH:'shapes',
       setDG:'dgimgs', delDG:'dgimgs', setPO:'posts', delPO:'posts',
-      setRV:'reviews', delRV:'reviews' };
+      setRV:'reviews', delRV:'reviews', setSC:'scheds', delSC:'scheds' };
     const skipped = new Set();
     for(const k in payload){
       const coll = KEYOF[k];
@@ -27077,6 +27093,7 @@ async function pushNow(){
       if(ok('dgimgs'))   { lastCloudDG = curDG;     markSet('dgimgs', curDG); }
       if(ok('posts'))    { lastCloudPO = curPO;     markSet('posts', curPO); }
       if(ok('reviews'))  { lastCloudRV = curRV;     markSet('reviews', curRV); }
+      if(ok('scheds'))   { lastCloudSC = curSC;     markSet('scheds', curSC); }
       cloudSeeded = true;
       if(res && res.failed && res.failed.length){
         // 어느 것이 막혔는지 이름을 말해 준다. '알 수 없는 오류' 는 아무 도움이 안 된다.
@@ -27395,7 +27412,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.40';
+const APP_VER = '5.41';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -29079,7 +29096,8 @@ const TRASH_GRP = {
   mlog:'maint', repair:'maint', fuel:'maint', run:'maint',
   voyage:'voyage',
   vdoc:'docs', contact:'docs',
-  check:'check'
+  check:'check',
+  sched:'cal'     // 5.41 일정 — 달력에서 만든다
 };
 const TRASH_GRPS = [
   { k:'stow',   n:'적재표' },
@@ -29087,7 +29105,8 @@ const TRASH_GRPS = [
   { k:'gear',   n:'장비' },
   { k:'voyage', n:'항해일지' },
   { k:'docs',   n:'문서' },
-  { k:'check',  n:'체크리스트' }
+  { k:'check',  n:'체크리스트' },
+  { k:'cal',    n:'달력' }
 ];
 const trashGrpName = k => (TRASH_GRPS.find(x => x.k === k) || {}).n || '';
 
@@ -30067,7 +30086,7 @@ async function backupData(){
     boat: curBoat(), boats: boats,
     items:items, trash:trash, maint:maint, repair:repair, voyage:voyage,
     fuel:fuel, runs:runs, contacts:contacts, vdocs:vdocs, checkt:checkt, mrtrash:mrTrash,
-    lockers:lockers, shapes:shapes, posts:posts, reviews:reviews, dgimgs:dgArr(),
+    lockers:lockers, shapes:shapes, posts:posts, reviews:reviews, scheds:scheds, dgimgs:dgArr(),
     // ★ 5.6 — 날씨·물때 지점도 함께 담는다 (사장님 지적).
     //   폰을 바꾸면 찍어 둔 바다를 하나하나 다시 찍어야 했다.
     spots: (typeof wxSpots !== 'undefined' && Array.isArray(wxSpots)) ? wxSpots : [],
@@ -30156,6 +30175,7 @@ function restoreData(ev){
       if(Array.isArray(data.checkt) && data.checkt.length) checkt = data.checkt;
       if(Array.isArray(data.mrtrash)) mrTrash = data.mrtrash;
       if(Array.isArray(data.reviews)) reviews = data.reviews;
+      if(Array.isArray(data.scheds)) scheds = data.scheds;
       // ★ 5.6 — 날씨·물때 지점.
       //   빈 배열로 덮어쓰지 않는다 — 옛 백업에는 이 칸이 아예 없다.
       if(Array.isArray(data.spots) && data.spots.length){
@@ -30640,7 +30660,7 @@ function mStatus(it){
 }
 // ★ 장비는 maint 배열에 함께 산다. 그래도 갈래 이름은 따로 둔다 —
 //   갈래가 'maint' 이면 창을 다시 그릴 때 정비 목록을 그리려 들어 장비 화면이 안 바뀐다.
-const DS = {maint:()=>maint, gear:()=>maint, mlog:()=>maint, review:()=>reviews, repair:()=>repair, voyage:()=>voyage, fuel:()=>fuel, run:()=>runs, contact:()=>contacts, vdoc:()=>vdocs};
+const DS = {sched:()=>scheds, maint:()=>maint, gear:()=>maint, mlog:()=>maint, review:()=>reviews, repair:()=>repair, voyage:()=>voyage, fuel:()=>fuel, run:()=>runs, contact:()=>contacts, vdoc:()=>vdocs};
 const getMR = (t,id) => (DS[t]?DS[t]():[]).find(x=>String(x.id)===String(id));
 function rerender(kind){
   if(kind==='gear' || kind==='review') renderGearWrap();
@@ -30650,6 +30670,7 @@ function rerender(kind){
   else if(kind==='voyage') renderVoyage();
   else if(kind==='fuel'||kind==='run') renderFuel();
   else if(kind==='contact'||kind==='vdoc') renderContacts();
+  else if(kind==='sched'){ if(typeof renderCal === 'function') renderCal(); }
 }
 // ══════════════════════════════════════════════════════════════════
 // ★★★ 5.5 — 기록을 저장하면 **밖에 내보내는 사본도 같이 다시 만든다**
@@ -32251,7 +32272,7 @@ function openMR(kind, id){
   if(dl) dl.innerHTML = allGrps().map(g=>`<option value="${esc(g)}">`).join('');
   const P = document.getElementById('mrPanel');
   const TITLES = {maint:t('정기점검'), gear:t('장비'), mlog:t('정비수첩'), review:t('제품 리뷰'), repair:t('수리목록'),
-                  voyage:t('항해일지'), fuel:t('연료 기록'), run:t('엔진 가동'), contact:t('연락처'), vdoc:t('문서')};   // ★ 5.30 — run 이 빠져 엔진 가동 창 제목이 「뱃일」 로 나왔다
+                  voyage:t('항해일지'), fuel:t('연료 기록'), run:t('엔진 가동'), contact:t('연락처'), vdoc:t('문서'), sched:t('일정')};   // ★ 5.30 — run 이 빠져 엔진 가동 창 제목이 「뱃일」 로 나왔다
   // ★ 4.95 — 항해일지는 사진이 자리마다 붙는다. 맨 아래 칸은 「이 항해 사진」 으로
   //   도착 밑에 올라갔다(사장님이 정하신 것). 여기에 또 두면 같은 칸이 둘이 된다.
   const hasPhotos = (kind==='maint'||kind==='gear'||kind==='mlog'||kind==='review'||kind==='repair'||kind==='vdoc');
@@ -32516,6 +32537,16 @@ function openMR(kind, id){
           ${it.email?`<a class="mrbtn" style="text-decoration:none" href="mailto:${esc(it.email)}">${esc(t('메일 쓰기'))}</a>`:''}
           ${it.site?`<a class="mrbtn" style="text-decoration:none" href="${esc(it.site)}" target="_blank" rel="noopener">${esc(t('사이트 열기'))}</a>`:''}
         </div>`:'');
+  } else if(kind==='sched'){
+    // ★ 5.41 — 구글 캘린더 「일정」 과 같은 칸: 제목·날짜·시각·반복(+ 아래 메모). 완료 표시는 없다(사장님).
+    body = tf('제목','title',it.title)
+      + tf('날짜','date',it.date,'date','')
+      + hmRow('시각', it.time, "v => mrField('time', v)")
+      + `<div class="mrrow"><span class="mrlbl">${esc(t('반복'))}</span>${unlocked
+          ?`<select onchange="mrField('rep',this.value)" style="flex:1">${
+              SCHED_REP.map(x=>`<option value="${x.v}"${String(it.rep||'')===x.v?' selected':''}>${esc(t(x.n))}</option>`).join('')
+            }</select>`
+          :`<b class="mrv">${esc(t(schedRepName(it.rep)))}</b>`}</div>`;
   } else if(kind==='vdoc'){
     // ★ 만료일은 필수가 아니다. 안 적으면 예전처럼 그냥 사진첩이다.
     const dd = vdocDue(it);
@@ -32679,6 +32710,7 @@ function mrNeedTitle(kind, it){
   if(!it) return null;
   if(kind === 'repair' && !String(it.title || '').trim()) return { key:'title', msg:'내용을 입력해 주세요' };
   if(kind === 'maint' && !String(it.name || '').trim()) return { key:'name', msg:'점검 항목을 입력해 주세요' };
+  if(kind === 'sched' && !String(it.title || '').trim()) return { key:'title', msg:'제목을 입력해 주세요' };
   return null;
 }
 function mrTitleErr(f){
@@ -32821,7 +32853,7 @@ async function mrDelete(){
 // 기록 갈래마다 어느 권한을 봐야 하나 — 여기 한 곳에서만 정한다
 const MR_PERM = { maint:'maint', repair:'maint', mlog:'maint', gear:'maint', review:'maint',
                   voyage:'voyage', fuel:'fuel', run:'fuel',
-                  contact:'contact', vdoc:'contact', check:'check' };
+                  contact:'contact', vdoc:'contact', check:'check', sched:'boat' };
 function mrTrashName(e){
   const d=e.data||{};
   return (e.kind==='gear' ? gearLabel(d) : e.kind==='mlog' ? mlogTitle(d) : (e.kind==='review' ? rvTitle(d) : '')) || d.name || d.title || d.label || (e.kind==='voyage'? voyName(d) : e.kind==='fuel'?(d.kind==='level' ? ((d.date||'')+' '+t('잔량 확인')+' '+(d.level==null?'?':d.level)+'L') : ((d.date||'')+' 주유 '+(d.liters||'?')+'L')) : e.kind==='run'?((d.date||'')+' 엔진 '+(d.hours||'?')+'h') : '항목');
@@ -32832,6 +32864,7 @@ function mrRestore(tid){
   if(isGone(e) || !e.data) return;          // 완전삭제한 표다 — 되살릴 속이 없다
   if(e.kind==='maint' || e.kind==='gear' || e.kind==='mlog') maint.push(e.data);
   else if(e.kind==='review') reviews.push(e.data);
+  else if(e.kind==='sched') scheds.push(e.data);
   else if(e.kind==='repair') repair.push(e.data);
   else if(e.kind==='voyage') voyage.push(e.data);
   else if(e.kind==='fuel') fuel.push(e.data);
@@ -33492,8 +33525,11 @@ function mrMapClick(e){
 let voyage=[], fuel=[], runs=[], contacts=[], vdocs=[], checkt=[];
 // 부품 사용기 — 「이 물건을 써 보니 어떻더라」. 배마다 따로 산다.
 let reviews=[];
+// ★ 5.41 — 일정 (사장님: 「청소 … 내가 멋대로 추가하고 싶은 거는 아예 추가를 못 하게 되어 있네」 → 「그냥 일정이라고 해라」 · 「완료표시는 없이해라」).
+//   구글 캘린더 「일정」 과 같은 칸 — 제목·날짜·시각·반복·메모. 완료 표시는 없다.
+let scheds=[];
 let mrTrash=[];
-const KIND_LABEL = {maint:t('정기점검'), gear:t('장비'), mlog:t('정비수첩'), review:t('제품 리뷰'), repair:t('수리'), voyage:t('항해일지'), fuel:t('연료'), contact:t('연락처'), vdoc:t('문서'), check:t('체크항목')};
+const KIND_LABEL = {sched:t('일정'), maint:t('정기점검'), gear:t('장비'), mlog:t('정비수첩'), review:t('제품 리뷰'), repair:t('수리'), voyage:t('항해일지'), fuel:t('연료'), contact:t('연락처'), vdoc:t('문서'), check:t('체크항목')};
 // ★★★ 4.102 — 긴급 연락처는 **그 배가 있는 나라의 것**을 준다 (사장님이 정하신 것 14)
 //
 //   사장님 말씀: 「내가 지금 모든 사람이 다 쓸 수 있는 범용 어플을 만들고 있는데」
@@ -41167,8 +41203,67 @@ const CAL_KINDS = {
   repairDone: { c:'#5FB894', n:'수리일' },
   vdoc:       { c:'#C4574B', n:'문서' },
   // ★ 5.27 — 사장님: 「달력에 기름 넣은건 안나오네」 → 「주유만 넣어라」. 잔량 확인·엔진 가동은 안 올린다.
-  fuel:       { c:'#A98BD6', n:'주유' }
+  fuel:       { c:'#A98BD6', n:'주유' },
+  // ★ 5.41 — 일정 (사장님: 「그냥 일정이라고 해라」)
+  sched:      { c:'#8E9AAB', n:'일정' }
 };
+
+// ── 일정 (5.41) ───────────────────────────────────────────────
+// 반복은 구글 캘린더와 같은 갈래만 둔다: 반복 안 함 · 매일 · 매주 · 매월 · 매년.
+const SCHED_REP = [ { v:'', n:'반복 안 함' }, { v:'d', n:'매일' }, { v:'w', n:'매주' },
+                    { v:'m', n:'매월' }, { v:'y', n:'매년' } ];
+function schedRepName(v){ const x = SCHED_REP.find(o => o.v === String(v || '')); return x ? x.n : '반복 안 함'; }
+// 그 기간(양 끝 포함)에 걸리는 날짜들. ★ 날짜는 'YYYY-MM-DD' 글자로만 셈한다 — Date 로 오가면 시간대 때문에 하루가 밀린다.
+//   매월 31일·매년 2월 29일처럼 그날이 없는 달(해)은 건너뛴다(구글 캘린더와 같다).
+function schedDates(s, from, to){
+  const out = [];
+  const d0 = String((s && s.date) || '').slice(0, 10);
+  const m0 = d0.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m0) return out;
+  const rep = String((s && s.rep) || '');
+  const lo = (from && from > d0) ? from : d0;
+  const hi = to || d0;
+  if(hi < lo) return out;
+  if(!rep){ if(d0 >= lo && d0 <= hi) out.push(d0); return out; }
+  const p = n => String(n).padStart(2, '0');
+  const ymd = (y, m, d) => y + '-' + p(m) + '-' + p(d);
+  const Y = +m0[1], M = +m0[2], D = +m0[3];
+  const days = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+  if(rep === 'd' || rep === 'w'){
+    const step = rep === 'd' ? 1 : 7;
+    const t0 = Date.UTC(Y, M - 1, D), tl = Date.UTC(+lo.slice(0,4), +lo.slice(5,7) - 1, +lo.slice(8,10));
+    let k = Math.max(0, Math.ceil((tl - t0) / 864e5 / step));
+    for(let n = 0; n < 400; n++, k++){
+      const x = new Date(t0 + k * step * 864e5);
+      const ds = ymd(x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate());
+      if(ds > hi) break; if(ds >= lo) out.push(ds);
+    }
+    return out;
+  }
+  if(rep === 'm'){
+    let y = +lo.slice(0, 4), m = +lo.slice(5, 7);
+    for(let n = 0; n < 400; n++){
+      if(D <= days(y, m)){ const ds = ymd(y, m, D); if(ds > hi) break; if(ds >= lo) out.push(ds); }
+      else if(ymd(y, m, 1) > hi) break;
+      m++; if(m > 12){ m = 1; y++; }
+    }
+    return out;
+  }
+  if(rep === 'y'){
+    for(let y = +lo.slice(0, 4); y <= +hi.slice(0, 4); y++){
+      if(D > days(y, M)) continue;
+      const ds = ymd(y, M, D); if(ds >= lo && ds <= hi) out.push(ds);
+    }
+    return out;
+  }
+  return out;
+}
+function addSched(day){
+  if(!unlocked) return;   // 잠금 시 버튼이 숨겨져 있다 — 조용히 무시
+  if(needPerm(MR_PERM.sched)) return;
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(String(day || '')) ? String(day) : today();
+  const it = { id:newId(), title:'', date:d, time:'', rep:'', note:'' };
+  scheds.push(it); saveMR(); mrOpenNew('sched', it.id);
+}
 
 // 그 기간에 걸린 것을 다 모은다. from·to 는 'YYYY-MM-DD' (양 끝 포함).
 // ★★ 이 함수는 읽기만 한다. 여기서 save 를 부르면 안 된다 — caltest 가 지킨다.
@@ -41220,6 +41315,12 @@ function calItems(from, to){
     const L = parseFloat(f.liters);
     const nm = (isFinite(L) && L > 0 ? fmtNum(L) + ' L' : t('주유')) + (f.full ? ' · ' + t('만탱크') : '');
     add(f.date, 'fuel', f.id, nm, f.time);
+  });
+  // ── 일정 (5.41) — 반복이면 그 기간에 걸리는 날마다 올린다
+  (Array.isArray(scheds) ? scheds : []).forEach(e => {
+    if(!e) return;
+    const nm = String(e.title || '').trim() || t('일정');
+    schedDates(e, from, to).forEach(d => add(d, 'sched', e.id, nm, e.time));
   });
   // ── 문서 만료일
   (Array.isArray(vdocs) ? vdocs : []).forEach(d => {
@@ -41346,7 +41447,7 @@ function calSwipeBind(){
 // 줄을 누르면 그 기록 창으로. ★ 달력은 기록을 품지 않는다 — 원래 자리로 보낸다.
 function calGo(kind, id){
   const K = { plan:'voyage', voyage:'voyage', maint:'maint', maintDone:'maint', mlog:'mlog',
-              repair:'repair', repairDone:'repair', vdoc:'vdoc', fuel:'fuel' }[kind];
+              repair:'repair', repairDone:'repair', vdoc:'vdoc', fuel:'fuel', sched:'sched' }[kind];
   if(!K) return;
   openMR(K, id);
 }
@@ -41357,6 +41458,7 @@ function calAdd(kind){
   if(kind === 'plan')   return addPlan(d);
   if(kind === 'mlog')   return addMlog({ date:d });
   if(kind === 'repair') return mrAdd('repair', d);
+  if(kind === 'sched')  return addSched(d);
 }
 // ══════════════════════════════════════════════════════════════
 // ★★ 폰 달력에 바로 넣기 (4.108 — 사장님 지적)
@@ -41585,6 +41687,7 @@ function renderCal(){
           <button class="tab edt" onclick="calAdd('plan')">${esc(t('+ 예정'))}</button>
           <button class="tab edt" onclick="calAdd('mlog')">${esc(t('+ 정비수첩'))}</button>
           <button class="tab edt" onclick="calAdd('repair')">${esc(t('+ 고장'))}</button>
+          <button class="tab edt" onclick="calAdd('sched')">${esc(t('+ 일정'))}</button>
         </div>`;
     }
     h += `</div>`;
@@ -51770,7 +51873,7 @@ window.__boot = 'start';
     //   배 스무 척이 하루 세 번씩만 열어도 막힌다. 막히면 다음 날까지 앱이 안 열린다.
     //   그래서 올릴 때 _u(올린 시각)를 찍어 두고, 받을 때는 그 뒤에 바뀐 것만 받는다.
     const CO = ['items','trash','maint','repair','voyage','fuel','runs','contacts',
-                'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews'];
+                'vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs','reviews','scheds'];
     // 받은 문서에서 가장 늦은 _u 를 찾고, _u 는 떼어 낸다.
     // ★ 떼지 않으면 앱 자료와 백업 파일에 알 수 없는 값이 섞인다.
     function rowsOf(snap){
@@ -51858,6 +51961,8 @@ window.__boot = 'start';
         (p.delDG||[]).forEach(k=>ops.push(['del','dgimgs',k]));
         (p.setRV||[]).forEach(i=>ops.push(['set','reviews',String(i.id),i]));
         (p.delRV||[]).forEach(k=>ops.push(['del','reviews',k]));
+        (p.setSC||[]).forEach(i=>ops.push(['set','scheds',String(i.id),i]));
+        (p.delSC||[]).forEach(k=>ops.push(['del','scheds',k]));
         // ★ meta 는 '배 정보' 쓰기 권한이 있어야 한다. 크루원에게는 없다.
         //   예전에는 무조건 함께 썼고, 그래서 크루원은 물품 하나도 못 올렸다.
         //   앱이 올려도 되는지 판단해서 p.meta 로 알려 준다.
@@ -51929,7 +52034,7 @@ window.__boot = 'start';
       try{ const bd = await getDoc(doc(fdb, 'boats', id)); if(bd.exists()) 사진담기(bd.data()); }catch(_){}
       const colls = ['all','items','trash','maint','repair','voyage','fuel','runs',
                      'contacts','vdocs','checkt','mrtrash','lockers','shapes','posts','dgimgs',
-                     'reviews','meta'];
+                     'reviews','scheds','meta'];
       // ★ 5.18 — 열여덟 갈래를 한꺼번에 지운다. 하나씩 차례로 하면 느린 기기(아이패드 시뮬레이터)에서
       //   1분을 넘겼고, 그 사이에 앱을 닫으면 배 문서가 남았다.
       await Promise.all(colls.map(async name => {

@@ -137,8 +137,8 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
   <p class="otherlang" id="otherLang"></p>
 
   <header>
-    <div class="logo"><img src="icon-512.png" alt="뱃일"></div>
-    <h1>뱃일</h1>
+    <div class="logo"><img src="icon-512.png" alt="Baetnil"></div>
+    <h1>Baetnil</h1>
     <p class="tag" data-t="tag">船一隻の記録を、ひとつの場所に。<br><b>整備手帳 · 装備一覧 · 航海日誌 · 積載表</b></p>
   </header>
 
@@ -223,9 +223,9 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
 
   <footer>
     <div class="links">
-      <a href="/terms.html"    data-t="f1" data-doc="terms">利用規約</a>
-      <a href="/privacy.html"  data-t="f2" data-doc="privacy">プライバシーポリシー</a>
-      <a href="/location.html" data-t="f3" data-doc="location">位置情報利用規約</a>
+      <a href="/terms.ja.html"    data-t="f1" data-doc="terms">利用規約</a>
+      <a href="/privacy.ja.html"  data-t="f2" data-doc="privacy">プライバシーポリシー</a>
+      <a href="/location.ja.html" data-t="f3" data-doc="location">位置情報利用規約</a>
       <a href="mailto:help@baetnil.com" data-t="f4">お問い合わせ</a>
     </div>
     <p data-t="f5">© 2026 Hyunmook. Baetnil は大韓民国で作っています。</p>
@@ -511,6 +511,10 @@ var I18N = {
       var name = docs[n].getAttribute('data-doc');
       docs[n].href = '/' + name + (lang === 'ko' ? '' : '.' + lang) + '.html';
     }
+    // ★ 5.46 — 큰 이름·로고 설명: 한국어만 「뱃일」, 영·러·일은 스토어 이름과 같은 「Baetnil」 (build_web.js 의 brand 와 같다)
+    var brandName = (lang === 'ko') ? '뱃일' : 'Baetnil';
+    var hh = document.querySelector('header > h1'); if(hh) hh.textContent = brandName;
+    var lg = document.querySelector('header .logo img'); if(lg) lg.setAttribute('alt', brandName);
     var bs = document.querySelectorAll('.langbar button');
     for(var j=0;j<bs.length;j++){
       bs[j].setAttribute('aria-pressed', bs[j].getAttribute('data-lang') === lang ? 'true' : 'false');

@@ -511,6 +511,10 @@ var I18N = {
       var name = docs[n].getAttribute('data-doc');
       docs[n].href = '/' + name + (lang === 'ko' ? '' : '.' + lang) + '.html';
     }
+    // ★ 5.46 — 큰 이름·로고 설명: 한국어만 「뱃일」, 영·러·일은 스토어 이름과 같은 「Baetnil」 (build_web.js 의 brand 와 같다)
+    var brandName = (lang === 'ko') ? '뱃일' : 'Baetnil';
+    var hh = document.querySelector('header > h1'); if(hh) hh.textContent = brandName;
+    var lg = document.querySelector('header .logo img'); if(lg) lg.setAttribute('alt', brandName);
     var bs = document.querySelectorAll('.langbar button');
     for(var j=0;j<bs.length;j++){
       bs[j].setAttribute('aria-pressed', bs[j].getAttribute('data-lang') === lang ? 'true' : 'false');

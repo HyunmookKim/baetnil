@@ -2,8 +2,8 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacy Policy — 뱃일</title>
-<meta name="description" content="Privacy Policy — 뱃일. Version 2.1, in effect from October 1, 2026">
+<title>Privacy Policy — Baetnil</title>
+<meta name="description" content="Privacy Policy — Baetnil. Version 2.2, in effect from October 15, 2026">
 <link rel="canonical" href="https://baetnil.com/privacy.en.html">
 <link rel="alternate" hreflang="ko" href="https://baetnil.com/privacy.html">
 <link rel="alternate" hreflang="ja" href="https://baetnil.com/privacy.ja.html">
@@ -35,9 +35,9 @@
   }</style>
 <div class="wrap">
 <header>
-  <div class="app">뱃일 · BAETNIL</div>
+  <div class="app">BAETNIL</div>
   <h1>Privacy Policy</h1>
-  <div class="meta">Version 2.1, in effect from October 1, 2026</div>
+  <div class="meta">Version 2.2, in effect from October 15, 2026</div>
   <nav><a href="terms.en.html">Terms of Service</a><a href="privacy.en.html" aria-current="page">Privacy Policy</a><a href="location.en.html">Location Information Terms</a></nav>
   <nav style="margin-top:8px"><a href="privacy.html" hreflang="ko">한국어</a><a href="privacy.ja.html" hreflang="ja">日本語</a><a href="privacy.ru.html" hreflang="ru">Русский</a></nav>
 </header>
@@ -63,16 +63,24 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
  c. When you contact Support (needed to reproduce the problem)
    · Your message, the App version, browser type, screen size, the screen you were on, whether you were online
  d. Location
-   · Current position (GPS): received only with your permission, to show weather and tides.
-     It is stored on your device only and is not sent to the server.
-   · Home port, berth and voyage coordinates: values you mark on the map yourself; these are stored on the server.
+   · Current position (GPS): received only with your permission. The value used to set a weather or tide spot
+     stays on your device only; when weather is fetched, only the coordinates of that spot are sent to the
+     weather source (see section 18).
+   · Track: when you start recording a voyage, your position is recorded at the interval you have set
+     (5 seconds by default; Menu › Settings › Track › Logging interval) until you arrive in port, and it is
+     stored on the server as part of that voyage record.
+   · Departure, log entry and arrival coordinates: your current position at that moment, stored on the
+     server as part of that voyage record.
+   · Home port and berth coordinates: values you mark on the map yourself; these are stored on the server.
    · Weather and tide spots: when you are signed in, the spots you save are stored on the server so you can use them
      on your other devices. Only you can see them — not even the operator. They are deleted with your account.
  Note: resident registration numbers, card numbers and bank account numbers are never collected.
 
 2. How it is collected
  You enter it in the App yourself, or it is received from your Google account when you sign in.
- The only thing collected automatically is the device information attached to a Support inquiry.
+ What is collected automatically: the device information attached to a Support inquiry, the device token
+ used to send notifications (if you turn them on), your position while a voyage is being recorded (the track),
+ and the location-use records (Location Information Terms, Article 6).
 
 3. Why it is used
  · to create your account and verify who you are
@@ -110,7 +118,7 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
 
 8. Your rights
  You may at any time view, correct or delete your personal data, or ask that its processing stop.
- · In the App: Menu › Account, My boat › Basics, and the delete option on each record
+ · In the App: Menu › Account (shown as your signed-in name), My boat › Basics, and Delete on each record
  · Other requests: Support, or help@baetnil.com
  Requests are handled without delay, and you will be told the outcome.
  A minor aged 14 or older may exercise these rights on their own.
@@ -144,11 +152,16 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
  Clearing site data in your browser settings removes them too.
 
 12. Location data
- · Current position (GPS) is received only with your permission and used only on your device.
+ · Current position (GPS) is received only with your permission. The value used to set a weather
+   spot stays on your device only.
    You can use the App without granting it — simply choose a spot yourself.
- · Home port, berth and voyage coordinates that you mark on the map are stored on the server.
-   Voyage coordinates can be seen only by that boat's crew, and they are never published even
-   if the boat is made public.
+ · When you start recording a voyage, your position (the track) is recorded at the interval you have
+   set until you arrive in port, and is stored on the server. Departure, log entry and arrival
+   coordinates, and the home port and berth coordinates you mark on the map, are also stored on the server.
+ · Voyage coordinates and tracks can be seen only by that boat's crew. They are never published even
+   if the boat is made public. The only exception: if you turn on &quot;Share this trip's track&quot; for a
+   particular voyage, that track, with the parts near the departure and arrival points (Privacy radius)
+   removed, and the log entry positions are shown as that voyage's visibility setting allows.
  · For details, please see the Location Information Terms.
 
 13. Data protection officer
@@ -168,7 +181,7 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
  Changes are announced in the App, and your consent will be sought again for material changes.
 
 16. How to delete your account and your data
- · In the App: Menu › Account › Delete my account
+ · In the App: Menu › Account (shown as your signed-in name) › Delete account
  · After you have removed the App: ask at <b>baetnil.com/delete.en.html</b>, or write to help@baetnil.com.
  · When you delete your account, your account details and the records you created are deleted without delay.
  · The posts and comments you wrote in the community are not deleted. Your name (and the boat
@@ -192,14 +205,19 @@ Kim Myung Joon (the &quot;operator&quot;) handles your personal data with care w
  · <b>Google Firebase</b> (sign-in / USA, storage / Seoul, Korea) — sign-in details and the records
    you enter
  · <b>Weather and tide sources</b> — only <b>the coordinates of the spot you are looking at.</b>
-   No information about who asked is sent. Sources: the Korea Meteorological Administration,
-   the Korea Hydrographic and Oceanographic Agency (KHOA), the Japan Meteorological Agency,
-   and any other agency named on screen as the source
- · <b>Map images</b> — OpenStreetMap
+   No information about who asked is sent. Sources: Open-Meteo (wind, wave and sea-level forecasts),
+   the Korea Meteorological Administration, the Korea Hydrographic and Oceanographic Agency (KHOA),
+   the Japan Meteorological Agency, and any other agency named on screen as the source
+ · <b>Map images</b> — OpenStreetMap, OpenSeaMap (sea marks)
+ · <b>Notifications</b> — if you turn notifications on, the device token used to deliver them
+   (Firebase Cloud Messaging)
+ · <b>Automatic translation of posts</b> — when you view a post written in another language in
+   translation, the App's server (Cloud Functions) sends that post to Google Cloud Translation.
+   No information about who wrote it is sent.
  There is <b>no advertising, no analytics and nothing that tracks what you do.</b>
  The App does not access your device's advertising ID.
 
-This Policy is effective as of October 1, 2026. (Version 2.1)</pre>
+This Policy is effective as of October 15, 2026. (Version 2.2)</pre>
 <footer>
   Baetnil — an app for people who go out on the water · <a href="https://baetnil.com/en/">Open the app</a><br>
   Contact <a href="mailto:help@baetnil.com">help@baetnil.com</a>

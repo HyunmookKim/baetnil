@@ -193,6 +193,11 @@ function bakeFront(){
     out = out.replace(/(<meta property="og:url" content=")[^"]*(">)/, '$1' + SITE + rel + '$2');
     out = out.replace(/(<link rel="canonical" href=")[^"]*(">)/, '$1' + SITE + rel + '$2');
 
+    // ★ 5.46 — 큰 이름·로고 설명. 한국어 판만 「뱃일」, 영·러·일 판은 스토어 이름과 같은 「Baetnil」.
+    //   여태는 /en/ /ja/ /ru/ 맨 위 큰 제목이 한글 「뱃일」 이었다.
+    out = out.replace('<img src="icon-512.png" alt="뱃일">', '<img src="icon-512.png" alt="' + esc(brand(L)) + '">')
+             .replace('<h1>뱃일</h1>', '<h1>' + esc(brand(L)) + '</h1>');
+
     // 말 고르는 줄 — 지금 판을 눌린 것으로
     out = out.replace(/(<button type="button" data-lang=")([a-z]{2})(" aria-pressed=")(?:true|false)(")/g,
       (all, a, v, b2, c) => a + v + b2 + (v === L ? 'true' : 'false') + c);
@@ -200,7 +205,9 @@ function bakeFront(){
     // 약관은 말마다 파일이 따로다 (bakeLegal 이 넷 다 굽는다).
     //   ★ 자바스크립트도 같은 규칙을 쓴다 (index.html). 두 곳이 어긋나면 안 된다.
     const dl = L;
-    out = out.replace(/(<a href=")([a-z]+)(\.html"[^>]*data-doc=)/g, (all, a, name, b2) =>
+    // ★ 5.46 — 대문의 링크는 href="/terms.html" 처럼 앞에 / 가 붙어 있어 이 줄이 아무것도 못 바꿨다.
+    //   그래서 /en/ /ja/ /ru/ 아래쪽 약관 링크가 자바스크립트가 돌 때까지 한국어 문서였다(검색 로봇은 한국어 문서를 봤다).
+    out = out.replace(/(<a href=")\/?([a-z]+)(\.html"[^>]*data-doc=)/g, (all, a, name, b2) =>
       a + '/' + name + (dl === 'ko' ? '' : '.' + dl) + '.html"' + b2.slice(b2.indexOf(' ')));
 
     write(L === 'ko' ? 'index.html' : L + '/index.html', out);
@@ -223,13 +230,16 @@ const LEGAL_HEAD  = {           // 「버전 … · …부터 적용」 줄. 말
   ko: (v, d) => `버전 ${v} · ${d}부터 적용`,
   en: (v, d) => `Version ${v}, in effect from ${d}`,
   ru: (v, d) => `Версия ${v}, действует с ${d}`,
-  ja: (v, d) => `版 ${v}・${d} から適用`
+  ja: (v, d) => `バージョン${v}・${d}施行`        // ★ 5.46 일본 약관 꼴(「…から施行します」·「バージョン」)
 };
+// ★ 5.46 — 앱 이름. 한국어만 「뱃일」, 영·러·일은 스토어·폰 이름과 같은 「Baetnil」.
+//   여태는 영·러·일 약관 탭 제목·머리·일본어 꼬리말에 한글 「뱃일」 이 들어 있었다.
+const brand = L => (L === 'ko' ? '뱃일' : 'Baetnil');
 const LEGAL_FOOT = {
   ko: '뱃일 — 배 타는 사람들을 위한 앱',
   en: 'Baetnil — an app for people who go out on the water',
   ru: 'Baetnil — приложение для тех, кто выходит в море',
-  ja: '뱃일 — 船に乗る人たちのアプリ'
+  ja: 'Baetnil — 船に乗る人のためのアプリ'
 };
 const LEGAL_OPEN = { ko:'앱 열기', en:'Open the app', ru:'Открыть приложение', ja:'アプリを開く' };
 const LEGAL_ASK  = { ko:'문의', en:'Contact', ru:'Связаться', ja:'お問い合わせ' };
@@ -317,14 +327,14 @@ function bakeLegal(){
 <html lang="${L}">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)} — 뱃일</title>
-<meta name="description" content="${esc(title)} — 뱃일. ${esc(head)}">
+<title>${esc(title)} — ${esc(brand(L))}</title>
+<meta name="description" content="${esc(title)} — ${esc(brand(L))}. ${esc(head)}">
 <link rel="canonical" href="${SITE}/${legalFile(k, L)}">
 ${hre}
 <style>${LEGAL_CSS}</style>
 <div class="wrap">
 <header>
-  <div class="app">뱃일 · BAETNIL</div>
+  <div class="app">${L === 'ko' ? '뱃일 · BAETNIL' : 'BAETNIL'}</div>
   <h1>${esc(title)}</h1>
   <div class="meta">${esc(head)}</div>
   <nav>${navDocs}</nav>

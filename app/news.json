@@ -1,7 +1,177 @@
 {
- "updated": "2026-10-04T23:39:10.262Z",
- "candidates": 81,
+ "updated": "2026-10-08T00:29:36.589Z",
+ "candidates": 98,
  "items": [
+  {
+   "title": "【パラオ】セーリングでつながる台湾とパラオ。初の国際交流レースを開催",
+   "t_ko": "파라오 세일링 협회, 국제 교류 레이스 개최 전 艇 정비 및 현지 해역 안전 교육 실시",
+   "s_ko": "파라오 세일링 협회는 대만 선수 17명 초청 친선 레이스를 10월 3일 개최하기 앞서 艇 정비, 부품 교체, 장비 확인 작업을 진행했다.\n파라오 해역의 산호초 위험과 조수 변화에 따른 안전 운항 방식을 사전에 교육하기 위해 레이스 전날 연습 세션을 마련했다.\n오프티미스트급 22척, ILCA급 11척이 참가한 가운데 현지 최대 규모 레이스를 성공적으로 운영했다.",
+   "cat": "정비",
+   "link": "https://bulkhead.jp/2026/10/118537/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-08T00:08:47.000Z"
+  },
+  {
+   "title": "Who is sailing the boat?",
+   "t_ko": "원양 레이싱, AI와 기술이 늦게 발견하면 안 될 역할",
+   "s_ko": "원양 레이싱에서 AI와 기술의 역할이 중요하며, 너무 늦게 발견하면 안 될 문제들이 있다는 점을 다룬다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/300506/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T21:00:00.000Z"
+  },
+  {
+   "title": "Complaint filed for sailing class injury",
+   "t_ko": "UC 버클리 요트 교실 사고, 부실한 교육과 배치로 인명 피해 소송",
+   "s_ko": "UC 버클리 수상스포츠센터 요트 수업 중 2024년 9월 발생한 어깨·다리 부상에 대해 사건 당사자가 부실 교육·인원 배치를 이유로 과실 소송을 제기했다.\n원고는 배상액으로 35,000달러 이상을 청구하고 있다.\n지역의 거센 해상 조건에서 안전한 교육 운영의 중요성을 시사한다.",
+   "cat": "안전",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/07/complaint-filed-for-sailing-class-injury/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-07T20:49:22.000Z"
+  },
+  {
+   "title": "Chaos for J/22 World Championships",
+   "t_ko": "J/22 세계선수권, 뉴올리언스에서 개최되며 국제 선수 참가",
+   "s_ko": "1994년 시작된 J/22 세계선수권이 2026년 10월 7~10일 뉴올리언스 서던 요트클럽에서 개최된다.\n유럽 3회 우승자인 네덜란드의 장-미셸 로티에와 미국의 과거 우승자들이 참가하여 경합한다.\n서던 요트클럽은 2005년 허리케인 카트리나로 파괴되었던 클럽하우스를 재건축한 후 2011년 세계선수권을 개최했던 이력이 있다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/07/chaos-for-j-22-world-championships/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-07T20:10:58.000Z"
+  },
+  {
+   "title": "52 SUPER SERIES Valencia Sailing Week day 2",
+   "t_ko": "52 슈퍼 시리즈 발렌시아 세일링 위크, 2일차 결과",
+   "s_ko": "바유팀이 일관된 성적으로 발렌시아 선두를 차지했고, 플래툰팀이 세계선수권 경쟁에서 소폭 진전했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300540/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T19:25:26.000Z"
+  },
+  {
+   "title": "RS200 SW Ugly Tour at Exe",
+   "t_ko": "RS200 SW 어글리 투어, 엑스 세일링 클럽에서 강풍 레이싱 개최",
+   "s_ko": "웨스트 컨트리 보트 리페어 RS200 SW 어글리 투어가 엑스 세일링 클럽에서 강한 바람 조건의 RS200 레이싱을 진행했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300534/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T18:57:06.000Z"
+  },
+  {
+   "title": "Impact of technology in offshore sailing",
+   "t_ko": "세계 요트연맹, 원양 레이싱의 기술 영향에 관한 글로벌 조사 추진",
+   "s_ko": "세계 요트연맹 대양·원양위원회(OOC)가 신기술이 원양 레이싱에 미치는 영향에 대해 레이싱 커뮤니티를 대상으로 글로벌 설문조사를 실시할 예정이다.\n2021년 11월부터 논의해온 기술 관련 이슈들이 최근 2025년 11월 해외 대회 조직위원포럼에서 논의되었고, 다양한 제안들이 접수되었다.\n원양 레이싱에 참여하는 선주·운영자·이해관계자들의 광범위한 의견 수렴을 통해 규정 방향을 결정할 계획이다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/07/impact-of-technology-in-offshore-sailing/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-07T18:38:55.000Z"
+  },
+  {
+   "title": "AC Recon: Oct 6 - Italians resume AC75 testing",
+   "t_ko": "Luna Rossa, 한 달 휴지 후 AC75 테스트 재개",
+   "s_ko": "Luna Rossa팀이 4주간 물 위에서 떨어져 있다가 오전 9시 5분에 마스트를 내려놓고 9시 15분에 AC75 보트를 투입해 테스트를 재개했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300526/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T14:46:42.000Z"
+  },
+  {
+   "title": "欧州勢のアジャスト力を実感したFISU大学セーリング世界選手権",
+   "t_ko": "FISU 대학 세일링 세계선수권: 유럽팀의 높은 '상황 적응력'과 빠른 의사결정이 결승 진출 좌우",
+   "s_ko": "9월 27~10월 2일 크로아티아 스플릿에서 열린 대회에서 일본 대표팀(13위)은 메달 획득과 결승 진출에 미달했다.\n유럽 팀들은 艇 교체, 세일 변경, 바뀐 조건에서도 신속히 상황을 파악하고 운항 방식을 수정하는 높은 적응 능력을 보였다.\n제한된 시간 내 우선순위를 결정하고, 선원 간 정보 공유·동작 조정·결과 확인을 빠르게 반복하는 팀이 상위권을 차지했다.",
+   "cat": "항해술",
+   "link": "https://bulkhead.jp/2026/10/118524/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-07T11:22:06.000Z"
+  },
+  {
+   "title": "First Bulent Atabay Cup - Türkiye",
+   "t_ko": "터키, 빌렌트 아타바이 컵 원양 레이스 첫 개최",
+   "s_ko": "터키 원양 레이싱 클럽(TAYK)이 2026년 10월 3일 빌렌트 아타바이 컵을 처음 개최했다.\n이 대회는 28년간 6척의 오리엔트 익스프레스 레이스 보트를 제작한 선주 빌렌트 아타바이를 추도한다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300495/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T08:20:00.000Z"
+  },
+  {
+   "title": "America's Cup: ETNZ restarts in Auckland",
+   "t_ko": "뉘질랜드 에미레이츠팀, 오클랜드에서 AC75 테스트 재개",
+   "s_ko": "뉘질랜드 에미레이츠팀이 2026년 45일 쿼터 중 22일째인 화요일 하우라키 만에서 테스트 및 개발 프로그램을 재개했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300480/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T07:14:00.000Z"
+  },
+  {
+   "title": "McIntyre Golden Globe Race Update",
+   "t_ko": "매킨타이어 골든글로브 레이스, 열대성 폭풍 이후 대서양 악천후 진입",
+   "s_ko": "지난 8일간 매킨타이어 골든글로브 선단이 열대성 폭풍 곤잘로의 불확실성에서 벗어났으나, 새로운 대서양 악천후 상황에 진입했다.",
+   "cat": "항해술",
+   "link": "https://www.sail-world.com/news/300509/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T06:29:00.000Z"
+  },
+  {
+   "title": "What causes tropical revolving storms and how to avoid them",
+   "t_ko": "열대 회전풍(태풍·허리케인·사이클론) 이해와 회피 방법",
+   "s_ko": "열대 회전풍은 지역에 따라 허리케인·태풍·사이클론으로 불리며, 북대서양 폭풍은 사피르-심프슨 척도로 등급이 나뉜다.\n명명된 시스템이 반드시 허리케인으로 발전하지는 않으나 주시가 필요하다.\n표층 해수 온도와 대기 조건 등 6가지 발달 조건이 있으며, 처음 5가지는 연중 발생하지만 해수 온도 조건은 특정 시기에만 충족된다.",
+   "cat": "항해술",
+   "link": "https://www.yachtingworld.com/homepage/what-causes-tropical-revolving-storms-and-how-to-avoid-them-164171",
+   "source": "Yachting World",
+   "lang": "en",
+   "date": "2026-10-07T05:53:32.000Z"
+  },
+  {
+   "title": "A new Atlantic home for The Ocean Race",
+   "t_ko": "The Ocean Race 본부, 2028년부터 포르투갈 포르투로 이전",
+   "s_ko": "The Ocean Race 본부, 주요 원양 레이싱 이벤트, 해양 건강·과학·교육 프로그램이 2028년부터 포르투갈 포르투를 기반지로 활동한다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/300507/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T05:47:44.000Z"
+  },
+  {
+   "title": "Teak deck refurbishment: step-by-step to guide to replacing planks and caulking",
+   "t_ko": "티크 데크 패널 교체 및 코킹 시공 단계별 가이드",
+   "s_ko": "티크 재질의 갑판은 세척만으로는 부족하며 주기적인 유지보수가 필요하다.\n티크 판재 교체와 코킹 작업의 구체적 절차와 기법을 단계별로 설명한다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/teak-deck-refurbishment-step-by-step-to-guide-to-replacing-planks-and-caulking-107212",
+   "source": "PBO",
+   "lang": "en",
+   "date": "2026-10-07T04:40:52.000Z"
+  },
+  {
+   "title": "Allstate Sugar Bowl J/22 Worlds returns",
+   "t_ko": "J/22 세계선수권, 멕시코만의 발달 중인 날씨 시스템 주시",
+   "s_ko": "뉴올리언스 서던 요트클럽에서 개최되는 J/22 세계선수권이 시작되기 앞서 멕시코만에서 발달 중인 날씨 시스템이 대회에 영향을 미칠 가능성이 논의되고 있다.",
+   "cat": "기타",
+   "link": "https://www.sail-world.com/news/300516/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-07T03:47:00.000Z"
+  },
+  {
+   "title": "世界トップ約80選手が集結。10月31日からウインドサーフィンW杯・横須賀三浦大会",
+   "t_ko": "ANA 윈드서핑 월드컵 요코스카·미우라 대회, 10월 31일 개최 — 수중익 활주 경기로 최고 시속 65km 달성",
+   "s_ko": "10월 31일~11월 4일 신나가와 현 츠쿠이하마 해변에서 2026 PWA 월드투어 최종전이 개최되며, 전 세계 상위 선수 약 80명이 참가한다.\n윈드포일 수중익 기술을 활용한 슬래롬 경기로 진행되며, 남자부는 시속 약 65km의 고속 레이스가 펼쳐진다.\n츠쿠이하마는 횡풍 조건이 우수한 국내 최고 경기장으로 알려져 있다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/10/118516/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-06T10:05:56.000Z"
+  },
   {
    "title": "Record fleet at Inclusion Championships 2026",
    "t_ko": "2026 세일링 포용 선수권—사상 최대 규모 40개국 222명 참가",
@@ -124,8 +294,8 @@
   },
   {
    "title": "【MINI2027】「1日2時間睡眠、トイレはバケツ」。海の上のリアルな生活",
-   "t_ko": "미니 6.50 장거리 레이스의 현실: 1일 2시간 수면, 열악한 선상 생활",
-   "s_ko": "프랑스 시즌을 마친 Mini 6.50 선수가 레이스 중 선상 생활의 실태를 공개했다.\n선실에서 중腰 자세로만 가능하며, 신체도 밸러스트의 일부로 사용되는 환경에서 20~30분 수면을 여러 번 반복해 하루 평균 2시간만 잔다.\n정박·항로 계획 등 장거리 항해 중 극한의 피로 관리 문제를 이해하는 데 도움이 된다.",
+   "t_ko": "미니 6.50 원양 레이스의 선상 생활: 1일 평균 2시간 수면, 제한된 공간에서의 신체 관리",
+   "s_ko": "미니 6.50은 선실 내 입식 불가능한 협소 공간으로, 중심 하중 조절을 위해 수면 위치를 수시로 변경해야 한다.\n20~30분 단위로 분산된 수면을 하루에 누적 약 2시간 취하며, 3시간 이상 확보하기도 어렵다.\n장시간 비효율적 자세 유지로 인한 근골격 부상 위험이 상존하며, 레이스 중 식사 및 위생 관리도 극히 제한적이다.",
    "cat": "항해술",
    "link": "https://bulkhead.jp/2026/10/118435/",
    "source": "BULKHEAD JAPAN",
@@ -201,196 +371,6 @@
    "source": "Yachting Monthly",
    "lang": "en",
    "date": "2026-10-01T05:40:37.000Z"
-  },
-  {
-   "title": "Antigua & Barbuda is calling",
-   "t_ko": "2027년 4월 앤티가바부다 크루징 행사 공지",
-   "s_ko": "2027년 4월 21~25일 앤티가바부다에서 4일간 항해, 섬 탐방, 친목 프로그램이 계획되고 있다.\n행사 개최지는 카리브 해 주요 크루징 해역이며, 장기 크루징 계획 중인 선주들의 목표 항로 기착지로 활용할 수 있다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/300300/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T21:15:00.000Z"
-  },
-  {
-   "title": "ILCA 6 Men's Worlds at Vilamoura day 4",
-   "t_ko": "2026 ILCA 6 남자 세계선수권: 비에우마에서 4일차 경기 진행",
-   "s_ko": "포르투갈 비에우마에서 열린 2026 ILCA 6 남자 세계선수권 4일차까지 브라질의 에리크 셰이트와 프란시스코 달 리가 선두를 나누고 있으며 4포인트차다.\n남은 2일의 경기로 최종 우승자가 결정될 것으로 보인다.\n접전 상황으로 마지막 날까지 승패가 불확실하다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300332/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T20:22:33.000Z"
-  },
-  {
-   "title": "Call for suggestions open for 10th Foiling Awards",
-   "t_ko": "제10회 포일링 어워드 추천 모집 개시",
-   "s_ko": "2026년 국제 포일링 커뮤니티의 우수 사례를 인정하는 포일링 어워드 추천이 개시됐다.\n선수, 프로젝트, 제품, 이벤트 부문에서 포일링 발전에 기여한 사례를 공개 모집한다.\n포일링 기술 혁신의 방향과 업계 트렌드를 파악할 수 있는 지표다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/300326/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T20:12:42.000Z"
-  },
-  {
-   "title": "Gstaad Yacht Club Centenary Trophy preview",
-   "t_ko": "제15회 그스타드 요트클럽 백주년 트로피 프리뷰",
-   "s_ko": "생트로페 보트쇼의 일환으로 열리는 그스타드 요트클럽 백주년 트로피에 약 20척의 요트가 참가할 예정이다.\n생트로페 노티크 소시에테와 공동 주최되며 세인트트로페즈 만 지역의 경기다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300315/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T20:12:00.000Z"
-  },
-  {
-   "title": "52 Super Series Valencia Sailing Week preview",
-   "t_ko": "52 슈퍼 시리즈 발렌시아 세일링위크: 시즌 말까지 우승 미결정",
-   "s_ko": "매년 52 슈퍼 시리즈의 시즌 우승이 마지막까지 결정되지 않을 정도로 경쟁이 치열하다.\n올해도 최종일 마지막 경기까지 우승팀이 미정될 전망이다.\n기술 수준이 균등한 함대의 특징을 보여준다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300328/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T19:03:15.000Z"
-  },
-  {
-   "title": "College Season 2026-27, Week 4",
-   "t_ko": "2026-27 대학 요트 시즌 4주차: 북동해 저기압 영향",
-   "s_ko": "북동해안(미국 동부)에 금요일부터 일요일 오전까지 북동쪽 저기압이 통과하면서 여러 경기장에서 1일 경기가 취소되고 일부는 하루로 압축됐다.\n경기가 진행된 지역에서는 다이바인 호이트 트로피가 동점 타이브레이커로 결정되고, 버지니아 공대와 위스콘신이 각각 2승을 거두는 등 악천후 속 경쟁이 벌어졌다.\n시즌 초반 성적이 부진했던 팀이 4주차에서 돌연 두각을 나타내는 등 변수가 증가했다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/09/30/college-season-2026-27-week-4/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-09-30T18:03:52.000Z"
-  },
-  {
-   "title": "New York to England on a Mini 6.50",
-   "t_ko": "벨기에 선수, 미니 6.50으로 뉴욕-잉글랜드 단독 횡단",
-   "s_ko": "쿠엔틴 드부아(Quentin Debois)가 미니 6.50급 요트로 북대서양 5,300km를 단독으로 횡단해 벨기에 해양 역사에 새로운 장을 기록했다.\n뉴욕에서 출발해 잉글랜드에 도착하는 원양 항해를 소형 요트로 성공적으로 완주했다.\n벨기에 크루징 선주들에게 소형 요트의 운항 능력과 안전성을 입증하는 사례다.",
-   "cat": "항해술",
-   "link": "https://www.sail-world.com/news/300321/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T15:57:00.000Z"
-  },
-  {
-   "title": "The safety check nearly half of boat owners skip",
-   "t_ko": "선주 절반이 건너뛰는 안전 점검",
-   "s_ko": "신규 조사에 따르면 거의 모든 선주가 출항 전 기상을 확인하지만, 항로나 계획을 누군가에게 미리 알리는 단순한 절차를 항상 따르는 선주는 6할 미만이다.\n출항 전 제3자에게 항로 정보를 전달하는 것은 조난 상황에서 구조 활동을 신속하게 시작할 수 있는 핵심 요소다.\n선주들은 기상 확인만큼 필수적인 안전 절차로 여겨야 한다.",
-   "cat": "안전",
-   "link": "https://www.sail-world.com/news/300271/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T13:30:00.000Z"
-  },
-  {
-   "title": "アジア大会5日目、日本勢が上位へ。29er女子が総合首位に浮上",
-   "t_ko": "제20회 아시아경기대회 세일링, 32년 만에 일본 개최…9월 26일 개막",
-   "s_ko": "1994년 광도대회 이후 32년 만에 일본에서 개최되는 아시아경기대회 세일링이 9월 26일부터 10월 3일까지 애지현 가모군의 도요타기직 가이요 요트하버에서 열린다.\n각국 대표 1팀만 출전하는 올림픽 동일 방식의 대회로, 아시아 국가들만 참가하기 때문에 대부분 소수 선박 플릿레이스로 진행된다.\n유니폼·경비·안전점검·숙박 등 거의 올림픽과 동일한 사양으로 진행되며, 적은 선박 수에도 불구하고 긴장감 높은 레이스가 예상된다.",
-   "cat": "산업",
-   "link": "https://bulkhead.jp/2026/09/118296/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-09-30T10:10:51.000Z"
-  },
-  {
-   "title": "PYRA Poole Bay Summer Series overall",
-   "t_ko": "풀 베이 요트 레이싱 협회 여름 시리즈 종료: 평균 20노트, 최대 26노트 돌풍",
-   "s_ko": "풀 베이 요트 레이싱 협회(PYRA)가 2026년 9월 27일 5번 경기로 첫 풀 베이 서머 시리즈를 종료했다.\n13척의 요트가 평균 남쪽 바람 20노트, 최대 돌풍 26노트 이상의 강풍 속에서 경주했다.\n강풍 조건에서 선박 관리 능력이 결과를 좌우했으며, 안정적인 컨트롤이 필요한 악조건 항해 사례다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300312/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T09:43:00.000Z"
-  },
-  {
-   "title": "What to expect at the Women's Match Racing Worlds",
-   "t_ko": "2026 여성 매치 레이싱 월드 챔피언십: 샌프란시스코 만의 도전 요소들",
-   "s_ko": "세인트 프란시스 요트클럽 개최로 샌프란시스코 만에서 열리는 여성 매치 레이싱 세계 선수권은 세계 최고 선수들의 전술, 강한 조류, 강풍이 한 곳에 모인다.\n만의 지리적 특성상 큰 조류 변화와 예측 어려운 돌풍이 주요 변수가 된다.\n폴린 쿠르투아(프랑스, 2025년 챔피언)의 연방 수비전과 신진 선수들의 도전이 예상된다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300302/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T08:42:08.000Z"
-  },
-  {
-   "title": "Next Generation Class now at Hamble Winter Series",
-   "t_ko": "해밍지 윈터 시리즈에 신규 청년 클래스 도입",
-   "s_ko": "해밍지 윈터 시리즈에 16~25세 청년 선수 전용 '넥스트 제너레이션 클래스'가 신설됐다.\n기존 나이대별 부문과 별도로 운영되어 청년 선수들이 혼령 함대에서 경쟁할 기회를 제공한다.\n상급 선수들과의 경쟁을 통한 기술 발전과 진로 개발을 지원하는 구조다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/300301/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-09-30T07:21:00.000Z"
-  },
-  {
-   "title": "Offshore sailing routines: How emotional intelligence keeps your crew safe",
-   "t_ko": "원양 항해 안전: 정서 지능으로 승무원 보호하기",
-   "s_ko": "마음과 신체가 당직 체계에 적응하는 데 최대 3일이 소요된다.\n선장이 도입할 수 있는 가장 효과적인 안전 프로토콜은 갑판의 아드레날린 분출 상황을 제거하는 것이다.\n원양 항해 중 체계적인 일과 루틴 구축이 승무원의 정신 건강과 안전을 동시에 높인다.",
-   "cat": "항해술",
-   "link": "https://www.yachtingworld.com/special-reports/offshore-sailing-routines-how-emotional-intelligence-keeps-your-crew-safe-164141",
-   "source": "Yachting World",
-   "lang": "en",
-   "date": "2026-09-30T05:00:07.000Z"
-  },
-  {
-   "title": "Small upgrades, big impact: The best new gear at Southampton Boat Show",
-   "t_ko": "2026 사우스햄튼 보트쇼의 실용적 신제품 5가지",
-   "s_ko": "사우스햄튼 인터내셔널 보트쇼에서는 럭셔리 슈퍼요트 외에 소형 부스와 스탠드에서 실질적인 혁신 제품들을 선보였다.\n무선 담수화기, 레이다 기반 연료/물 탱크 모니터, 초슬림 해양 무선기(IC-M430, 기존보다 깊이 50% 감소, 야간 모드 포함) 등이 전시됐다.\n공간 부족 차트 테이블 환경에서 설치할 수 있는 콤팩트 장비들이 선주들의 관심을 모았다.",
-   "cat": "장비",
-   "link": "https://www.yachtingmonthly.com/gear/small-upgrades-big-impact-the-best-new-gear-at-southampton-boat-show-106449",
-   "source": "Yachting Monthly",
-   "lang": "en",
-   "date": "2026-09-30T03:09:50.000Z"
-  },
-  {
-   "title": "Пресловутые Пески едва не заполучили очередную жертву",
-   "t_ko": "독일 랑게오그 항구 진입 중 폴란드 요트 좌초",
-   "s_ko": "폴란드 선원, 러시아 선원, 우크라이나 선원으로 구성된 승무원이 덴마크에서 스페인으로 요트를 회항하던 중 엔진 고장이 발생했다.\n북서풍 4~5급과 1.5m 높이의 파도 속에서 랑게오그 항구 진입을 시도했으나 북쪽 해협 입구의 수심이 얕은 모래톱(뱅크)에 요트가 밀려나갔다.\n밀물과 썰물의 변화로 요트가 옆으로 누울 위험이 증가하면서 독일 해양 구조대가 출동했다.",
-   "cat": "사고",
-   "link": "https://yachtrussia.com/news/2026/09/30/20260930-preslovutye-peski-edva-ne-zapoluchili-ocherednuu-jertvu.html",
-   "source": "Yacht Russia",
-   "lang": "en",
-   "date": "2026-09-30T00:00:00.000Z"
-  },
-  {
-   "title": "ИИ на Bosphorus Cup",
-   "t_ko": "제25회 보스포루스컵에서 AI를 활용한 기상 정보 분석",
-   "s_ko": "ROSSKO RACER 항해사 바딤 미하일로프가 보스포루스컵 브리핑 녹음 내용을 AI로 정리하고 기상 예보 분석에 AI를 활용한 경험을 공유했다.\n휴대폰에 기록된 주최자 설명을 AI가 번역·정리하고, 풍속 그래프 사진과 계기 수치를 예보와 비교해 현장 상황을 정확하게 파악했다.\n미숙한 선수든 베테랑이든 AI 도구를 통해 낯선 해역의 특성을 신속하게 학습하고 전술 회의에서 놓친 내용을 보완할 수 있다.",
-   "cat": "항해술",
-   "link": "https://yachtrussia.com/news/2026/09/30/20260930-ii-na-bosphorus-cup.html",
-   "source": "Yacht Russia",
-   "lang": "en",
-   "date": "2026-09-30T00:00:00.000Z"
-  },
-  {
-   "title": "雨と微風の三河湾・蒲郡アジア大会4日目。420日本が首位を守る",
-   "t_ko": "아시아대회 4일목, 가모군 앞바다 약풍 계속…420급 일본이 선두 유지",
-   "s_ko": "9월 29일 제20회 아시아경기대회 세일링 4경기날, 본주의 정체 전선 영향으로 강우가 계속되었고 약풍이 이어졌다.\n남서풍으로 470, 420, ILCA7, ILCA6, 49er, 49erFX 레이스가 진행되었다.\n420급의 각모리 미사키(2학년)/사쿠마쓰 리호(3학년)는 1-3-1위로 선두를 차지, 최근 여름 단기간에 와카야마 인터하이, 청森 국스포, 미에 420 전일본선수권에 참가한 후 본대회에 도전하고 있다.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/09/118269/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-09-29T08:20:48.000Z"
-  },
-  {
-   "title": "ロンドン五輪金メダリストXu Lijia、全日本マッチレース参戦へ",
-   "t_ko": "런던 올림픽 금메달리스트 Xu Lijia, 전일본 매치레이스 선수권 참전",
-   "s_ko": "2012년 런던 올림픽 여자 레이저 라디알 금메달리스트 Xu Lijia(중국)가 10월 23~25일 미카와미토 마리나에서 열리는 '2026 전일본 오톰 매치레이스'(그레이드 3)에 스키퍼로 참전한다.\n약 30년 만에 일본 국제 매치레이스에 올림픽 금메달리스트가 나타나며, 여성 금메달리스트 참전은 일본 매치레이스 사상 최초다.\n일본의 유망 젊은 세일러들과 새로 팀을 구성해 경기에 임한다.",
-   "cat": "산업",
-   "link": "https://bulkhead.jp/2026/09/118256/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-09-29T00:01:15.000Z"
-  },
-  {
-   "title": "長雨と微風のアジア大会。470磯崎／関が首位。420角森／實松は初日トップ",
-   "t_ko": "장마와 약풍의 아시아대회, 470급 이소자키/세키가 선두…420급 초일 1위",
-   "s_ko": "9월 28일 가모군 가이요 요트하버에서 개최 중인 제20회 아시아경기대회 3경기날, 초반 바람 대기 후 남서풍으로 경기가 진행되었다.\n470급은 3경기 중 이소자키 데쓰야/세키 유리에가 3-2-1위로 선두를 지키고, 420급 각모리 미사키/사쿠마쓰 리호는 1-3-1위로 초일 1위에 올랐다.\n본대회는 강우와 약풍 악조건으로 레이스 스케줄이 밀려있으며, ILCA4 남녀 경기는 아직 1경기도 실시하지 못했다.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/09/118236/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-09-28T12:56:36.000Z"
   }
  ]
 }

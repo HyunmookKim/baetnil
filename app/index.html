@@ -805,13 +805,30 @@ body.locked .stat.tapstat{pointer-events:none;cursor:default}
 .stat.pickstat{cursor:pointer}
 .stat.pickstat span{white-space:nowrap}
 .stat.pickstat span em{font-style:normal;opacity:.7;margin-left:3px}
-/* ★ 5.42 — 항해 통계 기간 (Saillogger 「All time · 해마다」 칩 + 은행 앱 「1개월·1년 … 직접입력」) — 한 줄, 옆으로 민다 */
-.perrow{display:flex;gap:6px;margin:12px 16px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.perrow::-webkit-scrollbar{display:none}
-/* 옆에 더 있다는 것을 오른쪽 끝을 흐리게 해서 알린다 — 끝까지 밀면 흐림을 뗀다 */
-.perrow:not(.end){-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}
-/* ★ 5.43 — 칩 다섯이 한 줄을 고르게 채운다(Apple 건강 「1일·1주·1개월…」 가 한 줄을 채우듯). 남으면 늘고, 모자라면(큰 글자) 옆으로 민다 */
-.perrow .tab{flex:1 0 auto;padding:6px 10px;font-size:12px;white-space:nowrap}
+/* ★ 5.49 — 여러 개 중 하나를 고르는 줄은 「한 덩어리 막대」(세그먼트 컨트롤)로 그린다.
+   사장님 (2026-10-10): 「이 좆같은 디자인은 또 뭐냐 … 다른 어플 어케 만드는지 확인하고 만들라니까」 — 5.43 의 기간 칩은
+   두꺼운 버튼 다섯 개를 따로 늘어놓아 넓은 화면에서 끝까지 늘어나고, 옆으로 밀리며 끝이 잘려 보였다.
+   근거: Apple HIG 「Segmented controls」 — 「a linear set of two or more segments, each of which functions as a button」 ·
+   「no more than about five segments on iPhone」 · 「all segments are usually equal in width」 · 「Use nouns or noun phrases」 /
+   UIKit UISegmentedControl 「A horizontal control that consists of multiple segments」 / Material 3 SegmentedButton(2~5개, 고르기·보기 바꾸기).
+   애플 건강 앱의 기간(일·주·월·6개월·년)도 이 막대다. 칸은 같은 폭, 고른 칸만 밝은 면이 올라온다. */
+.seg{display:flex;align-items:stretch;padding:2px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--bd);box-sizing:border-box}
+.seg > button{position:relative;flex:1 1 0;min-width:0;margin:0;border:0;background:none;color:var(--tm);font-family:inherit;font-size:13px;font-weight:600;
+  line-height:1.2;padding:7px 4px;min-height:38px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.seg > button.on{background:var(--acs);color:var(--th);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+/* 칸 높이 38px — 사장님이 정하신 단추 최소 높이(btntest·tapsizetest). 막대 테두리까지 44px = Apple HIG 누름 크기 44pt */
+/* 고르지 않은 칸 사이에만 가는 금 (UISegmentedControl 과 같게) */
+.seg > * + *::before{content:'';position:absolute;left:0;top:28%;bottom:28%;width:1px;background:var(--bd)}
+.seg > .on::before,.seg > .on + *::before{display:none}
+/* 글자가 칸보다 길면(큰 글자·긴 말) 같은 폭을 버리고 글자 길이대로 나눈다 — 글자를 자르지 않는다 (UISegmentedControl apportionsSegmentWidthsByContent) */
+.seg.fit > button{flex:1 1 auto;padding-left:8px;padding-right:8px;text-overflow:clip}
+/* 그래도 안 들어가면(아주 큰 글자 · 러시아어) 칸 안에서 두 줄로 — 막대 밖으로 밀어내거나 자르지 않는다 */
+.seg.wrap > button{white-space:normal;word-break:keep-all;overflow-wrap:normal;min-width:min-content;line-height:1.15;padding-top:5px;padding-bottom:5px}
+.perseg{margin:12px 16px 0}
+/* 옆으로 미는 칩 줄 끝에 붙은 막대(정박지 목록·지도) — 끝까지 밀어도 화면 끝에 붙지 않게 */
+.tfilt > .seg:last-child{margin-right:16px}
+/* 넓은 화면에서 끝까지 늘이지 않는다 — 바로 아래 「‹ 2026년 ›」 줄과 같은 왼쪽 끝에 둔다 */
+@media(min-width:700px){ .perseg{max-width:520px} }
 /* ★ 5.43 — 1일·1개월·1년 넘기는 줄. 앱 달력 머리 줄(.calhead ‹ 2026년 10월 ›)을 그대로 쓴다 — 새 모양을 만들지 않는다 */
 .pernav{padding:8px 10px 0}
 .pernav .calym{font-size:17px}
@@ -27684,7 +27701,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.48';
+const APP_VER = '5.49';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -34887,10 +34904,27 @@ function voyPerTitle(p, r){
   const dot = d => String(d || '').replace(/-/g, '.');
   return r.a === r.b ? dot(r.a) : dot(r.a) + ' – ' + dot(r.b);
 }
+// ★ 5.49 — 막대(.seg) 안 글자가 칸보다 길면 글자 길이대로 나눈다(.fit). 그려 놓은 뒤에 재야 안다.
+function segFit(root){
+  try{ (root || document).querySelectorAll('.seg').forEach(S => {
+    S.classList.remove('fit', 'wrap');
+    const 넘침 = () => [...S.children].some(b => b.scrollWidth > b.clientWidth);   // 반 픽셀만 넘쳐도 「…」 가 붙는다 — 여유를 두지 않는다
+    if(넘침()) S.classList.add('fit');
+    if(넘침()) S.classList.add('wrap');
+  }); }catch(_){}
+}
+// 막대가 새로 그려질 때마다 한 번 잰다 (연료·정박지 화면도 같은 막대를 쓴다)
+(function(){ let q = 0;
+  const later = () => { if(q) return; q = requestAnimationFrame(() => { q = 0; if(document.querySelector('.seg')) segFit(); }); };
+  try{ new MutationObserver(later).observe(document.documentElement, { childList:true, subtree:true, characterData:true }); }catch(_){}
+  // 글꼴이 늦게 들어오거나 화면 폭·글자 크기가 바뀌면 글자 폭이 달라진다 — 다시 잰다
+  try{ window.addEventListener('resize', later); }catch(_){}
+  try{ if(document.fonts){ document.fonts.ready.then(later); document.fonts.addEventListener && document.fonts.addEventListener('loadingdone', later); } }catch(_){}
+})();
 function voyPerRow(){
   const p = voyPer(), r = voyPerRange(p);
-  const chip = (k, name) => `<button class="tab${p.k === k ? ' on' : ''}" onclick="voyPerSet('${k}')">${esc(name)}</button>`;
-  let h = `<div class="perrow" onscroll="this.classList.toggle('end', this.scrollLeft + this.clientWidth >= this.scrollWidth - 4)">`
+  const chip = (k, name) => `<button class="${p.k === k ? 'on' : ''}" aria-pressed="${p.k === k}" onclick="voyPerSet('${k}')">${esc(name)}</button>`;
+  let h = `<div class="seg perseg" role="group">`
     + chip('d', t('1일')) + chip('m', t('1개월')) + chip('y', t('1년')) + chip('all', t('전체')) + chip('c', t('직접 입력'))
     + `</div>`;
   if(!r) return h;
@@ -35031,11 +35065,7 @@ function renderVoyage(){
   L.innerHTML = head + qbox + planBox + (past.map(row).join('') || (voyQ.trim()
         ? `<div class="mrnone">${esc(t('찾은 항해가 없습니다.'))}</div>`
         : `<div class="mrnone">${esc(t('기록된 항해가 없습니다. 오른쪽 아래 [+]를 눌러 시작해 보세요.'))}</div>`));
-  // ★ 5.42 — 고른 기간 칩이 화면 밖(오른쪽)에 있으면 보이게 민다
-  try{ const R = L.querySelector('.perrow'), on = R && R.querySelector('.tab.on');
-       if(R && on){ const 오른끝 = on.offsetLeft - R.offsetLeft + on.offsetWidth;
-                    R.scrollLeft = 오른끝 > R.clientWidth - 24 ? 오른끝 - R.clientWidth + 24 : 0;   // 안 보일 때만 민다
-                    R.classList.toggle('end', R.scrollLeft + R.clientWidth >= R.scrollWidth - 4); } }catch(_){}
+  segFit(L);
 }
 // ── 항적 기록 칸 (앱에서, 이 항해를 기록하고 있을 때만 보인다)
 // ★ 켜졌는지 꺼졌는지 화면에 표시가 없으면, 배에서 몇 시간 뒤에야 안 그려진 걸 안다.
@@ -40668,8 +40698,10 @@ function setSpotView(v){
   renderSpots();
 }
 function spotViewBtns(){
-  return `<button class="tchip${spotView==='list'?' on':''}" onclick="setSpotView('list')">${esc(t('목록'))}</button>`
-    + `<button class="tchip${spotView==='map'?' on':''}" onclick="setSpotView('map')">${esc(t('지도'))}</button>`;
+  // ★ 5.49 — 목록·지도는 둘 중 하나를 고르는 것 — 막대(.seg)로 (Apple HIG 「switch between closely related subviews」)
+  return `<span class="seg" role="group" style="flex:none">`
+    + `<button class="${spotView==='list'?'on':''}" aria-pressed="${spotView==='list'}" onclick="setSpotView('list')">${esc(t('목록'))}</button>`
+    + `<button class="${spotView==='map'?'on':''}" aria-pressed="${spotView==='map'}" onclick="setSpotView('map')">${esc(t('지도'))}</button></span>`;
 }
 function spotViewBar(){ return `<div class="tfilt" style="justify-content:flex-end">${spotViewBtns()}</div>`; }
 // ★ 지도에 찍는 수를 묶어 둔다. 천 곳을 한 번에 찍으면 배 위 폰에서 멎는다.
@@ -45042,8 +45074,9 @@ function renderFuel(){
     <div class="mrnone edt" style="text-align:left;padding-top:0">${
       esc(t('L/시간과 잔량은 눌러서 수정할 수 있습니다.'))}</div>
     <div class="mrrow edt"><span class="mrlbl">${esc(t('잔량 확인 방법'))}</span>
-      <button class="minib ${게이지 ? '' : 'grn'}" onclick="fuelHowSet('est')">${esc(t('앱 추정'))}</button>
-      <button class="minib ${게이지 ? 'grn' : ''}" onclick="fuelHowSet('gauge')">${esc(t('연료 게이지'))}</button></div>`;
+      <div class="seg" role="group" style="flex:1;min-width:0">
+      <button class="${게이지 ? '' : 'on'}" aria-pressed="${!게이지}" onclick="fuelHowSet('est')">${esc(t('앱 추정'))}</button>
+      <button class="${게이지 ? 'on' : ''}" aria-pressed="${게이지}" onclick="fuelHowSet('gauge')">${esc(t('연료 게이지'))}</button></div></div>`;
 
   const notes = [];
   if(eh.total > 0)

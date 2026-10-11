@@ -144,7 +144,7 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
 
   <div class="get">
     <div class="getgrid">
-      <a class="btn main on" href="app/">
+      <a class="btn main on" href="/app/">
         <b data-t="g1t">Open in your browser ›</b><span data-t="g1s">Nothing to install</span>
       </a>
       <a class="btn on" href="https://apps.apple.com/app/id6811930420" target="_blank" rel="noopener">
@@ -153,7 +153,7 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
       <a class="btn on" href="https://play.google.com/store/apps/details?id=kr.baetnil.app" target="_blank" rel="noopener">
         <b data-t="g3t">Android ›</b><span data-t="g3s">Get it on Google Play</span>
       </a>
-      <a class="btn on" href="app/">
+      <a class="btn on" href="/app/">
         <b data-t="g4t">Windows · Mac</b><span data-t="g4s">Press “Install” in your browser</span>
       </a>
     </div>
@@ -242,7 +242,7 @@ footer{padding:36px 0 56px; border-top:1px solid var(--ln); font-size:14px; colo
   try{
     var app = (window.matchMedia && matchMedia('(display-mode: standalone)').matches)
               || navigator.standalone === true;
-    if(app){ location.replace('app/'); }
+    if(app){ location.replace('/app/'); }
   }catch(_){}
 })();
 

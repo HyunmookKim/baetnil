@@ -1,6 +1,78 @@
 {
- "updated": "2026-10-10T23:57:14.150Z",
+ "updated": "2026-10-12T00:04:30.200Z",
  "gov": [
+  {
+   "title": "KOMSA, 어업인 간담회·어선 안전점검 추진",
+   "press": "수산인신문",
+   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBVVm5pNml0UTI5cm1EWUlLTmJ6OG1jZWJTMllQNDJLTFdfMi1SRDlvcDh4QmtqWmlKSFFFWW5laGlXZlNkeGE0WEw4SFpLazF4V1pkcjI0Q0xUUldZemdsQ3VBaVFyanE5eEE?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-11T12:45:50.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "주꾸미 잡으려다 ‘면허 정지 운항’ 적발…군산해경, 50대 조사",
+   "press": "공뉴스",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE4tQ1A5bVNWTWxwWmtpNHlxSTg3OUhiSGsyX0o2aVI5cTB2azBfZVpVTldDYTlRSDVMMng4TS1oNUVIRDJCWUpSNEtLVWxDUEsyS0x3WkxjUWJsdllnMzFLREVtakVHbDJIcjhaaQ?oc=5",
+   "source": "요트·마리나",
+   "date": "2026-10-11T12:19:58.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "거제 앞바다 구명조끼 미착용 적발…첫 위반 과태료 90만원에 어민 부담",
+   "press": "거제신문",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFA3QmIxd2xnYUZ0M3JyWUpOZUFZSG5jOWozVTZ2ZUFsQWVtaExyUG1qRWxPSVN6NzBQb2g5bk5MV2t0NkU3b3RzdE5nUHppbmdldGZFNC1PRjhyd2NSeTBJZFQwME1PVThEQjhGNk1B?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-11T12:14:16.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "중부지방해양경찰청, 가을철 낚시어선 특별단속 실시",
+   "press": "경기도민일보 미디어",
+   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5WaDIyaG1LdzhPbFZ5OThCdm1oVnRCRVEzRTdSX1h0Y0ZnM3QwbWF4ZVpuMGROY19BSnBFbE5mQUhYWmg1aEJpbFZ2Y0FPZEZKR21CbFFDN3NDLVFoN2o2ZkplaVRwYjlpdXc?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-11T09:40:03.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "경남도, 남부권 최초 해양레저관광 전문인력 양성 거점 구축",
+   "press": "해사신문",
+   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFBHc1M4d2dVd2M4bnE0VG9IMUxKbG9GWDczU2NpVHM5cllTbkczbVg5LXBjSDc0dC1lLXp6Yl8xMUt5Q0FYRG1nZW8tbERQb1U5VWRjakRNejRCd1QwVDBjLUg4RGRGMDZPQVFj?oc=5",
+   "source": "요트·마리나",
+   "date": "2026-10-11T09:11:00.000Z",
+   "cat": "산업"
+  },
+  {
+   "title": "태안서 낚싯배 김 양식장에 걸려 고립⋯22명 구조",
+   "press": "대전MBC",
+   "link": "https://news.google.com/rss/articles/CBMiT0FVX3lxTE0yeEpwT3lJS293R0RBZDF3Q0pYeUF3TDVJVlBkblhKYjNOX1NFWGlxUWt6NWdvRUI4N2FxZHRpRGs1eWJ6alRrY19wbnZyVlk?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-11T07:19:27.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "해상 중증 환자 절반, 응급처치 없이 이송...해경 구급 인력·조직 ‘구멍’",
+   "press": "경북매일",
+   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBIUXF4bHhqQklUV1h2Z3BVd1l5ZkNyd3p0V0E2V1kwYlJxQjFIV3pKaW1iM2I0b29heVpmVUowT2JkVmtPUUNUQ3FSZnQ2U1AwTjNOZ05tMVkzQQ?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-11T04:25:00.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "해양수산부, 이제는 어업도 데이터 시대, 수산 자원관리 과학적으로",
+   "press": "기호일보",
+   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE55SVhucUxnZGdZOHdYN3kwOUhpb2dDNVYtZTZpUGJXLUVzekxvMWhTenZPWHdrTnJEV1FQV2FPYWZWbnRPUlR2bXlLQUtTVTNGQmdEd2dQNkhJdTMzbXl5b3p2ZXJZLXU2TjlVdzk3RQ?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-11T01:45:27.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "군산해경, 원거리 수상레저 미신고 고무보트 적발",
+   "press": "로컬세계",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTFBWaHdtcERKTlBZYUJoVExCQzBBV3pTdjEyUllqUVRHbXpNVS01RmljMGRwbXpZenc2emp1dTVVQXlFQ2o2b0tHN3p2QklrdzBFTlUzNjVzY2JYZG9hR19IMNIBWEFVX3lxTE1seU5OOG5WdVZMb3VWTTNGa3c5cEV3dlRWRUdlNDRDU3ltS2ZxTlFpRGJoNUoyV29SUWV0NGc3SXFjaEJhNy1RZ0lPN3J3R0NPN3QxNGNZZk8?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-11T00:09:30.000Z",
+   "cat": "규정"
+  },
   {
    "title": "진도 해상서 70대 남성 바다에 빠져 심정지...해경 구조",
    "press": "국제뉴스",
@@ -29,7 +101,7 @@
    "title": "중부해경청, 음주운항·정원 초과 등 안전 위반행위 집중단속",
    "press": "아시아뉴스통신",
    "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBuc1dTTkF6Y2h5QmdidmoyZGVxTHZ5WTl5Qlp0SHFrRjF5UmZ1Zzd6c1VnTmd2QVFYeXNKMk13UUVjUlcwQVBZX1pZbHltb3FGV3E2Q1ZtMHRoQ09jZndadnNucGkzWFdXZzZ4Zm9TOVpJQjhB?oc=5",
-   "source": "해양정책",
+   "source": "해양안전",
    "date": "2026-10-10T15:05:52.000Z",
    "cat": "규정"
   },
@@ -56,14 +128,6 @@
    "source": "해양안전",
    "date": "2026-10-10T02:57:20.000Z",
    "cat": "안전"
-  },
-  {
-   "title": "중부지방해양경찰청, 가을철 낚시어선 특별단속 실시",
-   "press": "경기도민일보 미디어",
-   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE5WaDIyaG1LdzhPbFZ5OThCdm1oVnRCRVEzRTdSX1h0Y0ZnM3QwbWF4ZVpuMGROY19BSnBFbE5mQUhYWmg1aEJpbFZ2Y0FPZEZKR21CbFFDN3NDLVFoN2o2ZkplaVRwYjlpdXc?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-10T00:29:08.000Z",
-   "cat": "규정"
   },
   {
    "title": "최근 5년간 제주해상서 주요 선박사고 563건…53명 사망·실종",
@@ -544,85 +608,24 @@
    "source": "해양정책",
    "date": "2026-10-05T09:10:56.000Z",
    "cat": "안전"
-  },
-  {
-   "title": "[속보] 제주 차귀도 해상서 29톤급 어선 전복…9명 구조·'한국인 선장 등' 2명 실종",
-   "press": "데일리안",
-   "link": "https://news.google.com/rss/articles/CBMigwJBVV95cUxOYkhKbDk3SG5pUzlYb1cyR2VXdlBKX1JVUjc1eGtya0hKeUVhcWNjWFE2TGlHWWJiT3BoeFZQWHRYRHI3VXdIZE50bnZ3V2MwMElRaHlwRmZaSUtyUlNBb1RTQkxBcHh3YjBzVllYN2N2UERHRFlMNE9kTmdPOHlJLXp2cE1KSGRFME1ENnRFcE9Bam1LTHJKUXBjNUJiZUd3U1dGR29MOEFtWHkwcjMyYXR3TjV5TUNSdzNaZDBaVTNwdVVoTW56WXJNdXZvR3ZSNVZiTHpmVkRIQWNTdWNXVHNMNVQzbEQweEtMWkdDWUxQUXZpU3FHOFRhUjN2VWdsLWhz?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-04T23:33:00.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "경영이양직불제 신청 기준 연령 확대",
-   "press": "수산인신문",
-   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9DRXYtUjR1Z080TlNqZ09JN29mSmxTTkE1TTlnQWU0VmF1dDJoRHpjSlppM1VQeGwxeXpPR1RTVkRsbnR3N2RlMTlXWWJfTlZ6alFFZHcxeHA5NWhRMVpGZXN5dUl5b2N5a2c?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-04T14:25:29.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "최근 5년 어선 사고 사망·실종 478명···미수검 선박도 3천척 넘어",
-   "press": "더경남뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBWUHBoWXN5V2VFdGtWX2hJZVpsMlJHN1VXRFNweWJ4cGp3cmVhbzVBSjktZk9iOUNwVnAyWnBVTzhZc2QwSWFCbG5OSWRCWENFZ2Rwag?oc=5",
-   "source": "낚시·어선",
-   "date": "2026-10-04T14:23:18.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "(아시안게임.요트) 금2·은2·동2 한국 요트 금의환향…“세계무대 향해 다시 뛴다”",
-   "press": "해양레저신문",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE1PZERlZjh1dWNyWlJ6TWNFYjlDYmFtdGJVQzJEUXU3SDdHVEhmR1ZXbkRybzFydnBUX3g0MmNqeEVGUHVnSDM0WGU4cU9HdGo5Z2xZMmNrRy13XzE5?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-10-04T12:00:00.000Z",
-   "cat": "산업"
-  },
-  {
-   "title": "통영서 ‘마리나선박 정비사’ 키운다…해양레저관광 전문인력 모집",
-   "press": "해양레저신문",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE03eW1Ldm5qbkpGRXNnSTBPTVpOU3Q3RWotWFNTcFJzSGtGTUMtd2NSSzNaSUxLOEdJN1BFTGlmbTh1blZJOHJnV2poRktISENZWnI5d1owd3VfYU1K?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-10-04T09:50:00.000Z",
-   "cat": "산업"
-  },
-  {
-   "title": "울산 방어진항 기름 유출 선박 13일 만에 적발…‘유지문’으로 추적",
-   "press": "해사신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9VeFhMYVNyVzVrQjFXQk1UYWhBYUxWUnZuZVZhdGUyWENta1BVVTdWR1JvbmswbHlBTkZOQ3JxS2JJY0FlbjFNam5lWjFKV2VZVGFab1lURENqUC1lZTVSNGtyZVljVFM0b3Fz?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-04T08:09:17.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "남재헌 해수부 차관, 해상풍력-수산업 간 상생을 위한 소통의 장 마련",
-   "press": "쉬핑뉴스넷",
-   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5Ud0xwYjBhZ2l1NVVqbEIyMWlUTzZGV3VETmtnbGtBcEw3TzNleEpJTnhHWlBnWk92WWNnRlNFcXBXQlVzc3JaUHBFZGlQbmlpM3JvZUtOWE5xUm5saEZ2NnZMbGgzSjZlNFZaOTZLSnFKNG8?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-04T07:50:47.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "부안해경, 격포항 인근 해상 카약 전복 사고자 1명 긴급 구조",
-   "press": "dtoday.co.kr",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFB2VnZMLVNKUTkwMDVmTzBjZjJWMzQwc3VPVUdEeVlnb2VRak5tcXFwNW9xQjVjVkRRSlo5SDhLMVQ2MWp1M2Rjb2RsREExdU9Dai1Oc1R0clg2Q3V5Nzgzc3REb1BNV3NveWg4?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-04T03:57:25.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "해상풍력 확대 속 어업인 이익 공유·안전 논의",
-   "press": "매일신문",
-   "link": "https://news.google.com/rss/articles/CBMiYkFVX3lxTE9WLS1naDFpd1ltYzhRLU1ZdEpMYWdnNUxCX0RYY24yeXpNLVN5N0JLaTd3V054T1M0SVhXYmxQcGd0UzFaMDhrMFhDSGk1SWhKck9ydk5sbEh6Y0M2aVNaaGRR?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-04T03:27:56.000Z",
-   "cat": "항만"
   }
  ],
  "wx": {
-  "src": "NEWS",
-  "active": [
-   "남해 동부 먼바다에 풍랑주의보"
+  "src": "KMA",
+  "zones": [],
+  "land": [
+   {
+    "kind": "호우주의보",
+    "reg": "서귀포시중산간",
+    "tmEf": "202610120900"
+   },
+   {
+    "kind": "호우주의보",
+    "reg": "제주도산지",
+    "tmEf": "202610120300"
+   }
   ],
-  "summary": "※ 언론 보도 기준 — 기상청 실시간 확인 필수"
+  "active": [],
+  "summary": "발효 중인 해상 특보 없음"
  }
 }

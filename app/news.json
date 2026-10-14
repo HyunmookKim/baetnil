@@ -1,7 +1,177 @@
 {
- "updated": "2026-10-12T00:03:37.721Z",
- "candidates": 92,
+ "updated": "2026-10-14T23:31:18.372Z",
+ "candidates": 101,
  "items": [
+  {
+   "title": "Mother Nature whatever she wants",
+   "t_ko": "2026 미국 유스 요트팀 선발: 두 허리케인 영향으로 일정 변경",
+   "s_ko": "2026 유스 요트 월드 챔피언십을 위한 미국 유스팀 선발에서 대서양의 허리케인 이사이아스와 태평양의 허리케인 레이첼이 동시에 발생하면서 선발 대회 개최지가 변경되었다.\n예정된 일정은 수정되었으나 선발은 12월 15~19일 포르투갈 룰레에서의 월드 챔피언십 참가팀 확정에 따라 진행되었다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/14/mother-nature-whatever-she-wants/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-14T22:57:40.000Z"
+  },
+  {
+   "title": "How would you decide this?",
+   "t_ko": "경기규칙 해석: 마크 통과 시 중복 상황에서의 책임",
+   "s_ko": "마크 존에 도입한 후 같은 쪽 선박이 가이브하여 순서를 바꾸려 할 때, 통제 불능 상태에서 컨택트가 발생한 경우 규칙 18.2(a)(2) 마크룸 제공 위반으로 선행 선박이 실격된다.\n프로테스트 위원회 판정은 기술적 통제 상실 여부를 기준으로 한다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/14/how-would-you-decide-this-29/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-14T22:18:52.000Z"
+  },
+  {
+   "title": "RS Aero North American Championship 2026",
+   "t_ko": "2026 RS 에어로 북미 챔피언십 개최",
+   "s_ko": "미국, 캐나다, 아일랜드의 항해자들이 Cedar Point Yacht Club에서 3일간의 RS 에어로 북미 챔피언십에 참가했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300723/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T19:33:20.000Z"
+  },
+  {
+   "title": "Goodchild has unfinished Route du Rhum business",
+   "t_ko": "라우트 뒤 롬 2026: 22척 IMOCA 함대 참가",
+   "s_ko": "13번째 라우트 뒤 롬 솔로 횡대서양 레이스에 22척의 IMOCA 클래스 선박이 참가한다.\n지난 2시즌 클래스 최고 성능자인 Sam Goodchild가 MACIF Santé Prévoyance호로 참가 예정이다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300725/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T19:28:12.000Z"
+  },
+  {
+   "title": "2025 podium set for Epigen J/24 Worlds 2026",
+   "t_ko": "2026 에피젠 J/24 월드 챔피언십: 202명 38팀 참가",
+   "s_ko": "2025 J/24 월드 챔피언십 상위 3팀이 Port Phillip의 2026 에피젠 J/24 월드 챔피언십에 참가하며, 10개국에서 총 202명 38팀이 모인다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300724/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T19:26:12.000Z"
+  },
+  {
+   "title": "Who will be 44th J/24 World Champion?",
+   "t_ko": "2026 J/24 월드 챔피언십: 호주 빅토리아에서 개최",
+   "s_ko": "J/24 월드 챔피언십은 11월 7~11일 호주 빅토리아 포트 필립에서 열리며, 10개국 38팀 202명이 참가한다.\n방어 챔피언 아일랜드 팀 Headicease(Cillian Dickson 헬름)를 포함해 전년도 상위 3팀이 재경합을 펼친다.\n봄철 포트 필립의 변산적 바람, 오후 해풍, 특히 남풍 시 황해가 크루들의 적응을 요구할 것이다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/10/14/who-will-be-44th-j-24-world-champion/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-10-14T17:38:04.000Z"
+  },
+  {
+   "title": "Cape 31 Gold Cup in Saint-Tropez Day 1",
+   "t_ko": "생트로페 케이프 31 골드컵 개최",
+   "s_ko": "생트로페에서 첫 케이프 31 골드컵이 개최되었으며, Marcus Brennecke의 Hatari가 가볍고 변산적인 바람 조건에서 레이스 1을 승리했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300722/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T17:11:51.000Z"
+  },
+  {
+   "title": "Portimão to build new training centre",
+   "t_ko": "포르티마오, 파라 포용 항해 훈련센터 신축",
+   "s_ko": "포르투갈 포르티마오에서 2026 월드 세일링 포용 선수권 대회가 완료된 후, 파라 포용 항해 훈련 및 개발센터 신축을 통해 스포츠 유산을 남길 예정이다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/300717/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T16:35:42.000Z"
+  },
+  {
+   "title": "John Gilmour Manuel: 1938-2026",
+   "t_ko": "요트계 거장 존 길모어 매뉴엘 별세",
+   "s_ko": "드래곤 클래스, 미터급 보트, 매치레이스 및 팀레이스 항해, 국제 심판 분야의 상징적 인물 존 길모어 매뉴엘이 타계했다.",
+   "cat": "기타",
+   "link": "https://www.sail-world.com/news/300712/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T15:29:18.000Z"
+  },
+  {
+   "title": "Compulsory lifejacket rule for New Zealand boaters",
+   "t_ko": "뉴질랜드 6m 이하 선박 승선자 구명조끼 착용 의무화",
+   "s_ko": "뉴질랜드에서 10월 9일부터 길이 6m 이하 레저용 선박에 탑승한 모든 인원은 제대로 착용한 구명조끼를 반드시 착용해야 한다.\n기존 규정은 선박에 구명조끼를 '보유'하도록 했으나, 새 규칙은 '착용'을 강제한다.\n이 조치는 연간 약 12명의 사망을 예방할 것으로 예상된다.",
+   "cat": "안전",
+   "link": "https://www.pbo.co.uk/news/compulsory-lifejacket-rule-for-new-zealand-boaters-107687",
+   "source": "PBO",
+   "lang": "en",
+   "date": "2026-10-14T09:58:02.000Z"
+  },
+  {
+   "title": "Rolex Middle Sea Race: The battle for line honours",
+   "t_ko": "롤렉스 미들시 레이스: 라인 아너 경쟁",
+   "s_ko": "Black Jack 100이 방어 타이틀을 위해 7척의 전 라운드 월드 레이싱 요트들과 대면한다.\n지중해의 예측 불가능한 날씨가 코스 레코드 도전 여부를 결정하는 변수가 될 예정이다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/300705/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-10-14T09:02:00.000Z"
+  },
+  {
+   "title": "西宮で全日本インカレ開幕。カットレース導入で変わる団体戦",
+   "t_ko": "2026 전일본 학생요트 단체전, 커트레이스 도입으로 규칙 변경",
+   "s_ko": "10월 14일 시작된 제91회 전일본 학생요트선수권 단체전에서 올해부터 커트레이스가 도입돼 5레이스 이상 성립 시 각 팀의 최악의 1레이스 득점이 제외된다.\n피니시 윈도(선두 통과 후 잔여 팀의 피니시 제한시간)는 작년 15분에서 10분으로 단축, 스나이프급 목표레이스타임은 50분에서 45분으로 조정됐다.\n3팀 합산으로 순위를 겨루는 단체전에서는 모든 팀이 안정적으로 달릴 것이 승리의 핵심 조건이 되므로, 커트레이스 규칙 변경이 전술에 큰 영향을 미칠 것으로 예상된다.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/10/118688/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-14T08:52:40.000Z"
+  },
+  {
+   "title": "‘The El Niño phase typically lasts nine to 18 months’ – How it affects sailors",
+   "t_ko": "슈퍼 엘니뇨가 항해자에게 미치는 영향",
+   "s_ko": "올해 전 지구적 날씨는 '슈퍼 엘니뇨'의 지배를 받고 있다.\n엘니뇨 단계는 일반적으로 9~18개월 동안 지속된다.\n항해자들은 이 해수 온도와 기후 패턴 변화를 고려하여 항로 계획과 기상 예측에 반영해야 한다.",
+   "cat": "기타",
+   "link": "https://www.yachtingworld.com/weather/the-el-nino-phase-typically-lasts-nine-to-18-months-how-it-affects-sailors-164228",
+   "source": "Yachting World",
+   "lang": "en",
+   "date": "2026-10-14T05:00:17.000Z"
+  },
+  {
+   "title": "Не электронный капитан, а хороший ассистент",
+   "t_ko": "크루징 중 ChatGPT 활용: 전자 선장이 아닌 좋은 조수",
+   "s_ko": "실제 크루징에서 ChatGPT는 전기·발전기 문제 해결, 패세지 플랜 수립, 마리나 예약, 엔진 운용 분석, 어업 계획 등을 지원했다.\n AI는 낯선 주제를 빠르게 이해하고 전문가 질문을 명확하게 수립하도록 도왔으나, 경우에 따라 재검증이 필수적이었다.\n결론: AI는 요트맨의 경험을 대체하지 않지만, 더 준비된 의사결정을 가능하게 한다.",
+   "cat": "정비",
+   "link": "https://yachtrussia.com/news/2026/10/14/20261014-ne-elektronnyy-kapitan-a-horoshiy-assistent.html",
+   "source": "Yacht Russia",
+   "lang": "en",
+   "date": "2026-10-14T00:00:00.000Z"
+  },
+  {
+   "title": "Права в смартфоне",
+   "t_ko": "러시아 디지털 ID로 소형 선박 조종면허 표시 가능",
+   "s_ko": "러시아에서 스마트폰의 디지털 ID 기능으로 소형 선박 조종면허를 QR코드 형태로 표시할 수 있게 되었다.\n종이 면허증을 잃어버리거나 젖어도 디지털 ID만 있으면 신원 인증이 가능하다.\n2026년 10월 현재 1천만 명 이상이 디지털 ID를 사용 중이다.",
+   "cat": "산업",
+   "link": "https://yachtrussia.com/news/2026/10/14/20261014-prava-v-smartfone.html",
+   "source": "Yacht Russia",
+   "lang": "en",
+   "date": "2026-10-14T00:00:00.000Z"
+  },
+  {
+   "title": "全日本学生eSailing選手権、東京科学大・芳賀大和が大接戦を制して優勝！",
+   "t_ko": "전일본 학생 e세일링 선수권, 도쿄과학대 요가가 우승",
+   "s_ko": "10월 12일 니시노미야 요트하버에서 전일본 학생 e세일링 선수권이 개최되어 도쿄과학대 요가 대화(yaaaaaaaa) 선수가 우승했다.\n예선, 결승, 왕자결정전으로 구성된 경기에서 78명이 참가했으며, 현장 참석 선수 외에 온라인으로도 원격 참가가 가능했다.\n요가 선수는 \"1학년 때부터 요트 코스 설정에 매료돼 VRI(가상 레이싱)를 많이 했다\"며 최종 단체전 우승을 다짐했다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/10/118680/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-12T22:40:23.000Z"
+  },
+  {
+   "title": "ユース日本代表を目指せ！10月31日から境港でユースワールド代表選考会開催",
+   "t_ko": "2026 유스세일링 월드 챔피언십 일본 대표선발 대회, 10월 31일 돗토리서 개최",
+   "s_ko": "10월 31일부터 11월 3일까지 돗토리 현 사카이하마 공공마리나에서 2026년 포르투갈 월드 챔피언십 대표선발 대회가 개최된다.\n420급, 29er급, ILCA 6급, iQFOiL Youth급 등 여러 클래스가 참가하며, 미래 올림픽을 목표하는 젊은 선수들이 국내 실력을 확인할 수 있는 중요한 기회다.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/10/118673/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-12T02:52:38.000Z"
+  },
   {
    "title": "America’s Cup: Bring on the lawyers",
    "t_ko": "노스세일 vs 뉴질랜드팀 특허 분쟁: 메인돛 루프 설계 발명자 인정 논쟁",
@@ -51,6 +221,16 @@
    "source": "Sail-World",
    "lang": "en",
    "date": "2026-10-11T17:17:00.000Z"
+  },
+  {
+   "title": "同志社大が470、スナイプ2冠達成！全日本学生ヨット個人選手権",
+   "t_ko": "도시샤대학, 470급·스나이프급 2관왕 달성…전일본 학생요트 개인선수권",
+   "s_ko": "10월 11일 니시노미야 해역에서 열린 2026 전일본 학생요트 개인선수권 최종일 470급에서 도시샤대의 타니·노나카·세키하타 팀이 모든 레이스를 싱글스코어로 정리해 역전우승했다.\n스나이프급에서도 도시샤대의 사케마키·호오라이·타카하시 팀이 우승했으나, 스나이프는 물선(수역)예선에서 떨어져 단체전 출전 자격을 얻지 못했다.\n최종학년인 4학년들에게는 마지막 레이스가 됐다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/10/118642/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-11T16:30:48.000Z"
   },
   {
    "title": "Musto's Championship Collection Smock nominated",
@@ -113,6 +293,16 @@
    "date": "2026-10-10T18:00:00.000Z"
   },
   {
+   "title": "明治大が両クラス首位発進。接戦の全日本インカレ個人戦、初日3レース",
+   "t_ko": "메이지대학, 전일본 인카레 개인전 양 클래스 선두로 출발",
+   "s_ko": "10월 10일 서일본 해역에서 2026 전일본 학생요트 개인선수권이 개막, 470급에서 하야카와·야마다(메이지대)가, 스나이프급에서 하토리·마쓰우라(메이지대)가 1위다.\n미풍 컨디션(남서풍 7노트 전후)에서 3레이스가 진행됐고, 상위 진영의 점수 차가 미미해 최종일 11일 큰 변동이 예상된다.\n4레이스 이상 진행 시 가장 나쁜 1레이스가 제외되는 커트레이스 규칙이 순위 변동에 영향을 줄 수 있다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/10/118616/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-10-10T11:23:24.000Z"
+  },
+  {
    "title": "Осторожно, люки открываются!",
    "t_ko": "긴급 해치 침수 사고: 카타마란 침몰, GOIOT 루크 결함 재발",
    "s_ko": "요트맨이 우측 선체의 긴급 탈출 해치를 통해 물이 유입되는 것을 발견했고, 결국 배를 버리고 보트로 탈출했다.\n호주 보급함 HMAS Supply에서 MH-60R 시호크 헬기가 약 15시간 후 구조했다.\n선주가 2020년 파나마에서 리콜 정비 중 해당 해치를 보강했음에도 같은 결함이 재발했으며, 이는 2019년 모로코 침수 사고와 같은 GOIOT 제품의 구조적 결함으로 보인다.",
@@ -151,176 +341,6 @@
    "source": "BULKHEAD JAPAN",
    "lang": "ja",
    "date": "2026-10-08T00:08:47.000Z"
-  },
-  {
-   "title": "Who is sailing the boat?",
-   "t_ko": "원양 레이싱, AI와 기술이 늦게 발견하면 안 될 역할",
-   "s_ko": "원양 레이싱에서 AI와 기술의 역할이 중요하며, 너무 늦게 발견하면 안 될 문제들이 있다는 점을 다룬다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/300506/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T21:00:00.000Z"
-  },
-  {
-   "title": "Complaint filed for sailing class injury",
-   "t_ko": "UC 버클리 요트 교실 사고, 부실한 교육과 배치로 인명 피해 소송",
-   "s_ko": "UC 버클리 수상스포츠센터 요트 수업 중 2024년 9월 발생한 어깨·다리 부상에 대해 사건 당사자가 부실 교육·인원 배치를 이유로 과실 소송을 제기했다.\n원고는 배상액으로 35,000달러 이상을 청구하고 있다.\n지역의 거센 해상 조건에서 안전한 교육 운영의 중요성을 시사한다.",
-   "cat": "안전",
-   "link": "https://www.sailingscuttlebutt.com/2026/10/07/complaint-filed-for-sailing-class-injury/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-10-07T20:49:22.000Z"
-  },
-  {
-   "title": "Chaos for J/22 World Championships",
-   "t_ko": "J/22 세계선수권, 뉴올리언스에서 개최되며 국제 선수 참가",
-   "s_ko": "1994년 시작된 J/22 세계선수권이 2026년 10월 7~10일 뉴올리언스 서던 요트클럽에서 개최된다.\n유럽 3회 우승자인 네덜란드의 장-미셸 로티에와 미국의 과거 우승자들이 참가하여 경합한다.\n서던 요트클럽은 2005년 허리케인 카트리나로 파괴되었던 클럽하우스를 재건축한 후 2011년 세계선수권을 개최했던 이력이 있다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/10/07/chaos-for-j-22-world-championships/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-10-07T20:10:58.000Z"
-  },
-  {
-   "title": "52 SUPER SERIES Valencia Sailing Week day 2",
-   "t_ko": "52 슈퍼 시리즈 발렌시아 세일링 위크, 2일차 결과",
-   "s_ko": "바유팀이 일관된 성적으로 발렌시아 선두를 차지했고, 플래툰팀이 세계선수권 경쟁에서 소폭 진전했다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300540/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T19:25:26.000Z"
-  },
-  {
-   "title": "RS200 SW Ugly Tour at Exe",
-   "t_ko": "RS200 SW 어글리 투어, 엑스 세일링 클럽에서 강풍 레이싱 개최",
-   "s_ko": "웨스트 컨트리 보트 리페어 RS200 SW 어글리 투어가 엑스 세일링 클럽에서 강한 바람 조건의 RS200 레이싱을 진행했다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300534/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T18:57:06.000Z"
-  },
-  {
-   "title": "Impact of technology in offshore sailing",
-   "t_ko": "세계 요트연맹, 원양 레이싱의 기술 영향에 관한 글로벌 조사 추진",
-   "s_ko": "세계 요트연맹 대양·원양위원회(OOC)가 신기술이 원양 레이싱에 미치는 영향에 대해 레이싱 커뮤니티를 대상으로 글로벌 설문조사를 실시할 예정이다.\n2021년 11월부터 논의해온 기술 관련 이슈들이 최근 2025년 11월 해외 대회 조직위원포럼에서 논의되었고, 다양한 제안들이 접수되었다.\n원양 레이싱에 참여하는 선주·운영자·이해관계자들의 광범위한 의견 수렴을 통해 규정 방향을 결정할 계획이다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/10/07/impact-of-technology-in-offshore-sailing/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-10-07T18:38:55.000Z"
-  },
-  {
-   "title": "AC Recon: Oct 6 - Italians resume AC75 testing",
-   "t_ko": "Luna Rossa, 한 달 휴지 후 AC75 테스트 재개",
-   "s_ko": "Luna Rossa팀이 4주간 물 위에서 떨어져 있다가 오전 9시 5분에 마스트를 내려놓고 9시 15분에 AC75 보트를 투입해 테스트를 재개했다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300526/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T14:46:42.000Z"
-  },
-  {
-   "title": "欧州勢のアジャスト力を実感したFISU大学セーリング世界選手権",
-   "t_ko": "FISU 대학 세일링 세계선수권: 유럽 팀들의 '조정력(아주스트 파워)' 분석",
-   "s_ko": "9월 27일부터 10월 2일 크로아티아 스플릿에서 열린 대회에서 일본 대표팀은 15개국 중 13위에 그쳤다.\n유럽 팀들은 艇 변경, 세일 조건 변화, 사용 가능 장비 변경 시 상황을 빠르게 파악하고 주행 방식을 수정하는 능력이 뛰어났으며, 이는 세일 트림·힐 앵글 조정을 넘어 선회 각도·타전술 변경을 포함한다.\n대회 중 제넉 트러블로 전艇이 제넉 없이 주행하는 사태가 발생했을 때, 상위팀들은 포지션 간 정보 공유와 동시 조정을 짧은 시간 내에 반복해 대응했다.",
-   "cat": "항해술",
-   "link": "https://bulkhead.jp/2026/10/118524/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-10-07T11:22:06.000Z"
-  },
-  {
-   "title": "First Bulent Atabay Cup - Türkiye",
-   "t_ko": "터키, 빌렌트 아타바이 컵 원양 레이스 첫 개최",
-   "s_ko": "터키 원양 레이싱 클럽(TAYK)이 2026년 10월 3일 빌렌트 아타바이 컵을 처음 개최했다.\n이 대회는 28년간 6척의 오리엔트 익스프레스 레이스 보트를 제작한 선주 빌렌트 아타바이를 추도한다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300495/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T08:20:00.000Z"
-  },
-  {
-   "title": "America's Cup: ETNZ restarts in Auckland",
-   "t_ko": "뉘질랜드 에미레이츠팀, 오클랜드에서 AC75 테스트 재개",
-   "s_ko": "뉘질랜드 에미레이츠팀이 2026년 45일 쿼터 중 22일째인 화요일 하우라키 만에서 테스트 및 개발 프로그램을 재개했다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/300480/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T07:14:00.000Z"
-  },
-  {
-   "title": "McIntyre Golden Globe Race Update",
-   "t_ko": "매킨타이어 골든글로브 레이스, 열대성 폭풍 이후 대서양 악천후 진입",
-   "s_ko": "지난 8일간 매킨타이어 골든글로브 선단이 열대성 폭풍 곤잘로의 불확실성에서 벗어났으나, 새로운 대서양 악천후 상황에 진입했다.",
-   "cat": "항해술",
-   "link": "https://www.sail-world.com/news/300509/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T06:29:00.000Z"
-  },
-  {
-   "title": "What causes tropical revolving storms and how to avoid them",
-   "t_ko": "열대 회전풍(태풍·허리케인·사이클론) 이해와 회피 방법",
-   "s_ko": "열대 회전풍은 지역에 따라 허리케인·태풍·사이클론으로 불리며, 북대서양 폭풍은 사피르-심프슨 척도로 등급이 나뉜다.\n명명된 시스템이 반드시 허리케인으로 발전하지는 않으나 주시가 필요하다.\n표층 해수 온도와 대기 조건 등 6가지 발달 조건이 있으며, 처음 5가지는 연중 발생하지만 해수 온도 조건은 특정 시기에만 충족된다.",
-   "cat": "항해술",
-   "link": "https://www.yachtingworld.com/homepage/what-causes-tropical-revolving-storms-and-how-to-avoid-them-164171",
-   "source": "Yachting World",
-   "lang": "en",
-   "date": "2026-10-07T05:53:32.000Z"
-  },
-  {
-   "title": "A new Atlantic home for The Ocean Race",
-   "t_ko": "The Ocean Race 본부, 2028년부터 포르투갈 포르투로 이전",
-   "s_ko": "The Ocean Race 본부, 주요 원양 레이싱 이벤트, 해양 건강·과학·교육 프로그램이 2028년부터 포르투갈 포르투를 기반지로 활동한다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/300507/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T05:47:44.000Z"
-  },
-  {
-   "title": "Teak deck refurbishment: step-by-step to guide to replacing planks and caulking",
-   "t_ko": "티크 데크 패널 교체 및 코킹 시공 단계별 가이드",
-   "s_ko": "티크 재질의 갑판은 세척만으로는 부족하며 주기적인 유지보수가 필요하다.\n티크 판재 교체와 코킹 작업의 구체적 절차와 기법을 단계별로 설명한다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/teak-deck-refurbishment-step-by-step-to-guide-to-replacing-planks-and-caulking-107212",
-   "source": "PBO",
-   "lang": "en",
-   "date": "2026-10-07T04:40:52.000Z"
-  },
-  {
-   "title": "Allstate Sugar Bowl J/22 Worlds returns",
-   "t_ko": "J/22 세계선수권, 멕시코만의 발달 중인 날씨 시스템 주시",
-   "s_ko": "뉴올리언스 서던 요트클럽에서 개최되는 J/22 세계선수권이 시작되기 앞서 멕시코만에서 발달 중인 날씨 시스템이 대회에 영향을 미칠 가능성이 논의되고 있다.",
-   "cat": "기타",
-   "link": "https://www.sail-world.com/news/300516/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-10-07T03:47:00.000Z"
-  },
-  {
-   "title": "世界トップ約80選手が集結。10月31日からウインドサーフィンW杯・横須賀三浦大会",
-   "t_ko": "미니 6.50 외양항해: 선상 생활의 현실 - 1일 2시간 수면, 화장실은 버킷",
-   "s_ko": "프랑스에서 Mini 6.50으로 1년간 레이스를 치른 선수가 선상 생활의 실제를 공개했다.\n미니 艇은 선내에서 직립할 수 없고 기본적으로 반쯤 구부린 자세이며, 풍향·走行방식에 맞춰 船의 무게중심을 조정하기 위해 자신의 신체를 밸러스트의 일부로 활용하므로 고정된 수면 장소가 없다.\n한 번에 20-30분 정도 수면하며 5-10분 눈을 감고 휴식하는 등 하루 총 수면은 평균 2시간 정도이며, 3시간을 취하면 상당히 체력이 회복된다고 보고했다.",
-   "cat": "기타",
-   "link": "https://bulkhead.jp/2026/10/118516/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-10-06T10:05:56.000Z"
-  },
-  {
-   "title": "クルトワ6連覇！女子マッチレース世界選手権、20戦19勝で圧勝",
-   "t_ko": "클루르토아 여자 매치레이스 세계선수권 6연패, 샌프란시스코만에서 20경기 중 19승",
-   "s_ko": "9월 30일부터 10월 4일 미국 샌프란시스코에서 열린 2026 여자 매치레이스 세계선수권에서 프랑스의 폴린 클루르토아 팀이 우승해 6연승 기록을 달성했다.\n샌프란시스코만은 강풍과 강한 조류로 세계적으로도 난이도가 높은 해역으로 알려져 있으며, 약 20노트에서 약풍까지 변화하는 조건과 강한 조류를 공략해 20경기 중 19승의 압도적 성적을 거두었다.\n결승전에서 미국의 니콜 브로 팀 '벨라 레이싱'을 3-0으로 꺾었으며, 클루르토아는 2021년부터 6개 대회 연속 세계 타이틀을 보유하고 있다.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/10/118509/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-10-06T03:48:22.000Z"
   }
  ]
 }

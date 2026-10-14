@@ -1,13 +1,93 @@
 {
- "updated": "2026-10-13T02:18:09.144Z",
+ "updated": "2026-10-14T00:00:29.802Z",
  "gov": [
+  {
+   "title": "[포토 뉴스] 목포해경, 신안군 홍도 해상 10명 탄 70톤급 어선 좌초 '전원구조'",
+   "press": "뉴스프리존",
+   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1iZ1FKTkRiODl0ZElXMHJ3ZW8xMXBqa2ptZWNLQlFtalpHOFNvdXc2NHRwanpPZnVEREZsaVZjUmxicnU5S0VLc05wd1F2cHM2eHc4U0UtS3dLNGpKSVMyRVRvWGprN1RySUVJYWhSREhHTHPSAXdBVV95cUxPdi1jZ2IyUVlqTzJDQi1MSlprZ1lKSzdNZ3NxOTZmVFB2aWlZaUJQS2hZRjFkWGU0VXczY3Q3T0IwUHBTRExyR3B1WmhFMGJNSTRjWjdha2YtSmZ0UE16RG9SNG51UHZvZWRpOVVVTVZZcC0tMDJxVQ?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T22:50:06.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "속초해경, 동해중부 해상 연안사고 위험예보 '주의보' 발령",
+   "press": "강원신문",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBqRWtvSEZaaGwweVh2ZUQ5aXE0dmxtekNuVmtBZy0xaV9ia0x5ZXZ5TXhsdmtReWwydFc1T3N6U293RzllV2NQdnJkanczNlpuUU80SkxWQzBMLVRLempNT1Y5a2RGSzM5?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T13:28:44.000Z",
+   "cat": "기상"
+  },
+  {
+   "title": "목포해양경찰서, 저수심 갯벌 고립 낚시객 2명 구조…헬기 긴급 투입",
+   "press": "시사의창",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBINF9CU192S082NExJa3gxQjlDVnJ0U3pVd3ZzZzgtVmo3UFpxUlNOOFpfMERoWTBEOHZfeDBMRUtiNHRwZ0R5NlA0bnE1THoydTRaTg?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T13:15:06.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "규모 7.7 지진에 동해안 해일 가정… 실제 여객선 띄워 구조훈련",
+   "press": "해양레저신문",
+   "link": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE10RzlLRDVYSmNLYklHN2VNR24wa2tVX2V4ZnhpSnEteDVwNkdyMEJkcXN4Y2gyckhSVDNUdWp1YjhBbTdKZW5yNklGMllQWV9rTlBKeU1Jdw?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T13:01:00.000Z",
+   "cat": "기상"
+  },
+  {
+   "title": "목포해경, 가을철 낚시어선 안전사고 예방 위한 캠페인 실시",
+   "press": "호남타임즈",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFAwX1poZlN5YlNOY0xaeFA3Q1JQY1BGc1pXV3pPRXRwaFQ0UDVSTEFaOXQ2X01fcVVLTHZzYTBJSDRWQUVONGNZOTZXQ0Qxa3h1MGF5VUZKdjlLS3BjeV9sa3dTVUZINWJhckFteFZ3?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T12:07:45.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "평택해경, 원인 불명 해양오염사고 조사훈련 실시…오염원 추적 역량 강화",
+   "press": "여성종합뉴스",
+   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBqTl9ZSFZNb2VJZ2RIOXFQdy1aRnp1Y2JJeE5YcmVfTlpzNTZHclktZEZRWDh3TVo0WHRmOWtSVVptT2N1aWJPdHA4MlRXNUdjNGN5VjZSYTVjS1lfaTdEdzJQeUFxbHdBcXhNNzYyTQ?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-13T11:22:19.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "지진해일 대비 여객선 화재 및 해상 인명사고 대응 민·관 합동훈련",
+   "press": "뉴시스",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1YWlRPeEdJOXdha3RUZFZTam0yMUUteGxRVDZ5OXZQZ0w0TTJVX2xHX3BzMGhqdDdjU0RRb2NZT1QtZ1p0blBkREtIbXdVVWVQVjktUkNQb0ZBMnJTVUFWTQ?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-13T09:50:36.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "[2026 국감 | 해수부] 어선사고 ‘안전대책 실효성’ 도마…“CPTPP 피해조사 재검토” 주문",
+   "press": "한국농어민신문",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFA1czJFYUJmbHpsYmIyZzUtcENpVExXQ3IyaUtkdnZHRHJzblBQRjM0NnFXS2RnVEwtRnNWekxkUS01b2h2NW4xU0IzclhOUVJlQVJIV1F1OXhsYm94OE9uTDFtamF0LVcxQ2tydA?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-13T08:15:53.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "[2026 국감] 해마다 어선사고 늘어나는데…안전예산 삭감한 해수부",
+   "press": "뉴스핌",
+   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFBFYUY2SzRsc0Y0UEFqNzFSRy1kS09VUDZxamFhSXNZcHhtbkdwMXR3LTljVXMwSFU0M0J2TlJMZ2haUXJVVnJBZHQ5UkMxNTdWaE9aX0VtU1RENTlE?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-13T07:04:18.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "군산 어청도서 낚시어선 스크루에 로프 감겨...승선원 22명 무사",
+   "press": "전민일보",
+   "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE54OXBkR2tLX3BiNUQ2YXVRbDFWSkF5akY2QkVjVDhYRWhFQTNzUkppRlQzaUdsZmVBdjBZc3YwekxrYjJ2YVZXelh2YmQ1X0dNblBMZjdXek5xaHVKaUZNNjQ1ZXd1UQ?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-13T06:44:00.000Z",
+   "cat": "안전"
+  },
   {
    "title": "[국감] “낚시어선 사고 90%가 인재”…이개호 의원, ‘국립해양낚시학교’ 설립 촉구",
    "press": "브레이크뉴스",
    "link": "https://news.google.com/rss/articles/CBMiSEFVX3lxTFBBQklxUnBYRG9PVlAweHprVzBidjk4N050NnNwWTJyNElTRi1fUlprbzlBSU0wb1BFTy1QVmRqb0d4Y1NidjhZTw?oc=5",
-   "source": "해양안전",
+   "source": "낚시·어선",
    "date": "2026-10-12T23:57:00.000Z",
-   "cat": "안전"
+   "cat": "규정"
   },
   {
    "title": "동해·포항 해상안전망 강화…포항항공대 28년 무사고 비행",
@@ -58,14 +138,6 @@
    "cat": "규정"
   },
   {
-   "title": "[2026 국감] 해마다 어선사고 늘어나는데…안전예산 삭감한 해수부",
-   "press": "뉴스핌",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTFBFYUY2SzRsc0Y0UEFqNzFSRy1kS09VUDZxamFhSXNZcHhtbkdwMXR3LTljVXMwSFU0M0J2TlJMZ2haUXJVVnJBZHQ5UkMxNTdWaE9aX0VtU1RENTlE?oc=5",
-   "source": "낚시·어선",
-   "date": "2026-10-12T07:04:00.000Z",
-   "cat": "안전"
-  },
-  {
    "title": "군산서 구명조끼 착용하지 않고 조업한 어선 선원 잇따라 적발",
    "press": "연합뉴스",
    "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE9TRkN5NGRnVzZPR1ZSQzZSSW1hU3gxMEI3cnZtTUhvakcwVEduYS0zclUxejNhYlZEaG9nNVgtejdDd0hIMi1vcFA0emtfVTlodVNUalFiLVhxZzjSAWBBVV95cUxOb2loNE02d3lSdDBfVWVDQW5yS2Jwc3o2WW0wYTlHdkE0bTVSTVI2NHg5VjBLTS04aWZQNFFMejZSRW0wM0RhTm01dGVPWjRpYXJuRlk2eGtMdXI3VHp3YlY?oc=5",
@@ -79,7 +151,7 @@
    "link": "https://news.google.com/rss/articles/CBMiVkFVX3lxTFBiV25CNkNVWUJsYnIyWElXZUUtUW9OMEZFcmtjMGNtNFo0TlFGVXNmd3ZYUHdGai13bmFCakhRVDZabXBvMVJpWmZPMVlYUjB2bGNoX3hR0gFWQVVfeXFMUGJXbkI2Q1VZQmxicjJYSVdlRS1Rb04wRkVya2MwY200WjROUUZVc2Z3dlhQd0ZqLXduYUJqSFFUNlptcG8xUmlaZk8xWVhSMHZsY2hfeFE?oc=5",
    "source": "낚시·어선",
    "date": "2026-10-12T06:16:00.000Z",
-   "cat": "안전"
+   "cat": "규정"
   },
   {
    "title": "한글날 연휴 인천 앞바다 사고…해루질 사망에 어선침수",
@@ -528,198 +600,130 @@
    "source": "낚시·어선",
    "date": "2026-10-07T00:02:32.000Z",
    "cat": "안전"
-  },
-  {
-   "title": "가을·겨울 해양사고 인명피해 집중…KOMSA, 전국 포구서 현장 점검",
-   "press": "데일리안",
-   "link": "https://news.google.com/rss/articles/CBMijgJBVV95cUxOc2dtOGp4QUtxQWdEWXNhcDdJeG9mYUtad1lzZXJySm9tVVdoVkVMQVlPVUNyVXZCV0daUDFQZGdFazN3dDB1V2ZVTEl6dElaX0VZOHRuYVBVZ0lyV3lwTlo0bW1mS2xHNHd1MzctR1NzMEkxbjNjWThrT3hmQjdib1NyODBXOFhzUEtkNTdCSXZibkk2eGhGRkhBVE9XNHQyVXVCWEpPSE4waWlSNnlVTnloN2YzcEYxaThvMVJ1dWQzV21hVFRtd2dPMjRDSTF5NVViZ2F1cE9fRFV6Mi1RR0VVQl9hb3dfZllRREV6eGI0QnJBQTBaU1I1aWlKc195clZNdjROaVFmQkxCQUE?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T22:58:00.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "해경, 해양 구조때 부력조끼 안 벗는다",
-   "press": "동아일보",
-   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE11QTR6aTVCNG9RdzRXTlFkMmN2MEZ5UXZVT1dpR2ViTTIzU0FaX2pxdVBNX1k2dVYyVm1QVlJpMWlPUEVUM0x6RENDRHNWSEh4UV9FOE1LWEhQY240ZkZjTl9NdWhUcVZqUW9NN2dOVFFhZkgtVXfSAWZBVV95cUxQOXFKcC00RFhEY2l0bUJqUTlKV2IzOWowT28zcFVTYjdRUnpnN0lraXRFeG9kMGRodVNWVTFMVUJOOGtMQWg3MFZTV1hPMC1STEdZU2ZEaGVNY3RhQXhQem91aUJQZWc?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T19:30:00.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "제주항·서귀포항 최근 5년 해양사고 225건…제주 국가어항 노후시설 10곳·노후화율 19.2%",
-   "press": "제주뉴스",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9fNnA4eDVLRDdqX0xGckcxQkFOcWZYOUJuX0Z1S29POWhUWGFGMm1pX2pUTGRFekZNUUdBMjRYMjlrYzMzdEN2d0t4dm1iT0NDYVNsU1JGbGI4NWNoY21lU3llY2JERnBZamh1ZURn0gFuQVVfeXFMT182cDh4NUtEN2pfTEZyRzFCQU5xZlg5Qm5fRnVLb085aFRYYUYybWlfalRMZEV6Rk1RR0EyNFgyOWtjMzN0Q3Z3S3h2bWJPQ0NhU2xTUkZsYjg1Y2hjbWVTeWVjYkRGcFlqaHVlRGc?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T19:20:23.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "김주영 국회의원, 해상특보구역 늘어도 관측망은 5년째 제자리",
-   "press": "뉴스체크",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBHSjhuUjNmbW9Hc2dxWkp2N1h3MGRyLTh6UHJnUk1RbklNUTdRQ1JrMUxKc3A5c2dEYXk1V3htR3lzUHFNalp1NlBxS2pKVEg5YVlTNVZnWDJPWnJ1Nnk0WlBLTWJnRzdGSTA2amdncXnSAXBBVV95cUxQR0o4blIzZm1vR3NncVpKdjdYdzBkci04elByZ1JNUW5JTVE3UUNSazFMSnNwOXNnRGF5NVd4bUd5c1BxTWpadTZQcUtqSlRIOWFZUzVWZ1gyT1pydTZ5NFpQS01iZ0c3RkkwNmpnZ3F5?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T14:38:10.000Z",
-   "cat": "기상"
-  },
-  {
-   "title": "해경청, 수상레저 음주·약물 조종 처벌 강화…안전관리 대폭 손질",
-   "press": "경기일보",
-   "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5keG40VlExZkZMWEFvNllkV3RFT29pRzlEQ0V6bTRnVHhnRDRFbGo2WHZUcVdZMUVreU1iN2x0RVVWYkxCMWVTWmFJcnJfN1ctS0dVUnl1ekdrNVk?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-10-06T13:37:00.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "인천대교 인근 해상 어획물 운반선서 불…승선원 3명 구조(종합)",
-   "press": "연합뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE4tbzJ1ZVBxVjZEM0oxWTNnejNpdW83cVhQNWxPYmlHRTV2S1d6UzU3TEtWYklpTFpKcEZ6V003TzFpLTZCNWh1YVE2OElvR1dBR3ZWcFBGYmg5VWfSAWBBVV95cUxPeTVHNG9BZUxsUFdXeFJFdUpNWGFHYUZpeGU4azVDRlFLMHluUWwzRV9UMEdNcnRfWEZxZGU0bmItd2s3cnBFemVtby1Deno2WjJwTUxoQm85OUh2MndSd1M?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T11:25:00.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "“노후어선 사고 3년 새 85.3% 증가···기관손상 2배 이상”",
-   "press": "https://www.theleader.co.kr/",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBoSmJTenVDdzVoUFdLRDk3eGZNQmJRWUwtd19jYUJxbkV0WERkaVR6cWNLWEgtR0p4Z2VJWDlOS21rZWZ1TnB0ZWZzeUJYTDd2Rjlzd2UzX0FXRGVsZGV0YXlaSTN6dHd1d0U2Wg?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T10:46:53.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "군산해경, 군산항 침몰 예인선 인양·예인 완료",
-   "press": "일간투데이",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTFB2M0RNUV9aUkx3Ty1QUkRYdlNBeEpTV2RYTmtTVndiQVBkRExjTHpvMS1vbGxfWUtDQkdocm1fclNfVS1JMDExMFo4YXAwX0k1QlpfdUREZzg3YTYxOTJfMTNzQV9fTHE4NDVn?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-06T08:58:52.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "창원 실리도~원전항 배전선로, 25m 이상 선박 신고 의무화 - 울산매일",
-   "press": "울산최초, 최고의 조간신문",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE5ReFdxTThiNTJTMFExLXJnRFN3T1VlaEtvcGc2ai1kWkNJcTk2b2JFWmRrUGFPbk1JbloyTlhXQmpHREVUMlVBZ3BlNVZDT0Z2a3FkOFFGSEs3OUFKeTRJb01YajRyb3A3aVJ6Q1930gFuQVVfeXFMTlF4V3FNOGI1MlMwUTEtcmdEU3dPVWVoS29wZzZqLWRaQ0lxOTZvYkVaZGtQYU9uTUluWjJOWFdCakdERVQyVUFncGU1VkNPRnZrcWQ4UUZISzc5QUp5NElvTVhqNHJvcDdpUnpDX3c?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-06T08:07:14.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "\"성진호, 어획물 과적·파도 맞고 전복 추정\"…수색 지속",
-   "press": "뉴시스",
-   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFAtZEMySjlrMF9mUkJkWnE1eEVHVmVVSlBCZ0lrcDgyOHNQd1J4aDdqYWgzOVBPMVNTX09TMEZ1U2Q2U0xTTF9NXzB3bmowWmdXMm9BMjJydXZhZ3dic0l1cnFUQ0Z3R1M0VFRQR3JhU2ZlWVZqb0RHbdIBeEFVX3lxTFAtZEMySjlrMF9mUkJkWnE1eEVHVmVVSlBCZ0lrcDgyOHNQd1J4aDdqYWgzOVBPMVNTX09TMEZ1U2Q2U0xTTF9NXzB3bmowWmdXMm9BMjJydXZhZ3dic0l1cnFUQ0Z3R1M0VFRQR3JhU2ZlWVZqb0RHbQ?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-06T06:42:50.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "경남도, 남부권 최초 해양레저관광 전문인력 양성 거점 구축",
-   "press": "뉴스프리존",
-   "link": "https://news.google.com/rss/articles/CBMid0FVX3lxTFBJTmh1NkQ1X0ppRG56MzF2X05uc1FSblhoSGlvWnRlRlZqMzdZbzRudE1yblQ5OVlmbE9yYlNka1VBRkJkMUFuVFBMUzhpNHNnT2MwWWk4dTJMb2g1STVaMC00cHdBRVNPZDdDVjRMWmU0dXU1MDJF0gF3QVVfeXFMUElOaHU2RDVfSmlEbnozMXZfTm5zUVJuWGhIaW9adGVGVmozN1lvNG50TXJuVDk5WWZsT3JiU2RrVUFGQmQxQW5UUExTOGk0c2dPYzBZaTh1MkxvaDVJNVowLTRwd0FFU09kN0NWNExaZTR1dTUwMkU?oc=5",
-   "source": "요트·마리나",
-   "date": "2026-10-06T03:33:29.000Z",
-   "cat": "산업"
   }
  ],
  "wx": {
   "src": "KMA",
   "zones": [
    {
-    "kind": "풍랑예비",
-    "reg": "강원북부앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "강원중부앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "강원남부앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
+    "kind": "풍랑경보",
     "reg": "동해중부안쪽먼바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140900"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑경보",
     "reg": "동해중부바깥먼바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140900"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
+    "reg": "남해동부바깥먼바다",
+    "tmEf": "202610140700"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "동해남부남쪽안쪽먼바다",
+    "tmEf": "202610140800"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "동해남부남쪽바깥먼바다",
+    "tmEf": "202610140800"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "동해남부북쪽안쪽먼바다",
+    "tmEf": "202610140500"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "동해남부북쪽바깥먼바다",
+    "tmEf": "202610140500"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "강원북부앞바다",
+    "tmEf": "202610140400"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "강원중부앞바다",
+    "tmEf": "202610140400"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "강원남부앞바다",
+    "tmEf": "202610140400"
+   },
+   {
+    "kind": "풍랑주의보",
     "reg": "전북북부앞바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140200"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "전북남부앞바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140200"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "전남북부서해앞바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140300"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "전남중부서해앞바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140300"
    },
    {
-    "kind": "풍랑예비",
-    "reg": "전남남부서해앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해남부북쪽안쪽먼바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해남부북쪽바깥먼바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해남부남쪽안쪽먼바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해남부남쪽바깥먼바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "충남북부앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "충남남부앞바다",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "남해서부서쪽먼바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140300"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "제주도서부앞바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140300"
    },
    {
-    "kind": "풍랑예비",
-    "reg": "제주도남쪽바깥먼바다",
-    "tmEf": "202610140558"
+    "kind": "풍랑주의보",
+    "reg": "제주도동부앞바다",
+    "tmEf": "202610140100"
    },
    {
-    "kind": "풍랑예비",
+    "kind": "풍랑주의보",
     "reg": "제주도남서쪽안쪽먼바다",
-    "tmEf": "202610140558"
+    "tmEf": "202610140100"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "서해남부북쪽안쪽먼바다",
+    "tmEf": "202610140000"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "서해남부북쪽바깥먼바다",
+    "tmEf": "202610140000"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "서해남부남쪽안쪽먼바다",
+    "tmEf": "202610140000"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "서해남부남쪽바깥먼바다",
+    "tmEf": "202610140000"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "제주도남쪽바깥먼바다",
+    "tmEf": "202610140000"
+   },
+   {
+    "kind": "풍랑주의보",
+    "reg": "제주도남동쪽안쪽먼바다",
+    "tmEf": "202610140000"
    },
    {
     "kind": "풍랑예비",
@@ -730,77 +734,64 @@
     "kind": "풍랑예비",
     "reg": "경북북부앞바다",
     "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "동해남부남쪽안쪽먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "동해남부남쪽바깥먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "동해남부북쪽안쪽먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "동해남부북쪽바깥먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "남해동부바깥먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "제주도남동쪽안쪽먼바다",
-    "tmEf": "202610141158"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해중부안쪽먼바다",
-    "tmEf": "202610132358"
-   },
-   {
-    "kind": "풍랑예비",
-    "reg": "서해중부바깥먼바다",
-    "tmEf": "202610132358"
    }
   ],
   "land": [
    {
-    "kind": "강풍예비",
+    "kind": "강풍주의보",
+    "reg": "진도군",
+    "tmEf": "202610140430"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "여수시",
+    "tmEf": "202610140130"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "거문도.초도",
+    "tmEf": "202610140130"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "완도군여서도",
+    "tmEf": "202610140130"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "신안군(흑산면제외)",
+    "tmEf": "202610140100"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "부안위도면",
+    "tmEf": "202610140100"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "군산옥도면(어청도 제외)",
+    "tmEf": "202610140100"
+   },
+   {
+    "kind": "강풍주의보",
     "reg": "흑산도.홍도",
-    "tmEf": "202610140558"
+    "tmEf": "202610132200"
    },
    {
-    "kind": "강풍예비",
-    "reg": "울릉도.독도",
-    "tmEf": "202610140558"
-   },
-   {
-    "kind": "강풍예비",
-    "reg": "백령도.대청도",
-    "tmEf": "202610132358"
-   },
-   {
-    "kind": "강풍예비",
-    "reg": "보령도서",
-    "tmEf": "202610132358"
-   },
-   {
-    "kind": "강풍예비",
+    "kind": "강풍주의보",
     "reg": "군산어청도",
-    "tmEf": "202610132358"
+    "tmEf": "202610132200"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "울릉도.독도",
+    "tmEf": "202610131640"
    }
   ],
   "active": [
-   "풍랑예비: 강원북부앞바다, 강원중부앞바다, 강원남부앞바다, 동해중부안쪽먼바다, 동해중부바깥먼바다, 전북북부앞바다, 전북남부앞바다, 전남북부서해앞바다, 전남중부서해앞바다, 전남남부서해앞바다, 서해남부북쪽안쪽먼바다, 서해남부북쪽바깥먼바다, 서해남부남쪽안쪽먼바다, 서해남부남쪽바깥먼바다, 충남북부앞바다, 충남남부앞바다, 남해서부서쪽먼바다, 제주도서부앞바다, 제주도남쪽바깥먼바다, 제주도남서쪽안쪽먼바다, 경북남부앞바다, 경북북부앞바다, 동해남부남쪽안쪽먼바다, 동해남부남쪽바깥먼바다, 동해남부북쪽안쪽먼바다, 동해남부북쪽바깥먼바다, 남해동부바깥먼바다, 제주도남동쪽안쪽먼바다, 서해중부안쪽먼바다, 서해중부바깥먼바다"
+   "풍랑경보: 동해중부안쪽먼바다, 동해중부바깥먼바다",
+   "풍랑주의보: 남해동부바깥먼바다, 동해남부남쪽안쪽먼바다, 동해남부남쪽바깥먼바다, 동해남부북쪽안쪽먼바다, 동해남부북쪽바깥먼바다, 강원북부앞바다, 강원중부앞바다, 강원남부앞바다, 전북북부앞바다, 전북남부앞바다, 전남북부서해앞바다, 전남중부서해앞바다, 남해서부서쪽먼바다, 제주도서부앞바다, 제주도동부앞바다, 제주도남서쪽안쪽먼바다, 서해남부북쪽안쪽먼바다, 서해남부북쪽바깥먼바다, 서해남부남쪽안쪽먼바다, 서해남부남쪽바깥먼바다, 제주도남쪽바깥먼바다, 제주도남동쪽안쪽먼바다",
+   "풍랑예비: 경북남부앞바다, 경북북부앞바다"
   ],
   "summary": ""
  }

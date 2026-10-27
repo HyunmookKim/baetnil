@@ -143,6 +143,15 @@ footer{margin-top:34px;padding-top:16px;border-top:1px solid rgba(255,255,255,.0
 //     (앱이 4.70 부터 항해에 lv 를 실어 보내고 있다. 정비수첩·리뷰는 4.72 부터다.)
 const openWeb = r => ((r && r.lv) || 'com') === 'com';
 
+// ★★★ 자동검사 배는 웹에 안 나간다 (2026-10-27)
+//   사장님(2026-10-01): 「검사 계정이든 글이든 다 … 진짜 어플에 안보이게 해라」.
+//   앱 안(5.27·5.30)에서만 가리고 웹은 안 봤다 — 「자동검사배2」 100척 · 항해 122건이
+//   baetnil.com/v/ 에 공개로 떠 있었고 사이트맵으로 구글에도 알리고 있었다.
+//   앱과 같은 표로 알아본다: 검사는 늘 이름에 「자동검사」 를 쓴다(앱의 E2E_NAME) · e2e 표.
+//   ★ 목록·한 건·사이트맵이 같은 문을 쓴다 — 한쪽만 막으면 다른 쪽으로 샌다.
+const E2E_NAME = /자동검사/;
+const isE2E = b => !!b && (b.e2e === true || E2E_NAME.test(String(b.name || '')));
+
 const LANGS = ['ko', 'ja', 'en', 'ru'];
 const LPATH = { ko:'', ja:'ja/', en:'en/', ru:'ru/' };
 const L10N = {
@@ -664,7 +673,7 @@ export default {
       if(!bid){
         const boats = await readAll();
         const items = [];
-        boats.filter(b => b && !b.adminHidden).forEach(b => {
+        boats.filter(b => b && !b.adminHidden && !isE2E(b)).forEach(b => {
           (b[KIND[d]] || []).forEach(r => {
             if(!r || !r.id || !openWeb(r)) return;
             if(d === 'm' && !(r.how || []).length) return;
@@ -685,7 +694,8 @@ export default {
 
       // ── 한 건
       const b = await readOne(bid);
-      if(!b) return gone(L);
+      // ★ 목록에서 뺀 배(운영자가 가린 배 · 자동검사 배)는 한 건 페이지도 없는 것과 같다
+      if(!b || b.adminHidden || isE2E(b)) return gone(L);
       const r = (b[KIND[d]] || []).find(x => x && String(x.id) === String(rid));
       // ★★★ 여기가 그 문이다. 「공개」 가 아니면 없는 것과 같다.
       if(!r || !openWeb(r)) return gone(L);

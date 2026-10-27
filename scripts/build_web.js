@@ -33,6 +33,15 @@ const LPATH = { ko:'', ja:'ja/', en:'en/', ru:'ru/' };
 //   lv 가 없는 옛 자료는 'com' 으로 본다 (지금까지 나가던 것이 갑자기 사라지면 안 된다).
 const openWeb = r => ((r && r.lv) || 'com') === 'com';
 
+// ★★★ 자동검사 배는 웹에 안 나간다 (2026-10-27)
+//   사장님(2026-10-01): 「검사 계정이든 글이든 다 … 진짜 어플에 안보이게 해라」.
+//   앱 안(5.27·5.30)에서만 가리고 웹은 안 봤다 — 「자동검사배2」 100척 · 항해 122건이
+//   baetnil.com/v/ 에 공개로 떠 있었고 사이트맵으로 구글에도 알리고 있었다.
+//   앱과 같은 표로 알아본다: 검사는 늘 이름에 「자동검사」 를 쓴다(앱의 E2E_NAME) · e2e 표.
+//   ★ 목록·한 건·사이트맵이 같은 문을 쓴다 — 한쪽만 막으면 다른 쪽으로 샌다.
+const E2E_NAME = /자동검사/;
+const isE2E = b => !!b && (b.e2e === true || E2E_NAME.test(String(b.name || '')));
+
 function unwrap(v){
   if(v == null) return null;
   if('stringValue'  in v) return v.stringValue;
@@ -356,7 +365,7 @@ ${hre}
 }
 
 (async () => {
-  const boats = (await readAll()).filter(b => b && !b.adminHidden);
+  const boats = (await readAll()).filter(b => b && !b.adminHidden && !isE2E(b));
 
   // ── 사이트맵 — 지금 「공개」 인 것만
   const urls = [];

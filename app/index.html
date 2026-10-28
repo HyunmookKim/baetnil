@@ -3685,6 +3685,7 @@ const I18N = {
     '해상 경보':'Marine warning',
     '원문 보기 (WMO)':'View original (WMO)',
     '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'Source — WMO METAREA XI high seas warnings (issued by JMA, WWJP90)',
+    '출처 — 일본 기상청 먼바다 경보 (WWJP27 · 미국 NOAA 사본)':'Source — JMA high seas warnings (WWJP27, copy via US NOAA)',
     '먼바다 해상경보':'High seas warnings',
     '먼바다 해상경보를 불러오지 못했습니다. 아래에서 직접 확인해 주세요':'Couldn\'t load high seas warnings. Check the links below.',
     '먼바다 해상경보 발효 중':'High seas warning in effect',
@@ -7357,6 +7358,7 @@ const I18N = {
     '해상 경보':'Морское предупреждение',
     '원문 보기 (WMO)':'Исходный текст (ВМО)',
     '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'Источник — предупреждения ВМО для открытого моря, METAREA XI (выпуск Японского метеорологического агентства, WWJP90)',
+    '출처 — 일본 기상청 먼바다 경보 (WWJP27 · 미국 NOAA 사본)':'Источник — предупреждения Японского метеорологического агентства для открытого моря (WWJP27, копия NOAA, США)',
     '먼바다 해상경보':'Предупреждения для открытого моря',
     '먼바다 해상경보를 불러오지 못했습니다. 아래에서 직접 확인해 주세요':'Не удалось загрузить предупреждения для открытого моря. Проверьте по ссылке ниже',
     '먼바다 해상경보 발효 중':'Действует предупреждение для открытого моря',
@@ -11085,6 +11087,7 @@ const I18N = {
     '해상 경보':'海上警報',
     '원문 보기 (WMO)':'原文を見る（WMO）',
     '출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)':'出典 — WMO METAREA XI 全般海上警報（気象庁発表 WWJP90）',
+    '출처 — 일본 기상청 먼바다 경보 (WWJP27 · 미국 NOAA 사본)':'出典 — 気象庁 全般海上警報（英文 WWJP27・米国海洋大気庁 NOAA 経由）',
     '먼바다 해상경보':'全般海上警報',
     '먼바다 해상경보를 불러오지 못했습니다. 아래에서 직접 확인해 주세요':'全般海上警報を取得できませんでした。下のリンクで確認してください',
     '먼바다 해상경보 발효 중':'全般海上警報 発表中',
@@ -27719,7 +27722,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.53';
+const APP_VER = '5.54';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -49506,8 +49509,14 @@ function wxSpotFarSea(){
 function mwAlertBox(){
   if(!wxSpotFarSea()) return '';
   const W = mwCache;
-  const foot = `<a href="https://wwmiws.wmo.int/index.php/metareas/bulletinset/11/html" target="_blank" rel="noopener">${esc(t('원문 보기 (WMO)'))}</a>`;
-  const src = `<div class="wxfoot">${esc(t('출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)'))}</div>`;
+  // ★★★ 5.54 — 수집기가 WMO 에서 못 받으면 같은 경보의 원본(気象庁 全般海上警報 英文 WWJP27)을
+  //   미국 NOAA 사본으로 받는다(via:'noaa'). 그때는 출처·원문 자리도 그쪽을 가리킨다 —
+  //   받은 곳과 다른 곳을 출처로 적으면 화면이 거짓말을 한다.
+  const viaNoaa = !!(W && W.via === 'noaa');
+  const foot = viaNoaa
+    ? `<a href="https://tgftp.nws.noaa.gov/data/raw/ww/wwjp27.rjtd..txt" target="_blank" rel="noopener">${esc(t('원문 보기'))} (NOAA)</a>`
+    : `<a href="https://wwmiws.wmo.int/index.php/metareas/bulletinset/11/html" target="_blank" rel="noopener">${esc(t('원문 보기 (WMO)'))}</a>`;
+  const src = `<div class="wxfoot">${esc(viaNoaa ? t('출처 — 일본 기상청 먼바다 경보 (WWJP27 · 미국 NOAA 사본)') : t('출처 — WMO METAREA XI 먼바다 경보 (일본 기상청 발표 WWJP90)'))}</div>`;
   if(!W || !W.ok){
     return `<div class="wxbox"><b>${esc(t('먼바다 해상경보'))}</b>
       <div>${esc(t('먼바다 해상경보를 불러오지 못했습니다. 아래에서 직접 확인해 주세요'))}</div>

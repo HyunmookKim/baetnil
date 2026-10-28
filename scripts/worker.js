@@ -178,7 +178,9 @@ const L10N = {
     '이 기록은 한국어로 쓰였습니다.':'この記録は韓国語で書かれています。',
     '없는 기록입니다':'ない記録です',
     '이 기록은 내려갔거나 지워졌습니다.':'この記録は公開が取り下げられたか、削除されました。',
-    '잠시 뒤에 다시 열어 주세요.':'しばらくしてからもう一度開いてください。'
+    '잠시 뒤에 다시 열어 주세요.':'しばらくしてからもう一度開いてください。',
+    // ★ 날씨 (앱 사전과 같은 말 — 앱의 wxText 와 같게 찍는다)
+    '북':'北', '북북동':'北北東', '북동':'北東', '동북동':'東北東', '동':'東', '동남동':'東南東', '남동':'南東', '남남동':'南南東', '남':'南', '남남서':'南南西', '남서':'南西', '서남서':'西南西', '서':'西', '서북서':'西北西', '북서':'北西', '북북서':'北北西', '(돌풍 {n})':'（突風 {n}）', '파고 {n}m':'波高 {n}m', '조위 {n}cm':'潮位 {n}cm', '자료 없음':'データなし'
   },
   en: {
     '뱃일 — 배 타는 사람들':'Baetnil — for people on boats',
@@ -203,7 +205,9 @@ const L10N = {
     '이 기록은 한국어로 쓰였습니다.':'This record was written in Korean.',
     '없는 기록입니다':'Not found',
     '이 기록은 내려갔거나 지워졌습니다.':'This record has been unpublished or deleted.',
-    '잠시 뒤에 다시 열어 주세요.':'Please try again in a moment.'
+    '잠시 뒤에 다시 열어 주세요.':'Please try again in a moment.',
+    // ★ 날씨 (앱 사전과 같은 말 — 앱의 wxText 와 같게 찍는다)
+    '북':'N', '북북동':'NNE', '북동':'NE', '동북동':'ENE', '동':'E', '동남동':'ESE', '남동':'SE', '남남동':'SSE', '남':'S', '남남서':'SSW', '남서':'SW', '서남서':'WSW', '서':'W', '서북서':'WNW', '북서':'NW', '북북서':'NNW', '(돌풍 {n})':' (gusts {n})', '파고 {n}m':'Waves {n} m', '조위 {n}cm':'Tide {n} cm', '자료 없음':'No data'
   },
   // ★ 러시아어가 여기 없었다 (4.94 에 넣음).
   //   대문에는 러시아어가 있는데 기록 페이지에는 없어서, 앞문과 뒷문이 서로 다른 말을 썼다.
@@ -230,11 +234,37 @@ const L10N = {
     '이 기록은 한국어로 쓰였습니다.':'Эта запись написана на корейском языке.',
     '없는 기록입니다':'Запись не найдена',
     '이 기록은 내려갔거나 지워졌습니다.':'Эта запись снята с публикации или удалена.',
-    '잠시 뒤에 다시 열어 주세요.':'Пожалуйста, откройте чуть позже.'
+    '잠시 뒤에 다시 열어 주세요.':'Пожалуйста, откройте чуть позже.',
+    // ★ 날씨 (앱 사전과 같은 말 — 앱의 wxText 와 같게 찍는다)
+    '북':'С', '북북동':'ССВ', '북동':'СВ', '동북동':'ВСВ', '동':'В', '동남동':'ВЮВ', '남동':'ЮВ', '남남동':'ЮЮВ', '남':'Ю', '남남서':'ЮЮЗ', '남서':'ЮЗ', '서남서':'ЗЮЗ', '서':'З', '서북서':'ЗСЗ', '북서':'СЗ', '북북서':'ССЗ', '(돌풍 {n})':' (порывы {n})', '파고 {n}m':'Волна {n} м', '조위 {n}cm':'Уровень воды {n} см', '자료 없음':'Нет данных'
   }
 };
 // ★ 옮긴 말이 없으면 한국어를 그대로 낸다. 빈 칸이 나오면 안 된다 (앱의 t() 와 같은 규칙).
 const T = (lang, s) => (lang === 'ko') ? s : ((L10N[lang] || {})[s] || s);
+// ★★★ 2026-10-28 — 날씨가 「[object Object] → [object Object]」 로 나왔다 (여수 Shunshine 공개 항해).
+//   앱은 날씨를 {dir,kt,gust,wave,tide,temp,…} 로 남기는데 여기는 글자로만 찍었다.
+//   앱의 wxText 를 그대로 옮겼다 — 같은 말, 같은 차례, 같은 단위 (러시아어는 уз·쉼표 소수점).
+//   ★ 한 겹 더 싸인 옛 자료({text:{kt:…}})도 푼다. 옛 글자 기록은 있는 그대로.
+const WX_DIRS = ['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
+function wxStr(w, L){
+  if(!w) return '';
+  if(typeof w === 'string') return T(L, w);
+  if(typeof w !== 'object') return String(w);
+  if(w.text && typeof w.text === 'object') return wxStr(w.text, L);
+  const has = (w.kt != null || w.wave != null || w.tide != null || w.temp != null);
+  if(!has) return T(L, String(w.text || ''));
+  const dec = v => L === 'ru' ? String(v).replace('.', ',') : String(v);
+  const sp = (L === 'ru' || L === 'en') ? '\u00a0' : '';
+  const kt = L === 'ru' ? 'уз' : 'kt';
+  const sub = (s, n) => T(L, s).split('{n}').join(String(n));
+  const parts = [];
+  if(w.kt != null) parts.push((w.dir != null ? T(L, WX_DIRS[Math.round(((Number(w.dir) % 360) / 22.5)) % 16]) : '')
+    + ' ' + dec(w.kt) + sp + kt + (w.gust != null ? sub('(돌풍 {n})', w.gust) : ''));
+  if(w.wave != null) parts.push(sub('파고 {n}m', dec(Number(w.wave).toFixed(1))));
+  if(w.tide != null) parts.push(sub('조위 {n}cm', w.tide));
+  if(w.temp != null) parts.push(w.temp + '\u2103');
+  return parts.join(' \u00b7 ') || T(L, '자료 없음');
+}
 // ★ 배 주인이 쓴 글은 옮기지 않는다. 기계로 옮기면 그 사람이 안 한 말이 그 사람 이름으로 남는다.
 //   대신 무슨 말로 쓰인 글인지 그 나라 말로 밝힌다.
 const wroteIn = L => (L === 'ko') ? '' :
@@ -338,7 +368,7 @@ function voyPage(b, v, L){
     [T(L,'날짜'), v.date], [T(L,'출발'), [v.from, v.timeOut].filter(Boolean).join(' · ')],
     [T(L,'도착'), [v.to, v.timeIn].filter(Boolean).join(' · ')],
     [T(L,'거리'), v.nm ? v.nm + ' NM' : ''], [T(L,'항해 시간'), durText(v.hours)],
-    [T(L,'종류'), v.kind], [T(L,'날씨'), [v.wxOut, v.wxIn].filter(Boolean).join(' → ')]
+    [T(L,'종류'), v.kind], [T(L,'날씨'), [wxStr(v.wxOut, L), wxStr(v.wxIn, L)].filter(Boolean).join(' → ')]
   ].filter(r => r[1]);
   // ★ 4.95 — 사진이 자리마다 붙는다 (출발 · 중간 기록 · 도착 · 이 항해 사진).
   //   읽는 사람에게는 「언제 어디서 찍은 것인지」 가 붙어 있어야 이야기가 된다.

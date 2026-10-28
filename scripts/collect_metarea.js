@@ -10,6 +10,17 @@
 //     앱은 날씨 지점이 그 안에 드는지 본다. 모르는 모양은 버리지 않고 원문 그대로 남긴다.
 const fs = require('fs');
 const URL = process.env.METAREA_URL || 'https://wwmiws.wmo.int/index.php/metareas/bulletinset/11/html';
+// ★★★ 2026-10-27 — 예비 자료처 (사장님: 「실패했을때 백업으로 쓸 수 있는 소스 … 잘 찾아서 넣어라」)
+//   10/21 부터 WMO WWMIWS 가 통째로 점검 중이다(「Le site est actuellement en maintenance」).
+//   그동안 이 경보가 10/21 것에 멈춰 있었다.
+//   ★ 같은 경보의 원본은 일본 기상청 「全般海上警報（定時）（英文）」 = 전문 이름 WWJP27, 하루 4번.
+//     (気象庁 配信資料カタログ 「海上警報」: https://www.data.jma.go.jp/suishin/cgi-bin/catalogue/make_product_page.cgi?id=KaijoKei)
+//     WWJP90 과 머리말만 다르고 꼴(WARNING AND SUMMARY · WARNING VALID · STORM/GALE WARNING …)이 같다.
+//   ★ 그 전문을 미국 기상청(NOAA)이 세계 기상 통신망(GTS)에서 받아 그대로 공개한다 — tgftp 의 raw/ww.
+//   ★ WMO 를 먼저 본다. 못 받았을 때만 NOAA 사본을 쓰고, 어디서 받았는지 파일에 적는다(via).
+//   ★ 사본이 낡았으면(발표 12시간 넘음) 쓰지 않는다 — 옛 경보를 새것처럼 내면 안 된다.
+const BACKUP = process.env.METAREA_BACKUP_URL || 'https://tgftp.nws.noaa.gov/data/raw/ww/wwjp27.rjtd..txt';
+const MAX_AGE_H = 12;
 const OUT = process.argv[2] || 'warn-metarea11.json';
 
 function textOf(html){
@@ -37,9 +48,10 @@ const AREAS = {
   'EAST CHINA SEA':      [23.0, 117.0, 33.5, 131.0],
   'SEA AROUND HOKKAIDO': [40.5, 138.5, 46.0, 147.0],
 };
-function parse(t){
-  const i = t.indexOf('WWJP90');
-  if(i < 0) throw new Error('WWJP90 없음');
+function parse(t, want){
+  want = want || 'WWJP90';
+  const i = t.indexOf(want);
+  if(i < 0) throw new Error(want + ' 없음');
   let body = t.slice(i);
   const end = body.indexOf('JAPAN METEOROLOGICAL AGENCY.=');
   if(end > 0) body = body.slice(0, end);
@@ -78,16 +90,44 @@ function parse(t){
   });
   return { head, issued, valid, warnings: out };
 }
+// 「DDHHMM」(UTC) → 그 시각. 달이 바뀌는 날(예: 1일에 받은 31일 발표)도 맞게 지난달로 돌린다.
+function issuedAt(ddhhmm, now){
+  const m = String(ddhhmm || '').match(/^(\d{2})(\d{2})(\d{2})$/); if(!m) return null;
+  now = now || new Date();
+  let d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), +m[1], +m[2], +m[3]));
+  if(d.getTime() - now.getTime() > 2 * 86400e3) d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, +m[1], +m[2], +m[3]));
+  return d;
+}
+const UA = { headers: { 'user-agent': 'baetnil-collector (+https://baetnil.com)' } };
+async function fromWMO(){
+  const r = await fetch(URL, UA);
+  if(!r.ok) throw new Error('WMO HTTP ' + r.status);
+  return { via: 'wmo', link: URL, from: 'WMO METAREA XI · 일본 기상청(JMA) WWJP90 High Seas Forecast',
+           ...parse(textOf(await r.text()), 'WWJP90') };
+}
+async function fromNOAA(now){
+  const r = await fetch(BACKUP, UA);
+  if(!r.ok) throw new Error('NOAA HTTP ' + r.status);
+  const p = parse(await r.text(), 'WWJP27');
+  const at = issuedAt(p.issued, now);
+  if(!at) throw new Error('NOAA 사본에 발표 시각이 없음');
+  const age = ((now || new Date()) - at) / 3600e3;
+  if(age > MAX_AGE_H) throw new Error('NOAA 사본이 낡음 (' + age.toFixed(1) + '시간 전 발표)');
+  return { via: 'noaa', link: BACKUP, from: '일본 기상청(JMA) 全般海上警報 영문 WWJP27 · 미국 NOAA 사본(GTS)', ...p };
+}
 if(require.main === module){
   (async () => {
-    const r = await fetch(URL, { headers: { 'user-agent': 'baetnil-collector (+https://baetnil.com)' } });
-    if(!r.ok){ console.error('HTTP ' + r.status); process.exit(1); }
-    const t = textOf(await r.text());
-    const p = parse(t);
-    const data = { ok: true, read: new Date().toISOString(),
-      from: 'WMO METAREA XI · 일본 기상청(JMA) WWJP90 High Seas Forecast', link: URL, areas: AREAS, ...p };
+    let p, why = '';
+    try{ p = await fromWMO(); }
+    catch(e){
+      why = String(e && e.message || e);
+      console.error('WMO 못 받음 — ' + why + ' → NOAA 사본(WWJP27)으로');
+      p = await fromNOAA();          // 이것도 못 받으면 던진다 → 실패(옛 파일은 그대로 둔다)
+    }
+    const data = { ok: true, read: new Date().toISOString(), areas: AREAS, ...p };
+    if(why) data.wmoFail = why;
     fs.writeFileSync(OUT, JSON.stringify(data));
-    console.log(p.head, '경보', p.warnings.length, p.warnings.map(w => w.kind + (w.circles ? ' 원' + w.circles.length : '') + (w.poly ? ' 다각' : '') + (w.areas ? ' ' + w.areas.join('/') : '')).join(' | '));
+    console.log('[' + p.via + ']', p.head, '경보', p.warnings.length, p.warnings.map(w => w.kind + (w.circles ? ' 원' + w.circles.length : '') + (w.poly ? ' 다각' : '') + (w.areas ? ' ' + w.areas.join('/') : '')).join(' | '));
   })().catch(e => { console.error(e); process.exit(1); });
 }
-module.exports = { parse, textOf, AREAS };
+module.exports = { parse, textOf, AREAS, issuedAt, fromWMO, fromNOAA };

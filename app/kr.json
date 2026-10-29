@@ -1,6 +1,110 @@
 {
- "updated": "2026-10-28T00:08:32.758Z",
+ "updated": "2026-10-29T00:30:26.490Z",
  "gov": [
+  {
+   "title": "서해해경청, 서남해권 해상교통 안전 논의…AI·자율운항 대응 모색",
+   "press": "더파워",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1yWEJCdHo1aTEtN0hoMlNiS2ZsUG1HOUE5Yms0VHlocDhEekk5VVBUVHFNR21LSWpGSGZjdC1VaUNUekFIcV9QMUJ2SVpqaWdJQjVZX21KYk0weFJYTTdlZ0tOUm5KOXhZYWVrZU9RSWtrQmVfMWRtOEpMZkZZUQ?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-28T23:27:54.000Z",
+   "cat": "항만"
+  },
+  {
+   "title": "속초해경, 겨울철 해양사고 대비 17개 기관과 수색·구조 협력 강화",
+   "press": "뉴스1",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTE9rdTNFNnRLM245MXRQdjROUEpfLW5CQmJDdENWQ1NkSEYyRHRCR2FIYm5CQUxkTjhJQUxnWG1oczhQLVg0UHVxQzgwOU4zN2VSd1I4Sg?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-28T14:40:31.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "부안해경, 가을 성어기 낚시어선 현장 안전점검… “해양사고 원천 차단”",
+   "press": "전북중앙",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE4ycUlxcnRUTS01LU1jUWliUVdXbkpwWUdOT2d1VG52Y3d6NF9PaVp5UlB2aE1NN2RCY245R1kydnBWVGlfbFJNdlNCOFlrSkszb2lWT0hESVRIN2pXa0x2U2lOLU4tdXfSAWtBVV95cUxNcWNkd3pvbHZLWE5UWnIwZl85X19IajVxYVhKMFVQNW5sY21aVlNJenFBM3YzVzFhbXV1VjBmQ01EdzVuWDNNLU14dHhZMURtQjFHaDJiam5DVlRvYnI2aTFraDd1VkU5LTFyRQ?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-28T09:43:52.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "평택해경, 야간 해상방제 합동훈련 참여…기름유출 사고 대응역량 점검",
+   "press": "여성종합뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5QRFdYOWQtOVBhMmF4MnNDNThGc25LRG45VHZKT1Y3OENVLUNqYlJNUGw4WXdWT2Z3dm9XNkhnQ3ExMUNtRWtHVEpvRjJzbHFYUldROUlLLThrdw?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-28T08:39:55.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "[단독] 태안군 6년간 해양조난사고 679건...충남도·태안군 해상풍력·해사채취 안전성 검증했나...",
+   "press": "타임뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiVEFVX3lxTFBDdUdzN0hseERLSDJDUlJVMU5TaU1NaTVOcllPS1BNZExJeXNxWFF6eWQ1VEhYY2xkLXpvd0Q5azBQbnNMN3V1U3RqSnh6TWdqMmp2OA?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-28T07:48:31.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "한국해양교통안전공단, AI 어선 설계·첨단 선박검사 시설 확충 \"어업인 안전 강화\"",
+   "press": "부산일보",
+   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5TRnJKcXp3LWhINi1tMGRTcGtiNmtGd1NxMUtiQzFpVEU5TjlTM1puc3Byc3l5cmxyTUVXc2tqX0VnT1ZFbWdncGN4d0hZYkh2cGJCX0F1ZmQ3dDVfU0dhRnFHdEt3T05IenN4aVBmY2Jkb1Bj?oc=5",
+   "source": "해양안전",
+   "date": "2026-10-28T07:42:43.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "배만 머무는 인천 바다, 사람이 머물고 돈이 도는 공간으로",
+   "press": "쓰담미디어",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE9JaGZ1a2h6eDNEV2FJTE11VDRuaGpvZmI5SDZYUTNsaHNlZS1xUWtMd1FMNGkwOU80N2RLdFZidy00ZlFoWnlBOTBuZGU5blJGczNjOGxCR3pERE9lSUJtQ19xVzNrUVU?oc=5",
+   "source": "요트·마리나",
+   "date": "2026-10-28T07:14:24.000Z",
+   "cat": "산업"
+  },
+  {
+   "title": "해경청, 일본 해상보안청과 해양오염 대응 협력 강화",
+   "press": "대한민국 정책브리핑",
+   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE16YVVMX2hsM3RhRFh5MWozRnd5d182am45c2Y2NTRsTURMZG9yUmFWb0gzb0RQQ0EtV3hBYWNnNm9yS3dWYVRiN0xKRXBrTnd4dHZwOUJrMEhSVXVkVl9RQlRGZGxscHlaYU0wMmVvOFlCNDls?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-28T07:06:12.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "어선 사고가 절반…해양경찰·수협·해양교통안전공단, 사고 예방 맞손",
+   "press": "한국NGO신문",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE1iN2NodkRDZlVPaDJXX3VLZkV4TXk2TUU3UzhBN1dVR2lUdGd6eWJNdUpwUTNselNoTUZ1MHBsbGhOSjNuR1lOOGY5UVlqc1d0OGdWSFdfOFVsX05nUzFqb3RMNjQ5LWFU?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-28T06:00:09.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "한·일 해양방제 당국 ‘맞손’…해경청, 화학물질 사고 대응 첨단기술·공조 강화",
+   "press": "아시아투데이",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9qYmF0bnlUenJnR05ub2xvNjExX0g2Qi0tYzRXekNLWlBKRVM3T0Z3UWlONTVscWowQkdQNVFfUF96RUpCbmNpTktkeDRXRVBBUkFfTHVkcXpROTczWk5CTXZocXktc2U2bTFyYjF3?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-28T04:59:59.000Z",
+   "cat": "기타"
+  },
+  {
+   "title": "양양군, 1인 어선 안전장비 지원사업 추진",
+   "press": "동방일보",
+   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTFBUQ3pFVHNudk01VVFxZlBLY01ETUs3bjJEVlNVTVEtdkg0X0ZlYzVxU3pYZ01nSUh1ZWg3UE9naHBUR1lQMGIyV1ZjUkJQeHVEczdWMGo1cE1CeFhQM1F3bU5PS0gzLWdMTlpySzA4dmppU00?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-28T04:28:44.000Z",
+   "cat": "안전"
+  },
+  {
+   "title": "군산해경, 어선 불법 개조 특별단속…4주간 집중 점검",
+   "press": "www.gukjenews.com",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTFBhaWM5a3U1c05EQkZWNjA3MWxwTXAyMUk4aS1WMG9rbXE1TXUxTGRXcDFzQmQ1c0dYNmhUMTUxSTlpVTB6N0ZmV2JNUXRZajUxam00bmh6b1BIaFNyXy1aTy1xMUxlM0RDOVBaRmRn?oc=5",
+   "source": "낚시·어선",
+   "date": "2026-10-28T04:02:14.000Z",
+   "cat": "규정"
+  },
+  {
+   "title": "2032년까지 ‘완전무인 자율운항’ 핵심기술 확보…‘피지컬 AI 항만’ 구현",
+   "press": "부산일보",
+   "link": "https://news.google.com/rss/articles/CBMifEFVX3lxTE5CZ3Y2ZEVpSnVPeG9qM09WZGhiUks5Y1Z3V1BHbjlsM3ZEaFQ1M09vYmJHemhzOHk1LXh1VDJkRVJUSWhGM0tCakllTmF0RXJFLTRCZklNaGVuS3EzSDFaa2RRT0d4b1ZXSHl5eU9zNnJ0WW50TnNGM18tTUE?oc=5",
+   "source": "해양정책",
+   "date": "2026-10-28T02:05:11.000Z",
+   "cat": "규정"
+  },
   {
    "title": "여수 가막만에 요트 16여 척 집결…바다 위 무료 경기 관람도",
    "press": "지이코노미",
@@ -528,96 +632,32 @@
    "source": "낚시·어선",
    "date": "2026-10-22T02:42:12.000Z",
    "cat": "규정"
-  },
-  {
-   "title": "어선 안전 확보·연안 침식 완화···양양군, 하반기 토사매몰어항 준설사업 착수",
-   "press": "이뉴스투데이",
-   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE5LLVc0VkthUEtNUXJaWGVfSExwZXRNMG1QTVJfc0VtbVFHSjhNM1FhdWFvZEhudjN2RGhQcDA5dGxRUG8tN2tWSHNPaVJjWmx2N1NRWDV5OVJKb19jbnR0SWlHX1pWZWJadTNISFlwQ0l4YTkt0gF0QVVfeXFMTkstVzRWS2FQS01RclpYZV9ITHBldE0wbVBNUl9zRW1tUUdKOE0zUWF1YW9kSG52M3ZEaFBwMDl0bFFQby03a1ZIc09pUmNabHY3U1FYNXk5UkpvX2NudHRJaUdfWlZlYlp1M0hIWXBDSXhhOS0?oc=5",
-   "source": "낚시·어선",
-   "date": "2026-10-21T23:45:39.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "동해해경, 동해항 인근 해상서 화학사고·수난사고 민·관 합동훈련…황산 유출·선박 화재 가정 6개 기관 10척 동원",
-   "press": "아주경제",
-   "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE93TTdnelFSTXZ1NFc3Q19RZ3ctS3RHQ0t2eHZ3WWVudlZub1Q3dW80VjBuVVFueTBzZmxHVDdXMFUyaS1VeWxXOXFBTllmelVqanBVOEJXMG3SAVhBVV95cUxPd003Z3pRUk12dTRXN0NfUWd3LUt0R0NLdnh2d1llbnZWbm9UN3VvNFYwblVRbnkwc2ZsR1Q3VzBVMmktVXlsVzlxQU5ZZnpVampwVThCVzBt?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-21T16:53:18.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "여수해경, 외국적 선박 대상 해상 마약류 밀반입 차단 합동 불시 검문검색",
-   "press": "일간투데이",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1WZk04cmRrX1JLcEh1MDl0NHhZQkJ1c1o3V0x5Q2IzdlRGUXVzTWctVmtOdlNlVkpMVWhTRHlURlV5Y1lVS3U4Q21LZEhLOV83R2gwOVZiZ1RVamZkbEt6bC1jYXVMakNkN3VR?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-21T14:39:00.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "동해안 위험해역 정보 QR코드로 확인…해양사고 예방 나선다",
-   "press": "경북도민일보",
-   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFBNMGhLQzNiVGNCZnRqX1pzT01MQU9yY2VvMkRWN284TWhKSE9LNE45TERVc29zUUhfNm9DcktpVDl4Rk9nNFctaGtoOHFlaUR5UmgtZkVNWXpOUENZYVBBRFZubnlIQWpLMVE?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-21T10:51:42.000Z",
-   "cat": "기상"
-  },
-  {
-   "title": "평택해경, 제부도 인근 해상 침수 모터보트 승객 전원 구조",
-   "press": "뉴스핌",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE5oRnRJUW1oNUs0SW1oRTlFSW5fbmRlQlh2dERWYzN6T1l4aEp6eEhOMXVZX2hnYUdqeHFpSDFXVzc2TWN5SU1sV2hiR3Ztc2Myb3VJZkFGVDlGV2xy?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-21T09:39:01.000Z",
-   "cat": "안전"
-  },
-  {
-   "title": "동해해경청, 광역VTS 관제구역 내 선박 법규위반 집중단속",
-   "press": "해사신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE95ZG9xZ0RidFUta0JVT25XTUZBQ1lLb3lEVXBIc1VRSl9qOVlFa3dZT3F5QUNQRXhDV1BCNmZQWE5OcUVXdjZvSDRTQzdTVHVPcjI3NnJELUNMVlYwNEpBckx6ZEt0UWtORDZB?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-21T09:25:00.000Z",
-   "cat": "규정"
-  },
-  {
-   "title": "해경 드론 61대 모두 소형…악천후엔 사실상 무용지물",
-   "press": "해사신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE5yamZxZHZfaGRyaW9jRnVNT1FhNDg0bnlfVC13NWFHcFFvd2FlWGpTNURuQThTZk94STdyRmhVUUpjT3hkUHJscjhRQlAxdDBJOFJTdzl2V0lHbjVUN1M0ZXp0ZGdFdF9tdGVN?oc=5",
-   "source": "해양안전",
-   "date": "2026-10-21T05:30:09.000Z",
-   "cat": "기타"
-  },
-  {
-   "title": "선박 좌초 위험 미리 확인한다…동해해경청 디지털 안전지도 구축",
-   "press": "해사신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE5IUm1zLXJodnJnbnJkWHM4QmdhOC1QODk0dWxZVEgwWVhFUWV6Ul9ZcTR6SUpTTVIySEZ2a3RJRlpVWGJ5NlFLMEJPRno1V0dDcnNMc3phQXAwRnVLOEJSa0VRbWFRNl9kVVBB?oc=5",
-   "source": "해양정책",
-   "date": "2026-10-21T04:18:14.000Z",
-   "cat": "항만"
-  },
-  {
-   "title": "해양안전 4대 현안 논의…19개 기관·단체, 해양사고방지 세미나 개최",
-   "press": "매일안전신문",
-   "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTFBneEJ6aUxmdWd4SC1LcWVfQ3BMZ3QtbW5XaHh1clJYV1BiYWkxOW1ka2NZMTRfSnZSVlFYNTVUMklmU3FUSGtXUTNfLWlvWWsyTmNPTkxQX3bSAWhBVV95cUxNcVU1VFFsS1dJUzFjY3hrSkl5VWJteUMzR3hVdjJVUkFDYjZMOEd2REk4QmtBZ0lIb1g0N0NwY25zR3NHbUs2OThwOVA5TzJQdHhWTWRnbHU4MndTUnMxSVdJQ3JNbU4xWg?oc=5",
-   "source": "낚시·어선",
-   "date": "2026-10-21T02:31:04.000Z",
-   "cat": "기타"
-  },
-  {
-   "title": "고위험 어선부터 해상운송 위기까지…해양사고 예방전략 한자리",
-   "press": "데일리안",
-   "link": "https://news.google.com/rss/articles/CBMirgJBVV95cUxNbXd6SGtFZGtiVndBbTlkXzlxMHRYYUdnYWJIbTdtVFV3d2VUQnVsU1BRcFB2RVRsbjlWTmNDNHg0NUx1MUcyMGR5b0g4aTdtVVBoTGFVZ3o2M0xTaG5vNVpFa0ZnUnRqTGlYSU0zSE9zRS0ycjBwTThJbVVUTExxWXE5eDgtZ0M3dXIyZkw5WmpycDJuREpXbXZ2SDlWOUl1MG5NWFFfTzc3VW93RF94RlRISnpsUFhpVG13WDJqWVYtNHM5Unk3YW8weWNIdmE3NWtURDZfbnpybGp4dlVRdi02SkJuVlAySmFLTi1ISXlQamdjc0liOWZuV3B3N2dBb2d4bS1vU2FMdDRaM2NZMFV1WFhoRkJwellQYWRicTZaXzJ4RWZuc21yd2FfQQ?oc=5",
-   "source": "낚시·어선",
-   "date": "2026-10-21T02:00:00.000Z",
-   "cat": "안전"
   }
  ],
  "wx": {
-  "src": "NEWS",
-  "active": [
-   "[오늘의 날씨 및 내일날씨]31호 태풍 인파 경로,강풍/풍랑 유의, 내일 중부지방, 모레 전국 비!",
-   "동해남부 남쪽 먼바다에 풍랑주의보",
-   "제주도, 강풍·풍랑특보 비상대응 1단계…피해도 잇따라",
-   "‘강풍·풍랑특보’ 28일 오전까지 초속 20m 강한 바람 예상"
+  "src": "KMA",
+  "zones": [
+   {
+    "kind": "풍랑예비",
+    "reg": "동해중부바깥먼바다",
+    "tmEf": "202610292358"
+   }
   ],
-  "summary": "※ 언론 보도 기준 — 기상청 실시간 확인 필수"
+  "land": [
+   {
+    "kind": "강풍주의보",
+    "reg": "백령도.대청도",
+    "tmEf": "202610290900"
+   },
+   {
+    "kind": "강풍주의보",
+    "reg": "연평도.우도",
+    "tmEf": "202610290900"
+   }
+  ],
+  "active": [
+   "풍랑예비: 동해중부바깥먼바다"
+  ],
+  "summary": ""
  }
 }

@@ -156,6 +156,8 @@ const LANGS = ['ko', 'ja', 'en', 'ru'];
 const LPATH = { ko:'', ja:'ja/', en:'en/', ru:'ru/' };
 const L10N = {
   ja: {
+    // ★ 배 종류 (앱 사전과 같은 말, 5.55) — 배 이름 줄에 한국어 「세일링 요트」 가 그대로 나왔다
+    '세일링 요트':'セーリングヨット', '모터보트·요트':'モーターボート・クルーザー', '낚시·유어선':'釣り・遊漁船', '어선':'漁船', '기타':'その他',
     '뱃일 — 배 타는 사람들':'뱃일 — 船に乗る人たち',
     '앱에서 보기':'アプリで見る', '앱 열기 →':'アプリを開く →',
     '이용약관':'利用規約', '개인정보':'プライバシー',
@@ -183,6 +185,8 @@ const L10N = {
     '북':'北', '북북동':'北北東', '북동':'北東', '동북동':'東北東', '동':'東', '동남동':'東南東', '남동':'南東', '남남동':'南南東', '남':'南', '남남서':'南南西', '남서':'南西', '서남서':'西南西', '서':'西', '서북서':'西北西', '북서':'北西', '북북서':'北北西', '(돌풍 {n})':'（突風 {n}）', '파고 {n}m':'波高 {n}m', '조위 {n}cm':'潮位 {n}cm', '자료 없음':'データなし'
   },
   en: {
+    // ★ 배 종류 (앱 사전과 같은 말, 5.55) — 배 이름 줄에 한국어 「세일링 요트」 가 그대로 나왔다
+    '세일링 요트':'Sailboat', '모터보트·요트':'Powerboat', '낚시·유어선':'Fishing / charter boat', '어선':'Fishing vessel', '기타':'Other',
     '뱃일 — 배 타는 사람들':'Baetnil — for people on boats',
     '앱에서 보기':'Open in the app', '앱 열기 →':'Open the app →',
     '이용약관':'Terms', '개인정보':'Privacy',
@@ -212,6 +216,8 @@ const L10N = {
   // ★ 러시아어가 여기 없었다 (4.94 에 넣음).
   //   대문에는 러시아어가 있는데 기록 페이지에는 없어서, 앞문과 뒷문이 서로 다른 말을 썼다.
   ru: {
+    // ★ 배 종류 (앱 사전과 같은 말, 5.55) — 배 이름 줄에 한국어 「세일링 요트」 가 그대로 나왔다
+    '세일링 요트':'Парусная яхта', '모터보트·요트':'Катер / моторная яхта', '낚시·유어선':'Рыболовное / прогулочное судно', '어선':'Промысловое судно', '기타':'Другое',
     '뱃일 — 배 타는 사람들':'Baetnil — для тех, кто выходит в море',
     '앱에서 보기':'Открыть в приложении', '앱 열기 →':'Открыть приложение →',
     '이용약관':'Условия', '개인정보':'Конфиденциальность',
@@ -320,8 +326,9 @@ const HARD = n => '★★★★★'.slice(0, Math.max(0, Math.min(5, Number(n)||
 const durText = h => { const n = Number(h); if(!isFinite(n) || n <= 0) return '';
   const m = Math.round(n * 60); return m >= 60 ? `${Math.floor(m/60)}시간 ${m%60 ? (m%60)+'분' : ''}`.trim() : m + '분'; };
 
-function byLine(b){
-  return `<div class="meta">${esc([b.name, b.port, b.typeName].filter(Boolean).join(' · '))}</div>`;
+// ★ 5.55 — 배 종류도 그 나라 말로 (앱이 공개 사본에 한국어 이름 typeName 을 싣는다)
+function byLine(b, L){
+  return `<div class="meta">${esc([b.name, b.port, b.typeName ? T(L || 'ko', b.typeName) : ''].filter(Boolean).join(' · '))}</div>`;
 }
 
 function mlogPage(b, m, L){
@@ -343,7 +350,7 @@ function mlogPage(b, m, L){
     [T(L,'쓴 부품'),   m.used]
   ].filter(r => r[1]);
   const body = `<h1>${esc(m.title || T(L,'정비 기록'))}</h1>${wroteIn(L)}
-${byLine(b)}
+${byLine(b, L)}
 ${prod ? `<div>${esc(prod)}${m.kind ? ` <span class="chip">${esc(m.kind)}</span>` : ''}</div>` : ''}
 <div style="margin:14px 0 4px">${rows.map(r =>
   `<div class="row"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}</div>
@@ -375,7 +382,7 @@ function voyPage(b, v, L){
   const shot = u => `<img src="${esc(u)}" style="width:100%;border-radius:12px;margin:10px 0" loading="lazy" alt="">`;
   const shots = a => (Array.isArray(a) ? a : []).map(pic).filter(Boolean).map(shot).join('');
   const pics = (v.photos||[]).map(pic).filter(Boolean).slice(0, 12);
-  const body = `<h1>${esc(nm)}</h1>${byLine(b)}${wroteIn(L)}
+  const body = `<h1>${esc(nm)}</h1>${byLine(b, L)}${wroteIn(L)}
 <div style="margin:14px 0 4px">${rows.map(r =>
   `<div class="row"><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}</div>
 ${shots(v.phOut)}
@@ -405,7 +412,7 @@ function rvPage(b, r, L){
     [T(L,'산 값'), r.price != null ? Number(r.price).toLocaleString() + (r.cur || '원') : '']
   ].filter(x => x[1]);
   const pics = (r.photos||[]).map(pic).filter(Boolean).slice(0, 8);
-  const body = `<h1>${esc(nm)}</h1>${byLine(b)}${wroteIn(L)}
+  const body = `<h1>${esc(nm)}</h1>${byLine(b, L)}${wroteIn(L)}
 <div style="margin:14px 0 4px">${rows.map(x =>
   `<div class="row"><b>${esc(x[0])}</b><span>${esc(x[1])}</span></div>`).join('')}</div>
 ${r.text ? `<h2 style="font-size:16px;margin:20px 0 2px">${esc(T(L, isBoat ? '타 보니' : '써 보니'))}</h2><p>${esc(r.text)}</p>` : ''}

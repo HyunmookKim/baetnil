@@ -3628,6 +3628,7 @@ const I18N = {
     '세일링 요트':'Sailboat',
     '모터보트·요트':'Powerboat',
     '낚시·유어선':'Fishing / charter boat',
+    '어선':'Fishing vessel',
     '기타':'Other',
     '영업용 배입니다':'This is a commercial boat',
     '개인 배입니다':'This is a private boat',
@@ -7301,6 +7302,7 @@ const I18N = {
     '세일링 요트':'Парусная яхта',
     '모터보트·요트':'Катер / моторная яхта',
     '낚시·유어선':'Рыболовное / прогулочное судно',
+    '어선':'Промысловое судно',
     '기타':'Другое',
     '영업용 배입니다':'Это коммерческое судно',
     '개인 배입니다':'Это частное судно',
@@ -11030,6 +11032,7 @@ const I18N = {
     '세일링 요트':'セーリングヨット',
     '모터보트·요트':'モーターボート・クルーザー',
     '낚시·유어선':'釣り・遊漁船',
+    '어선':'漁船',
     '기타':'その他',
     '영업용 배입니다':'営業用の船です',
     '개인 배입니다':'個人の船です',
@@ -16445,7 +16448,7 @@ function dgPickBuiltin(k){
   if(!lkCanEdit()) return;
   const kind = k;
   const b = (typeof curBoat==='function') ? curBoat() : null;
-  const myType = (b && b.type) || '';
+  const myType = (b && typeBase(b.type)) || '';
   const list = Object.keys(DG_BUILTIN)
     .filter(x => dgSeedUrl(kind, x))
     .sort((x,y) => (DG_BUILTIN[y].type===myType) - (DG_BUILTIN[x].type===myType))
@@ -17827,7 +17830,11 @@ function unstashBoats(uid){
 // ===== 배(boat) =====
 // 한 사람이 배를 여러 척 가질 수 있고, 나중에 남의 배도 함께 관리하게 된다.
 // 그래서 모든 데이터는 배 밑에 놓는다. 지금은 로컬이지만 구조는 그때와 같다.
-const BOAT_TYPES = { sail:'세일링 요트', power:'모터보트·요트', fishing:'낚시·유어선', other:'기타' };
+// ★ 5.55 — 「어선」 을 넣었다 (사장님 「그래」, 2026-10-30).
+//   일본 사용자의 「第七太海丸」(○○丸 = 어선 이름 꼴)이 종류가 없어 「기타」 를 골랐다. 스토어 글은 「어선도 쓸 수 있다」 고 한다.
+//   어선은 낚시·유어선과 같은 것(어로장비 정비 갈래·투망·양망 기록·제원 칸)을 쓴다 — typeBase 가 한 곳에서 잇는다.
+const BOAT_TYPES = { sail:'세일링 요트', power:'모터보트·요트', fishing:'낚시·유어선', fishery:'어선', other:'기타' };
+const typeBase = t => (t === 'fishery') ? 'fishing' : t;
 let boats = [];            // [{id, name, type, port, code, createdAt}]
 let currentBoatId = null;
 
@@ -19796,6 +19803,17 @@ function createBoat(){
   if(first){
     try{ if(!contacts || !contacts.length){ contacts = contactDefaults(); seedFreshSet('contacts', contacts); } }catch(_){}
     try{ if(!checkt  || !checkt.length){  checkt  = checkDefaults();  seedFreshSet('checkt', checkt); } }catch(_){}
+    // ★★ 5.55 — 첫 배에도 선종 정비 항목을 더한다 (어선을 넣으며 찾음).
+    //   처음 켤 때는 배가 없어 공통 16개만 깔린다. 그래서 첫 배는 세일링이든 낚싯배든
+    //   선종 항목(리깅·세일, 활어창 등)이 빠진 채 시작했다 — 두 번째 배부터만 들어갔다.
+    //   ★ 손대지 않은 기본 항목뿐일 때만, 없는 것만 더한다. 지우거나 바꾸지 않는다.
+    try{
+      if(Array.isArray(maint) && maint.length && maint.every(x => isPristineSeed('maint', x))){
+        const have = new Set(maint.map(x => String(x.id)));
+        const add = maintDefaults().filter(x => !have.has(String(x.id)));
+        if(add.length){ maint = maint.concat(add); seedFreshSet('maint', maint); }
+      }
+    }catch(_){}
   }
   sysSave();
   try{ pushPublic(nb); }catch(_){}      // 공개로 시작하므로 밖에 내보내는 사본도 바로 만든다
@@ -19803,7 +19821,13 @@ function createBoat(){
   document.getElementById('mrPanel').classList.remove('open');
   applyBoatName();
   syncPortSpot(nb);    // 홈포트를 날씨·물때 지점으로
-  switchTab('stow');   // 등록이 끝났으니 적재표부터 보여준다
+  // ★★★ 5.55 — 등록이 끝나면 「오늘」 의 「시작하기」 카드로 간다 (사장님 「그래」, 2026-10-30).
+  //   예전에는 적재표로 보냈다 — 첫 화면이 「이 배의 도면이 아직 없습니다」(가장 품이 드는 일)였고,
+  //   새로 들어온 두 척(베트남·일본)은 기록 0 으로 멈춰 있었다.
+  //   「시작하기」 카드(4.122)가 다음 할 일(계류 위치 → 출항 전 점검 → 정비 기록) 하나에만 단추를 둔다.
+  //   근거: Apple HIG Onboarding 「Teach through interactivity」 — 설명보다 실제로 한 가지를 해 보게.
+  switchTab('home');
+  try{ const L = document.getElementById('homeList'); if(L) L.scrollTop = 0; window.scrollTo(0, 0); }catch(_){}
 }
 function applyBoatName(){
   const el = document.getElementById('boatSub');
@@ -25718,7 +25742,7 @@ function boatField(k, v){
   try{ pubRefresh(); }catch(_){}
   if(k === 'type' && before !== v){
     // 선종이 바뀌면 없는 계통이 남을 수 있다. 지우지는 않고 알리기만 한다.
-    const grps = MAINT_GRPS_BY_TYPE[v] || MAINT_GRPS_BY_TYPE.other;
+    const grps = MAINT_GRPS_BY_TYPE[typeBase(v)] || MAINT_GRPS_BY_TYPE.other;   // 5.55 — 어선(fishery)은 낚시·유어선 계통을 쓴다
     const extra = [...new Set(maintRows().filter(m=>m.grp && !grps.includes(m.grp)).map(m=>m.grp))];
     if(extra.length)
       tell(t('선종을 바꾸셨습니다.') + '\n\n'
@@ -25921,7 +25945,7 @@ function boatWxCard(now, idx){
 // 출처가 아니라 출발점이다 — 실제 배와 다를 수 있다고 화면에 적어 둔다.
 function suggestWxLimits(b){
   if(!b) return null;
-  const t = b.type || 'other';
+  const t = typeBase(b.type) || 'other';
   const loa = Number((b.spec && b.spec.loa) || b.loa || 0);
   // 길이를 모르면 선종별로 흔한 크기를 쓴다
   const L = (loa > 0) ? loa : (t === 'sail' ? 11 : t === 'fishing' ? 9 : 8);
@@ -27722,7 +27746,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.54';
+const APP_VER = '5.55';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -30645,7 +30669,8 @@ function logKinds(){
 }
 function boatType(){
   const b = (typeof curBoat === 'function') ? curBoat() : null;
-  return (b && MAINT_BY_TYPE[b.type]) ? b.type : 'other';
+  const t = b ? typeBase(b.type) : '';
+  return (t && MAINT_BY_TYPE[t]) ? t : 'other';
 }
 function maintDefaults(){
   const t = boatType();

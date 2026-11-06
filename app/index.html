@@ -27746,7 +27746,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.55';
+const APP_VER = '5.56';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -37051,8 +37051,11 @@ function trBar(coll, id, src, cmt){
       <button class="minib" onclick="trOff('${jsq(coll)}','${jsq(id)}')">${esc(t('원문 보기'))}</button></div>`;
   }
   if(TR_BUSY[key]) return `<div class="trbar"><span>${esc(t('번역하는 중…'))}</span></div>`;
-  if(!meUid()) return '';                                   // 함수가 로그인한 사람만 받는다
-  if(navigator && navigator.onLine === false) return '';     // 인터넷이 없으면 못 옮긴다
+  // ★ (2026-11-03, 뉴스와 같은 꼴) 옮겨 둔 것이 있으면 인터넷·로그인이 없어도 「번역 보기」 로 돌아갈 수 있다.
+  //   예전에는 아래 두 줄에 막혀, 바다에서(인터넷 없음) 「원문 보기」 를 누르면 돌아올 단추가 사라졌다.
+  const 옮겨둠 = !!(TR_SKIP[key] && TR_GOT[key + ':' + langNow()]);
+  if(!옮겨둠 && !meUid()) return '';                                   // 함수가 로그인한 사람만 받는다
+  if(!옮겨둠 && navigator && navigator.onLine === false) return '';     // 인터넷이 없으면 못 옮긴다
   // ★ 글과 댓글을 따로 견준다.
   //   둘 다 내 말이면 아무것도 안 낸다 — 한국어뿐인 글에 번역 줄이 붙으면 고장으로 보인다.
   //   하나라도 남의 말이면 옮긴다.
@@ -49768,7 +49771,19 @@ function newsNeedTr(rows){
 function newsTrBar(rows){
   if(!rows.length) return '';
   if(TR_BUSY.news) return `<div class="trbar"><span>${esc(t('번역하는 중…'))}</span></div>`;
-  if(!trNewsOn) return '';
+  // ★★ 「원문 보기」 를 누른 뒤에도 번역으로 돌아갈 단추를 둔다 (사장님 지적, 2026-11-03:
+  //   「원문보기 누르면 다시 번역보는 버튼은 없냐」).
+  //   4.81 에 「번역해서 보기」 를 없애면서 원문을 보던 사람이 돌아올 길까지 없앴다.
+  //   커뮤니티 글(trBar)은 「원문 보기」 ↔ 「번역 보기」 를 같은 자리에 번갈아 둔다 — 뉴스도 같게.
+  //   (페이스북·인스타그램도 같은 자리에 「원문 보기」 / 「번역 보기」 를 번갈아 보여 준다)
+  if(!trNewsOn){
+    if(!newsTrSkip || !newsNeedTr(rows)) return '';
+    const 있나 = Object.keys(TR_NEWS[langNow()] || {}).length > 0;
+    // 옮겨 둔 것이 없으면 새로 옮겨야 한다 — 로그인·인터넷이 없으면 단추를 내지 않는다 (trBar 와 같다)
+    if(!있나 && (!meUid() || (navigator && navigator.onLine === false))) return '';
+    return `<div class="trbar"><span style="flex:1"></span>
+    <button class="minib blu" onclick="newsTrBack()">${esc(t('번역 보기'))}</button></div>`;
+  }
   if(!newsNeedTr(rows)) return '';            // 원래 내 말이면 아무 말도 안 낸다
   // ★★★ 실제로 바뀐 글자가 하나라도 있어야 「옮겼다」 고 말한다 (2026-08-31).
   //   서버가 거절했는데도 이 줄을 띄우고 있었다. 화면이 거짓말을 한 것이다.
@@ -49785,6 +49800,13 @@ function newsTrBar(rows){
 // 「원어로 보기」 를 누른 사람에게는 다시 안 옮긴다 (그 화면에 있는 동안)
 let newsTrSkip = false;
 function newsTrOff(){ trNewsOn = false; newsTrSkip = true; renderNews(); }
+// 「번역 보기」 — 옮겨 둔 것이 있으면 그것을 바로 쓴다(값이 다시 들지 않는다). 없는 것은 newsTrAuto 가 옮긴다.
+function newsTrBack(){
+  newsTrSkip = false;
+  const got = TR_NEWS[langNow()] || {};
+  if(Object.keys(got).some(k => got[k] && got[k] !== k)) trNewsOn = true;
+  renderNews();
+}
 // 목록을 그릴 때 저절로 부른다. 사람이 누를 것이 없다.
 // ★ 뉴스는 한 화면에 여든 건이 온다. 제목+요약이면 백육십 도막이다.
 //   서버는 한 번에 60 도막까지다 — 넘기면 통째로 거절이다. 그래서 나눠 보낸다.

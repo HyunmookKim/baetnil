@@ -1,7 +1,207 @@
 {
- "updated": "2026-11-05T01:07:14.277Z",
- "candidates": 98,
+ "updated": "2026-11-09T00:10:16.459Z",
+ "candidates": 90,
  "items": [
+  {
+   "title": "ジュニアセーラー79艇が熱戦。愛媛・新居浜で坊っちゃんカップ開催",
+   "t_ko": "일본 주니어 요트 대회에서 '트랙트랙' 기술 실시간 활용",
+   "s_ko": "11월 1~2일 에히메현 니이하마시에서 제22회 보쿠쇼 컵 요트 대회 개최, 전국에서 79척 참가했다.\nOP급 C클래스를 제외한 전 艇에 'TracTrac' 시스템을 도입해 육상의 보호자와 코치가 스마트폰으로 아이들의 주행 위치를 실시간 확인할 수 있게 했으며 호평을 얻었다.\n1일차는 서북서풍 7~10노트로 각 클래스별로 5레이스, 2일차는 약풍 속에서 추가 1레이스씩을 실시했다.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/11/119185/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-08T23:06:59.000Z"
+  },
+  {
+   "title": "X-Yachts Composites Shipyard Tour",
+   "t_ko": "X-요트 복합재 조선소 투어: 선체 제조 공법",
+   "s_ko": "X-요트 모든 선박을 제조하는 복합재 조선소는 금형 회전기, 첨단 복합재료, 진공 주입(vacuum infusion) 등 혁신적인 빌드 기술을 갖추고 있다.\n현대 요트 제조의 주요 공법과 설비 수준을 보여주는 사례다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/301423/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T22:10:00.000Z"
+  },
+  {
+   "title": "Louis Burton finishes 3rd in the Route du Rhum",
+   "t_ko": "루트 뒤 럼 레이스 Louis Burton 3위 완주",
+   "s_ko": "41세 프랑스 선수 루이 버튼이 11월 8일 14시 30분 루트 뒤 럼 완주선에 도착해 3위로 입선했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301422/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T22:02:31.000Z"
+  },
+  {
+   "title": "Live from the Southern Ocean: Andrea Lodolo retires from 2026 Golden Globe Race after knee injury, shares details in exclusive satellite call",
+   "t_ko": "골든글로브 레이스 2026 선수 무릎 부상으로 기권",
+   "s_ko": "이탈리아 선수 안드레아 로돌로는 11월 8일 골든글로브 레이스 2026에서 무릎 부상으로 기권을 발표했으며, 남대양에서 위성 통신으로 기자들에게 상세 사항을 공개했다.",
+   "cat": "사고",
+   "link": "https://www.yachtingmonthly.com/boat-events/golden-globe-race/live-from-the-southern-ocean-andrea-lodolo-retires-from-2026-golden-globe-race-after-knee-injury-shares-details-in-an-exclusive-satellite-call-106941",
+   "source": "Yachting Monthly",
+   "lang": "en",
+   "date": "2026-11-08T20:40:36.000Z"
+  },
+  {
+   "title": "Thomas Coville finishes 2nd in the Route du Rhum",
+   "t_ko": "루트 뒤 럼 레이스 Thomas Coville 2위 완주",
+   "s_ko": "프랑스 선수 토마 코빌이 13번째 루트 뒤 럼에서 거대 울팀 소데보 울팀 3호로 2위 입선했고, 지역시간 12시 42분 포앙타 피트레 근처 완주선을 통과했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301419/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T18:58:52.000Z"
+  },
+  {
+   "title": "Golden Globe Race: Successful rescue of Guy Deboer",
+   "t_ko": "골든글로브 레이스 선수 남대서양에서 구조",
+   "s_ko": "골든글로브 레이스 참가자 Guy deBoer가 11월 7일 선상 낙상 후 건강 악화로 긴급 의료 후송을 요청했고, 브라질 해군 헬기가 리우 동쪽 약 870해리 지점에서 그를 타시바 36 스피릿호에서 구조했다.\n원양 항해 중 예기치 않은 부상으로 인한 긴급 상황 발생 사례로, 단독 항해자는 현지 해군·구조 당국의 연락처와 응급 프로토콜을 사전에 숙지해야 한다.",
+   "cat": "사고",
+   "link": "https://www.sail-world.com/news/301416/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T14:18:05.000Z"
+  },
+  {
+   "title": "18ft Skiff SIXT Spring Championship Race 5",
+   "t_ko": "시드니 하버 18ft 스키프 챔피언십 30노트 이상 강풍으로 레이스 중단 위험",
+   "s_ko": "뉴사우스웨일스 동쪽 해안에서 30노트 이상 돌풍이 불어 2026 SIXT 스프링 챔피언십 레이스 5가 중단될 가능성이 높아졌다.",
+   "cat": "안전",
+   "link": "https://www.sail-world.com/news/301415/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T11:29:59.000Z"
+  },
+  {
+   "title": "Francesca Clapcich in Route du Rhum - Day 7",
+   "t_ko": "루트 뒤 럼 레이스 1주차 말 IMOCA 함대 열대 저기압 통과",
+   "s_ko": "루트 뒤 럼 선두권 IMOCA 항해자들이 남쪽으로의 정박(gybe) 후 활발한 열대 저기압의 강풍이 몰아치는 거친 야간 항해를 겪고 있다.\n예측 불가능한 악천후 구간에서 세일 트림과 항로 계획의 중요성을 보여주는 사례다.",
+   "cat": "기타",
+   "link": "https://www.sail-world.com/news/301413/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T09:34:00.000Z"
+  },
+  {
+   "title": "Tom Laperche, SVR-Lazartigue wins Route du Rhum",
+   "t_ko": "루트 뒤 럼 레이스 Tom Laperche 우승",
+   "s_ko": "젊은 프랑스 선수 톰 라퍼시가 거대 파란색 울팀 다중선체 SVR-라자르티그로 11월 1일(현지시간) 22시 31분 포앙타 피트레 완주선을 통과해 루트 뒤 럼에서 결정적 승리를 거두었다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301410/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-08T05:34:00.000Z"
+  },
+  {
+   "title": "五輪メダルを目指す次世代セーラーへ。HOPE育成プログラム第7期生募集開始",
+   "t_ko": "일본 요트연맹, 올림픽 메달 목표 차세대 선수 육성 프로그램 시작",
+   "s_ko": "일본 요트연맹 올림픽 강화위원회가 'HOPE 육성 프로그램 제7기생' 모집을 시작했으며 신청 마감은 11월 14일이다.\n본 프로그램은 12~22세 세일러를 대상으로 범범 기술뿐 아니라 피지컬·규칙·기상·영양·영어·인테그리티 등 세일링 경기에서 승리하기 위한 모든 요소를 학습하도록 설계됐다.\n2021년 1월 개시된 이 프로그램의 최종 목표는 수료생들이 올림픽 경기대회에서 상위권을 노릴 수 있는 선수로 성장하는 것이다.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/11/119179/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-08T02:43:58.000Z"
+  },
+  {
+   "title": "Get Ready for Winter Sailing",
+   "t_ko": "겨울 항해를 위한 장비: 4mm 웻수트와 열 레이어 조합",
+   "s_ko": "겨울 항해 시 4mm 웻수트에 폴리프로/핫 소재 열 베이스 레이어와 에쿠아플리스 또는 SB1 근해용 드라이 스목을 겹겹이 입으면 트랩된 공기층으로 보온 효율이 높아진다.\n기온이 낮아지는 시즌에 장시간 항해할 때 쾌적함과 안전을 유지하기 위한 기본 장비 조합이다.",
+   "cat": "장비",
+   "link": "https://www.sail-world.com/news/301307/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-07T18:30:00.000Z"
+  },
+  {
+   "title": "Why sail solo nonstop around the world?",
+   "t_ko": "척추 질환 진단 후 태평양 횡단한 항해자, 세계 일주 무정차 항해 시작",
+   "s_ko": "희귀 척추 질환 진단을 받은 올리버 위저는 유튜브 동영상으로 항해를 배운 후 1998년 퍼시픽 크래프트 40으로 11월 1일 워싱턴 포트타운센드를 출발해 세계 일주 무정차·무지원 단독 항해에 나섰다.\n태평양을 거쳐 케이프혼을 거로 남대양을 횡단한 후 뉴질랜드를 거쳐 귀항하는 항로이며, 실시간 추적 및 유튜브로 항해 과정을 기록하고 있다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/06/why-sail-solo-nonstop-around-the-world/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-06T23:43:38.000Z"
+  },
+  {
+   "title": "ARC+ start delayed due to bad weather",
+   "t_ko": "ARC+ 대서양 랠리 악천후로 출항 연기",
+   "s_ko": "카나리 제도 인근 두 개의 저기압으로 인한 폭풍과 50노트 이상의 돌풍이 예보되자, 세계 크루징 클럽(WCC)이 78척의 요트가 참가한 ARC+ 랠리의 라스팔마스 출항을 연기했다.\n출항 예정일(11월 8일)에 전형적인 북풍이 아닌 강한 남서풍과 거대한 파도가 예상되어 안전상 문제가 대두됐다.",
+   "cat": "안전",
+   "link": "https://www.yachtingmonthly.com/boat-events/arc-start-delayed-due-to-bad-weather-106883",
+   "source": "Yachting Monthly",
+   "lang": "en",
+   "date": "2026-11-06T10:04:01.000Z"
+  },
+  {
+   "title": "How to keep food fresh onboard: Your guide to the marine fridge",
+   "t_ko": "선상 냉장고 선택과 유지 관리 가이드",
+   "s_ko": "현대 선상 냉장고는 전력 효율성과 컴팩트함이 개선되어 대부분의 현대식 갤리에 설치 가능하며, 전개식·상개식·쿨박스 등 다양한 형태가 있다.\n식품 보관을 위한 필수 장비로, 보관 방식의 선택과 에너지 관리가 장시간 항해의 실질적 쾌적함을 좌우한다.",
+   "cat": "장비",
+   "link": "https://www.pbo.co.uk/gear/how-to-keep-food-fresh-onboard-your-guide-to-the-marine-fridge-107794",
+   "source": "PBO",
+   "lang": "en",
+   "date": "2026-11-06T06:23:19.000Z"
+  },
+  {
+   "title": "早稲田ヨット部OBの4人が挑戦！メルジェス20全日本出場記",
+   "t_ko": "早大 요트부 OB들, 메르주스 20 전일본선수권서 첫 승리 경험",
+   "s_ko": "11월 1~3일 하야마 해역에서 열린 제13회 메르주스 20 전일본선수권에 早大 출신 젊은 선수 4명이 TOC팀으로 참가했다.\n艇을 인수한 지 약 1개월로 4명이 함께 항해하는 것이 첫 경험이었으나, 북풍 미풍 레이스에서 상측 마크를 1위로 통과해 최종 순위를 지켜냈다.\n제너커 상향에 트러블이 발생해 크루워크와 艇 조작 기술 개선 필요성을 느꼈으나, 상위팀과의 격차는 도구 차이가 아닌 크루워크·태틱스·튜닝의 축적이라는 점을 인식했다.",
+   "cat": "항해술",
+   "link": "https://bulkhead.jp/2026/11/119160/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-06T02:12:42.000Z"
+  },
+  {
+   "title": "Film depicts voyage by triple amputee",
+   "t_ko": "삼중절단 장애인 항해자 태평양 횡단 기록 영화 공개",
+   "s_ko": "영국 육군 베테랑 크레이그 우드는 세계 최초의 삼중절단 장애인으로 태평양을 단독 항해했으며, 메디컬리 41피트 쌍동선 시리우스 II로 3월 25일 푸에르토 바예르타에서 출발해 6월 24일 히로시마에 도착한 7,500해리 90일간의 항해를 영화 '싱글 핸디드'로 기록했다.\n항해 중 선체 손상과 보철팔 파손 등의 장애물을 극복한 사례를 보여주며, 두 개의 기네스 월드 레코드를 세웠다.",
+   "cat": "기타",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/05/film-depicts-voyage-by-triple-amputee/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-05T22:23:31.000Z"
+  },
+  {
+   "title": "Twelve remain in Golden Globe Race",
+   "t_ko": "골든글로브 레이스 2026 현황: 16명 중 12명 계속 진행",
+   "s_ko": "9월 6일 프랑스 레사블도롱에서 출발한 16명의 단독 선수 중 12명이 계속 진행 중이며, 선두의 다미앵 기요(프랑스)는 이미 희망봉 자오선을 통과했다.\n1988년 이전 설계 32~36피트 생산 선박으로 현대 기술 없이 경쟁하는 '레트로 레이스' 포맷의 4번째 대회다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/05/twelve-remain-in-golden-globe-race/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-05T21:09:10.000Z"
+  },
+  {
+   "title": "Boat preservation remains a priority",
+   "t_ko": "루트 뒤 럼 레이스 중 다중선체 캡사이즈와 포일 손상 다수 발생",
+   "s_ko": "루트 뒤 럼 3,542해리 단독 항해 레이스에 115척이 참가했으나, 초울팀, 오션 피프티, IMOCA, 클래스40 등 여섯 개 부문에서 탈주가 잇따랐고 각 다중선체 부문마다 캡사이즈가 발생했다.\n샤를 쇨들리에의 32미터 마크시 에드몬드 드 로칠드호는 포일 손상으로 초항을 마쳤으며, 프란시스 조용과 아르멜 르클레아크 등 주요 선수들도 물에 빠졌다.",
+   "cat": "사고",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/05/boat-preservation-remains-a-priority/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-05T19:49:09.000Z"
+  },
+  {
+   "title": "横須賀ウインドサーフィンW杯閉幕。大西富士子11位、倉鹿野巧23位",
+   "t_ko": "요코스카 윈드서핑 월드컵 폐막, 일본 선수 최고성적 달성",
+   "s_ko": "10월 31일~11월 4일 가나가와현 요코스카시 쓰쿠이하마 해변에서 열린 ANAウインドサーフィンワールドカップ에서 세계 31개국 약 80명의 톱 라이더가 포일 슬래롬으로 경쟁했다.\n초반 3일간 바람 부족으로 경기가 성립하지 않았으나, 4일차부터 경기가 진행돼 최종 남자 3레이스, 여자 4레이스가 실시됐다.\n여자는 오오니시 후지코가 일본 최고성적 11위, 남자는 쿠라지카노 타쿠미가 일본 최고성적 23위에 입상했다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119142/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-05T02:43:16.000Z"
+  },
+  {
+   "title": "転覆、衝突、リタイア続出。波乱のルート・デュ・ラム2026",
+   "t_ko": "루트 뒤 람 2026 시작 이틀 만에 대형 사고 다발",
+   "s_ko": "11월 1일 프랑스 생말로에서 출발한 제13회 루트 뒤 람(단독 대서양 횡단 레이스)에서 연일 전복·충돌·마스트 손상·폴 및 러더 파손이 발생 중이다.\n11월 4일 우승 후보 아르멜 르 클레아크의 Banque Populaire XI가 아조레스 제도 인근에서 전복했으며, 전회 우승자 샤를 코드렐리에는 폴 손상으로 리타이어했다.\n2018년 우승자 프란시스 조와용도 11월 2일 아일랜드 해역에서 전복했으나 화물선에 의해 구조됐다.",
+   "cat": "사고",
+   "link": "https://bulkhead.jp/2026/11/119135/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-05T02:02:33.000Z"
+  },
   {
    "title": "When one race changed everything",
    "t_ko": "J/24 요트 포트필립만에서 35노트 이상 돌풍 중 전복, 침몰",
@@ -151,176 +351,6 @@
    "source": "BULKHEAD JAPAN",
    "lang": "ja",
    "date": "2026-11-02T02:22:43.000Z"
-  },
-  {
-   "title": "Collision after Route du Rhum start – both skippers unhurt",
-   "t_ko": "Collision after Route du Rhum start – both skippers unhurt",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.yachtingworld.com/all-latest-posts/collision-after-route-du-rhum-start-both-skippers-unhurt-164470",
-   "source": "Yachting World",
-   "lang": "en",
-   "date": "2026-11-01T21:56:38.000Z"
-  },
-  {
-   "title": "Route du Rhum - Destination Guadeloupe start",
-   "t_ko": "Route du Rhum - Destination Guadeloupe start",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301232/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T18:16:00.000Z"
-  },
-  {
-   "title": "Sailing Calendar: November 2026",
-   "t_ko": "Sailing Calendar: November 2026",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/01/sailing-calendar-november-2026/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-01T17:36:36.000Z"
-  },
-  {
-   "title": "Team Malizia's Boris Herrmann is Off",
-   "t_ko": "Team Malizia's Boris Herrmann is Off",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301230/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T17:25:00.000Z"
-  },
-  {
-   "title": "Francesca Clapcich sets off on Route du Rhum",
-   "t_ko": "Francesca Clapcich sets off on Route du Rhum",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301229/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T16:40:00.000Z"
-  },
-  {
-   "title": "Melbourne to Devonport Yacht Race 2026",
-   "t_ko": "Melbourne to Devonport Yacht Race 2026",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301225/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T14:13:23.000Z"
-  },
-  {
-   "title": "Illusion racing continues at Bembridge",
-   "t_ko": "Illusion racing continues at Bembridge",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301228/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T14:10:00.000Z"
-  },
-  {
-   "title": "DF95 Autumn Series at Barton's Point week 5",
-   "t_ko": "DF95 Autumn Series at Barton's Point week 5",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301227/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T13:26:00.000Z"
-  },
-  {
-   "title": "A season on the water. A new adventure ahead.",
-   "t_ko": "A season on the water. A new adventure ahead.",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301137/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T12:00:00.000Z"
-  },
-  {
-   "title": "LGT Wealth Management Australia Cup Overall",
-   "t_ko": "LGT Wealth Management Australia Cup Overall",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301224/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T10:50:53.000Z"
-  },
-  {
-   "title": "2026 CTO J/24 Pre-Worlds Regatta",
-   "t_ko": "2026 CTO J/24 Pre-Worlds Regatta",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301222/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T10:40:11.000Z"
-  },
-  {
-   "title": "New Books from Adlard Coles Nautical",
-   "t_ko": "New Books from Adlard Coles Nautical",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301174/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T10:00:00.000Z"
-  },
-  {
-   "title": "18ft Skiff Club Race 2 & SIXT Spring Champs Race 4",
-   "t_ko": "18ft Skiff Club Race 2 & SIXT Spring Champs Race 4",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301221/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T08:58:31.000Z"
-  },
-  {
-   "title": "Oceanbridge NZ Match Racing - Final day",
-   "t_ko": "Oceanbridge NZ Match Racing - Final day",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301220/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T08:09:00.000Z"
-  },
-  {
-   "title": "市川航平が全勝優勝を飾る！ 三河湾で開催、全日本オータムマッチレース",
-   "t_ko": "일본 전국 오토 매치레이스 개최, 시카와 항평 전승 우승",
-   "s_ko": "10월 24~25일 아이치현 미카와만에서 전일본 오토 매치레이스 개최. 초일 최대 18노트의 강풍으로 스피네이커 없이 진행, 오후 10노트 이하로 약화되어 8플라이트 실시.\n2일차는 약풍으로 육상 대기 후 풍향 안정화되면서 경기 개시. 세대를 초월한 선수들이 참가.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/11/119052/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-11-01T03:22:04.000Z"
-  },
-  {
-   "title": "2026 Optimist South American Championship overall",
-   "t_ko": "2026 Optimist South American Championship overall",
-   "s_ko": "",
-   "cat": "",
-   "link": "https://www.sail-world.com/news/301219/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-01T00:56:00.000Z"
-  },
-  {
-   "title": "和歌山でテーザー全日本開催。伊藤・村岸組が5度目の全日本制覇！",
-   "t_ko": "일본 테저 전국선수권 개최, 이토·무라기시조 5도 우승",
-   "s_ko": "10월 24~25일 와카야마 세일링센터에서 제41회 테저 전국선수권 개최. 전국 30척이 참가, 태풍 접근으로 불안정한 풍향과 강풍·호우 속 2레이스 진행.\n초일 남남서 10노트, 2일차 남남서 6노트의 시프티한 조건에서 경기 실시.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/10/118999/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-10-29T20:42:40.000Z"
   }
  ]
 }

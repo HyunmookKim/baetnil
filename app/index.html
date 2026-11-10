@@ -3871,6 +3871,7 @@ const I18N = {
     '휴지통으로 옮겼습니다':'Moved to Trash',
     '삭제한 기록':'Deleted',
     '되돌리기':'Undo',
+    '다시 시작':'Resume',
     '다시 실행':'Redo',
     '수납칸':'Locker',
     '선':'Line',
@@ -7545,6 +7546,7 @@ const I18N = {
     '휴지통으로 옮겼습니다':'Перемещено в корзину',
     '삭제한 기록':'Удалённое',
     '되돌리기':'Отменить',
+    '다시 시작':'Возобновить',
     '다시 실행':'Повторить',
     '수납칸':'Рундук',
     '선':'Линия',
@@ -11273,6 +11275,7 @@ const I18N = {
     '휴지통으로 옮겼습니다':'ゴミ箱に移しました',
     '삭제한 기록':'削除した記録',
     '되돌리기':'元に戻す',
+    '다시 시작':'再開',
     '다시 실행':'やり直す',
     '수납칸':'収納スペース',
     '선':'線',
@@ -19514,7 +19517,13 @@ async function trkStart(vid){
   if(trkNow && String(trkNow.vid) === String(vid)) return '';
   if(trkNow) await trkStop();
   trkSmoothReset();
-  trkNow = { vid: String(vid), boat: String(currentBoatId || ''), from: new Date().toISOString(), pts: [], id: null };
+  // ★★★ 5.57 — 이 항해에 이미 찍힌 점이 있으면(도착을 되돌려 「다시 시작」 한 때) 그 뒤에 이어 붙인다.
+  //   비운 채로 시작하면 멈출 때 it.trk 를 새 점으로 통째로 바꿔, 앞 구간 항적이 사라진다.
+  const 앞점 = (() => { try{
+    const v0 = (typeof voyage !== 'undefined' ? voyage : []).find(v => String(v.id) === String(vid));
+    return (v0 && Array.isArray(v0.trk)) ? v0.trk.filter(p => p && isFinite(p.la) && isFinite(p.lo)) : [];
+  }catch(_){ return []; } })();
+  trkNow = { vid: String(vid), boat: String(currentBoatId || ''), from: new Date().toISOString(), pts: 앞점.slice(), id: null };
   trkKeep();
   trkAttachWhy = '';
   const ok = await trkAttach();
@@ -27746,7 +27755,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.56';
+const APP_VER = '5.57';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -42650,6 +42659,10 @@ function legRow(label, placeKey, timeKey, wxKey, it){
                onclick="${kind === 'out' ? 'departNow()' : 'arriveNow()'}">${
                esc(kind === 'out' ? t('지금 출발 (시각·위치·날씨)') : t('지금 도착 (시각·위치·날씨)'))
              }</button></div>` : '')
+       // ★★★ 5.57 — 도착을 누른 뒤 도착 칸에 「다시 시작」 (사장님 2026-11-10: 「그냥 도착칸에 도착 누른뒤 다시 시작 버튼 뜨도록」). 오늘 도착한 항해만.
+       + ((kind === 'in' && unlocked && voyCanResume(it))
+          ? `<div class="mrrow"><button class="mrbtn big" style="width:100%" onclick="voyResume('${jsq(String(it.id))}')">${
+               esc(t('다시 시작'))}</button></div>` : '')
        + `<div class="mrrow">${place}${time}</div>`
        // ★★★ 5.24 — 도착 날짜 (며칠짜리 항해). 「지금 도착」 을 누르면 앱이 오늘로 넣는다.
        //   도착 시각이 있을 때만 보인다 — 도착 전에는 적을 것이 없다.
@@ -42885,6 +42898,28 @@ function arriveNow(){
   reviewSoon();    // ★ 5.46 — 항해를 마친 때가 스토어 평가를 물을 자연스러운 때다 (조건은 reviewSoon)
 }
 
+// ★★★ 5.57 — 도착을 되돌리고 같은 항해를 이어서 기록한다 (사장님, 2026-11-10)
+//   「오늘 배탓는데 중간에 모르고 지금 도착 눌렀는데 취소도 안되고 그사이에 항적도 … 기록 안되네」
+//   ★ 다른 앱 — 가민: 활동을 멈추면 바로 끝내지 않고 「다시 시작」(이어서 진행)·「저장」 을 고르게 한다.
+//     Argo(보트 항해 앱): 끝나지 않은 항해를 다시 이어서 기록한다(「항해 기록을 잃지 않는다」).
+//   ★ 도착 시각·날짜·위치·날씨만 비운다. 출발·중간 기록·사진·지금까지의 항적은 그대로 두고,
+//     항적은 지금까지 점 뒤에 이어 붙인다(trkStart 가 이 항해의 점을 먼저 싣는다).
+//   ★ 항해·엔진 시간은 다시 「지금 도착」 할 때 새로 계산된다.
+function voyCanResume(it){
+  if(!it || isPlan(it) || !String(it.timeIn || '').trim()) return false;
+  // 오늘 도착한 항해만 — 지난 항해를 다시 열면 오늘 위치가 그 항해에 섞인다
+  return voyDay(it.dateIn || it.date) === today();
+}
+function voyResume(id){
+  if(!unlocked) return;
+  const it = getMR('voyage', id || mrOpenId); if(!it) return;
+  if(!String(it.timeIn || '').trim()) return;
+  it.timeIn = ''; delete it.dateIn;
+  it.posIn = null; it.wxIn = null;
+  it.seed = false; saveMR();
+  try{ if(typeof trkStartSay === 'function') trkStartSay(it.id); }catch(_){}
+  renderVoyage(); openMR('voyage', it.id);
+}
 // 시각 문자열을 항상 HH:MM 으로 맞춘다.
 // 어디서 들어왔든 '13:1' 같은 모양이 화면에 나오면 안 된다.
 // ===== 시각 칸 =====

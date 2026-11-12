@@ -1,7 +1,187 @@
 {
- "updated": "2026-11-09T00:10:16.459Z",
- "candidates": 90,
+ "updated": "2026-11-12T02:02:40.770Z",
+ "candidates": 101,
  "items": [
+  {
+   "title": "SafeSport Investigative Updates",
+   "t_ko": "미국 올림픽 세이프스포츠 센터, 요트 관련 성적 비위 조사 진행 중",
+   "s_ko": "미국 올림픽·패럴림픽 운동의 일부인 세일링 참가자·이벤트가 센터 조사 대상에 포함된다.\n미시간 주 그랜드래피즈의 한 저명한 청소년 요트 자원봉사자가 혐의 조사 대상이 되어 매카토 베이 주니어 협회에서 제외되었다.\n중앙 징계 데이터베이스에서 조사 대상자와 처분받은 자의 현황을 공개한다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/11/safesport-investigative-updates-2/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-11T23:16:22.000Z"
+  },
+  {
+   "title": "J/24世界選手権、アイルランド〈Headcase〉が2連覇。日本勢は〈月光〉が6位",
+   "t_ko": "J/24 세계선수권 멜버른 개최—일본 팀 월광 6위",
+   "s_ko": "11월 11일 오스트레일리아 멜버른 샌드링엄요트클럽에서 열린 J/24 세계선수권에서 아일랜드 팀 헤드케이스가 최종일 역전으로 우승하며 2연패를 달성했다.\n일본에서 출전한 월광은 6위(64점), 구(Goo)는 9위(79점), 앙슈(仰秀)는 28위(219점)를 기록했다.\n38척이 10레이스를 완주했다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119237/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-11T23:14:01.000Z"
+  },
+  {
+   "title": "Elvstrøm Sails Game-Changing Blue Water Runner",
+   "t_ko": "엘브스트룀 세일의 혁신적 블루워터 다운윈드 세일",
+   "s_ko": "3 in 1 다운윈드 세일 시스템이 호주와 뉴질랜드에서 시판 개시되었다.\n단축 승무원(shorthanded) 크루징과 원양 항해에 특화된 설계다.",
+   "cat": "장비",
+   "link": "https://www.sail-world.com/news/301493/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T22:30:00.000Z"
+  },
+  {
+   "title": "1 minute 46 seconds",
+   "t_ko": "2026 Route du Rhum: 두 개 신기록 수립하며 피니시 라인 통과",
+   "s_ko": "Ocean50급 및 IMOCA급 선두 세일요트가 과달루프 포앙타피트르 피니시 라인을 단 1분 46초 차이로 통과했다.\n두 개의 신기록이 동시에 수립되는 압도적 경쟁이 벌어졌다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301505/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T21:18:05.000Z"
+  },
+  {
+   "title": "Irish repeat as J/24 World Champions",
+   "t_ko": "2026 J/24 세계선수권: 아일랜드팀 연패 달성",
+   "s_ko": "아일랜드 팀 헤드케이스(Headcase)가 11월 7~11일 호주 빅토리아에서 열린 세계선수권에서 우승하여 J/24 월드 타이틀을 연달아 차지했다.\n개최 첫날 20~30노트의 강풍과 높은 파도로 브로치, 파손, 기권이 이어졌으나 이후 경풍과 약풍의 도전을 받았다.\n38팀이 14세부터 80세 이상까지 참가했으며 10개국이 대표팀을 보냈다.",
+   "cat": "레이스",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/11/irish-repeat-as-j-24-world-champions/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-11T21:12:02.000Z"
+  },
+  {
+   "title": "Swiss Surprise Championship 2026",
+   "t_ko": "2026 스위스 서프라이즈 선수권: 로지 요트클럽 주니어팀 우승",
+   "s_ko": "로지 요트클럽 주니어팀이 스위스 서프라이즈 선수권에서 주니어 크루 중 1위를 차지했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301504/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T19:41:00.000Z"
+  },
+  {
+   "title": "Updates to Sailor Categorization Code",
+   "t_ko": "세일러 분류 코드 업데이트: 정부 지원 수혜자 규정 변경",
+   "s_ko": "국가청, 올림픽위원회 등 정부 기관으로부터 훈련·경기 지원을 받는 선수는 코칭·체력·심리·물리치료 서비스나 장비 제공을 포함해 모두 보수로 간주되며 Group 3(프로) 선수로 분류된다.\n월드 세일링의 sailor categorization system이 이러한 규정을 명확히 하기 위해 개정되었다.\n아마추어와 프로 구분이 자격 및 참가 자격에 영향을 미치므로 선수들이 자신의 지원 출처를 확인해야 한다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/11/updates-to-sailor-categorization-code/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-11T16:27:55.000Z"
+  },
+  {
+   "title": "Skiff Junior European Championships day 1",
+   "t_ko": "2026 49er/49erFX/Nacra 17 주니어 유럽선수권: 17개국 98명 선수 참가",
+   "s_ko": "비라모우라 세일링에서 개최된 대회에 49척, 26명의 코치와 17개국에서 98명의 선수들이 참여했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301492/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T15:45:11.000Z"
+  },
+  {
+   "title": "Corentin Horeau interviewed after IMOCA victory",
+   "t_ko": "코랜틱 호로 선수, 2026 IMOCA 레이스 레코드 달성",
+   "s_ko": "코랜틱 호로가 Route du Rhum-Destination Guadeloupe에서 IMOCA 클래스 우승을 차지하고 레이스 기록을 수립했다.\n비정상적·비전형적 기상 패턴에 직면한 가운데 일관된 공격과 스피드로 승리를 거머쥐었다.\n이는 호로의 첫 Route du Rhum 참가에서의 우승이다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301494/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T15:36:00.000Z"
+  },
+  {
+   "title": "Topper European Championships 2026",
+   "t_ko": "2026 토퍼 유럽선수권: 웨이머스에서 개최",
+   "s_ko": "국제 토퍼급이 웨이머스 & 포틀랜드 국가해양학교(WPNSA)에서 유럽선수권을 개최했다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301482/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T10:43:00.000Z"
+  },
+  {
+   "title": "International Moth Worlds 2026 Day 5",
+   "t_ko": "2026 국제 모스 월드 5일차: 스완 강의 변덕스러운 바람",
+   "s_ko": "마운츠 베이 세일링 클럽 스완 강에서 화요일 포일러 경기가 취소된 후 수요일 아침 남동풍에서 3경기가 변덕스럽게 진행되었다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301479/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T09:48:00.000Z"
+  },
+  {
+   "title": "Francesca Clapcich in Route du Rhum - Day 10",
+   "t_ko": "Route du Rhum 10일차: 무풍으로 인한 저속 항해",
+   "s_ko": "프란체스카 클랩치 선수가 11Hour Racing IMOCA급에서 지난 24시간간 평균 1.9노트의 저속만 달성했다.\n IMOCA 함대 대부분이 장시간 무풍 상태에 갇혀있다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301478/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T09:46:00.000Z"
+  },
+  {
+   "title": "Promotion is everyone’s responsibility",
+   "t_ko": "클래스 홍보는 모두의 책임: J/24 32년 역사 속 동향 분석",
+   "s_ko": "J/24 클래스는 1977년 조직 레이싱 시작 후 1979년 첫 월드 챔피언십에서 72척이 참가했으나 1994년 멜게스 24, J/80 출현으로 위기를 맞았다.\n최근 수십 년간 신규 구매 대신 중고 보트 구매로 신입 선수를 확보하는 추세로 변했다.\n원 디자인 표준 준수로 인한 경쟁 가능성과 중고 시장 활성화가 진입장벽 완화를 초래했다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/11/promotion-is-everyones-responsibility/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-11T08:54:33.000Z"
+  },
+  {
+   "title": "Wild Day on the Harbour for the 18s",
+   "t_ko": "호주 18풋 보트 2026-27 시즌: 30노트 남동풍 속 영마들의 활약",
+   "s_ko": "지난 일요일 시드니 해버에서 18풋 리그 시즌 참가 선수들이 30노트를 넘는 남동풍을 맞으며 항해했다.\n2026-27 시즌에 업계 최고의 재능 있는 영 세일러들이 참가해 있다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301476/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-11T08:29:23.000Z"
+  },
+  {
+   "title": "Best electric outboard motor: We put the market leaders to the test",
+   "t_ko": "전동 선외기 실제 성능 비교: 시장 주요 제품 테스트",
+   "s_ko": "배터리 기술 발전으로 독립 배터리 없이 최대 3kW 출력을 낼 수 있게 되면서 전동 선외기가 휘발유 제품과 경쟁 가능해졌다.\n소형 휴대용 선외기 시장에서 전동 제품이 휘발유 제품을 앞지르기 시작했다.\n리튬 배터리의 높은 전력 밀도로 글레이닝 속도에서의 전동 구동이 실제 가능하게 되었다.",
+   "cat": "장비",
+   "link": "https://www.yachtingmonthly.com/gear/electric-outboard-motor-we-test-12-options-81853",
+   "source": "Yachting Monthly",
+   "lang": "en",
+   "date": "2026-11-11T06:30:24.000Z"
+  },
+  {
+   "title": "Epoxy primer: how to apply this two-pack paint",
+   "t_ko": "에폭시 프라이머 도장: 2액형 페인트 시공법",
+   "s_ko": "자외선 손상으로 물러난 겔코트를 에폭시 프라이머로 안정화·강화한 뒤 언더코트와 탑코트를 시공하는 방법을 설명한다.\n먼지 제거 후 솔벤트로 표면을 닦고 습식 천과 건식 천을 번갈아 사용해 잔여 먼지를 제거한다.\n인터내셔널의 인터프로텍트 제품으로 2회 도장하는 구체적 절차를 실제 시공 사례로 제시한다.",
+   "cat": "정비",
+   "link": "https://www.pbo.co.uk/expert-advice/epoxy-primer-how-to-apply-this-two-pack-paint-107924",
+   "source": "PBO",
+   "lang": "en",
+   "date": "2026-11-11T06:05:31.000Z"
+  },
+  {
+   "title": "新門司でU35セーラーが激突。 ECL AGENCY CUP 2026、Papillonが総合優勝",
+   "t_ko": "신문지(新門司) ECL 에이전시컵—젊은 세일러들의 경쟁, 파피용 우승",
+   "s_ko": "11월 7~8일 후쿠오카현 기타큐슈시 신문지마리나에서 제4회 ECL 에이전시컵이 개최되어 크루저·오픈클래스 18척, U35 FAREAST 28R클래스 6팀이 참가했다.\nU35 FE28R클래스는 35세 이하 젊은 세일러들이 주최사 보유 艇을 사용하는 원디자인 프리트 레이스로, 艇 소유 부담 없이 경기에 도전할 수 있도록 설계됐다.\n중국 상해의 FAREAST사 建造 FE28R은 현재 월드매치레이싱투어(WMRT)에 채용되고 있다.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/11/119222/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-11T03:52:52.000Z"
+  },
+  {
+   "title": "浜名湖で初開催！第4回RS Aero全日本選手権に17艇出場",
+   "t_ko": "RS 에어로 전일본선수권 하마나코 처음 개최—17척 출전",
+   "s_ko": "11월 7~8일 시즈오카현 하마마츠시 하마나코에서 제4회 RS 에어로 전일본선수권이 개최됐다—일본RS클래스협회가 엽산(葉山) 외 지역에서 처음 대회를 연 것이다.\n공인 대회로 RS 에어로클래스 13척(에어로7: 2척, 에어로6: 6척, 에어로5: 5척), RS 오픈클래스 4척(RS700: 1척, RS500: 1척, RS페바: 2척) 등 총 17척이 등록했으며, 에어로6 1척은 아일랜드 리피터 참가였다.\n초일 오후부터 북서풍 24노트의 강풍이 불어 1레이스만 진행됐다.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119208/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-10T05:36:05.000Z"
+  },
   {
    "title": "ジュニアセーラー79艇が熱戦。愛媛・新居浜で坊っちゃんカップ開催",
    "t_ko": "일본 주니어 요트 대회에서 '트랙트랙' 기술 실시간 활용",
@@ -191,166 +371,6 @@
    "source": "BULKHEAD JAPAN",
    "lang": "ja",
    "date": "2026-11-05T02:43:16.000Z"
-  },
-  {
-   "title": "転覆、衝突、リタイア続出。波乱のルート・デュ・ラム2026",
-   "t_ko": "루트 뒤 람 2026 시작 이틀 만에 대형 사고 다발",
-   "s_ko": "11월 1일 프랑스 생말로에서 출발한 제13회 루트 뒤 람(단독 대서양 횡단 레이스)에서 연일 전복·충돌·마스트 손상·폴 및 러더 파손이 발생 중이다.\n11월 4일 우승 후보 아르멜 르 클레아크의 Banque Populaire XI가 아조레스 제도 인근에서 전복했으며, 전회 우승자 샤를 코드렐리에는 폴 손상으로 리타이어했다.\n2018년 우승자 프란시스 조와용도 11월 2일 아일랜드 해역에서 전복했으나 화물선에 의해 구조됐다.",
-   "cat": "사고",
-   "link": "https://bulkhead.jp/2026/11/119135/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-11-05T02:02:33.000Z"
-  },
-  {
-   "title": "When one race changed everything",
-   "t_ko": "J/24 요트 포트필립만에서 35노트 이상 돌풍 중 전복, 침몰",
-   "s_ko": "호주 빅토리아주의 J/24 요트 'Gatsby'가 포트필립만 레이싱 중 조건이 악화되어 35노트 이상 돌풍에 전복했다.\n스피니커가 수심에 걸려 선체를 누르고 물이 선체 내부로 유입되었으며, 예인 중 선체가 침몰했다.\n승무원 전원은 안전하게 탈출했다.",
-   "cat": "사고",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/04/when-one-race-changed-everything/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-05T00:35:01.000Z"
-  },
-  {
-   "title": "A-Class Catamaran Worlds in the USA",
-   "t_ko": "2026 A급 카타마란 월드 챔피언십, 79척 11개국 참가",
-   "s_ko": "2026년 11월 9~14일 미국 탬파에서 개최되는 A급 카타마란 월드 챔피언십에 79척, 11개국 선수들이 참가한다.\n포일링 기술 도입 여부에 따라 고성능 포일링 18척의 오픈 플릿과 논포일링 61척의 클래식 플릿으로 나뉜다.\n미국의 Ravi Parent(전 오픈 챔피언, 현 미국 국가대표 챔피언)와 폴란드의 Jacek Noetzel(현 클래식 챔피언)이 출전할 예정이다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/04/a-class-catamaran-worlds-in-the-usa/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-04T23:25:39.000Z"
-  },
-  {
-   "title": "Island time at ISCA World Championships",
-   "t_ko": "2026 ISCA 선피시 월드 챔피언십, 완전예약 및 팬아메리카 게임 예선 격상",
-   "s_ko": "2026년 11월 6~13일 미국령 버진아일랜드 세인트크로이에서 17개국 선수들이 참가하는 ISCA 선피시 월드 챔피언십이 완전예약되었다.\n청소년(19세 미만), 마스터즈(40세 이상), 여성 부문 월드 챔피언십이 오픈 챔피언십 이전에 별도 개최된다.\n2026년 여성 및 오픈 부문 우승이 2027 팬아메리카 게임 출전 자격 예선이 된다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/04/island-time-at-isca-world-championships/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-04T22:29:40.000Z"
-  },
-  {
-   "title": "Adapt or get left behind",
-   "t_ko": "오이스터 요츠, 50년 만에 첫 쌍동선(카타마란) 출시",
-   "s_ko": "50년간 1,300척의 단동선을 건조한 영국 조선소 오이스터 요츠가 Berret Racoupeau 설계의 C60 카타마란을 신규 출시했다.\n선박주 Richard Hadida는 많은 고객들이 20~30도 경경각에서의 항해를 원하지 않으며 현대식 럭셔리 카타마란의 공간·안정성·쾌적함을 요구했다고 설명했다.\n단동선 사업이 여전히 중심이 되겠지만 카타마란은 시장 영역을 확대할 것이다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/04/adapt-or-get-left-behind/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-04T21:07:36.000Z"
-  },
-  {
-   "title": "RS21 World Championship 2026",
-   "t_ko": "2026 RS21 월드 챔피언십, 급속 성장하는 클래스의 스냅샷",
-   "s_ko": "10월 28~31일 칸에서 개최된 RS21 월드 챔피언십은 단순한 세계 타이틀 싸움을 넘어 빠르게 확대되고 있는 클래스의 현주소를 보여줬다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301310/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T17:43:54.000Z"
-  },
-  {
-   "title": "A gruelling start for the two Sodebo trimarans",
-   "t_ko": "Route du Rhum 시작 3일, Sodebo 트리마란 두 척 선전",
-   "s_ko": "Route du Rhum - Destination Guadeloupe 레이스 시작 3일 후 Thomas Coville과 Léonard Legrand이 각 클래스에서 좋은 성적을 보이고 있다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301308/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T16:52:31.000Z"
-  },
-  {
-   "title": "GB1 and Circolo Canottieri Napoli partnership",
-   "t_ko": "GB1 팀과 나폴리 보트클럽 파트너십, 38차 아메리카스컵",
-   "s_ko": "영국 Royal Yacht Squadron Ltd를 대표하는 GB1팀이 38차 아메리카스컵 챌린저로서 나폴리의 Circolo Canottieri Napoli와 파트너십을 체결했다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/301305/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T16:26:33.000Z"
-  },
-  {
-   "title": "Ultim Banque Populaire XI Ultim capsizes mid-Atlantic. Skipper awaits rescue",
-   "t_ko": "Route du Rhum 중 Maxi Banque Populaire XI 전복, 선장 구조 대기",
-   "s_ko": "아조레스 북서쪽 550해리 지점에서 Ultim 포일링 트리마란 Maxi Banque Populaire XI가 현지시간 오전 5시 30분경 전복했다.\n선장 Armel Le Cléac'h는 선체 내부에서 안전하며 부상 없다. 조난신호를 발동했고 해상팀과 연락 중이다.\n CROSS Jobourg과 MRCC Boston이 조율한 구조 작업이 진행 중이다.",
-   "cat": "사고",
-   "link": "https://www.yachtingworld.com/events-2/ultim-banque-populaire-xi-ultim-capsizes-mid-atlantic-skipper-awaits-rescue-164520",
-   "source": "Yachting World",
-   "lang": "en",
-   "date": "2026-11-04T11:59:27.000Z"
-  },
-  {
-   "title": "Route du Rhum - Destination Guadeloupe Day 4",
-   "t_ko": "Route du Rhum의 Ocean Fifty 요트 전복, 선장 구조 대기",
-   "s_ko": "Ocean Fifty 선급 'Elvest'의 선장 Matthieu Perraut가 화요일 오후 10시경 전복했다.\n선장은 안전한 상태이며 아조레스 북쪽 400해리 지점에서 구조를 기다리고 있다.",
-   "cat": "사고",
-   "link": "https://www.sail-world.com/news/301290/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T08:50:12.000Z"
-  },
-  {
-   "title": "2027 World Sailing Champs Australian Sailing Team",
-   "t_ko": "2027 월드 세일링 챔피언십 호주 대표팀 선발, LA 올림픽 예선 기회",
-   "s_ko": "호주 세일링팀이 2027년 1월 브라질 포르탈레자에서 개최되는 월드 세일링 챔피언십에 출전할 12명의 선수 대표팀을 선발했다.\n해당 대회는 2028 LA 올림픽 선수단 선발 예선으로, 호주 선수들이 올림픽 출전 자격을 획득할 첫 기회다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/301288/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T07:34:00.000Z"
-  },
-  {
-   "title": "Heat exchanger flushing tips",
-   "t_ko": "엔진 냉각 시스템 열교환기 플러싱 유지보수법",
-   "s_ko": "엔진 배기구 수량 감소는 냉각 시스템 막힘의 신호이며, 점진적 감소는 오버히팅 알람까지 눈에 띄지 않을 수 있다.\n열교환기에 시간에 따라 쌓인 침전물과 오염물이 냉각 효율을 저하시킨다.\n정기적 유지보수로 냉각 효율을 유지하고 크루징 중 엔진 오버히팅을 예방할 수 있다.",
-   "cat": "정비",
-   "link": "https://www.pbo.co.uk/expert-advice/heat-exchanger-flushing-tips-107773",
-   "source": "PBO",
-   "lang": "en",
-   "date": "2026-11-04T05:06:36.000Z"
-  },
-  {
-   "title": "Beck returns to InfoTrack for another shot",
-   "t_ko": "Christian Beck의 100피트 메이지, InfoTrack 네이밍 라이츠 회복",
-   "s_ko": "기술 회사 InfoTrack가 Christian Beck의 라인 어너즈 2회 우승 100피트 메이지의 네이밍 라이츠를 회복했다.\n2026 Rolex 시드니 호바트 요트 레이스 전 자선 파트너십 및 유명 앰버서더 선발을 공식 발표했다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/301291/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-04T04:18:00.000Z"
-  },
-  {
-   "title": "Antigua welcomes 44Cup to its 2027 Calendar",
-   "t_ko": "앤티과, 2027년 44Cup 국제 레이싱 서킷 개최 확정",
-   "s_ko": "앤티과 요트 및 보트 협회(ABYMA)가 저명한 국제 44Cup 레이싱 서킷이 2027년에 앤티과에서 2개 이벤트를 개최할 예정임을 발표했다.\n이는 이미 풍부한 국제 요팅·해양 이벤트 달력을 더욱 강화한다.",
-   "cat": "산업",
-   "link": "https://www.sail-world.com/news/301286/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-03T21:41:17.000Z"
-  },
-  {
-   "title": "Oliver Heer: Worth the gamble",
-   "t_ko": "Oliver Heer, 솔로 원양 레이싱의 위험을 감수하는 이유",
-   "s_ko": "솔로 원양 레이싱은 고위험 게임이다. 내륙국 스위스 출신의 Oliver Heer가 영국을 기반으로 야심찬 IMOCA 캠페인을 진행 중이다.\n현대 IMOCA 캠페인은 대규모 예산, 데이터 집약적이며 복잡한 프로젝트이며, Vendée Globe 같은 도전에 도달하려면 높은 스킬셋과 타협 없는 헌신이 필요하다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/03/oliver-heer-worth-the-gamble/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-03T21:30:29.000Z"
-  },
-  {
-   "title": "【MINI2027】日本とは全然違う!? フランスで感じた外洋セーリング文化",
-   "t_ko": "프랑스 외양 세일링 문화: 미니급 선수의 관찰기",
-   "s_ko": "DMG MORI 세일링 아카데미 선수가 프랑스 로리앙에서 6개월간 활동하며 느낀 외양 세일링 현지 문화를 소개했다.\n미니 아틀란틱 대회 64명 참가자 중 프랑스인 49명, 유럽인 10명, 미국·멕시코·일본인 각 1~3명으로 구성되어 본 경기지 국가의 선수가 대부분을 차지한다.\n레이스 브리핑은 기본적으로 프랑스어로 진행되며 비(非)프랑스어권 선수를 위해 영어 설명도 제공하지만, 세부사항은 프랑스어만 사용되는 경우가 많아 정보 격차가 발생한다.",
-   "cat": "산업",
-   "link": "https://bulkhead.jp/2026/11/119065/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-11-02T02:22:43.000Z"
   }
  ]
 }

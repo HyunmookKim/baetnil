@@ -202,6 +202,31 @@ function bakeFront(){
     out = out.replace(/(<meta property="og:url" content=")[^"]*(">)/, '$1' + SITE + rel + '$2');
     out = out.replace(/(<link rel="canonical" href=")[^"]*(">)/, '$1' + SITE + rel + '$2');
 
+    // ★ 5.57 — 앱 정보(schema.org MobileApplication)를 말마다 굽는다.
+    //   사장님(2026-11-15): 「우리 어플도 인공지능 쓰면 나올수있게」·「요트 뭐 말만하면 우리 어플 나올 수 있게」.
+    //   이름·설명은 스토어 이름·스토어 글과 같은 말(사이트·스토어가 같은 말을 해야 인용된다 — AppTweak GEO for apps).
+    //   구글 문서(developers.google.com/search/docs/appearance/structured-data/software-app): name·offers.price 필수.
+    //   평점(aggregateRating)은 실제 값이 없으므로 넣지 않는다 — 지어내지 않는다.
+    //   applicationCategory 는 구글 목록에 「내비게이션」 이 없어 넣지 않는다(근거 없이 고르지 않음).
+    {
+      const ld = {
+        '@context': 'https://schema.org',
+        '@type': 'MobileApplication',
+        name: d.title,
+        alternateName: ['뱃일', 'Baetnil'],
+        description: d.desc,
+        url: SITE + rel,
+        inLanguage: L,
+        operatingSystem: 'iOS, Android',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+        sameAs: ['https://apps.apple.com/app/id6811930420',
+                 'https://play.google.com/store/apps/details?id=kr.baetnil.app'],
+        publisher: { '@type': 'Organization', name: brand(L), url: SITE + '/', email: 'help@baetnil.com' }
+      };
+      const json = JSON.stringify(ld).replace(/</g, '\\u003c');
+      out = out.replace(/(<script type="application\/ld\+json" id="appld">)[\s\S]*?(<\/script>)/, '$1' + json + '$2');
+    }
+
     // ★ 5.46 — 큰 이름·로고 설명. 한국어 판만 「뱃일」, 영·러·일 판은 스토어 이름과 같은 「Baetnil」.
     //   여태는 /en/ /ja/ /ru/ 맨 위 큰 제목이 한글 「뱃일」 이었다.
     out = out.replace('<img src="icon-512.png" alt="뱃일">', '<img src="icon-512.png" alt="' + esc(brand(L)) + '">')

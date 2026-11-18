@@ -4559,6 +4559,7 @@ const I18N = {
     '기준값 (약최고고조위 HAT)':'Datum (highest astronomical tide, HAT)',
     '기한 지남':'Overdue',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>':'Overdue items show in red; items due within 30 days show in yellow.<br><br>',
+    '노란색이 되는 날은 항목마다 「임박」 칸에서 바꿀 수 있습니다.<br><br>':'You can change when each item turns yellow in its “Due soon” field.<br><br>',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.':'Overdue items show in red; items due within 30 days show in yellow.',
     '기항':'Port call',
     '길이 {n}m':'LOA {n} m',
@@ -8233,6 +8234,7 @@ const I18N = {
     '기준값 (약최고고조위 HAT)':'Опорный уровень (наивысший теоретический уровень, HAT)',
     '기한 지남':'Просрочено',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>':'Просроченное — красным, срок в ближайшие 30 дней — жёлтым.<br><br>',
+    '노란색이 되는 날은 항목마다 「임박」 칸에서 바꿀 수 있습니다.<br><br>':'Когда пункт станет жёлтым, можно задать для каждого пункта в поле «Скоро».<br><br>',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.':'Просроченное — красным, срок в ближайшие 30 дней — жёлтым.',
     '기항':'Заход в порт',
     '길이 {n}m':'Длина {n} м',
@@ -11951,6 +11953,7 @@ const I18N = {
     '기준값 (약최고고조위 HAT)':'基準値（最高水面・HAT）',
     '기한 지남':'期限超過',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>':'期限が過ぎると赤、30日以内は黄色で表示されます。<br><br>',
+    '노란색이 되는 날은 항목마다 「임박」 칸에서 바꿀 수 있습니다.<br><br>':'黄色になる時期は、項目ごとに「期限間近」欄で変更できます。<br><br>',
     '기한이 지나면 빨간색, 30일 이내면 노란색으로 표시됩니다.':'期限が過ぎると赤、30日以内は黄色で表示されます。',
     '기항':'寄港',
     '길이 {n}m':'全長 {n}m',
@@ -16838,6 +16841,7 @@ const HELP = {
     t('반복 주기를 정합니다. 단위는 <b>일 · 주 · 개월</b> 중에서 선택할 수 있습니다.<br><br>') +
     t('마지막 점검일을 입력하면 다음 예정일이 자동으로 계산되고, 목록에 남은 기간이 표시됩니다. ') +
     t('기한이 지나면 빨간색, 30일 이내면 노란색으로 나타납니다.<br><br>') +
+    t('노란색이 되는 날은 항목마다 「임박」 칸에서 바꿀 수 있습니다.<br><br>') +
     t('<b>엔진 시간</b>: 엔진 가동 시간 기준으로 하는 작업이면 오른쪽 칸에 입력합니다. ') +
     // ★ 여기에 **숫자 보기를 적지 않는다** (사장님이 정하신 것 14).
     //   보기로 적은 숫자도 사람은 「그 값을 쓰면 되나 보다」 로 읽는다.
@@ -27755,7 +27759,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.57';
+const APP_VER = '5.58';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -30992,6 +30996,25 @@ function mLastRow(it, s){
     ${다음들.length ? `<div class="mrrow"><span class="mrlbl">${esc(t('다음'))}</span>
       <b class="mrv" style="flex:1;font-weight:450">${esc(다음들.join(' · '))}</b></div>` : ''}`;
 }
+// ★★ 5.58 — 「임박」 을 항목마다 정한다 (사장님 2026-11-17 「이렇게 주기가 짧은건 맨날 임박인데 어케 해야하냐」 → 「1번고」).
+//   전에는 모든 항목이 「30일 안이면 임박」 이라, 2주·3주마다 하는 일은 하자마자 늘 노랬다.
+//   다른 앱: Fleetio 는 알림마다 「Due Soon Threshold」, Maintenance Supporter 는 작업마다 warning_days.
+//   처음 값은 예전과 같은 30일 — 업데이트로 사람들 화면이 갑자기 바뀌지 않게. 칸(soonDays)을 비우거나 0 이면 30.
+//   ★ 임박을 가르는 자리는 여섯 곳(mStatus · mntDueTag · maintCounts · maintFilter · 갈래 머리 · gearState) — 모두 이 문을 지난다.
+const MAINT_SOON = 30;
+function mSoonDays(it){
+  const n = parseInt(it && it.soonDays, 10);
+  return (isFinite(n) && n > 0) ? Math.min(365, n) : MAINT_SOON;
+}
+function mSoonRow(it){
+  if(!it || !mHasMonths(it)) return '';            // 엔진 시간만 쓰는 항목은 날로 세지 않는다
+  const n = mSoonDays(it);
+  const 띄움 = (typeof langNow === 'function' && langNow() === 'ko') ? '' : ' ';
+  return `<div class="mrrow"><span class="mrlbl">${esc(t('임박'))}</span>${unlocked
+      // ★ 칸과 단위를 한 덩이로 — 그냥 두면 칸이 늘어나 「일 전부터」 가 오른쪽 끝으로 밀린다 (주기 줄 .cycrow 와 같게)
+      ? `<span class="cycrow"><span><input type="number" min="1" max="365" value="${n}" style="width:70px" onchange="mrField('soonDays',parseInt(this.value,10)||0)"><span class="mrv2">${esc(t('일 전부터'))}</span></span></span>`
+      : `<b class="mrv">${n}${띄움}${esc(t('일 전부터'))}</b>`}</div>`;
+}
 function mStatus(it){
   const hl = mHourLeft(it);                       // 시간으로 본 남은 양
   if((!it.lastDate || !mHasMonths(it)) && hl === null)
@@ -31010,7 +31033,7 @@ function mStatus(it){
   }
   // ── 달력만 볼 때
   const 달력 = (days<0)   ? {c:'#E4756A', t:tsub('{n}일 지남', {n:-days}), k:'late', next:nd, days}
-             : (days<=30) ? {c:'#D9AE63', t:tsub('{n}일 남음', {n:days}),  k:'soon', next:nd, days}
+             : (days<=mSoonDays(it)) ? {c:'#D9AE63', t:tsub('{n}일 남음', {n:days}),  k:'soon', next:nd, days}
                           : {c:'#5FB894', t:tsub('{n}일 남음', {n:days}), k:'ok', next:nd, days};
   if(hl === null) return 달력;
   // ── 둘 다 있으면 **먼저 오는 쪽**을 보여 준다
@@ -31153,7 +31176,7 @@ function mntBar(){
 function mntDueTag(){
   let late = 0, soon = 0;
   try{ maintRows().forEach(it => { const d = mStatus(it).days;
-    if(d !== null && d < 0) late++; else if(d !== null && d <= 30) soon++; }); }catch(_){}
+    if(d !== null && d < 0) late++; else if(d !== null && d <= mSoonDays(it)) soon++; }); }catch(_){}
   if(late) return ` <span class="dcnt late">${late}</span>`;
   if(soon) return ` <span class="dcnt soon">${soon}</span>`;
   return '';
@@ -32371,14 +32394,14 @@ function maintCounts(){
     const d = mStatus(it).days;
     if(d === null) none++;
     else if(d < 0) late++;
-    else if(d <= 30) soon++;
+    else if(d <= mSoonDays(it)) soon++;
     if(it.seed) seed++;
   });
   return { late, soon, none, seed, all: maintRows().length };
 }
 function maintFilter(mode){
   if(mode === 'late') return maintRows().filter(it => { const d = mStatus(it).days; return d !== null && d < 0; });
-  if(mode === 'soon') return maintRows().filter(it => { const d = mStatus(it).days; return d !== null && d >= 0 && d <= 30; });
+  if(mode === 'soon') return maintRows().filter(it => { const d = mStatus(it).days; return d !== null && d >= 0 && d <= mSoonDays(it); });
   return maint.slice();
 }
 let maintMode = 'all';
@@ -32474,7 +32497,7 @@ function renderMaintList(){
       return da-db;
     });
     const red = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d<0;}).length;
-    const yel = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d>=0&&d<=30;}).length;
+    const yel = arr.filter(it=>{const d=mStatus(it).days; return d!==null&&d>=0&&d<=mSoonDays(it);}).length;
     const closed = (maintMode === 'all') ? !!fold[g] : false;
     const head = `<div class="ghead" onclick="toggleGrp('${jsq(g)}')">
       <span class="garr">${closed?'&#9656;':'&#9662;'}</span><b>${esc(keyShow(g))}</b>
@@ -32674,6 +32697,7 @@ function openMR(kind, id){
         :`<b class="mrv">${esc(keyShow(it.grp||'기타'))}</b>`}</div>
       ${mCycleRow(it)}
       ${mLastRow(it, s)}
+      ${mSoonRow(it)}
       ${gearPickRow(it, 'maint')}
       <div class="mrrow"><span class="mrlbl">${esc(t('담당'))}</span>
         <b class="mrv" style="flex:1">${it.who ? esc(taskOwnerName(curBoat(), it.who)) : esc(t('없음'))}</b>
@@ -32933,8 +32957,8 @@ function openMR(kind, id){
                                 : tsub('{n}일 남음', {n: dd.days}))}</b>`}</div>`
       + (it.expiry
           ? `<div class="mrrow"><span class="mrlbl">${esc(t('미리 알림'))}</span>${unlocked
-              ?`<input type="number" min="1" max="365" value="${esc(String(it.before||VDOC_BEFORE))}" style="width:70px" onchange="mrField('before',parseInt(this.value,10)||0)"> ${esc(t('일 전부터'))}`
-              :`<b class="mrv">${esc(String(it.before||VDOC_BEFORE))}${esc(t('일 전부터'))}</b>`}</div>`
+              ?`<span class="cycrow"><span><input type="number" min="1" max="365" value="${esc(String(it.before||VDOC_BEFORE))}" style="width:70px" onchange="mrField('before',parseInt(this.value,10)||0)"><span class="mrv2">${esc(t('일 전부터'))}</span></span></span>`
+              :`<b class="mrv">${esc(String(it.before||VDOC_BEFORE))}${(typeof langNow === 'function' && langNow() === 'ko') ? '' : ' '}${esc(t('일 전부터'))}</b>`}</div>`
             + `<div class="mrm" style="padding:0 0 8px 74px;color:#7b8794">${
                 esc(t('선박검사·보험처럼 발급에 시간이 걸리는 서류는 알림을 넉넉히 설정해 두세요.'))}</div>`
           : '');
@@ -33138,7 +33162,8 @@ async function mrCancel(){
 const NUM_FIELD = {
   liters:{ max:100000, name:'주유량' }, cost:{ max:100000000, name:'금액' },
   hours: { max:10000,  name:'시간'   }, engineH:{ max:10000, name:'엔진 시간' },
-  nm:    { max:100000, name:'거리'   }
+  nm:    { max:100000, name:'거리'   },
+  soonDays:{ max:365, name:'임박' }
 };
 function mrField(k,v){
   // ★ 4.102 — 돈을 처음 적을 때 그 사람 나라의 화폐 단위를 함께 담는다 (나중에 「원」 으로 안 보이게)
@@ -45647,7 +45672,7 @@ function gearCounts(id){
 function gearState(id){
   let late = 0, soon = 0;
   gearMaint(id).forEach(m => { const d = mStatus(m).days;
-    if(d !== null && d < 0) late++; else if(d !== null && d <= 30) soon++; });
+    if(d !== null && d < 0) late++; else if(d !== null && d <= mSoonDays(m)) soon++; });
   const open = gearRepair(id).filter(r => r && r.status !== 'done').length;
   if(open) return { k:'late', label: tsub('고장 {n}', { n: open }) };
   if(late) return { k:'late', label: tsub('기한 지남 {n}', { n: late }) };
@@ -50397,7 +50422,7 @@ function wxStamp(){
 // ══════════════════════════════════════════════════════════════════════
 const WX_CACHE_KEY = 'wxcache';
 const WX_FRESH_MS  = 60 * 60 * 1000;        // 한 시간 안이면 다시 안 부른다
-const WX_KEEP_MS   = 12 * 60 * 60 * 1000;   // 못 받으면 반나절까지는 담아 둔 것을 쓴다
+// ★ 5.58 — 반나절(WX_KEEP_MS)로 끊던 것을 없앴다. 그 예보가 다룬 시각이 남아 있는 동안 쓴다(wxCacheUsable).
 async function wxCacheGet(key){
   try{
     // ★ 5.20 — 켜자마자 부르면 저장소가 아직 안 열려 있다. 열릴 때까지(길어야 2초) 기다린다.
@@ -50408,6 +50433,7 @@ async function wxCacheGet(key){
   return null;
 }
 function wxCachePut(key, d){
+  if(!d || !d.w || d.w._noWx) return;            // ★ 5.58 — 껍데기는 안 담는다
   try{ idbSet(WX_CACHE_KEY, { key: key, at: Date.now(), w: d.w, m: d.m }).catch(()=>{}); }catch(_){}
 }
 // 앱을 열면 날씨를 한 번 받아 둔다.
@@ -50432,7 +50458,20 @@ function wxRefresh(key, lat, lon){
   WX_BG[key] = (async ()=>{
     try{
       const d = await wxFetch(lat, lon);
-      wxCachePut(key, d);                           // 그 자리의 날씨는 그 자리 열쇠로 담는다
+      if(d.w && d.w._noWx){
+        // ★ 5.58 — 예보를 못 받았다. 보여 주던 진짜 예보가 있으면 그대로 둔다(껍데기로 바꾸지 않는다).
+        if(wxData && wxData.key === key && wxData.w && !wxData.w._noWx) return false;
+        let c = null; try{ c = await wxCacheGet(key); }catch(_){}
+        if(wxCacheUsable(c)){
+          if(wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key){
+            wxData = { key, w: c.w, m: c.m, _at: c.at || 0 }; wxStamp(); wxFailed = false;
+            try{ if(typeof renderHome === 'function') renderHome(); }catch(_){}
+            try{ if(typeof curScreen === 'function' && curScreen() === 'weather' && typeof renderWeather === 'function') renderWeather(); }catch(_){}
+          }
+          return false;
+        }
+      }
+      wxCachePut(key, d);                           // 그 자리의 날씨는 그 자리 열쇠로 담는다 (껍데기는 wxCachePut 이 거른다)
       if(wxCur && wxPtKey(wxCur.lat, wxCur.lon) === key){
         wxData = { key, ...d, _at: Date.now() }; wxStamp(); wxFailed = false;
         try{ if(typeof renderHome === 'function') renderHome(); }catch(_){}
@@ -50457,6 +50496,8 @@ function ensureWx(){
       wxStamp();
       // 들고 있는 것이 한 시간을 넘었으면 뒤에서 새로 받는다
       if(wxData._at && (Date.now() - wxData._at) >= WX_FRESH_MS) wxRefresh(key, wxLat0, wxLon0);
+      // ★ 5.58 — 예보를 못 받아 물결만 들고 있으면 15초에 한 번까지 다시 묻는다 (wxHomeHeal 과 같은 간격)
+      else if(wxData.w && wxData.w._noWx && Date.now() - wxTryAt >= 15000){ wxTryAt = Date.now(); wxRefresh(key, wxLat0, wxLon0); }
       return wxData;
     }
     wxEnsuring = true;
@@ -50465,7 +50506,7 @@ function ensureWx(){
       let c = null;
       try{ c = await wxCacheGet(key); }catch(_){}
       const age = c ? (Date.now() - (c.at || 0)) : Infinity;
-      if(c && age < WX_KEEP_MS && wxSame()){
+      if(c && wxCacheUsable(c) && wxSame()){
         wxData = { key, w: c.w, m: c.m, _at: c.at || 0 }; wxStamp();
         try{ if(typeof renderHome === 'function') renderHome(); }catch(_){}   // 담아 둔 것을 곧바로
       }
@@ -50594,8 +50635,11 @@ async function wxAtPoint(lat, lon){
       return WX_PT[k];
     }
   }catch(_){}
-  const d = await wxFetch(lat, lon);
-  wxCachePut(k, d);                       // ★ 5.0 — 폰에도 담아 둔다 (C7)
+  let d = await wxFetch(lat, lon);
+  if(d.w && d.w._noWx){                    // ★ 5.58 — 예보를 못 받았으면 담아 둔 진짜 예보가 먼저
+    try{ const c = await wxCacheGet(k); if(wxCacheUsable(c)) d = { w: c.w, m: c.m }; }catch(_){}
+  }
+  wxCachePut(k, d);                       // ★ 5.0 — 폰에도 담아 둔다 (C7) · 껍데기는 안 담긴다
   const ks = Object.keys(WX_PT);
   if(ks.length >= WX_PT_MAX) delete WX_PT[ks[0]];
   WX_PT[k] = d;
@@ -50636,12 +50680,56 @@ function wxHasWave(m){
   const a = H.wave_height, b = H.wave_period;
   return !!((a && a.some(v=>v!=null)) || (b && b.some(v=>v!=null)));
 }
+// ★★ 5.58 — 날씨 서버(Open-Meteo 예보 서버)가 들쭉날쭉하다 (사장님 2026-11-18 「어제부터 날씨안된다」).
+//   사장님 컴퓨터에서 잰 것: 예보 서버(api.open-meteo.com)가 40초 넘게 대답이 없다가 몇 분 뒤 0.2초에 왔다.
+//   같은 회사 물결 서버는 그동안 멀쩡했다. 다른 개발자도 10/14 부터 같은 실패(시간 초과·503)를 적었다
+//   (github.com/onpaj/Anela.Heblo/issues/4513 — 거기서 내놓은 해법: 다시 묻기 · 마지막 예보 보여 주기).
+//   ① 실패하면 **한 번 더** 묻는다 — 안드로이드 Volley 의 기본 다시 묻기(DefaultRetryPolicy)가 1번이다.
+//      400번대(429 너무 많이 물음 제외)는 다시 물어도 같으니 안 묻는다.
+async function wxGetJson(url){
+  for(let i = 0; i < 2; i++){
+    try{
+      const r = await fetchTimeout(url);
+      if(r.ok) return await r.json();
+      if(r.status >= 400 && r.status < 500 && r.status !== 429) return null;
+    }catch(_){}
+  }
+  return null;
+}
+// ③ 예보를 못 받았어도 물결을 받았으면 물결·물때는 보여 준다.
+//   예보 칸(바람·기온·비·시정)은 비워 둔 껍데기를 만들고 _noWx 로 표시한다 — 비운 값은 「자료 없음」 으로 나온다.
+//   시간 축은 물결 자료의 것을 쓴다(둘 다 timezone=auto 로 받으므로 같은 축이다).
+function wxStubFromMarine(m){
+  const H = (m && m.hourly) || {};
+  const times = Array.isArray(H.time) ? H.time.slice() : [];
+  if(!times.length) return null;
+  const nul = () => times.map(() => null);
+  return { _noWx: true, latitude: m.latitude, longitude: m.longitude,
+           utc_offset_seconds: m.utc_offset_seconds, timezone: m.timezone,
+           hourly: { time: times, temperature_2m: nul(), apparent_temperature: nul(), precipitation: nul(),
+                     weather_code: nul(), wind_speed_10m: nul(), wind_direction_10m: nul(),
+                     wind_gusts_10m: nul(), visibility: nul() },
+           daily: { time: [], sunrise: [], sunset: [] } };
+}
+// ② 담아 둔 예보는 **그 예보가 다룬 시각이 남아 있는 동안** 보여 준다 (전에는 반나절이면 버렸다).
+//   언제 받은 예보인지는 화면에 밝힌다(wxAgeText — Windy 「Forecast update time」 처럼).
+//   껍데기(_noWx)는 담아 두지 않는다 — 다음에 담아 둔 진짜 예보를 덮으면 안 된다.
+function wxCacheUsable(c){
+  try{
+    if(!c || !c.w || c.w._noWx) return false;
+    const H = c.w.hourly;
+    if(!H || !Array.isArray(H.time) || !H.time.length) return false;
+    const t0 = wxTs(H.time[0], c);
+    if(t0 == null) return false;
+    return Date.now() < t0 + (H.time.length - 1) * 3600e3;
+  }catch(_){ return false; }
+}
 async function wxMarineNear(lat, lon){
   const pts = wxRingPts(lat, lon);
   const u = 'https://marine-api.open-meteo.com/v1/marine?latitude=' + pts.map(p=>p[0]).join(',')
     + '&longitude=' + pts.map(p=>p[1]).join(',')
     + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
-  const j = await fetchTimeout(u).then(r=>r.ok?r.json():null).catch(()=>null);
+  const j = await wxGetJson(u);
   const arr = Array.isArray(j) ? j : (j ? [j] : []);
   // ★ 5.10 — 첫 번째가 아니라 **가장 가까운** 값을 쓴다. 거리는 Open-Meteo 가 실제로 쓴 칸으로 잰다.
   let best = null, bd = 1e9;
@@ -50660,10 +50748,8 @@ async function wxFetch(lat, lon){
     + '&daily=sunrise,sunset&timezone=auto&forecast_days=5&wind_speed_unit=kn';
   const mar = 'https://marine-api.open-meteo.com/v1/marine?latitude='+lat.toFixed(4)+'&longitude='+lon.toFixed(4)
     + '&hourly=wave_height,wave_period,wave_direction,sea_level_height_msl&timezone=auto&forecast_days=5';
-  const [a, b0] = await Promise.all([
-    fetchTimeout(base).then(r=>r.ok?r.json():null).catch(()=>null),
-    fetchTimeout(mar).then(r=>r.ok?r.json():null).catch(()=>null),
-  ]);
+  let [a, b0] = await Promise.all([ wxGetJson(base), wxGetJson(mar) ]);
+  if(!a) a = wxStubFromMarine(b0);                 // ③ 예보는 못 받았지만 물결은 받았다
   if(!a) throw new Error(t('날씨 데이터를 받지 못했습니다'));
   let b = b0;
   if(!wxHasWave(b)){
@@ -51749,8 +51835,10 @@ function renderWxSel(){
   let wline = '';
   if(idx >= 0){
     const wv = wxData.m && wxData.m.hourly ? wxData.m.hourly.wave_height[idx] : null;
-    wline = `${esc(t('바람'))} <b style="color:${wxWindColor(H.wind_speed_10m[idx])}">${nU(H.wind_speed_10m[idx].toFixed(0),'kt')}</b> ${esc(dirName(H.wind_direction_10m[idx]))}
-      · ${esc(tsub('돌풍 {g}', { g: H.wind_gusts_10m[idx].toFixed(0) }))} · ${esc(t('파고'))} <b>${wv!=null?nU(wv.toFixed(1),'m'):'—'}</b> · ${H.temperature_2m[idx].toFixed(0)}°`;
+    // ★ 5.58 — 예보를 못 받은 칸(null)은 「—」 로 둔다 (파고 칸과 같게)
+    const k = H.wind_speed_10m[idx], g = H.wind_gusts_10m[idx], dr = H.wind_direction_10m[idx], tp = H.temperature_2m[idx];
+    wline = `${esc(t('바람'))} <b style="color:${k!=null?wxWindColor(k):'#5A5F66'}">${k!=null?nU(k.toFixed(0),'kt'):'—'}</b> ${dr!=null?esc(dirName(dr)):''}
+      · ${esc(tsub('돌풍 {g}', { g: g!=null ? g.toFixed(0) : '—' }))} · ${esc(t('파고'))} <b>${wv!=null?nU(wv.toFixed(1),'m'):'—'}</b>${tp!=null ? ' · ' + tp.toFixed(0) + '°' : ''}`;
   }
   const bline = '';
   bar.innerHTML = `
@@ -51918,11 +52006,17 @@ async function renderWeather(){
       // ★ 5.10 — 화살표 글자(➤)는 기본이 **오른쪽(동쪽)** 을 가리킨다. 여태 dir+180 으로 돌려서
       //   북풍(dir 0)이 서쪽(←)을 가리켰다 — 90° 어긋나 있었다. 바람이 **불어 가는 쪽** 은 dir+180 이고,
       //   ➤ 가 동쪽(90°)에서 시작하므로 거기서 90° 를 뺀다: dir+180-90 = dir+90.
-      rowArrow += `<div class="wc" onclick="wxSelHour(${ts})"><span class="wxarrow sm" style="transform:rotate(${dir+90}deg);color:${wxWindColor(k)}">&#10148;</span></div>`;
-      rowWind  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="background:${wxWindColor(k)}22;color:${wxWindColor(k)}">${k.toFixed(0)}</div>`;
-      rowGust  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${g.toFixed(0)}</div>`;
+      // ★ 5.58 — 예보를 못 받아 바람·기온이 빈 칸(null)이면 파고 칸처럼 「·」 로 둔다 (전에는 null.toFixed 로 화면이 통째로 무너졌다)
+      const tp = H.temperature_2m ? H.temperature_2m[i] : null;
+      rowArrow += (k != null && dir != null)
+        ? `<div class="wc" onclick="wxSelHour(${ts})"><span class="wxarrow sm" style="transform:rotate(${dir+90}deg);color:${wxWindColor(k)}">&#10148;</span></div>`
+        : `<div class="wc" onclick="wxSelHour(${ts})"></div>`;
+      rowWind  += (k != null)
+        ? `<div class="wc wcv" onclick="wxSelHour(${ts})" style="background:${wxWindColor(k)}22;color:${wxWindColor(k)}">${k.toFixed(0)}</div>`
+        : `<div class="wc wcv" onclick="wxSelHour(${ts})" style="color:#5A5F66">·</div>`;
+      rowGust  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${g != null ? g.toFixed(0) : '·'}</div>`;
       rowWave  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="color:${wv!=null?wxWaveColor(wv):'#5A5F66'}">${wv!=null?decL(wv.toFixed(1)):'·'}</div>`;
-      rowTemp  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${H.temperature_2m[i].toFixed(0)}°</div>`;
+      rowTemp  += `<div class="wc wcv dim" onclick="wxSelHour(${ts})">${tp != null ? tp.toFixed(0) + '°' : '·'}</div>`;
       const rn = (H.precipitation && H.precipitation[i] != null) ? H.precipitation[i] : null;
       rowRain  += `<div class="wc wcv" onclick="wxSelHour(${ts})" style="${wxRainStyle(rn)}">${(rn!=null && rn>0) ? decL(rn.toFixed(1)) : '·'}</div>`;
     }
@@ -52058,7 +52152,9 @@ async function renderWeather(){
               : tsub('{spot} 조위관측소({km}km)의 조화상수로 계산한 물때입니다.', { spot: nameFor(TA.spot.name), km: Math.round(TA.spot.dist) }))} <button class="mrbtn edt" onclick="tideInput()">${esc(t('직접 입력'))}</button></div>`:'')))}
       </div>`;
 
-    L.innerHTML = head + (wxAgeText() ? `<div class="mrnone" style="text-align:left;margin:4px 0 0">${esc(wxAgeText())}${(wxData && WX_BG[wxData.key]) ? ' · ' + esc(t('최신 예보를 불러오는 중…')) : ''}</div>` : '') + wxAlertBox()
+    L.innerHTML = head + ((W && W._noWx) ? `<div class="mrnone" style="text-align:left;margin:4px 0 0;padding:6px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">${esc(t('날씨 데이터를 받지 못했습니다'))}
+        <button class="minib blu" onclick="wxTryAt=0;wxData=null;renderWeather()">${esc(t('다시 시도'))}</button></div>` : '')
+      + (wxAgeText() ? `<div class="mrnone" style="text-align:left;margin:4px 0 0">${esc(wxAgeText())}${(wxData && WX_BG[wxData.key]) ? ' · ' + esc(t('최신 예보를 불러오는 중…')) : ''}</div>` : '') + wxAlertBox()
       + `<div id="boatWx"></div>`
       + `<div id="wxSelBar" class="selbar"></div>`
       + timeline

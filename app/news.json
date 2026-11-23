@@ -1,7 +1,207 @@
 {
- "updated": "2026-11-19T02:05:47.820Z",
- "candidates": 89,
+ "updated": "2026-11-23T01:11:28.183Z",
+ "candidates": 80,
  "items": [
+  {
+   "title": "Naples to host 38th America's Cup in 2027",
+   "t_ko": "2027년 38회 America's Cup, 나폴리에서 개최",
+   "s_ko": "2027년 38회 America's Cup이 나폴리에서 개최될 것으로 확정되었다.\n이탈리아 시드니 총영사관이 호주 국립해양박물관에서 개최 도시 지정을 축하하는 행사를 개최했다.\n호주팀 Team Australia가 25년 이상 만에 경기에 복귀할 예정이다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/301777/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T22:43:00.000Z"
+  },
+  {
+   "title": "Youth Portugal Grand Prix day 1",
+   "t_ko": "제3회 Youth Portugal Grand Prix 1일차: Vilamoura에서 개최, 북동풍 가변 조건",
+   "s_ko": "포르투갈 Vilamoura에서 개최된 청소년 대회 개막일, 4개 함대 모두 경주를 완료했다.\n맑은 날씨, 약한 바람 속에서 북서~북동풍이 가변했다.\n향후 경주 일정 중 바람 변화에 대한 경주 관리자 대응이 주목된다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301775/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T22:32:00.000Z"
+  },
+  {
+   "title": "Final Final: The TP52 that goes back to the Future",
+   "t_ko": "TP52 'Final Final': 차별화된 계통의 현대 경주정",
+   "s_ko": "TP52급 경주정 'Final Final'은 현대의 정교한 근해 경주 머신 계통과 다른 설계 방향을 대표한다.\n기존 TP52 진화 경로와 대비되는 설계 특성을 갖춘다.",
+   "cat": "장비",
+   "link": "https://www.sail-world.com/news/301771/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T18:02:19.000Z"
+  },
+  {
+   "title": "OK Dinghy SA State Championship overall",
+   "t_ko": "OK Dinghy SA 주(State) 챔피언십 2일차: 불안정한 바람으로 경주 중단",
+   "s_ko": "26/27 SA OK 디 State Championships 2일차에서 경주 위원 Malcolm Hughes가 모든 수단을 동원했으나 안정적인 바람을 확보하지 못해 오후 2시 30분에 경주를 중단했다.\n예보 가능성이 낮은 현지 미풍 조건에서 경주 운영의 어려움이 드러났다.",
+   "cat": "레이스",
+   "link": "https://www.sail-world.com/news/301772/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T13:37:00.000Z"
+  },
+  {
+   "title": "強風で3レース実施。ILCA全日本選手権2日目、各クラス首位争い",
+   "t_ko": "ILCA 전일본선수권 2일차: 강풍 속 3레이스 진행, 고등학생들의 치열한 경합",
+   "s_ko": "11월 22일 2일차 경기에서 20노트 근처까지 풍속 상승, 전복과 리타이어 다수 발생 속 3레이스 실시.\nILCA7에서 구로다 히로토가 연승으로 5레이스 중 2위를 컷하여 3연패에 한발 앞서감.\nILCA6 70척 중 가하라 겐키가 선두 유지, ILCA4에서 여성 선수 2인(아라이 가오루·아라이 카자나)이 1·2위 점유.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119457/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-22T13:26:45.000Z"
+  },
+  {
+   "title": "Ultim Banque Populaire XI returning to Lorient",
+   "t_ko": "105ft 트리마란 Ultim Banque Populaire XI, 대서양 중부 캡사이즈 후 로리앙으로 1300nm 예인",
+   "s_ko": "Route du Rhum 도중 중대서양에서 캡사이즈한 105ft 울팀급 트리마란이 프랑스 로리앙의 팀 베이스로 1300nm를 예인 중이다.\n선박의 복구 및 손상 평가가 진행될 예정이다.\n원양 경주 참가 시 극단적 기상 조건에서의 안전성과 선체 설계에 대한 고려가 필요함을 시사한다.",
+   "cat": "사고",
+   "link": "https://www.sail-world.com/news/301764/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T12:44:00.000Z"
+  },
+  {
+   "title": "WASZP now an official World Sailing Class",
+   "t_ko": "WASZP, 월드 세일링 공식 클래스 인정",
+   "s_ko": "World Sailing 위원회가 WASZP의 공식 클래스 지위를 2026년 11월 21일 승인했다.\n클래스는 2024년 12월 정식 신청 후 약 2년에 걸쳐 승인 절차를 완료했다.\n국제 규정 하에서 WASZP 대회의 공식성과 참가 자격이 강화된다.",
+   "cat": "산업",
+   "link": "https://www.sail-world.com/news/301761/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T10:52:58.000Z"
+  },
+  {
+   "title": "18ft Skiff NSW Championship Race 1",
+   "t_ko": "18ft 스키프 NSW 챔피언십 1R: Yandoo, 중반 캡사이즈 후 1위",
+   "s_ko": "디펜딩 챔피언 Yandoo 팀(Jack Macartney, Fang Warren, Lewis Brake)이 경주 중반 캡사이즈했음에도 불구하고 1R을 제압했다.\n경주는 시드니 하버에서 북동풍 20노트, 돌풍 조건에서 진행되었다.\n캡사이즈 복구와 조기 재진입 능력이 최종 승리의 핵심 요소였다.",
+   "cat": "사고",
+   "link": "https://www.sail-world.com/news/301756/?source=rss",
+   "source": "Sail-World",
+   "lang": "en",
+   "date": "2026-11-22T08:54:17.000Z"
+  },
+  {
+   "title": "冷たい西風が吹く西宮で開催、関西学生ヨット秋季選手権",
+   "t_ko": "관서학생 요트 추계선수권: 신팀 첫 대회, 최대 10노트 한냉풍 속 개최",
+   "s_ko": "11월 21~22일 효고현 신니시노미야 요트하버에서 관서학생 요트 추계선수권 개최.\n470급 43척, 스나이프급 50척 참가, 4학년 은퇴 후 신팀 첫 경기로 최대 10노트의 한냉한 서풍 조건.\n470급 유승은 유모토 신유/요코미조 다이, 스나이프급은 미우라 고토/다카모리 치카라로 모두 간사이가쿠인대 차지.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119444/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-22T08:41:44.000Z"
+  },
+  {
+   "title": "【パラオ】パラオの子どもたちが体験した伝統カヌーの世界",
+   "t_ko": "팔라우 아이들의 전통 카누 체험: 현지 세일링연맹 주관, 목재 카누 제작과 항해 프로그램",
+   "s_ko": "11월 13~14일 팔라우세일링연맹(PSA)이 주최한 전통카누 프로그램에서 초등학생·고등학생이 한 그루 통나무에서 선체를 깎고 팬다누스 잎을 엮어 돛을 제작.\n전통 카누는 타와 센터보드가 없어 일반 디딩이와 다른 조종 특성 경험.\n아메리크 초, 뮤운즈 초, 팔라우 고등학교 학생 참가로 태평양 세일링 문화 계승.",
+   "cat": "산업",
+   "link": "https://bulkhead.jp/2026/11/119426/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-22T07:26:02.000Z"
+  },
+  {
+   "title": "Who is junior sailing actually for?",
+   "t_ko": "청소년 세일링의 목적과 구조에 대한 비판적 검토",
+   "s_ko": "영국 코칭 전문가는 청소년 경주 체계가 아이들의 즐거움보다 올림픽 선수 발굴에 중점을 두고 있다고 지적한다.\n스포츠 의학 리뷰에 따르면 청소년 성적은 성인 올림픽 성적 편차의 2.2%만 설명한다.\n선주의 자녀가 세일링을 배울 때 프로그램 선택 기준을 재검토할 필요가 있다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/21/who-is-junior-sailing-actually-for/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-22T00:20:35.000Z"
+  },
+  {
+   "title": "全国から116艇が集結。山口・光で5年ぶりにILCA全日本選手権開幕",
+   "t_ko": "ILCA 전일본선수권 개막: 5년 만에 야마구치 미츠에서 개최, 116척 참가",
+   "s_ko": "11월 21일 야마구치현 미츠시에서 ILCA 전일본선수권 개막, ILCA4 19척·ILCA6 70척·ILCA7 27척 총 116척 참가.\n첫날은 불안정한 바람으로 클라우드 이동이 빨라 풍향이 크게 변하고, 미풍에서 강풍까지 급격한 변화 속에 2레이스 실시.\n ILCA6 고등학생 대전이 주목: 아시아게임 일본대표 모리 이쿠토, 인터하이 우승 카하라 겐키, JOC 주니어올림픽컵 우승 이노우에 코타 등의 경쟁.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119400/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-21T11:08:03.000Z"
+  },
+  {
+   "title": "A humbling stint on the foredeck",
+   "t_ko": "항해술 칼럼: 선미 담당자의 선수 전환 경험",
+   "s_ko": "주로 선미(드라이버, 메인 트리머, 택티셔)에서 근무하는 선수가 선수(보우) 담당자로 복귀한 경험을 기술한다.\n25노트 돌풍 30노트 조건에서 대칭 스피네이커를 호이스트하며 선수 갑판 작업의 물리적·심리적 부담을 직면했다.\n선부(보우) 경험 회귀는 전체 팀 역량 향상과 역할별 이해도를 높인다.",
+   "cat": "항해술",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/20/a-humbling-stint-on-the-foredeck/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-21T00:38:14.000Z"
+  },
+  {
+   "title": "Sailfaster with Justin Callahan",
+   "t_ko": "팟캐스트 'Sailfaster': Harvard 5회 전국 챔피언 Justin Callahan의 레이싱 사고방식",
+   "s_ko": "Harvard 대학 5회 전국 챔피언 Justin Callahan이 경주 중 차별화된 사고 방식을 공개한다.\n윈드워드 마크 도달 전부터 전술을 계획하고, 다운윈드 구간에서 기회 창출, 위험 회피 판단 타이밍을 강조한다.\n경주자의 사고 프레임이 성적 차이를 만드는 핵심 요소임을 시사한다.",
+   "cat": "항해술",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/20/sailfaster-with-justin-callahan/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-20T18:36:58.000Z"
+  },
+  {
+   "title": "Szymon Sikora wins Image Award 2026",
+   "t_ko": "폴란드 사진작가 Szymon Sikora, Pantaenius Yacht Racing Image Award 2026 수상",
+   "s_ko": "폴란드 사진작가 Szymon Sikora가 세일링 국제 사진 경진대회 17회 Pantaenius Yacht Racing Image Award에서 우승했다.\n수상작은 폴란드 Kolobrzeg의 Offshore Power Race 중 태양 일식을 배경으로 한 경주정 실루엣 이미지다.\n152명의 사진작가(30개국)가 참여한 사상 최대 규모 작품 수를 기록했다.",
+   "cat": "기타",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/20/szymon-sikora-wins-image-award-2026/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-20T16:36:37.000Z"
+  },
+  {
+   "title": "オーストラリア・メルボルン開催、〈月光〉J/24世界選手権レポート",
+   "t_ko": "J/24 세계선수권 참가기: 멜버른에서 강풍 속 항로권 프로테스트로 실격",
+   "s_ko": "오스트레일리아 멜버른에서 열린 J/24 세계선수권(10개국 38척)에 일본팀 3척이 참가했으나, 첫날 강풍(20~30노트)에서 1위, 2위로 출발한 후 항로권 분쟁으로 실격 처리됨.\n프리월드 대회에서 2일간 4레이스 우승으로 충분한 준비가 되었으나, 강풍과 고파도에서 브로칭과 리타이어가 연속 발생.\n이후 풍속이 10노트대에서 5노트 이하로 급격히 변하는 조건 경험.",
+   "cat": "레이스",
+   "link": "https://bulkhead.jp/2026/11/119380/",
+   "source": "BULKHEAD JAPAN",
+   "lang": "ja",
+   "date": "2026-11-20T08:30:29.000Z"
+  },
+  {
+   "title": "Safe mooring practices for winter gales",
+   "t_ko": "겨울 폭풍 대비 안전 계류 방법",
+   "s_ko": "영국 항만에서 70mph 이상의 겨울 폭풍 대비를 위한 항만청 체크리스트를 제시한다.\n스프레이후드, 콕핏 커버 등 천 소품의 고정, 돛 덮개의 프래핑(래핑), 헤드세일 정리 등이 권장된다.\n선주는 계절별로 계류 설정을 조정하고 예인력, 계류줄 상태를 미리 점검해야 한다.",
+   "cat": "안전",
+   "link": "https://www.pbo.co.uk/seamanship/safe-mooring-practices-for-winter-gales-107892",
+   "source": "PBO",
+   "lang": "en",
+   "date": "2026-11-20T05:30:13.000Z"
+  },
+  {
+   "title": "Studying technology in offshore racing",
+   "t_ko": "원양 경주 기술 연구: ORC·IRC 공동 태스크포스 출범",
+   "s_ko": "ORC와 IRC가 원양 경주의 자동화 장비와 소수 승무원 항해에 대한 영향을 연구하는 공동 태스크포스를 구성했다.\n기술 위원회, 등급 사무소, 항해장관청, 선주, 단독 항해자 대표와 장비 제조사가 참여한다.\n향후 등급 시스템과 경주 운영 기준이 변경될 가능성이 있다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/19/studying-technology-in-offshore-racing/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-19T21:35:55.000Z"
+  },
+  {
+   "title": "College offshore regatta comes west",
+   "t_ko": "대학 원양 경주, 태평양 북서부로 확대: PNWIOR 첫 개최",
+   "s_ko": "2026년 11월 14~15일 시애틀 Puget Sound에서 첫 Pacific Northwest Intercollegiate Offshore Regatta(PNWIOR)가 9개 대학팀의 J/105 경주로 개최되었다.\n University of Washington Huskies가 4경주 중 3승으로 우승했으며, 새로운 Hamachi Cup을 수상했다.\n동부(일리노이, 뉴욕) IOR 시리즈와 함께 미국 원양 세일링의 미래 세대 양성 기반이 구축되고 있다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/19/college-offshore-regatta-comes-west/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-19T21:30:57.000Z"
+  },
+  {
+   "title": "Cole Brauer: Doing things differently",
+   "t_ko": "Cole Brauer와 Rosalin Kuiper, HERA Ocean Racing 창설",
+   "s_ko": "2023~24 Global Solo Challenge 첫 미국 여성 단독 세계 일주 항해자 Cole Brauer(미국)와 Rosalin Kuiper(네덜란드)가 HERA Ocean Racing을 설립했다.\n두 선수는 2024년 Rolex Yachtswoman of the Year를 수상한 경력을 보유하고 있다.\n여성 주도의 국제 원양 경주 팀 출범은 업계 다양성 확대를 의미한다.",
+   "cat": "산업",
+   "link": "https://www.sailingscuttlebutt.com/2026/11/19/cole-brauer-doing-things-differently/",
+   "source": "Scuttlebutt",
+   "lang": "en",
+   "date": "2026-11-19T20:23:28.000Z"
+  },
   {
    "title": "Big guns will gather for the RORC Caribbean 600",
    "t_ko": "2027 RORC 카리브해 600 대회: 고성능 선단 집결",
@@ -171,156 +371,6 @@
    "source": "BULKHEAD JAPAN",
    "lang": "ja",
    "date": "2026-11-17T06:11:23.000Z"
-  },
-  {
-   "title": "What will World Sailing decide in 2026?",
-   "t_ko": "2026 월드세일링 연차대회, 칭다오서 개최…올림픽 항로·지속가능성 의제 결정",
-   "s_ko": "11월 16-21일 중국 칭다오에서 400명 이상의 국제 대표단이 참석한 월드세일링 연차대회가 열린다.\n올림픽 세일링 참가 조건, 장애인 포함 전략, 2030년 지속가능성 의제 등 세일링 스포츠의 전략적 방향을 결정하는 핵심 회의다.\n각국 수협과 클래스 협회, 선수, 대회 운영진, 해양산업 대표들이 함께 규정 및 제도 변화를 논의한다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/15/what-will-world-sailing-decide-in-2026/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-15T20:47:34.000Z"
-  },
-  {
-   "title": "World Sailing needs to do some governing",
-   "t_ko": "몬스 클래스 여성 월드 챔피언 논란…월드세일링의 거버넌스 강화 촉구",
-   "s_ko": "2026 몬스 클래스 여성 월드 챔피언으로 인정받은 해티 로저스는 경쟁한 다른 여성 선수가 단 1명뿐이었다.\n공식적인 여성 월드 타이틀이 존재하지 않음에도 불구하고 클래스가 소셜미디어에서 이를 공식 기록으로 선포했다.\n월드세일링이 이러한 거버넌스 문제를 보다 엄격하게 관리해야 한다는 지적이 제기되고 있다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/15/world-sailing-needs-to-do-some-governing/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-15T20:35:13.000Z"
-  },
-  {
-   "title": "Achille Nebout wins the Route du Rhum",
-   "t_ko": "아실 느부 루트 뒤 롬 레이스 우승…과들루프 포앙타피트르 도착",
-   "s_ko": "아실 느부가 루트 뒤 롬 레이스에서 우승하여 과들루프 포앙타피트르 피니시라인에 도달했다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301601/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-15T20:21:00.000Z"
-  },
-  {
-   "title": "Australia’s mission to win America’s Cup",
-   "t_ko": "호주의 아메리카스컵 위업…1983년 윙드킬과 무적함대 격파의 유산",
-   "s_ko": "1983년 아메리카스컵에서 혁신적 윙드킬을 장착한 호주 II가 뉴포트에서 미국 방어팀의 132년 우승 기록을 격파했다.\n당시 항법사로 참여한 그랜트 심머는 초기 3-1 패배 상황에서 마지막 3경기 연승으로 전환했던 경험을 회상한다.",
-   "cat": "기타",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/15/australias-mission-to-win-americas-cup/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-15T19:00:30.000Z"
-  },
-  {
-   "title": "Expert Service Means More Life For Your Sails",
-   "t_ko": "세일 정기 점검의 중요성…손상 조기 발견으로 수명 연장",
-   "s_ko": "모든 세일은 교체 여부와 관계없이 정기적 점검이 필요하다.\n전문 검사를 통해 마모, 바뀬(batten) 포켓 손상, 마찰 자국 등 다양한 손상을 조기에 발견하고 수리할 수 있다.\n세일 수명 연장과 성능 향상을 위해 정기적 서비스 일정을 계획하는 것이 권장된다.",
-   "cat": "정비",
-   "link": "https://www.sail-world.com/news/301596/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-15T14:30:00.000Z"
-  },
-  {
-   "title": "2027 Class Calendar Announced for RS2000 Sailors",
-   "t_ko": "RS2000 클래스 2027년 일정 발표…리전널 시리즈·챔피언십·신규 사건 개최",
-   "s_ko": "RS2000 클래스의 2027년 캘린더가 공개되었다.\n2개 리전널 시리즈, 4개 클래스 챔피언십, 청소년 대상 신규 이벤트로 구성된다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301597/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-15T12:00:00.000Z"
-  },
-  {
-   "title": "NeverSoft automatic RIB inflation system launched",
-   "t_ko": "자동 공기압 관리 밸브 '네버소프트' 론칭…고무보트 안전성 강화",
-   "s_ko": "바튼 마린이 METSTRADE 2026에서 자동 공기압 관리 밸브 캡 '네버소프트' 시리즈를 공개했다.\n고무보트의 자동 압력 조절로 안전성을 높이는 신제품이다.",
-   "cat": "장비",
-   "link": "https://www.sail-world.com/news/301575/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-15T09:00:00.000Z"
-  },
-  {
-   "title": "市橋愛生／後藤凛子が49erFXジュニア欧州選手権で優勝！",
-   "t_ko": "49er FX 주니어 유럽선수권에서 일본 선수팀 우승",
-   "s_ko": "11월 10~14일 포르투갈 빌라모우라에서 열린 49er FX 주니어 유럽선수권에서 일본의 이치하시 아이오·고토 린코 조가 우승했다.\n초기 2일간은 폭풍우로 경기 취소, 13일부터 10~20노트 바람에서 4레이스 실시했다.\n최종일 스위스 선수팀과 동점(23점)으로 끝나 타이브레이크를 통해 우승을 확정했다.",
-   "cat": "레이스",
-   "link": "https://bulkhead.jp/2026/11/119247/",
-   "source": "BULKHEAD JAPAN",
-   "lang": "ja",
-   "date": "2026-11-14T23:59:57.000Z"
-  },
-  {
-   "title": "Is this bringing Corinthian Confusion?",
-   "t_ko": "\"유급 참가자 증가로 코린시안 정의 모호해진다\"…클럽 세일링의 혼란 심화",
-   "s_ko": "레크리에이션 세일링에 유급 참가자가 늘어나면서 코린시안(아마추어) 정의가 모호해지고 있다.\n일반적으로 코린시안은 세일링 비용을 부담하고, 프로는 보수를 받는 구분이 있었으나, 스폰서 지원·상금·식사 지원 등 '간접 이익'의 판단 기준이 불명확해지고 있다.\n클럽 레벨에서 비용 구조의 차이가 경쟁의 공정성 논란을 야기할 수 있다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/14/is-this-bringing-corinthian-confusion/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-14T18:47:31.000Z"
-  },
-  {
-   "title": "No party too far for ice sailors",
-   "t_ko": "핀란드 무오니오서 2026-27 아이스요팅 시즌 시작…북극권 선수들의 먼 여정",
-   "s_ko": "핀란드와 스웨덴 아이스요트 선수들이 북극권 핀란드 라플란드 무오니오에서 2026-27 시즌을 개시했다.\n스웨덴 스톡홀름에서 악천후를 헤치며 17시간을 운전하는 등 양호한 빙상 환경을 위해 먼 거리를 이동한다.",
-   "cat": "기타",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/14/no-party-too-far-for-ice-sailors/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-14T18:06:33.000Z"
-  },
-  {
-   "title": "Inside AC: Can an old boat win?",
-   "t_ko": "2027 아메리카스컵, 호주팀의 '낡은 배 재활용' 전략…새로운 활 장착·전면 분해 후 재건",
-   "s_ko": "호주팀이 2021년 아메리카스컵 우승선 Te Rehutai를 기반으로 새 활을 장착하고 완전히 분해한 후 나폴리 2027 대회용으로 재건하고 있다.\n글렌 애쉬비 선장은 낡은 선체도 신기술 적용으로 경쟁력을 갖출 수 있음을 설명했다.\n뉘질랜드의 성공 비결과 다섯 번째 승무원의 역할 변화 등 기술적 개선사항을 공개했다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/14/inside-ac-can-an-old-boat-win/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-14T16:22:22.000Z"
-  },
-  {
-   "title": "2027 Newport to Ensenada Race registration open",
-   "t_ko": "2027 뉴포트-엔세나다 요트 레이스 등록 개시…4월 23-25일 개최",
-   "s_ko": "제79회 뉴포트-엔세나다 국제 요트 레이스 등록이 2027년 4월 23-25일 대회를 위해 개시되었다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301580/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-14T14:36:00.000Z"
-  },
-  {
-   "title": "WASZP Games 2027 NoR Published",
-   "t_ko": "2027 WASZP 게임즈 공지사항 발행…갈라호 북부서 6월-7월 개최",
-   "s_ko": "2027 WASZP 게임즈 공지사항이 발행되었다.\n이탈리아 갈라호 북부에서 6월 28-7월 1일 주니어·마스터스 부문, 7월 3-7일 오픈 챔피언십이 열린다.\n레이스허브에서 12월 1일부터 참가 신청을 받는다.",
-   "cat": "레이스",
-   "link": "https://www.sail-world.com/news/301586/?source=rss",
-   "source": "Sail-World",
-   "lang": "en",
-   "date": "2026-11-14T13:15:08.000Z"
-  },
-  {
-   "title": "ISCA Worlds: “It’s never like this”",
-   "t_ko": "ISCA 월즈 '이례적 무풍 상황'…바하마 날씨 시스템으로 경기 1일만 진행",
-   "s_ko": "미국령 버진아일랜드 세인트크로이에서 열린 ISCA 클래스 월드 시리즈는 7일간 4개 타이틀을 겨루기로 계획되었으나, 바하마 인근 날씨 시스템으로 통상적인 북동 무역풍이 소실되어 경기를 중흘에 1일만 진행했다.\n여성 32척 부문에서 페루의 타니아 지머만이 1점 차로 우승했다.",
-   "cat": "레이스",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/13/isca-worlds-its-never-like-this/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-13T19:13:50.000Z"
-  },
-  {
-   "title": "Rustler 36: Golden Globe’s go-to boat",
-   "t_ko": "러스틀러 36, 골든글로브 레이스의 실용선박 선택지로 주목…역대 우승·상위권 다수 진출",
-   "s_ko": "1980년대 초 팔머스 롱킬 설계의 러스틀러 36은 2018년 우승, 2022년 2위, 현재 2026-27 레이스 선두를 차지하고 있다.\n비용을 억제하기 위해 1988년 이전 설계의 32-36피트 생산 선박을 요구하는 골든글로브 레이스의 요구사항을 충족한다.\n9월 6일 출발 16척 중 4척이 러스틀러 36을 선택했으며, 10주 후 선두와 2위, 계속 경쟁 중인 선박이 모두 이 선형이다.",
-   "cat": "산업",
-   "link": "https://www.sailingscuttlebutt.com/2026/11/13/rustler-36-golden-globes-go-to-boat/",
-   "source": "Scuttlebutt",
-   "lang": "en",
-   "date": "2026-11-13T17:58:14.000Z"
   }
  ]
 }

@@ -27759,7 +27759,7 @@ function lkAdd(rect, zone, label){
 // 도형은 그림일 뿐이고, 물품은 수납칸에만 들어간다.
 // 앱 버전. 여기 한 곳만 고치면 화면 표시가 따라온다.
 // sw.js 의 캐시 이름(baetnil-x.y)과 같아야 한다 — 검사에서 확인한다.
-const APP_VER = '5.59';
+const APP_VER = '5.60';
 // 수납칸 모양. 좌표(x,y,w,h)는 그대로 두고 겉모습만 바꾼다 —
 // 옛 칸은 shape 가 없으므로 저절로 네모가 된다.
 const LK_SHAPES = [
@@ -32866,16 +32866,29 @@ function openMR(kind, id){
     // ★ 돌고 있는 동안에는 「지금 껐습니다」 하나만 크게 보여 준다.
     //   그 순간 사람이 할 일은 그것뿐이다. 가동시간 칸을 같이 보여 주면 손으로 적으려 든다.
     const 도는중 = runOn(it);
+    // ★★★ 5.60 — 정지 시각은 돌고 있을 때도 적을 수 있다 (사장님 2026-11-27:
+    //   「나중에 3시간 돌렸다고 쓰고 싶어도 못쓰게 되있네」). 끄는 것을 잊고 하루 뒤에 열면
+    //   「지금 껐습니다」 는 지금 시각으로만 끈다. Clockify 모바일도 돌고 있는 기록을 열면
+    //   시작·끝 시각을 바로 고친다. 우리 항해일지도 항해 중에 도착 시각 칸이 늘 열려 있다 — 같은 꼴.
+    //   정지 시각을 넣으면 그 시각으로 끝나고 가동시간이 계산된다. 가동시간 칸은 여전히 안 보인다.
+    const 끝힌트 = unlocked ? `<span class="mrm" style="flex:1;color:#7b8794">${
+              esc(t('입력하면 가동 시간이 자동으로 계산됩니다'))}</span>` : '';
+    const 날짜칸 = (lbl, key, val, min) => `<div class="mrrow"><span class="mrlbl">${esc(t(lbl))}</span>${unlocked
+          ? `<input type="date" value="${esc(String(val || ''))}"${min ? ` min="${esc(min)}"` : ''} style="flex:1" onchange="runTimeSet('${key}', this.value)">`
+          : `<b class="mrv">${esc(String(val || '—'))}</b>`}</div>`;
     body = 도는중
       ? runOnBox(it)
-        + tf('날짜','date',it.date,'date','')
+        + 날짜칸('날짜', 'date', it.date)
         + hmRow('시동 시각', it.time, "v => runTimeSet('time', v)")
-      : tf('날짜','date',it.date,'date','')
+        + hmRow('정지 시각', '', "v => runEndAt(v)", 끝힌트)
+      : 날짜칸('날짜', 'date', it.date)
         + durRow('가동시간', 'hours', it.hours)
         + hmRow('시동 시각', it.time, "v => runTimeSet('time', v)")
-        + hmRow('정지 시각', it.endTime, "v => runTimeSet('endTime', v)",
-            unlocked ? `<span class="mrm" style="flex:1;color:#7b8794">${
-              esc(t('입력하면 가동 시간이 자동으로 계산됩니다'))}</span>` : '')
+        + hmRow('정지 시각', it.endTime, "v => runTimeSet('endTime', v)", 끝힌트)
+        // ★★★ 5.60 — 끈 날짜. 「지금 껐습니다」 를 며칠 뒤에 누르면 그날로 들어가 버려서,
+        //   정지 시각만 고쳐서는 가동시간이 맞지 않았다. 항해일지 도착 날짜와 같은 꼴 —
+        //   정지 시각이 있을 때만 보인다. 시동 날짜보다 앞은 고를 수 없다.
+        + (it.endTime ? 날짜칸('종료일', 'endDate', it.endDate || it.date, it.date) : '')
         + (unlocked && !it.endTime && !it.hours
             ? `<div class="mrrow edt"><button class="mrbtn" onclick="runResume('${jsq(it.id)}')">${
                  esc(t('아직 가동 중입니다'))}</button></div>` : '');
@@ -45426,6 +45439,26 @@ function runStop(id){
   if(m != null) tell(tsub('엔진을 껐습니다. 가동 시간 {v}', { v: durText(m / 60) }), { kind:'good' });
 }
 // 다시 켜기 — 잘못 껐을 때
+// ★★★ 5.60 — 돌고 있는 기록에 정지 시각을 넣으면 그 시각으로 끝낸다 (끄는 것을 잊었을 때).
+//   끈 날짜는 시동 뒤 처음 오는 그 시각 — 시동 21:47 · 정지 00:47 이면 다음 날 00:47.
+//   하루를 넘겨 돌렸으면 끈 뒤 「종료일」 에서 고친다.
+function runEndAt(v){
+  if(!unlocked) return;
+  const it = getMR('run', mrOpenId); if(!it || !runOn(it)) return;
+  const end = hm(v || '');
+  if(!/^\d{2}:\d{2}$/.test(end)) return;
+  const a = runAt(it.date, it.time), b = runAt(it.date, end);
+  it.on = false;
+  it.endTime = end;
+  it.endDate = (a && b && b < a) ? addDay(it.date) : (it.date || today());
+  runSync(it);
+  saveMR();
+  if(typeof schedulePush === 'function') schedulePush();
+  renderFuel();
+  openMR('run', it.id);
+  const m = runMins(it);
+  if(m != null) tell(tsub('엔진을 껐습니다. 가동 시간 {v}', { v: durText(m / 60) }), { kind:'good' });
+}
 function runResume(id){
   if(!unlocked) return;
   const it = runs.find(x => String(x.id) === String(id));
@@ -45438,7 +45471,11 @@ function runResume(id){
 // 시각 칸을 고치면 가동시간을 다시 셈한다
 function runTimeSet(key, v){
   const it = getMR('run', mrOpenId); if(!it) return;
+  // ★ 5.60 — 끈 날짜는 시동 날짜보다 앞일 수 없다 (칸에 min 이 있지만 손으로 친 값도 막는다)
+  if(key === 'endDate' && (!v || (it.date && v < it.date))){ openMR('run', mrOpenId); return; }
   it[key] = v;
+  // 시동 날짜를 끈 날짜 뒤로 옮기면 끈 날짜도 따라간다
+  if(key === 'date' && it.endDate && v && it.endDate < v) it.endDate = v;
   runSync(it);
   saveMR();
   if(typeof schedulePush === 'function') schedulePush();
